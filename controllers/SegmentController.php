@@ -1,0 +1,189 @@
+<?php
+
+namespace app\controllers;
+
+use app\models\Projects;
+use Yii;
+use app\models\Segment;
+use yii\data\ActiveDataProvider;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+
+/**
+ * SegmentController implements the CRUD actions for Segment model.
+ */
+class SegmentController extends AppController
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Segment models.
+     * @return mixed
+     */
+    public function actionIndex($id)
+    {
+        $project = Projects::findOne($id);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => Segment::find()->where(['project_id' => $id]),
+        ]);
+
+        $newModel = new Segment();
+        $newModel->project_id = $id;
+        $newModel->creat_date = date('Y:m:d');
+        $newModel->plan_gps = date('Y:m:d', (time() + 3600*24*30));
+        $newModel->plan_ps = date('Y:m:d', (time() + 3600*24*60));
+        $newModel->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
+        $newModel->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
+        $newModel->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
+        $newModel->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
+
+        if ($newModel->load(Yii::$app->request->post()) && $newModel->save()){
+            if ($project->save()){
+                $project->update_at = date('Y:m:d');
+                return $this->redirect(['index', 'id' => $newModel->project_id]);
+            }
+        }
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+            'project' => $project,
+            'newModel' => $newModel,
+        ]);
+    }
+
+    public function actionRoadmap($id)
+    {
+        $project = Projects::findOne($id);
+
+        $models = Segment::find()->where(['project_id' => $id])->all();
+
+        return $this->render('roadmap', [
+            'project' => $project,
+            'models' => $models,
+        ]);
+    }
+
+    /**
+     * Displays a single Segment model.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView($id)
+    {
+        $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+            'project' => $project,
+        ]);
+    }
+
+    /**
+     * Creates a new Segment model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate($id)
+    {
+        $model = new Segment();
+        $model->project_id = $id;
+
+        $model->creat_date = date('Y:m:d');
+        $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
+        $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
+        $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
+        $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
+        $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
+        $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
+
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $project->update_at = date('Y:m:d');
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($project->save()){
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'project' => $project,
+        ]);
+    }
+
+    /**
+     * Updates an existing Segment model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $project->update_at = date('Y:m:d');
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($project->save()) {
+                Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+            'project' => $project,
+        ]);
+    }
+
+    /**
+     * Deletes an existing Segment model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDelete($id)
+    {
+        $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
+        $project->update_at = date('Y:m:d');
+
+        if ($project->save()) {
+            Yii::$app->session->setFlash('success', "Сегмент {$this->findModel($id)->name} удален");
+            $this->findModel($id)->delete();
+            return $this->redirect(['index', 'id' => $project->id]);
+
+        }
+    }
+
+    /**
+     * Finds the Segment model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Segment the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Segment::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+}

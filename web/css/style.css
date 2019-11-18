@@ -1,0 +1,14 @@
+.popap_fast
+{
+    display: none;
+}
+.popap_fast.active
+{
+    display: block;
+}
+.cross-out
+{
+    cursor: pointer;
+    font-size: 24px;
+    margin-top: 25px;
+}
