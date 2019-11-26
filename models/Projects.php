@@ -123,9 +123,9 @@ class Projects extends ActiveRecord
         return [
             [['user_id', 'created_at', 'update_at', 'project_name'], 'required'],
             [['user_id', 'invest_amount'], 'integer'],
-            [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date'], 'safe'],
+            [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'patent_name', 'core_rid', 'layout_technology', 'files'], 'string'],
-            [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name',], 'string', 'max' => 255],
+            [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5],
         ];
     }
@@ -156,6 +156,8 @@ class Projects extends ActiveRecord
             'invest_name' => 'Инвестор',
             'invest_date' => 'Дата получения инвестиций',
             'invest_amount' => 'Сумма инвестиций',
+            'date_of_announcement' => 'Дата анонсирования проекта',
+            'announcement_event' => 'Мероприятие, на котором проект анонсирован впервые',
             'files' => 'Презентационные материалы',
         ];
     }

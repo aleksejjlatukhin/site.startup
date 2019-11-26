@@ -62,7 +62,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
                     'model' => $modelsConcept[0],
                     'formId' => 'dynamic-form',
                     'formFields' => [
-                        'description',
+                        'name',
                     ],
                 ]); ?>
 
@@ -83,7 +83,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
                                 </div>
 
                                 <?= $form->field($modelsConcept, "[{$i}]name", [
-                                    'template' => '<div class="col-md-3">{label}</div><div class="col-md-8">{input}</div><div class="col-md-1">{error}</div>'
+                                    'template' => '<div class="col-md-10">{input}</div><div class="col-md-2">{error}</div>'
                                 ])->textInput(['maxlength' => true])?>
 
                             </div><!-- .row -->
@@ -189,6 +189,18 @@ use wbraganca\dynamicform\DynamicFormWidget;
     ]) ?>
 
     <?= $form->field($model, 'invest_amount')->textInput() ?>
+
+    <?= $form->field($model, 'date_of_announcement')->widget(\yii\jui\DatePicker::class, [
+        'dateFormat' => 'yyyy-MM-dd',
+        //'inline' => true,
+        'clientOptions' => [
+            'autoclose' => true,
+            'format' => 'yyyy-MM-dd'
+        ],
+        //'language' => 'ru',
+    ]) ?>
+
+    <?= $form->field($model, 'announcement_event')->textInput() ?>
 
     <div class="container row">
         <div class="pull-left">

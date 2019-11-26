@@ -43,13 +43,6 @@ class SegmentController extends AppController
 
         $newModel = new Segment();
         $newModel->project_id = $id;
-        $newModel->creat_date = date('Y:m:d');
-        $newModel->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-        $newModel->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-        $newModel->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-        $newModel->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-        $newModel->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-        $newModel->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
 
         if ($newModel->load(Yii::$app->request->post()) && $newModel->save()){
             if ($project->save()){
@@ -77,6 +70,20 @@ class SegmentController extends AppController
         ]);
     }
 
+    public function actionOneRoadmap($id)
+    {
+        $model = Segment::findOne($id);
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+        return $this->render('one-roadmap', [
+            'model' => $model,
+            'project' => $project,
+        ]);
+
+    }
+
+
+
     /**
      * Displays a single Segment model.
      * @param string $id
@@ -97,18 +104,10 @@ class SegmentController extends AppController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($id)
+/*    public function actionCreate($id)
     {
         $model = new Segment();
         $model->project_id = $id;
-
-        $model->creat_date = date('Y:m:d');
-        $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-        $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-        $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-        $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-        $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-        $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
 
         $project = Projects::find()->where(['id' => $model->project_id])->one();
         $project->update_at = date('Y:m:d');
@@ -123,7 +122,7 @@ class SegmentController extends AppController
             'model' => $model,
             'project' => $project,
         ]);
-    }
+    }*/
 
     /**
      * Updates an existing Segment model.
@@ -135,11 +134,29 @@ class SegmentController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
         $project = Projects::find()->where(['id' => $model->project_id])->one();
         $project->update_at = date('Y:m:d');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if ($project->save()) {
+
+                if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age'] &&
+                    $_POST['Segment']['income'] && $_POST['Segment']['quantity'] && $_POST['Segment']['market_volume'])
+                {
+                    if (empty($model->creat_date))
+                    {
+                        $model->creat_date = date('Y:m:d');
+                        $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
+                        $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
+                        $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
+                        $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
+                        $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
+                        $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
+                        $model->save();
+                    }
+                }
+
                 Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
                 return $this->redirect(['view', 'id' => $model->id]);
             }
@@ -164,7 +181,7 @@ class SegmentController extends AppController
         $project->update_at = date('Y:m:d');
 
         if ($project->save()) {
-            Yii::$app->session->setFlash('success', "Сегмент {$this->findModel($id)->name} удален");
+            Yii::$app->session->setFlash('error', "Сегмент {$this->findModel($id)->name} удален");
             $this->findModel($id)->delete();
             return $this->redirect(['index', 'id' => $project->id]);
 

@@ -1,3 +1,11 @@
+.open_fast
+{
+    display: block;
+}
+.open_fast.active
+{
+    display: none;
+}
 .popap_fast
 {
     display: none;

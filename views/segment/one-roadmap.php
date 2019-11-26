@@ -7,10 +7,11 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Дорожная карта сегментов';
+$this->title = 'Дорожная карта сегмента "' . $model->name . '"';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['index', 'id' => $project->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['segment/view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="segment-index">
@@ -50,8 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </thead>
         <tbody>
         <? $j = 0;?>
-        <?php foreach ($models as $model) : ?>
-        <?php $j++;?>
+            <?php $j++;?>
             <tr class="text-center">
                 <th scope="row"><?= $j; ?></th>
 
@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }?></td>
 
                 <td><? if (!empty($model->fact_gps)){
-                    echo date("d.m.y", strtotime($model->fact_gps));
+                        echo date("d.m.y", strtotime($model->fact_gps));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_ps)){
@@ -119,9 +119,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
             </tr>
-        <?php endforeach; ?>
         </tbody>
     </table>
 
 
 </div>
+

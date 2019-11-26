@@ -16,9 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'field_of_activity')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'field_of_activity')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'sort_of_activity')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'sort_of_activity')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'age')->textInput(['maxlength' => true]) ?>
 

@@ -33,10 +33,11 @@ class Segment extends \yii\db\ActiveRecord
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
-    public function getRoadmap()
+    public function getInterview()
     {
-        return $this->hasOne(Roadmap::class, ['segment_id' => 'id']);
+        return $this->hasOne(Interview::class, ['segment_id' => 'id']);
     }
+    
 
     /**
      * {@inheritdoc}
@@ -48,7 +49,6 @@ class Segment extends \yii\db\ActiveRecord
             [['project_id'], 'integer'],
             [['field_of_activity', 'sort_of_activity', 'add_info'], 'string'],
             [['name', 'age', 'income', 'quantity', 'market_volume'], 'string', 'max' => 255],
-            [['creat_date', 'plan_gps'], 'required'],
             [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
     }

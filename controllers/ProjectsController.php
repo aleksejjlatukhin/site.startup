@@ -101,13 +101,13 @@ class ProjectsController extends AppController
                     if ($flag = $model->save(false)) {
                         foreach ($modelsConcept as $modelsConcept) {
                             $modelsConcept->project_id = $model->id;
-                            $modelsConcept->creat_date = date('Y:m:d');
+                            /*$modelsConcept->creat_date = date('Y:m:d');
                             $modelsConcept->plan_gps = date('Y:m:d', (time() + 3600*24*30));
                             $modelsConcept->plan_ps = date('Y:m:d', (time() + 3600*24*60));
                             $modelsConcept->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
                             $modelsConcept->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
                             $modelsConcept->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-                            $modelsConcept->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
+                            $modelsConcept->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));*/
 
                             if (! ($flag = $modelsConcept->save(false))) {
                                 $transaction->rollBack();
@@ -194,7 +194,7 @@ class ProjectsController extends AppController
                         }
                         foreach ($modelsConcept as $modelsConcept) {
                             $modelsConcept->project_id = $model->id;
-                            if (empty($modelsConcept->creat_date)){
+                            /*if (empty($modelsConcept->creat_date)){
                                 $modelsConcept->creat_date = date('Y:m:d');
                                 $modelsConcept->plan_gps = date('Y:m:d', (time() + 3600*24*30));
                                 $modelsConcept->plan_ps = date('Y:m:d', (time() + 3600*24*60));
@@ -202,7 +202,7 @@ class ProjectsController extends AppController
                                 $modelsConcept->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
                                 $modelsConcept->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
                                 $modelsConcept->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
-                            }
+                            }*/
                             if (! ($flag = $modelsConcept->save(false))) {
                                 $transaction->rollBack();
                                 break;

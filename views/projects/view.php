@@ -81,6 +81,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'invest_amount',
 
             [
+                'attribute' => 'date_of_announcement',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'announcement_event',
+
+            [
                 'attribute' => 'created_at',
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
