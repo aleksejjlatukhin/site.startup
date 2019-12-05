@@ -18,9 +18,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
 ?>
+
+<div class="stages">
+    <div class="stage active"><span>Разработка программы ПИ</span></div>
+    <div class="stage"><span>Проведение ПИ</span></div>
+    <div class="stage"><span>Выводы по ГПС</span></div>
+    <div class="stage"><span>Отзыв эксперта</span></div>
+</div>
+
 <div class="interview-view">
 
-    <h3>Постановка задачи</h3>
+    <h3>Данные сегмента</h3>
 
     <?= DetailView::widget([
         'model' => $segment,
@@ -63,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <div class="d-inline p-2 bg-success" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Примерный список вопросов для проведения интервью</div>
+    <h4><u>Примерный список вопросов для проведения интервью</u></h4 class="d-inline p-2 bg-success" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">
 
     <?php
     $j = 0;
@@ -80,65 +88,123 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ?>
 
-    <div class="d-inline p-2 bg-success" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Список респондентов</div>
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Полученные данные по ГПС</div>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'summary' => false,
-        'columns' => [
-            [
-                'header' => '№',
-                'class' => 'yii\grid\SerialColumn'
-            ],
-
-            //'name',
-            [
-                'attribute' => 'name',
-                'value' => function ($responds) {
-                    if (mb_strlen($responds->name) > 30){
-
-                        $responds->name = mb_substr($responds->name, 0, 30) . '...';
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th scope="col" style="text-align: center;padding-bottom: 15px;">Респонденты</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Данные респондентов</th>
+            <th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">ГПС</th>
+            <th scope="col" style="text-align: center;width: 100px;padding-bottom: 15px;">Дата ГПС</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Отзыв эксперта</th>
+            <th scope="col" style="text-align: center;width: 100px;">Дата отзыва</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="text-align: center; padding-top: 20px;">
+                <?php if (!empty($responds)) {
+                    if (count($responds)%10 == 1){
+                        echo Html::a(count($responds) . ' респондент', Url::to(['respond/index', 'id' => $model->id]));
                     }
-                    return Html::a(Html::encode($responds->name), Url::to(['respond/view', 'id' => $responds->id]));
-                },
-                'options' => ['width' => '130'],
-                'format' => 'raw',
-            ],
-            'info_respond',
-            'add_info',
-            //'date_interview',
-            [
-                'attribute' => 'date_interview',
-                'options' => ['width' => '70'],
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-            'place_interview',
+                    if (count($responds)%10 == 2 || count($responds)%10 == 3 || count($responds)%10 == 4){
+                        echo Html::a(count($responds) . ' респондента', Url::to(['respond/index', 'id' => $model->id]));
+                    }
+                    if (count($responds)%10 == 0 || count($responds)%10 > 4){
+                        echo Html::a(count($responds) . ' респондентов', Url::to(['respond/index', 'id' => $model->id]));
+                    }
 
-            //['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+                }?>
+            </td>
 
-    <p class="open_fast">
-        <?= Html::submitButton('Добавить респондента', ['class' => 'btn btn-primary']) ?>
-    </p>
+            <td style="text-align: center; padding-top: 20px;">
 
-    <div class="popap_fast">
+                <?php
+                $sum = 0;
+                foreach ($responds as $respond){
+                    $sum += $respond->exist_respond;
+                }
+                $value = round(($sum / count($responds) * 100) * 100) / 100;
 
-        <?php $form = ActiveForm::begin(); ?>
+                echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
+                ?>
 
-        <div class="col-sm-9">
-            <?= $form->field($newRespond, 'name')->textInput(['maxlength' => true])->label('Напишите Ф.И.О. респондента') ?>
-        </div>
+            </td>
 
-        <span class="cross-out glyphicon text-danger glyphicon-remove"></span>
+            <td style="text-align: center; padding-top: 20px;">
 
-        <div class="col-sm-12 form-group">
-            <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-        </div>
-    </div>
+                <?php
+                $sumInt = 0;
+                foreach ($responds as $respond){
+                    $sumInt += $respond->descInterview->exist_desc;
+                }
+                $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
+
+                echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
+                ?>
+
+            </td>
+
+            <td style="text-align: center; padding-top: 20px;">
+
+                <? if (!empty($model->problems)){
+                    foreach ($model->problems as $problem) {
+                        //echo $problem->title . '<br>';
+                        echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) . '<hr>';
+                    }
+                }
+                ?>
+
+                <div style="padding-bottom: 10px;"><?= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));?></div>
+
+            </td>
+
+            <td style="text-align: center; padding-top: 20px;">
+
+                <? if (!empty($model->problems)){
+                    foreach ($model->problems as $problem) {
+                        echo date("d.m.Y", strtotime($problem->date_gps)) . '<hr>';
+                    }
+                }
+                ?>
+
+                <br>
+
+            </td>
+
+            <td style="text-align: center; padding-top: 20px;">
+
+                <? if (!empty($model->feedbacks)){
+                    foreach ($model->feedbacks as $feedback) {
+                        //echo $problem->title . '<br>';
+                        echo Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '<hr>';
+                    }
+                }
+                ?>
+
+                <div style="padding-bottom: 10px;"><?= Html::a("+ добавить", Url::to(['feedback-expert/create', 'id' => $model->id]));?></div>
+
+            </td>
+
+            <td style="text-align: center; padding-top: 20px;">
+
+                <? if (!empty($model->feedbacks)){
+                    foreach ($model->feedbacks as $feedback) {
+                        echo date("d.m.Y", strtotime($feedback->date_feedback)) . '<hr>';
+                    }
+                }
+                ?>
+
+                <br>
+
+            </td>
 
 
-        <?php ActiveForm::end(); ?>
+        </tr>
+        </tbody>
+    </table>
 
 </div>
 

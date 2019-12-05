@@ -10,4 +10,8 @@ $(document).ready(function() {
         $('.popap_fast').removeClass('active');
         $('.open_fast').removeClass('active');
     });
+
+    $('.link-del').click(function () {
+        $('.feed-exp').addClass('active');
+    });
 });

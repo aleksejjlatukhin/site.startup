@@ -3,7 +3,13 @@
 namespace app\controllers;
 
 use app\models\Authors;
+use app\models\FeedbackExpert;
+use app\models\GenerationProblem;
+use app\models\Interview;
 use app\models\Model;
+use app\models\PreFiles;
+use app\models\Questions;
+use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
 use Yii;
@@ -49,6 +55,42 @@ class ProjectsController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+
+    public function actionDownload($filename)
+    {
+        $model = PreFiles::find()->where(['file_name' => $filename])->one();
+
+        $path = \Yii::getAlias('upload/files/');
+
+        $file = $path . $model->file_name;
+
+        if (file_exists($file)) {
+
+            return \Yii::$app->response->sendFile($file);
+        }
+    }
+
+
+    public function actionDeleteFile($filename)
+    {
+        $model = PreFiles::find()->where(['file_name' => $filename])->one();
+
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+        $path = \Yii::getAlias('upload/files/');
+
+        unlink($path . $model->file_name);
+
+        $model->delete();
+
+        if (Yii::$app->request->isAjax)
+        {
+            return 'Delete';
+        }else{
+            return $this->redirect(['update', 'id' => $project->id]);
+        }
     }
 
     /**
@@ -101,14 +143,6 @@ class ProjectsController extends AppController
                     if ($flag = $model->save(false)) {
                         foreach ($modelsConcept as $modelsConcept) {
                             $modelsConcept->project_id = $model->id;
-                            /*$modelsConcept->creat_date = date('Y:m:d');
-                            $modelsConcept->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-                            $modelsConcept->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-                            $modelsConcept->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-                            $modelsConcept->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-                            $modelsConcept->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-                            $modelsConcept->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));*/
-
                             if (! ($flag = $modelsConcept->save(false))) {
                                 $transaction->rollBack();
                                 break;
@@ -125,10 +159,20 @@ class ProjectsController extends AppController
                         }
                     }
 
-
-
                     if ($flag) {
                         $transaction->commit();
+
+                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
+
+                        if ($model->validate() && $model->upload()){
+                            foreach ($model->present_files as $file){
+                                $preFiles = new PreFiles();
+                                $preFiles->file_name = $file;
+                                $preFiles->project_id = $model->id;
+                                $preFiles->save(false);
+                            }
+                        }
+
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 } catch (Exception $e) {
@@ -176,11 +220,6 @@ class ProjectsController extends AppController
             $valid = Model::validateMultiple($modelsConcept) && $valid;
             $valid = Model::validateMultiple($modelsAuthors) && $valid;
 
-            $model->present_files = UploadedFile::getInstances($model, 'present_files');
-            if ($model->present_files) {
-                $model->uploadfiles();
-            }
-
 
             if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
@@ -194,15 +233,6 @@ class ProjectsController extends AppController
                         }
                         foreach ($modelsConcept as $modelsConcept) {
                             $modelsConcept->project_id = $model->id;
-                            /*if (empty($modelsConcept->creat_date)){
-                                $modelsConcept->creat_date = date('Y:m:d');
-                                $modelsConcept->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-                                $modelsConcept->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-                                $modelsConcept->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-                                $modelsConcept->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-                                $modelsConcept->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-                                $modelsConcept->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
-                            }*/
                             if (! ($flag = $modelsConcept->save(false))) {
                                 $transaction->rollBack();
                                 break;
@@ -220,8 +250,22 @@ class ProjectsController extends AppController
                     }
                     if ($flag) {
                         $transaction->commit();
-                        Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
-                        return $this->redirect(['view', 'id' => $model->id]);
+
+                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
+
+                        if ($model->validate() && $model->upload()){
+                            foreach ($model->present_files as $file){
+                                $preFiles = new PreFiles();
+                                $preFiles->file_name = $file;
+                                $preFiles->project_id = $model->id;
+                                $preFiles->save(false);
+                            }
+
+
+                            Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
+                            return $this->redirect(['view', 'id' => $model->id]);
+                        }
+
                     }
                 } catch (Exception $e) {
                     $transaction->rollBack();
@@ -246,9 +290,59 @@ class ProjectsController extends AppController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        Segment::deleteAll(['project_id' => $model->id]);
+        $segments = Segment::find()->where(['project_id' => $model->id])->all();
+        $preFiles = PreFiles::find()->where(['project_id' => $model->id])->all();
+
+        if ($segments){
+
+            foreach ($segments as $segment){
+                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
+                if (!empty($interview->feedbacks)){
+                    foreach ($interview->feedbacks as $feedback) {
+                        if ($feedback->feedback_file !== null){
+                            unlink('upload/feedbacks/' . $feedback->feedback_file);
+                        }
+                    }
+                }
+
+
+                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+                foreach ($responds as $respond){
+                    $descInterview = $respond->descInterview;
+
+                    if ($descInterview->interview_file !== null){
+                        unlink('upload/interviews/' . $descInterview->interview_file);
+                    }
+
+                    if (!empty($descInterview)){
+                        $descInterview->delete();
+                    }
+                }
+            }
+
+            foreach ($segments as $segment){
+                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
+                Questions::deleteAll(['interview_id' => $interview->id]);
+                Respond::deleteAll(['interview_id' => $interview->id]);
+                FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
+                GenerationProblem::deleteAll(['interview_id' => $interview->id]);
+                Interview::deleteAll(['segment_id' => $segment->id]);
+            }
+        }
+
+        foreach ($preFiles as $file){
+            if (!empty($file)){
+                unlink('upload/files/' . $file->file_name);
+            }
+        }
+
+        PreFiles::deleteAll(['project_id' => $model->id]);
         Authors::deleteAll(['project_id' => $model->id]);
-        $model = $this->findModel($id)->delete();
+        Segment::deleteAll(['project_id' => $model->id]);
+
+        Yii::$app->session->setFlash('error', 'Прооект "' . $this->findModel($id)->project_name . '" удален');
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }

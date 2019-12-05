@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\DescInterview;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
@@ -24,7 +25,7 @@ class RespondController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -36,14 +37,66 @@ class RespondController extends Controller
      * Lists all Respond models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($id)
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Respond::find(),
-        ]);
+        $models = Respond::find()->where(['interview_id' => $id])->all();
+        $interview = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $newRespond = new Respond();
+        $newRespond->interview_id = $id;
+        if ($newRespond->load(Yii::$app->request->post()))
+        {
+            $newRespond->save();
+            $interview->count_respond = $interview->count_respond + 1;
+            $interview->save();
+
+            $project->update_at = date('Y:m:d');
+            if ($project->save()){
+                Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
+                return $this->redirect(['index', 'id' => $id]);
+            }
+        }
 
         return $this->render('index', [
+            'models' => $models,
+            'newRespond' => $newRespond,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+    public function actionExist($id)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Respond::find()->where(['interview_id' => $id]),
+        ]);
+        $interview = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        return $this->render('exist', [
             'dataProvider' => $dataProvider,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+    public function actionByDateInterview($id)
+    {
+        $models = Respond::find()->where(['interview_id' => $id])->all();
+        $interview = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        return $this->render('by-date-interview', [
+            'models' => $models,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
         ]);
     }
 
@@ -59,14 +112,16 @@ class RespondController extends Controller
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $desc_interview = DescInterview::find()->where(['respond_id' => $model->id])->one();
 
         return $this->render('view', [
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
-
+            'desc_interview' => $desc_interview,
         ]);
     }
+
 
     /**
      * Creates a new Respond model.
@@ -103,8 +158,10 @@ class RespondController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $project->update_at = date('Y:m:d');
-            Yii::$app->session->setFlash('success', 'Данные обновлены!');
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($project->save()){
+                Yii::$app->session->setFlash('success', 'Данные обновлены!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -123,19 +180,36 @@ class RespondController extends Controller
      */
     public function actionDelete($id)
     {
+        $descInterview = DescInterview::find()->where(['respond_id' => $this->findModel($id)])->one();
         $interview = Interview::find()->where(['id' => $this->findModel($id)->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
+        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
 
-        Yii::$app->session->setFlash('error', 'Респондент: "' . $this->findModel($id)->name . '" удален!');
-
-        if ($this->findModel($id)->delete()){
-            $interview->count_respond = $interview->count_respond -1;
-            $interview->save();
+        if (count($responds) == 1){
+            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
+            return $this->redirect(['view', 'id' => $this->findModel($id)->id]);
         }
 
-        return $this->redirect(['interview/view', 'id' => $interview->id]);
+        if ($project->save()){
+            Yii::$app->session->setFlash('error', 'Респондент: "' . $this->findModel($id)->name . '" удален!');
+
+            if ($descInterview){
+                if ($descInterview->interview_file !== null){
+                    unlink('upload/interviews/' . $descInterview->interview_file);
+                }
+
+                $descInterview->delete();
+            }
+
+
+            if ($this->findModel($id)->delete()){
+                $interview->count_respond = $interview->count_respond -1;
+                $interview->save();
+            }
+            return $this->redirect(['interview/view', 'id' => $interview->id]);
+        }
     }
 
     /**

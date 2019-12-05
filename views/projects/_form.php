@@ -3,11 +3,14 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use wbraganca\dynamicform\DynamicFormWidget;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Projects */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
+
 
 <div class="projects-form">
 
@@ -204,17 +207,31 @@ use wbraganca\dynamicform\DynamicFormWidget;
 
     <div class="container row">
         <div class="pull-left">
-            <p><?= $form->field($model, 'present_files[]')->label('Презентационные материалы')->fileInput(['multiple' => true,]) ?>
 
-                <?php if (!empty($model->files)) : ?>
-                    <?php foreach ($model->getFiles($model) as $file) : ?>
-<!--                        <a href="--><?//= \yii\helpers\Url::to(['/../web/upload/files/' . $file])  ; ?><!--">-->
-                            <?= $file . ' | ';?>
-<!--                        </a>-->
-                    <?php endforeach; ?>
-                <?php endif;?>
+            <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label('Презентационные файлы') ?></p>
 
-            </p>
+            <p><?php if (!empty($model->preFiles)){
+                    foreach ($model->preFiles as $file){
+                        echo Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => 'btn btn-default prefiles']) .
+                            ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $file->file_name], [
+                                'onclick'=>
+                                    "$.ajax({
+                                         type:'POST',
+                                         cache: false,
+                                         url: '".Url::to(['delete-file', 'filename' => $file->file_name])."',
+                                         success  : function(response) {
+                                             $('.link-del ' . $file->id).html(response);
+                                             $('.prefiles').remove();
+                                         }
+                                      });
+                                 return false;
+                                 $('.prefiles').remove();
+                                 ",
+                                'class' => "link-del $file->id",
+                            ]) . '<br>';
+                    }
+                }?></p>
+
         </div>
     </div>
 

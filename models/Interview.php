@@ -57,6 +57,16 @@ class Interview extends \yii\db\ActiveRecord
         return $this->hasMany(Questions::class, ['interview_id' => 'id']);
     }
 
+    public function getFeedbacks()
+    {
+        return $this->hasMany(FeedbackExpert::class, ['interview_id' => 'id']);
+    }
+
+    public function getProblems()
+    {
+        return $this->hasMany(GenerationProblem::class, ['interview_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */

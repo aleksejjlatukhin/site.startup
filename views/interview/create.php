@@ -13,11 +13,19 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' 
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<div class="stages">
+    <div class="stage active"><span>Разработка программы ПИ</span></div>
+    <div class="stage"><span>Проведение ПИ</span></div>
+    <div class="stage"><span>Выводы по ГПС</span></div>
+    <div class="stage"><span>Отзыв эксперта</span></div>
+</div>
+
 <div class="interview-create">
 
     <h1>Разработка программы ПИ</h1><br>
 
-    <h3>Постановка задачи</h3>
+    <h3>Данные сегмента</h3>
 
     <?= DetailView::widget([
         'model' => $segment,

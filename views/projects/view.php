@@ -98,8 +98,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
-                'attribute'=>'files',
-                'value' => str_replace(',', ' | ', $model->files),
+                'attribute' => 'pre_files',
+                'label' => 'Презентационные файлы',
+                'value' => function($model){
+                    $string = '';
+                    foreach ($model->preFiles as $file){
+                        $string .= Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => '']) . '<br>';
+                    }
+                    return $string;
+                },
                 'format' => 'html',
             ]
 

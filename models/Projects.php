@@ -46,11 +46,6 @@ class Projects extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    public function getConcepts()
-    {
-        return $this->hasMany(Concept::class, ['project_id' => 'id']);
-    }
-
     public function getAuthors()
     {
         return $this->hasMany(Authors::class, ['project_id' => 'id']);
@@ -59,6 +54,11 @@ class Projects extends ActiveRecord
     public function getSegments()
     {
         return $this->hasMany(Segment::class, ['project_id' => 'id']);
+    }
+
+    public function getPreFiles()
+    {
+        return $this->hasMany(PreFiles::class, ['project_id' => 'id']);
     }
 
     public function getConceptDesc($model)
@@ -92,22 +92,11 @@ class Projects extends ActiveRecord
     }
 
 
-    public function getFiles($model)
-    {
-        $doc = trim($model->files);
-        $doc = substr($doc, 0, -1);
-        $files = explode(',', $doc);
-        return $files;
-    }
-
-    public function uploadfiles(){
+    public function upload(){
         if($this->validate()){
             foreach($this->present_files as $file){
-                $path = 'upload/files/' . $file->baseName . '.' . $file->extension;
-                $this->files .= $file->baseName . '.' . $file->extension . ',';
-                $file->saveAs($path);
-                //$this->attachImage($path);
-                //@unlink($path);
+                //$filename=Yii::$app->getSecurity()->generateRandomString(15);
+                $file->saveAs('upload/files/' . $file->baseName . '.' . $file->extension);
             }
             return true;
         }else{
@@ -124,7 +113,7 @@ class Projects extends ActiveRecord
             [['user_id', 'created_at', 'update_at', 'project_name'], 'required'],
             [['user_id', 'invest_amount'], 'integer'],
             [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
-            [['description', 'patent_name', 'core_rid', 'layout_technology', 'files'], 'string'],
+            [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
             [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5],
         ];
@@ -158,7 +147,6 @@ class Projects extends ActiveRecord
             'invest_amount' => 'Сумма инвестиций',
             'date_of_announcement' => 'Дата анонсирования проекта',
             'announcement_event' => 'Мероприятие, на котором проект анонсирован впервые',
-            'files' => 'Презентационные материалы',
         ];
     }
 }

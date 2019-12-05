@@ -14,11 +14,17 @@ $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ', 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Генерация ПИ - редактирование';
 ?>
+
+<div class="stages">
+    <div class="stage active"><span>Разработка программы ПИ</span></div>
+    <div class="stage"><span>Проведение ПИ</span></div>
+    <div class="stage"><span>Выводы по ГПС</span></div>
+    <div class="stage"><span>Отзыв эксперта</span></div>
+</div>
+
 <div class="interview-update">
 
-    <h1>Генерация ПИ - редактирование</h1>
-
-    <h3>Постановка задачи</h3>
+    <h3>Данные сегмента</h3>
 
     <?= DetailView::widget([
         'model' => $segment,
@@ -37,8 +43,8 @@ $this->params['breadcrumbs'][] = 'Генерация ПИ - редактиров
         ],
     ]) ?>
 
+    <h1>Генерация ПИ - редактирование</h1>
     <br>
-    <hr>
 
     <?= $this->render('_form_update', [
         'model' => $model,

@@ -2,7 +2,12 @@
 
 namespace app\controllers;
 
+use app\models\FeedbackExpert;
+use app\models\GenerationProblem;
+use app\models\Interview;
 use app\models\Projects;
+use app\models\Questions;
+use app\models\Respond;
 use Yii;
 use app\models\Segment;
 use yii\data\ActiveDataProvider;
@@ -74,6 +79,19 @@ class SegmentController extends AppController
     {
         $model = Segment::findOne($id);
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $interview = Interview::find()->where(['segment_id' => $model->id])->one();
+        $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
+
+        if (!empty($problems)){
+            foreach ($problems as $k => $problem){
+                if (($k+1) == count($problems)){
+                    if ($model->fact_gps !== $problem->date_gps){
+                        $model->fact_gps = $problem->date_gps;
+                        $model->save();
+                    }
+                }
+            }
+        }
 
         return $this->render('one-roadmap', [
             'model' => $model,
@@ -179,10 +197,45 @@ class SegmentController extends AppController
     {
         $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
         $project->update_at = date('Y:m:d');
+        $interview = Interview::find()->where(['segment_id' => $id])->one();
+        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
 
         if ($project->save()) {
+
             Yii::$app->session->setFlash('error', "Сегмент {$this->findModel($id)->name} удален");
+
+            foreach ($responds as $respond){
+                $descInterview = $respond->descInterview;
+
+                if ($descInterview->interview_file !== null){
+                    unlink('upload/interviews/' . $descInterview->interview_file);
+                }
+
+                if (!empty($descInterview)){
+                    $descInterview->delete();
+                }
+            }
+
+            if (!empty($interview->feedbacks)){
+                foreach ($interview->feedbacks as $feedback) {
+                    if ($feedback->feedback_file !== null){
+                        unlink('upload/feedbacks/' . $feedback->feedback_file);
+                    }
+                }
+            }
+
+
+            Questions::deleteAll(['interview_id' => $interview->id]);
+            Respond::deleteAll(['interview_id' => $interview->id]);
+            FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
+            GenerationProblem::deleteAll(['interview_id' => $interview->id]);
+
+            if ($interview){
+                $interview->delete();
+            }
+
             $this->findModel($id)->delete();
+
             return $this->redirect(['index', 'id' => $project->id]);
 
         }

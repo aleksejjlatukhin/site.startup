@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\DescInterview;
+use app\models\FeedbackExpert;
+use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
@@ -25,7 +28,7 @@ class InterviewController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -60,22 +63,25 @@ class InterviewController extends Controller
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $newRespond = new Respond();
-        $newRespond->interview_id = $id;
-        if ($newRespond->load(Yii::$app->request->post()))
-        {
-            $newRespond->save();
-            $model->count_respond = $model->count_respond + 1;
-            $model->save();
-
-            $project->update_at = date('Y:m:d');
-            Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
-        }
-
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
+        foreach ($responds as $respond){
+            if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
+                $respond->exist_respond = 1;
+            }else{
+                $respond->exist_respond = 0;
+            }
+        }
+
+        foreach ($responds as $respond){
+            if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
+                $respond->descInterview->exist_desc = 1;
+            }
+        }
+
+
         $dataProvider = new ActiveDataProvider([
-            'query' => Respond::find(),
+            'query' => Respond::find()->where(['interview_id' => $id]),
         ]);
 
 
@@ -84,7 +90,6 @@ class InterviewController extends Controller
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
-            'newRespond' => $newRespond,
             'responds' => $responds,
             'dataProvider' => $dataProvider,
         ]);
@@ -194,9 +199,13 @@ class InterviewController extends Controller
             }
 
             $project->update_at = date('Y:m:d');
-            Yii::$app->session->setFlash('success', "Данные для интервью загружены");
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($project->save()){
+
+                Yii::$app->session->setFlash('success', "Данные для интервью загружены");
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
         }
 
         return $this->render('create', [
@@ -271,9 +280,12 @@ class InterviewController extends Controller
             }
 
             $project->update_at = date('Y:m:d');
-            Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($project->save()){
+
+                Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -296,16 +308,42 @@ class InterviewController extends Controller
         $model = $this->findModel($id);
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $responds = Respond::find()->where(['interview_id' => $model->id])->all();
         $project->update_at = date('Y:m:d');
 
-        Questions::deleteAll(['interview_id' => $id]);
-        Respond::deleteAll(['interview_id' => $id]);
+        if ($project->save()){
 
-        Yii::$app->session->setFlash('error', "Ваше интервью удалено, создайте новое интервью!");
+            foreach ($responds as $respond){
+                $descInterview = $respond->descInterview;
 
-        $model->delete();
+                if ($descInterview->interview_file !== null){
+                    unlink('upload/interviews/' . $descInterview->interview_file);
+                }
 
-        return $this->redirect(['create', 'id' => $model->segment_id]);
+                if (!empty($descInterview)){
+                    $descInterview->delete();
+                }
+            }
+
+            if (!empty($model->feedbacks)){
+                foreach ($model->feedbacks as $feedback) {
+                    if ($feedback->feedback_file !== null){
+                        unlink('upload/feedbacks/' . $feedback->feedback_file);
+                    }
+                }
+            }
+
+            Questions::deleteAll(['interview_id' => $id]);
+            Respond::deleteAll(['interview_id' => $id]);
+            FeedbackExpert::deleteAll(['interview_id' => $id]);
+            GenerationProblem::deleteAll(['interview_id' => $id]);
+
+            Yii::$app->session->setFlash('error', "Ваше интервью удалено, создайте новое интервью!");
+
+            $model->delete();
+
+            return $this->redirect(['create', 'id' => $model->segment_id]);
+        }
     }
 
     /**
