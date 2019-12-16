@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }?></td>
 
                 <td><? if (!empty($model->fact_gps)){
-                        echo date("d.m.y", strtotime($model->fact_gps));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_gps)), Url::to(['generation-problem/view', 'id' => $problem->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_ps)){

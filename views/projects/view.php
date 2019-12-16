@@ -31,10 +31,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
 
-//            'id',
-//            'user_id',
-            'project_fullname:ntext',
             'project_name',
+            'project_fullname:ntext',
             'description:ntext',
             'rid',
             'core_rid:ntext',

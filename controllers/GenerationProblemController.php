@@ -2,10 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\ConfirmProblem;
 use app\models\DescInterview;
+use app\models\FeedbackExpertConfirm;
 use app\models\Interview;
 use app\models\Projects;
+use app\models\QuestionsConfirm;
 use app\models\Respond;
+use app\models\RespondsConfirm;
 use app\models\Segment;
 use Yii;
 use app\models\GenerationProblem;
@@ -103,14 +107,17 @@ class GenerationProblemController extends Controller
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $project->update_at = date('Y:m:d');
+            if ($model->save()){
 
-            if ($project->save()){
+                $project->update_at = date('Y:m:d');
 
-                Yii::$app->session->setFlash('success', "Данные по ". $model->title ." загружены");
-                return $this->redirect(['interview/view', 'id' => $model->interview_id]);
+                if ($project->save()){
+
+                    Yii::$app->session->setFlash('success', "Данные по ". $model->title ." загружены");
+                    return $this->redirect(['interview/view', 'id' => $model->interview_id]);
+                }
             }
         }
 
@@ -119,6 +126,7 @@ class GenerationProblemController extends Controller
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
+            'responds' => $responds,
         ]);
     }
 
@@ -166,22 +174,53 @@ class GenerationProblemController extends Controller
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['gps_id' => $model->id])->one();
+        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
         $project->update_at = date('Y:m:d');
 
         if ($project->save()) {
+
+            foreach ($responds as $respond){
+                $descInterview = $respond->descInterview;
+
+                if ($descInterview->interview_file !== null){
+                    unlink('upload/interviews-confirm/' . $descInterview->interview_file);
+                }
+
+                if (!empty($descInterview)){
+                    $descInterview->delete();
+                }
+            }
+
+            if (!empty($confirmProblem->feedbacks)){
+                foreach ($confirmProblem->feedbacks as $feedback) {
+                    if ($feedback->feedback_file !== null){
+                        unlink('upload/feedbacks-confirm/' . $feedback->feedback_file);
+                    }
+                }
+            }
+
+            QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+            RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+
             Yii::$app->session->setFlash('error', '"' . $model->title . '" удалена!');
+
+            $confirmProblem->delete();
+
+            $model->delete();
+
+            $j = 0;
+            foreach ($interview->problems as $item){
+                $j++;
+                $item->title = 'ГПС ' . $j;
+                $item->save();
+            }
+
+            return $this->redirect(['interview/view', 'id' => $interview->id]);
         }
 
-        $model->delete();
 
-        $j = 0;
-        foreach ($interview->problems as $item){
-            $j++;
-            $item->title = 'ГПС ' . $j;
-            $item->save();
-        }
-
-        return $this->redirect(['interview/view', 'id' => $interview->id]);
     }
 
     /**

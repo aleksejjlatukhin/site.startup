@@ -74,7 +74,10 @@ class SiteController extends AppController
         }
 
         $model = new SingupForm();
+        $users = User::find()->all();
+
         if ($model->load(\Yii::$app->request->post())){
+
             $user = new User();
             $user->fio = $model->fio;
             $user->telephone = $model->telephone;
@@ -82,13 +85,26 @@ class SiteController extends AppController
             $user->username = $model->username;
             $user->password = \Yii::$app->security->generatePasswordHash($model->password);
 
-            if ($user->save()){
-                //\Yii::$app->user->login($user);
-                return $this->goBack('login');
+            $copy = 0;
+
+            foreach ($users as $item){
+                if (mb_strtolower(str_replace(' ', '',$user->username)) == mb_strtolower(str_replace(' ', '',$item->username))){
+                    $copy++;
+
+                }
+                if ($copy == 0){
+                    if ($user->save()){
+                        return $this->goBack('login');
+                    }
+                } else{
+                    Yii::$app->session->setFlash('error', 'Пользователь с логином "'. $user->username .'" уже существует!');
+                }
             }
         }
 
-        return $this->render('singup', compact('model'));
+        return $this->render('singup', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -52,9 +52,17 @@ class DescInterviewController extends Controller
 
     public function actionDownload($filename)
     {
+        $user = Yii::$app->user->identity;
         $model = DescInterview::find()->where(['interview_file' => $filename])->one();
+        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
+        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias('upload/interviews/');
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+            mb_convert_encoding($respond->name , "windows-1251") . '/');
 
         $file = $path . $model->interview_file;
 
@@ -68,9 +76,17 @@ class DescInterviewController extends Controller
 
     public function actionDeleteFile($filename)
     {
+        $user = Yii::$app->user->identity;
         $model = DescInterview::find()->where(['interview_file' => $filename])->one();
+        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
+        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias('upload/interviews/');
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+            mb_convert_encoding($respond->name , "windows-1251") . '/');
 
         unlink($path . $model->interview_file);
 
@@ -114,6 +130,7 @@ class DescInterviewController extends Controller
      */
     public function actionCreate($id)
     {
+        $user = Yii::$app->user->identity;
         $model = new DescInterview();
         $model->respond_id = $id;
         $model->date_fact = date('Y:m:d');
@@ -129,21 +146,32 @@ class DescInterviewController extends Controller
             return $this->redirect(['respond/view', 'id' => $id]);
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-            if ($model->loadFile !== null){
-                if ($model->validate() && $model->upload()){
-                    $model->interview_file = $model->loadFile;
-                    $model->save(false);
-                }
+            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                mb_convert_encoding($respond->name , "windows-1251") . '/';
+            if (!file_exists($respond_dir)){
+                mkdir($respond_dir, 0777);
             }
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                Yii::$app->session->setFlash('success', "Материалы полученные во время интервью добавлены!");
-                return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+            if ($model->save()){
+
+                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                if ($model->loadFile !== null){
+                    if ($model->validate() && $model->upload($respond_dir)){
+                        $model->interview_file = $model->loadFile;
+                        $model->save(false);
+                    }
+                }
+
+                $project->update_at = date('Y:m:d');
+                if ($project->save()){
+                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью добавлены!");
+                    return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+                }
             }
         }
 
@@ -164,6 +192,7 @@ class DescInterviewController extends Controller
      */
     public function actionUpdate($id)
     {
+        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $respond = Respond::find()->where(['id' => $model->respond_id])->one();
         $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
@@ -174,21 +203,32 @@ class DescInterviewController extends Controller
             $model->loadFile = $model->interview_file;
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-            if ($model->loadFile !== null){
-                if ($model->validate() && $model->upload()){
-                    $model->interview_file = $model->loadFile;
-                    $model->save(false);
-                }
+            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                mb_convert_encoding($respond->name , "windows-1251") . '/';
+            if (!file_exists($respond_dir)){
+                mkdir($respond_dir, 0777);
             }
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                Yii::$app->session->setFlash('success', "Материалы полученные во время интервью обновлены");
-                return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+            if ($model->save()){
+
+                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                if ($model->loadFile !== null){
+                    if ($model->validate() && $model->upload($respond_dir)){
+                        $model->interview_file = $model->loadFile;
+                        $model->save(false);
+                    }
+                }
+
+                $project->update_at = date('Y:m:d');
+                if ($project->save()){
+                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью обновлены");
+                    return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+                }
             }
         }
 
@@ -209,16 +249,20 @@ class DescInterviewController extends Controller
      */
     public function actionDelete($id)
     {
+        $user = Yii::$app->user->identity;
         $model = DescInterview::find()->where(['respond_id' => $id])->one();
-        if ($model->interview_file !== null){
-            unlink('upload/interviews/' . $model->interview_file);
-        }
-
         $respond = Respond::findOne($id);
         $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
+
+        if ($model->interview_file !== null){
+            unlink(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                mb_convert_encoding($respond->name , "windows-1251") . '/' . $model->interview_file);
+        }
 
         if ($project->save()) {
 

@@ -1,0 +1,67 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use yii\helpers\Url;
+
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Проверка заполнения данных о респондентах';
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
+$this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<div class="respond-confirm exist">
+
+    <h2><?= Html::encode($this->title) ?></h2>
+
+    <hr>
+
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'options' => ['class' => 'text-center'],
+        'summary' =>false,
+        'columns' => [
+            [
+                'header' => '№',
+                'class' => 'yii\grid\SerialColumn',
+                'options' => ['width' => '20'],
+            ],
+
+            [
+                'attribute' => 'name',
+                'headerOptions' => ['class' => 'text-center'],
+                'value' => function ($model) {
+                    return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
+                },
+                'format' => 'raw',
+            ],
+
+            [
+                'attribute' => 'data',
+                'headerOptions' => ['class' => 'text-center'],
+                'label' => 'Данные респондента',
+                'value' => function($model){
+                    if (!empty($model->name) && !empty($model->info_respond) && !empty($model->date_plan) && !empty($model->place_interview)){
+                        return 'Заполнены';
+                    }else{
+                        return 'Необходимо заполнить';
+                    }
+
+                }
+            ],
+
+        ],
+    ]); ?>
+
+    <?= Html::a('Вернуться к описанию программы ППИ', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
+
+</div>

@@ -3,11 +3,14 @@
 namespace app\controllers;
 
 use app\models\FeedbackExpert;
+use app\models\FeedbackExpertConfirm;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Questions;
+use app\models\QuestionsConfirm;
 use app\models\Respond;
+use app\models\RespondsConfirm;
 use Yii;
 use app\models\Segment;
 use yii\data\ActiveDataProvider;
@@ -41,18 +44,52 @@ class SegmentController extends AppController
     public function actionIndex($id)
     {
         $project = Projects::findOne($id);
+        $user = Yii::$app->user->identity;
 
         $dataProvider = new ActiveDataProvider([
             'query' => Segment::find()->where(['project_id' => $id]),
         ]);
 
+        $models = Segment::find()->where(['project_id' => $project->id])->all();
+
+        $segments_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/';
+
+        if (!file_exists($segments_dir)){
+            mkdir($segments_dir, 0777);
+        }
+
+        foreach ($models as $model){
+            $segment_dir = $segments_dir . '/' . mb_convert_encoding($model->name , "windows-1251") . '/';
+            $segment_dir = mb_strtolower($segment_dir, "windows-1251");
+
+            if (!file_exists($segment_dir)){
+                mkdir($segment_dir, 0777);
+            }
+        }
+
         $newModel = new Segment();
         $newModel->project_id = $id;
 
-        if ($newModel->load(Yii::$app->request->post()) && $newModel->save()){
-            if ($project->save()){
-                $project->update_at = date('Y:m:d');
-                return $this->redirect(['index', 'id' => $newModel->project_id]);
+        if ($newModel->load(Yii::$app->request->post())){
+
+            $countSeg = 0;
+            foreach ($models as $model){
+                if(mb_strtolower(str_replace(' ', '', $newModel->name)) == mb_strtolower(str_replace(' ', '', $model->name))){
+                    $countSeg++;
+                }
+            }
+
+            if ($countSeg == 0){
+                if ($newModel->save()){
+
+                    if ($project->save()){
+                        $project->update_at = date('Y:m:d');
+                        return $this->redirect(['index', 'id' => $newModel->project_id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', 'Сегмент с названием "'. $newModel->name .'" уже существует!');
             }
         }
 
@@ -69,9 +106,31 @@ class SegmentController extends AppController
 
         $models = Segment::find()->where(['project_id' => $id])->all();
 
+        foreach ($models as $model){
+            $interview = Interview::find()->where(['segment_id' => $model->id])->one();
+            $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
+            if (!empty($problems)){
+                foreach ($problems as $k => $problem){
+                    if (($k+1) == count($problems)){
+                        if (!empty($problem)){
+                            if ($model->fact_gps !== $problem->date_gps){
+                                $model->fact_gps = $problem->date_gps;
+                                $model->save();
+                            }
+                        }
+                    }
+                }
+            }
+            if (count($problems) == 0){
+                $model->fact_gps = null;
+                $model->save();
+            }
+        }
+
         return $this->render('roadmap', [
             'project' => $project,
             'models' => $models,
+            'problem' => $problem,
         ]);
     }
 
@@ -85,17 +144,24 @@ class SegmentController extends AppController
         if (!empty($problems)){
             foreach ($problems as $k => $problem){
                 if (($k+1) == count($problems)){
-                    if ($model->fact_gps !== $problem->date_gps){
-                        $model->fact_gps = $problem->date_gps;
-                        $model->save();
+                    if (!empty($problem)){
+                        if ($model->fact_gps !== $problem->date_gps){
+                            $model->fact_gps = $problem->date_gps;
+                            $model->save();
+                        }
                     }
                 }
             }
+        }
+        if (count($problems) == 0){
+            $model->fact_gps = null;
+            $model->save();
         }
 
         return $this->render('one-roadmap', [
             'model' => $model,
             'project' => $project,
+            'problem' => $problem,
         ]);
 
     }
@@ -152,31 +218,69 @@ class SegmentController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $models = Segment::find()->where(['project_id' => $project->id])->all();
         $project->update_at = date('Y:m:d');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if ($project->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-                if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age'] &&
-                    $_POST['Segment']['income'] && $_POST['Segment']['quantity'] && $_POST['Segment']['market_volume'])
-                {
-                    if (empty($model->creat_date))
-                    {
-                        $model->creat_date = date('Y:m:d');
-                        $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-                        $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-                        $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-                        $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-                        $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-                        $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
-                        $model->save();
+            $kol = 0;
+            foreach ($models as $item){
+                if (mb_strtolower(str_replace(' ', '', $model->name)) == mb_strtolower(str_replace(' ', '',$item->name)) && $model->id !== $item->id){
+
+                    $kol++;
+                }
+            }
+
+            if ($kol == 0){
+
+                foreach ($models as $item){
+
+                    if ($model->id == $item->id && mb_strtolower($model->name) !== mb_strtolower($item->name)){
+
+                        $old_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                            . '/' . mb_convert_encoding($project->project_name, "windows-1251") . '/segments/' .
+                            mb_convert_encoding($item->name , "windows-1251") . '/';
+
+                        $old_dir = mb_strtolower($old_dir, "windows-1251");
+
+                        $new_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                            . '/' . mb_convert_encoding($project->project_name, "windows-1251") . '/segments/' .
+                            mb_convert_encoding($model->name , "windows-1251") . '/';
+
+                        $new_dir = mb_strtolower($new_dir, "windows-1251");
+
+                        rename($old_dir, $new_dir);
                     }
                 }
 
-                Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
-                return $this->redirect(['view', 'id' => $model->id]);
+                if ($model->save()){
+
+                    if ($project->save()) {
+
+                        if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age'] &&
+                            $_POST['Segment']['income'] && $_POST['Segment']['quantity'] && $_POST['Segment']['market_volume'])
+                        {
+                            if (empty($model->creat_date))
+                            {
+                                $model->creat_date = date('Y:m:d');
+                                $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
+                                $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
+                                $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
+                                $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
+                                $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
+                                $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
+                                $model->save();
+                            }
+                        }
+
+                        Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', 'Сегмент с названием "'. $model->name .'" уже существует!');
             }
         }
 
@@ -195,10 +299,13 @@ class SegmentController extends AppController
      */
     public function actionDelete($id)
     {
-        $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
+        $model = $this->findModel($id);
+        $user = Yii::$app->user->identity;
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
         $project->update_at = date('Y:m:d');
-        $interview = Interview::find()->where(['segment_id' => $id])->one();
+        $interview = Interview::find()->where(['segment_id' => $model->id])->one();
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+        $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
         if ($project->save()) {
 
@@ -225,16 +332,61 @@ class SegmentController extends AppController
             }
 
 
+            if (!empty($generationProblems)){
+                foreach ($generationProblems as $generationProblem){
+                    if (!empty($generationProblem->confirm)){
+                        $confirmProblem = $generationProblem->confirm;
+
+                        if (!empty($confirmProblem->questions)){
+                            QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+                        if (!empty($confirmProblem->feedbacks)){
+                            $feedbacksConfirm = $confirmProblem->feedbacks;
+                            foreach ($feedbacksConfirm as $feedbackConfirm){
+                                if ($feedbackConfirm->feedback_file !== null){
+                                    unlink('upload/feedbacks-confirm/' . $feedbackConfirm->feedback_file);
+                                }
+                            }
+                            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+
+                        if (!empty($confirmProblem->responds)){
+                            $respondsConfirm = $confirmProblem->responds;
+                            foreach ($respondsConfirm as $respondConfirm){
+                                if (!empty($respondConfirm->descInterview)){
+                                    $descInterviewConfirm = $respondConfirm->descInterview;
+                                    if ($descInterviewConfirm->interview_file !== null){
+                                        unlink('upload/interviews-confirm/' . $descInterviewConfirm->interview_file);
+                                    }
+                                    $descInterviewConfirm->delete();
+                                }
+                            }
+                            RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+                        $confirmProblem->delete();
+                    }
+                }
+            }
+
+
             Questions::deleteAll(['interview_id' => $interview->id]);
             Respond::deleteAll(['interview_id' => $interview->id]);
             FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
             GenerationProblem::deleteAll(['interview_id' => $interview->id]);
 
+            $pathDelete = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"), "windows-1251")
+                . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") .
+                '/segments/' . mb_strtolower(mb_convert_encoding($model->name, "windows-1251"), "windows-1251"));
+            $this->delTree($pathDelete);
+
             if ($interview){
                 $interview->delete();
             }
 
-            $this->findModel($id)->delete();
+            $model->delete();
 
             return $this->redirect(['index', 'id' => $project->id]);
 

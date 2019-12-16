@@ -16,13 +16,7 @@ use yii\helpers\Url;
 
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form', 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?//= $form->field($model, 'user_id')->textInput() ?>
-
-    <?//= $form->field($model, 'created_at')->textInput() ?>
-
-    <?//= $form->field($model, 'update_at')->textInput() ?>
-
-    <?= $form->field($model, 'project_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'project_name')->textInput(['maxlength' => true, 'autofocus' => true]) ?>
 
     <?= $form->field($model, 'project_fullname')->textInput(['maxlength' => true]) ?>
 
@@ -92,6 +86,7 @@ use yii\helpers\Url;
                             </div><!-- .row -->
 
                         </div>
+
                     <?php endforeach; ?>
 
                 </div>

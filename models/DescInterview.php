@@ -14,6 +14,7 @@ use Yii;
  */
 class DescInterview extends \yii\db\ActiveRecord
 {
+
     public $loadFile;
 
     public $exist_desc;
@@ -31,10 +32,10 @@ class DescInterview extends \yii\db\ActiveRecord
         return $this->hasOne(Respond::class, ['id' => 'respond_id']);
     }
 
-    public function upload()
+    public function upload($path)
     {
         if ($this->validate()) {
-            $this->loadFile->saveAs('upload/interviews/' . $this->loadFile->baseName . '.' . $this->loadFile->extension);
+            $this->loadFile->saveAs($path . $this->loadFile->baseName . '.' . $this->loadFile->extension);
             return true;
         } else {
             return false;
@@ -47,11 +48,11 @@ class DescInterview extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['respond_id', 'date_fact', 'description'], 'required'],
+            [['respond_id', 'date_fact', 'description', 'result'], 'required'],
             [['respond_id'], 'integer'],
             [['date_fact'], 'safe'],
             [['description'], 'string'],
-            [['interview_file'], 'string', 'max' => 255],
+            [['interview_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf',],
             ['exist_desc', 'boolean'],
         ];
@@ -68,6 +69,7 @@ class DescInterview extends \yii\db\ActiveRecord
             'date_fact' => 'Фактическая дата интервью',
             'description' => 'Материалы интервью',
             'interview_file' => 'Файл',
+            'result' => 'Вывод',
         ];
     }
 }

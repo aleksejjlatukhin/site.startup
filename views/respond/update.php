@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $model->interview_id]];
-$this->params['breadcrumbs'][] = ['label' => 'Респондент: ' . mb_substr($model->name, 0, 10) . '...', 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Страница редактирования';
 ?>
 

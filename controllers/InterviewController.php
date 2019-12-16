@@ -4,10 +4,13 @@ namespace app\controllers;
 
 use app\models\DescInterview;
 use app\models\FeedbackExpert;
+use app\models\FeedbackExpertConfirm;
 use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
+use app\models\QuestionsConfirm;
 use app\models\Respond;
+use app\models\RespondsConfirm;
 use app\models\Segment;
 use Yii;
 use app\models\Interview;
@@ -19,7 +22,7 @@ use yii\filters\VerbFilter;
 /**
  * InterviewController implements the CRUD actions for Interview model.
  */
-class InterviewController extends Controller
+class InterviewController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -102,6 +105,7 @@ class InterviewController extends Controller
      */
     public function actionCreate($id)
     {
+        $user = Yii::$app->user->identity;
         $segment = Segment::findOne($id);
 
         if ($segment->field_of_activity == null || $segment->sort_of_activity == null || $segment->age == null ||
@@ -123,6 +127,27 @@ class InterviewController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $interviews_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/';
+            if (!file_exists($interviews_dir)){
+                mkdir($interviews_dir, 0777);
+            }
+
+            $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/';
+            if (!file_exists($feedbacks_dir)){
+                mkdir($feedbacks_dir, 0777);
+            }
+
+            $generation_problems_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/';
+            if (!file_exists($generation_problems_dir)){
+                mkdir($generation_problems_dir, 0777);
+            }
 
             for ($i = 1; $i <= $model->count_respond; $i++ )
             {
@@ -225,7 +250,6 @@ class InterviewController extends Controller
      */
     public function actionUpdate($id)
     {
-        //$model = $this->findModel($id);
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
 
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -255,8 +279,6 @@ class InterviewController extends Controller
                 {
                     $item->delete();
                 }
-
-
             }
 
 
@@ -306,9 +328,11 @@ class InterviewController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
+        $user = Yii::$app->user->identity;
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $responds = Respond::find()->where(['interview_id' => $model->id])->all();
+        $generationProblems = GenerationProblem::find()->where(['interview_id' => $model->id])->all();
         $project->update_at = date('Y:m:d');
 
         if ($project->save()){
@@ -333,10 +357,64 @@ class InterviewController extends Controller
                 }
             }
 
+            if (!empty($generationProblems)){
+                foreach ($generationProblems as $generationProblem){
+                    if (!empty($generationProblem->confirm)){
+                        $confirmProblem = $generationProblem->confirm;
+
+                        if (!empty($confirmProblem->questions)){
+                            QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+                        if (!empty($confirmProblem->feedbacks)){
+                            $feedbacksConfirm = $confirmProblem->feedbacks;
+                            foreach ($feedbacksConfirm as $feedbackConfirm){
+                                if ($feedbackConfirm->feedback_file !== null){
+                                    unlink('upload/feedbacks-confirm/' . $feedbackConfirm->feedback_file);
+                                }
+                            }
+                            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+
+                        if (!empty($confirmProblem->responds)){
+                            $respondsConfirm = $confirmProblem->responds;
+                            foreach ($respondsConfirm as $respondConfirm){
+                                if (!empty($respondConfirm->descInterview)){
+                                    $descInterviewConfirm = $respondConfirm->descInterview;
+                                    if ($descInterviewConfirm->interview_file !== null){
+                                        unlink('upload/interviews-confirm/' . $descInterviewConfirm->interview_file);
+                                    }
+                                    $descInterviewConfirm->delete();
+                                }
+                            }
+                            RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                        }
+
+                        $confirmProblem->delete();
+                    }
+                }
+            }
+
             Questions::deleteAll(['interview_id' => $id]);
             Respond::deleteAll(['interview_id' => $id]);
             FeedbackExpert::deleteAll(['interview_id' => $id]);
             GenerationProblem::deleteAll(['interview_id' => $id]);
+
+            $pathDeleteInt = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
+                '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/interviews';
+            $this->delTree($pathDeleteInt);
+
+            $pathDeleteGps = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                    . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
+                    '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/generation problems';
+            $this->delTree($pathDeleteGps);
+
+            $pathDeleteFeedbacks = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                    . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
+                    '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/feedbacks';
+            $this->delTree($pathDeleteFeedbacks);
 
             Yii::$app->session->setFlash('error', "Ваше интервью удалено, создайте новое интервью!");
 

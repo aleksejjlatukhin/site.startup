@@ -29,15 +29,17 @@
     display: block;
     margin-top: -20px;
 }
-
 .stages
 {
     display: flex;
+    height: 1px;
     flex-direction: row;
+    background-color: #ccc;
     justify-content: space-around;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
+    margin-top: 40px;
+    align-items: center;
 }
-
 .stage
 {
     width: 250px;
@@ -48,12 +50,10 @@
     padding-top: 10px;
     box-shadow: 1px 2px rgba(0,0,0,0.5);
 }
-
 .stage.active
 {
     background-color: #9bcc60;
 }
-
 .stage span
 {
     font-size: 14px;

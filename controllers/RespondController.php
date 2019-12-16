@@ -16,7 +16,7 @@ use yii\filters\VerbFilter;
 /**
  * RespondController implements the CRUD actions for Respond model.
  */
-class RespondController extends Controller
+class RespondController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -48,14 +48,26 @@ class RespondController extends Controller
         $newRespond->interview_id = $id;
         if ($newRespond->load(Yii::$app->request->post()))
         {
-            $newRespond->save();
-            $interview->count_respond = $interview->count_respond + 1;
-            $interview->save();
+            $kol = 0;
+            foreach ($models as $elem){
+                if ($newRespond->id !== $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
+                    $kol++;
+                }
+            }
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
-                return $this->redirect(['index', 'id' => $id]);
+            if ($kol == 0){
+                if($newRespond->save()){
+                    $interview->count_respond = $interview->count_respond + 1;
+                    $interview->save();
+
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()){
+                        Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
+                        return $this->redirect(['index', 'id' => $id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');
             }
         }
 
@@ -150,17 +162,62 @@ class RespondController extends Controller
      */
     public function actionUpdate($id)
     {
+        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
 
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $models = Respond::find()->where(['interview_id' => $interview->id])->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                Yii::$app->session->setFlash('success', 'Данные обновлены!');
-                return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            $kol = 0;
+            foreach ($models as $item){
+                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '',$model->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                    $kol++;
+                }
+            }
+
+            if ($kol == 0){
+
+                foreach ($models as $elem){
+                    if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
+
+                        $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                            mb_convert_encoding($elem->name , "windows-1251") . '/';
+
+                        $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                            mb_convert_encoding($model->name , "windows-1251") . '/';
+
+                        if (file_exists($old_dir)){
+                            rename($old_dir, $new_dir);
+                        }
+                    }
+                }
+
+                $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                if (!file_exists($respond_dir)){
+                    mkdir($respond_dir, 0777);
+                }
+
+                if ($model->save()){
+
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()){
+                        Yii::$app->session->setFlash('success', 'Данные обновлены!');
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');
             }
         }
 
@@ -180,8 +237,10 @@ class RespondController extends Controller
      */
     public function actionDelete($id)
     {
-        $descInterview = DescInterview::find()->where(['respond_id' => $this->findModel($id)])->one();
-        $interview = Interview::find()->where(['id' => $this->findModel($id)->interview_id])->one();
+        $user = Yii::$app->user->identity;
+        $model = $this->findModel($id);
+        $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
+        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
@@ -189,22 +248,27 @@ class RespondController extends Controller
 
         if (count($responds) == 1){
             Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['view', 'id' => $this->findModel($id)->id]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         if ($project->save()){
-            Yii::$app->session->setFlash('error', 'Респондент: "' . $this->findModel($id)->name . '" удален!');
+            Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
 
             if ($descInterview){
-                if ($descInterview->interview_file !== null){
-                    unlink('upload/interviews/' . $descInterview->interview_file);
-                }
-
                 $descInterview->delete();
             }
 
+            $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
+                mb_convert_encoding($model->name , "windows-1251") . '/';
 
-            if ($this->findModel($id)->delete()){
+            if (file_exists($del_dir)){
+                $this->delTree($del_dir);
+            }
+
+
+            if ($model->delete()){
                 $interview->count_respond = $interview->count_respond -1;
                 $interview->save();
             }

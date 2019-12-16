@@ -79,6 +79,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
+                'attribute' => 'description',
+                'label' => 'Вывод из интервью',
+                'value' => function($model){
+                    return $model->descInterview->result;
+                },
+                'visible' => !empty($model->descInterview->result),
+            ],
+
+            [
                 'attribute' => 'interview_file',
                 'label' => 'Файл',
                 'value' => function($model){

@@ -27,6 +27,11 @@ class GenerationProblem extends \yii\db\ActiveRecord
         return $this->hasOne(Interview::class, ['id' => 'interview_id']);
     }
 
+    public function getConfirm()
+    {
+        return $this->hasOne(ConfirmProblem::class, ['gps_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */

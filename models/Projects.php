@@ -92,11 +92,11 @@ class Projects extends ActiveRecord
     }
 
 
-    public function upload(){
+    public function upload($path){
         if($this->validate()){
             foreach($this->present_files as $file){
                 //$filename=Yii::$app->getSecurity()->generateRandomString(15);
-                $file->saveAs('upload/files/' . $file->baseName . '.' . $file->extension);
+                $file->saveAs($path . $file->baseName . '.' . $file->extension);
             }
             return true;
         }else{

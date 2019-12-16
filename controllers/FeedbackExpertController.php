@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
@@ -16,7 +17,7 @@ use yii\web\UploadedFile;
 /**
  * FeedbackExpertController implements the CRUD actions for FeedbackExpert model.
  */
-class FeedbackExpertController extends Controller
+class FeedbackExpertController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -51,9 +52,16 @@ class FeedbackExpertController extends Controller
 
     public function actionDownload($filename)
     {
+        $user = Yii::$app->user->identity;
         $model = FeedbackExpert::find()->where(['feedback_file' => $filename])->one();
+        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias('upload/feedbacks/');
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($model->name , "windows-1251") . '/');
 
         $file = $path . $model->feedback_file;
 
@@ -67,9 +75,17 @@ class FeedbackExpertController extends Controller
 
     public function actionDeleteFile($filename)
     {
+        $user = Yii::$app->user->identity;
         $model = FeedbackExpert::find()->where(['feedback_file' => $filename])->one();
+        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias('upload/feedbacks/');
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($model->name , "windows-1251") . '/');
+
 
         unlink($path . $model->feedback_file);
 
@@ -113,6 +129,13 @@ class FeedbackExpertController extends Controller
      */
     public function actionCreate($id)
     {
+        $user = Yii::$app->user->identity;
+        $generationProblems = GenerationProblem::find()->where(['interview_id' => $id])->all();
+        if (count($generationProblems) < 1){
+            Yii::$app->session->setFlash('error', "Необходима хотя бы одна ГПС!");
+            return $this->redirect(['interview/view', 'id' => $id]);
+        }
+
         $model = new FeedbackExpert();
         $model->interview_id = $id;
         $model->date_feedback = date('Y:m:d');
@@ -123,25 +146,47 @@ class FeedbackExpertController extends Controller
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-            if ($model->loadFile !== null){
-                if ($model->validate() && $model->upload()){
-                    $model->feedback_file = $model->loadFile;
-                    $model->save(false);
+            $kol = 0;
+            foreach ($models as $item){
+                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '',$model->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                    $kol++;
                 }
             }
 
-            $project->update_at = date('Y:m:d');
+            if ($kol == 0){
 
-            if ($project->save()){
+                $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                if (!file_exists($expert_dir)){
+                    mkdir($expert_dir, 0777);
+                }
 
-                Yii::$app->session->setFlash('success', $model->title ." добавлен");
-                return $this->redirect(['view', 'id' => $model->id]);
+                if ($model->save()){
+
+                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                    if ($model->loadFile !== null){
+                        if ($model->validate() && $model->upload($expert_dir)){
+                            $model->feedback_file = $model->loadFile;
+                            $model->save(false);
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+
+                    if ($project->save()){
+
+                        Yii::$app->session->setFlash('success', $model->title ." добавлен");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', "Эксперт с таким именем уже добавил отзыв!");
             }
-
         }
 
         return $this->render('create', [
@@ -161,8 +206,10 @@ class FeedbackExpertController extends Controller
      */
     public function actionUpdate($id)
     {
+        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+        $models = FeedbackExpert::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
@@ -171,21 +218,63 @@ class FeedbackExpertController extends Controller
         }
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-            if ($model->loadFile !== null){
-                if ($model->validate() && $model->upload()){
-                    $model->feedback_file = $model->loadFile;
-                    $model->save(false);
+            $kol = 0;
+            foreach ($models as $item){
+                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '',$model->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                    $kol++;
                 }
             }
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()) {
-                Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($kol == 0){
+
+                foreach ($models as $elem){
+                    if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
+
+                        $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+                            mb_convert_encoding($elem->name , "windows-1251") . '/';
+
+                        $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+                            mb_convert_encoding($model->name , "windows-1251") . '/';
+
+                        if (file_exists($old_dir)){
+                            rename($old_dir, $new_dir);
+                        }
+                    }
+                }
+
+                $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                if (!file_exists($expert_dir)){
+                    mkdir($expert_dir, 0777);
+                }
+
+                if ($model->save()){
+
+                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                    if ($model->loadFile !== null){
+                        if ($model->validate() && $model->upload($expert_dir)){
+                            $model->feedback_file = $model->loadFile;
+                            $model->save(false);
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()) {
+                        Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+            }else{
+                Yii::$app->session->setFlash('error', "Эксперт с таким именем уже добавил отзыв!");
             }
         }
 
@@ -206,15 +295,21 @@ class FeedbackExpertController extends Controller
      */
     public function actionDelete($id)
     {
+        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
-        if ($model->feedback_file !== null){
-            unlink('upload/feedbacks/' . $model->feedback_file);
-        }
-
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
+
+        $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($model->name , "windows-1251") . '/';
+
+        if (file_exists($del_dir)){
+            $this->delTree($del_dir);
+        }
 
         if ($project->save()) {
 

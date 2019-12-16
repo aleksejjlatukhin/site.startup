@@ -25,6 +25,8 @@ use yii\helpers\Url;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6])->label('') ?>
 
+    <?= $form->field($model, 'result')->textInput(['maxlength' => true]) ?>
+
     <div class="container row">
         <div class="pull-left">
 

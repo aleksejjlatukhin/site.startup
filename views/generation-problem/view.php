@@ -36,6 +36,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) */?>
+        <?php if (empty($model->confirm)) : ?>
+            <?= Html::a('Подтвердить ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?php else: ?>
+            <?= Html::a('Подтверждение ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?php endif; ?>
     </p>
 
     <?= DetailView::widget([

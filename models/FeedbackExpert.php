@@ -32,10 +32,10 @@ class FeedbackExpert extends \yii\db\ActiveRecord
     }
 
 
-    public function upload()
+    public function upload($path)
     {
         if ($this->validate()) {
-            $this->loadFile->saveAs('upload/feedbacks/' . $this->loadFile->baseName . '.' . $this->loadFile->extension);
+            $this->loadFile->saveAs($path . $this->loadFile->baseName . '.' . $this->loadFile->extension);
             return true;
         } else {
             return false;
@@ -67,7 +67,7 @@ class FeedbackExpert extends \yii\db\ActiveRecord
             'title' => 'Название отзыва',
             'name' => 'ФИО эксперта',
             'position' => 'Организация / Должность',
-            'feedback_file' => 'Отзыв',
+            'feedback_file' => 'Отзыв(файл)',
             'comment' => 'Комментарий',
             'date_feedback' => 'Дата',
         ];

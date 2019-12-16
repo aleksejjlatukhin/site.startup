@@ -53,6 +53,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'description:ntext',
 
+            'result',
+
             [
                 'attribute' => 'interview_file',
                 'value' => function($model){
