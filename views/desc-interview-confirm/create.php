@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\DescInterviewConfirm */
 
-$this->title = 'Материалы полученные во время интервью';
+$this->title = 'Анкета респондента';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исхо
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Респондент: ' . $respond->name, 'url' => ['responds-confirm/view', 'id' => $respond->id]];
-$this->params['breadcrumbs'][] = 'Добавление материалов полученных во время интервью';
+$this->params['breadcrumbs'][] = 'Анкета респондента';
 ?>
 <div class="desc-interview-confirm-create">
 

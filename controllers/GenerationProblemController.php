@@ -79,6 +79,18 @@ class GenerationProblemController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+
+
+    // ОТКЛЮЧАЕМ CSRF
+    public function beforeAction($action)
+    {
+        if ($action->id == 'test') {
+            $this->enableCsrfValidation = false;
+        }
+        return parent::beforeAction($action);
+    }
+
+
     public function actionCreate($id)
     {
         $responds = Respond::find()->where(['interview_id' => $id])->all();
@@ -107,27 +119,61 @@ class GenerationProblemController extends Controller
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->isAjax){
 
-            if ($model->save()){
+            if ($model->load(Yii::$app->request->post())) {
+                $model->description = $_POST['GenerationProblem']['description'];
 
-                $project->update_at = date('Y:m:d');
+                if ($model->save()){
 
-                if ($project->save()){
+                    $project->update_at = date('Y:m:d');
+                    $project->save();
 
-                    Yii::$app->session->setFlash('success', "Данные по ". $model->title ." загружены");
-                    return $this->redirect(['interview/view', 'id' => $model->interview_id]);
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $model;
+                    return $model;
+
                 }
             }
         }
 
+
         return $this->render('create', [
             'model' => $model,
+            'models' => $models,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
             'responds' => $responds,
         ]);
+    }
+
+
+    public function actionTest($id){
+
+
+        $model = new GenerationProblem();
+        $model->interview_id = $id;
+        $model->date_gps = date('Y:m:d');
+        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
+        $model->title = 'ГПС ' . (count($models)+1);
+
+
+        if (Yii::$app->request->isAjax){
+
+            if($model->load(\Yii::$app->request->post())){
+                $model->description = $_POST['GenerationProblem']['description'];
+
+                if ($model->save()) {
+
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $model;
+                    return $model;
+                }
+            }
+        }
+
+        return $this->render('test', compact('model', 'models'));
     }
 
     /**

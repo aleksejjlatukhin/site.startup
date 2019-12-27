@@ -112,6 +112,27 @@ class RespondController extends AppController
         ]);
     }
 
+
+    public function actionByStatusResponds($id)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Respond::find()->where(['interview_id' => $id]),
+        ]);
+
+        $models = Respond::find()->where(['interview_id' => $id])->all();
+        $interview = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        return $this->render('by-status-responds', [
+            'dataProvider' => $dataProvider,
+            'models' => $models,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
     /**
      * Displays a single Respond model.
      * @param string $id

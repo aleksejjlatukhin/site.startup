@@ -126,111 +126,118 @@ class InterviewController extends AppController
             return $this->redirect(['view', 'id' => $modelInterview->id]);
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            $interviews_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/';
-            if (!file_exists($interviews_dir)){
-                mkdir($interviews_dir, 0777);
-            }
+            if ($model->count_respond > $model->count_positive){
 
-            $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/';
-            if (!file_exists($feedbacks_dir)){
-                mkdir($feedbacks_dir, 0777);
-            }
+                if ($model->save()){
 
-            $generation_problems_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/';
-            if (!file_exists($generation_problems_dir)){
-                mkdir($generation_problems_dir, 0777);
-            }
+                    $interviews_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($segment->name , "windows-1251") .'/interviews/';
+                    if (!file_exists($interviews_dir)){
+                        mkdir($interviews_dir, 0777);
+                    }
 
-            for ($i = 1; $i <= $model->count_respond; $i++ )
-            {
-                $newRespond[$i] = new Respond();
-                $newRespond[$i]->interview_id = $model->id;
-                $newRespond[$i]->name = 'Респондент ' . $i;
-                $newRespond[$i]->save();
-            }
+                    $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/';
+                    if (!file_exists($feedbacks_dir)){
+                        mkdir($feedbacks_dir, 0777);
+                    }
 
-            if ($model->question_1 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?';
-                $question->save();
-            }
-            if ($model->question_2 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Что нравится / не нравится в текущем положении вещей?';
-                $question->save();
-            }
-            if ($model->question_3 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Вас беспокоит данная ситуация?';
-                $question->save();
-            }
-            if ($model->question_4 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Что вы пытались с этим сделать?';
-                $question->save();
-            }
-            if ($model->question_5 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Что вы делали с этим в последний раз, какие шаги предпринимали?';
-                $question->save();
-            }
-            if ($model->question_6 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Если ничего не делали, то почему?';
-                $question->save();
-            }
-            if ($model->question_7 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Сколько денег / времени на это тратится сейчас?';
-                $question->save();
-            }
-            if ($model->question_8 == 1){
-                $question = new Questions();
-                $question->interview_id = $model->id;
-                $question->status = 1;
-                $question->title = 'Есть ли деньги на решение сложившейся ситуации сейчас?';
-                $question->save();
-            }
+                    $generation_problems_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/';
+                    if (!file_exists($generation_problems_dir)){
+                        mkdir($generation_problems_dir, 0777);
+                    }
 
-            if ($newQuestions->load(Yii::$app->request->post())){
-                if (!empty($newQuestions->title)){
-                    $newQuestions->interview_id = $model->id;
-                    $newQuestions->status = 1;
-                    //debug($newQuestions);
-                    $newQuestions->save();
+                    for ($i = 1; $i <= $model->count_respond; $i++ )
+                    {
+                        $newRespond[$i] = new Respond();
+                        $newRespond[$i]->interview_id = $model->id;
+                        $newRespond[$i]->name = 'Респондент ' . $i;
+                        $newRespond[$i]->save();
+                    }
+
+                    if ($model->question_1 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?';
+                        $question->save();
+                    }
+                    if ($model->question_2 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Что нравится / не нравится в текущем положении вещей?';
+                        $question->save();
+                    }
+                    if ($model->question_3 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Вас беспокоит данная ситуация?';
+                        $question->save();
+                    }
+                    if ($model->question_4 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Что вы пытались с этим сделать?';
+                        $question->save();
+                    }
+                    if ($model->question_5 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Что вы делали с этим в последний раз, какие шаги предпринимали?';
+                        $question->save();
+                    }
+                    if ($model->question_6 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Если ничего не делали, то почему?';
+                        $question->save();
+                    }
+                    if ($model->question_7 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Сколько денег / времени на это тратится сейчас?';
+                        $question->save();
+                    }
+                    if ($model->question_8 == 1){
+                        $question = new Questions();
+                        $question->interview_id = $model->id;
+                        $question->status = 1;
+                        $question->title = 'Есть ли деньги на решение сложившейся ситуации сейчас?';
+                        $question->save();
+                    }
+
+                    if ($newQuestions->load(Yii::$app->request->post())){
+                        if (!empty($newQuestions->title)){
+                            $newQuestions->interview_id = $model->id;
+                            $newQuestions->status = 1;
+                            //debug($newQuestions);
+                            $newQuestions->save();
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+
+                    if ($project->save()){
+
+                        Yii::$app->session->setFlash('success', "Данные для интервью загружены");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
                 }
+            }else{
+                Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества респондентов соответствующих сенгменту!");
             }
-
-            $project->update_at = date('Y:m:d');
-
-            if ($project->save()){
-
-                Yii::$app->session->setFlash('success', "Данные для интервью загружены");
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-
         }
 
         return $this->render('create', [
@@ -262,51 +269,59 @@ class InterviewController extends AppController
 
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            if ((count($responds)+1) <= $model->count_respond){
-                for ($count = count($responds) + 1; $count <= $model->count_respond; $count++ )
-                {
-                    $newRespond[$count] = new Respond();
-                    $newRespond[$count]->interview_id = $model->id;
-                    $newRespond[$count]->name = 'Респондент ' . $count;
-                    $newRespond[$count]->save();
+            if ($model->count_respond > $model->count_positive){
+
+                if ($model->save()){
+
+                    if ((count($responds)+1) <= $model->count_respond){
+                        for ($count = count($responds) + 1; $count <= $model->count_respond; $count++ )
+                        {
+                            $newRespond[$count] = new Respond();
+                            $newRespond[$count]->interview_id = $model->id;
+                            $newRespond[$count]->name = 'Респондент ' . $count;
+                            $newRespond[$count]->save();
+                        }
+                    }else{
+                        $minus = count($responds) - $model->count_respond;
+                        $respond = Respond::find()->orderBy(['id' => SORT_DESC])->limit($minus)->all();
+                        foreach ($respond as $item)
+                        {
+                            $item->delete();
+                        }
+                    }
+
+
+                    if ($newQuestions->load(Yii::$app->request->post())){
+                        if (!empty($newQuestions->title)){
+                            $newQuestions->interview_id = $id;
+                            $newQuestions->status = 1;
+                            //debug($newQuestions);
+                            $newQuestions->save();
+                        }
+                    }
+
+                    $status = $_POST['Interview']['questions'];
+
+                    foreach ($model->questions as $key => $question){
+                        $question->status = $status[$key];
+                        $question->save();
+                        if($question->status == 0){
+                            $question->delete();
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+
+                    if ($project->save()){
+
+                        Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
                 }
             }else{
-                $minus = count($responds) - $model->count_respond;
-                $respond = Respond::find()->orderBy(['id' => SORT_DESC])->limit($minus)->all();
-                foreach ($respond as $item)
-                {
-                    $item->delete();
-                }
-            }
-
-
-            if ($newQuestions->load(Yii::$app->request->post())){
-                if (!empty($newQuestions->title)){
-                    $newQuestions->interview_id = $id;
-                    $newQuestions->status = 1;
-                    //debug($newQuestions);
-                    $newQuestions->save();
-                }
-            }
-
-            $status = $_POST['Interview']['questions'];
-
-            foreach ($model->questions as $key => $question){
-                $question->status = $status[$key];
-                $question->save();
-                if($question->status == 0){
-                    $question->delete();
-                }
-            }
-
-            $project->update_at = date('Y:m:d');
-
-            if ($project->save()){
-
-                Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
-                return $this->redirect(['view', 'id' => $model->id]);
+                Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества респондентов соответствующих сенгменту!");
             }
         }
 

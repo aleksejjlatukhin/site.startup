@@ -53,8 +53,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'description:ntext',
 
-            'result',
-
             [
                 'attribute' => 'interview_file',
                 'value' => function($model){
@@ -65,6 +63,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 },
                 'visible' => !empty($model->interview_file),
+                'format' => 'html',
+            ],
+
+            'result',
+
+            [
+                'attribute' => 'status',
+                'value' => !$model->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>',
                 'format' => 'html',
             ],
         ],

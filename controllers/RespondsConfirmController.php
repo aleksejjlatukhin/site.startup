@@ -226,36 +226,6 @@ class RespondsConfirmController extends AppController
 
             if ($kol == 0){
 
-                foreach ($models as $elem){
-                    if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
-
-                        $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                            mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                            mb_convert_encoding($elem->name , "windows-1251") . '/';
-
-                        $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                            mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                            mb_convert_encoding($model->name , "windows-1251") . '/';
-
-                        if (file_exists($old_dir)){
-                            rename($old_dir, $new_dir);
-                        }
-                    }
-                }
-
-                $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                    mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                    mb_convert_encoding($model->name , "windows-1251") . '/';
-                if (!file_exists($respond_dir)){
-                    mkdir($respond_dir, 0777);
-                }
-
                 if ($model->save()) {
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
@@ -310,16 +280,6 @@ class RespondsConfirmController extends AppController
             if ($descInterview){
                 $descInterview->delete();
             }
-
-            $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                mb_convert_encoding($model->name , "windows-1251") . '/';
-            if (file_exists($del_dir)){
-                $this->delTree($del_dir);
-            }
-
 
             if ($model->delete()){
                 $confirmProblem->count_respond = $confirmProblem->count_respond -1;

@@ -25,8 +25,6 @@ use yii\helpers\Url;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6])->label('') ?>
 
-    <?= $form->field($model, 'result')->textInput(['maxlength' => true]) ?>
-
     <div class="container row">
         <div class="pull-left">
 
@@ -66,6 +64,11 @@ use yii\helpers\Url;
 
         </div>
     </div>
+
+    <?= $form->field($model, 'result')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'status', ['template' => '<div class="col-md-12" style="padding-left: 0">{label}</div><div class="col-md-12" style="padding-left: 0; margin-bottom: 10px;"><div class="col-md-2" style="padding-left: 0">{input}</div></div>'])->dropDownList([ '0' => 'Нет', '1' => 'Да', ]) ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

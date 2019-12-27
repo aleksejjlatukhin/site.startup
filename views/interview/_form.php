@@ -16,6 +16,12 @@ use yii\widgets\ActiveForm;
         ])->textInput(['type' => 'number']);?>
     </div>
 
+    <div class="row">
+        <?= $form->field($model, 'count_positive', [
+            'template' => '<div class="col-md-3">{label}</div><div class="col-md-2">{input}</div>'
+        ])->textInput(['type' => 'number']);?>
+    </div>
+
     <h4><u>Текст легенды</u></h4>
 
     <div class="row">

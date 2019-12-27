@@ -48,16 +48,15 @@ use yii\helpers\Url;
 </table>
 
 
-
 <div class="generation-problem-form">
 
-    <?php $form = ActiveForm::begin(['id' => 'my_form_problem', 'action' => ['create', 'id' => $model->interview_id]]); ?>
+    <?php $form = ActiveForm::begin(['id' => 'gpsForm']); ?>
 
     <? $placeholder = 'Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
-    <?= $form->field($model, 'description')->label('Описание гипотезы проблемы сегмента')->textarea(['rows' => 6, 'placeholder' => $placeholder]) ?>
+    <?= $form->field($model, 'description')->label('<h4>Напишите описание гипотезы проблемы сегмента</h4>')->textarea(['rows' => 6, 'placeholder' => $placeholder]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
@@ -67,32 +66,58 @@ use yii\helpers\Url;
 
 </div>
 
+<hr>
 
+<h4>Добавленные гипотезы проблем сегмента:</h4>
+<div class="new" style="font-size: 15px;font-weight: 700;">
+    <?php if (!empty($models)) : ?>
+        <?php foreach ($models as $model) : ?>
+            <?= Html::a($model->title, Url::to(['view', 'id' => $model->id])) . ' | ';?>
+        <?php endforeach;?>
+    <?php endif; ?>
+</div>
+
+<hr>
+
+<?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
 
 <?php
 
-/*$js = <<<JS
-    $('#my_form_problem').submit(function(){
+$script = "
+    
+     $('form').on('beforeSubmit', function(e){
         
-        var $form = $(this);
+        var data = $(this).serialize();
 
         $.ajax({
         
-            url: form.attr('action'),
-            method: 'post',
-            //dataType: 'html',
-            data: form.serializeArray(),
-            success: function(data){
-                $('#results').html(data);
+            url: '". Url::to(['test', 'id' => $model->interview_id])."',
+            method: 'POST',
+            data: data,
+            success: function(response){
+                console.log(data);
+                
+                $('.new').append('<\a href=\"\" id=\"link\">' + response.title + '<\/a>' + ' | ');
+                 
+                var a = document.getElementById('link');
+                var str = '".Url::toRoute(['view'])."?id=' +response.id;
+                a.href = str;
+                a.id = response.id;
+                
+                //$('#generationproblem-description').val('');
+                $('#gpsForm')[0].reset();
             },
-            error:  function(xhr, str){
-	            alert('Возникла ошибка: ' + xhr.responseCode);
+            error: function(){
+                alert('Ошибка');
             }
         });
+        e.preventDefault();
 
         return false;
-    });
-JS;*/
+     });
+";
+
+$this->registerJs($script);
 
 
 

@@ -79,15 +79,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
-                'attribute' => 'description',
-                'label' => 'Вывод из интервью',
-                'value' => function($model){
-                    return $model->descInterview->result;
-                },
-                'visible' => !empty($model->descInterview->result),
-            ],
-
-            [
                 'attribute' => 'interview_file',
                 'label' => 'Файл',
                 'value' => function($model){
@@ -96,6 +87,25 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $string;
                 },
                 'visible' => !empty($model->descInterview->interview_file),
+                'format' => 'html',
+            ],
+
+            [
+                'attribute' => 'result',
+                'label' => 'Вывод из интервью',
+                'value' => function($model){
+                    return $model->descInterview->result;
+                },
+                'visible' => !empty($model->descInterview->result),
+            ],
+
+            [
+                'attribute' => 'respond_status',
+                'label' => 'Является ли респондент представителем сегмента?',
+                'value' => function($model){
+                    return !$model->descInterview->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>';
+                },
+                'visible' => !empty($model->descInterview),
                 'format' => 'html',
             ],
 

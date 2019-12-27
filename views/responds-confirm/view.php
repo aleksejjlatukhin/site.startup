@@ -31,9 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
         <?if(!($desc_interview->responds_confirm_id == $model->id)){
-            echo Html::a('Добавить интервью', ['desc-interview-confirm/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']);
+            echo Html::a('Добавить анкету', ['desc-interview-confirm/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']);
         }else{
-            echo Html::a('материалы интервью', ['desc-interview-confirm/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success pull-right']);
+            echo Html::a('материалы анкеты', ['desc-interview-confirm/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success pull-right']);
         }?>
     </p>
 
@@ -64,37 +64,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 
-            [
-                'attribute' => 'description',
-                'label' => 'Материалы интервью',
-                'value' => function($model){
-                    return $model->descInterview->description;
-                },
-                'visible' => !empty($model->descInterview->description),
-            ],
 
             [
                 'attribute' => 'interview_status',
-                'label' => 'Индикатор теста',
+                'label' => 'Значимость проблемы',
                 'value' => function($model){
-                    return !$model->descInterview->status ? '<span style="color:red">Не пройден</span>' : '<span style="color:green">Пройден</span>';
+                    return !$model->descInterview->status ? '<span style="color:red">Проблемы не существует или она малозначимая</span>' : '<span style="color:green">Значимая проблема</span>';
                 },
                 'visible' => !empty($model->descInterview),
                 'format' => 'html',
             ],
 
-
-            [
-                'attribute' => 'interview_file',
-                'label' => 'Файл',
-                'value' => function($model){
-                    $string = '';
-                    $string .= Html::a($model->descInterview->interview_file, ['desc-interview-confirm/download', 'filename' => $model->descInterview->interview_file], ['class' => '']);
-                    return $string;
-                },
-                'visible' => !empty($model->descInterview->interview_file),
-                'format' => 'html',
-            ],
         ],
     ]) ?>
 

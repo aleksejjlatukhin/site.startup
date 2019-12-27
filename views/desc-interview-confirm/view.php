@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\DescInterviewConfirm */
 
-$this->title = 'Материалы интервью';
+$this->title = 'Анкета респондента';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -37,32 +37,16 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
 
         'attributes' => [
-            //'id',
-            //'respond_id',
+
             [
                 'attribute' => 'date_fact',
                 'format' => ['date', 'dd.MM.yyyy'],
 
             ],
 
-            'description:ntext',
-
             [
                 'attribute' => 'status',
-                'value' => !$model->status ? '<span style="color:red">Не пройден</span>' : '<span style="color:green">Пройден</span>',
-                'format' => 'html',
-            ],
-
-            [
-                'attribute' => 'interview_file',
-                'value' => function($model){
-                    if (!empty($model->interview_file)){
-                        $string = '';
-                        $string .= Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => '']);
-                        return $string;
-                    }
-                },
-                'visible' => !empty($model->interview_file),
+                'value' => !$model->status ? '<span style="color:red">Проблемы не существует или она малозначимая</span>' : '<span style="color:green">Значимая проблема</span>',
                 'format' => 'html',
             ],
         ],

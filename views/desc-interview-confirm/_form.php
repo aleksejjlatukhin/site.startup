@@ -13,59 +13,30 @@ use yii\helpers\Url;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <!--    --><?/*= $form->field($model, 'date_fact')->label('Фактическая дата интервью')->widget(\yii\jui\DatePicker::class, [
-        'dateFormat' => 'yyyy-MM-dd',
-        //'inline' => true,
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-MM-dd',
-        ],
-        //'language' => 'ru',
-    ]) */?>
+    <div  style="margin-top: 30px;margin-bottom: 30px;">
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6])->label('') ?>
+        <h4>Выберите один из вариантов:</h4>
 
-    <?= $form->field($model, 'status', ['template' => '<div class="col-md-12" style="padding-left: 0">{label}</div><div class="col-md-12" style="padding-left: 0; margin-bottom: 10px;"><div class="col-md-2" style="padding-left: 0">{input}</div></div>'])->dropDownList([ '0' => 'Не пройден', '1' => 'Пройден', ]) ?>
+        <?= $form->field($model, 'status')
+        ->radioList(
+            [0 => 'Проблемы не существует или она малозначимая', 1 => 'Значимая проблема'],
+            [
+                'item' => function($index, $label, $name, $checked, $value) {
 
-    <div class="container row">
-        <div class="pull-left">
+                    $return = '<label style="width: 100%;">';
+                    $return .= '<input type="radio" name="' . $name . '" value="' . $value . '" tabindex="3">';
+                    $return .= '<i></i>';
+                    $return .= '<span>' . ucwords($label) . '</span>';
+                    $return .= '</label>';
 
-            <p class="feed"><b>Файл</b></p>
-            <?php if (!empty($model->interview_file)) : ?>
-                <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp']])->fileInput()->label('') ?></p>
-            <?php endif;?>
-
-            <?php if (empty($model->interview_file)) : ?>
-                <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp active']])->fileInput()->label('') ?></p>
-            <?php endif;?>
-
-            <p>
-                <?php
-                if (!empty($model->interview_file))
-                {
-                    echo Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => 'btn btn-default feedback']) .
-                        ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $model->interview_file], [
-                            'onclick'=>
-                                "$.ajax({
-                                         type:'POST',
-                                         cache: false,
-                                         url: '".Url::to(['delete-file', 'filename' => $model->interview_file])."',
-                                         success  : function(response) {
-                                             $('.link-del').html(response);
-                                             $('.feedback').remove();
-                                         }
-                                      });
-                                 return false;
-                                 $('.feedback').remove();
-                                 ",
-                            'class' => "link-del",
-                        ]);
+                    return $return;
                 }
-                ?>
-            </p>
-
-        </div>
+            ]
+        )
+        ->label(false);?>
     </div>
+
+
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

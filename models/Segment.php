@@ -46,6 +46,7 @@ class Segment extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'name', 'age', 'income', 'quantity', 'market_volume'], 'trim'],
             [['project_id'], 'integer'],
             [['field_of_activity', 'sort_of_activity', 'add_info'], 'string'],
             [['name', 'age', 'income', 'quantity', 'market_volume'], 'string', 'max' => 255],

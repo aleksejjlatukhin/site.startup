@@ -52,63 +52,7 @@ class DescInterviewConfirmController extends Controller
         ]);
     }
 
-    public function actionDownload($filename)
-    {
-        $user = Yii::$app->user->identity;
-        $model = DescInterviewConfirm::find()->where(['interview_file' => $filename])->one();
-        $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-            mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-            mb_convert_encoding($respond->name , "windows-1251") . '/');
-
-        $file = $path . $model->interview_file;
-
-        if (file_exists($file)) {
-
-            return \Yii::$app->response->sendFile($file);
-        }
-
-    }
-
-
-    public function actionDeleteFile($filename)
-    {
-        $user = Yii::$app->user->identity;
-        $model = DescInterviewConfirm::find()->where(['interview_file' => $filename])->one();
-        $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-            mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-            mb_convert_encoding($respond->name , "windows-1251") . '/');
-
-        unlink($path . $model->interview_file);
-
-        $model->interview_file = null;
-
-        $model->update();
-
-        if (Yii::$app->request->isAjax)
-        {
-            return 'Delete';
-        }else{
-            return $this->redirect(['update', 'id' => $model->id]);
-        }
-    }
 
     /**
      * Displays a single DescInterviewConfirm model.
@@ -166,29 +110,11 @@ class DescInterviewConfirmController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                mb_convert_encoding($respond->name , "windows-1251") . '/';
-            if (!file_exists($respond_dir)){
-                mkdir($respond_dir, 0777);
-            }
-
             if ($model->save()) {
-
-                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                if ($model->loadFile !== null){
-                    if ($model->validate() && $model->upload($respond_dir)){
-                        $model->interview_file = $model->loadFile;
-                        $model->save(false);
-                    }
-                }
 
                 $project->update_at = date('Y:m:d');
                 if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью добавлены!");
+                    Yii::$app->session->setFlash('success', "Анкета добавлена!");
                     return $this->redirect(['responds-confirm/view', 'id' => $model->responds_confirm_id]);
                 }
             }
@@ -224,35 +150,14 @@ class DescInterviewConfirmController extends Controller
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if ($model->interview_file !== null){
-            $model->loadFile = $model->interview_file;
-        }
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") . '/generation problems/' .
-                mb_convert_encoding($generationProblem->title , "windows-1251") .'/interviews-confirm/' .
-                mb_convert_encoding($respond->name , "windows-1251") . '/';
-            if (!file_exists($respond_dir)){
-                mkdir($respond_dir, 0777);
-            }
-
             if ($model->save()) {
-
-                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                if ($model->loadFile !== null){
-                    if ($model->validate() && $model->upload($respond_dir)){
-                        $model->interview_file = $model->loadFile;
-                        $model->save(false);
-                    }
-                }
 
                 $project->update_at = date('Y:m:d');
                 if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью обновлены");
+                    Yii::$app->session->setFlash('success', "Анкета обновлена!");
                     return $this->redirect(['responds-confirm/view', 'id' => $model->responds_confirm_id]);
                 }
             }
@@ -279,9 +184,6 @@ class DescInterviewConfirmController extends Controller
     public function actionDelete($id)
     {
         $model = DescInterviewConfirm::find()->where(['responds_confirm_id' => $id])->one();
-        if ($model->interview_file !== null){
-            unlink('upload/interviews-confirm/' . $model->interview_file);
-        }
 
         $respond = RespondsConfirm::findOne($id);
         $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
@@ -292,7 +194,7 @@ class DescInterviewConfirmController extends Controller
 
         if ($project->save()) {
 
-            Yii::$app->session->setFlash('error', 'Материалы полученные во время интервью ' . date("d.m.Y", strtotime($model->date_fact)) . ' удалены!');
+            Yii::$app->session->setFlash('error', 'Анкета ' . $respond->name . ' удалена!');
 
             $model->delete();
 

@@ -40,7 +40,7 @@ class Interview extends \yii\db\ActiveRecord
         return [
             [['segment_id', 'count_respond', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
             [['segment_id'], 'integer'],
-            ['count_respond', 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['question_1', 'question_2', 'question_3', 'question_4', 'question_5', 'question_6', 'question_7', 'question_8'], 'boolean'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => 255],
         ];
@@ -76,6 +76,7 @@ class Interview extends \yii\db\ActiveRecord
             'id' => 'ID',
             'segment_id' => 'Segment ID',
             'count_respond' => 'Количество респондентов',
+            'count_positive' => 'Количество респондентов соответствующих сегменту',
             'greeting_interview' => 'Приветствие в начале встречи',
             'view_interview' => 'Представление интервьюера',
             'reason_interview' => 'Почему мне интересно',

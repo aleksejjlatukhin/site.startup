@@ -7,6 +7,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\QuestionsConfirm;
+use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
 use Yii;
@@ -59,7 +60,7 @@ class ConfirmProblemController extends AppController
      */
     public function actionView($id)
     {
-        $model = ConfirmProblem::find()->with('questions')->where(['id' => $id])->one();
+        $model = ConfirmProblem::find()->where(['id' => $id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
@@ -109,10 +110,22 @@ class ConfirmProblemController extends AppController
 
         $generationPromblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
+        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $newQuestions = new QuestionsConfirm();
+        $countPositive = 0;
+        foreach ($responds as $respond){
+            if ($respond->descInterview->status == 1){
+                $countPositive++;
+            }
+        }
+
+        if ($countPositive < $interview->count_positive){
+            Yii::$app->session->setFlash('error', "Не набрано необходимое количество представителей сегмента!");
+            return $this->redirect(['generation-problem/view', 'id' => $generationPromblem->id]);
+        }
+
 
         $modelConfirmProblem = ConfirmProblem::find()->where(['gps_id' => $id])->one();
         if (!empty($modelConfirmProblem)){
@@ -171,71 +184,6 @@ class ConfirmProblemController extends AppController
                         $newRespond[$i]->save();
                     }
 
-                    if ($model->question_1 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?';
-                        $question->save();
-                    }
-                    if ($model->question_2 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что нравится / не нравится в текущем положении вещей?';
-                        $question->save();
-                    }
-                    if ($model->question_3 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Вас беспокоит данная ситуация?';
-                        $question->save();
-                    }
-                    if ($model->question_4 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что вы пытались с этим сделать?';
-                        $question->save();
-                    }
-                    if ($model->question_5 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что вы делали с этим в последний раз, какие шаги предпринимали?';
-                        $question->save();
-                    }
-                    if ($model->question_6 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Если ничего не делали, то почему?';
-                        $question->save();
-                    }
-                    if ($model->question_7 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Сколько денег / времени на это тратится сейчас?';
-                        $question->save();
-                    }
-                    if ($model->question_8 == 1){
-                        $question = new QuestionsConfirm();
-                        $question->confirm_problem_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Есть ли деньги на решение сложившейся ситуации сейчас?';
-                        $question->save();
-                    }
-
-                    if ($newQuestions->load(Yii::$app->request->post())){
-                        if (!empty($newQuestions->title)){
-                            $newQuestions->confirm_problem_id = $model->id;
-                            $newQuestions->status = 1;
-                            //debug($newQuestions);
-                            $newQuestions->save();
-                        }
-                    }
 
                     $project->update_at = date('Y:m:d');
 
@@ -256,7 +204,6 @@ class ConfirmProblemController extends AppController
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'newQuestions' => $newQuestions,
         ]);
     }
 
@@ -274,9 +221,6 @@ class ConfirmProblemController extends AppController
         $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $questions = QuestionsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-        $newQuestions = new QuestionsConfirm();
 
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
 
@@ -303,25 +247,6 @@ class ConfirmProblemController extends AppController
                         }
                     }
 
-                    if ($newQuestions->load(Yii::$app->request->post())){
-                        if (!empty($newQuestions->title)){
-                            $newQuestions->confirm_problem_id = $id;
-                            $newQuestions->status = 1;
-                            //debug($newQuestions);
-                            $newQuestions->save();
-                        }
-                    }
-
-                    $status = $_POST['ConfirmProblem']['questions'];
-
-                    foreach ($model->questions as $key => $question){
-                        $question->status = $status[$key];
-                        $question->save();
-                        if($question->status == 0){
-                            $question->delete();
-                        }
-                    }
-
 
                     $project->update_at = date('Y:m:d');
 
@@ -342,7 +267,6 @@ class ConfirmProblemController extends AppController
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'newQuestions' => $newQuestions,
         ]);
     }
 

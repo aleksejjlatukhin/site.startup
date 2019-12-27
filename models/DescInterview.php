@@ -55,6 +55,7 @@ class DescInterview extends \yii\db\ActiveRecord
             [['interview_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf',],
             ['exist_desc', 'boolean'],
+            ['status', 'boolean'],
         ];
     }
 
@@ -70,6 +71,7 @@ class DescInterview extends \yii\db\ActiveRecord
             'description' => 'Материалы интервью',
             'interview_file' => 'Файл',
             'result' => 'Вывод',
+            'status' => 'Данный респондент является представителем сегмента?',
         ];
     }
 }

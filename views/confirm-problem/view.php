@@ -42,13 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p> <h3>Исходные данные ПИ</h3>
     <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-    <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+    <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
         'class' => 'btn btn-danger',
         'data' => [
             'confirm' => 'Вы действительно хотите удалить интервью для "' . $generationProblem->title . '" ?',
             'method' => 'post',
         ],
-    ]) ?>
+    ]) */?>
     </p>
 
 
@@ -57,40 +57,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'count_respond',
             'count_positive',
-            'greeting_interview',
-            'view_interview',
-            'reason_interview',
         ],
     ]) ?>
 
-    <h4><u>Примерный список вопросов для проведения интервью</u></h4 class="d-inline p-2 bg-success" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">
-
-    <?php
-    $j = 0;
-    if (!empty($model->questions)){
-        foreach ($model->questions as $question){
-            if ($question->status == 1){
-                $j++;
-                echo '<div class=""><b>' . $j . '.</b> ' . $question->title . '</div>' . '<br>';
-            }
-        }
-    }else{
-        echo "Вопросов пока нет...";
-    }
-
-    ?>
 
     <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Полученные данные ПИ</div>
 
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th scope="col" style="text-align: center;padding-bottom: 15px;">Респонденты</th>
-            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Данные респондентов</th>
-            <th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>
-            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Результат ППИ</th>
-            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Отзыв эксперта</th>
-            <th scope="col" style="text-align: center;width: 180px;">Дата отзыва</th>
+            <th scope="col" style="text-align: center;padding: 30px 0;">Респонденты</th>
+            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Данные респондентов</th>
+            <!--<th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>-->
+            <th scope="col" style="text-align: center;width: 180px;">Количество позитивных ответов / всего опрошенных</th>
+            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Результат ППИ</th>
+            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Отзыв эксперта</th>
+            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Дата отзыва</th>
         </tr>
         </thead>
         <tbody>
@@ -124,10 +106,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </td>
 
-            <td style="text-align: center; padding-top: 20px;">
+            <!--<td style="text-align: center; padding-top: 20px;">
 
                 <?php
-                $sumInt = 0;
+/*                $sumInt = 0;
                 foreach ($responds as $respond){
                     $sumInt += $respond->descInterview->exist_desc;
                 }
@@ -135,9 +117,30 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p>$valueInt  %</p>",
                     Url::to(['responds-confirm/by-date-interview', 'id' => $model->id]));
+                */?>
+
+            </td>-->
+
+            <td style="text-align: center; padding-top: 20px;">
+
+                <?php
+                    $a = 0;
+                    $b = 0;
+                    foreach ($responds as $respond){
+                        if (!empty($respond->descInterview)){
+                            $b++;
+                            if ($respond->descInterview->status == 1){
+                                $a++;
+                            }
+                        }
+                    }
+
+                    echo $a . ' / ' . $b;
+
                 ?>
 
             </td>
+
 
             <td style="text-align: center; padding-top: 20px;">
 

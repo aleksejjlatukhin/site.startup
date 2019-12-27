@@ -38,10 +38,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
     }
 
-    public function getQuestions()
-    {
-        return $this->hasMany(QuestionsConfirm::class, ['confirm_problem_id' => 'id']);
-    }
 
     public function getFeedbacks()
     {
@@ -59,11 +55,9 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['gps_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
+            [['gps_id', 'count_respond', 'count_positive'], 'required'],
             [['gps_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
-            [['question_1', 'question_2', 'question_3', 'question_4', 'question_5', 'question_6', 'question_7', 'question_8'], 'boolean'],
-            [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => 255],
         ];
     }
 
@@ -76,18 +70,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             'id' => 'ID',
             'gps_id' => 'Gps ID',
             'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Количество позитивных интервью',
-            'greeting_interview' => 'Приветствие в начале встречи',
-            'view_interview' => 'Представление интервьюера',
-            'reason_interview' => 'Почему мне интересно',
-            'question_1' => '',
-            'question_2' => '',
-            'question_3' => '',
-            'question_4' => '',
-            'question_5' => '',
-            'question_6' => '',
-            'question_7' => '',
-            'question_8' => '',
+            'count_positive' => 'Необходимое количество позитивных интервью',
         ];
     }
 }
