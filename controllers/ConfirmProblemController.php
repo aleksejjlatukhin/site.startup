@@ -97,6 +97,42 @@ class ConfirmProblemController extends AppController
         ]);
     }
 
+
+    public function actionNotExistConfirm($id)
+    {
+        $model = ConfirmProblem::find()->where(['id' => $id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $generationProblem->exist_confirm = 0;
+
+        if ($generationProblem->save()){
+
+            $project->update_at = date('Y:m:d');
+            return $this->redirect(['interview/view', 'id' => $interview->id]);
+        }
+    }
+
+
+    public function actionExistConfirm($id)
+    {
+        $model = ConfirmProblem::find()->where(['id' => $id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $generationProblem->exist_confirm = 1;
+
+        if ($generationProblem->save()){
+
+            $project->update_at = date('Y:m:d');
+            return $this->redirect(['gcp/index', 'id' => $model->id]);
+        }
+    }
+
     /**
      * Creates a new ConfirmProblem model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -151,24 +187,12 @@ class ConfirmProblemController extends AppController
                     }
 
 
-                    $interviews_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                        . mb_convert_encoding($generationPromblem->title , "windows-1251") . '/interviews-confirm/';
-
-                    $interviews_dir = mb_strtolower($interviews_dir, "windows-1251");
-
-                    if (!file_exists($interviews_dir)){
-                        mkdir($interviews_dir, 0777);
-                    }
-
-
                     $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
                         mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
                         mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
                         . mb_convert_encoding($generationPromblem->title , "windows-1251") . '/feedbacks-confirm/';
 
-                    $feedback_dirs = mb_strtolower($feedbacks_dir, "windows-1251");
+                    $feedbacks_dir = mb_strtolower($feedbacks_dir, "windows-1251");
 
                     if (!file_exists($feedbacks_dir)){
                         mkdir($feedbacks_dir, 0777);
@@ -216,7 +240,7 @@ class ConfirmProblemController extends AppController
      */
     public function actionUpdate($id)
     {
-        $model = ConfirmProblem::find()->with('questions')->where(['id' => $id])->one();
+        $model = ConfirmProblem::find()->where(['id' => $id])->one();
         $generationPromblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
@@ -299,33 +323,17 @@ class ConfirmProblemController extends AppController
             $this->delTree($gps_dir);
         }
 
-
-
         if ($project->save()){
 
             foreach ($responds as $respond){
+
                 $descInterview = $respond->descInterview;
-
-                if ($descInterview->interview_file !== null){
-                    unlink('upload/interviews-confirm/' . $descInterview->interview_file);
-                }
-
                 if (!empty($descInterview)){
                     $descInterview->delete();
                 }
             }
 
-            if (!empty($model->feedbacks)){
-                foreach ($model->feedbacks as $feedback) {
-                    if ($feedback->feedback_file !== null){
-                        unlink('upload/feedbacks-confirm/' . $feedback->feedback_file);
-                    }
-                }
-            }
 
-
-
-            QuestionsConfirm::deleteAll(['confirm_problem_id' => $id]);
             RespondsConfirm::deleteAll(['confirm_problem_id' => $id]);
             FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $id]);
 

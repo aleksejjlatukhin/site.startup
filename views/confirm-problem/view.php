@@ -145,22 +145,33 @@ $this->params['breadcrumbs'][] = $this->title;
             <td style="text-align: center; padding-top: 20px;">
 
                 <?php
-                    //$count_exist = 0;
-                    $count_positive = 0;
+
+                    $sumPositive = 0;
                     foreach ($responds as $respond){
-                        //$count_exist += $respond->descInterview->exist_desc;
                         if ($respond->descInterview->status == 1){
-                            $count_positive++;
+                            $sumPositive++;
                         }
                     }
 
+                    $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
 
-                echo Html::a("<progress max='$model->count_positive' value='$count_positive' id='info-interview'></progress><p>$count_positive / $model->count_positive</p>",
-                    Url::to(['responds-confirm/by-status-interview', 'id' => $model->id]));
+                    if ($sumPositive < $model->count_positive){
 
-                    if ($count_positive < $model->count_positive){
+                        $model->exist_confirm = 0;
+
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive %</p>",
+                            Url::to(['responds-confirm/by-status-interview', 'id' => $model->id]));
+
                         echo '<span style="color:red">Тест не пройден!</span>';
-                    }else{
+                    }
+
+                    if ($model->count_positive <= $sumPositive){
+
+                        $model->exist_confirm = 1;
+
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive %</p>",
+                            Url::to(['responds-confirm/by-status-interview', 'id' => $model->id]));
+
                         echo '<span style="color:green">Тест пройден</span>';
                     }
 
@@ -199,5 +210,28 @@ $this->params['breadcrumbs'][] = $this->title;
         </tr>
         </tbody>
     </table>
+
+    <?
+
+    if ($generationProblem->exist_confirm !== $model->exist_confirm){
+
+        if ($model->exist_confirm == 0){
+
+            echo Html::a('Закончить тест', ['not-exist-confirm', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Проблема не подтверждена! Вы действительно хотите закончить тест для "' . $generationProblem->title . '" ?',
+                    'method' => 'post',
+                ],
+            ]);
+        }
+
+        if ($model->exist_confirm == 1){
+
+            echo Html::a('Закончить тест', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
+        }
+    }
+
+    ?>
 
 </div>

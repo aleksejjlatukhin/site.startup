@@ -79,6 +79,7 @@ use yii\helpers\Url;
                                     <button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
                                 </div>
 
+
                                 <?= $form->field($modelsConcept, "[{$i}]name", [
                                     'template' => '<div class="col-md-10">{input}</div><div class="col-md-2">{error}</div>'
                                 ])->textInput(['maxlength' => true])?>

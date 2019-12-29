@@ -166,7 +166,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
 
                 if ($model->count_positive <= $sumPositive){
-                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
+                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
                 }
 
                 if ($sumPositive < $model->count_positive){
@@ -182,8 +182,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <? if (!empty($model->problems)){
                     foreach ($model->problems as $problem) {
-                        //echo $problem->title . '<br>';
-                        echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) . '<hr>';
+
+                        echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id]));
+                        if (isset($problem->exist_confirm)){
+                            if ($problem->exist_confirm == 0){
+                                echo '<br><span style="color:red">Тест закончен, проблема не подтверждена!</span>';
+                            }
+                            if ($problem->exist_confirm == 1){
+                                echo '<br><span style="color:green">Тест закончен, проблема подтверждена!</span>';
+                            }
+                        }
+                        echo '<hr>';
                     }
                 }
                 ?>

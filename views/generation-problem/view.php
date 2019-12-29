@@ -41,6 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php else: ?>
             <?= Html::a('Подтверждение ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
+
+        <?php if ($model->exist_confirm == 1){
+            echo Html::a('Перейти на страницу ГЦП', ['gcp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+        }?>
     </p>
 
     <?= DetailView::widget([
@@ -48,9 +52,25 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             //'title',
             'description:ntext',
+
             [
                 'attribute' => 'date_gps',
                 'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'exist_confirm',
+                'label' => 'Подтверждение проблемы',
+                'visible' => ($model->exist_confirm !== null),
+                'value' => function($model){
+                    if ($model->exist_confirm == 0){
+                        return '<span style="color:red">Тест закончен, проблема не подтверждена!</span>';
+                    }
+                    if ($model->exist_confirm == 1){
+                        return '<span style="color:green">Тест закончен, проблема подтверждена!</span>';
+                    }
+                },
+                'format' => 'html',
             ],
         ],
     ]) ?>

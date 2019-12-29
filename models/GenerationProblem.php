@@ -41,7 +41,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
             [['interview_id', 'description', 'date_gps', 'title'], 'required'],
             ['title', 'string', 'max' => 255],
             [['title', 'description'], 'trim'],
-            [['interview_id'], 'integer'],
+            [['interview_id', 'exist_confirm'], 'integer'],
             [['description'], 'string'],
             [['date_gps'], 'safe'],
         ];

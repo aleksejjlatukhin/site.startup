@@ -33,6 +33,8 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return 'confirm_problem';
     }
 
+    public $exist_confirm;
+
     public function getProblem()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
@@ -56,7 +58,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     {
         return [
             [['gps_id', 'count_respond', 'count_positive'], 'required'],
-            [['gps_id'], 'integer'],
+            [['gps_id', 'exist_confirm'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
         ];
     }
