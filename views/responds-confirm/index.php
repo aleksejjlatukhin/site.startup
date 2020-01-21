@@ -7,14 +7,14 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Информация о респондентах программы ППИ';
+$this->title = 'Информация о респондентах';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -29,17 +29,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <table class="table table-bordered table-striped">
         <thead>
-        <tr>
-            <th scope="col" rowspan="2" style="width: 20px;padding-bottom: 25px;text-align: center;">№</th>
-            <th scope="col" rowspan="2" style="width: 180px;text-align: center;padding-bottom: 25px">Респонденты</th>
-            <th scope="col" rowspan="2" style="width: 250px;text-align: center;padding-bottom: 25px">Данные респондента</th>
-            <th scope="col" colspan="2" style="text-align: center; width: 140px;">Дата интервью</th>
-            <th scope="col" rowspan="2" style="width: 250px;text-align: center;padding-bottom: 25px">Место проведения</th>
-        </tr>
-        <tr class="text-center">
-            <td style="width: 70px;">План</td>
-            <td style="width: 70px;">Факт</td>
-        </tr>
+            <tr>
+                <th scope="col" style="width: 20px;text-align: center;">№</th>
+                <th scope="col" style="width: 180px;text-align: center;">Респонденты</th>
+                <th scope="col" style="width: 250px;text-align: center;">Данные респондента</th>
+                <th scope="col" style="text-align: center; width: 140px;">Дата опроса</th>
+                <th scope="col" style="width: 250px;text-align: center;">Электронная почта</th>
+            </tr>
         </thead>
         <tbody>
         <? $j = 0;?>
@@ -65,17 +61,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo $model->info_respond;
                     }?></td>
 
-                <td class="text-center"><?if (!empty($model->date_plan)) {
-                        echo date("d.m.Y", strtotime($model->date_plan));
-                    }?></td>
 
                 <td class="text-center"><? if (!empty($model->descInterview->date_fact)){
                         $date_fact = date("d.m.Y", strtotime($model->descInterview->date_fact));
                         echo Html::a(Html::encode($date_fact), Url::to(['desc-interview-confirm/view', 'id' => $model->descInterview->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->place_interview)){
-                        echo $model->place_interview;
+                <td class="text-center"><? if (!empty($model->email)){
+                        echo $model->email;
                     } ?></td>
 
             </tr>
@@ -106,6 +99,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <hr>
-    <?= Html::a('Вернуться к описанию программы ППИ', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('Вернуться на страницу подтверждения', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
 
 </div>

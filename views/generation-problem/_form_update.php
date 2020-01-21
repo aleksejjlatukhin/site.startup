@@ -11,7 +11,7 @@ use yii\helpers\Url;
 
 <div class="generation-problem-form">
 
-    <?php $form = ActiveForm::begin(['id' => 'my_form_problem', 'action' => ['create', 'id' => $model->interview_id]]); ?>
+    <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 

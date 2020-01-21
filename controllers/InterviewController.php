@@ -128,7 +128,7 @@ class InterviewController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->count_respond > $model->count_positive){
+            if ($model->count_respond >= $model->count_positive){
 
                 if ($model->save()){
 
@@ -271,7 +271,7 @@ class InterviewController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->count_respond > $model->count_positive){
+            if ($model->count_respond >= $model->count_positive){
 
                 if ($model->save()){
 

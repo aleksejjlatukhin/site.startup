@@ -7,18 +7,18 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Результат ППИ';
+$this->title = 'Результат подтверждения ' . $generationProblem->title;
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="respond-confirm exist">
+<div class="respond-confirm by-status-interview">
 
     <h2><?= Html::encode($this->title) ?></h2>
 
@@ -43,9 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p>Количество опрошенных респондентов: <?= $i; ?> </p>
 
-        <p>Необходимое количество позитивных интервью: <?= $confirmProblem->count_positive; ?> </p>
+        <p>Необходимое количество позитивных ответов: <?= $confirmProblem->count_positive; ?> </p>
 
-        <p>Количество позитивных интервью: <?= $j; ?> </p>
+        <p>Количество позитивных ответов: <?= $j; ?> </p>
 
     </div>
 
@@ -64,6 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'name',
+                'label' => 'Респонденты',
                 'headerOptions' => ['class' => 'text-center'],
                 'value' => function ($model) {
                     return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
@@ -74,10 +75,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'status',
                 'headerOptions' => ['class' => 'text-center'],
-                'label' => 'Индикатор теста',
+                'label' => 'Результаты опроса',
                 'value' => function($model){
                     if ($model->descInterview->status == 1){
-                        return '<span style="color:green">Тест пройден</span>';
+                        return '<span style="color:green">Значимая проблема</span>';
                     }
 
                     if($model->descInterview == null){
@@ -85,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
 
                     if($model->descInterview->status == 0){
-                        return '<span style="color:red">Тест не пройден!</span>';
+                        return '<span style="color:red">Проблемы не существует</span>';
                     }
 
                 },
@@ -95,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?= Html::a('Вернуться к описанию программы ППИ', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('Вернуться на страницу подтверждения', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
 
 </div>
 

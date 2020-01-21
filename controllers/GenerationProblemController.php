@@ -7,7 +7,6 @@ use app\models\DescInterview;
 use app\models\FeedbackExpertConfirm;
 use app\models\Interview;
 use app\models\Projects;
-use app\models\QuestionsConfirm;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
@@ -84,7 +83,7 @@ class GenerationProblemController extends Controller
     // ОТКЛЮЧАЕМ CSRF
     public function beforeAction($action)
     {
-        if ($action->id == 'test') {
+        if ($action->id == 'create') {
             $this->enableCsrfValidation = false;
         }
         return parent::beforeAction($action);
@@ -149,7 +148,7 @@ class GenerationProblemController extends Controller
     }
 
 
-    public function actionTest($id){
+    /*public function actionTest($id){
 
 
         $model = new GenerationProblem();
@@ -174,7 +173,7 @@ class GenerationProblemController extends Controller
         }
 
         return $this->render('test', compact('model', 'models'));
-    }
+    }*/
 
     /**
      * Updates an existing GenerationProblem model.
@@ -195,7 +194,7 @@ class GenerationProblemController extends Controller
             $project->update_at = date('Y:m:d');
             if ($project->save()) {
                 Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
-                return $this->redirect(['interview/view', 'id' => $model->interview_id]);
+                return $this->redirect(['generation-problem/view', 'id' => $model->id]);
             }
         }
 
@@ -246,7 +245,6 @@ class GenerationProblemController extends Controller
                 }
             }
 
-            QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
             RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
             FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
 

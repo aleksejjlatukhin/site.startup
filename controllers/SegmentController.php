@@ -109,6 +109,9 @@ class SegmentController extends AppController
         foreach ($models as $model){
             $interview = Interview::find()->where(['segment_id' => $model->id])->one();
             $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
+
+            $confirmGps = [];
+
             if (!empty($problems)){
                 foreach ($problems as $k => $problem){
                     if (($k+1) == count($problems)){
@@ -119,10 +122,19 @@ class SegmentController extends AppController
                             }
                         }
                     }
+                    if ($problem->date_confirm !== null){
+                        $confirmGps[] = $problem;
+                    }
                 }
             }
             if (count($problems) == 0){
                 $model->fact_gps = null;
+                $model->save();
+            }
+
+            $confirmProblem = $confirmGps[0];
+            if ($model->fact_ps !== $confirmProblem->date_confirm){
+                $model->fact_ps = $confirmProblem->date_confirm;
                 $model->save();
             }
         }
@@ -131,6 +143,7 @@ class SegmentController extends AppController
             'project' => $project,
             'models' => $models,
             'problem' => $problem,
+            'confirmProblem' => $confirmProblem,
         ]);
     }
 
@@ -140,6 +153,8 @@ class SegmentController extends AppController
         $project = Projects::find()->where(['id' => $model->project_id])->one();
         $interview = Interview::find()->where(['segment_id' => $model->id])->one();
         $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
+
+        $confirmGps = [];
 
         if (!empty($problems)){
             foreach ($problems as $k => $problem){
@@ -151,17 +166,33 @@ class SegmentController extends AppController
                         }
                     }
                 }
+
+                if ($problem->date_confirm !== null){
+                    $confirmGps[] = $problem;
+                }
             }
         }
+
+
         if (count($problems) == 0){
             $model->fact_gps = null;
             $model->save();
         }
 
+        $confirmProblem = $confirmGps[0];
+        if ($model->fact_ps !== $confirmProblem->date_confirm){
+            $model->fact_ps = $confirmProblem->date_confirm;
+            $model->save();
+        }
+
+
+
+
         return $this->render('one-roadmap', [
             'model' => $model,
             'project' => $project,
             'problem' => $problem,
+            'confirmProblem' => $confirmProblem,
         ]);
 
     }

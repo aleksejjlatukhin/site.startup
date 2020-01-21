@@ -7,7 +7,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\ConfirmProblem */
 
-$this->title = 'Описание программы ППИ';
+$this->title = 'Программа подтверждения ' . $generationProblem->title;
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -18,6 +18,18 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="confirm-problem-view">
+
+    <h2>Программа подтверждения <?= $generationProblem->title; ?></h2><br>
+
+    <?= DetailView::widget([
+        'model' => $generationProblem,
+        'attributes' => [
+            [
+                'attribute' => 'description',
+                'label' => 'Формулировка проблемы'
+            ],
+        ],
+    ]) ?>
 
     <h3>Данные сегмента</h3>
 
@@ -40,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <br>
 
-    <p> <h3>Исходные данные ПИ</h3>
+    <p> <h3>Вводные данные для подтверждения <?= $generationProblem->title; ?></h3>
     <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
     <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
         'class' => 'btn btn-danger',
@@ -61,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Полученные данные ПИ</div>
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Формирование данных программы подтверждения <?= $generationProblem->title; ?></div>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -70,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Данные респондентов</th>
             <!--<th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>-->
             <th scope="col" style="text-align: center;width: 180px;">Количество позитивных ответов / всего опрошенных</th>
-            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Результат ППИ</th>
+            <th scope="col" style="text-align: center;width: 180px;padding: 20px 0;">Результат подтверждения ГПС</th>
             <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Отзыв эксперта</th>
             <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Дата отзыва</th>
         </tr>
@@ -230,6 +242,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             echo Html::a('Закончить тест', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
         }
+    }
+
+    if ($model->exist_confirm == 1 && $generationProblem->exist_confirm == 1) {
+        echo Html::a('Перейти на страницу ГЦП', ['gcp/index', 'id' => $model->id], ['class' => 'btn btn-success']);
     }
 
     ?>

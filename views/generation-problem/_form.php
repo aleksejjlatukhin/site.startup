@@ -12,7 +12,7 @@ use yii\helpers\Url;
 
 
 <div class="d-inline p-2 bg-success" style="font-size: 16px;border-radius: 5px;padding:15px 20px;margin-bottom: 20px;">
-    Необходимо просмотреть и проанализировать все материалы интервью и выявить проблемы, которые характерны для нескольких респондентов
+    Необходимо просмотреть и проанализировать все материалы интервью представителей сегмента и выявить проблемы, которые характерны для нескольких респондентов
 </div>
 
 <table class="table table-bordered table-striped">
@@ -25,23 +25,25 @@ use yii\helpers\Url;
     <tbody>
     <?php foreach ($responds as $respond) : ?>
         <?php if ((!empty($respond->descInterview))) : ?>
-        <tr>
-            <td>
-                <?= Html::a($respond->name, Url::to(['respond/view', 'id' => $respond->id])); ?>
-            </td>
+            <?php if (($respond->descInterview->status == 1)) : ?>
+                <tr>
+                    <td>
+                        <?= Html::a($respond->name, Url::to(['respond/view', 'id' => $respond->id])); ?>
+                    </td>
 
-            <td>
-                <?php if (strlen($respond->descInterview->result) <= 200) : ?>
+                    <td>
+                        <?php if (strlen($respond->descInterview->result) <= 200) : ?>
 
-                <?= mb_substr($respond->descInterview->result, 0, 200) ?>
+                        <?= mb_substr($respond->descInterview->result, 0, 200) ?>
 
-                <?php else: ?>
+                        <?php else: ?>
 
-                <?= mb_substr($respond->descInterview->result, 0, 200) . '...' ?>
+                        <?= mb_substr($respond->descInterview->result, 0, 200) . '...' ?>
 
-                <?php endif; ?>
-            </td>
-        </tr>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif;?>
         <?php endif;?>
     <?php endforeach;?>
     </tbody>
@@ -91,7 +93,7 @@ $script = "
 
         $.ajax({
         
-            url: '". Url::to(['test', 'id' => $model->interview_id])."',
+            url: '". Url::to(['create', 'id' => $model->interview_id])."',
             method: 'POST',
             data: data,
             success: function(response){

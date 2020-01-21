@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' 
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -46,17 +46,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Ф.И.О. респондента'
             ],
             'info_respond',
-            'place_interview',
 
             [
-                'attribute' => 'date_plan',
-                'label' => 'Запланированная дата интервью',
-                'format' => ['date', 'dd.MM.yyyy'],
+                'attribute' =>'email',
+                'visible' => ($model->email != null ),
             ],
 
             [
                 'attribute' => 'date_fact',
-                'label' => 'Фактическая дата интервью',
+                'label' => 'Дата опроса',
                 'value' => function($model){
                     return $model->descInterview->date_fact;
                 },
@@ -78,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <?= Html::a('Вернуться к описанию программы ППИ', ['confirm-problem/view', 'id' => $model->confirm_problem_id], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('Вернуться на страницу подтверждения', ['confirm-problem/view', 'id' => $model->confirm_problem_id], ['class' => 'btn btn-default']) ?>
 
     <?= Html::a('Информация о респондентах', ['responds-confirm/index', 'id' => $model->confirm_problem_id], ['class' => 'btn btn-default pull-right']) ?>
 

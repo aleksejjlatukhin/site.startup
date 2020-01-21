@@ -6,7 +6,6 @@ use app\models\FeedbackExpertConfirm;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
-use app\models\QuestionsConfirm;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
@@ -69,7 +68,7 @@ class ConfirmProblemController extends AppController
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
 
         foreach ($responds as $respond){
-            if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
+            if (!empty($respond->name) && !empty($respond->info_respond)){
                 $respond->exist_respond = 1;
             }else{
                 $respond->exist_respond = 0;
@@ -100,13 +99,14 @@ class ConfirmProblemController extends AppController
 
     public function actionNotExistConfirm($id)
     {
-        $model = ConfirmProblem::find()->where(['id' => $id])->one();
+        $model = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $generationProblem->exist_confirm = 0;
+        $generationProblem->date_confirm = null;
 
         if ($generationProblem->save()){
 
@@ -118,13 +118,14 @@ class ConfirmProblemController extends AppController
 
     public function actionExistConfirm($id)
     {
-        $model = ConfirmProblem::find()->where(['id' => $id])->one();
+        $model = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $generationProblem->exist_confirm = 1;
+        $generationProblem->date_confirm = date('Y:m:d');
 
         if ($generationProblem->save()){
 
@@ -144,8 +145,8 @@ class ConfirmProblemController extends AppController
         $model = new ConfirmProblem();
         $model->gps_id = $id;
 
-        $generationPromblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
+        $generationProblem = GenerationProblem::findOne($id);
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
@@ -153,13 +154,14 @@ class ConfirmProblemController extends AppController
         $countPositive = 0;
         foreach ($responds as $respond){
             if ($respond->descInterview->status == 1){
+                $respondsPre[] = $respond;
                 $countPositive++;
             }
         }
 
         if ($countPositive < $interview->count_positive){
             Yii::$app->session->setFlash('error', "Не набрано необходимое количество представителей сегмента!");
-            return $this->redirect(['generation-problem/view', 'id' => $generationPromblem->id]);
+            return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
         }
 
 
@@ -168,17 +170,31 @@ class ConfirmProblemController extends AppController
             return $this->redirect(['view', 'id' => $modelConfirmProblem->id]);
         }
 
+        $model->count_respond = count($respondsPre);
+
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->count_respond > $model->count_positive){
+            if ($model->count_respond >= $model->count_positive){
 
                 if ($model->save()){
+
+                    foreach ($responds as $respond) {
+                        if ($respond->descInterview->status == 1){
+
+                            $respondConfirm = new RespondsConfirm();
+                            $respondConfirm->confirm_problem_id = $model->id;
+                            $respondConfirm->name = $respond->name;
+                            $respondConfirm->info_respond = $respond->info_respond;
+                            $respondConfirm->email = $respond->email;
+                            $respondConfirm->save();
+                        }
+                    }
 
 
                     $gps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
                         mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
                         mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                        . mb_convert_encoding($generationPromblem->title , "windows-1251");
+                        . mb_convert_encoding($generationProblem->title , "windows-1251");
 
                     $gps_dir = mb_strtolower($gps_dir, "windows-1251");
 
@@ -190,7 +206,7 @@ class ConfirmProblemController extends AppController
                     $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
                         mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
                         mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                        . mb_convert_encoding($generationPromblem->title , "windows-1251") . '/feedbacks-confirm/';
+                        . mb_convert_encoding($generationProblem->title , "windows-1251") . '/feedbacks-confirm/';
 
                     $feedbacks_dir = mb_strtolower($feedbacks_dir, "windows-1251");
 
@@ -200,13 +216,13 @@ class ConfirmProblemController extends AppController
 
 
 
-                    for ($i = 1; $i <= $model->count_respond; $i++ )
+                    /*for ($i = 1; $i <= $model->count_respond; $i++ )
                     {
                         $newRespond[$i] = new RespondsConfirm();
                         $newRespond[$i]->confirm_problem_id = $model->id;
                         $newRespond[$i]->name = 'Респондент ' . $i;
                         $newRespond[$i]->save();
-                    }
+                    }*/
 
 
                     $project->update_at = date('Y:m:d');
@@ -224,7 +240,7 @@ class ConfirmProblemController extends AppController
 
         return $this->render('create', [
             'model' => $model,
-            'generationPromblem' => $generationPromblem,
+            'generationProblem' => $generationProblem,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
@@ -241,8 +257,8 @@ class ConfirmProblemController extends AppController
     public function actionUpdate($id)
     {
         $model = ConfirmProblem::find()->where(['id' => $id])->one();
-        $generationPromblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
@@ -250,11 +266,11 @@ class ConfirmProblemController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->count_respond > $model->count_positive){
+            if ($model->count_respond >= $model->count_positive){
 
                 if ($model->save()){
 
-                    if ((count($responds)+1) <= $model->count_respond){
+                    /*if ((count($responds)+1) <= $model->count_respond){
                         for ($count = count($responds) + 1; $count <= $model->count_respond; $count++ )
                         {
                             $newRespond[$count] = new RespondsConfirm();
@@ -269,7 +285,7 @@ class ConfirmProblemController extends AppController
                         {
                             $item->delete();
                         }
-                    }
+                    }*/
 
 
                     $project->update_at = date('Y:m:d');
@@ -287,7 +303,7 @@ class ConfirmProblemController extends AppController
 
         return $this->render('update', [
             'model' => $model,
-            'generationPromblem' => $generationPromblem,
+            'generationProblem' => $generationProblem,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
@@ -305,8 +321,8 @@ class ConfirmProblemController extends AppController
     {
         $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
-        $generationPromblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationPromblem->interview_id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $model->id])->all();
@@ -315,7 +331,7 @@ class ConfirmProblemController extends AppController
         $gps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
             mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
             mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($generationPromblem->title , "windows-1251");
+            . mb_convert_encoding($generationProblem->title , "windows-1251");
 
         $gps_dir = mb_strtolower($gps_dir, "windows-1251");
 

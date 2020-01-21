@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <h1>Общие данные о проекте</h1>
 
-    <?= $this->render('_form', [
+    <?= $this->render('_form_update', [
         'model' => $model,
         'modelsConcept' => $modelsConcept,
         'modelsAuthors' => $modelsAuthors,

@@ -51,13 +51,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p> <h3>Исходные данные интервью</h3>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+        <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Вы действительно хотите удалить интервью для "' . $segment->name . '" ?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ]) */?>
     </p>
 
 
@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ?>
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Полученные данные по ГПС</div>
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Формирование ГПС по данным из ПИ</div>
 
     <table class="table table-bordered table-striped">
         <thead>

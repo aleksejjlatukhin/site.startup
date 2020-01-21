@@ -80,6 +80,8 @@ use yii\helpers\Url;
                                 </div>
 
 
+
+
                                 <?= $form->field($modelsConcept, "[{$i}]name", [
                                     'template' => '<div class="col-md-10">{input}</div><div class="col-md-2">{error}</div>'
                                 ])->textInput(['maxlength' => true])?>

@@ -51,6 +51,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Ф.И.О. респондента'
             ],
             'info_respond',
+
+            [
+                'attribute' =>'email',
+                'visible' => ($model->email != null),
+            ],
+
             'place_interview',
 
             [

@@ -6,17 +6,29 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\ConfirmProblem */
 
-$this->title = 'Редактирование программы ППИ';
+$this->title = 'Редактирование программы подтверждения ' . $generationProblem->title;
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationPromblem->title, 'url' => ['generation-problem/view', 'id' => $generationPromblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Разработка программы ППИ', 'url' => ['confirm-problem/view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="confirm-problem-update">
+
+    <h2><?= $this->title; ?></h2><br>
+
+    <?= DetailView::widget([
+        'model' => $generationProblem,
+        'attributes' => [
+            [
+                'attribute' => 'description',
+                'label' => 'Формулировка гипотезы проблемы'
+            ],
+        ],
+    ]) ?>
 
     <h3>Данные сегмента</h3>
 
@@ -37,16 +49,25 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <h1>Генерация ПИ - редактирование</h1>
-    <br>
+    <h3>Респонденты</h3>
+    <hr>
 
-    <?= $this->render('_form_update', [
+    <?= DetailView::widget([
         'model' => $model,
-        'generationPromblem' => $generationPromblem,
+        'attributes' => [
+            [
+                'attribute' => 'count_respond',
+                'label' => 'Количество респондентов (представителей сегмента)'
+            ],
+        ],
+    ]) ?>
+
+    <?= $this->render('_form', [
+        'model' => $model,
+        'generationProblem' => $generationProblem,
         'interview' => $interview,
         'segment' => $segment,
         'project' => $project,
-        'newQuestions' => $newQuestions,
     ]) ?>
 
 </div>

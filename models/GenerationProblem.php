@@ -43,7 +43,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
             [['title', 'description'], 'trim'],
             [['interview_id', 'exist_confirm'], 'integer'],
             [['description'], 'string'],
-            [['date_gps'], 'safe'],
+            [['date_gps', 'date_confirm'], 'safe'],
         ];
     }
 
@@ -57,7 +57,8 @@ class GenerationProblem extends \yii\db\ActiveRecord
             'interview_id' => 'Interview ID',
             'title' => 'Название ГПС',
             'description' => 'Описание',
-            'date_gps' => 'Дата',
+            'date_gps' => 'Дата создания',
+            'date_confirm' => 'Дата подтверждения'
         ];
     }
 }

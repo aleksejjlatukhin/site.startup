@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' 
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Респондент: ' . $respond->name, 'url' => ['responds-confirm/view', 'id' => $respond->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Анкета респондента', 'url' => ['desc-interview-confirm/view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = $this->title;

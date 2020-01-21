@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' 
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание программы ППИ', 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'name',
+                'label' => 'Респонденты',
                 'headerOptions' => ['class' => 'text-center'],
                 'value' => function ($model) {
                     return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
@@ -48,9 +49,9 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'data',
                 'headerOptions' => ['class' => 'text-center'],
-                'label' => 'Данные респондента',
+                'label' => 'Данные респондентов',
                 'value' => function($model){
-                    if (!empty($model->name) && !empty($model->info_respond) && !empty($model->date_plan) && !empty($model->place_interview)){
+                    if (!empty($model->name) && !empty($model->info_respond)){
                         return 'Заполнены';
                     }else{
                         return 'Необходимо заполнить';
@@ -62,6 +63,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?= Html::a('Вернуться к описанию программы ППИ', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('Вернуться на страницу подтверждения', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
 
 </div>

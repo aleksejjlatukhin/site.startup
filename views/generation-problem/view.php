@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if (empty($model->confirm)) : ?>
             <?= Html::a('Подтвердить ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
-            <?= Html::a('Подтверждение ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Подтверждение ПС', ['confirm-problem/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
 
         <?php if ($model->exist_confirm == 1){
@@ -71,6 +71,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 },
                 'format' => 'html',
+            ],
+
+            [
+                'attribute' => 'date_confirm',
+                'visible' => ($model->date_confirm !== null),
+                'format' => ['date', 'dd.MM.yyyy'],
             ],
         ],
     ]) ?>

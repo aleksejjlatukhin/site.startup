@@ -20,6 +20,7 @@ class FeedbackExpertConfirm extends \yii\db\ActiveRecord
 {
 
     public $loadFile;
+
     /**
      * {@inheritdoc}
      */

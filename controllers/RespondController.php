@@ -272,6 +272,11 @@ class RespondController extends AppController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
+        if ($interview->count_respond == $interview->count_positive){
+            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         if ($project->save()){
             Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
 

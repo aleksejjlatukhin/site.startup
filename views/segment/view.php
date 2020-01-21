@@ -20,20 +20,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
 
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+        <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Вы точно хотите удалить сегмент ' . $model->name . '?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ]) */?>
 
         <? if (!empty($model->field_of_activity) && !empty($model->sort_of_activity) && !empty($model->age) &&
             !empty($model->income) && !empty($model->quantity) && !empty($model->market_volume)) {
-                echo Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $model->id], ['class' => 'btn btn-success']);
+                echo Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $model->id], ['class' => 'btn btn-default']);
         }?>
 
-        <?= Html::a('Далее', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?= Html::a('Разработка программы ПИ', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
 
     </p>
 
@@ -57,6 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
 
-    <?= Html::a('Далее', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
+    <?//= Html::a('Далее', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
 
 </div>

@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <th scope="col" rowspan="2" style="width: 130px;text-align: center;padding-bottom: 45px">Сегменты</th>
             <th scope="col" style="width: 90px; text-align: center">Генерация ГЦС</th>
             <th scope="col" colspan="2" style="text-align: center">Генерация ГПС</th>
-            <th scope="col" colspan="2" style="text-align: center">Подтверждение ПС</th>
+            <th scope="col" colspan="2" style="text-align: center">Подтверждение ГПС</th>
             <th scope="col" colspan="2" style="text-align: center">Разработка ГЦП</th>
             <th scope="col" colspan="2" style="text-align: center">Подтверждение ГЦП</th>
             <th scope="col" colspan="2" style="text-align: center">Разработка ГMVP</th>
@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_ps)){
-                        echo date("d.m.y", strtotime($model->fact_ps));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_ps)), Url::to(['generation-problem/view', 'id' => $confirmProblem->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_dev_gcp)){

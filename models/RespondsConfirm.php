@@ -44,9 +44,9 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         return [
             [['confirm_problem_id', 'name'], 'required'],
             [['confirm_problem_id'], 'integer'],
-            [['name', 'info_respond', 'place_interview'], 'trim'],
-            [['date_plan'], 'safe'],
-            [['name', 'info_respond', 'place_interview'], 'string', 'max' => 255],
+            [['name', 'info_respond', 'email'], 'trim'],
+            [['name', 'info_respond', 'email'], 'string', 'max' => 255],
+            ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
             ['exist_respond', 'boolean'],
         ];
     }
@@ -61,8 +61,7 @@ class RespondsConfirm extends \yii\db\ActiveRecord
             'confirm_problem_id' => 'Confirm Problem ID',
             'name' => 'Респондент',
             'info_respond' => 'Данные респондента',
-            'date_plan' => 'План',
-            'place_interview' => 'Место проведения',
+            'email' => 'Адрес электронной почты',
         ];
     }
 }

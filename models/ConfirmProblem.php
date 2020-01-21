@@ -25,6 +25,9 @@ use Yii;
  */
 class ConfirmProblem extends \yii\db\ActiveRecord
 {
+
+    public $exist_confirm;
+
     /**
      * {@inheritdoc}
      */
@@ -32,8 +35,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     {
         return 'confirm_problem';
     }
-
-    public $exist_confirm;
 
     public function getProblem()
     {
@@ -72,7 +73,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             'id' => 'ID',
             'gps_id' => 'Gps ID',
             'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Необходимое количество позитивных интервью',
+            'count_positive' => 'Необходимое количество позитивных ответов',
         ];
     }
 }

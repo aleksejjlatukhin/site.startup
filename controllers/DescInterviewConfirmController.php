@@ -102,9 +102,8 @@ class DescInterviewConfirmController extends Controller
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
 
-        if ($respond->name == null || $respond->info_respond == null || $respond->place_interview == null ||
-            $respond->date_plan == null){
-            Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о респонденте!");
+        if ($respond->name == null || $respond->info_respond == null){
+            Yii::$app->session->setFlash('error', "Необходимо заполнить данные о респонденте!");
             return $this->redirect(['responds-confirm/view', 'id' => $id]);
         }
 

@@ -225,9 +225,11 @@ class RespondsConfirmController extends AppController
             }
 
             if ($kol == 0){
-
-                if ($model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
+                if ($model->save()){
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()){
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
                 }
             }else{
                 Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');

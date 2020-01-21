@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'info_respond')->textInput(['maxlength' => true]) ?>
 
-    <?//= $form->field($model, 'date_interview')->textInput() ?>
+    <?= $form->field($model, 'email')->textInput() ?>
 
     <?= $form->field($model, 'date_plan')->label('Запланированная дата интервью')->widget(\yii\jui\DatePicker::class, [
         'dateFormat' => 'yyyy-MM-dd',

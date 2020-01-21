@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a('Далее', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?= Html::a('Генерация ГЦС', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
     </p>
 
     <?= DetailView::widget([
@@ -110,6 +110,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         ],
     ]) ?>
-    <?= Html::a('Далее', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
+    <?//= Html::a('Далее', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
 
 </div>
