@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </thead>
         <tbody>
         <? $j = 0;?>
-        <?php foreach ($models as $model) : ?>
+        <?php foreach ($models as $i => $model) : ?>
         <?php $j++;?>
             <tr class="text-center">
                 <th scope="row"><?= $j; ?></th>
@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_ps)){
-                        echo Html::a(date("d.m.y", strtotime($model->fact_ps)), Url::to(['generation-problem/view', 'id' => $confirmProblem->id]));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_ps)), Url::to(['generation-problem/view', 'id' => $confirmProblems[$i]->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_dev_gcp)){
@@ -91,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_dev_gcp)){
-                        echo date("d.m.y", strtotime($model->fact_dev_gcp));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_dev_gcp)), Url::to(['gcp/view', 'id' => $offersGcp[$i]->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_gcp)){
@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_gcp)){
-                        echo date("d.m.y", strtotime($model->fact_gcp));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_gcp)), Url::to(['gcp/view', 'id' => $comfirmGcpses[$i]->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_dev_gmvp)){

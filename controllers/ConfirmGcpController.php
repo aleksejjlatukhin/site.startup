@@ -114,7 +114,9 @@ class ConfirmGcpController extends AppController
         if ($gcp->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['gcp/index', 'id' => $confirmProblem->id]);
+            if ($project->save()){
+                return $this->redirect(['gcp/index', 'id' => $confirmProblem->id]);
+            }
         }
     }
 
@@ -135,7 +137,9 @@ class ConfirmGcpController extends AppController
         if ($gcp->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['mvp/index', 'id' => $model->id]);
+            if ($project->save()){
+                return $this->redirect(['mvp/index', 'id' => $model->id]);
+            }
         }
     }
 

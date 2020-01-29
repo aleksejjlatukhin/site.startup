@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
+use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -106,13 +107,22 @@ class SegmentController extends AppController
 
         $models = Segment::find()->where(['project_id' => $id])->all();
 
+        $confirmProblems = [];
+        $offersGcp = [];
+        $comfirmGcpses = [];
+
         foreach ($models as $model){
             $interview = Interview::find()->where(['segment_id' => $model->id])->one();
             $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
             $confirmGps = [];
+            $confirmProblem = [];
+            $offers = [];
+            $comfirmGcps = [];
+            $confirmGcp = [];
 
             if (!empty($problems)){
+
                 foreach ($problems as $k => $problem){
                     if (($k+1) == count($problems)){
                         if (!empty($problem)){
@@ -125,25 +135,77 @@ class SegmentController extends AppController
                     if ($problem->date_confirm !== null){
                         $confirmGps[] = $problem;
                     }
+
+                    $gcps = Gcp::find()->where(['confirm_problem_id' => $problems[$k]->confirm->id])->all();
+                    foreach ($gcps as $gcp) {
+                        $offers[] = $gcp;
+                    }
+                }
+
+                if (count($confirmGps) > 1){
+                    for ($i = 0; $i < count($confirmGps); $i++){
+                        if($confirmGps[$i]->date_confirm < $confirmGps[$i+1]->date_confirm){
+                            $confirmProblem = $confirmGps[$i];
+                            $confirmProblems[] = $confirmProblem;
+                        }
+                    }
+                }else{
+                    $confirmProblem = $confirmGps[0];
+                    $confirmProblems[] = $confirmProblem;
+                }
+
+                if ($model->fact_ps !== $confirmProblem->date_confirm){
+                    $model->fact_ps = $confirmProblem->date_confirm;
+                    $model->save();
                 }
             }
-            if (count($problems) == 0){
-                $model->fact_gps = null;
-                $model->save();
+
+            foreach ($offers as $i => $offer){
+
+                if(($i + 1) == count($offers)){
+                    if (!empty($offer)){
+                        $offersGcp[] = $offer;
+                        if($model->fact_dev_gcp !== $offer->date_create){
+                            $model->fact_dev_gcp = $offer->date_create;
+                            $model->save();
+                        }
+                    }
+                }
+
+                if ($offer->date_confirm !== null){
+                    $comfirmGcps[] = $offer;
+                }
             }
 
-            $confirmProblem = $confirmGps[0];
-            if ($model->fact_ps !== $confirmProblem->date_confirm){
-                $model->fact_ps = $confirmProblem->date_confirm;
+
+            if (count($comfirmGcps) > 1){
+
+                for ($i = 0; $i < count($comfirmGcps); $i++){
+                    if($comfirmGcps[$i]->date_confirm < $comfirmGcps[$i+1]->date_confirm){
+                        $confirmGcp = $comfirmGcps[$i];
+                        $comfirmGcpses[] = $confirmGcp;
+                    }
+                }
+            }else{
+                $confirmGcp = $comfirmGcps[0];
+                $comfirmGcpses[] = $confirmGcp;
+            }
+
+            if ($model->fact_gcp !== $confirmGcp->date_confirm){
+                $model->fact_gcp = $confirmGcp->date_confirm;
                 $model->save();
             }
         }
+
+
 
         return $this->render('roadmap', [
             'project' => $project,
             'models' => $models,
             'problem' => $problem,
-            'confirmProblem' => $confirmProblem,
+            'confirmProblems' => $confirmProblems,
+            'offersGcp' => $offersGcp,
+            'comfirmGcpses' => $comfirmGcpses,
         ]);
     }
 
@@ -155,9 +217,14 @@ class SegmentController extends AppController
         $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
         $confirmGps = [];
+        $confirmProblem = [];
+        $offers = [];
+        $comfirmGcps = [];
+        $confirmGcp = [];
 
         if (!empty($problems)){
             foreach ($problems as $k => $problem){
+
                 if (($k+1) == count($problems)){
                     if (!empty($problem)){
                         if ($model->fact_gps !== $problem->date_gps){
@@ -170,22 +237,62 @@ class SegmentController extends AppController
                 if ($problem->date_confirm !== null){
                     $confirmGps[] = $problem;
                 }
+
+                $gcps = Gcp::find()->where(['confirm_problem_id' => $problems[$k]->confirm->id])->all();
+                foreach ($gcps as $gcp) {
+                    $offers[] = $gcp;
+                }
             }
         }
 
-
-        if (count($problems) == 0){
-            $model->fact_gps = null;
-            $model->save();
+        if (count($confirmGps) > 1){
+            for ($i = 0; $i < count($confirmGps); $i++){
+                if($confirmGps[$i]->date_confirm < $confirmGps[$i+1]->date_confirm){
+                    $confirmProblem = $confirmGps[$i];
+                }
+            }
+        }else{
+            $confirmProblem = $confirmGps[0];
         }
 
-        $confirmProblem = $confirmGps[0];
         if ($model->fact_ps !== $confirmProblem->date_confirm){
             $model->fact_ps = $confirmProblem->date_confirm;
             $model->save();
         }
 
 
+        foreach ($offers as $i => $offer){
+
+            if(($i + 1) == count($offers)){
+                if (!empty($offer)){
+                    if($model->fact_dev_gcp !== $offer->date_create){
+                        $model->fact_dev_gcp = $offer->date_create;
+                        $model->save();
+                    }
+                }
+            }
+
+            if ($offer->date_confirm !== null){
+                $comfirmGcps[] = $offer;
+            }
+        }
+
+
+        if (count($comfirmGcps) > 1){
+
+            for ($i = 0; $i < count($comfirmGcps); $i++){
+                if($comfirmGcps[$i]->date_confirm < $comfirmGcps[$i+1]->date_confirm){
+                    $confirmGcp = $comfirmGcps[$i];
+                }
+            }
+        }else{
+            $confirmGcp = $comfirmGcps[0];
+        }
+
+        if ($model->fact_gcp !== $confirmGcp->date_confirm){
+            $model->fact_gcp = $confirmGcp->date_confirm;
+            $model->save();
+        }
 
 
         return $this->render('one-roadmap', [
@@ -193,6 +300,8 @@ class SegmentController extends AppController
             'project' => $project,
             'problem' => $problem,
             'confirmProblem' => $confirmProblem,
+            'offer' => $offer,
+            'confirmGcp' => $confirmGcp,
         ]);
 
     }

@@ -40,6 +40,11 @@ class ConfirmGcp extends \yii\db\ActiveRecord
         return $this->hasMany(RespondsGcp::class, ['confirm_gcp_id' => 'id']);
     }
 
+    public function getMvps()
+    {
+        return $this->hasMany(Mvp::class, ['confirm_gcp_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */

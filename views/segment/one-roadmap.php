@@ -91,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_dev_gcp)){
-                        echo date("d.m.y", strtotime($model->fact_dev_gcp));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_dev_gcp)), Url::to(['gcp/view', 'id' => $offer->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_gcp)){
@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?></td>
 
                 <td><? if (!empty($model->fact_gcp)){
-                        echo date("d.m.y", strtotime($model->fact_gcp));
+                        echo Html::a(date("d.m.y", strtotime($model->fact_gcp)), Url::to(['gcp/view', 'id' => $confirmGcp->id]));
                     } ?></td>
 
                 <td><? if (!empty($model->plan_dev_gmvp)){

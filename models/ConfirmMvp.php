@@ -39,6 +39,11 @@ class ConfirmMvp extends \yii\db\ActiveRecord
         return $this->hasMany(RespondsMvp::class, ['confirm_mvp_id' => 'id']);
     }
 
+    public function getBusiness()
+    {
+        return $this->hasOne(BusinessModel::class, ['confirm_mvp_id' => 'id']);
+    }
+
 
     /**
      * {@inheritdoc}

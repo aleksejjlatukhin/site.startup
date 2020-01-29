@@ -111,7 +111,9 @@ class ConfirmProblemController extends AppController
         if ($generationProblem->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['interview/view', 'id' => $interview->id]);
+            if ($project->save()){
+                return $this->redirect(['interview/view', 'id' => $interview->id]);
+            }
         }
     }
 
@@ -130,7 +132,9 @@ class ConfirmProblemController extends AppController
         if ($generationProblem->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['gcp/index', 'id' => $model->id]);
+            if ($project->save()){
+                return $this->redirect(['gcp/index', 'id' => $model->id]);
+            }
         }
     }
 

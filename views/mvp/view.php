@@ -88,6 +88,21 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
+                'attribute' => 'statuses',
+                'label' => 'Статус подтверждения',
+                'visible' => ($model->exist_confirm !== null),
+                'value' => function($model) {
+                    if ($model->exist_confirm == 0) {
+                        return '<span style="color:red">MVP не подтвержден</span>';
+                    }
+                    if ($model->exist_confirm == 1) {
+                        return '<span style="color:green">MVP подтвержден</span>';
+                    }
+                },
+                'format' => 'html',
+            ],
+
+            [
                 'attribute' => 'date_confirm',
                 'visible' => ($model->date_confirm !== null),
                 'format' => ['date', 'dd.MM.yyyy'],

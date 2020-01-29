@@ -227,9 +227,23 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
 
-    if ($model->exist_confirm == 1 && $mvp->exist_confirm == 1) {
-        echo Html::a('Перейти на страницу MVP', ['mvp/index', 'id' => $confirmGcp->id], ['class' => 'btn btn-success']);
+    if ($mvp->exist_confirm !== null && $mvp->exist_confirm == $model->exist_confirm) {
+
+        echo Html::a('Сводная таблица данных по проекту', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default']);
     }
+
+    if ($mvp->exist_confirm == 1 && $mvp->exist_confirm == $model->exist_confirm) {
+
+        if (!empty($model->business)){
+            echo Html::a('Описание бизнес-модели', ['business-model/view', 'id' => $model->business->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
+        }else{
+            echo Html::a('Создать бизнес-модель', ['business-model/create', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
+
+        }
+    }
+
+
+
 
     ?>
 

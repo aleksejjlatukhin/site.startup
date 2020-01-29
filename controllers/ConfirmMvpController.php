@@ -121,7 +121,9 @@ class ConfirmMvpController extends Controller
         if ($mvp->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
+            if ($project->save()){
+                return $this->redirect(['projects/result', 'id' => $project->id]);
+            }
         }
     }
 
@@ -144,7 +146,9 @@ class ConfirmMvpController extends Controller
         if ($mvp->save()){
 
             $project->update_at = date('Y:m:d');
-            return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
+            if ($project->save()){
+                return $this->redirect(['projects/result', 'id' => $project->id]);
+            }
         }
     }
 

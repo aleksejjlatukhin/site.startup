@@ -52,6 +52,12 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return $this->hasMany(RespondsConfirm::class, ['confirm_problem_id' => 'id']);
     }
 
+    public function getGcps()
+    {
+        return $this->hasMany(Gcp::class, ['confirm_problem_id' => 'id']);
+    }
+
+
     /**
      * {@inheritdoc}
      */

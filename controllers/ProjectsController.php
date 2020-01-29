@@ -3,11 +3,17 @@
 namespace app\controllers;
 
 use app\models\Authors;
+use app\models\BusinessModel;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
+use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Model;
+use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\Questions;
 use app\models\QuestionsConfirm;
@@ -110,7 +116,6 @@ class ProjectsController extends AppController
     {
         $model = $this->findModel($id);
 
-
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
         $equally = array();
         foreach ($segments as $k => $segment){
@@ -128,6 +133,45 @@ class ProjectsController extends AppController
 
         return $this->render('view', [
             'model' => $model,
+        ]);
+    }
+
+
+    public function actionResult($id)
+    {
+        $model = Projects::findOne($id);
+        $segments = Segment::find()->where(['project_id' => $model->id])->all();
+        $problems = [];
+        $offers = [];
+        $mvProducts = [];
+        $confirmMvps = [];
+        foreach ($segments as $segment){
+            $generationProblems = GenerationProblem::find()->where(['interview_id' => $segment->interview->id])->all();
+            foreach ($generationProblems as $k => $generationProblem){
+                $problems[] = $generationProblem;
+                $gcps = Gcp::find()->where(['confirm_problem_id' => $generationProblem->confirm->id])->all();
+                foreach ($gcps as $gcp){
+                    $offers[] = $gcp;
+                    $mvps = Mvp::find()->where(['confirm_gcp_id' => $gcp->confirm->id])->all();
+                    foreach ($mvps as $mvp){
+                        $mvProducts[] = $mvp;
+                        $confMvp = ConfirmMvp::find()->where(['mvp_id' => $mvp->id])->one();
+                        $confirmMvps[] = $confMvp;
+                    }
+                }
+            }
+        }
+        //debug($confirmMvp);
+
+        return $this->render('result', [
+            'model' => $model,
+            'segments' => $segments,
+            'generationProblems' => $generationProblems,
+            'problems' => $problems,
+            'offers' => $offers,
+            'mvProducts' => $mvProducts,
+            'confirmMvps' => $confirmMvps,
+
         ]);
     }
 

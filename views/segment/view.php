@@ -33,7 +33,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $model->id], ['class' => 'btn btn-default']);
         }?>
 
-        <?= Html::a('Разработка программы ПИ', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?php if(!($model->interview)) : ?>
+            <?= Html::a('Разработка программы ПИ', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?php else: ?>
+            <?= Html::a('Программа ПИ - исходные данные', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?php endif;?>
 
     </p>
 
