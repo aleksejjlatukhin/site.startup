@@ -7,6 +7,7 @@ use app\models\FeedbackExpertConfirm;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
+use app\models\Mvp;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\QuestionsConfirm;
@@ -101,6 +102,57 @@ class SegmentController extends AppController
         ]);
     }
 
+
+    private function lastItem($items)
+    {
+        $itemTime = [];
+
+        if (count($items) > 1){
+
+            for ($i = 0; $i <count($items); $i++){
+                $itemTime[] = $items[$i]->date_time_create;
+            }
+
+            for ($i = 0; $i <count($items); $i++){
+
+                if($items[$i]->date_time_create == max($itemTime)) {
+                    $lastItem = $items[$i];
+                }
+            }
+
+        }else{
+            $lastItem = $items[0];
+        }
+
+        return $lastItem;
+    }
+
+
+    private function firstConfirm($confirms)
+    {
+        $confirmTime = [];
+
+        if (count($confirms) > 1){
+
+            for ($i = 0; $i <count($confirms); $i++){
+                $confirmTime[] = $confirms[$i]->date_time_confirm;
+            }
+
+            for ($i = 0; $i <count($confirms); $i++){
+
+                if($confirms[$i]->date_time_confirm == min($confirmTime)) {
+                    $firstConfirm = $confirms[$i];
+                }
+            }
+
+        }else{
+            $firstConfirm = $confirms[0];
+        }
+
+        return $firstConfirm;
+    }
+
+
     public function actionRoadmap($id)
     {
         $project = Projects::findOne($id);
@@ -110,16 +162,18 @@ class SegmentController extends AppController
         $confirmProblems = [];
         $offersGcp = [];
         $comfirmGcpses = [];
+        $mvProds = [];
+        $comfirmMvpses = [];
 
         foreach ($models as $model){
             $interview = Interview::find()->where(['segment_id' => $model->id])->one();
             $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
             $confirmGps = [];
-            $confirmProblem = [];
             $offers = [];
             $comfirmGcps = [];
-            $confirmGcp = [];
+            $mvProducts = [];
+            $comfirmMvps = [];
 
             if (!empty($problems)){
 
@@ -142,58 +196,66 @@ class SegmentController extends AppController
                     }
                 }
 
-                if (count($confirmGps) > 1){
-                    for ($i = 0; $i < count($confirmGps); $i++){
-                        if($confirmGps[$i]->date_confirm < $confirmGps[$i+1]->date_confirm){
-                            $confirmProblem = $confirmGps[$i];
-                            $confirmProblems[] = $confirmProblem;
-                        }
-                    }
-                }else{
-                    $confirmProblem = $confirmGps[0];
-                    $confirmProblems[] = $confirmProblem;
-                }
+
+                $confirmProblem = $this->firstConfirm($confirmGps);
+                $confirmProblems[] = $confirmProblem;
 
                 if ($model->fact_ps !== $confirmProblem->date_confirm){
                     $model->fact_ps = $confirmProblem->date_confirm;
                     $model->save();
                 }
-            }
 
-            foreach ($offers as $i => $offer){
+                foreach ($offers as $i => $offer){
 
-                if(($i + 1) == count($offers)){
-                    if (!empty($offer)){
-                        $offersGcp[] = $offer;
-                        if($model->fact_dev_gcp !== $offer->date_create){
-                            $model->fact_dev_gcp = $offer->date_create;
-                            $model->save();
-                        }
+                    if ($offer->date_confirm !== null){
+                        $comfirmGcps[] = $offer;
+                    }
+
+                    $mvps = Mvp::find()->where(['confirm_gcp_id' => $offer->confirm->id])->all();
+                    foreach ($mvps as $mvp){
+                        $mvProducts[] = $mvp;
                     }
                 }
 
-                if ($offer->date_confirm !== null){
-                    $comfirmGcps[] = $offer;
+                $offer = $this->lastItem($offers);
+                $offersGcp[] = $offer;
+
+
+                if($model->fact_dev_gcp !== $offer->date_create){
+                    $model->fact_dev_gcp = $offer->date_create;
+                    $model->save();
                 }
-            }
 
 
-            if (count($comfirmGcps) > 1){
-
-                for ($i = 0; $i < count($comfirmGcps); $i++){
-                    if($comfirmGcps[$i]->date_confirm < $comfirmGcps[$i+1]->date_confirm){
-                        $confirmGcp = $comfirmGcps[$i];
-                        $comfirmGcpses[] = $confirmGcp;
-                    }
-                }
-            }else{
-                $confirmGcp = $comfirmGcps[0];
+                $confirmGcp = $this->firstConfirm($comfirmGcps);
                 $comfirmGcpses[] = $confirmGcp;
-            }
 
-            if ($model->fact_gcp !== $confirmGcp->date_confirm){
-                $model->fact_gcp = $confirmGcp->date_confirm;
-                $model->save();
+                if ($model->fact_gcp !== $confirmGcp->date_confirm){
+                    $model->fact_gcp = $confirmGcp->date_confirm;
+                    $model->save();
+                }
+
+                $mvProduct = $this->lastItem($mvProducts);
+                $mvProds[] = $mvProduct;
+
+                if($model->fact_dev_gmvp !== $mvProduct->date_create){
+                    $model->fact_dev_gmvp = $mvProduct->date_create;
+                    $model->save();
+                }
+
+                foreach ($mvProducts as $mvProduct){
+                    if ($mvProduct->exist_confirm === 1){
+                        $comfirmMvps[] = $mvProduct;
+                    }
+                }
+
+                $confirmMvp = $this->firstConfirm($comfirmMvps);
+                $comfirmMvpses[] = $confirmMvp;
+
+                if ($model->fact_gmvp !== $confirmMvp->date_confirm){
+                    $model->fact_gmvp = $confirmMvp->date_confirm;
+                    $model->save();
+                }
             }
         }
 
@@ -206,8 +268,11 @@ class SegmentController extends AppController
             'confirmProblems' => $confirmProblems,
             'offersGcp' => $offersGcp,
             'comfirmGcpses' => $comfirmGcpses,
+            'mvProds' => $mvProds,
+            'comfirmMvpses' => $comfirmMvpses,
         ]);
     }
+
 
     public function actionOneRoadmap($id)
     {
@@ -217,10 +282,10 @@ class SegmentController extends AppController
         $problems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
         $confirmGps = [];
-        $confirmProblem = [];
         $offers = [];
         $comfirmGcps = [];
-        $confirmGcp = [];
+        $mvProducts = [];
+        $comfirmMvps = [];
 
         if (!empty($problems)){
             foreach ($problems as $k => $problem){
@@ -245,15 +310,8 @@ class SegmentController extends AppController
             }
         }
 
-        if (count($confirmGps) > 1){
-            for ($i = 0; $i < count($confirmGps); $i++){
-                if($confirmGps[$i]->date_confirm < $confirmGps[$i+1]->date_confirm){
-                    $confirmProblem = $confirmGps[$i];
-                }
-            }
-        }else{
-            $confirmProblem = $confirmGps[0];
-        }
+
+        $confirmProblem = $this->firstConfirm($confirmGps);
 
         if ($model->fact_ps !== $confirmProblem->date_confirm){
             $model->fact_ps = $confirmProblem->date_confirm;
@@ -261,36 +319,58 @@ class SegmentController extends AppController
         }
 
 
-        foreach ($offers as $i => $offer){
+        $offerGcp = $this->lastItem($offers);
 
-            if(($i + 1) == count($offers)){
-                if (!empty($offer)){
-                    if($model->fact_dev_gcp !== $offer->date_create){
-                        $model->fact_dev_gcp = $offer->date_create;
-                        $model->save();
-                    }
-                }
-            }
+
+        if($model->fact_dev_gcp !== $offerGcp->date_create){
+            $model->fact_dev_gcp = $offerGcp->date_create;
+            $model->save();
+        }
+
+
+        foreach ($offers as $i => $offer){
 
             if ($offer->date_confirm !== null){
                 $comfirmGcps[] = $offer;
             }
-        }
 
+            if (!empty($offer->confirm)){
 
-        if (count($comfirmGcps) > 1){
-
-            for ($i = 0; $i < count($comfirmGcps); $i++){
-                if($comfirmGcps[$i]->date_confirm < $comfirmGcps[$i+1]->date_confirm){
-                    $confirmGcp = $comfirmGcps[$i];
+                $mvps = Mvp::find()->where(['confirm_gcp_id' => $offer->confirm->id])->all();
+                foreach ($mvps as $mvp){
+                    $mvProducts[] = $mvp;
                 }
             }
-        }else{
-            $confirmGcp = $comfirmGcps[0];
         }
+
+
+        $confirmGcp = $this->firstConfirm($comfirmGcps);
 
         if ($model->fact_gcp !== $confirmGcp->date_confirm){
             $model->fact_gcp = $confirmGcp->date_confirm;
+            $model->save();
+        }
+
+        foreach ($mvProducts as $i => $mvProduct){
+
+            if ($mvProduct->exist_confirm === 1){
+                $comfirmMvps[] = $mvProduct;
+            }
+        }
+
+
+        $mvProduct = $this->lastItem($mvProducts);
+
+        if($model->fact_dev_gmvp !== $mvProduct->date_create){
+            $model->fact_dev_gmvp = $mvProduct->date_create;
+            $model->save();
+        }
+
+
+        $comfirmMvp = $this->firstConfirm($comfirmMvps);
+
+        if ($model->fact_gmvp !== $comfirmMvp->date_confirm){
+            $model->fact_gmvp = $comfirmMvp->date_confirm;
             $model->save();
         }
 
@@ -300,12 +380,14 @@ class SegmentController extends AppController
             'project' => $project,
             'problem' => $problem,
             'confirmProblem' => $confirmProblem,
-            'offer' => $offer,
+            'offerGcp' => $offerGcp,
             'confirmGcp' => $confirmGcp,
+            'mvProduct' => $mvProduct,
+            'comfirmMvp' => $comfirmMvp,
+
         ]);
 
     }
-
 
 
     /**

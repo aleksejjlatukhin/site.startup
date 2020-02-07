@@ -161,7 +161,7 @@ class ProjectsController extends AppController
                 }
             }
         }
-        //debug($confirmMvp);
+
 
         return $this->render('result', [
             'model' => $model,

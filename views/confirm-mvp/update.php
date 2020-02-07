@@ -32,34 +32,37 @@ $this->params['breadcrumbs'][] = $this->title;
     <h4>Подтвержденная гипотеза ценностного предложения:</h4>
     <p>- <?= $gcp->description;?></p>
 
-    <h3 style="margin: 15px 0;">Данные сегмента</h3>
-    <?= DetailView::widget([
-        'model' => $segment,
-        'attributes' => [
-            'quantity',
-            'market_volume',
-            'name',
-            'field_of_activity:ntext',
-            'sort_of_activity:ntext',
-            'age',
-            'income',
-            [
-                'attribute' => 'add_info',
-                'visible' => !empty($segment->add_info),
-            ],
-        ],
-    ]) ?>
+    <h3 style="margin: 30px 0 10px 0;">Данные сегмента</h3>
 
+    <div style="margin-bottom: 30px;">
+
+        <?= DetailView::widget([
+            'model' => $segment,
+            'attributes' => [
+                'quantity',
+                'market_volume',
+                'name',
+                'field_of_activity:ntext',
+                'sort_of_activity:ntext',
+                'age',
+                'income',
+                [
+                    'attribute' => 'add_info',
+                    'visible' => !empty($segment->add_info),
+                ],
+            ],
+        ]) ?>
+
+    </div>
 
     <h3>Респонденты</h3>
-    <hr>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             [
                 'attribute' => 'count_respond',
-                'label' => 'Количество респондентов (подтвердивших ГЦП)'
+                'label' => 'Количество респондентов'
             ],
         ],
     ]) ?>

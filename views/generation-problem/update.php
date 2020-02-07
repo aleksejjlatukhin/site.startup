@@ -15,16 +15,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $model->titl
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage active"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="generation-problem-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?= $this->render('_form_update', [
         'model' => $model,

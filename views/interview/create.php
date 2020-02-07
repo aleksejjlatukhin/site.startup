@@ -14,29 +14,39 @@ $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage active"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="interview-create">
 
-    <h1>Разработка программы ПИ</h1><br>
-
     <h3>Данные сегмента</h3>
+
+    <div style="margin-bottom: 30px;">
 
     <?= DetailView::widget([
         'model' => $segment,
         'attributes' => [
-            'quantity',
-            'market_volume',
+
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($segment->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($segment->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($segment->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
@@ -44,8 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    </div>
+
+    <h2>Разработка программы ПИ</h2>
     <br>
-    <hr>
 
     <?= $this->render('_form', [
         'model' => $model,

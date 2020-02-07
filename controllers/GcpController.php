@@ -125,6 +125,7 @@ class GcpController extends AppController
         $model->title = 'ГЦП ' . (count($models)+1);
         $model->confirm_problem_id = $id;
         $model->date_create = date('Y:m:d');
+        $model->date_time_create = date('Y-m-d H:i:s');
 
         if ($generationProblem->exist_confirm !== 1){
             Yii::$app->session->setFlash('error', "У проблемы с данным ID отсутствует подтверждение, поэтому вы не можете перейти к созданию ГЦП.");

@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="mvp-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p style="text-indent: 20px;">Minimum Viable Product(MVP) — минимально жизнеспособный продукт,
         концепция минимализма программной комплектации выводимого на рынок устройства.
@@ -29,13 +29,20 @@ $this->params['breadcrumbs'][] = $this->title;
         но достаточными для удовлетворения первых потребителей функциями.
         Основная задача — получение обратной связи для формирования гипотез дальнейшего развития продукта.</p>
 
-    <p>
-        <?= Html::a('Добавить MVP', ['create', 'id' => $confirmGcp->id], ['class' => 'btn btn-success']) ?>
+    <p style="margin-bottom: 20px;">
+
+        <?= Html::a('Добавить MVP', ['create', 'id' => $confirmGcp->id], ['class' => 'btn btn-primary']) ?>
+
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
     </p>
 
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'summary' => false,
         'columns' => [
             [
                 'class' => 'yii\grid\SerialColumn',

@@ -15,13 +15,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Респондент: ' . $respond
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage"><span>Разработка программы ПИ</span></div>
-    <div class="stage  active"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="desc-interview-update">
 
     <h2><?= Html::encode($this->title) ?></h2>

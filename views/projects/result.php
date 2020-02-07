@@ -7,22 +7,52 @@ use yii\helpers\Url;
 
 <?php
 
-$this->title = 'Сводная таблица данных по проекту "' . mb_strtolower($model->project_name) . '"';
+$this->title = 'Сводная таблица проекта "' . mb_strtolower($model->project_name) . '"';
 
 ?>
 
-<h2 style="text-align: center"><?= 'Сводная таблица данных по проекту ' . Html::a(Html::encode(mb_strtolower('"' . $model->project_name . '"')), Url::to(['view', 'id' => $model->id])) ?></h2 style="text-align: center"><br>
+
+
+<p>
+    <h2><?= 'Сводная таблица проекта ' . Html::a(Html::encode(mb_strtolower('"' . $model->project_name . '"')), Url::to(['view', 'id' => $model->id])) ?>
+
+    <?= Html::a('Дорожная карта проекта', ['segment/roadmap', 'id' => $model->id], ['class' => 'btn btn-default pull-right']) ?></h2>
+</p>
+
+<br>
+
+<div style="display: flex; flex: auto; flex-wrap: wrap;">
+    <div style="width: 500px;">
+        <p><span class="bolder">Сегмент</span> - целевой сегмент, по которому проводится исследование.</p>
+        <p><span class="bolder">ГПС</span> - гипотеза проблемы целевого сегмента.</p>
+        <p><span class="bolder">Подтв. ГПС</span> - подтверждение гипотезы проблемы целевого сегмента.</p>
+        <p><span class="bolder">ГЦП</span> - гипотеза ценностного предложения.</p>
+        <p><span class="bolder">Подтв. ГЦП</span> - подтверждение гипотезы ценностного предложения.</p>
+    </div>
+    <div style="width: 500px;">
+        <p><span class="bolder">MVP</span>(Minimum Viable Product) — минимально жизнеспособный продукт, обладающий минимальными, но достаточными для удовлетворения первых потребителей функциями.</p>
+        <p><span class="bolder">Подтв. MVP</span> - подтверждение MVP(см.выше).</p>
+        <p><span class="bolder">Бизнес-модель</span> - построение бизнес-модели по Остервальдеру.</p>
+    </div>
+</div>
+
+<div style="display: flex; flex: auto; flex-wrap: wrap; margin-bottom: 30px;">
+    <p style="padding-right: 75px;">" <span  class="bolder" style="color: green; font-size: 20px;">+</span> " - этап подтвержден.</p>
+    <p style="padding-right: 75px;">" <span  class="bolder" style="color: red; font-size: 20px;">-</span> " - этап не подтвержден.</p>
+    <p>" <span  class="bolder" style="font-size: 20px;">---</span> " - действия по этапу не проводились.</p>
+</div>
+
 
 <table class="table table-bordered table">
     <thead>
     <tr>
         <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Сегмент</th>
         <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">ГПС</th>
-        <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Подтверждение ГПС</th>
+        <th scope="col" style="text-align: center;width: 80px;padding: 20px 0;">Подтв. ГПС</th>
         <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">ГЦП</th>
-        <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Подтверждение ГЦП</th>
+        <th scope="col" style="text-align: center;width: 80px;padding: 20px 0;">Подтв. ГЦП</th>
         <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">MVP</th>
-        <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Подтверждение MVP</th>
+        <th scope="col" style="text-align: center;width: 80px;padding: 20px 0;">Подтв. MVP</th>
         <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Бизнес-модель</th>
     </tr>
     </thead>
@@ -31,20 +61,19 @@ $this->title = 'Сводная таблица данных по проекту "
 
     <?
 
-
+    $countMvps = [];
+    $countGcps = [];
 
     foreach ($segments as $segment){
 
-        $countProblems = [];
-        $countGcps = [];
-        $countMvps = [];
+        /*$countProblems = [];
 
         $countProblems[] = count($segment->interview->problems);
         foreach ($countProblems as $k => $countProblem){
             if ($countProblems[$k] == 0){
                 $countProblems[$k] = 1;
             }
-        }
+        }*/
 
 
         foreach ($problems as $k => $problem){
@@ -94,18 +123,24 @@ $this->title = 'Сводная таблица данных по проекту "
             }
         }
 
-        $countP = array_sum($countProblems);
+        //$countP = array_sum($countProblems);
         $countG = array_sum($countGcps);
         $countM = array_sum($countMvps);
         $minHeight = 35;
 
-        $ourCount = array($countP, $countG, $countM);
-        $maxCount = max($ourCount);
+        //$ourCount = array($countP, $countG, $countM);
+        //$maxCount = max($ourCount);
 
         //debug($countGcps);
         //debug($countMvps);
+    }
 
-        echo '<tr style="text-align: center"><td style="vertical-align: middle; height: ' . $minHeight *  $countM . 'px">' . Html::a(Html::encode($segment->name), Url::to(['segment/view', 'id' => $segment->id])). '</td>';
+    //debug($countMvps);
+
+
+    foreach ($segments as $k => $segment){
+
+        echo '<tr style="text-align: center"><td style="vertical-align: middle; height: ' . $minHeight *  $countM[$k] . 'px">' . Html::a(Html::encode($segment->name), Url::to(['segment/view', 'id' => $segment->id])). '</td>';
 
         echo '<td style="padding: 0;">';
 
@@ -171,6 +206,7 @@ $this->title = 'Сводная таблица данных по проекту "
                     echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;"> --- </div>';
                 }
 
+
                 foreach ($offers as $j => $offer) {
 
                     if ($offer->confirm_problem_id == $problem->confirm->id) {
@@ -180,6 +216,9 @@ $this->title = 'Сводная таблица данных по проекту "
                         }
                         if ($offer->exist_confirm === 0) {
                             echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> - </div>';
+                        }
+                        if ($offer->exist_confirm === null) {
+                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> --- </div>';
                         }
                     }
                 }
@@ -195,7 +234,7 @@ $this->title = 'Сводная таблица данных по проекту "
             if ($problem->interview_id == $segment->interview->id) {
 
                 if (empty($problem->confirm->gcps)){
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;"> --- </div>';
+                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;"> --- </div>';
                 }
 
                 foreach ($offers as $j => $offer) {
@@ -203,7 +242,7 @@ $this->title = 'Сводная таблица данных по проекту "
                     if ($offer->confirm_problem_id == $problem->confirm->id) {
 
                         if (empty($offer->confirm->mvps)){
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> --- </div>';
+                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;"> --- </div>';
                         }
 
                         foreach ($mvProducts as $mvProduct) {
@@ -318,7 +357,6 @@ $this->title = 'Сводная таблица данных по проекту "
 
     </tbody>
 </table>
-
 
 
 

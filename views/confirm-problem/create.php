@@ -31,16 +31,34 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h3>Данные сегмента</h3>
 
+    <div style="margin-bottom: 30px;">
+
     <?= DetailView::widget([
         'model' => $segment,
         'attributes' => [
-            'quantity',
-            'market_volume',
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($segment->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($segment->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($segment->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
@@ -48,8 +66,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    </div>
+
     <h3>Респонденты</h3>
-    <hr>
 
     <?= DetailView::widget([
         'model' => $model,

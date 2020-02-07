@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <hr>
+    <br>
 
 
     <?= GridView::widget([

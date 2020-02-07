@@ -13,6 +13,8 @@ use app\models\User;
 
 class SiteController extends AppController
 {
+    public $layout = 'base';
+
     /**
      * {@inheritdoc}
      */
@@ -63,12 +65,64 @@ class SiteController extends AppController
         return $this->render('index', compact('user'));
     }
 
+
+    public function actionTargetSegment()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('target-segment', compact('user'));
+    }
+
+
+    public function actionSegmentProblems()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('segment-problems', compact('user'));
+    }
+
+
+    public function actionProblemConfirmation()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('problem-confirmation', compact('user'));
+    }
+
+
+    public function actionValueProposition()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('value-proposition', compact('user'));
+    }
+
+
+    public function actionOfferConfirmation()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('offer-confirmation', compact('user'));
+    }
+
+
+    public function actionDevelopmentMvp()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('development-mvp', compact('user'));
+    }
+
+
+    public function actionMvpConfirmation()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('mvp-confirmation', compact('user'));
+    }
+
+
     /**
      * @return string|Response
      * @throws \yii\base\Exception
      */
     public function actionSingup()
     {
+        $this->layout = 'first';
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -114,6 +168,8 @@ class SiteController extends AppController
      */
     public function actionLogin()
     {
+        $this->layout = 'first';
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }

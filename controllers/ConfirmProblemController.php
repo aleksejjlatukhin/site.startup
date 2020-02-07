@@ -128,6 +128,7 @@ class ConfirmProblemController extends AppController
 
         $generationProblem->exist_confirm = 1;
         $generationProblem->date_confirm = date('Y:m:d');
+        $generationProblem->date_time_confirm = date('Y-m-d H:i:s');
 
         if ($generationProblem->save()){
 

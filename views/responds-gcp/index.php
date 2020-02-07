@@ -7,7 +7,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Информация о респондентах ' . $gcp->title;
+$this->title = 'Информация о респондентах';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <hr>
+    <br>
 
     <table class="table table-bordered table-striped">
         <thead>

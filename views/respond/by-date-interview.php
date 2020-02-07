@@ -16,18 +16,11 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исхо
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage active"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="respond by-date-interview">
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <hr>
+    <br>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -74,8 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php endforeach; ?>
         </tbody>
     </table>
-
-    <hr>
 
     <?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $interview->id], ['class' => 'btn btn-default']) ?>
 </div>

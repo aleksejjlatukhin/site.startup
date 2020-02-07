@@ -16,32 +16,100 @@ use yii\helpers\Url;
 
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form', 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?= $form->field($model, 'project_name')->textInput(['maxlength' => true, 'autofocus' => true]) ?>
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Описание проекта</h4>
+                </div>
+            </div>
 
-    <?= $form->field($model, 'project_fullname')->textInput(['maxlength' => true]) ?>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'project_name', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'project_fullname', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
 
-    <?= $form->field($model, 'rid')->textInput(['maxlength' => true]) ?>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'description', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textarea(['rows' => 2]) ?>
+            </div>
 
-    <?= $form->field($model, 'core_rid')->textarea(['rows' => 6]) ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'patent_number')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'patent_date')->widget(\yii\jui\DatePicker::class, [
-        'dateFormat' => 'yyyy-MM-dd',
-        //'inline' => true,
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-MM-dd',
-        ],
-        //'language' => 'ru',
-    ]) ?>
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Результат интеллектуальной деятельности</h4>
+                </div>
+            </div>
 
-    <?= $form->field($model, 'patent_name')->textInput(['maxlength' => true]) ?>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'rid', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'core_rid', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textarea(['rows' => 2]) ?>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Данные о патенте</h4>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'patent_name', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 20px;">
+                <?= $form->field($model, 'patent_number', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'patent_date', [
+                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                ])->widget(\yii\jui\DatePicker::class, [
+                    'dateFormat' => 'yyyy-MM-dd',
+                    //'inline' => true,
+                    'clientOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-MM-dd',
+                    ],
+                    //'language' => 'ru',
+                ]) ?>
+            </div>
+
+        </div>
+    </div>
+
 
         <div class="row">
-            <div class="panel-body">
+            <div class="panel-body col-sm-8">
                 <div class="panel panel-default"><!-- widgetBody -->
                     <div class="panel-heading">
                         <h4>Целевые сегменты</h4>
@@ -79,12 +147,9 @@ use yii\helpers\Url;
                                     <button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
                                 </div>
 
-
-
-
                                 <?= $form->field($modelsConcept, "[{$i}]name", [
-                                    'template' => '<div class="col-md-10">{input}</div><div class="col-md-2">{error}</div>'
-                                ])->textInput(['maxlength' => true])?>
+                                    'template' => '<div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textarea(['rows' => 1])?>
 
                             </div><!-- .row -->
 
@@ -94,7 +159,7 @@ use yii\helpers\Url;
 
                 </div>
 
-                <p><button type="button" class="add-item btn btn-primary btn-md">Добавить сегмент </i></button></p>
+                <p class="col-sm-3"><button type="button" class="add-item btn btn-primary btn-md">Добавить сегмент </i></button></p>
 
                 <?php DynamicFormWidget::end(); ?>
             </div>
@@ -102,7 +167,7 @@ use yii\helpers\Url;
 
 
         <div class="row">
-            <div class="panel-body">
+            <div class="panel-body col-sm-8">
                 <div class="panel panel-default"><!-- widgetBody -->
                     <div class="panel-heading">
                         <h4>Команда проекта</h4>
@@ -143,95 +208,219 @@ use yii\helpers\Url;
                                     <button type="button" class="remove-authors btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
                                 </div>
 
-                                <?= $form->field($modelsAuthors, "[{$i}]fio")->textInput(['maxlength' => true]) ?>
-                                <?= $form->field($modelsAuthors, "[{$i}]role")->textInput(['maxlength' => true]) ?>
-                                <?= $form->field($modelsAuthors, "[{$i}]experience")->textarea(['rows' => 3]) ?>
+                                <?= $form->field($modelsAuthors, "[{$i}]fio", [
+                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textInput(['maxlength' => true]) ?>
+
+                                <?= $form->field($modelsAuthors, "[{$i}]role", [
+                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textInput(['maxlength' => true]) ?>
+
+                                <?= $form->field($modelsAuthors, "[{$i}]experience", [
+                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textarea(['rows' => 1]) ?>
+
                             </div><!-- .row -->
 
                         </div>
                     <?php endforeach; ?>
                 </div>
 
-                <p><button type="button" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
+                <p class="col-sm-3"><button type="button" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
 
                 <?php DynamicFormWidget::end(); ?>
             </div>
         </div>
 
-    <hr>
-    <?= $form->field($model, 'technology')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'layout_technology')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'register_name')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Сведения о технологии</h4>
+                </div>
+            </div>
 
-    <?= $form->field($model, 'register_date')->widget(\yii\jui\DatePicker::class, [
-        'dateFormat' => 'yyyy-MM-dd',
-        //'inline' => true,
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-MM-dd'
-        ],
-        //'language' => 'ru',
-    ]) ?>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'technology', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
 
-    <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'invest_name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'invest_date')->widget(\yii\jui\DatePicker::class, [
-        'dateFormat' => 'yyyy-MM-dd',
-        //'inline' => true,
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-MM-dd'
-        ],
-        //'language' => 'ru',
-    ]) ?>
-
-    <?= $form->field($model, 'invest_amount')->textInput() ?>
-
-    <?= $form->field($model, 'date_of_announcement')->widget(\yii\jui\DatePicker::class, [
-        'dateFormat' => 'yyyy-MM-dd',
-        //'inline' => true,
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'yyyy-MM-dd'
-        ],
-        //'language' => 'ru',
-    ]) ?>
-
-    <?= $form->field($model, 'announcement_event')->textInput() ?>
-
-    <div class="container row">
-        <div class="pull-left">
-
-            <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label('Презентационные файлы') ?></p>
-
-            <p><?php if (!empty($model->preFiles)){
-                    foreach ($model->preFiles as $file){
-                        echo Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => 'btn btn-default prefiles']) .
-                            ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $file->file_name], [
-                                'onclick'=>
-                                    "$.ajax({
-                                         type:'POST',
-                                         cache: false,
-                                         url: '".Url::to(['delete-file', 'filename' => $file->file_name])."',
-                                         success  : function(response) {
-                                             $('.link-del ' . $file->id).html(response);
-                                             $('.prefiles').remove();
-                                         }
-                                      });
-                                 return false;
-                                 $('.prefiles').remove();
-                                 ",
-                                'class' => "link-del $file->id",
-                            ]) . '<br>';
-                    }
-                }?></p>
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'layout_technology', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textarea(['rows' => 2]) ?>
+            </div>
 
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Регистрация юридического лица</h4>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'register_name', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'register_date', [
+                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                ])->widget(\yii\jui\DatePicker::class, [
+                    'dateFormat' => 'yyyy-MM-dd',
+                    //'inline' => true,
+                    'clientOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-MM-dd',
+                    ],
+                    //'language' => 'ru',
+                ]) ?>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Адрес сайта</h4>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'site', [
+                    'template' => '<div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Инвестиции в проект</h4>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'invest_name', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'invest_amount', [
+                    'template' => '<div class="col-md-6" style="padding-top: 15px;">{label}</div><div class="col-md-6">{input}</div><div class="col-sm-6">{error}</div>'
+                ])->textInput(['type' => 'number']);?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'invest_date', [
+                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                ])->widget(\yii\jui\DatePicker::class, [
+                    'dateFormat' => 'yyyy-MM-dd',
+                    //'inline' => true,
+                    'clientOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-MM-dd',
+                    ],
+                    //'language' => 'ru',
+                ]) ?>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Анонс проекта</h4>
+                </div>
+            </div>
+
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'announcement_event', [
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textInput(['maxlength' => true]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 20px;">
+                <?= $form->field($model, 'date_of_announcement', [
+                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                ])->widget(\yii\jui\DatePicker::class, [
+                    'dateFormat' => 'yyyy-MM-dd',
+                    //'inline' => true,
+                    'clientOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-MM-dd',
+                    ],
+                    //'language' => 'ru',
+                ]) ?>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Презентационные файлы</h4>
+                </div>
+            </div>
+
+            <div class="container row">
+                <div class="pull-left">
+
+                    <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label('Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"') ?></p>
+
+                    <p><?php if (!empty($model->preFiles)){
+                            foreach ($model->preFiles as $file){
+                                echo Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => 'btn btn-default prefiles']) .
+                                    ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $file->file_name], [
+                                        'onclick'=>
+                                            "$.ajax({
+                                                 type:'POST',
+                                                 cache: false,
+                                                 url: '".Url::to(['delete-file', 'filename' => $file->file_name])."',
+                                                 success  : function(response) {
+                                                     $('.link-del ' . $file->id).html(response);
+                                                     $('.prefiles').remove();
+                                                 }
+                                              });
+                                         return false;
+                                         $('.prefiles').remove();
+                                         ",
+                                        'class' => "link-del $file->id",
+                                    ]) . '<br>';
+                            }
+                        }?></p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <br>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

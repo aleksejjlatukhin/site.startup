@@ -16,16 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
-<div class="stages">
-    <div class="stage"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage active"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="generation-problem-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -37,13 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) */?>
         <?php if (empty($model->confirm)) : ?>
-            <?= Html::a('Подтвердить ПС', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Подтвердить ГПС >>', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
-            <?= Html::a('Подтверждение ПС', ['confirm-problem/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Подтверждение ГПС', ['confirm-problem/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
 
         <?php if ($model->exist_confirm == 1){
-            echo Html::a('Перейти на страницу ГЦП', ['gcp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+            echo Html::a('Перейти на страницу ГЦП >>', ['gcp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
         }?>
     </p>
 
@@ -81,6 +74,11 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
+    <div style="display:flex;flex-wrap: wrap;">
 
+        <?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
+
+        <div style="font-style: italic;margin-left: auto;"><span class="bolder">ГПС*</span> - гипотеза проблемного интервью.</div>
+
+    </div>
 </div>

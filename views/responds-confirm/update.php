@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\RespondsConfirm */
 
-$this->title = 'Редактирование данных респондента: ' . $model->name;
+$this->title = 'Редактирование данных респондента';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -19,6 +19,8 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 <div class="responds-confirm-update">
 
     <h3><?= Html::encode($this->title) ?></h3>
+
+    <br>
 
     <?= $this->render('_form', [
         'model' => $model,

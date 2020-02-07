@@ -11,7 +11,7 @@ use yii\helpers\Url;
 ?>
 
 
-<div class="d-inline p-2 bg-success" style="font-size: 16px;border-radius: 5px;padding:15px 20px;margin-bottom: 20px;">
+<div class="d-inline p-2 bg-success col-md-8" style="font-size: 15px;border-radius: 5px;padding:15px;margin-bottom: 20px;">
     Необходимо просмотреть и проанализировать все материалы интервью представителей сегмента и выявить проблемы, которые характерны для нескольких респондентов
 </div>
 
@@ -58,7 +58,7 @@ use yii\helpers\Url;
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
-    <?= $form->field($model, 'description')->label('<h4>Напишите описание гипотезы проблемы сегмента</h4>')->textarea(['rows' => 6, 'placeholder' => $placeholder]) ?>
+    <?= $form->field($model, 'description')->label('<h4>Напишите описание гипотезы проблемы сегмента</h4>')->textarea(['rows' => 4, 'placeholder' => $placeholder]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

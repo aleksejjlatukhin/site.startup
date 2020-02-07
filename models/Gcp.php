@@ -46,7 +46,7 @@ class Gcp extends \yii\db\ActiveRecord
             [['confirm_problem_id', 'exist_confirm'], 'integer'],
             [['description'], 'string'],
             [['title', 'good', 'benefit', 'contrast'], 'string', 'max' => 255],
-            [['date_create', 'date_confirm'], 'safe'],
+            [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
         ];
     }
 

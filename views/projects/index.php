@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
+    <p style="margin-bottom: 20px;">
         <?= Html::a('Создать проект', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
@@ -22,15 +22,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'options' => ['width' => '70'],
+        'summary' => false,
         'columns' => [
 
             [
                 'header' => '№',
                 'class' => 'yii\grid\SerialColumn',
             ],
-
-//            'id',
-//            'user_id',
 
             [
                 'attribute' => 'project_name',
@@ -41,8 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             'project_fullname:ntext',
-
-//            'description:ntext',
             'rid',
             'patent_number',
 
@@ -52,15 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             'patent_name:ntext',
-//            'core_rid:ntext',
             'technology',
-//            'layout_technology:ntext',
-//            'register_name',
-//            'register_date',
-//            'site',
-//            'invest_name',
-//            'invest_date',
-//            'invest_amount',
 
             [
                 'attribute' => 'created_at',
@@ -72,7 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 
-            //['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 

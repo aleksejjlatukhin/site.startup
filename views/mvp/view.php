@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="mvp-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p>
         <?= Html::a('Редактирование', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) */?>
 
         <?php if (empty($model->confirm)) : ?>
-            <?= Html::a('Подтвердить MVP', ['confirm-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Подтвердить MVP >>', ['confirm-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
             <?= Html::a('Подтверждение MVP', ['confirm-mvp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>

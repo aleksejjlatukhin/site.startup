@@ -15,35 +15,50 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ', 'url' =>
 $this->params['breadcrumbs'][] = 'Генерация ПИ - редактирование';
 ?>
 
-<div class="stages">
-    <div class="stage active"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="interview-update">
 
     <h3>Данные сегмента</h3>
 
+    <div style="margin-bottom: 30px;">
+
     <?= DetailView::widget([
         'model' => $segment,
         'attributes' => [
-            'quantity',
-            'market_volume',
+
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($segment->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($segment->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($segment->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
             ],
+
         ],
     ]) ?>
 
-    <h1>Генерация ПИ - редактирование</h1>
+    </div>
+
+    <h2>Генерация ПИ - редактирование</h2>
     <br>
 
     <?= $this->render('_form_update', [

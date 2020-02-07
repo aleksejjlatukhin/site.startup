@@ -36,13 +36,29 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $segment,
         'attributes' => [
-            'quantity',
-            'market_volume',
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($segment->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($segment->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($segment->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
@@ -61,6 +77,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'method' => 'post',
         ],
     ]) */?>
+
+    <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+    <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
     </p>
 
 
@@ -229,7 +250,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         if ($model->exist_confirm == 0){
 
-            echo Html::a('Закончить тест', ['not-exist-confirm', 'id' => $model->id], [
+            echo Html::a('Закончить тест >>', ['not-exist-confirm', 'id' => $model->id], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Проблема не подтверждена! Вы действительно хотите закончить тест для "' . $generationProblem->title . '" ?',
@@ -240,12 +261,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
         if ($model->exist_confirm == 1){
 
-            echo Html::a('Закончить тест', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
+            echo Html::a('Закончить тест >>', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
         }
     }
 
     if ($model->exist_confirm == 1 && $generationProblem->exist_confirm == 1) {
-        echo Html::a('Перейти на страницу ГЦП', ['gcp/index', 'id' => $model->id], ['class' => 'btn btn-success']);
+        echo Html::a('Перейти на страницу ГЦП >>', ['gcp/index', 'id' => $model->id], ['class' => 'btn btn-success']);
     }
 
     ?>

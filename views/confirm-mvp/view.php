@@ -26,15 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="confirm-mvp-view">
 
     <h2 style="margin: 20px 0;"><?= Html::encode($this->title) ?></h2>
-    <hr>
 
-    <h4>MVP требующее подтверждения:</h4>
-    <p>- <?= $mvp->description;?></p>
+    <div style="margin-bottom: 30px;">
 
-    <h4>Подтвержденная гипотеза ценностного предложения:</h4>
-    <p>- <?= $gcp->description;?></p>
+        <h4>MVP требующее подтверждения:</h4>
+        <p>- <?= $mvp->description;?></p>
 
-    <hr>
+        <h4>Подтвержденная гипотеза ценностного предложения:</h4>
+        <p>- <?= $gcp->description;?></p>
+
+    </div>
+
     <h3>Данные для подтверждения <?= $mvp->title ?></h3>
 
     <p>
@@ -46,6 +48,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) */?>
+
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
     </p>
 
     <?= DetailView::widget([
@@ -227,17 +234,17 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
 
-    if ($mvp->exist_confirm !== null && $mvp->exist_confirm == $model->exist_confirm) {
+    /*if ($mvp->exist_confirm !== null && $mvp->exist_confirm == $model->exist_confirm) {
 
         echo Html::a('Сводная таблица данных по проекту', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default']);
-    }
+    }*/
 
     if ($mvp->exist_confirm == 1 && $mvp->exist_confirm == $model->exist_confirm) {
 
         if (!empty($model->business)){
-            echo Html::a('Описание бизнес-модели', ['business-model/view', 'id' => $model->business->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
+            echo Html::a('Описание бизнес-модели >>', ['business-model/view', 'id' => $model->business->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
         }else{
-            echo Html::a('Создать бизнес-модель', ['business-model/create', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
+            echo Html::a('Создать бизнес-модель >>', ['business-model/create', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
 
         }
     }

@@ -17,24 +17,25 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <div class="row">
-        <p>
+    <p style="margin-bottom: 20px;">
 <!--            <span class="col-sm-3">-->
 <!--                --><?//= Html::a('Добавить целевой семент', ['create', 'id' => $project->id], ['class' => 'btn btn-success']) ?>
 <!--            </span>-->
 
-            <span class="col-sm-3">
-                <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-success']) ?>
-            </span>
-        </p>
-    </div>
 
-    <hr>
+        <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-success']) ?>
+
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default']) ?>
+
+    </p>
+
+
 
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'options' => ['width' => '70'],
+        'summary' => false,
         'columns' => [
             [
                 'header' => '№',
@@ -97,7 +98,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
-
-
     <?php ActiveForm::end(); ?>
+</div>
+
+<br>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">ГЦС*</span> — гипотеза целевого сегмента.</p>
 </div>

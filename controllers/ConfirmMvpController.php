@@ -142,6 +142,7 @@ class ConfirmMvpController extends Controller
 
         $mvp->exist_confirm = 1;
         $mvp->date_confirm = date('Y:m:d');
+        $mvp->date_time_confirm = date('Y-m-d H:i:s');
 
         if ($mvp->save()){
 

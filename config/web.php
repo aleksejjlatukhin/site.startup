@@ -55,6 +55,13 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'target-segment' => 'site/target-segment',
+                'segment-problems' => 'site/segment-problems',
+                'problem-confirmation' => 'site/problem-confirmation',
+                'value-proposition' => 'site/value-proposition',
+                'offer-confirmation' => 'site/offer-confirmation',
+                'development-mvp' => 'site/development-mvp',
+                'mvp-confirmation' => 'site/mvp-confirmation',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],

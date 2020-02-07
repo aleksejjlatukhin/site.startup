@@ -111,7 +111,8 @@ class Projects extends ActiveRecord
     {
         return [
             [['user_id', 'created_at', 'update_at', 'project_name'], 'required'],
-            [['user_id', 'invest_amount'], 'integer'],
+            [['user_id',], 'integer'],
+            [['invest_amount'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
             [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
@@ -135,7 +136,7 @@ class Projects extends ActiveRecord
             'rid' => 'Результат интеллектуальной деятельности',
             'patent_number' => 'Номер патента',
             'patent_date' => 'Дата получения патента',
-            'patent_name' => 'Название патента',
+            'patent_name' => 'Наименование патента',
             'core_rid' => 'Суть результата интеллектуальной деятельности',
             'technology' => 'На какой технологии основан проект',
             'layout_technology' => 'Макет базовой технологии',

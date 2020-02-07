@@ -98,13 +98,13 @@ class GenerationProblemController extends Controller
         foreach ($responds as $respond){
 
             $descInterview = DescInterview::find()->where(['respond_id' => $respond->id])->one();
-            if(!empty($descInterview)){
+            if($descInterview->status == 1){
                 $count++;
             }
         }
 
         if ($count < 1){
-            Yii::$app->session->setFlash('error', "Необходимо добавить материалы интервью хотя бы с одним респондентом!");
+            Yii::$app->session->setFlash('error', "Необходимо добавить материалы интервью хотя бы с одним представителем сегмента!");
             return $this->redirect(['interview/view', 'id' => $id]);
         }
 

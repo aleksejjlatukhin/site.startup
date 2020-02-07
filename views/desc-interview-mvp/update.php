@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="desc-interview-mvp-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?= $this->render('_form', [
         'model' => $model,

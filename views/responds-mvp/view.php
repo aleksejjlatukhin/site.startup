@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="responds-mvp-view">
 
     <h3><?= Html::encode($this->title) ?></h3>
+    <br>
 
     <p>
         <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>

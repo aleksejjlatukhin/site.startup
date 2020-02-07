@@ -36,14 +36,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) */?>
-        <?= Html::a('Сводная таблица данных по проекту', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default']);
-        ?>
+
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
     </p>
 
-    <div class="" style="display: flex; flex: auto; flex-wrap: wrap">
+    <div style="display: flex; flex: auto; flex-wrap: wrap">
         <div>
             <div class="block-200"><h3 style="color: #3c3c3c">Потребительский сегмент</h3><?= $segment->name; ?></div>
-            <div class="block-200"><h3 style="color: #3c3c3c">Потенциальное количество потребителей</h3><?= $model->quantity; ?></div>
+            <div class="block-200"><h3 style="color: #3c3c3c">Потенциальное количество потребителей</h3><?= number_format($model->quantity, 0, '', ' '); ?></div>
         </div>
         <div class="block-200"><h3 style="color: #3c3c3c">Ключевые партнеры: </h3><?= $model->partners; ?></div>
         <div>
@@ -55,8 +58,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="block-200"><h3 style="color: #3c3c3c">Взаимоотношения с клиентами</h3><?= $model->relations; ?></div>
             <div class="block-200"><h3 style="color: #3c3c3c">Каналы коммуникации и сбыта</h3><?= $model->distribution_of_sales; ?></div>
         </div>
+        <div style="justify-content: space-between; display: flex">
         <div class="block-100"><h3 style="color: #3c3c3c">Структура издержек</h3><?= $model->cost; ?></div>
         <div class="block-100"><h3 style="color: #3c3c3c">Потоки поступления доходов</h3><?= $model->revenue; ?></div>
+        </div>
     </div>
 
 </div>

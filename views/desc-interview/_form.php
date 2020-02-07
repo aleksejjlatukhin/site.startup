@@ -23,52 +23,57 @@ use yii\helpers\Url;
         //'language' => 'ru',
     ]) */?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6])->label('') ?>
+    <div class="row">
+        <div class="col-md-8">
 
-    <div class="container row">
-        <div class="pull-left">
+            <?= $form->field($model, 'description')->textarea(['rows' => 2])->label('') ?>
 
-            <p class="feed"><b>Файл</b></p>
-            <?php if (!empty($model->interview_file)) : ?>
-                <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp']])->fileInput()->label('') ?></p>
-            <?php endif;?>
+            <div class="container row">
+                <div class="pull-left">
 
-            <?php if (empty($model->interview_file)) : ?>
-                <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp active']])->fileInput()->label('') ?></p>
-            <?php endif;?>
+                    <p class="feed"><b>Файл (доступные расширения: png, jpg, odt, xlsx, txt, doc, docx, pdf)</b></p>
+                    <?php if (!empty($model->interview_file)) : ?>
+                        <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp']])->fileInput()->label('') ?></p>
+                    <?php endif;?>
 
-            <p>
-                <?php
-                if (!empty($model->interview_file))
-                {
-                    echo Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => 'btn btn-default feedback']) .
-                        ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $model->interview_file], [
-                            'onclick'=>
-                                "$.ajax({
-                                         type:'POST',
-                                         cache: false,
-                                         url: '".Url::to(['delete-file', 'filename' => $model->interview_file])."',
-                                         success  : function(response) {
-                                             $('.link-del').html(response);
-                                             $('.feedback').remove();
-                                         }
-                                      });
-                                 return false;
-                                 $('.feedback').remove();
-                                 ",
-                            'class' => "link-del",
-                        ]);
-                }
-                ?>
-            </p>
+                    <?php if (empty($model->interview_file)) : ?>
+                        <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp active']])->fileInput()->label('') ?></p>
+                    <?php endif;?>
+
+                    <p>
+                        <?php
+                        if (!empty($model->interview_file))
+                        {
+                            echo Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => 'btn btn-default feedback']) .
+                                ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $model->interview_file], [
+                                    'onclick'=>
+                                        "$.ajax({
+                                                 type:'POST',
+                                                 cache: false,
+                                                 url: '".Url::to(['delete-file', 'filename' => $model->interview_file])."',
+                                                 success  : function(response) {
+                                                     $('.link-del').html(response);
+                                                     $('.feedback').remove();
+                                                 }
+                                              });
+                                         return false;
+                                         $('.feedback').remove();
+                                         ",
+                                    'class' => "link-del",
+                                ]);
+                        }
+                        ?>
+                    </p>
+
+                </div>
+            </div>
+
+            <?= $form->field($model, 'result')->textarea(['rows' => 2]) ?>
+
+            <?= $form->field($model, 'status', ['template' => '<div class="col-md-12" style="padding-left: 0">{label}</div><div class="col-md-12" style="padding-left: 0; margin-bottom: 10px;"><div class="col-md-2" style="padding-left: 0">{input}</div></div>'])->dropDownList([ '0' => 'Нет', '1' => 'Да', ]) ?>
 
         </div>
     </div>
-
-    <?= $form->field($model, 'result')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'status', ['template' => '<div class="col-md-12" style="padding-left: 0">{label}</div><div class="col-md-12" style="padding-left: 0; margin-bottom: 10px;"><div class="col-md-2" style="padding-left: 0">{input}</div></div>'])->dropDownList([ '0' => 'Нет', '1' => 'Да', ]) ?>
-
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

@@ -19,13 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
-<div class="stages">
-    <div class="stage active"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="interview-view">
 
     <h3>Данные сегмента</h3>
@@ -33,17 +26,35 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $segment,
         'attributes' => [
-            'quantity',
-            'market_volume',
+
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($segment->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($segment->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($segment->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
             ],
+
         ],
     ]) ?>
 
@@ -58,6 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) */?>
+
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
     </p>
 
 
@@ -245,6 +261,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </tr>
         </tbody>
     </table>
+
+    <div style="font-style: italic"><span class="bolder">ГПС*</span> - гипотеза проблемного интервью.</div>
 
 </div>
 

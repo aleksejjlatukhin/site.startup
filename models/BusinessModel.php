@@ -41,7 +41,8 @@ class BusinessModel extends \yii\db\ActiveRecord
         return [
             [['confirm_mvp_id', 'quantity', 'sort_of_activity', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
             [['confirm_mvp_id'], 'integer'],
-            [['quantity', 'sort_of_activity', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
+            [['quantity',], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['sort_of_activity', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
         ];
     }
 

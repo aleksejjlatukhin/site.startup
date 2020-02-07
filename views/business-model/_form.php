@@ -12,26 +12,63 @@ use yii\helpers\Url;
 <div class="business-model-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <div class="row" style="margin-bottom: 5px">
+        <?= '<div class="col-md-8" style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Потребительский сегмент: ', Url::to(['segment/view', 'id' => $segment->id])) . '</span>' . mb_strtolower($segment->name) . '</div>' ?>
+    </div>
 
-    <?= '<div style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Потребительский сегмент: ', Url::to(['segment/view', 'id' => $segment->id])) . '</span>' . mb_strtolower($segment->name) . '</div>' ?>
+    <div class="row" style="margin-bottom: 5px">
+        <?= '<div class="col-md-8" style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Ценностное предложение: ', Url::to(['gcp/view', 'id' => $gcp->id])) . '</span>' . mb_strtolower($gcp->description) . '</div>' ?>
+    </div>
 
-    <?= '<div style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Ценностное предложение: ', Url::to(['gcp/view', 'id' => $gcp->id])) . '</span>' . mb_strtolower($gcp->description) . '</div>' ?>
+    <hr>
+    <div class="row" style="margin-bottom: 5px">
+        <?= $form->field($model, 'quantity', [
+            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
+        ])->textInput(['type' => 'number']); ?>
+    </div>
+    <br>
 
-    <?= $form->field($model, 'quantity')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'sort_of_activity', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'sort_of_activity')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'relations', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'relations')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'partners', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'partners')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'distribution_of_sales', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'distribution_of_sales')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'resources', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'resources')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'cost', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
-    <?= $form->field($model, 'cost')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'revenue')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 15px;">
+        <?= $form->field($model, 'revenue', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 1]) ?>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

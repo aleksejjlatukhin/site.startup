@@ -12,6 +12,9 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <div class="row">
+        <div class="col-md-8">
+
     <?= '<b>1. Формулировка перспективного продукта (товара / услуги):</b> ' . $form->field($model, 'good')->textInput(['maxlength' => true])->label(false) ?>
 
     <p><b>2. Для какого сегмента предназначено: <?= Html::a($segment->name, ['segment/view', 'id' => $segment->id]) ?></b></p>
@@ -21,13 +24,16 @@ use yii\widgets\ActiveForm;
     <?= '<b>4. Какую выгоду дает использование данного продукта
                 потребителю – представителю сегмента. <br>Все выгоды
                 формулируются по трем критериям: временной фактор;
-                экономический фактор; качественный фактор. <br>Первые два
+                экономический фактор; качественный фактор. Первые два
                 параметра выгоды должны быть исчисляемыми. Параметр
-                качества(исчисляемый /лаконичный текст):</b> ' . $form->field($model, 'benefit')->textInput(['maxlength' => true])->label(false) ?>
+                качества(исчисляемый /лаконичный текст):</b> ' . $form->field($model, 'benefit')->textarea(['rows' => 1])->label(false) ?>
 
     <?= '<b>5. По сравнению с каким продуктом заявлена выгода (с чем
                 сравнивается). <br>Указываются параметры аналога, с которыми
-                сравниваются параметры нового продукта:</b> ' . $form->field($model, 'contrast')->textInput(['maxlength' => true])->label(false) ?>
+                сравниваются параметры нового продукта:</b> ' . $form->field($model, 'contrast')->textarea(['rows' => 1])->label(false) ?>
+
+        </div>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

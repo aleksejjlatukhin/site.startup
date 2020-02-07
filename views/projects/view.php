@@ -24,7 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a('Генерация ГЦС', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+
+        <?= Html::a('Генерация ГЦС >>', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+
+        <?= Html::a('Сводная таблица проекта', ['result', 'id' => $model->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-right' => '5px']]) ?>
     </p>
 
     <?= DetailView::widget([
@@ -61,7 +64,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'technology',
             'layout_technology:ntext',
             'register_name',
-            //'register_date',
 
             [
                 'attribute' => 'register_date',
@@ -76,7 +78,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 
-            'invest_amount',
+            [
+                'attribute' => 'invest_amount',
+                'value' => number_format($model->invest_amount, 0, '', ' '),
+            ],
 
             [
                 'attribute' => 'date_of_announcement',

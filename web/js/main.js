@@ -14,4 +14,5 @@ $(document).ready(function() {
     $('.link-del').click(function () {
         $('.feed-exp').addClass('active');
     });
+
 });

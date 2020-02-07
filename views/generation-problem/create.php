@@ -14,16 +14,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исхо
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage active"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="generation-problem-create">
 
-    <h2 style="padding-left: 20px;"><?= Html::encode($this->title) ?></h2>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?= $this->render('_form', [
         'model' => $model,

@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <hr>
+    <br>
 
     <table class="table table-bordered table-striped">
         <thead>

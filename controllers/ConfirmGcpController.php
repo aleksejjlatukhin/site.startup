@@ -133,6 +133,7 @@ class ConfirmGcpController extends AppController
 
         $gcp->exist_confirm = 1;
         $gcp->date_confirm = date('Y:m:d');
+        $gcp->date_time_confirm = date('Y-m-d H:i:s');
 
         if ($gcp->save()){
 

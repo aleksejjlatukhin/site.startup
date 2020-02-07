@@ -34,9 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
         }?>
 
         <?php if(!($model->interview)) : ?>
-            <?= Html::a('Разработка программы ПИ', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Разработка программы ПИ >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
         <?php else: ?>
-            <?= Html::a('Программа ПИ - исходные данные', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Программа ПИ - исходные данные >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
         <?php endif;?>
 
     </p>
@@ -44,15 +44,30 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            //'id',
-            //'project_id',
+
             'name',
             'field_of_activity:ntext',
             'sort_of_activity:ntext',
             'age',
-            'income',
-            'quantity',
-            'market_volume',
+
+            [
+                'attribute' => 'income',
+                'value' => number_format($model->income, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'quantity',
+                'value' => number_format($model->quantity, 0, '', ' '),
+
+            ],
+
+            [
+                'attribute' => 'market_volume',
+                'value' => number_format($model->market_volume, 0, '', ' '),
+
+            ],
+
             [
                 'attribute' => 'add_info',
                 'visible' => !empty($model->add_info),
@@ -62,5 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <?//= Html::a('Далее', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
+    
+    <div style="font-style: italic"><span class="bolder">Программа ПИ*</span> - программа проблемного интервью</div>
 
 </div>

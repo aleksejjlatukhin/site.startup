@@ -15,16 +15,11 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исхо
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="stages">
-    <div class="stage active"><span>Разработка программы ПИ</span></div>
-    <div class="stage"><span>Проведение ПИ</span></div>
-    <div class="stage"><span>Выводы по ГПС</span></div>
-    <div class="stage"><span>Отзыв эксперта</span></div>
-</div>
-
 <div class="respond-view">
 
     <h3><?= Html::encode($this->title) ?></h3>
+
+    <br>
 
     <p>
         <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>

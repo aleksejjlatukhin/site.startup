@@ -20,13 +20,13 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gcp-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p>
         <?= Html::a('Редактирование', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
         <?php if (empty($model->confirm)) : ?>
-            <?= Html::a('Подтвердить ГЦП', ['confirm-gcp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Подтвердить ГЦП >>', ['confirm-gcp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
             <?= Html::a('Подтверждение ГЦП', ['confirm-gcp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) */?>
         <?php if ($model->exist_confirm == 1){
-            echo Html::a('Перейти на страницу MVP', ['mvp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+            echo Html::a('Перейти на страницу MVP >>', ['mvp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
         }?>
     </p>
 

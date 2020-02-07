@@ -134,6 +134,7 @@ class MvpController extends Controller
         $model = new Mvp();
         $model->confirm_gcp_id = $id;
         $model->date_create = date('Y:m:d');
+        $model->date_time_create = date('Y-m-d H:i:s');
         $models = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
         $model->title = 'MVP ' . (count($models)+1);
 

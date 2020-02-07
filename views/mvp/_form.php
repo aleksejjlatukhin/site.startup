@@ -13,6 +13,9 @@ use yii\helpers\Url;
 
     <?php $form = ActiveForm::begin(['id' => 'mvpForm']); ?>
 
+    <div class="row">
+        <div class="col-md-8">
+
     <? $placeholder = 'Примеры: 
 - презентация, 
 - макет, 
@@ -20,7 +23,10 @@ use yii\helpers\Url;
 - опытный образец, 
 - видео и т.д.' ?>
 
-    <?= $form->field($model, 'description')->label('<h4>Напишите описание Minimum Viable Product</h4>')->textarea(['rows' => 6, 'placeholder' => $placeholder]) ?>
+    <?= $form->field($model, 'description')->label('<h4>Напишите описание Minimum Viable Product</h4>')->textarea(['rows' => 5, 'placeholder' => $placeholder]) ?>
+
+        </div>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
@@ -30,18 +36,24 @@ use yii\helpers\Url;
 
 </div>
 
-<hr>
+<div class="row">
+    <div class="col-md-8">
 
-<h4>Добавленные MVP:</h4>
-<div class="new" style="font-size: 15px;font-weight: 700;">
-    <?php if (!empty($models)) : ?>
-        <?php foreach ($models as $model) : ?>
-            <?= Html::a($model->title, Url::to(['view', 'id' => $model->id])) . ' | ';?>
-        <?php endforeach;?>
-    <?php endif; ?>
+        <hr>
+
+        <h4>Добавленные MVP:</h4>
+        <div class="new" style="font-size: 15px;font-weight: 700;">
+            <?php if (!empty($models)) : ?>
+                <?php foreach ($models as $model) : ?>
+                    <?= Html::a($model->title, Url::to(['view', 'id' => $model->id])) . ' | ';?>
+                <?php endforeach;?>
+            <?php endif; ?>
+        </div>
+
+        <hr>
+
+    </div>
 </div>
-
-<hr>
 
 <?= Html::a('Вернуться к таблице MVP', ['mvp/index', 'id' => $confirmGcp->id], ['class' => 'btn btn-default']) ?>
 

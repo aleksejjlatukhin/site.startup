@@ -46,7 +46,7 @@ class Mvp extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['confirm_gcp_id', 'exist_confirm'], 'integer'],
-            [['date_create', 'date_confirm'], 'safe'],
+            [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
 
         ];
     }

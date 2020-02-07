@@ -12,23 +12,54 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?//= $form->field($model, 'project_id')->textInput() ?>
+    <div class="row" style="margin-bottom: 10px;">
+        <?= $form->field($model, 'name', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textInput(['maxlength' => true]) ?>
+    </div>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 10px;">
+        <?= $form->field($model, 'field_of_activity', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 2]) ?>
+    </div>
 
-    <?= $form->field($model, 'field_of_activity')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 10px;">
+        <?= $form->field($model, 'sort_of_activity', [
+                'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 2]) ?>
+    </div>
 
-    <?= $form->field($model, 'sort_of_activity')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 5px;">
+        <?= $form->field($model, 'age', [
+            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
+        ])->textInput(['type' => 'number']);?>
+    </div>
 
-    <?= $form->field($model, 'age')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 5px">
+        <?= $form->field($model, 'income', [
+            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
+        ])->textInput(['type' => 'number']); ?>
+    </div>
 
-    <?= $form->field($model, 'income')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 5px">
+        <?= $form->field($model, 'quantity', [
+            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
+        ])->textInput(['type' => 'number']); ?>
+    </div>
 
-    <?= $form->field($model, 'quantity')->textInput(['maxlength' => true]) ?>
+    <div class="row" style="margin-bottom: 5px">
+        <?= $form->field($model, 'market_volume', [
+            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
+        ])->textInput(['type' => 'number']); ?>
+    </div>
 
-    <?= $form->field($model, 'market_volume')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'add_info')->textarea(['rows' => 6]) ?>
+    <br>
+    <div class="row" style="margin-bottom: 10px;">
+        <?= $form->field($model, 'add_info', [
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+        ])->textarea(['rows' => 4]) ?>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
