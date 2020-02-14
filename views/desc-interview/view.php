@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $respond->interview_id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $respond->interview_id]];
 $this->params['breadcrumbs'][] = ['label' => 'Респондент: ' . $respond->name, 'url' => ['respond/view', 'id' => $respond->id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -32,42 +32,48 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) */?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
+    <div class="row">
+        <div class="col-md-8">
 
-        'attributes' => [
-            //'id',
-            //'respond_id',
-            [
-                'attribute' => 'date_fact',
-                'format' => ['date', 'dd.MM.yyyy'],
+            <?= DetailView::widget([
+                'model' => $model,
 
-            ],
+                'attributes' => [
+                    //'id',
+                    //'respond_id',
+                    [
+                        'attribute' => 'date_fact',
+                        'format' => ['date', 'dd.MM.yyyy'],
 
-            'description:ntext',
+                    ],
 
-            [
-                'attribute' => 'interview_file',
-                'value' => function($model){
-                    if (!empty($model->interview_file)){
-                        $string = '';
-                        $string .= Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => '']);
-                        return $string;
-                    }
-                },
-                'visible' => !empty($model->interview_file),
-                'format' => 'html',
-            ],
+                    'description:ntext',
 
-            'result',
+                    [
+                        'attribute' => 'interview_file',
+                        'value' => function($model){
+                            if (!empty($model->interview_file)){
+                                $string = '';
+                                $string .= Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => '']);
+                                return $string;
+                            }
+                        },
+                        'visible' => !empty($model->interview_file),
+                        'format' => 'html',
+                    ],
 
-            [
-                'attribute' => 'status',
-                'value' => !$model->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>',
-                'format' => 'html',
-            ],
-        ],
-    ]) ?>
+                    'result',
+
+                    [
+                        'attribute' => 'status',
+                        'value' => !$model->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>',
+                        'format' => 'html',
+                    ],
+                ],
+            ]) ?>
+
+        </div>
+    </div>
 
     <?= Html::a('Вернуться к общим данным респондента', ['respond/view', 'id' => $model->respond_id], ['class' => 'btn btn-default']) ?>
 

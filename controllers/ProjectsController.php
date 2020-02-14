@@ -9,6 +9,8 @@ use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
+use app\models\FeedbackExpertGcp;
+use app\models\FeedbackExpertMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -16,9 +18,10 @@ use app\models\Model;
 use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\Questions;
-use app\models\QuestionsConfirm;
 use app\models\Respond;
 use app\models\RespondsConfirm;
+use app\models\RespondsGcp;
+use app\models\RespondsMvp;
 use app\models\Segment;
 use app\models\User;
 use Yii;
@@ -340,7 +343,6 @@ class ProjectsController extends AppController
         $user = Yii::$app->user->identity;
         $model->update_at = date('Y:m:d');
 
-
         if ($model->load(Yii::$app->request->post())) {
 
             $oldIDs = ArrayHelper::map($modelsConcept, 'id', 'id');
@@ -484,11 +486,23 @@ class ProjectsController extends AppController
 
 
                                     if ($model->validate() && $model->upload($present_files_dir)){
+
                                         foreach ($model->present_files as $file){
-                                            $preFiles = new PreFiles();
-                                            $preFiles->file_name = $file;
-                                            $preFiles->project_id = $model->id;
-                                            $preFiles->save(false);
+
+                                            $y = 0;
+                                            foreach ($model->preFiles as $preFile){
+                                                if ($file == $preFile->file_name){
+                                                    $y++;
+                                                }
+                                            }
+
+                                            if ($y == 0){
+
+                                                $preFiles = new PreFiles();
+                                                $preFiles->file_name = $file;
+                                                $preFiles->project_id = $model->id;
+                                                $preFiles->save(false);
+                                            }
                                         }
 
 
@@ -528,38 +542,22 @@ class ProjectsController extends AppController
     {
         $model = $this->findModel($id);
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $preFiles = PreFiles::find()->where(['project_id' => $model->id])->all();
         $user = Yii::$app->user->identity;
 
-        if ($segments){
 
+        if(!empty($segments)){
             foreach ($segments as $segment){
+
                 $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
-                if (!empty($interview->feedbacks)){
-                    foreach ($interview->feedbacks as $feedback) {
-                        if ($feedback->feedback_file !== null){
-                            unlink('upload/feedbacks/' . $feedback->feedback_file);
+                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+
+                if(!empty($responds)){
+                    foreach ($responds as $respond){
+                        if (!empty($respond->descInterview)){
+                            $respond->descInterview->delete();
                         }
                     }
                 }
-
-
-                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-                foreach ($responds as $respond){
-                    $descInterview = $respond->descInterview;
-
-                    if ($descInterview->interview_file !== null){
-                        unlink('upload/interviews/' . $descInterview->interview_file);
-                    }
-
-                    if (!empty($descInterview)){
-                        $descInterview->delete();
-                    }
-                }
-            }
-
-            foreach ($segments as $segment){
-                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
 
                 $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
 
@@ -568,33 +566,87 @@ class ProjectsController extends AppController
                         if (!empty($generationProblem->confirm)){
                             $confirmProblem = $generationProblem->confirm;
 
-                            if (!empty($confirmProblem->questions)){
-                                QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
                             if (!empty($confirmProblem->feedbacks)){
-                                $feedbacksConfirm = $confirmProblem->feedbacks;
-                                foreach ($feedbacksConfirm as $feedbackConfirm){
-                                    if ($feedbackConfirm->feedback_file !== null){
-                                        unlink('upload/feedbacks-confirm/' . $feedbackConfirm->feedback_file);
-                                    }
-                                }
                                 FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
                             }
 
 
                             if (!empty($confirmProblem->responds)){
                                 $respondsConfirm = $confirmProblem->responds;
+
                                 foreach ($respondsConfirm as $respondConfirm){
                                     if (!empty($respondConfirm->descInterview)){
-                                        $descInterviewConfirm = $respondConfirm->descInterview;
-                                        if ($descInterviewConfirm->interview_file !== null){
-                                            unlink('upload/interviews-confirm/' . $descInterviewConfirm->interview_file);
-                                        }
-                                        $descInterviewConfirm->delete();
+                                        $respondConfirm->descInterview->delete();
                                     }
                                 }
+
                                 RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                            }
+
+
+                            if (!empty($confirmProblem->gcps)){
+                                $gcps = $confirmProblem->gcps;
+
+                                foreach ($gcps as $gcp){
+                                    if(!empty($gcp->confirm)){
+                                        $confirmGcp = $gcp->confirm;
+
+                                        if (!empty($confirmGcp->feedbacks)){
+                                            FeedbackExpertGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        if (!empty($confirmGcp->responds)){
+                                            $respondsGcp = $confirmGcp->responds;
+
+                                            foreach ($respondsGcp as $respondGcp){
+                                                if (!empty($respondGcp->descInterview)){
+                                                    $respondGcp->descInterview->delete();
+                                                }
+                                            }
+
+                                            RespondsGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        if (!empty($confirmGcp->mvps)){
+                                            $mvps = $confirmGcp->mvps;
+
+                                            foreach ($mvps as $mvp){
+                                                if (!empty($mvp->confirm)){
+                                                    $confirmMvp = $mvp->confirm;
+
+                                                    if (!empty($confirmMvp->feedbacks)){
+                                                        FeedbackExpertMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
+                                                    }
+
+                                                    if (!empty($confirmMvp->responds)){
+                                                        $respondsMvp = $confirmMvp->responds;
+
+                                                        foreach ($respondsMvp as $respondMvp){
+                                                            if (!empty($respondMvp->descInterview)){
+                                                                $respondMvp->descInterview->delete();
+                                                            }
+                                                        }
+
+                                                        RespondsMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
+                                                    }
+
+                                                    if (!empty($confirmMvp->business)){
+                                                        $confirmMvp->business->delete();
+                                                    }
+
+
+                                                    $confirmMvp->delete();
+                                                }
+                                            }
+
+                                            Mvp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        $confirmGcp->delete();
+                                    }
+                                }
+
+                                Gcp::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
                             }
 
                             $confirmProblem->delete();
@@ -602,23 +654,23 @@ class ProjectsController extends AppController
                     }
                 }
 
+
+
                 Questions::deleteAll(['interview_id' => $interview->id]);
-                Respond::deleteAll(['interview_id' => $interview->id]);
                 FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
+                Respond::deleteAll(['interview_id' => $interview->id]);
                 GenerationProblem::deleteAll(['interview_id' => $interview->id]);
                 Interview::deleteAll(['segment_id' => $segment->id]);
-
-
             }
         }
 
-
+        /*Удаление загруженных папок и файлов пользователя*/
         $pathDelete = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
             . '/' . mb_strtolower(mb_convert_encoding($model->project_name, "windows-1251"),"windows-1251"));
         if (file_exists($pathDelete)){
             $this->delTree($pathDelete);
         }
-
+        /*-----------------------------------------------*/
 
 
         PreFiles::deleteAll(['project_id' => $model->id]);

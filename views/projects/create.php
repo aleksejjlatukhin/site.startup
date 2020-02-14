@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="projects-create">
 
-    <h1>Общие данные о проекте</h1>
+    <h2>Общие данные о проекте</h2>
 
     <?= $this->render('_form', [
         'model' => $model,

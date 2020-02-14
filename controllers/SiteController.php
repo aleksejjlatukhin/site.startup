@@ -114,6 +114,12 @@ class SiteController extends AppController
         return $this->render('mvp-confirmation', compact('user'));
     }
 
+    public function actionBusinessModel()
+    {
+        $user = Yii::$app->user->identity;
+        return $this->render('business-model', compact('user'));
+    }
+
 
     /**
      * @return string|Response

@@ -13,14 +13,13 @@ use app\models\Segment;
 use Yii;
 use app\models\RespondsGcp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * RespondsGcpController implements the CRUD actions for RespondsGcp model.
  */
-class RespondsGcpController extends Controller
+class RespondsGcpController extends AppController
 {
     /**
      * {@inheritdoc}

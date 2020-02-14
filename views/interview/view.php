@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Interview */
 
-$this->title = 'Генерация ПИ - исходные данные';
+$this->title = 'Программа генерации ГПС';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
@@ -21,102 +21,128 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="interview-view">
 
-    <h3>Данные сегмента</h3>
 
-    <?= DetailView::widget([
-        'model' => $segment,
-        'attributes' => [
+    <p>
 
-            'name',
-            'field_of_activity:ntext',
-            'sort_of_activity:ntext',
-            'age',
-
-            [
-                'attribute' => 'income',
-                'value' => number_format($segment->income, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'quantity',
-                'value' => number_format($segment->quantity, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'market_volume',
-                'value' => number_format($segment->market_volume, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'add_info',
-                'visible' => !empty($segment->add_info),
-            ],
-
-        ],
-    ]) ?>
-
-    <br>
-
-    <p> <h3>Исходные данные интервью</h3>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы действительно хотите удалить интервью для "' . $segment->name . '" ?',
-                'method' => 'post',
-            ],
-        ]) */?>
+        <span style="font-size: 30px;"><?= $this->title; ?></span>
 
         <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
     </p>
 
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'count_respond',
-            'count_positive',
-            'greeting_interview',
-            'view_interview',
-            'reason_interview',
-        ],
-    ]) ?>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="faq_list">
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Данные сегмента</div>
+                    </div>
+                    <div class="faq_item_body">
 
-    <h4><u>Примерный список вопросов для проведения интервью</u></h4 class="d-inline p-2 bg-success" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">
+                        <?= DetailView::widget([
+                            'model' => $segment,
+                            'attributes' => [
 
-    <?php
-    $j = 0;
-    if (!empty($model->questions)){
-        foreach ($model->questions as $question){
-            if ($question->status == 1){
-                $j++;
-                echo '<div class=""><b>' . $j . '.</b> ' . $question->title . '</div>' . '<br>';
-            }
-        }
-    }else{
-        echo "Вопросов пока нет...";
-    }
+                                'name',
+                                'field_of_activity:ntext',
+                                'sort_of_activity:ntext',
+                                'age',
 
-    ?>
+                                [
+                                    'attribute' => 'income',
+                                    'value' => number_format($segment->income, 0, '', ' '),
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Формирование ГПС по данным из ПИ</div>
+                                ],
+
+                                [
+                                    'attribute' => 'quantity',
+                                    'value' => number_format($segment->quantity, 0, '', ' '),
+
+                                ],
+
+                                [
+                                    'attribute' => 'market_volume',
+                                    'value' => number_format($segment->market_volume, 0, '', ' '),
+
+                                ],
+
+                                [
+                                    'attribute' => 'add_info',
+                                    'visible' => !empty($segment->add_info),
+                                ],
+                            ],
+                        ]) ?>
+
+                    </div>
+                </div>
+
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Исходные данные для интервью</div>
+                    </div>
+                    <div class="faq_item_body">
+
+                        <?= DetailView::widget([
+                            'model' => $model,
+                            'attributes' => [
+                                'count_respond',
+                                'count_positive',
+                                'greeting_interview',
+                                'view_interview',
+                                'reason_interview',
+                            ],
+                        ]) ?>
+
+                    </div>
+                </div>
+
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Примерный список вопросов</div>
+                    </div>
+                    <div class="faq_item_body">
+
+                        <?php
+                        $j = 0;
+                        if (!empty($model->questions)){
+                            foreach ($model->questions as $question){
+                                if ($question->status == 1){
+                                    $j++;
+                                    echo '<div class=""><b>' . $j . '.</b> ' . $question->title . '</div>' . '<br>';
+                                }
+                            }
+                        }else{
+                            echo "Вопросов пока нет...";
+                        }
+
+                        ?>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Таблица проведения программы генерации ГПС</div>
 
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th scope="col" style="width: 80px;text-align: center;padding-bottom: 15px;">Респонденты</th>
+            <th scope="col" style="width: 80px;text-align: center;padding-bottom: 20px;">Респонденты</th>
             <th scope="col" style="text-align: center;width: 180px;">Данные респондентов</th>
             <th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>
             <th scope="col" style="text-align: center;width: 180px;">Представители сегмента</th>
-            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">ГПС</th>
-            <th scope="col" style="text-align: center;width: 100px;padding-bottom: 15px;">Дата ГПС</th>
-            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 15px;">Отзыв эксперта</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">ГПС</th>
+            <th scope="col" style="text-align: center;width: 100px;padding-bottom: 20px;">Дата ГПС</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Отзыв эксперта</th>
             <th scope="col" style="text-align: center;width: 100px;">Дата отзыва</th>
         </tr>
         </thead>
@@ -202,10 +228,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id]));
                         if (isset($problem->exist_confirm)){
                             if ($problem->exist_confirm == 0){
-                                echo '<br><span style="color:red">Тест закончен, проблема не подтверждена!</span>';
+                                echo '<br><span style="color:red">Гипотеза проблемы не подтверждена!</span>';
                             }
                             if ($problem->exist_confirm == 1){
-                                echo '<br><span style="color:green">Тест закончен, проблема подтверждена!</span>';
+                                echo '<br><span style="color:green">Гипотеза проблемы подтверждена!</span>';
                             }
                         }
                         echo '<hr>';
@@ -221,7 +247,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <? if (!empty($model->problems)){
                     foreach ($model->problems as $problem) {
-                        echo date("d.m.Y", strtotime($problem->date_gps)) . '<hr>';
+                        echo date("d.m.Y", strtotime($problem->date_gps));
+                        if (isset($problem->exist_confirm)){
+                            echo '<div style="height: 40px;"></div>' . '<hr>';
+                        }else{
+                            echo '<hr>';
+                        }
                     }
                 }
                 ?>
@@ -232,10 +263,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <td style="text-align: center; padding-top: 20px;">
 
-                <? if (!empty($model->feedbacks)){
-                    foreach ($model->feedbacks as $feedback) {
-                        //echo $problem->title . '<br>';
-                        echo Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '<hr>';
+                <?
+                $height = [];
+                foreach ($model->problems as $i => $problem) {
+                    if (isset($problem->exist_confirm)){
+                        $height[] = 40;
+                    }else{
+                        $height[] = 0;
+                    }
+                }
+
+                if (!empty($model->feedbacks)){
+                    foreach ($model->feedbacks as $k => $feedback) {
+                        echo Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '<div style="height:'. $height[$k] .'px"></div><hr>';
                     }
                 }
                 ?>
@@ -247,8 +287,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <td style="text-align: center; padding-top: 20px;">
 
                 <? if (!empty($model->feedbacks)){
-                    foreach ($model->feedbacks as $feedback) {
-                        echo date("d.m.Y", strtotime($feedback->date_feedback)) . '<hr>';
+                    foreach ($model->feedbacks as $k => $feedback) {
+                        echo date("d.m.Y", strtotime($feedback->date_feedback)) . '<div style="height:'. $height[$k] .'px"></div><hr>';
                     }
                 }
                 ?>
@@ -262,7 +302,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <div style="font-style: italic"><span class="bolder">ГПС*</span> - гипотеза проблемного интервью.</div>
+    <div style="font-style: italic"><span class="bolder">ГПС*</span> - гипотеза проблемы сегмента.</div>
 
 </div>
 

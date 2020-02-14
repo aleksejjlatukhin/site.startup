@@ -392,7 +392,23 @@ use yii\helpers\Url;
             <div class="container row">
                 <div class="pull-left">
 
-                    <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label('Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"') ?></p>
+                    <?php if (count($model->preFiles) < 5) : ?>
+
+                    <div style="font-size: 13px; font-weight: 700;margin-top: -5px;">
+                        <p>Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"</p>
+                        <p style="margin-top: -10px;">Максимальное  количество - 5 файлов</p>
+                    </div>
+
+                    <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></p>
+
+                    <?php else : ?>
+
+                    <div style="font-size: 13px; font-weight: 700;margin-top: -5px;">
+                        <p>Добавлено максимальное количество файлов.</p>
+                        <p style="margin-top: -10px;">Чтобы загрузить новые файлы, удалите уже загруженные.</p>
+                    </div>
+
+                    <?php endif; ?>
 
                     <p><?php if (!empty($model->preFiles)){
                             foreach ($model->preFiles as $file){
@@ -414,8 +430,8 @@ use yii\helpers\Url;
                                         'class' => "link-del $file->id",
                                     ]) . '<br>';
                             }
-                        }?></p>
-
+                        }?>
+                    </p>
                 </div>
             </div>
 

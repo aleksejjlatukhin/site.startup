@@ -12,98 +12,122 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Таблица ГЦП', 'url' => ['gcp/index', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Разработка ГЦП', 'url' => ['gcp/index', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $gcp->title, 'url' => ['gcp/view', 'id' => $gcp->id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="confirm-gcp-view">
 
-    <h3 style="margin: 15px 0;">Данные сегмента</h3>
-    <?= DetailView::widget([
-        'model' => $segment,
-        'attributes' => [
-            'name',
-            'field_of_activity:ntext',
-            'sort_of_activity:ntext',
-            'age',
-
-            [
-                'attribute' => 'income',
-                'value' => number_format($segment->income, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'quantity',
-                'value' => number_format($segment->quantity, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'market_volume',
-                'value' => number_format($segment->market_volume, 0, '', ' '),
-
-            ],
-
-            [
-                'attribute' => 'add_info',
-                'visible' => !empty($segment->add_info),
-            ],
-        ],
-    ]) ?>
-
-    <?= DetailView::widget([
-        'model' => $gcp,
-        'attributes' => [
-            'title',
-            'description',
-        ],
-    ]) ?>
-
-    <br>
-    <h3>Данные для подтверждения <?= $gcp->title ?></h3>
-
     <p>
-        <?= Html::a('Редактирование', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?/*= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) */?>
+
+        <span style="font-size: 30px;"><?= $this->title; ?></span>
 
         <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'count_respond',
-            'count_positive',
-        ],
-    ]) ?>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="faq_list">
 
-    <br>
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Данные сегмента</div>
+                    </div>
+                    <div class="faq_item_body">
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-bottom: 20px;">Формирование данных программы подтверждения <?= $gcp->title ?></div>
+                        <?= DetailView::widget([
+                            'model' => $segment,
+                            'attributes' => [
+
+                                'name',
+                                'field_of_activity:ntext',
+                                'sort_of_activity:ntext',
+                                'age',
+
+                                [
+                                    'attribute' => 'income',
+                                    'value' => number_format($segment->income, 0, '', ' '),
+
+                                ],
+
+                                [
+                                    'attribute' => 'quantity',
+                                    'value' => number_format($segment->quantity, 0, '', ' '),
+
+                                ],
+
+                                [
+                                    'attribute' => 'market_volume',
+                                    'value' => number_format($segment->market_volume, 0, '', ' '),
+
+                                ],
+
+                                [
+                                    'attribute' => 'add_info',
+                                    'visible' => !empty($segment->add_info),
+                                ],
+                            ],
+                        ]) ?>
+
+                    </div>
+                </div>
+
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Формулировка ГЦП</div>
+                    </div>
+                    <div class="faq_item_body">
+
+                        <p style="margin-top: 0; padding: 10px;background-color: #d9d6c4;">
+                            <?= $gcp->description; ?>
+                        </p>
+
+                    </div>
+                </div>
+
+                <div class="faq_item">
+                    <div class="faq_item_title">
+                        <div class="faq_item_title_inner">Вводные данные для подтверждения</div>
+                    </div>
+                    <div class="faq_item_body">
+
+                        <?= DetailView::widget([
+                            'model' => $model,
+                            'attributes' => [
+                                'count_respond',
+                                'count_positive',
+                            ],
+                        ]) ?>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Формирование данных программы подтверждения <?= $gcp->title ?></div>
 
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th scope="col" style="text-align: center;padding: 30px 0;">Респонденты</th>
-            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Данные респондентов</th>
-            <th scope="col" style="text-align: center;width: 180px;">Количество позитивных ответов / всего опрошенных</th>
-            <th scope="col" style="text-align: center;width: 180px;padding: 20px 0;">Результат подтверждения ГЦП</th>
-            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Отзыв эксперта</th>
-            <th scope="col" style="text-align: center;width: 180px;padding: 30px 0;">Дата отзыва</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Респонденты</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Данные респондентов</th>
+            <th scope="col" style="text-align: center;width: 180px;">Позитивные ответы / всего опрошенных</th>
+            <th scope="col" style="text-align: center;width: 180px;">Результат подтверждения ГЦП</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Отзыв эксперта</th>
+            <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Дата отзыва</th>
         </tr>
         </thead>
         <tbody>
@@ -178,7 +202,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive %</p>",
                         Url::to(['responds-gcp/by-status-interview', 'id' => $model->id]));
 
-                    echo '<span style="color:red">Тест не пройден!</span>';
+                    if ($gcp->exist_confirm === 0){
+                        echo '<span style="color:red">Тест не пройден!</span>';
+                    }
                 }
 
                 if ($model->count_positive <= $sumPositive){
@@ -188,7 +214,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive %</p>",
                         Url::to(['responds-gcp/by-status-interview', 'id' => $model->id]));
 
-                    echo '<span style="color:green">Тест пройден</span>';
+                    if ($gcp->exist_confirm === 1){
+                        echo '<span style="color:green">Тест пройден</span>';
+                    }
                 }
 
                 ?>
@@ -249,7 +277,15 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     if ($model->exist_confirm == 1 && $gcp->exist_confirm == 1) {
-        echo Html::a('Перейти на страницу MVP >>', ['mvp/index', 'id' => $model->id], ['class' => 'btn btn-success']);
+
+        if(!empty($model->mvps)){
+
+            echo Html::a('Разработка ГMVP >>', ['mvp/index', 'id' => $model->id], ['class' => 'btn btn-success']);
+
+        }else{
+
+            echo Html::a('Разработка ГMVP >>', ['mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']);
+        }
     }
 
     ?>

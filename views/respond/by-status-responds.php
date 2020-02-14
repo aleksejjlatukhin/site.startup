@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -94,5 +94,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <hr>
 
-    <?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $interview->id], ['class' => 'btn btn-default']) ?>
+    <?= Html::a('<< Программа генерации ГПС', ['interview/view', 'id' => $interview->id], ['class' => 'btn btn-default']) ?>
 </div>

@@ -9,7 +9,6 @@ use app\models\Segment;
 use Yii;
 use app\models\FeedbackExpert;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;

@@ -15,21 +15,15 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="segment-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <p>
 
-    <p style="margin-bottom: 20px;">
-<!--            <span class="col-sm-3">-->
-<!--                --><?//= Html::a('Добавить целевой семент', ['create', 'id' => $project->id], ['class' => 'btn btn-success']) ?>
-<!--            </span>-->
+        <span style="font-size: 30px;"><?= $this->title; ?></span>
 
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
-        <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-success']) ?>
-
-        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default']) ?>
+        <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-success pull-right']) ?>
 
     </p>
-
-
 
 
     <?= GridView::widget([
@@ -42,39 +36,73 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\SerialColumn',
             ],
 
-            //'id',
-            //'project_id',
-
             [
                 'attribute' => 'name',
                 'value' => function ($model) {
                     return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
                 },
                 'format' => 'raw',
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '180'],
             ],
 
-            //'name',
-            'field_of_activity:ntext',
-            'sort_of_activity:ntext',
-            //'age',
+            [
+                'attribute' => 'field_of_activity',
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '180'],
+            ],
+
+            [
+                'attribute' => 'sort_of_activity',
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '180'],
+            ],
+
             [
                 'attribute' => 'age',
-                'label' => 'Возраст потреби-теля'
+                'label' => 'Возраст потреб.*',
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '50'],
             ],
-            //'income',
+
             [
                 'attribute' => 'income',
-                'label' => 'Доход потреби-телей (руб/мес)'
+                'label' => 'Доход потр.* (руб/мес)',
+                'value' => function ($model) {
+                    if ($model->income !== null){
+                        return number_format($model->income, 0, '', ' ');
+                    }
+                },
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '110'],
             ],
-            //'quantity',
+
             [
                 'attribute' => 'quantity',
-                'label' => 'Потенц. кол-во потреби-телей'
+                'label' => 'Потенциал. кол. потреб.*',
+                'value' => function ($model) {
+                    if ($model->quantity !== null){
+                        return number_format($model->quantity, 0, '', ' ');
+                    }
+                },
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '110'],
             ],
-            'market_volume',
+
+            [
+                'attribute' => 'market_volume',
+                'label' => 'V - рынка* (млн/год)',
+                'value' => function ($model) {
+                    if ($model->market_volume !== null){
+                        return number_format($model->market_volume, 0, '', ' ');
+                    }
+                },
+                'contentOptions'=>['style'=>'white-space: normal;'],
+                'options' => ['width' => '90'],
+            ],
+
             'add_info:ntext',
 
-            //['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 
@@ -106,3 +134,20 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="row">
     <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">ГЦС*</span> — гипотеза целевого сегмента.</p>
 </div>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Возраст потреб.*</span> — возраст потребителя.</p>
+</div>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Доход потр.*</span> — доход потребителя.</p>
+</div>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Потенциал. кол. потреб.*</span> — потенциальное количество потребителей.</p>
+</div>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">V - рынка*</span> — объем рынка.</p>
+</div>
+

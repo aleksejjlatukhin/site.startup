@@ -12,14 +12,13 @@ use app\models\Segment;
 use Yii;
 use app\models\Mvp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * MvpController implements the CRUD actions for mvp model.
  */
-class MvpController extends Controller
+class MvpController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -136,7 +135,7 @@ class MvpController extends Controller
         $model->date_create = date('Y:m:d');
         $model->date_time_create = date('Y-m-d H:i:s');
         $models = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
-        $model->title = 'MVP ' . (count($models)+1);
+        $model->title = 'ГMVP ' . (count($models)+1);
 
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();

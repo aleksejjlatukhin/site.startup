@@ -38,7 +38,7 @@ class Interview extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['segment_id', 'count_respond', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
+            [['segment_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
             [['segment_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['question_1', 'question_2', 'question_3', 'question_4', 'question_5', 'question_6', 'question_7', 'question_8'], 'boolean'],

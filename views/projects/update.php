@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="projects-update">
 
-    <h1>Общие данные о проекте</h1>
+    <h2>Общие данные о проекте</h2>
 
     <?= $this->render('_form_update', [
         'model' => $model,

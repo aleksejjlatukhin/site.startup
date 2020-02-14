@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="projects-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p style="margin-bottom: 20px;">
         <?= Html::a('Создать проект', ['create'], ['class' => 'btn btn-success']) ?>

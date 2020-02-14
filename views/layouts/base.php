@@ -82,6 +82,8 @@ AppAsset::register($this);
 
                 <?= Html::a('7.<br>Подтвержд<br>ение ГMVP', Url::to(['mvp-confirmation']), ['class' => 'arrowlist'])?>
 
+                <?= Html::a('8.<br>Генерация<br>бизнес-модели', Url::to(['business-model']), ['class' => 'arrowlist'])?>
+
             </div>
 
         </div>

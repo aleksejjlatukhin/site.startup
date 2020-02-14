@@ -63,6 +63,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
     $countMvps = [];
     $countGcps = [];
+    $countGcpsConfirm = [];
 
     foreach ($segments as $segment){
 
@@ -112,6 +113,13 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
                     if ($offer->confirm_problem_id == $problem->confirm->id){
 
+                        $countGcpsConfirm[] = count($offer->confirm->mvps);
+                        foreach ($countGcpsConfirm as $i => $countGcpConfirm){
+                            if ($countGcpsConfirm[$i] == 0){
+                                $countGcpsConfirm[$i] = 1;
+                            }
+                        }
+
                         $countMvps[] = count($offer->confirm->mvps);
                         foreach ($countMvps as $i => $countMvp){
                             if ($countMvps[$i] == 0){
@@ -136,6 +144,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
     }
 
     //debug($countMvps);
+    //debug($countGcpsConfirm);
 
 
     foreach ($segments as $k => $segment){
@@ -181,14 +190,15 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             if ($problem->interview_id == $segment->interview->id) {
 
                 if (empty($problem->confirm->gcps)){
+
                     echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;"> --- </div>';
                 }
 
                 foreach ($offers as $j => $offer) {
 
                     if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        echo '<div class="border-gray" style="line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</div>';
+                        //debug($countMvps[$j]);
+                        echo '<div class="border-gray" style="line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</div>';
                     }
                 }
             }
@@ -212,13 +222,13 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                     if ($offer->confirm_problem_id == $problem->confirm->id) {
 
                         if ($offer->exist_confirm === 1) {
-                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> + </div>';
+                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;"> + </div>';
                         }
                         if ($offer->exist_confirm === 0) {
-                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> - </div>';
+                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;"> - </div>';
                         }
                         if ($offer->exist_confirm === null) {
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"> --- </div>';
+                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;"> --- </div>';
                         }
                     }
                 }

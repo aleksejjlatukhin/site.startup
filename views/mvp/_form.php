@@ -23,13 +23,15 @@ use yii\helpers\Url;
 - опытный образец, 
 - видео и т.д.' ?>
 
-    <?= $form->field($model, 'description')->label('<h4>Напишите описание Minimum Viable Product</h4>')->textarea(['rows' => 5, 'placeholder' => $placeholder]) ?>
+    <?= $form->field($model, 'description')->label('<h4>Напишите описание гипотезы Minimum Viable Product</h4>')->textarea(['rows' => 5, 'placeholder' => $placeholder]) ?>
 
         </div>
     </div>
 
     <div class="form-group">
+
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+
     </div>
 
     <?php ActiveForm::end(); ?>
@@ -55,7 +57,7 @@ use yii\helpers\Url;
     </div>
 </div>
 
-<?= Html::a('Вернуться к таблице MVP', ['mvp/index', 'id' => $confirmGcp->id], ['class' => 'btn btn-default']) ?>
+
 
 <?php
 

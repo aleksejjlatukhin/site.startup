@@ -15,14 +15,13 @@ use app\models\Segment;
 use Yii;
 use app\models\ConfirmMvp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * ConfirmMvpController implements the CRUD actions for ConfirmMvp model.
  */
-class ConfirmMvpController extends Controller
+class ConfirmMvpController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -122,7 +121,7 @@ class ConfirmMvpController extends Controller
 
             $project->update_at = date('Y:m:d');
             if ($project->save()){
-                return $this->redirect(['projects/result', 'id' => $project->id]);
+                return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
             }
         }
     }
@@ -148,7 +147,7 @@ class ConfirmMvpController extends Controller
 
             $project->update_at = date('Y:m:d');
             if ($project->save()){
-                return $this->redirect(['projects/result', 'id' => $project->id]);
+                return $this->redirect(['business-model/create', 'id' => $model->id]);
             }
         }
     }
@@ -238,7 +237,7 @@ class ConfirmMvpController extends Controller
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для проведения подтверждения ". $mvp->title ." загружены");
+                        Yii::$app->session->setFlash('success', "Данные для подтверждения загружены");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
@@ -307,7 +306,7 @@ class ConfirmMvpController extends Controller
 
                     if ($project->save()) {
 
-                        Yii::$app->session->setFlash('success', "Данные для подтверждения " . $mvp->title . " обновлены!");
+                        Yii::$app->session->setFlash('success', "Данные для подтверждения обновлены!");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }

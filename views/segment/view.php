@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="segment-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <p>
 
@@ -34,9 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
         }?>
 
         <?php if(!($model->interview)) : ?>
-            <?= Html::a('Разработка программы ПИ >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Переход к генерации ГПС >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
         <?php else: ?>
-            <?= Html::a('Программа ПИ - исходные данные >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Генерация ГПС >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
         <?php endif;?>
 
     </p>
@@ -52,20 +52,29 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'income',
-                'value' => number_format($model->income, 0, '', ' '),
-
+                'value' => function ($model) {
+                    if ($model->income !== null){
+                        return number_format($model->income, 0, '', ' ');
+                    }
+                },
             ],
 
             [
                 'attribute' => 'quantity',
-                'value' => number_format($model->quantity, 0, '', ' '),
-
+                'value' => function ($model) {
+                    if ($model->quantity !== null){
+                        return number_format($model->quantity, 0, '', ' ');
+                    }
+                },
             ],
 
             [
                 'attribute' => 'market_volume',
-                'value' => number_format($model->market_volume, 0, '', ' '),
-
+                'value' => function ($model) {
+                    if ($model->market_volume !== null){
+                        return number_format($model->market_volume, 0, '', ' ');
+                    }
+                },
             ],
 
             [
@@ -78,6 +87,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?//= Html::a('Далее', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success btn-block']) ?>
     
-    <div style="font-style: italic"><span class="bolder">Программа ПИ*</span> - программа проблемного интервью</div>
+    <div style="font-style: italic"><span class="bolder">Генерация ГПС*</span> - генерация гипотез проблем сегмента</div>
 
 </div>

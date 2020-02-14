@@ -11,10 +11,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Таблица ГЦП', 'url' => ['index', 'id' => $confirmProblem->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Разработка ГЦП', 'url' => ['index', 'id' => $confirmProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -31,55 +31,63 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a('Подтверждение ГЦП', ['confirm-gcp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
 
-        <?/*= Html::a('Удаление', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы действительно хотите удалить '. $model->title .'?',
-                'method' => 'post',
-            ],
-        ]) */?>
         <?php if ($model->exist_confirm == 1){
-            echo Html::a('Перейти на страницу MVP >>', ['mvp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+
+            if (!empty($model->confirm->mvps)){
+
+                echo Html::a('Разработка ГMVP >>', ['mvp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+
+            }else{
+
+                echo Html::a('Разработка ГMVP >>', ['mvp/create', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+            }
+
         }?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            //'id',
-            //'confirm_problem_id',
-            //'title',
-            //'good',
-            //'benefit',
-            //'contrast',
-            'description:ntext',
+    <div class="row">
+        <div class="col-md-8">
 
-            [
-                'attribute' => 'date_create',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
 
-            [
-                'attribute' => 'exist_confirm',
-                'label' => 'Подтверждение ГЦП',
-                'visible' => ($model->exist_confirm !== null),
-                'value' => function($model){
-                    if ($model->exist_confirm == 0){
-                        return '<span style="color:red">Тест закончен, гипотеза не подтверждена!</span>';
-                    }
-                    if ($model->exist_confirm == 1){
-                        return '<span style="color:green">Тест закончен, гипотеза подтверждена!</span>';
-                    }
-                },
-                'format' => 'html',
-            ],
+                    'description:ntext',
 
-            [
-                'attribute' => 'date_confirm',
-                'visible' => ($model->date_confirm !== null),
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-        ],
-    ]) ?>
+                    [
+                        'attribute' => 'date_create',
+                        'format' => ['date', 'dd.MM.yyyy'],
+                    ],
+
+                    [
+                        'attribute' => 'exist_confirm',
+                        'label' => 'Подтверждение гипотезы',
+                        'visible' => ($model->exist_confirm !== null),
+                        'value' => function($model){
+                            if ($model->exist_confirm == 0){
+                                return '<span style="color:red">ГЦП не подтверждена!</span>';
+                            }
+                            if ($model->exist_confirm == 1){
+                                return '<span style="color:green">ГЦП подтверждена!</span>';
+                            }
+                        },
+                        'format' => 'html',
+                    ],
+
+                    [
+                        'attribute' => 'date_confirm',
+                        'visible' => ($model->date_confirm !== null),
+                        'format' => ['date', 'dd.MM.yyyy'],
+                    ],
+                ],
+            ]) ?>
+
+            <div style="margin-top: -10px;"><?= Html::a('<< Разработка ГЦП', ['index', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?></div>
+
+            <div style="font-style: italic;margin-top: 20px;"><span class="bolder">ГЦП*</span> - гипотеза ценностного предложения.</div>
+
+        </div>
+    </div>
+
 
 </div>

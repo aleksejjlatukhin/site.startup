@@ -14,14 +14,13 @@ use app\models\Segment;
 use Yii;
 use app\models\BusinessModel;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * BusinessModelController implements the CRUD actions for BusinessModel model.
  */
-class BusinessModelController extends Controller
+class BusinessModelController extends AppController
 {
     /**
      * {@inheritdoc}

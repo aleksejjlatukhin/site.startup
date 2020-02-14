@@ -14,7 +14,6 @@ use app\models\Segment;
 use Yii;
 use app\models\FeedbackExpertMvp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
@@ -22,7 +21,7 @@ use yii\web\UploadedFile;
 /**
  * FeedbackExpertMvpController implements the CRUD actions for FeedbackExpertMvp model.
  */
-class FeedbackExpertMvpController extends Controller
+class FeedbackExpertMvpController extends AppController
 {
     /**
      * {@inheritdoc}

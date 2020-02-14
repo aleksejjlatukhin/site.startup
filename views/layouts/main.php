@@ -163,6 +163,16 @@ AppAsset::register($this);
 
                 <!------------------------------------->
 
+                <?php if ($controller == 'business-model') : ?>
+
+                    <div class="menu-last-arrow-active">8.<br>Генерация<br>бизнес-модели<div class="crib-gcs-last">Генерация бизнес-модели по Остервальдеру</div></div>
+
+                <?php else: ?>
+
+                    <div class="menu-last-arrow">8.<br>Генерация<br>бизнес-модели<div class="crib-gcs-last">Генерация бизнес-модели по Остервальдеру</div></div>
+
+                <?php endif;?>
+
             </div>
 
         </div>

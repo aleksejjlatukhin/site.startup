@@ -10,7 +10,6 @@ use app\models\Segment;
 use Yii;
 use app\models\Gcp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 

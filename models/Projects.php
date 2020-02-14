@@ -93,16 +93,30 @@ class Projects extends ActiveRecord
 
 
     public function upload($path){
+
         if($this->validate()){
+
             foreach($this->present_files as $file){
                 //$filename=Yii::$app->getSecurity()->generateRandomString(15);
-                $file->saveAs($path . $file->baseName . '.' . $file->extension);
+
+                $y = 0;
+                foreach ($this->preFiles as $preFile){
+                    if ($file == $preFile->file_name){
+                        $y++;
+                    }
+                }
+
+                if ($y == 0){
+                    $file->saveAs($path . $file->baseName . '.' . $file->extension);
+                }
             }
             return true;
         }else{
             return false;
         }
     }
+
+
 
     /**
      * {@inheritdoc}
@@ -116,9 +130,11 @@ class Projects extends ActiveRecord
             [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
             [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
-            [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5],
+            [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5 - count($this->preFiles)],
         ];
     }
+
+
 
     /**
      * {@inheritdoc}
@@ -145,7 +161,7 @@ class Projects extends ActiveRecord
             'site' => 'Адрес сайта',
             'invest_name' => 'Инвестор',
             'invest_date' => 'Дата получения инвестиций',
-            'invest_amount' => 'Сумма инвестиций',
+            'invest_amount' => 'Сумма инвестиций (руб.)',
             'date_of_announcement' => 'Дата анонсирования проекта',
             'announcement_event' => 'Мероприятие, на котором проект анонсирован впервые',
         ];

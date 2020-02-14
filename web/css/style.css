@@ -128,7 +128,7 @@ progress.info-red::-moz-progress-bar{
 .block-200{
     width: 223px;
     margin: 0 5px 5px 0;
-    min-height: 220px;
+    min-height: 180px;
     border: solid 1px #9d9d9d;
     padding: 5px;
     color: #4c4c4c;
@@ -151,22 +151,24 @@ progress.info-red::-moz-progress-bar{
 
 /*Меню-стрелка на главной странице - начало*/
 .arrow{
-    background-image: url("/web/images/background-arrow.png");
-    height: 135px;
+    background-image: url("/web/images/blue_arrow.png");
+    height: 115px;
     width: 1140px;
-
+    margin-top: -15px;
 }
 #arrow-container{
     display: flex;
-    width: 93%;
+    width: 100%;
     justify-content: space-between;
+    align-items: center;
 }
 .arrowlist{
-    height: 120px;
-    width: 120px;
+    height: 100px;
+    width: 100px;
     border-radius: 50%;
     text-align: center;
-    padding-top: 25px;
+    padding-top: 15px;
+    margin-top: 5px;
     background-color: #d9d6c4;
     border: 1px solid #b9bbbe;
     font-weight: 700;
@@ -184,7 +186,20 @@ progress.info-red::-moz-progress-bar{
     width: 120px;
     border-radius: 50%;
     text-align: center;
-    padding-top: 25px;
+    padding-top: 15px;
+    background-color: #d9d6c4;
+    border: 1px solid #b9bbbe;
+    font-weight: 700;
+    text-decoration: none;
+    color: #3a3427;
+}
+.arrowlist:last-child{
+    height: 100px;
+    width: 140px;
+    border-radius: 15px;
+    text-align: center;
+    margin-left: 40px;
+    padding-top: 15px;
     background-color: #d9d6c4;
     border: 1px solid #b9bbbe;
     font-weight: 700;
@@ -210,23 +225,25 @@ progress.info-red::-moz-progress-bar{
 
 /*Меню-стрелка на остальных страницах - начало*/
 .menu-arrow{
-    background-image: url("/web/images/background-arrow.png");
-    height: 135px;
+    background-image: url("/web/images/blue_arrow.png");
+    height: 115px;
     width: 1140px;
-
+    margin-top: -15px;
 }
 #menu-arrow-container{
     display: flex;
-    width: 93%;
+    width: 100%;
     justify-content: space-between;
     position: relative;
+    align-items: center;
 }
 .menu-arrowlist{
-    height: 120px;
-    width: 120px;
+    height: 100px;
+    width: 100px;
     border-radius: 50%;
     text-align: center;
-    padding-top: 25px;
+    margin-top: 5px;
+    padding-top: 15px;
     background-color: #d9d6c4;
     border: 1px solid #b9bbbe;
     font-weight: 700;
@@ -234,11 +251,12 @@ progress.info-red::-moz-progress-bar{
     color: #3a3427;
 }
 .menu-arrowlist-active{
-    height: 120px;
-    width: 120px;
+    height: 100px;
+    width: 100px;
     border-radius: 50%;
     text-align: center;
-    padding-top: 25px;
+    margin-top: 5px;
+    padding-top: 15px;
     border: 1px solid #b9bbbe;
     font-weight: 700;
     background-color: #9bcc60;
@@ -253,19 +271,30 @@ progress.info-red::-moz-progress-bar{
 }
 .crib-gcs{
     display: block;
-    width: 170px;
-    padding: 3px;
-    border-radius: 5px;
+    width: 100px;
+    height: 100px;
+    margin-top: 5px;
+    margin-left: -1px;
+    padding: 17px 5px;
+    border-radius: 50%;
     border: 1px solid #b9bbbe;
-    background-color: #fff;
+    background-color: #9bcc60;
     opacity: 0;
     position: absolute;
-    top: 90px;
-    margin-left: -25px;
-    font-weight: 400;
+    top: 0;
+    font-weight: 700;
     transition: 0.4s;
-    font-size: 13px;
-    color: #646b63;
+    font-size: 10px;
+    color: #3a3427;
+}
+.menu-arrowlist:nth-child(1) .crib-gcs, .menu-arrowlist:nth-child(2) .crib-gcs {
+    padding: 25px 5px;
+}
+.menu-arrowlist:nth-child(6) .crib-gcs {
+    padding: 10px 5px;
+}
+.menu-arrowlist:nth-child(7) .crib-gcs {
+    padding: 15px 5px;
 }
 .menu-arrowlist:hover .crib-gcs{
     opacity: 1;
@@ -273,4 +302,138 @@ progress.info-red::-moz-progress-bar{
 .menu-arrowlist-active:hover .crib-gcs{
     opacity: 1;
 }
-/*Меню-стрелка на остальных страницах - конец*/
+
+.menu-last-arrow{
+    height: 100px;
+    width: 140px;
+    text-align: center;
+    margin-top: 5px;
+    margin-left: 40px;
+    padding-top: 15px;
+    background-color: #d9d6c4;
+    border-radius: 15px;
+    border: 1px solid #b9bbbe;
+    font-weight: 700;
+    text-decoration: none;
+    color: #3a3427;
+}
+.menu-last-arrow-active{
+    height: 100px;
+    width: 140px;
+    text-align: center;
+    margin-top: 5px;
+    padding-top: 15px;
+    background-color: #9bcc60;
+    border-radius: 15px;
+    border: 1px solid #b9bbbe;
+    font-weight: 700;
+    text-decoration: none;
+    color: #3a3427;
+    margin-left: 40px;
+}
+.menu-last-arrow:hover{
+    cursor: pointer;
+}
+.menu-last-arrow-active{
+    cursor: pointer;
+}
+.crib-gcs-last{
+    display: block;
+    width: 140px;
+    height: 100px;
+    margin-top: 5px;
+    margin-left: -1px;
+    padding: 25px 5px;
+    border-radius: 15px;
+    border: 1px solid #b9bbbe;
+    background-color: #9bcc60;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    font-weight: 700;
+    transition: 0.4s;
+    font-size: 12px;
+    color: #3a3427;
+}
+.menu-last-arrow:hover .crib-gcs-last{
+    opacity: 1;
+}
+.menu-last-arrow-active:hover .crib-gcs-last{
+    opacity: 1;
+}
+
+/*Меню-стрелка на остальных страницах - конец
+---------------------------------------------*/
+
+
+/* Показать и скрыть данные сегмента - начало
+--------------------------------------------*/
+.faq_list{
+    position: relative;
+    color: #202020;
+    margin: 5px 0;
+}
+.faq_item{
+    box-sizing: border-box;
+    border-left: 8px solid #3A3A3A;
+    padding-left: 15px;
+    padding-bottom: 5px;
+}
+.faq_item_title{
+    box-sizing: border-box;
+    font-size: 13px;
+    position: relative;
+    font-weight: 900;
+}
+.faq_item_title_inner{
+    display: inline-block;
+    position: relative;
+    padding: 0 50px 0 0;
+    cursor: pointer;
+}
+.faq_item_title_inner:hover{
+    color: #FDA900;
+    transition: .4s;
+}
+.faq_item_title_inner:hover:before{
+    transform: translateY(1px);
+}
+.faq_item_title_inner:before{
+    position: absolute;
+    content: '';
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: url(../images/icons8-sort-down-30.png) no-repeat center center;
+    cursor: pointer;
+    transition: .4s;
+    transition-timing-function: ease-in-out;
+}
+.faq_item_title_inner.open:before{
+    transform: rotate(180deg);
+}
+.faq_item_body{
+    font-size: 14px;
+    padding: 20px 0 2px 0;
+    box-sizing: border-box;
+    display: none;
+}
+.faq_show_all{
+    font-weight: 900;
+    padding-left: 45px;
+    margin-top: 30px;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.faq_show_all:hover{
+    color: #FDA900;
+    font-size: 15px;
+}
+
+/* Показать и скрыть данные сегмента - конец
+--------------------------------------------*/
+
+
+

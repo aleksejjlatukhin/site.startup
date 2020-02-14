@@ -12,7 +12,6 @@ use app\models\Segment;
 use Yii;
 use app\models\ConfirmProblem;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -134,7 +133,7 @@ class ConfirmProblemController extends AppController
 
             $project->update_at = date('Y:m:d');
             if ($project->save()){
-                return $this->redirect(['gcp/index', 'id' => $model->id]);
+                return $this->redirect(['gcp/create', 'id' => $model->id]);
             }
         }
     }
@@ -234,7 +233,7 @@ class ConfirmProblemController extends AppController
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для интервью ППС загружены");
+                        Yii::$app->session->setFlash('success', "Данные для подтверждения загружены");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
@@ -297,7 +296,7 @@ class ConfirmProblemController extends AppController
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
+                        Yii::$app->session->setFlash('success', "Данные для подтверждения обновлены!");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }

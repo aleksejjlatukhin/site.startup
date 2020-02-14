@@ -9,7 +9,6 @@ use app\models\Segment;
 use Yii;
 use app\models\DescInterview;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
@@ -17,7 +16,7 @@ use yii\web\UploadedFile;
 /**
  * DescInterviewController implements the CRUD actions for DescInterview model.
  */
-class DescInterviewController extends Controller
+class DescInterviewController extends AppController
 {
     /**
      * {@inheritdoc}

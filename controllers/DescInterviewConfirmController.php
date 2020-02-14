@@ -12,15 +12,13 @@ use app\models\User;
 use Yii;
 use app\models\DescInterviewConfirm;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
  * DescInterviewConfirmController implements the CRUD actions for DescInterviewConfirm model.
  */
-class DescInterviewConfirmController extends Controller
+class DescInterviewConfirmController extends AppController
 {
     /**
      * {@inheritdoc}

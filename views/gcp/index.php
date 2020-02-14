@@ -6,27 +6,27 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Гипотезы ценностных предложений';
+$this->title = 'Разработка ГЦП';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
-$this->params['breadcrumbs'][] = 'Таблица ГЦП';
+$this->params['breadcrumbs'][] = 'Разработка ГЦП';
 ?>
 <div class="gcp-index">
 
-    <h2><?= Html::encode($this->title) ?></h2>
-    <br>
-
     <p>
-        <?= Html::a('Добавить ГЦП', ['create', 'id' => $confirmProblem->id], ['class' => 'btn btn-primary']) ?>
+
+        <span style="font-size: 30px;">Таблица разработанных ГЦП</span>
 
         <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
+
+        <?= Html::a('Добавить ГЦП', ['create', 'id' => $confirmProblem->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
 
     </p>
 
@@ -42,7 +42,6 @@ $this->params['breadcrumbs'][] = 'Таблица ГЦП';
                 'options' => ['width' => '30']
             ],
 
-            //'title',
             [
                 'attribute' => 'title',
                 'value' => function($model){
@@ -50,10 +49,7 @@ $this->params['breadcrumbs'][] = 'Таблица ГЦП';
                 },
                 'format' => 'html',
             ],
-            //'good',
-            //'benefit',
-            //'contrast',
-            //'description:ntext',
+
             [
                 'attribute' => 'description',
                 'header' => '<div style="text-align: center">Формулировка ГЦП</div>',
@@ -81,5 +77,6 @@ $this->params['breadcrumbs'][] = 'Таблица ГЦП';
         ],
     ]); ?>
 
+    <div style="font-style: italic;margin-left: auto;"><span class="bolder">ГЦП*</span> - гипотеза ценностного предложения.</div>
 
 </div>

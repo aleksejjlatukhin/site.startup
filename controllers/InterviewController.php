@@ -8,14 +8,12 @@ use app\models\FeedbackExpertConfirm;
 use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
-use app\models\QuestionsConfirm;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
 use Yii;
 use app\models\Interview;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 

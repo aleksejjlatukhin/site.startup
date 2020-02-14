@@ -15,14 +15,13 @@ use app\models\Segment;
 use Yii;
 use app\models\DescInterviewMvp;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * DescInterviewMvpController implements the CRUD actions for DescInterviewMvp model.
  */
-class DescInterviewMvpController extends Controller
+class DescInterviewMvpController extends AppController
 {
     /**
      * {@inheritdoc}
@@ -63,7 +62,7 @@ class DescInterviewMvpController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
-        $respond = RespondsMvp::findOne($id);
+        $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
         $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -153,7 +152,7 @@ class DescInterviewMvpController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $respond = RespondsMvp::findOne($id);
+        $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
         $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();

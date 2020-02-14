@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ПИ - исходные данные', 'url' => ['interview/view', 'id' => $interview->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -22,13 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?/*= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы точно хотите удалить ' . $model->title . ' ?',
-                'method' => 'post',
-            ],
-        ]) */?>
+
         <?php if (empty($model->confirm)) : ?>
             <?= Html::a('Подтвердить ГПС >>', ['confirm-problem/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
@@ -36,49 +30,60 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php endif; ?>
 
         <?php if ($model->exist_confirm == 1){
-            echo Html::a('Перейти на страницу ГЦП >>', ['gcp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+
+            if (!empty($model->confirm->gcps)){
+
+                echo Html::a('Разработка ГЦП >>', ['gcp/index', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+
+            }else{
+                echo Html::a('Разработка ГЦП >>', ['gcp/create', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+            }
         }?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            //'title',
-            'description:ntext',
+    <div class="row">
+        <div class="col-md-8">
 
-            [
-                'attribute' => 'date_gps',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    //'title',
+                    'description:ntext',
 
-            [
-                'attribute' => 'exist_confirm',
-                'label' => 'Подтверждение проблемы',
-                'visible' => ($model->exist_confirm !== null),
-                'value' => function($model){
-                    if ($model->exist_confirm == 0){
-                        return '<span style="color:red">Тест закончен, проблема не подтверждена!</span>';
-                    }
-                    if ($model->exist_confirm == 1){
-                        return '<span style="color:green">Тест закончен, проблема подтверждена!</span>';
-                    }
-                },
-                'format' => 'html',
-            ],
+                    [
+                        'attribute' => 'date_gps',
+                        'format' => ['date', 'dd.MM.yyyy'],
+                    ],
 
-            [
-                'attribute' => 'date_confirm',
-                'visible' => ($model->date_confirm !== null),
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-        ],
-    ]) ?>
+                    [
+                        'attribute' => 'exist_confirm',
+                        'label' => 'Подтверждение гипотезы',
+                        'visible' => ($model->exist_confirm !== null),
+                        'value' => function($model){
+                            if ($model->exist_confirm == 0){
+                                return '<span style="color:red">Гипотеза проблемы не подтверждена!</span>';
+                            }
+                            if ($model->exist_confirm == 1){
+                                return '<span style="color:green">Гипотеза проблемы подтверждена!</span>';
+                            }
+                        },
+                        'format' => 'html',
+                    ],
 
-    <div style="display:flex;flex-wrap: wrap;">
+                    [
+                        'attribute' => 'date_confirm',
+                        'visible' => ($model->date_confirm !== null),
+                        'format' => ['date', 'dd.MM.yyyy'],
+                    ],
+                ],
+            ]) ?>
 
-        <?= Html::a('Вернуться к исходным данным', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
+            <div style="margin-top: -10px;"><?= Html::a('<< Программа генерации ГПС', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?></div>
 
-        <div style="font-style: italic;margin-left: auto;"><span class="bolder">ГПС*</span> - гипотеза проблемного интервью.</div>
+            <div style="font-style: italic;margin-top: 20px;"><span class="bolder">ГПС*</span> - гипотеза проблемы сегмента.</div>
 
+        </div>
     </div>
+
+
 </div>
