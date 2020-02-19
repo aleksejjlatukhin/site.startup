@@ -390,7 +390,12 @@ use yii\helpers\Url;
             <div class="container row">
                 <div class="pull-left">
 
-                    <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label('Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"') ?></p>
+                    <div style="font-size: 13px; font-weight: 700;margin-top: -5px;">
+                        <p>Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"</p>
+                        <p style="margin-top: -10px;">Максимальное  количество - 5 файлов</p>
+                    </div>
+
+                    <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></p>
 
                     <p><?php if (!empty($model->preFiles)){
                             foreach ($model->preFiles as $file){

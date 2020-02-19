@@ -64,6 +64,11 @@ class ProjectsController extends AppController
             'query' => Projects::find()->where(['user_id' => $user['id']]),
         ]);
 
+        $projects = Projects::find()->where(['user_id' => $user['id']])->all();
+        if (count($projects) == 0){
+            return $this->redirect(['create']);
+        }
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
@@ -119,7 +124,7 @@ class ProjectsController extends AppController
     {
         $model = $this->findModel($id);
 
-        $segments = Segment::find()->where(['project_id' => $model->id])->all();
+        /*$segments = Segment::find()->where(['project_id' => $model->id])->all();
         $equally = array();
         foreach ($segments as $k => $segment){
             $equally[$segment->name][] = $segment->name;
@@ -130,7 +135,7 @@ class ProjectsController extends AppController
             if (count($segment) > 1){
                 //echo 'значение-&nbsp'.$k.'&nbsp встречается &nbsp'.count($segment).'&nbsp раз(раза) <br>';
             }
-        }
+        }*/
 
 
 

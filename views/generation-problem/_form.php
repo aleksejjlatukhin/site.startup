@@ -20,8 +20,8 @@ use yii\helpers\Url;
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th scope="col"  style="width: 120px;text-align: center;padding-bottom: 15px; padding-top: 15px;">Респонденты</th>
-                <th scope="col"  style="width: 330px;text-align: center;padding-bottom: 15px;padding-top: 15px;">Выводы интервью</th>
+                <th scope="col"  class="col-md-4" style="text-align: center;padding-bottom: 15px; padding-top: 15px;">Респонденты</th>
+                <th scope="col"  class="col-md-8" style="text-align: center;padding-bottom: 15px;padding-top: 15px;">Выводы интервью</th>
             </tr>
             </thead>
             <tbody>

@@ -49,23 +49,17 @@ class MvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $mvps = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
 
         if ($gcp->exist_confirm !== 1){
             Yii::$app->session->setFlash('error', "Отсутствует подтверждение ГЦП с данным ID, поэтому вы не можете перейти к созданию MVP.");
             return $this->redirect(['gcp/view', 'id' => $gcp->id]);
         }
 
-        $mvps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/'
-            . mb_convert_encoding($gcp->title , "windows-1251") . '/mvps/';
-
-        $mvps_dir = mb_strtolower($mvps_dir, "windows-1251");
-
-        if (!file_exists($mvps_dir)){
-            mkdir($mvps_dir, 0777);
+        if (count($mvps) == 0){
+            return $this->redirect(['create', 'id' => $id]);
         }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => Mvp::find()->where(['confirm_gcp_id' => $id]),
@@ -130,6 +124,7 @@ class MvpController extends AppController
      */
     public function actionCreate($id)
     {
+        $user = Yii::$app->user->identity;
         $model = new Mvp();
         $model->confirm_gcp_id = $id;
         $model->date_create = date('Y:m:d');
@@ -151,6 +146,19 @@ class MvpController extends AppController
                 $model->description = $_POST['Mvp']['description'];
 
                 if ($model->save()){
+
+                    $mvps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
+                        . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/'
+                        . mb_convert_encoding($gcp->title , "windows-1251") . '/mvps/';
+
+                    $mvps_dir = mb_strtolower($mvps_dir, "windows-1251");
+
+                    if (!file_exists($mvps_dir)){
+                        mkdir($mvps_dir, 0777);
+                    }
+
 
                     $project->update_at = date('Y:m:d');
                     $project->save();

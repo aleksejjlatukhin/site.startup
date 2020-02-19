@@ -45,21 +45,15 @@ class GcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $Gcps = Gcp::find()->where(['confirm_problem_id' => $id])->all();
 
         if ($generationProblem->exist_confirm !== 1){
             Yii::$app->session->setFlash('error', "Отсутствует подтверждение проблемы с данным ID, поэтому вы не можете перейти к созданию ГЦП.");
             return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
         }
 
-        $gcps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/';
-
-        $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
-
-        if (!file_exists($gcps_dir)){
-            mkdir($gcps_dir, 0777);
+        if (count($Gcps) == 0){
+            return $this->redirect(['create', 'id' => $id]);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -141,6 +135,17 @@ class GcpController extends AppController
             $model->description .= 'в отличии от "' . mb_strtolower($model->contrast) . '".';
 
             if ($model->save()){
+
+                $gcps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
+                    . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/';
+
+                $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
+
+                if (!file_exists($gcps_dir)){
+                    mkdir($gcps_dir, 0777);
+                }
 
                 $gcp_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
                     mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
