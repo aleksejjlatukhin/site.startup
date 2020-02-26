@@ -22,26 +22,50 @@ use yii\filters\VerbFilter;
  */
 class InterviewController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $segment = Segment::findOne(Yii::$app->request->get());
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all Interview models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => Interview::find(),
@@ -50,7 +74,7 @@ class InterviewController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single Interview model.

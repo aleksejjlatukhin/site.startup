@@ -29,6 +29,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['site/login'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -38,7 +39,19 @@ $config = [
             // send all mails to a file by default. You have to set
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
-            'useFileTransport' => true,
+
+            //'useFileTransport' => true, /*Письмо отправляется в дирректорию runtime/mail/ */
+
+            'useFileTransport' => false,/*Письмл отправляется на реальный адрес*/
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.mail.ru',
+                'username' => 'alex.latukhin@mail.ru',
+                'password' => 'cjaeirfvjzljxrf20111118vjzljxrf',
+                'port' => '465',
+                'encryption' => 'ssl',
+            ],
+
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -62,6 +75,7 @@ $config = [
                 'offer-confirmation' => 'site/offer-confirmation',
                 'development-mvp' => 'site/development-mvp',
                 'mvp-confirmation' => 'site/mvp-confirmation',
+                'send-email' => 'site/send-email',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],

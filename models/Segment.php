@@ -50,7 +50,7 @@ class Segment extends \yii\db\ActiveRecord
             [['project_id'], 'integer'],
             [['age', 'income', 'quantity', 'market_volume'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['field_of_activity', 'sort_of_activity', 'add_info'], 'string'],
-            [['name',], 'string', 'max' => 255],
+            [['name',], 'string', 'min' => 6, 'max' => 48],
             [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
     }

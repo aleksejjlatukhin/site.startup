@@ -19,19 +19,49 @@ use yii\filters\VerbFilter;
  */
 class RespondsConfirmController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = RespondsConfirm::findOne(Yii::$app->request->get());
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['by-status-interview']) || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
+
+            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
@@ -107,7 +137,7 @@ class RespondsConfirmController extends AppController
         ]);
     }
 
-    public function actionByDateInterview($id)
+    /*public function actionByDateInterview($id)
     {
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
@@ -124,7 +154,7 @@ class RespondsConfirmController extends AppController
             'segment' => $segment,
             'project' => $project,
         ]);
-    }
+    }*/
 
 
     public function actionByStatusInterview($id)
@@ -183,7 +213,7 @@ class RespondsConfirmController extends AppController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    /*public function actionCreate()
     {
         $model = new RespondsConfirm();
 
@@ -194,7 +224,7 @@ class RespondsConfirmController extends AppController
         return $this->render('create', [
             'model' => $model,
         ]);
-    }
+    }*/
 
     /**
      * Updates an existing RespondsConfirm model.

@@ -26,7 +26,7 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'project_name', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-5">{input}</div><div class="col-md-12">{error}</div>'
                 ])->textInput(['maxlength' => true]) ?>
             </div>
 
@@ -148,8 +148,8 @@ use yii\helpers\Url;
                                 </div>
 
                                 <?= $form->field($modelsConcept, "[{$i}]name", [
-                                    'template' => '<div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                                ])->textarea(['rows' => 1])?>
+                                    'template' => '<div class="col-md-6">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textInput(['maxlength' => true])?>
 
                             </div><!-- .row -->
 

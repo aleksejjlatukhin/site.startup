@@ -26,7 +26,7 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'project_name', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
+                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-5">{input}</div><div class="col-md-12">{error}</div>'
                 ])->textInput(['maxlength' => true]) ?>
             </div>
 
@@ -392,7 +392,7 @@ use yii\helpers\Url;
             <div class="container row">
                 <div class="pull-left">
 
-                    <?php if (count($model->preFiles) < 5) : ?>
+                    <?php if (count($model->preFiles) < 4) : ?>
 
                     <div style="font-size: 13px; font-weight: 700;margin-top: -5px;">
                         <p>Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"</p>
@@ -412,13 +412,13 @@ use yii\helpers\Url;
 
                     <p><?php if (!empty($model->preFiles)){
                             foreach ($model->preFiles as $file){
-                                echo Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => 'btn btn-default prefiles']) .
-                                    ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $file->file_name], [
+                                echo Html::a($file->file_name, ['download', 'id' => $file->id], ['class' => 'btn btn-default prefiles']) .
+                                    ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'id' => $file->id], [
                                         'onclick'=>
                                             "$.ajax({
                                                  type:'POST',
                                                  cache: false,
-                                                 url: '".Url::to(['delete-file', 'filename' => $file->file_name])."',
+                                                 url: '".Url::to(['delete-file', 'id' => $file->id])."',
                                                  success  : function(response) {
                                                      $('.link-del ' . $file->id).html(response);
                                                      $('.prefiles').remove();

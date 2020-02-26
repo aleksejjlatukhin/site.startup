@@ -29,37 +29,57 @@ AppAsset::register($this);
 
 <div class="wrap">
 
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name = 'site.startup',
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Главная', 'url' => ['/']],
-            ['label' => 'Мои проекты', 'url' => ['/projects/index']],
-            //['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-            ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Выход (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
-    ]);
-    NavBar::end();
-    ?>
+    <div style="margin-bottom: -15px;">
 
+        <?php
+        NavBar::begin([
+            'brandLabel' => Yii::$app->name = 'site.startup',
+            'brandUrl' => Yii::$app->homeUrl,
+            'options' => [
+                'class' => 'navbar-inverse navbar-fixed-top',
+            ],
+        ]);
+
+
+        if (!Yii::$app->user->isGuest):
+            ?>
+            <div class="navbar-form navbar-right">
+                <button class="btn btn-md btn-default"
+                        data-container="body"
+                        data-toggle="popover"
+                        data-trigger="focus"
+                        data-placement="bottom"
+                        data-title="<?= Yii::$app->user->identity['username'] ?>"
+                        data-content="
+                                <p><a href='<?= Url::to(['/site/profile']) ?>' data-method='post'>Мой профиль</a></p>
+                                <p><a href='<?= Url::to(['/site/logout']) ?>' data-method='post'>Выход</a></p>
+                            ">
+                    <span class="glyphicon glyphicon-user"></span>
+                </button>
+            </div>
+        <?php
+        endif;
+
+
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Главная', 'url' => ['/']],
+
+                !Yii::$app->user->isGuest ? (
+                ['label' => 'Мои проекты', 'url' => ['/projects/index']]) : (''),
+
+                Yii::$app->user->isGuest ? (
+                ['label' => 'Войти', 'url' => ['/site/login']]) : (''),
+
+                Yii::$app->user->isGuest ? (
+                ['label' => 'Регистрация', 'url' => ['/site/singup']]) : (''),
+            ],
+        ]);
+        NavBar::end();
+        ?>
+
+    </div>
 
 
     <div class="container">

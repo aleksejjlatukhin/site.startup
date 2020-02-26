@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
     <div class="row" style="margin-bottom: 10px;">
         <?= $form->field($model, 'name', [
-            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
+            'template' => '<div class="col-md-12">{label}</div><div class="col-md-5">{input}</div>'
         ])->textInput(['maxlength' => true]) ?>
     </div>
 

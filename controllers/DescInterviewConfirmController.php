@@ -20,26 +20,58 @@ use yii\filters\VerbFilter;
  */
 class DescInterviewConfirmController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = DescInterviewConfirm::findOne(Yii::$app->request->get());
+            $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $respond = RespondsConfirm::findOne(Yii::$app->request->get());
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all DescInterviewConfirm models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => DescInterviewConfirm::find(),
@@ -48,7 +80,7 @@ class DescInterviewConfirmController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
 
 
@@ -99,6 +131,9 @@ class DescInterviewConfirmController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
+        if (!empty($respond->descInterview)){
+            return $this->redirect(['view', 'id' => $respond->descInterview->id]);
+        }
 
         if ($respond->name == null || $respond->info_respond == null){
             Yii::$app->session->setFlash('error', "Необходимо заполнить данные о респонденте!");

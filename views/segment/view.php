@@ -6,11 +6,11 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Segment */
 
-$this->title = $model->name;
+$this->title = 'Сегмент: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['index', 'id' => $project->id]];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $model->name;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="segment-view">

@@ -22,26 +22,64 @@ use yii\filters\VerbFilter;
  */
 class BusinessModelController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = BusinessModel::findOne(Yii::$app->request->get());
+            $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
+            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get());
+            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all BusinessModel models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => BusinessModel::find(),
@@ -50,7 +88,7 @@ class BusinessModelController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single BusinessModel model.
@@ -95,11 +133,6 @@ class BusinessModelController extends AppController
         $model = new BusinessModel();
         $model->confirm_mvp_id = $id;
 
-        $businessModel = BusinessModel::find()->where(['confirm_mvp_id' => $id])->one();
-        if (!empty($businessModel)){
-            return $this->redirect(['view', 'id' => $businessModel->id]);
-        }
-
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -112,6 +145,12 @@ class BusinessModelController extends AppController
 
         $model->quantity = $segment->quantity;
         $model->sort_of_activity = $segment->sort_of_activity;
+
+
+        if ($confirmMvp->business){
+            return $this->redirect(['view', 'id' => $confirmMvp->business->id]);
+        }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 

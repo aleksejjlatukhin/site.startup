@@ -6,9 +6,9 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Projects */
 
-$this->title = $model->project_name;
+$this->title = 'Проект: ' . $model->project_name;
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $model->project_name;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="projects-view">
@@ -81,7 +81,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'invest_amount',
-                'value' => number_format($model->invest_amount, 0, '', ' '),
+                'value' => function($model){
+                    if($model->invest_amount !== null){
+                       return number_format($model->invest_amount, 0, '', ' ');
+                    }
+                },
             ],
 
             [
@@ -107,7 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model){
                     $string = '';
                     foreach ($model->preFiles as $file){
-                        $string .= Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => '']) . '<br>';
+                        $string .= Html::a($file->file_name, ['download', 'id' => $file->id], ['class' => '']) . '<br>';
                     }
                     return $string;
                 },

@@ -10,33 +10,14 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\SingupForm;
 use app\models\User;
+use app\models\ResetPasswordForm;
+use yii\base\InvalidArgumentException;
+use yii\web\BadRequestHttpException;
+use app\models\SendEmailForm;
 
 class SiteController extends AppController
 {
     public $layout = 'base';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'actions' => ['login', 'singup'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-        ];
-    }
 
     /**
      * {@inheritdoc}
@@ -127,38 +108,25 @@ class SiteController extends AppController
      */
     public function actionSingup()
     {
-        $this->layout = 'first';
+        //$this->layout = 'first';
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new SingupForm();
-        $users = User::find()->all();
 
-        if ($model->load(\Yii::$app->request->post())){
-
-            $user = new User();
-            $user->fio = $model->fio;
-            $user->telephone = $model->telephone;
-            $user->email = $model->email;
-            $user->username = $model->username;
-            $user->password = \Yii::$app->security->generatePasswordHash($model->password);
-
-            $copy = 0;
-
-            foreach ($users as $item){
-                if (mb_strtolower(str_replace(' ', '',$user->username)) == mb_strtolower(str_replace(' ', '',$item->username))){
-                    $copy++;
-
-                }
-                if ($copy == 0){
-                    if ($user->save()){
-                        return $this->goBack('login');
+        if ($model->load(Yii::$app->request->post()) && $model->validate()){
+            if ($user = $model->singup()){
+                if ($user->status === User::STATUS_ACTIVE){
+                    if (Yii::$app->getUser()->login($user)){
+                        return $this->goHome();
                     }
-                } else{
-                    Yii::$app->session->setFlash('error', 'Пользователь с логином "'. $user->username .'" уже существует!');
                 }
+            }else{
+                Yii::$app->session->setFlash('error', 'Возникла ошибка при регистрации.');
+                Yii::error('Ошибка при регистрации');
+                return $this->refresh();
             }
         }
 
@@ -174,13 +142,14 @@ class SiteController extends AppController
      */
     public function actionLogin()
     {
-        $this->layout = 'first';
+        //$this->layout = 'first';
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
+
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
@@ -199,8 +168,53 @@ class SiteController extends AppController
     {
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        return $this->redirect(['/']);
     }
+
+
+    public function actionSendEmail()
+    {
+
+        $model = new SendEmailForm();
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate()) {
+                if($model->sendEmail()):
+                    Yii::$app->getSession()->setFlash('warning', 'Проверьте емайл.');
+                    return $this->goHome();
+                else:
+                    Yii::$app->getSession()->setFlash('error', 'Нельзя сбросить пароль.');
+                endif;
+            }
+        }
+
+        return $this->render('send-email', [
+            'model' => $model,
+        ]);
+    }
+
+
+    public function actionResetPassword($key)
+    {
+        try {
+            $model = new ResetPasswordForm($key);
+        }
+        catch (InvalidArgumentException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->resetPassword()) {
+                Yii::$app->getSession()->setFlash('warning', 'Пароль изменен.');
+                return $this->redirect(['/site/login']);
+            }
+        }
+
+        return $this->render('reset-password', [
+            'model' => $model,
+        ]);
+    }
+
 
     /**
      * Displays contact page.

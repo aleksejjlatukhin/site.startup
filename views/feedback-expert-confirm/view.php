@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model){
                     if (!empty($model->feedback_file)){
                         $string = '';
-                        $string .= Html::a($model->feedback_file, ['download', 'filename' => $model->feedback_file], ['class' => '']);
+                        $string .= Html::a($model->feedback_file, ['download', 'id' => $model->id], ['class' => '']);
                         return $string;
                     }
                 },

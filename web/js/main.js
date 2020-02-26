@@ -36,4 +36,7 @@ $(document).ready(function() {
     /*--------------------------------------------*/
 
 
+    /*Всплывающие  блоки */
+    $('[data-toggle="popover"]').popover({html:true})
+
 });

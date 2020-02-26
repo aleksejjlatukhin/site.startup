@@ -44,13 +44,13 @@ use yii\helpers\Url;
                         <?php
                         if (!empty($model->interview_file))
                         {
-                            echo Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => 'btn btn-default feedback']) .
-                                ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $model->interview_file], [
+                            echo Html::a($model->interview_file, ['download', 'id' => $model->id], ['class' => 'btn btn-default feedback']) .
+                                ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'id' => $model->id], [
                                     'onclick'=>
                                         "$.ajax({
                                                  type:'POST',
                                                  cache: false,
-                                                 url: '".Url::to(['delete-file', 'filename' => $model->interview_file])."',
+                                                 url: '".Url::to(['delete-file', 'id' => $model->id])."',
                                                  success  : function(response) {
                                                      $('.link-del').html(response);
                                                      $('.feedback').remove();

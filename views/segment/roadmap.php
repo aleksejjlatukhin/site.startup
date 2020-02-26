@@ -55,64 +55,59 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <td>
                     <?php
-                    $name = $model->name;
-                    if (mb_strlen($name) > 10){
-
-                        $name = mb_substr($model->name, 0, 10) . '...';
-                    }
-                    echo Html::a(Html::encode($name), Url::to(['view', 'id' => $model->id]));
+                        echo Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
                     ?>
                 </td>
 
-                <td><?if (!empty($model->creat_date)) {
+                <td style="vertical-align: middle;"><?if (!empty($model->creat_date)) {
                         echo date("d.m.y", strtotime($model->creat_date));
                     }?></td>
 
-                <td><?if (!empty($model->plan_gps)) {
+                <td style="vertical-align: middle;"><?if (!empty($model->plan_gps)) {
                         echo date("d.m.y", strtotime($model->plan_gps));
                     }?></td>
 
-                <td><? if (!empty($model->fact_gps)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_gps)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_gps)), Url::to(['generation-problem/view', 'id' => $problem->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->plan_ps)){
+                <td style="vertical-align: middle;"><? if (!empty($model->plan_ps)){
                         echo date("d.m.y", strtotime($model->plan_ps));
                     } ?></td>
 
-                <td><? if (!empty($model->fact_ps)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_ps)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_ps)), Url::to(['generation-problem/view', 'id' => $confirmProblems[$i]->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->plan_dev_gcp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->plan_dev_gcp)){
                         echo date("d.m.y", strtotime($model->plan_dev_gcp));
                     } ?></td>
 
-                <td><? if (!empty($model->fact_dev_gcp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_dev_gcp)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_dev_gcp)), Url::to(['gcp/view', 'id' => $offersGcp[$i]->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->plan_gcp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->plan_gcp)){
                         echo date("d.m.y", strtotime($model->plan_gcp));
                     } ?></td>
 
-                <td><? if (!empty($model->fact_gcp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_gcp)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_gcp)), Url::to(['gcp/view', 'id' => $comfirmGcpses[$i]->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->plan_dev_gmvp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->plan_dev_gmvp)){
                         echo date("d.m.y", strtotime($model->plan_dev_gmvp));
                     } ?></td>
 
-                <td><? if (!empty($model->fact_dev_gmvp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_dev_gmvp)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_dev_gmvp)), Url::to(['mvp/view', 'id' => $mvProds[$i]->id]));
                     } ?></td>
 
-                <td><? if (!empty($model->plan_gmvp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->plan_gmvp)){
                         echo date("d.m.y", strtotime($model->plan_gmvp));
                     } ?></td>
 
-                <td><? if (!empty($model->fact_gmvp)){
+                <td style="vertical-align: middle;"><? if (!empty($model->fact_gmvp)){
                         echo Html::a(date("d.m.y", strtotime($model->fact_gmvp)), Url::to(['mvp/view', 'id' => $comfirmMvpses[$i]->id]));
                     } ?></td>
 

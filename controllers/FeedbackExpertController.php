@@ -18,19 +18,45 @@ use yii\web\UploadedFile;
  */
 class FeedbackExpertController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = FeedbackExpert::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $interview = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
@@ -49,10 +75,10 @@ class FeedbackExpertController extends AppController
     }
 
 
-    public function actionDownload($filename)
+    public function actionDownload($id)
     {
         $user = Yii::$app->user->identity;
-        $model = FeedbackExpert::find()->where(['feedback_file' => $filename])->one();
+        $model = FeedbackExpert::findOne($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
@@ -72,10 +98,10 @@ class FeedbackExpertController extends AppController
     }
 
 
-    public function actionDeleteFile($filename)
+    public function actionDeleteFile($id)
     {
         $user = Yii::$app->user->identity;
-        $model = FeedbackExpert::find()->where(['feedback_file' => $filename])->one();
+        $model = FeedbackExpert::findOne($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
@@ -144,6 +170,7 @@ class FeedbackExpertController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
 
         if ($model->load(Yii::$app->request->post())) {
 

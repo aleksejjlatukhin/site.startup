@@ -129,7 +129,8 @@ class Projects extends ActiveRecord
             [['invest_amount'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
-            [['project_fullname','project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
+            ['project_name', 'string', 'min' => 3, 'max' => 32],
+            [['project_fullname', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5 - count($this->preFiles)],
         ];
     }

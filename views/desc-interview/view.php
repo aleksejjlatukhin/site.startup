@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => function($model){
                             if (!empty($model->interview_file)){
                                 $string = '';
-                                $string .= Html::a($model->interview_file, ['download', 'filename' => $model->interview_file], ['class' => '']);
+                                $string .= Html::a($model->interview_file, ['download', 'id' => $model->id], ['class' => '']);
                                 return $string;
                             }
                         },

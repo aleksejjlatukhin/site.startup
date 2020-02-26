@@ -27,30 +27,40 @@ use app\models\User;
 use Yii;
 use app\models\Projects;
 use yii\data\ActiveDataProvider;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
+
 
 /**
  * ProjectsController implements the CRUD actions for Projects model.
  */
 class ProjectsController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['result'])
+            || in_array($action->id, ['delete'])){
+
+            $model = Projects::findOne(Yii::$app->request->get());
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($model->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+        }else{
+            return parent::beforeAction($action);
+        }
     }
+
 
     /**
      * Lists all Projects models.
@@ -75,9 +85,9 @@ class ProjectsController extends AppController
     }
 
 
-    public function actionDownload($filename)
+    public function actionDownload($id)
     {
-        $model = PreFiles::find()->where(['file_name' => $filename])->one();
+        $model = PreFiles::findOne($id);
         $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
 
@@ -93,9 +103,9 @@ class ProjectsController extends AppController
     }
 
 
-    public function actionDeleteFile($filename)
+    public function actionDeleteFile($id)
     {
-        $model = PreFiles::find()->where(['file_name' => $filename])->one();
+        $model = PreFiles::findOne($id);
         $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
 
@@ -123,21 +133,6 @@ class ProjectsController extends AppController
     public function actionView($id)
     {
         $model = $this->findModel($id);
-
-        /*$segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $equally = array();
-        foreach ($segments as $k => $segment){
-            $equally[$segment->name][] = $segment->name;
-        }
-
-        $i = 0;
-        foreach ($equally as $k => $segment){
-            if (count($segment) > 1){
-                //echo 'значение-&nbsp'.$k.'&nbsp встречается &nbsp'.count($segment).'&nbsp раз(раза) <br>';
-            }
-        }*/
-
-
 
         return $this->render('view', [
             'model' => $model,

@@ -23,26 +23,66 @@ use yii\filters\VerbFilter;
  */
 class DescInterviewMvpController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = DescInterviewMvp::findOne(Yii::$app->request->get());
+            $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
+            $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
+            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $respond = RespondsMvp::findOne(Yii::$app->request->get());
+            $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
+            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all DescInterviewMvp models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => DescInterviewMvp::find(),
@@ -51,7 +91,7 @@ class DescInterviewMvpController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single DescInterviewMvp model.
@@ -109,6 +149,10 @@ class DescInterviewMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        if (!empty($respond->descInterview)){
+            return $this->redirect(['view', 'id' => $respond->descInterview->id]);
+        }
 
         if ($respond->name == null || $respond->info_respond == null){
             Yii::$app->session->setFlash('error', "Необходимо заполнить данные о респонденте!");

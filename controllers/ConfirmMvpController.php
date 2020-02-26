@@ -23,26 +23,62 @@ use yii\filters\VerbFilter;
  */
 class ConfirmMvpController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = ConfirmMvp::findOne(Yii::$app->request->get());
+            $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $mvp = Mvp::findOne(Yii::$app->request->get());
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all ConfirmMvp models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => ConfirmMvp::find(),
@@ -51,7 +87,7 @@ class ConfirmMvpController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single ConfirmMvp model.
@@ -171,6 +207,10 @@ class ConfirmMvpController extends AppController
 
         $model = new ConfirmMvp();
         $model->mvp_id = $id;
+
+        if (!empty($mvp->confirm)){
+            return $this->redirect(['view', 'id' => $mvp->confirm->id]);
+        }
 
         $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         foreach ($responds as $respond){

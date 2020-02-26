@@ -21,26 +21,57 @@ use yii\filters\VerbFilter;
  */
 class GenerationProblemController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+
+            $model = GenerationProblem::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['create'])){
+
+            $interview = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                if ($action->id == 'create') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
      * Lists all GenerationProblem models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => GenerationProblem::find(),
@@ -49,7 +80,7 @@ class GenerationProblemController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single GenerationProblem model.
@@ -78,15 +109,6 @@ class GenerationProblemController extends AppController
      * @return mixed
      */
 
-
-    // ОТКЛЮЧАЕМ CSRF
-    public function beforeAction($action)
-    {
-        if ($action->id == 'create') {
-            $this->enableCsrfValidation = false;
-        }
-        return parent::beforeAction($action);
-    }
 
 
     public function actionCreate($id)

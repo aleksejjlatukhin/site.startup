@@ -7,7 +7,7 @@ namespace app\controllers;
 use yii\web\Controller;
 use Yii;
 
-class AppController extends Controller
+class AppController extends BehaviorsController
 {
 
     public function delTree($dir)

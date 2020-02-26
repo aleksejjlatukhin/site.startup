@@ -116,7 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <div class="col-sm-9">
+    <div class="col-sm-6">
         <?= $form->field($newModel, 'name')->textInput(['maxlength' => true]) ?>
     </div>
 

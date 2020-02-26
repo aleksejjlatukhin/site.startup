@@ -23,19 +23,42 @@ use yii\filters\VerbFilter;
  */
 class SegmentController extends AppController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
+
+    public function beforeAction($action)
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
+
+        if (in_array($action->id, ['view']) || in_array($action->id, ['update'])
+            || in_array($action->id, ['one-roadmap']) || in_array($action->id, ['delete'])){
+
+            $model = Segment::findOne(Yii::$app->request->get());
+            $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['index']) || in_array($action->id, ['roadmap'])){
+
+            $project = Projects::findOne(Yii::$app->request->get());
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }else{
+            return parent::beforeAction($action);
+        }
+
     }
 
     /**
@@ -398,6 +421,7 @@ class SegmentController extends AppController
     public function actionView($id)
     {
         $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
+
         return $this->render('view', [
             'model' => $this->findModel($id),
             'project' => $project,
