@@ -34,7 +34,7 @@ class PreFiles extends \yii\db\ActiveRecord
         return [
             [['project_id', 'file_name'], 'required'],
             [['project_id'], 'integer'],
-            [['file_name'], 'string', 'max' => 255],
+            [['file_name', 'server_file'], 'string', 'max' => 255],
         ];
     }
 

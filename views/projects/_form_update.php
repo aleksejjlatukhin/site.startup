@@ -396,7 +396,7 @@ use yii\helpers\Url;
 
                     <div style="font-size: 13px; font-weight: 700;margin-top: -5px;">
                         <p>Загружаемые файлы должны иметь расширения: "png, jpg, odt, xlsx, txt, doc, docx, pdf"</p>
-                        <p style="margin-top: -10px;">Максимальное  количество - 5 файлов</p>
+                        <p style="margin-top: -10px;">Максимальное  количество - до 5 файлов. Используйте множественную загрузку.</p>
                     </div>
 
                     <p><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></p>

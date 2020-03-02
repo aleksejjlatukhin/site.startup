@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "projects".
@@ -94,25 +95,37 @@ class Projects extends ActiveRecord
 
     public function upload($path){
 
-        if($this->validate()){
+        if (!is_dir($path)){
 
-            foreach($this->present_files as $file){
-                //$filename=Yii::$app->getSecurity()->generateRandomString(15);
+            throw new NotFoundHttpException('Дирректория не существует!');
 
-                $y = 0;
-                foreach ($this->preFiles as $preFile){
-                    if ($file == $preFile->file_name){
-                        $y++;
+        }else{
+
+            if($this->validate()){
+
+                foreach($this->present_files as $file){
+
+                    $filename = Yii::$app->getSecurity()->generateRandomString(15);
+
+                    try{
+
+                        $file->saveAs($path . $filename . '.' . $file->extension);
+
+                        $preFiles = new PreFiles();
+                        $preFiles->file_name = $file;
+                        $preFiles->server_file = $filename . '.' . $file->extension;
+                        $preFiles->project_id = $this->id;
+                        $preFiles->save(false);
+
+                    }catch (\Exception $e){
+
+                        throw new NotFoundHttpException('Невозможно загрузить файл!');
                     }
                 }
-
-                if ($y == 0){
-                    $file->saveAs($path . $file->baseName . '.' . $file->extension);
-                }
+                return true;
+            }else{
+                return false;
             }
-            return true;
-        }else{
-            return false;
         }
     }
 
@@ -134,7 +147,6 @@ class Projects extends ActiveRecord
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf', 'maxFiles' => 5 - count($this->preFiles)],
         ];
     }
-
 
 
     /**

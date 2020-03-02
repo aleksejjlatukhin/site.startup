@@ -91,11 +91,11 @@ class DescInterviewController extends AppController
             mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
             mb_convert_encoding($respond->name , "windows-1251") . '/');
 
-        $file = $path . $model->interview_file;
+        $file = $path . $model->server_file;
 
         if (file_exists($file)) {
 
-            return \Yii::$app->response->sendFile($file);
+            return \Yii::$app->response->sendFile($file, $model->interview_file);
         }
 
     }
@@ -115,9 +115,10 @@ class DescInterviewController extends AppController
             mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
             mb_convert_encoding($respond->name , "windows-1251") . '/');
 
-        unlink($path . $model->interview_file);
+        unlink($path . $model->server_file);
 
         $model->interview_file = null;
+        $model->server_file = null;
 
         $model->update();
 
@@ -187,12 +188,12 @@ class DescInterviewController extends AppController
                 mkdir($respond_dir, 0777);
             }
 
-            if ($model->save()){
+            if ($model->validate() && $model->save()){
 
                 $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                 if ($model->loadFile !== null){
-                    if ($model->validate() && $model->upload($respond_dir)){
+                    if ($model->upload($respond_dir)){
                         $model->interview_file = $model->loadFile;
                         $model->save(false);
                     }
@@ -244,12 +245,12 @@ class DescInterviewController extends AppController
                 mkdir($respond_dir, 0777);
             }
 
-            if ($model->save()){
+            if ($model->validate() && $model->save()){
 
                 $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                 if ($model->loadFile !== null){
-                    if ($model->validate() && $model->upload($respond_dir)){
+                    if ($model->upload($respond_dir)){
                         $model->interview_file = $model->loadFile;
                         $model->save(false);
                     }

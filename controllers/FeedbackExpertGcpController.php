@@ -105,11 +105,11 @@ class FeedbackExpertGcpController extends AppController
             . mb_convert_encoding($gcp->title , "windows-1251") . '/feedbacks-confirm/'
             . mb_convert_encoding($model->name , "windows-1251") . '/');
 
-        $file = $path . $model->feedback_file;
+        $file = $path . $model->server_file;
 
         if (file_exists($file)) {
 
-            return \Yii::$app->response->sendFile($file);
+            return \Yii::$app->response->sendFile($file, $model->feedback_file);
         }
     }
 
@@ -133,9 +133,10 @@ class FeedbackExpertGcpController extends AppController
             . mb_convert_encoding($gcp->title , "windows-1251") . '/feedbacks-confirm/'
             . mb_convert_encoding($model->name , "windows-1251") . '/');
 
-        unlink($path . $model->feedback_file);
+        unlink($path . $model->server_file);
 
         $model->feedback_file = null;
+        $model->server_file = null;
 
         $model->update();
 
@@ -221,12 +222,12 @@ class FeedbackExpertGcpController extends AppController
                     mkdir($expert_dir, 0777);
                 }
 
-                if ($model->save()) {
+                if ($model->validate() && $model->save()) {
 
                     $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                     if ($model->loadFile !== null){
-                        if ($model->validate() && $model->upload($expert_dir)){
+                        if ($model->upload($expert_dir)){
                             $model->feedback_file = $model->loadFile;
                             $model->save(false);
                         }
@@ -326,12 +327,12 @@ class FeedbackExpertGcpController extends AppController
                     mkdir($expert_dir, 0777);
                 }
 
-                if ($model->save()) {
+                if ($model->validate() && $model->save()) {
 
                     $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                     if ($model->loadFile !== null){
-                        if ($model->validate() && $model->upload($expert_dir)){
+                        if ($model->upload($expert_dir)){
                             $model->feedback_file = $model->loadFile;
                             $model->save(false);
                         }

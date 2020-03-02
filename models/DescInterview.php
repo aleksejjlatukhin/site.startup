@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "desc_interview".
@@ -34,11 +35,31 @@ class DescInterview extends \yii\db\ActiveRecord
 
     public function upload($path)
     {
-        if ($this->validate()) {
-            $this->loadFile->saveAs($path . $this->loadFile->baseName . '.' . $this->loadFile->extension);
-            return true;
-        } else {
-            return false;
+        if (!is_dir($path)){
+
+            throw new NotFoundHttpException('Дирректория не существует!');
+
+        }else{
+
+            if ($this->validate()) {
+
+                //$filename = $this->loadFile->baseName;
+                $filename=Yii::$app->getSecurity()->generateRandomString(15);
+
+                try{
+
+                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                    $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+                }catch (\Exception $e){
+
+                    throw new NotFoundHttpException('Невозможно загрузить файл!');
+                }
+
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -52,7 +73,7 @@ class DescInterview extends \yii\db\ActiveRecord
             [['respond_id'], 'integer'],
             [['date_fact'], 'safe'],
             [['description'], 'string'],
-            [['interview_file', 'result'], 'string', 'max' => 255],
+            [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx',],
             ['exist_desc', 'boolean'],
             ['status', 'boolean'],

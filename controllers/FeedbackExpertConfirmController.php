@@ -96,11 +96,11 @@ class FeedbackExpertConfirmController extends AppController
             mb_convert_encoding($generationProblem->title , "windows-1251") .'/feedbacks-confirm/' .
             mb_convert_encoding($model->name , "windows-1251") . '/');
 
-        $file = $path . $model->feedback_file;
+        $file = $path . $model->server_file;
 
         if (file_exists($file)) {
 
-            return \Yii::$app->response->sendFile($file);
+            return \Yii::$app->response->sendFile($file, $model->feedback_file);
         }
 
     }
@@ -122,9 +122,10 @@ class FeedbackExpertConfirmController extends AppController
             mb_convert_encoding($generationProblem->title , "windows-1251") .'/feedbacks-confirm/' .
             mb_convert_encoding($model->name , "windows-1251") . '/');
 
-        unlink($path . $model->feedback_file);
+        unlink($path . $model->server_file);
 
         $model->feedback_file = null;
+        $model->server_file = null;
 
         $model->update();
 
@@ -201,12 +202,12 @@ class FeedbackExpertConfirmController extends AppController
                     mkdir($expert_dir, 0777);
                 }
 
-                if ($model->save()) {
+                if ($model->validate() && $model->save()) {
 
                     $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                     if ($model->loadFile !== null){
-                        if ($model->validate() && $model->upload($expert_dir)){
+                        if ($model->upload($expert_dir)){
                             $model->feedback_file = $model->loadFile;
                             $model->save(false);
                         }
@@ -301,18 +302,20 @@ class FeedbackExpertConfirmController extends AppController
                     mkdir($expert_dir, 0777);
                 }
 
-                if ($model->save()) {
+                if ($model->validate() && $model->save()) {
 
                     $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
 
                     if ($model->loadFile !== null){
-                        if ($model->validate() && $model->upload($expert_dir)){
+                        if ($model->upload($expert_dir)){
                             $model->feedback_file = $model->loadFile;
                             $model->save(false);
+
                         }
                     }
 
                     $project->update_at = date('Y:m:d');
+
                     if ($project->save()) {
                         Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
                         return $this->redirect(['view', 'id' => $model->id]);

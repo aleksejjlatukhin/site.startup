@@ -94,11 +94,11 @@ class ProjectsController extends AppController
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
             . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") . '/present files/');
 
-        $file = $path . $model->file_name;
+        $file = $path . $model->server_file;
 
         if (file_exists($file)) {
 
-            return \Yii::$app->response->sendFile($file);
+            return \Yii::$app->response->sendFile($file, $model->file_name);
         }
     }
 
@@ -112,7 +112,7 @@ class ProjectsController extends AppController
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
             . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") . '/present files/');
 
-        unlink($path . $model->file_name);
+        unlink($path . $model->server_file);
 
         $model->delete();
 
@@ -293,14 +293,7 @@ class ProjectsController extends AppController
 
                                         $model->present_files = UploadedFile::getInstances($model, 'present_files');
 
-                                        if ($model->validate() && $model->upload($present_files_dir)){
-                                            foreach ($model->present_files as $file){
-                                                $preFiles = new PreFiles();
-                                                $preFiles->file_name = $file;
-                                                $preFiles->project_id = $model->id;
-                                                $preFiles->save(false);
-                                            }
-                                        }
+                                        $model->upload($present_files_dir);
 
                                         return $this->redirect(['view', 'id' => $model->id]);
                                     }
@@ -476,6 +469,7 @@ class ProjectsController extends AppController
                                     }
 
                                 }
+
                                 if ($flag) {
                                     $transaction->commit();
 
@@ -485,30 +479,11 @@ class ProjectsController extends AppController
                                         . '/' . mb_strtolower(mb_convert_encoding($model->project_name, "windows-1251"),"windows-1251") . '/present files/';
 
 
-                                    if ($model->validate() && $model->upload($present_files_dir)){
+                                    $model->upload($present_files_dir);
 
-                                        foreach ($model->present_files as $file){
+                                     Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
+                                     return $this->redirect(['view', 'id' => $model->id]);
 
-                                            $y = 0;
-                                            foreach ($model->preFiles as $preFile){
-                                                if ($file == $preFile->file_name){
-                                                    $y++;
-                                                }
-                                            }
-
-                                            if ($y == 0){
-
-                                                $preFiles = new PreFiles();
-                                                $preFiles->file_name = $file;
-                                                $preFiles->project_id = $model->id;
-                                                $preFiles->save(false);
-                                            }
-                                        }
-
-
-                                        Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
-                                        return $this->redirect(['view', 'id' => $model->id]);
-                                    }
 
                                 }
                             } catch (Exception $e) {

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "feedback_expert".
@@ -34,11 +35,31 @@ class FeedbackExpert extends \yii\db\ActiveRecord
 
     public function upload($path)
     {
-        if ($this->validate()) {
-            $this->loadFile->saveAs($path . $this->loadFile->baseName . '.' . $this->loadFile->extension);
-            return true;
-        } else {
-            return false;
+        if (!is_dir($path)){
+
+            throw new NotFoundHttpException('Дирректория не существует!');
+
+        }else{
+
+            if ($this->validate()) {
+
+                //$filename = $this->loadFile->baseName;
+                $filename=Yii::$app->getSecurity()->generateRandomString(15);
+
+                try{
+
+                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                    $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+                }catch (\Exception $e){
+
+                    throw new NotFoundHttpException('Невозможно загрузить файл!');
+                }
+
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -50,7 +71,7 @@ class FeedbackExpert extends \yii\db\ActiveRecord
         return [
             [['interview_id', 'name', 'comment', 'title'], 'required'],
             [['interview_id'], 'integer'],
-            [['name', 'position', 'feedback_file', 'comment', 'title'], 'string', 'max' => 255],
+            [['name', 'position', 'feedback_file', 'server_file', 'comment', 'title'], 'string', 'max' => 255],
             [['date_feedback'], 'safe'],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf',],
         ];

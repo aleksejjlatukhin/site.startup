@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Файл',
                 'value' => function($model){
                     $string = '';
-                    $string .= Html::a($model->descInterview->interview_file, ['desc-interview/download', 'filename' => $model->descInterview->interview_file], ['class' => '']);
+                    $string .= Html::a($model->descInterview->interview_file, ['desc-interview/download', 'id' => $model->descInterview->id], ['class' => '']);
                     return $string;
                 },
                 'visible' => !empty($model->descInterview->interview_file),
