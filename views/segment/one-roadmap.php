@@ -74,8 +74,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Генерация ГПС - Факт -->
-                <?php if ((!empty($model->fact_gps) && $model->fact_gps > $model->plan_gps) ||
-                    (empty($model->fact_gps) && strtotime($model->plan_gps) < time())) : ?>
+                <?php if ((!empty($model->plan_gps) && !empty($model->fact_gps) && $model->fact_gps > $model->plan_gps) ||
+                    (!empty($model->plan_gps) && empty($model->fact_gps) && strtotime($model->plan_gps) < time())) : ?>
 
                     <td style="vertical-align: middle; background-color: red;">
                         <? if (!empty($model->fact_gps)){
@@ -105,8 +105,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Подтверждение ГПС - Факт-->
-                <?php if ((!empty($model->fact_ps) && $model->fact_ps > $model->plan_ps) ||
-                (empty($model->fact_ps) && strtotime($model->plan_ps) < time())) : ?>
+                <?php if ((!empty($model->plan_ps) && !empty($model->fact_ps) && $model->fact_ps > $model->plan_ps) ||
+                (!empty($model->plan_ps) && empty($model->fact_ps) && strtotime($model->plan_ps) < time())) : ?>
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_ps)){
@@ -136,8 +136,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Разработка ГЦП - Факт-->
-                <?php if ((!empty($model->fact_dev_gcp) && $model->fact_dev_gcp > $model->plan_dev_gcp) ||
-                (empty($model->fact_dev_gcp) && strtotime($model->plan_dev_gcp) < time())) : ?>
+                <?php if ((!empty($model->plan_dev_gcp) && !empty($model->fact_dev_gcp) && $model->fact_dev_gcp > $model->plan_dev_gcp) ||
+                (!empty($model->plan_dev_gcp) && empty($model->fact_dev_gcp) && strtotime($model->plan_dev_gcp) < time())) : ?>
 
                     <td style="vertical-align: middle;background-color: red;">
 
@@ -171,8 +171,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Подтверждение ГЦП - Факт-->
-                <?php if ((!empty($model->fact_gcp) && $model->fact_gcp > $model->plan_gcp) ||
-                (empty($model->fact_gcp) && strtotime($model->plan_gcp) < time())) : ?>
+                <?php if ((!empty($model->plan_gcp) && !empty($model->fact_gcp) && $model->fact_gcp > $model->plan_gcp) ||
+                (!empty($model->plan_gcp) && empty($model->fact_gcp) && strtotime($model->plan_gcp) < time())) : ?>
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_gcp)){
@@ -202,8 +202,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Разработка ГMVP - Факт-->
-                <?php if ((!empty($model->fact_dev_gmvp) && $model->fact_dev_gmvp > $model->plan_dev_gmvp) ||
-                (empty($model->fact_dev_gmvp) && strtotime($model->plan_dev_gmvp) < time())) : ?>
+                <?php if ((!empty($model->plan_dev_gmvp) && !empty($model->fact_dev_gmvp) && $model->fact_dev_gmvp > $model->plan_dev_gmvp) ||
+                (!empty($model->plan_dev_gmvp) && empty($model->fact_dev_gmvp) && strtotime($model->plan_dev_gmvp) < time())) : ?>
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_dev_gmvp)){
@@ -233,8 +233,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 <!--Подтверждение ГMVP - Факт-->
-                <?php if ((!empty($model->fact_gmvp) && $model->fact_gmvp > $model->plan_gmvp) ||
-                (empty($model->fact_gmvp) && strtotime($model->plan_gmvp) < time())) : ?>
+                <?php if ((!empty($model->plan_gmvp) && !empty($model->fact_gmvp) && $model->fact_gmvp > $model->plan_gmvp) ||
+                (!empty($model->plan_gmvp) && empty($model->fact_gmvp) && strtotime($model->plan_gmvp) < time())) : ?>
 
                     <td style="vertical-align: middle; background-color: red;">
                         <? if (!empty($model->fact_gmvp)){

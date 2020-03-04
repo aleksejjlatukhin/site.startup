@@ -31,7 +31,7 @@ AppAsset::register($this);
 
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name = 'site.startup',
+        'brandLabel' => Yii::$app->name = 'Startpool',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -104,9 +104,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Startpool <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <!--<p class="pull-right"><?/*= Yii::powered() */?></p>-->
     </div>
 </footer>
 

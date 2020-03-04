@@ -73,7 +73,7 @@ class FeedbackExpert extends \yii\db\ActiveRecord
             [['interview_id'], 'integer'],
             [['name', 'position', 'feedback_file', 'server_file', 'comment', 'title'], 'string', 'max' => 255],
             [['date_feedback'], 'safe'],
-            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf',],
+            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
         ];
     }
 

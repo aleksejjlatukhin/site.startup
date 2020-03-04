@@ -31,7 +31,7 @@ use yii\helpers\Url;
             <div class="container row">
                 <div class="pull-left">
 
-                    <p class="feed"><b>Файл (доступные расширения: png, jpg, odt, xlsx, txt, doc, docx, pdf)</b></p>
+                    <p class="feed"><b>Файл (доступные расширения: png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls)</b></p>
                     <?php if (!empty($model->interview_file)) : ?>
                         <p><?= $form->field($model, 'loadFile', ['options' => ['class' => 'feed-exp']])->fileInput()->label('') ?></p>
                     <?php endif;?>

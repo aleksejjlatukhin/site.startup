@@ -37,6 +37,8 @@ $(document).ready(function() {
 
 
     /*Всплывающие  блоки */
-    $('[data-toggle="popover"]').popover({html:true})
+    $('[data-toggle="popover"]').popover({html:true});
 
+    /*Разворащивающееся меню*/
+    //$('.catalog').dcAccordion({speed:300});
 });

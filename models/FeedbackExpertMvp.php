@@ -77,7 +77,7 @@ class FeedbackExpertMvp extends \yii\db\ActiveRecord
             [['confirm_mvp_id'], 'integer'],
             [['date_feedback'], 'safe'],
             [['title', 'name', 'position', 'feedback_file', 'server_file', 'comment'], 'string', 'max' => 255],
-            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf',],
+            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
         ];
     }
 

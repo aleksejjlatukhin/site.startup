@@ -74,7 +74,7 @@ class DescInterview extends \yii\db\ActiveRecord
             [['date_fact'], 'safe'],
             [['description'], 'string'],
             [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
-            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx',],
+            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
             ['exist_desc', 'boolean'],
             ['status', 'boolean'],
         ];

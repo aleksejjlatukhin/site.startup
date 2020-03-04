@@ -24,8 +24,13 @@ class AppAsset extends AssetBundle
         'css/style.css',
     ];
     public $js = [
-        'js/main.js'
+        'js/jquery.cookie.js',
+        'js/jquery.accordion.js',
+        'js/main.js',
     ];
+
+    public $jsOptions = ['position' => \yii\web\View::POS_HEAD,];
+
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapPluginAsset',

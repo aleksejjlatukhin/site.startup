@@ -181,6 +181,7 @@ class SegmentController extends AppController
 
         $models = Segment::find()->where(['project_id' => $id])->all();
 
+        $gps = [];
         $confirmProblems = [];
         $offersGcp = [];
         $comfirmGcpses = [];
@@ -200,7 +201,11 @@ class SegmentController extends AppController
             if (!empty($problems)){
 
                 foreach ($problems as $k => $problem){
+                    /*Выбираем последнюю добавленную ГПС*/
                     if (($k+1) == count($problems)){
+
+                        $gps[] = $problem;
+
                         if (!empty($problem)){
                             if ($model->fact_gps !== $problem->date_gps){
                                 $model->fact_gps = $problem->date_gps;
@@ -286,7 +291,7 @@ class SegmentController extends AppController
         return $this->render('roadmap', [
             'project' => $project,
             'models' => $models,
-            'problem' => $problem,
+            'gps' => $gps,
             'confirmProblems' => $confirmProblems,
             'offersGcp' => $offersGcp,
             'comfirmGcpses' => $comfirmGcpses,

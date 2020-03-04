@@ -10,6 +10,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\models\User;
 
 AppAsset::register($this);
 ?>
@@ -88,21 +89,21 @@ AppAsset::register($this);
 
             <div id="arrow-container">
 
-                <?= Html::a('1.<br>Генерация<br>ГЦС', Url::to(['target-segment']), ['class' => 'arrowlist'])?>
+                <?= Html::a('1.<br>Генерация<br>ГЦС', Url::to(['/target-segment']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('2.<br>Генерация<br>ГПС', Url::to(['segment-problems']), ['class' => 'arrowlist'])?>
+                <?= Html::a('2.<br>Генерация<br>ГПС', Url::to(['/segment-problems']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('3.<br>Подтвержд<br>ение ГПС', Url::to(['problem-confirmation']), ['class' => 'arrowlist'])?>
+                <?= Html::a('3.<br>Подтвержд<br>ение ГПС', Url::to(['/problem-confirmation']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('4.<br>Разработка<br>ГЦП', Url::to(['value-proposition']), ['class' => 'arrowlist'])?>
+                <?= Html::a('4.<br>Разработка<br>ГЦП', Url::to(['/value-proposition']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('5.<br>Подтвержд<br>ение ГЦП', Url::to(['offer-confirmation']), ['class' => 'arrowlist'])?>
+                <?= Html::a('5.<br>Подтвержд<br>ение ГЦП', Url::to(['/offer-confirmation']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('6.<br>Разработка<br>ГMVP', Url::to(['development-mvp']), ['class' => 'arrowlist'])?>
+                <?= Html::a('6.<br>Разработка<br>ГMVP', Url::to(['/development-mvp']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('7.<br>Подтвержд<br>ение ГMVP', Url::to(['mvp-confirmation']), ['class' => 'arrowlist'])?>
+                <?= Html::a('7.<br>Подтвержд<br>ение ГMVP', Url::to(['/mvp-confirmation']), ['class' => 'arrowlist'])?>
 
-                <?= Html::a('8.<br>Генерация<br>бизнес-модели', Url::to(['business-model']), ['class' => 'arrowlist'])?>
+                <?= Html::a('8.<br>Генерация<br>бизнес-модели', Url::to(['/business-model']), ['class' => 'arrowlist'])?>
 
             </div>
 
@@ -127,7 +128,27 @@ AppAsset::register($this);
             </div>
         <?php endif;?>
 
-        <?= $content ?>
+
+        <h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
+            <div class="row">
+
+                <div class="col-md-3">
+                    <span style="padding-right: 130px;">Меню</span>
+                </div>
+
+                <div class="col-md-9">
+                    <?= Html::encode($this->title) ?>
+                </div>
+
+            </div>
+        </h5>
+
+
+        <div class = "row">
+
+            <?= $content ?>
+
+        </div>
 
     </div>
 </div>
