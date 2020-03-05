@@ -17,9 +17,15 @@ $this->title = 'Дорожная карта проекта ' . '"' . mb_strtolow
     'user' => $user,
 ]) ?>
 
-<div class="user-index col-md-9">
+<div class="user-index col-md-9" style="padding-left: 0;">
 
-        <br>
+    <h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
+        <div class="row">
+
+            <?= Html::encode($this->title) ?>
+
+        </div>
+    </h5>
 
         <table class="table table-bordered table-striped">
             <thead>

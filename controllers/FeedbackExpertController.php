@@ -63,7 +63,7 @@ class FeedbackExpertController extends AppController
      * Lists all FeedbackExpert models.
      * @return mixed
      */
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
             'query' => FeedbackExpert::find(),
@@ -72,7 +72,7 @@ class FeedbackExpertController extends AppController
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
 
     public function actionDownload($id)
@@ -84,9 +84,9 @@ class FeedbackExpertController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-            mb_convert_encoding($model->name , "windows-1251") . '/');
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/');
 
         $file = $path . $model->server_file;
 
@@ -107,9 +107,9 @@ class FeedbackExpertController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-            mb_convert_encoding($model->name , "windows-1251") . '/');
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/');
 
 
         unlink($path . $model->server_file);
@@ -185,9 +185,9 @@ class FeedbackExpertController extends AppController
             if ($kol == 0){
 
                 $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
                 if (!file_exists($expert_dir)){
                     mkdir($expert_dir, 0777);
                 }
@@ -260,14 +260,14 @@ class FeedbackExpertController extends AppController
                     if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
 
                         $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-                            mb_convert_encoding($elem->name , "windows-1251") . '/';
+                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+                            mb_convert_encoding($this->translit($elem->name) , "windows-1251") . '/';
 
                         $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-                            mb_convert_encoding($model->name , "windows-1251") . '/';
+                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+                            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
                         if (file_exists($old_dir)){
                             rename($old_dir, $new_dir);
@@ -276,9 +276,9 @@ class FeedbackExpertController extends AppController
                 }
 
                 $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
                 if (!file_exists($expert_dir)){
                     mkdir($expert_dir, 0777);
                 }
@@ -330,9 +330,9 @@ class FeedbackExpertController extends AppController
         $project->update_at = date('Y:m:d');
 
         $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-            mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/' .
-            mb_convert_encoding($model->name , "windows-1251") . '/';
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/' .
+            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
         if (file_exists($del_dir)){
             $this->delTree($del_dir);

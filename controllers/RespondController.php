@@ -232,14 +232,14 @@ class RespondController extends AppController
                     if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
 
                         $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
-                            mb_convert_encoding($elem->name , "windows-1251") . '/';
+                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                            mb_convert_encoding($this->translit($elem->name) , "windows-1251") . '/';
 
                         $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
-                            mb_convert_encoding($model->name , "windows-1251") . '/';
+                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
                         if (file_exists($old_dir)){
                             rename($old_dir, $new_dir);
@@ -248,9 +248,9 @@ class RespondController extends AppController
                 }
 
                 $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($model->name , "windows-1251") . '/';
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
                 if (!file_exists($respond_dir)){
                     mkdir($respond_dir, 0777);
                 }
@@ -311,9 +311,9 @@ class RespondController extends AppController
             }
 
             $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                mb_convert_encoding($segment->name , "windows-1251") .'/interviews/' .
-                mb_convert_encoding($model->name , "windows-1251") . '/';
+                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
             if (file_exists($del_dir)){
                 $this->delTree($del_dir);

@@ -19,13 +19,21 @@ $this->title = 'Презентационные файлы проекта ' . '"'
 ]) ?>
 
 
-<div class="user-index col-md-9">
+<div class="user-index col-md-9" style="padding-left: 0;">
+
+    <h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
+        <div class="row">
+
+            <?= Html::encode($this->title) ?>
+
+        </div>
+    </h5>
 
     <br>
 
     <?php if (!empty($model->preFiles)) : ?>
 
-        <ul style="text-decoration: none;padding: 0;">
+        <ul style="text-decoration: none;padding: 0;list-style: none;">
                 <?php foreach ($model->preFiles as $file) : ?>
                     <li style="padding: 2px 0;">
                         <?= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => 'btn btn-default'])?>

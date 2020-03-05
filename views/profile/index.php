@@ -7,7 +7,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Персональные данные';
+$this->title = 'Данные пользователя';
 
 ?>
 
@@ -16,7 +16,15 @@ $this->title = 'Персональные данные';
 ]) ?>
 
 
-<div class="user-index col-md-9">
+<div class="user-index col-md-9" style="padding-left: 0;">
+
+    <h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
+        <div class="row">
+
+            <?= Html::encode($this->title) ?>
+
+        </div>
+    </h5>
 
     <div style="display:flex;border-bottom: 1px solid #ccc;padding: 20px 0 10px 0;">
 

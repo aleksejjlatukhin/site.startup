@@ -240,11 +240,11 @@ class ConfirmMvpController extends AppController
                     }
 
                     $mvp_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                        . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/'
-                        . mb_convert_encoding($gcp->title , "windows-1251") . '/mvps/'
-                        . mb_convert_encoding($mvp->title , "windows-1251");
+                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                        . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
+                        . mb_convert_encoding($this->translit($gcp->title) , "windows-1251") . '/mvps/'
+                        . mb_convert_encoding($this->translit($mvp->title) , "windows-1251");
 
                     $mvp_dir = mb_strtolower($mvp_dir, "windows-1251");
 
@@ -253,11 +253,11 @@ class ConfirmMvpController extends AppController
                     }
 
                     $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                        . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/'
-                        . mb_convert_encoding($gcp->title , "windows-1251") . '/mvps/'
-                        . mb_convert_encoding($mvp->title , "windows-1251") . '/feedbacks-confirm/';
+                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                        . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
+                        . mb_convert_encoding($this->translit($gcp->title) , "windows-1251") . '/mvps/'
+                        . mb_convert_encoding($this->translit($mvp->title) , "windows-1251") . '/feedbacks-confirm/';
 
                     $feedbacks_dir = mb_strtolower($feedbacks_dir, "windows-1251");
 
@@ -282,7 +282,7 @@ class ConfirmMvpController extends AppController
                     }
                 }
             }else{
-                Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества позитивных интервью!");
+                Yii::$app->session->setFlash('error', "Количество позитивных ответов не может быть больше количества респондентов");
             }
         }
 

@@ -8,10 +8,14 @@ use yii\helpers\Url;
 
 <div class="col-md-3">
 
-    <ul class="catalog" style = "background: #ccc;padding-top: 20px; min-height: 100vh; list-style: none;">
+    <ul class="catalog" style = "background: #ccc;padding-top: 1px; min-height: 100vh; list-style: none;padding-left: 20px;">
+
+        <li style="margin: -10px 0 20px 0;">
+            <h3>Профиль пользователя</h3>
+        </li>
 
         <li style="padding-bottom: 3px;">
-            <?= Html::a('Персональные данные', Url::to(['/profile/index']))?>
+            <?= Html::a('Данные пользователя', Url::to(['/profile/index']))?>
         </li>
 
         <?php if (!empty($user->projects)) : ?>

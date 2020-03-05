@@ -92,7 +92,7 @@ class ProjectsController extends AppController
         $project = Projects::find()->where(['id' => $model->project_id])->one();
 
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") . '/present files/');
+            . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
 
         $file = $path . $model->server_file;
 
@@ -110,7 +110,7 @@ class ProjectsController extends AppController
         $project = Projects::find()->where(['id' => $model->project_id])->one();
 
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") . '/present files/');
+            . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
 
         unlink($path . $model->server_file);
 
@@ -230,7 +230,7 @@ class ProjectsController extends AppController
                                 mkdir($user_dir, 0777);
                             }
 
-                            $project_dir = $user_dir . '/' . mb_convert_encoding($model->project_name , "windows-1251") . '/';
+                            $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
                             $project_dir = mb_strtolower($project_dir, "windows-1251");
                             if (!file_exists($project_dir)){
                                 mkdir($project_dir, 0777);
@@ -243,14 +243,14 @@ class ProjectsController extends AppController
 
 
                             $segments_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                                mb_convert_encoding($model->project_name , "windows-1251") . '/segments/';
+                                mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
 
                             if (!file_exists($segments_dir)){
                                 mkdir($segments_dir, 0777);
                             }
 
                             foreach ($modelsConcept as $modelConcept){
-                                $segment_dir = $segments_dir . '/' . mb_convert_encoding($modelConcept->name , "windows-1251") . '/';
+                                $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($modelConcept->name) , "windows-1251") . '/';
                                 $segment_dir = mb_strtolower($segment_dir, "windows-1251");
 
                                 if (!file_exists($segment_dir)){
@@ -376,12 +376,12 @@ class ProjectsController extends AppController
                         if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
 
                             $old_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                                . '/' . mb_convert_encoding($elem->project_name, "windows-1251") . '/';
+                                . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
 
                             $old_dir = mb_strtolower($old_dir, "windows-1251");
 
                             $new_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                                . '/' . mb_convert_encoding($model->project_name, "windows-1251") . '/';
+                                . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
 
                             $new_dir = mb_strtolower($new_dir, "windows-1251");
 
@@ -396,14 +396,14 @@ class ProjectsController extends AppController
                                 if ($segment->id == $modelConcept->id && $segment->name !== $modelConcept->name){
 
                                     $old_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                                        . '/' . mb_convert_encoding($model->project_name, "windows-1251")
-                                        . '/segments/' . mb_convert_encoding($segment->name, "windows-1251") . '/';
+                                        . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251")
+                                        . '/segments/' . mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/';
 
                                     $old_dir = mb_strtolower($old_dir, "windows-1251");
 
                                     $new_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                                        . '/' . mb_convert_encoding($model->project_name, "windows-1251")
-                                        . '/segments/' . mb_convert_encoding($modelConcept->name, "windows-1251") . '/';
+                                        . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251")
+                                        . '/segments/' . mb_convert_encoding($this->translit($modelConcept->name), "windows-1251") . '/';
 
                                     $new_dir = mb_strtolower($new_dir, "windows-1251");
 
@@ -414,14 +414,14 @@ class ProjectsController extends AppController
 
 
                         $segments_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                            mb_convert_encoding($model->project_name , "windows-1251") . '/segments/';
+                            mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
 
                         if (!file_exists($segments_dir)){
                             mkdir($segments_dir, 0777);
                         }
 
                         foreach ($modelsConcept as $modelConcept){
-                            $segment_dir = $segments_dir . '/' . mb_convert_encoding($modelConcept->name , "windows-1251") . '/';
+                            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($modelConcept->name) , "windows-1251") . '/';
                             $segment_dir = mb_strtolower($segment_dir, "windows-1251");
 
                             if (!file_exists($segment_dir)){
@@ -443,7 +443,7 @@ class ProjectsController extends AppController
                                     if (! empty($deletedIDs)) {
 
                                         $seg = Segment::find()->where(['id' => $deletedIDs])->one();
-                                        $segment_dir = $segments_dir . '/' . mb_convert_encoding($seg->name , "windows-1251") . '/';
+                                        $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($seg->name) , "windows-1251") . '/';
                                         $segment_dir = mb_strtolower($segment_dir, "windows-1251");
                                         $this->delTree($segment_dir);
 
@@ -476,7 +476,7 @@ class ProjectsController extends AppController
                                     $model->present_files = UploadedFile::getInstances($model, 'present_files');
 
                                     $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-                                        . '/' . mb_strtolower(mb_convert_encoding($model->project_name, "windows-1251"),"windows-1251") . '/present files/';
+                                        . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
 
 
                                     $model->upload($present_files_dir);
@@ -641,7 +641,7 @@ class ProjectsController extends AppController
 
         /*Удаление загруженных папок и файлов пользователя*/
         $pathDelete = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($model->project_name, "windows-1251"),"windows-1251"));
+            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
         if (file_exists($pathDelete)){
             $this->delTree($pathDelete);
         }

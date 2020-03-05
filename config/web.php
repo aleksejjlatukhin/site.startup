@@ -42,12 +42,12 @@ $config = [
 
             //'useFileTransport' => true, /*Письмо отправляется в дирректорию runtime/mail/ */
 
-            'useFileTransport' => false,/*Письмл отправляется на реальный адрес*/
+            'useFileTransport' => false,/*Письмо отправляется на реальный адрес*/
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.mail.ru',
-                'username' => 'alex.latukhin@mail.ru',
-                'password' => 'cjaeirfvjzljxrf20111118vjzljxrf',
+                'username' => 'fedotov.michail@mail.ru',
+                'password' => 'Frctkthfnjhcnfhnfgghjtrnjd2020',
                 'port' => '465',
                 'encryption' => 'ssl',
             ],

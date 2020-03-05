@@ -155,22 +155,22 @@ class InterviewController extends AppController
                 if ($model->save()){
 
                     $interviews_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/interviews/';
+                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/';
                     if (!file_exists($interviews_dir)){
                         mkdir($interviews_dir, 0777);
                     }
 
                     $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/feedbacks/';
+                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/';
                     if (!file_exists($feedbacks_dir)){
                         mkdir($feedbacks_dir, 0777);
                     }
 
                     $generation_problems_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                        mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/';
+                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/';
                     if (!file_exists($generation_problems_dir)){
                         mkdir($generation_problems_dir, 0777);
                     }
@@ -253,7 +253,7 @@ class InterviewController extends AppController
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для интервью загружены");
+                        Yii::$app->session->setFlash('success', "Данные для программы генерации ГПС загружены");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
@@ -338,7 +338,7 @@ class InterviewController extends AppController
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для интервью обновлены!");
+                        Yii::$app->session->setFlash('success', "Данные для программы генерации ГПС обновлены!");
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
@@ -375,18 +375,18 @@ class InterviewController extends AppController
         if ($project->save()){
 
             $pathDeleteInt = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                    . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
-                    '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/interviews';
+                    . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") .
+                    '/segments/' . mb_convert_encoding($this->translit($segment->name), "windows-1251")) . '/interviews';
             $this->delTree($pathDeleteInt);
 
             $pathDeleteGps = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                    . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
-                    '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/generation problems';
+                    . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") .
+                    '/segments/' . mb_convert_encoding($this->translit($segment->name), "windows-1251")) . '/generation problems';
             $this->delTree($pathDeleteGps);
 
             $pathDeleteFeedbacks = \Yii::getAlias('upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                    . '/' . mb_convert_encoding($project->project_name, "windows-1251") .
-                    '/segments/' . mb_convert_encoding($segment->name, "windows-1251")) . '/feedbacks';
+                    . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") .
+                    '/segments/' . mb_convert_encoding($this->translit($segment->name), "windows-1251")) . '/feedbacks';
             $this->delTree($pathDeleteFeedbacks);
 
             foreach ($responds as $respond){

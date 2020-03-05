@@ -33,7 +33,7 @@ AppAsset::register($this);
 
         <?php
         NavBar::begin([
-            'brandLabel' => Yii::$app->name = 'StartPool',
+            'brandLabel' => Yii::$app->name = '<span style="padding-left: 20px;">StartPool</span>',
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-fixed-top',

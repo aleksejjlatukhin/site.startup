@@ -77,14 +77,14 @@ class SegmentController extends AppController
         $models = Segment::find()->where(['project_id' => $project->id])->all();
 
         $segments_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-            mb_convert_encoding($project->project_name , "windows-1251") . '/segments/';
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
 
         if (!file_exists($segments_dir)){
             mkdir($segments_dir, 0777);
         }
 
         foreach ($models as $model){
-            $segment_dir = $segments_dir . '/' . mb_convert_encoding($model->name , "windows-1251") . '/';
+            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
             $segment_dir = mb_strtolower($segment_dir, "windows-1251");
 
             if (!file_exists($segment_dir)){
@@ -490,14 +490,14 @@ class SegmentController extends AppController
                     if ($model->id == $item->id && mb_strtolower($model->name) !== mb_strtolower($item->name)){
 
                         $old_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                            . '/' . mb_convert_encoding($project->project_name, "windows-1251") . '/segments/' .
-                            mb_convert_encoding($item->name , "windows-1251") . '/';
+                            . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                            mb_convert_encoding($this->translit($item->name) , "windows-1251") . '/';
 
                         $old_dir = mb_strtolower($old_dir, "windows-1251");
 
                         $new_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
-                            . '/' . mb_convert_encoding($project->project_name, "windows-1251") . '/segments/' .
-                            mb_convert_encoding($model->name , "windows-1251") . '/';
+                            . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
                         $new_dir = mb_strtolower($new_dir, "windows-1251");
 
@@ -587,10 +587,6 @@ class SegmentController extends AppController
                     if (!empty($generationProblem->confirm)){
                         $confirmProblem = $generationProblem->confirm;
 
-                        if (!empty($confirmProblem->questions)){
-                            QuestionsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                        }
-
                         if (!empty($confirmProblem->feedbacks)){
                             $feedbacksConfirm = $confirmProblem->feedbacks;
                             foreach ($feedbacksConfirm as $feedbackConfirm){
@@ -628,8 +624,8 @@ class SegmentController extends AppController
             GenerationProblem::deleteAll(['interview_id' => $interview->id]);
 
             $pathDelete = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"), "windows-1251")
-                . '/' . mb_strtolower(mb_convert_encoding($project->project_name, "windows-1251"),"windows-1251") .
-                '/segments/' . mb_strtolower(mb_convert_encoding($model->name, "windows-1251"), "windows-1251"));
+                . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
+                '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"), "windows-1251"));
             $this->delTree($pathDelete);
 
             if ($interview){

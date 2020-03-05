@@ -167,9 +167,9 @@ class GcpController extends AppController
             if ($model->save()){
 
                 $gcps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/';
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                    . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
 
                 $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
 
@@ -178,10 +178,10 @@ class GcpController extends AppController
                 }
 
                 $gcp_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
-                    mb_convert_encoding($project->project_name , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($segment->name , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($generationProblem->title , "windows-1251") . '/gcps/'
-                    . mb_convert_encoding($model->title , "windows-1251");
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                    . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
+                    . mb_convert_encoding($this->translit($model->title) , "windows-1251");
 
                 $gcp_dir = mb_strtolower($gcp_dir, "windows-1251");
 

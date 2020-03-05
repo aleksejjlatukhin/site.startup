@@ -34,7 +34,7 @@ AppAsset::register($this);
 
         <?php
         NavBar::begin([
-            'brandLabel' => Yii::$app->name = 'StartPool',
+            'brandLabel' => Yii::$app->name = '<span style="padding-left: 20px;">StartPool</span>',
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-fixed-top',
@@ -85,29 +85,29 @@ AppAsset::register($this);
 
     <div class="container">
 
-        <div class="arrow">
+        <!--<div class="arrow">
 
             <div id="arrow-container">
 
-                <?= Html::a('1.<br>Генерация<br>ГЦС', Url::to(['/target-segment']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('1.<br>Генерация<br>ГЦС', Url::to(['/target-segment']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('2.<br>Генерация<br>ГПС', Url::to(['/segment-problems']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('2.<br>Генерация<br>ГПС', Url::to(['/segment-problems']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('3.<br>Подтвержд<br>ение ГПС', Url::to(['/problem-confirmation']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('3.<br>Подтвержд<br>ение ГПС', Url::to(['/problem-confirmation']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('4.<br>Разработка<br>ГЦП', Url::to(['/value-proposition']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('4.<br>Разработка<br>ГЦП', Url::to(['/value-proposition']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('5.<br>Подтвержд<br>ение ГЦП', Url::to(['/offer-confirmation']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('5.<br>Подтвержд<br>ение ГЦП', Url::to(['/offer-confirmation']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('6.<br>Разработка<br>ГMVP', Url::to(['/development-mvp']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('6.<br>Разработка<br>ГMVP', Url::to(['/development-mvp']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('7.<br>Подтвержд<br>ение ГMVP', Url::to(['/mvp-confirmation']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('7.<br>Подтвержд<br>ение ГMVP', Url::to(['/mvp-confirmation']), ['class' => 'arrowlist'])*/?>
 
-                <?= Html::a('8.<br>Генерация<br>бизнес-модели', Url::to(['/business-model']), ['class' => 'arrowlist'])?>
+                <?/*= Html::a('8.<br>Генерация<br>бизнес-модели', Url::to(['/business-model']), ['class' => 'arrowlist'])*/?>
 
             </div>
 
-        </div>
+        </div>-->
 
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
@@ -129,7 +129,7 @@ AppAsset::register($this);
         <?php endif;?>
 
 
-        <h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
+        <!--<h5 class="d-inline p-2" style="font-weight: 700;text-transform: uppercase;text-align: center; background-color: #0972a5;color: #fff; height: 50px; line-height: 50px;margin-bottom: 0;">
             <div class="row">
 
                 <div class="col-md-3">
@@ -137,14 +137,14 @@ AppAsset::register($this);
                 </div>
 
                 <div class="col-md-9">
-                    <?= Html::encode($this->title) ?>
+                    <?/*= Html::encode($this->title) */?>
                 </div>
 
             </div>
-        </h5>
+        </h5>-->
 
 
-        <div class = "row">
+        <div class = "row" style="margin-top: -4px;">
 
             <?= $content ?>
 
@@ -154,7 +154,7 @@ AppAsset::register($this);
 </div>
 
 
-<script type="text/javascript">
+<!--<script type="text/javascript">
     try{
         var el=document.getElementById('arrow-container').getElementsByTagName('a');
         var url=document.location.href;
@@ -164,7 +164,7 @@ AppAsset::register($this);
             };
         };
     }catch(e){}
-</script>
+</script>-->
 
 
 <footer class="footer">
