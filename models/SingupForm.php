@@ -75,6 +75,8 @@ class SingupForm extends Model
         }
     }
 
+
+
     public function singup()
     {
         $user = new User();
@@ -85,6 +87,7 @@ class SingupForm extends Model
         $user->username = $this->username;
         $user->email = $this->email;
         $user->status = $this->status;
+        $user->role = 'user';
         $user->setPassword($this->password);
         $user->generateAuthKey();
         return $user->save() ? $user : null;

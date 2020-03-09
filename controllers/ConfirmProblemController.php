@@ -226,7 +226,7 @@ class ConfirmProblemController extends AppController
                     }
 
 
-                    $gps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    $gps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                         mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                         mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                         . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251");
@@ -238,7 +238,7 @@ class ConfirmProblemController extends AppController
                     }
 
 
-                    $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                         mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                         mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                         . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/feedbacks-confirm/';
@@ -363,7 +363,7 @@ class ConfirmProblemController extends AppController
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $model->id])->all();
         $project->update_at = date('Y:m:d');
 
-        $gps_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $gps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
             . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251");

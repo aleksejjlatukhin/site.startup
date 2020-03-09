@@ -231,12 +231,12 @@ class RespondController extends AppController
                 foreach ($models as $elem){
                     if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
 
-                        $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                             mb_convert_encoding($this->translit($elem->name) , "windows-1251") . '/';
 
-                        $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                             mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
@@ -247,7 +247,7 @@ class RespondController extends AppController
                     }
                 }
 
-                $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                     mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
@@ -310,7 +310,7 @@ class RespondController extends AppController
                 $descInterview->delete();
             }
 
-            $del_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                 mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                 mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                 mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';

@@ -108,7 +108,6 @@ class SiteController extends AppController
      */
     public function actionSingup()
     {
-        //$this->layout = 'first';
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -119,6 +118,11 @@ class SiteController extends AppController
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
             if ($user = $model->singup()){
                 if ($user->status === User::STATUS_ACTIVE){
+
+                    //В зависимости от роли пользователя
+                    // создаем папку на сервере
+                    $user->createDirName();
+
                     if (Yii::$app->getUser()->login($user)){
                         return $this->goHome();
                     }

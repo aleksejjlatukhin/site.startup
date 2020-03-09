@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Дата создания сегмента-->
                 <td style="vertical-align: middle;">
                     <?if (!empty($model->creat_date)) {
-                        echo date("d.m.", strtotime($model->creat_date));
+                        echo date("d.m.y", strtotime($model->creat_date));
                     }?>
                 </td>
 
@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Генерация ГПС - План-->
                 <td style="vertical-align: middle;">
                     <?if (!empty($model->plan_gps)) {
-                        echo date("d.m.", strtotime($model->plan_gps));
+                        echo date("d.m.y", strtotime($model->plan_gps));
                     }?>
                 </td>
 
@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_gps)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gps)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gps)),
                                 Url::to(['generation-problem/view', 'id' => $gps[$i]['id']]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -93,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_gps)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gps)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gps)),
                                 Url::to(['generation-problem/view', 'id' => $gps[$i]['id']]));
                         } ?>
                     </td>
@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Подтверждение ГПС - План-->
                 <td style="vertical-align: middle;">
                     <? if (!empty($model->plan_ps)){
-                        echo date("d.m.", strtotime($model->plan_ps));
+                        echo date("d.m.y", strtotime($model->plan_ps));
                     } ?>
                 </td>
 
@@ -115,7 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_ps)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_ps)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_ps)),
                                 Url::to(['generation-problem/view', 'id' => $confirmProblems[$i]->id]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -124,7 +124,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_ps)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_ps)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_ps)),
                                 Url::to(['generation-problem/view', 'id' => $confirmProblems[$i]->id]));
                         } ?>
                     </td>
@@ -135,7 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Разработка ГЦП - План-->
                 <td style="vertical-align: middle;">
                     <? if (!empty($model->plan_dev_gcp)){
-                        echo date("d.m.", strtotime($model->plan_dev_gcp));
+                        echo date("d.m.y", strtotime($model->plan_dev_gcp));
                     } ?>
                 </td>
 
@@ -146,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_dev_gcp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_dev_gcp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_dev_gcp)),
                                 Url::to(['gcp/view', 'id' => $offersGcp[$i]->id]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -155,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_dev_gcp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_dev_gcp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_dev_gcp)),
                                 Url::to(['gcp/view', 'id' => $offersGcp[$i]->id]));
                         } ?>
                     </td>
@@ -166,7 +166,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Подтверждение ГЦП - План-->
                 <td style="vertical-align: middle;">
                     <? if (!empty($model->plan_gcp)){
-                        echo date("d.m.", strtotime($model->plan_gcp));
+                        echo date("d.m.y", strtotime($model->plan_gcp));
                     } ?>
                 </td>
 
@@ -177,7 +177,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_gcp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gcp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gcp)),
                                 Url::to(['gcp/view', 'id' => $comfirmGcpses[$i]->id]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_gcp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gcp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gcp)),
                                 Url::to(['gcp/view', 'id' => $comfirmGcpses[$i]->id]));
                         } ?>
                     </td>
@@ -197,7 +197,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Разработка ГMVP - План-->
                 <td style="vertical-align: middle;">
                     <? if (!empty($model->plan_dev_gmvp)){
-                        echo date("d.m.", strtotime($model->plan_dev_gmvp));
+                        echo date("d.m.y", strtotime($model->plan_dev_gmvp));
                     } ?>
                 </td>
 
@@ -208,7 +208,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_dev_gmvp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_dev_gmvp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_dev_gmvp)),
                                 Url::to(['mvp/view', 'id' => $mvProds[$i]->id]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -217,7 +217,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_dev_gmvp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_dev_gmvp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_dev_gmvp)),
                                 Url::to(['mvp/view', 'id' => $mvProds[$i]->id]));
                         } ?>
                     </td>
@@ -228,7 +228,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Подтверждение ГMVP - План-->
                 <td style="vertical-align: middle;">
                     <? if (!empty($model->plan_gmvp)){
-                        echo date("d.m.", strtotime($model->plan_gmvp));
+                        echo date("d.m.y", strtotime($model->plan_gmvp));
                     } ?>
                 </td>
 
@@ -239,7 +239,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;background-color: red;">
                         <? if (!empty($model->fact_gmvp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gmvp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gmvp)),
                                 Url::to(['mvp/view', 'id' => $comfirmMvpses[$i]->id]), ['style' => ['color' => '#fff',]]);
                         } ?>
                     </td>
@@ -248,7 +248,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td style="vertical-align: middle;">
                         <? if (!empty($model->fact_gmvp)){
-                            echo Html::a(date("d.m.", strtotime($model->fact_gmvp)),
+                            echo Html::a(date("d.m.y", strtotime($model->fact_gmvp)),
                                 Url::to(['mvp/view', 'id' => $comfirmMvpses[$i]->id]));
                         } ?>
                     </td>

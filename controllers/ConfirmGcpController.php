@@ -223,7 +223,7 @@ class ConfirmGcpController extends AppController
                         }
                     }
 
-                    $feedbacks_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                    $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                     . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'

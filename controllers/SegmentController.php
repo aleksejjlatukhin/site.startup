@@ -76,7 +76,7 @@ class SegmentController extends AppController
 
         $models = Segment::find()->where(['project_id' => $project->id])->all();
 
-        $segments_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
 
         if (!file_exists($segments_dir)){
@@ -489,13 +489,13 @@ class SegmentController extends AppController
 
                     if ($model->id == $item->id && mb_strtolower($model->name) !== mb_strtolower($item->name)){
 
-                        $old_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                             . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
                             mb_convert_encoding($this->translit($item->name) , "windows-1251") . '/';
 
                         $old_dir = mb_strtolower($old_dir, "windows-1251");
 
-                        $new_dir = 'upload/'. mb_convert_encoding($user['username'], "windows-1251")
+                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                             . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
                             mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
 
@@ -623,7 +623,7 @@ class SegmentController extends AppController
             FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
             GenerationProblem::deleteAll(['interview_id' => $interview->id]);
 
-            $pathDelete = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"), "windows-1251")
+            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                 . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
                 '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"), "windows-1251"));
             $this->delTree($pathDelete);

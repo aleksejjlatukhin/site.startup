@@ -86,7 +86,7 @@ class DescInterviewController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
             mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
@@ -110,7 +110,7 @@ class DescInterviewController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
             mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
@@ -180,7 +180,7 @@ class DescInterviewController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                 mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                 mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                 mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
@@ -237,7 +237,7 @@ class DescInterviewController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                 mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                 mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                 mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
@@ -290,7 +290,7 @@ class DescInterviewController extends AppController
         $project->update_at = date('Y:m:d');
 
         if ($model->interview_file !== null){
-            unlink(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+            unlink(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                 mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                 mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
                 mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/' . $model->interview_file);

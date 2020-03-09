@@ -105,7 +105,7 @@ class FeedbackExpertMvpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
             . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
@@ -135,7 +135,7 @@ class FeedbackExpertMvpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
             . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
@@ -228,7 +228,7 @@ class FeedbackExpertMvpController extends AppController
 
             if ($kol == 0){
 
-                $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                $expert_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                     . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
@@ -319,7 +319,7 @@ class FeedbackExpertMvpController extends AppController
                 foreach ($models as $elem){
                     if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
 
-                        $old_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                             . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
@@ -327,7 +327,7 @@ class FeedbackExpertMvpController extends AppController
                             . mb_convert_encoding($this->translit($mvp->title) , "windows-1251") . '/feedbacks-confirm/'
                             . mb_convert_encoding($this->translit($elem->name) , "windows-1251") . '/';
 
-                        $new_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                             . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
@@ -341,7 +341,7 @@ class FeedbackExpertMvpController extends AppController
                     }
                 }
 
-                $expert_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/' .
+                $expert_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
                     . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'

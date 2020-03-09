@@ -1,5 +1,4 @@
 <?php
-use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -14,7 +13,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
 
 <p>
-    <h2><?= 'Сводная таблица проекта ' . Html::a(Html::encode(mb_strtolower('"' . $model->project_name . '"')), Url::to(['view', 'id' => $model->id])) ?>
+<h2><?= 'Сводная таблица проекта ' . Html::a(Html::encode(mb_strtolower('"' . $model->project_name . '"')), Url::to(['view', 'id' => $model->id])) ?>
 
     <?= Html::a('Дорожная карта проекта', ['segment/roadmap', 'id' => $model->id], ['class' => 'btn btn-default pull-right']) ?></h2>
 </p>
@@ -69,46 +68,51 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
         foreach ($problems as $k => $problem){
 
+            /*Если ГПС относится к выбранному сегменту*/
             if ($problem->interview_id == $segment->interview->id){
 
-                if (count($problem->confirm->gcps) != 0){
+                /*Если подтверждения ГПС не существует*/
+                if (empty($problem->confirm)){
+                    $countGcps[] = 1;
 
-                    foreach ($offers as $offer) {
-                        if ($offer->confirm_problem_id == $problem->confirm->id){
-                            if (count($offer->confirm->mvps) != 0){
+                /*Если подтверждения ГПС существует*/
+                }else {
+
+                    /*Если у ГПС существуют ГЦП и они являются массивом*/
+                    if (is_array($problem->confirm->gcps) && !empty($problem->confirm->gcps)){
+
+                        /*Проходимся циклом по ГЦП*/
+                        foreach ($offers as $i => $offer) {
+
+                            /*Если у выбранной ГЦП существуют ГMVP и они являются массивом и ГЦП относится к выбранной ГПС*/
+                            if (is_array($offer->confirm->mvps) && !empty($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
+
                                 $countGcps[$k] += count($offer->confirm->mvps);
-                            }
-                            if (count($offer->confirm->mvps) == 0){
+
+                            /*Если у выбранной ГЦП не существуют ГMVP и ГЦП относится к выбранной ГПС*/
+                            }elseif (empty($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
+
                                 $countGcps[$k]++;
                             }
                         }
                     }
                 }
 
-                if (count($problem->confirm->gcps) == 0) {
-                    $countGcps[$k] = count($problem->confirm->gcps);
-                    foreach ($countGcps as $h => $countGcp) {
-                        if ($countGcps[$h] == 0) {
-                            $countGcps[$h] = 1;
-                        }
-                    }
+                /*Если у ГПС не существует ГЦП*/
+                if (is_array($problem->confirm->gcps) && empty($problem->confirm->gcps)) {
+                    $countGcps[] = 1;
                 }
 
 
-                if (empty($problem->confirm->gcps)){
-                    $countMvps[] = 1;
-                }
+                foreach ($offers as $y => $offer) {
 
-                foreach ($offers as $offer) {
+                    /*Если не существует подтверждение ГЦП и ГЦП относится к выбранной ГПС*/
+                    if (empty($offer->confirm) && $offer->confirm_problem_id == $problem->confirm->id){
 
-                    if ($offer->confirm_problem_id == $problem->confirm->id){
+                        $countMvps[$y] = 1;
 
-                        $countGcpsConfirm[] = count($offer->confirm->mvps);
-                        foreach ($countGcpsConfirm as $i => $countGcpConfirm){
-                            if ($countGcpsConfirm[$i] == 0){
-                                $countGcpsConfirm[$i] = 1;
-                            }
-                        }
+                    /*Если у выбранной ГЦП существует массив ГMVP и ГЦП относится к выбранной ГПС*/
+                    }elseif (is_array($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
 
                         $countMvps[] = count($offer->confirm->mvps);
                         foreach ($countMvps as $i => $countMvp){
@@ -121,9 +125,10 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             }
         }
 
-        $countG = array_sum($countGcps);
         $countM = array_sum($countMvps);
         $minHeight = 35;
+        //debug($countMvps);
+        //debug($countGcps);
 
     }
 
@@ -192,17 +197,17 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                     if ($problem->exist_confirm === 0){
 
                         /*Если подтверждение ГПС отрицательное выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">  </div>';
+                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
 
                     }elseif ($problem->exist_confirm === 1){
 
                         /*Если подтверждение ГПС положительное выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
+                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
 
                     }elseif ($problem->exist_confirm === null){
 
                         /*Если подтверждение ГПС отсутствует или не закончено выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">  </div>';
+                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
                     }
                 }
 
@@ -211,7 +216,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
                     if ($offer->confirm_problem_id == $problem->confirm->id) {
                         //debug($countMvps[$j]);
-                        echo '<div class="border-gray" style="line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</div>';
+                        echo '<div class="border-gray" style="line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</div>';
                     }
                 }
             }
@@ -229,7 +234,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                 if (empty($problem->confirm->gcps)){
 
                     /*Если не  существует ГЦП выводим следующее*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">  </div>';
+                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
                 }
 
 
@@ -241,17 +246,17 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                         if ($offer->exist_confirm === 1) {
 
                             /*Если подтверждение ГЦП положительное выводим следующее*/
-                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
+                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
                         }
                         if ($offer->exist_confirm === 0) {
 
                             /*Если подтверждение ГЦП отрицательное выводим следующее*/
-                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
+                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
                         }
                         if ($offer->exist_confirm === null) {
 
                             /*Если подтверждение ГЦП отсутствует или не закончено выводим следующее*/
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcpsConfirm[$j] . 'px; height: ' . $minHeight * $countGcpsConfirm[$j] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
+                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
                         }
                     }
                 }
@@ -438,6 +443,10 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
     </tbody>
 </table>
+
+
+
+
 
 
 
