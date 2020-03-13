@@ -1,4 +1,4 @@
-<?php
+
 
 namespace app\models;
 
@@ -25,9 +25,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['second_name','first_name','middle_name', 'telephone', 'username', 'email', 'password'], 'filter', 'filter' => 'trim'],
-            [['second_name','first_name','middle_name', 'email', 'telephone'], 'string', 'max' => 255],
-            [['second_name','first_name','middle_name', 'username', 'email', 'status'], 'required'],
+            [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_image'], 'filter', 'filter' => 'trim'],
+            [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_image'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status'], 'required'],
             ['email', 'email'],
             ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
             ['username', 'string', 'min' => 3, 'max' => 32],
@@ -35,7 +35,10 @@ class User extends ActiveRecord implements IdentityInterface
             ['password', 'required', 'on' => 'create'],
             ['username', 'unique', 'message' => 'Этот логин уже занят.'],
             ['email', 'unique', 'message' => 'Эта почта уже зарегистрирована.'],
-            ['secret_key', 'unique']
+            ['secret_key', 'unique'],
+            ['avatar_image', 'default', 'value' => function () {
+                return \Yii::getAlias('@web/images/avatar/default.jpg');
+            }],
         ];
     }
 
@@ -151,7 +154,8 @@ class User extends ActiveRecord implements IdentityInterface
      * таблицы user для нового пользователя.
      * Вызываеться из модели RegForm.
      */
-    public function generateAuthKey(){
+    public function generateAuthKey()
+    {
         $this->auth_key = \Yii::$app->security->generateRandomString();
     }
 
@@ -169,8 +173,7 @@ class User extends ActiveRecord implements IdentityInterface
     // для смены пароля через почту
     public static function findBySecretKey($key)
     {
-        if (!static::isSecretKeyExpire($key))
-        {
+        if (!static::isSecretKeyExpire($key)) {
             return null;
         }
         return static::findOne([
@@ -182,7 +185,7 @@ class User extends ActiveRecord implements IdentityInterface
     // для смены пароля через почту
     public function generateSecretKey()
     {
-        $this->secret_key = \Yii::$app->security->generateRandomString().'_'.time();
+        $this->secret_key = \Yii::$app->security->generateRandomString() . '_' . time();
     }
 
 
@@ -198,30 +201,29 @@ class User extends ActiveRecord implements IdentityInterface
     // для смены пароля через почту
     public static function isSecretKeyExpire($key)
     {
-        if (empty($key))
-        {
+        if (empty($key)) {
             return false;
         }
         $expire = \Yii::$app->params['secretKeyExpire'];
         $parts = explode('_', $key);
-        $timestamp = (int) end($parts);
+        $timestamp = (int)end($parts);
 
         return $timestamp + $expire >= time();
     }
 
     //Создание папки username
-    public function createDirName ()
+    public function createDirName()
     {
-        if ($this->role == 'user'){
+        if ($this->role == 'user') {
 
             $user_dir = UPLOAD . mb_convert_encoding($this->username, "windows-1251") . '/';
             $user_dir = mb_strtolower($user_dir, "windows-1251");
-            if (!file_exists($user_dir)){
+            if (!file_exists($user_dir)) {
                 mkdir($user_dir, 0777);
             }
 
             return true;
-        }else{
+        } else {
             return false;
         }
     }

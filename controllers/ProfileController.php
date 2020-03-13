@@ -7,6 +7,8 @@ use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Mvp;
+use app\models\PasswordChangeForm;
+use app\models\ProfileForm;
 use app\models\Projects;
 use app\models\Segment;
 use Yii;
@@ -70,6 +72,54 @@ class ProfileController extends AppController
 
         return $this->render('index', [
             'user' => $user,
+        ]);
+    }
+
+
+    public function actionUpdateProfile()
+    {
+
+        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $model = new ProfileForm();
+
+        $model->second_name = $user->second_name;
+        $model->first_name = $user->first_name;
+        $model->middle_name = $user->middle_name;
+        $model->telephone = $user->telephone;
+        $model->username = $user->username;
+        $model->email = $user->email;
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()){
+
+            if ($model->update()){
+
+                return $this->redirect(['index']);
+            }
+        }
+
+        return $this->render('update-profile', [
+            'user' => $user,
+            'model' => $model,
+        ]);
+
+    }
+
+    public function actionChangePassword()
+    {
+        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $model = new PasswordChangeForm($user, []);
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()){
+
+            if ($model->changePassword()){
+
+                return $this->redirect(['index']);
+            }
+        }
+
+        return $this->render('change-password', [
+            'user' => $user,
+            'model' => $model,
         ]);
     }
 
