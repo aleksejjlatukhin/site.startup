@@ -92,15 +92,19 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'patent_date', [
-                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                    'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-2">{input}</div><div class="col-md-6"></div>'
                 ])->widget(\yii\jui\DatePicker::class, [
-                    'dateFormat' => 'yyyy-MM-dd',
+                    'dateFormat' => 'dd.MM.yyyy',
                     //'inline' => true,
                     'clientOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-MM-dd',
+                        'format' => 'dd.MM.yyyy',
                     ],
                     //'language' => 'ru',
+                    'options' => [
+                        'class' => 'form-control input-md',
+                        'readOnly'=>'readOnly'
+                    ],
                 ]) ?>
             </div>
 
@@ -276,15 +280,19 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'register_date', [
-                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                    'template' => '<div class="col-md-3" style="padding-top: 5px;">{label}</div><div class="col-md-2">{input}</div><div class="col-md-7"></div>'
                 ])->widget(\yii\jui\DatePicker::class, [
-                    'dateFormat' => 'yyyy-MM-dd',
+                    'dateFormat' => 'dd.MM.yyyy',
                     //'inline' => true,
                     'clientOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-MM-dd',
+                        'format' => 'dd.MM.yyyy',
                     ],
                     //'language' => 'ru',
+                    'options' => [
+                        'class' => 'form-control input-md',
+                        'readOnly'=>'readOnly'
+                    ],
                 ]) ?>
             </div>
 
@@ -325,21 +333,25 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'invest_amount', [
-                    'template' => '<div class="col-md-6" style="padding-top: 15px;">{label}</div><div class="col-md-6">{input}</div><div class="col-sm-6">{error}</div>'
+                    'template' => '<div class="col-md-4" style="padding-top: 7px;">{label}</div><div class="col-md-3">{input}</div><div class="col-md-5"></div>'
                 ])->textInput(['type' => 'number']);?>
             </div>
 
             <div class="row" style="margin-bottom: 15px;">
                 <?= $form->field($model, 'invest_date', [
-                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                    'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-2">{input}</div><div class="col-md-6"></div>'
                 ])->widget(\yii\jui\DatePicker::class, [
-                    'dateFormat' => 'yyyy-MM-dd',
+                    'dateFormat' => 'dd.MM.yyyy',
                     //'inline' => true,
                     'clientOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-MM-dd',
+                        'format' => 'dd.MM.yyyy',
                     ],
                     //'language' => 'ru',
+                    'options' => [
+                        'class' => 'form-control input-md',
+                        'readOnly'=>'readOnly'
+                    ],
                 ]) ?>
             </div>
 
@@ -365,15 +377,19 @@ use yii\helpers\Url;
 
             <div class="row" style="margin-bottom: 20px;">
                 <?= $form->field($model, 'date_of_announcement', [
-                    'template' => '<div class="col-md-5" style="padding-top: 5px;">{label}</div><div class="col-md-5">{input}</div>'
+                    'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-2">{input}</div><div class="col-md-6"></div>'
                 ])->widget(\yii\jui\DatePicker::class, [
-                    'dateFormat' => 'yyyy-MM-dd',
+                    'dateFormat' => 'dd.MM.yyyy',
                     //'inline' => true,
                     'clientOptions' => [
                         'autoclose' => true,
-                        'format' => 'yyyy-MM-dd',
+                        'format' => 'dd.MM.yyyy',
                     ],
                     //'language' => 'ru',
+                    'options' => [
+                        'class' => 'form-control input-md',
+                        'readOnly'=>'readOnly'
+                    ],
                 ]) ?>
             </div>
 

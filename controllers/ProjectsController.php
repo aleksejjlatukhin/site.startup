@@ -199,6 +199,20 @@ class ProjectsController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
+            /*Преобразование даты в число*/
+            if ($model->patent_date){
+                $model->patent_date = strtotime($model->patent_date);
+            }
+            if ($model->register_date){
+                $model->register_date = strtotime($model->register_date);
+            }
+            if ($model->invest_date){
+                $model->invest_date = strtotime($model->invest_date);
+            }
+            if ($model->date_of_announcement){
+                $model->date_of_announcement = strtotime($model->date_of_announcement);
+            }
+
             $modelsConcept = Model::createMultiple(Segment::class);
             Model::loadMultiple($modelsConcept, Yii::$app->request->post());
 
@@ -335,6 +349,21 @@ class ProjectsController extends AppController
         $model->update_at = date('Y:m:d');
 
         if ($model->load(Yii::$app->request->post())) {
+
+            /*Преобразование даты в число*/
+            if ($model->patent_date){
+                $model->patent_date = strtotime($model->patent_date);
+            }
+            if ($model->register_date){
+                $model->register_date = strtotime($model->register_date);
+            }
+            if ($model->invest_date){
+                $model->invest_date = strtotime($model->invest_date);
+            }
+            if ($model->date_of_announcement){
+                $model->date_of_announcement = strtotime($model->date_of_announcement);
+            }
+
 
             $oldIDs = ArrayHelper::map($modelsConcept, 'id', 'id');
             $modelsConcept = Model::createMultiple(Segment::class, $modelsConcept);

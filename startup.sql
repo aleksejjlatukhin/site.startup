@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 13 2020 г., 13:39
+-- Время создания: Мар 15 2020 г., 15:42
 -- Версия сервера: 5.6.43
 -- Версия PHP: 5.6.38
 
@@ -449,18 +449,18 @@ CREATE TABLE `projects` (
   `description` text,
   `rid` varchar(255) DEFAULT NULL,
   `patent_number` varchar(255) DEFAULT NULL,
-  `patent_date` date DEFAULT NULL,
+  `patent_date` int(11) DEFAULT NULL,
   `patent_name` text,
   `core_rid` text,
   `technology` varchar(255) DEFAULT NULL,
   `layout_technology` text,
   `register_name` varchar(255) DEFAULT NULL,
-  `register_date` date DEFAULT NULL,
+  `register_date` int(11) DEFAULT NULL,
   `site` varchar(255) DEFAULT NULL,
   `invest_name` varchar(255) DEFAULT NULL,
-  `invest_date` date DEFAULT NULL,
+  `invest_date` int(11) DEFAULT NULL,
   `invest_amount` int(11) DEFAULT NULL,
-  `date_of_announcement` date DEFAULT NULL,
+  `date_of_announcement` int(11) DEFAULT NULL,
   `announcement_event` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -469,7 +469,7 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `update_at`, `project_fullname`, `project_name`, `description`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`) VALUES
-(1, 1, '2020-03-06', '2020-03-07', 'Проект 1', 'Проект 1', '', '', '', NULL, '', '', '', '', '', NULL, '', '', NULL, NULL, NULL, '');
+(1, 1, '2020-03-06', '2020-03-15', 'Проект 1', 'Проект 1', '', '', '', 1584478800, '', '', '', '', 'Зарегистрированное юр. лицо', 1584392400, 'Адрес сайта', 'Инвестор', 1584219600, 6000000, 1584306000, 'Мероприятие, на котором проект анонсирован впервые');
 
 -- --------------------------------------------------------
 
@@ -839,7 +839,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
@@ -947,7 +947,7 @@ ALTER TABLE `pre_files`
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `questions`
@@ -983,7 +983,7 @@ ALTER TABLE `responds_mvp`
 -- AUTO_INCREMENT для таблицы `segments`
 --
 ALTER TABLE `segments`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `user`
