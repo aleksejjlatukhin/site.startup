@@ -25,24 +25,33 @@ use yii\widgets\ActiveForm;
                 ])->textInput(['type' => 'number']);?>
             </div>
 
-            <h4><u>Текст легенды</u></h4>
+            <h4><u>Текст легенды проблемного интервью</u></h4>
 
             <div class="row">
+
+                <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
+
                 <?= $form->field($model, 'greeting_interview', [
                     'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textInput(['maxlength' => true]) ?>
+                ])->textarea(['rows' => 2, 'placeholder' => $placeholder]) ?>
             </div>
 
             <div class="row" style="margin-top: 10px;">
+
+                <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+
                 <?= $form->field($model, 'view_interview', [
                     'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textInput(['maxlength' => true]) ?>
+                ])->textarea(['rows' => 2, 'placeholder' => $placeholder]) ?>
             </div>
 
             <div class="row" style="margin-top: 10px;">
+
+                <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
+
                 <?= $form->field($model, 'reason_interview', [
                     'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textInput(['maxlength' => true]) ?>
+                ])->textarea(['rows' => 2, 'placeholder' => $placeholder]) ?>
             </div>
 
             <div class="d-inline p-2 bg-success text-center" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;margin: 20px 0;">Примерный список вопросов для проведения интервью</div>

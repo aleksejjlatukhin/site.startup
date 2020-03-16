@@ -30,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <th scope="col" rowspan="2" style="width: 250px;text-align: center;padding-bottom: 25px">Данные респондента</th>
             <th scope="col" colspan="2" style="text-align: center; width: 140px;">Дата интервью</th>
             <th scope="col" rowspan="2" style="width: 250px;text-align: center;padding-bottom: 25px">Место проведения</th>
+            <th scope="col" rowspan="2" style="width: 250px;text-align: center;padding-bottom: 25px">Варианты проблем</th>
         </tr>
         <tr class="text-center">
             <td style="width: 70px;">План</td>
@@ -71,6 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <td><? if (!empty($model->place_interview)){
                         echo $model->place_interview;
+                    } ?></td>
+
+                <td><? if (!empty($model->descInterview)){
+                        echo $model->descInterview->result;
                     } ?></td>
 
             </tr>

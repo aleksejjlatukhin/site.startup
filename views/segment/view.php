@@ -30,13 +30,13 @@ $this->params['breadcrumbs'][] = $model->name;
 
         <? if (!empty($model->field_of_activity) && !empty($model->sort_of_activity) && !empty($model->age) &&
             !empty($model->income) && !empty($model->quantity) && !empty($model->market_volume)) {
-                echo Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $model->id], ['class' => 'btn btn-default']);
+                echo Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $model->id], ['class' => 'btn btn-default pull-right']);
         }?>
 
         <?php if(!($model->interview)) : ?>
-            <?= Html::a('Переход к генерации ГПС >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Переход к генерации ГПС >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
-            <?= Html::a('Генерация ГПС >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success pull-right']) ?>
+            <?= Html::a('Генерация ГПС >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success']) ?>
         <?php endif;?>
 
     </p>
