@@ -41,4 +41,12 @@ $(document).ready(function() {
 
     /*Разворащивающееся меню*/
     //$('.catalog').dcAccordion({speed:300});
+
+    /*Всплывающие подсказки в сводной таблице проекта*/
+    $('[data-toggle="tooltip"]').tooltip({
+        placement: "top",
+        delay: {"show": 100, "hide": 100},
+    });
+
+
 });

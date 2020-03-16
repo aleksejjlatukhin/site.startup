@@ -158,11 +158,11 @@ class GcpController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $model->description = 'Наш продукт "' . mb_strtolower($model->good) . '" ';
-            $model->description .= 'помогает "' . mb_strtolower($segment->name) . '", ';
-            $model->description .= 'который хочет удовлетворить проблему "' . mb_strtolower($generationProblem->description) . '", ';
-            $model->description .= 'избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, "' . mb_strtolower($model->benefit) . '", ';
-            $model->description .= 'в отличии от "' . mb_strtolower($model->contrast) . '".';
+            $model->description = 'Наш продукт ' . mb_strtolower($model->good) . ' ';
+            $model->description .= 'помогает ' . mb_strtolower($segment->name) . ', ';
+            $model->description .= 'который хочет удовлетворить проблему ' . mb_strtolower($generationProblem->description) . ', ';
+            $model->description .= 'избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, ' . mb_strtolower($model->benefit) . ', ';
+            $model->description .= 'в отличии от ' . mb_strtolower($model->contrast) . '.';
 
             if ($model->save()){
 

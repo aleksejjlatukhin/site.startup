@@ -134,7 +134,7 @@ class ConfirmProblemController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $generationProblem->exist_confirm = 0;
-        $generationProblem->date_confirm = null;
+        $generationProblem->date_confirm = date('Y:m:d');
 
         if ($generationProblem->save()){
 
