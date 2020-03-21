@@ -42,10 +42,34 @@ $(document).ready(function() {
     /*Разворащивающееся меню*/
     //$('.catalog').dcAccordion({speed:300});
 
-    /*Всплывающие подсказки в сводной таблице проекта*/
-    $('[data-toggle="tooltip"]').tooltip({
+    /*Всплывающие подсказки в сводной таблице проекта(Bootstrap)*/
+    /*$('[data-toggle="tooltip"]').tooltip({
         placement: "top",
         delay: {"show": 100, "hide": 100},
+    });*/
+
+    /*Всплывающие подсказки в сводной таблице проекта (Query UI Tooltip)*/
+    $('[data-toggle="tooltip"]').tooltip({
+        /*position: {
+            my: "center bottom-10",
+            at: "center top",
+        },
+        show: {
+            effect: "slideDown",
+            delay: 100
+        },*/
+        position: {
+            my: "center bottom-20",
+            at: "center top",
+            using: function( position, feedback ) {
+                $( this ).css( position );
+                $( "<div>" )
+                    .addClass( "pro-tooltip" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+            }
+        }
     });
 
 });

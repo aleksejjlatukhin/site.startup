@@ -129,7 +129,7 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
         foreach ($segments as $k => $segment){
 
             /*Выводим названия сегментов*/
-            echo '<tr style="text-align: center"><td style="vertical-align: middle; height: ' . $minHeight *  $countM[$k] . 'px">' . Html::a(Html::encode($segment->name), Url::to(['segment/view', 'id' => $segment->id])). '</td>';
+            echo '<tr style="text-align: center"><td style="font-weight: 700; vertical-align: middle; height: ' . $minHeight *  $countM[$k] . 'px">' . Html::a(Html::encode($segment->name), Url::to(['segment/view', 'id' => $segment->id])). '</td>';
 
             /*Выводим ГПС*/
             echo '<td style="padding: 0;">';
@@ -144,7 +144,7 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
 
                 if ($problem->interview_id == $segment->interview->id) {
 
-                    echo '<div class="border-gray" style="line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">
+                    echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">
                 
                     <span data-toggle="tooltip" title="'.$problem->description.'">' . Html::a(Html::encode($problem->title), Url::to(['generation-problem/view', 'id' => $problem->id])) . '</span>
                 
@@ -190,10 +190,10 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
 
                     /*Если есть подтверждение то выводим его результат*/
                     if ($problem->exist_confirm === 1) {
-                        echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m', strtotime($problem->date_confirm)) .'</div>';
+                        echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m', strtotime($problem->date_confirm)) .'</div>';
                     }
                     if ($problem->exist_confirm === 0) {
-                        echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m', strtotime($problem->date_confirm)) .'</div>';
+                        echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m', strtotime($problem->date_confirm)) .'</div>';
                     }
 
                     /*Если у существующей ГПС нет подтверждения то выводим следующее*/
@@ -239,7 +239,7 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
 
                         if ($offer->confirm_problem_id == $problem->confirm->id) {
                             //debug($countMvps[$j]);
-                            echo '<div class="border-gray" style="line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">
+                            echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">
                         
                             <span data-toggle="tooltip" title="'.$offer->description.'">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</span>
                         
@@ -315,12 +315,12 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
                             if ($offer->exist_confirm === 1) {
 
                                 /*Если подтверждение ГЦП положительное выводим следующее*/
-                                echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m', strtotime($offer->date_confirm)) .'</div>';
+                                echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m', strtotime($offer->date_confirm)) .'</div>';
                             }
                             if ($offer->exist_confirm === 0) {
 
                                 /*Если подтверждение ГЦП отрицательное выводим следующее*/
-                                echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m', strtotime($offer->date_confirm)) .'</div>';
+                                echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m', strtotime($offer->date_confirm)) .'</div>';
                             }
                             if ($offer->exist_confirm === null) {
 
@@ -379,7 +379,7 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
                                 if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
 
                                     /*Выводим название соответствующего ГMVP*/
-                                    echo '<div class="border-gray" style="line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">
+                                    echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">
                                 
                                     <span data-toggle="tooltip" title="'.$mvProduct->description.'">' . Html::a(Html::encode($mvProduct->title), Url::to(['mvp/view', 'id' => $mvProduct->id])) . '</span>
                                 
@@ -474,12 +474,12 @@ $this->title = 'Сводная таблица проекта ' . '"' . mb_strtol
                                     if ($mvProduct->exist_confirm === 1) {
 
                                         /*Если подтверждение ГMVP положительное выводим следующее*/
-                                        echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m', strtotime($mvProduct->date_confirm)) .'</div>';
+                                        echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m', strtotime($mvProduct->date_confirm)) .'</div>';
                                     }
                                     if ($mvProduct->exist_confirm === 0) {
 
                                         /*Если подтверждение ГMVP отрицательное выводим следующее*/
-                                        echo '<div class="border-gray" style="font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m', strtotime($mvProduct->date_confirm)) .'</div>';
+                                        echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m', strtotime($mvProduct->date_confirm)) .'</div>';
                                     }
                                     if ($mvProduct->exist_confirm === null) {
 
