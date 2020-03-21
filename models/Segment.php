@@ -46,13 +46,45 @@ class Segment extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'age', 'income', 'quantity', 'market_volume'], 'trim'],
+            [['name', 'field_of_activity', 'sort_of_activity', 'add_info'], 'trim'],
             [['project_id'], 'integer'],
-            [['age', 'income', 'quantity', 'market_volume'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '999999999'],
+            [['age_from', 'age_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '100'],
+            ['age_from', 'uniqueAge'],
+            [['income_from', 'income_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '1000'],
+            ['income_from', 'uniqueIncome'],
+            [['quantity_from', 'quantity_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '1000'],
+            ['quantity_from', 'uniqueQuantity'],
+            [['market_volume_from', 'market_volume_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '1000'],
+            ['market_volume_from', 'uniqueMarketVolume'],
             [['field_of_activity', 'sort_of_activity', 'add_info'], 'string'],
             [['name',], 'string', 'min' => 6, 'max' => 48],
             [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
+    }
+
+
+    public function uniqueAge($attr){
+        if ($this->age_from == $this->age_to){
+            $this->addError($attr, 'Значения не должны совпадать.');
+        }
+    }
+
+    public function uniqueIncome($attr){
+        if ($this->income_from == $this->income_to){
+            $this->addError($attr, 'Значения не должны совпадать.');
+        }
+    }
+
+    public function uniqueQuantity($attr){
+        if ($this->quantity_from == $this->quantity_to){
+            $this->addError($attr, 'Значения не должны совпадать.');
+        }
+    }
+
+    public function uniqueMarketVolume($attr){
+        if ($this->market_volume_from == $this->market_volume_to){
+            $this->addError($attr, 'Значения не должны совпадать.');
+        }
     }
 
     /**
@@ -66,10 +98,10 @@ class Segment extends \yii\db\ActiveRecord
             'name' => 'Наименование сегмента',
             'field_of_activity' => 'Сфера деятельности потребителя',
             'sort_of_activity' => 'Род деятельности потребителя',
-            'age' => 'Возраст потребителя',
-            'income' => 'Доход потребителя (руб./мес.)',
-            'quantity' => 'Потенциальное количество потребителей (ед.)',
-            'market_volume' => 'Объем рынка (млн. руб./год)',
+            'age_from' => 'Возраст потребителя',
+            'income_from' => 'Доход потребителя (тыс. руб./мес.)',
+            'quantity_from' => 'Потенциальное количество потребителей (тыс. чел.)',
+            'market_volume_from' => 'Объем рынка (млн. руб./год)',
             'add_info' => 'Дополнительная информация',
             'creat_date' => 'Дата создания',
             'plan_gps' => 'План',

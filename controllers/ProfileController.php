@@ -218,6 +218,8 @@ class ProfileController extends AppController
     }
 
 
+
+
     public function actionRoadmap($id)
     {
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
@@ -246,20 +248,19 @@ class ProfileController extends AppController
             if (!empty($problems)){
 
                 foreach ($problems as $k => $problem){
-
                     /*Выбираем последнюю добавленную ГПС*/
                     if (($k+1) == count($problems)){
+
+                        $gps[] = $problem;
+
                         if (!empty($problem)){
-
-                            $gps[] = $problem;
-
                             if ($model->fact_gps !== $problem->date_gps){
                                 $model->fact_gps = $problem->date_gps;
                                 $model->save();
                             }
                         }
                     }
-                    if ($problem->date_confirm !== null){
+                    if ($problem->exist_confirm === 1){
                         $confirmGps[] = $problem;
                     }
 
@@ -280,7 +281,7 @@ class ProfileController extends AppController
 
                 foreach ($offers as $i => $offer){
 
-                    if ($offer->date_confirm !== null){
+                    if ($offer->exist_confirm === 1){
                         $comfirmGcps[] = $offer;
                     }
 
@@ -333,8 +334,8 @@ class ProfileController extends AppController
         }
 
 
+
         return $this->render('roadmap', [
-            'user' => $user,
             'project' => $project,
             'models' => $models,
             'gps' => $gps,

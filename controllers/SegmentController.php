@@ -213,7 +213,7 @@ class SegmentController extends AppController
                             }
                         }
                     }
-                    if ($problem->date_confirm !== null){
+                    if ($problem->exist_confirm === 1){
                         $confirmGps[] = $problem;
                     }
 
@@ -234,7 +234,7 @@ class SegmentController extends AppController
 
                 foreach ($offers as $i => $offer){
 
-                    if ($offer->date_confirm !== null){
+                    if ($offer->exist_confirm === 1){
                         $comfirmGcps[] = $offer;
                     }
 
@@ -326,7 +326,7 @@ class SegmentController extends AppController
                     }
                 }
 
-                if ($problem->date_confirm !== null){
+                if ($problem->exist_confirm === 1){
                     $confirmGps[] = $problem;
                 }
 
@@ -339,7 +339,7 @@ class SegmentController extends AppController
 
 
         $confirmProblem = $this->firstConfirm($confirmGps);
-
+        //debug($confirmProblem);
         if ($model->fact_ps !== $confirmProblem->date_confirm){
             $model->fact_ps = $confirmProblem->date_confirm;
             $model->save();
@@ -357,7 +357,7 @@ class SegmentController extends AppController
 
         foreach ($offers as $i => $offer){
 
-            if ($offer->date_confirm !== null){
+            if ($offer->exist_confirm === 1){
                 $comfirmGcps[] = $offer;
             }
 
@@ -372,6 +372,7 @@ class SegmentController extends AppController
 
 
         $confirmGcp = $this->firstConfirm($comfirmGcps);
+        //debug($confirmGcp);
 
         if ($model->fact_gcp !== $confirmGcp->date_confirm){
             $model->fact_gcp = $confirmGcp->date_confirm;
@@ -505,12 +506,13 @@ class SegmentController extends AppController
                     }
                 }
 
-                if ($model->save()){
+                if ($model->validate() && $model->save()){
 
                     if ($project->save()) {
 
-                        if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age'] &&
-                            $_POST['Segment']['income'] && $_POST['Segment']['quantity'] && $_POST['Segment']['market_volume'])
+                        if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age_from'] && $_POST['Segment']['age_to']
+                            && $_POST['Segment']['income_from'] && $_POST['Segment']['income_to'] && $_POST['Segment']['quantity_from'] && $_POST['Segment']['quantity_to']
+                            && $_POST['Segment']['market_volume_from'] && $_POST['Segment']['market_volume_to'])
                         {
                             if (empty($model->creat_date))
                             {

@@ -36,30 +36,60 @@ $this->params['breadcrumbs'][] = 'Редактирование';
                                 'name',
                                 'field_of_activity:ntext',
                                 'sort_of_activity:ntext',
-                                'age',
+
+                                [
+                                    'attribute' => 'age',
+                                    'label' => 'Возраст потребителя',
+                                    'value' => function ($model) {
+                                        if ($model->age_from !== null && $model->age_to !== null){
+                                            return 'от ' . number_format($model->age_from, 0, '', ' ') . ' до '
+                                                . number_format($model->age_to, 0, '', ' ');
+                                        }
+                                    },
+                                ],
+
 
                                 [
                                     'attribute' => 'income',
-                                    'value' => number_format($segment->income, 0, '', ' '),
-
+                                    'label' => 'Доход потребителя (тыс. руб./мес.)',
+                                    'value' => function ($model) {
+                                        if ($model->income_from !== null && $model->income_to !== null){
+                                            return 'от ' . number_format($model->income_from, 0, '', ' ') . ' до '
+                                                . number_format($model->income_to, 0, '', ' ');
+                                        }
+                                    },
                                 ],
+
 
                                 [
                                     'attribute' => 'quantity',
-                                    'value' => number_format($segment->quantity, 0, '', ' '),
-
+                                    'label' => 'Потенциальное количество потребителей (тыс. чел.)',
+                                    'value' => function ($model) {
+                                        if ($model->quantity_from !== null && $model->quantity_to !== null){
+                                            return 'от ' . number_format($model->quantity_from, 0, '', ' ') . ' до '
+                                                . number_format($model->quantity_to, 0, '', ' ');
+                                        }
+                                    },
                                 ],
+
 
                                 [
                                     'attribute' => 'market_volume',
-                                    'value' => number_format($segment->market_volume, 0, '', ' '),
-
+                                    'label' => 'Объем рынка (млн. руб./год)',
+                                    'value' => function ($model) {
+                                        if ($model->market_volume_from !== null && $model->market_volume_to !== null){
+                                            return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . ' до '
+                                                . number_format($model->market_volume_to, 0, '', ' ');
+                                        }
+                                    },
                                 ],
+
 
                                 [
                                     'attribute' => 'add_info',
-                                    'visible' => !empty($segment->add_info),
+                                    'visible' => !empty($model->add_info),
                                 ],
+
                             ],
                         ]) ?>
 

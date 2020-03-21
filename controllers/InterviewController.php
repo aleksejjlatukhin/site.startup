@@ -130,8 +130,7 @@ class InterviewController extends AppController
         $user = Yii::$app->user->identity;
         $segment = Segment::findOne($id);
 
-        if ($segment->field_of_activity == null || $segment->sort_of_activity == null || $segment->age == null ||
-            $segment->income == null || $segment->quantity == null || $segment->market_volume == null){
+        if (empty($segment->creat_date)){
             Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о сегменте!");
             return $this->redirect(['segment/view', 'id' => $id]);
         }

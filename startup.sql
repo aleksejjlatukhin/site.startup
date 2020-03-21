@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 15 2020 г., 15:42
+-- Время создания: Мар 21 2020 г., 11:09
 -- Версия сервера: 5.6.43
 -- Версия PHP: 5.6.38
 
@@ -41,7 +41,8 @@ CREATE TABLE `authors` (
 --
 
 INSERT INTO `authors` (`id`, `project_id`, `fio`, `role`, `experience`) VALUES
-(1, 1, 'Иванов Иван Иванович', 'Главный', '');
+(1, 1, 'Иванов Иван Иванович', 'Главный', ''),
+(2, 2, 'Иванов Иван Иванович', 'Главный', '');
 
 -- --------------------------------------------------------
 
@@ -89,7 +90,8 @@ CREATE TABLE `confirm_gcp` (
 INSERT INTO `confirm_gcp` (`id`, `gcp_id`, `count_respond`, `count_positive`) VALUES
 (1, 1, 2, 2),
 (2, 3, 1, 1),
-(3, 4, 1, 1);
+(3, 4, 1, 1),
+(4, 5, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -109,7 +111,9 @@ CREATE TABLE `confirm_mvp` (
 --
 
 INSERT INTO `confirm_mvp` (`id`, `mvp_id`, `count_respond`, `count_positive`) VALUES
-(1, 1, 2, 2);
+(1, 1, 2, 2),
+(2, 3, 1, 1),
+(3, 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -221,7 +225,8 @@ CREATE TABLE `desc_interview_mvp` (
 
 INSERT INTO `desc_interview_mvp` (`id`, `responds_mvp_id`, `date_fact`, `status`) VALUES
 (1, 1, '2020-03-06', 2),
-(2, 2, '2020-03-06', 2);
+(2, 2, '2020-03-06', 2),
+(3, 4, '2020-03-15', 2);
 
 -- --------------------------------------------------------
 
@@ -321,10 +326,12 @@ CREATE TABLE `gcp` (
 --
 
 INSERT INTO `gcp` (`id`, `confirm_problem_id`, `title`, `good`, `benefit`, `contrast`, `description`, `date_create`, `date_time_create`, `date_confirm`, `date_time_confirm`, `exist_confirm`) VALUES
-(1, 1, 'ГЦП 1', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт \"продукт 1\" помогает \"сегмент 1\", который хочет удовлетворить проблему \"напишите описание гипотезы проблемы сегмента\", избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, \"выгода\", в отличии от \"продукт 2\".', '2020-03-06', '2020-03-06 12:29:20', '2020-03-06', '2020-03-06 12:30:11', 1),
-(2, 1, 'ГЦП 2', 'Interbink', 'выгода', 'продукт2', 'Наш продукт \"interbink\" помогает \"сегмент 1\", который хочет удовлетворить проблему \"напишите описание гипотезы проблемы сегмента\", избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, \"выгода\", в отличии от \"продукт2\".', '2020-03-06', '2020-03-06 12:29:37', NULL, NULL, NULL),
-(3, 3, 'ГЦП 1', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт \"продукт 1\" помогает \"сегмент 1\", который хочет удовлетворить проблему \"напишите описание гипотезы проблемы сегмента\", избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, \"выгода\", в отличии от \"продукт 2\".', '2020-03-07', '2020-03-07 17:16:33', NULL, NULL, 0),
-(4, 3, 'ГЦП 2', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт \"продукт 1\" помогает \"сегмент 1\", который хочет удовлетворить проблему \"напишите описание гипотезы проблемы сегмента\", избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, \"выгода\", в отличии от \"продукт 2\".', '2020-03-07', '2020-03-07 17:16:57', '2020-03-07', '2020-03-07 17:18:20', 1);
+(1, 1, 'ГЦП 1', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', '2020-03-06', '2020-03-06 12:29:20', '2020-03-06', '2020-03-06 12:30:11', 1),
+(2, 1, 'ГЦП 2', 'Interbink', 'выгода', 'продукт2', 'Наш продукт interbink помогает сегмент 1, который хочет удовлетворить проблему напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт2.', '2020-03-06', '2020-03-06 12:29:37', NULL, NULL, NULL),
+(3, 3, 'ГЦП 1', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', '2020-03-07', '2020-03-07 17:16:33', '2020-03-15', NULL, 0),
+(4, 3, 'ГЦП 2', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода\", в отличии от продукт 2.', '2020-03-07', '2020-03-07 17:16:57', '2020-03-07', '2020-03-07 17:18:20', 1),
+(5, 3, 'ГЦП 3', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', '2020-03-15', '2020-03-15 16:48:20', '2020-03-15', NULL, 0),
+(6, 1, 'ГЦП 3', 'Продукт 1', 'выгода', 'продукт 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему 1 напишите описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', '2020-03-16', '2020-03-16 16:07:29', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -348,9 +355,10 @@ CREATE TABLE `generation_problem` (
 --
 
 INSERT INTO `generation_problem` (`id`, `interview_id`, `title`, `description`, `date_gps`, `date_confirm`, `date_time_confirm`, `exist_confirm`) VALUES
-(1, 1, 'ГПС 1', 'Напишите описание гипотезы проблемы сегмента', '2020-03-06', '2020-03-06', '2020-03-06 12:29:02', 1),
-(2, 1, 'ГПС 2', 'Напишите описание гипотезы проблемы сегмента', '2020-03-06', NULL, NULL, 0),
-(3, 1, 'ГПС 3', 'Напишите описание гипотезы проблемы сегмента', '2020-03-07', '2020-03-07', '2020-03-07 17:15:27', 1);
+(1, 1, 'ГПС 1', '1 Напишите описание гипотезы проблемы сегмента', '2020-03-06', '2020-03-06', '2020-03-06 12:29:02', 1),
+(2, 1, 'ГПС 2', '2 Напишите описание гипотезы проблемы сегмента', '2020-03-06', '2020-03-15', NULL, 0),
+(3, 1, 'ГПС 3', '3 Напишите описание гипотезы проблемы сегмента', '2020-03-07', '2020-03-07', '2020-03-07 17:15:27', 1),
+(4, 1, 'ГПС 4', '4 Напишите описание гипотезы проблемы сегмента', '2020-03-15', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -408,8 +416,8 @@ CREATE TABLE `mvp` (
 INSERT INTO `mvp` (`id`, `confirm_gcp_id`, `title`, `description`, `date_create`, `date_time_create`, `date_confirm`, `date_time_confirm`, `exist_confirm`) VALUES
 (1, 1, 'ГMVP 1', 'Макет', '2020-03-06', '2020-03-06 12:30:18', '2020-03-06', '2020-03-06 12:31:06', 1),
 (2, 1, 'ГMVP 2', 'Презентация', '2020-03-06', '2020-03-06 12:30:26', NULL, NULL, NULL),
-(3, 3, 'ГMVP 1', 'Макет', '2020-03-07', '2020-03-07 17:18:27', NULL, NULL, NULL),
-(4, 3, 'ГMVP 2', 'презентация', '2020-03-07', '2020-03-07 17:18:34', NULL, NULL, NULL);
+(3, 3, 'ГMVP 1', 'Макет', '2020-03-07', '2020-03-07 17:18:27', '2020-03-15', NULL, 0),
+(4, 3, 'ГMVP 2', 'презентация', '2020-03-07', '2020-03-07 17:18:34', '2020-03-15', '2020-03-15 22:15:39', 1);
 
 -- --------------------------------------------------------
 
@@ -469,7 +477,8 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `update_at`, `project_fullname`, `project_name`, `description`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`) VALUES
-(1, 1, '2020-03-06', '2020-03-15', 'Проект 1', 'Проект 1', '', '', '', 1584478800, '', '', '', '', 'Зарегистрированное юр. лицо', 1584392400, 'Адрес сайта', 'Инвестор', 1584219600, 6000000, 1584306000, 'Мероприятие, на котором проект анонсирован впервые');
+(1, 1, '2020-03-06', '2020-03-20', 'Проект 1', 'Проект 1', '', '', '', 1584478800, '', '', '', '', 'Зарегистрированное юр. лицо', 1584392400, 'Адрес сайта', 'Инвестор', 1584219600, 6000000, 1584306000, 'Мероприятие, на котором проект анонсирован впервые'),
+(2, 1, '2020-03-15', '2020-03-15', '', 'Проект 2', '', '', '', NULL, '', '', '', '', '', NULL, '', '', NULL, NULL, NULL, '');
 
 -- --------------------------------------------------------
 
@@ -572,7 +581,8 @@ INSERT INTO `responds_gcp` (`id`, `confirm_gcp_id`, `name`, `info_respond`, `ema
 (1, 1, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
 (2, 1, 'Карлов Виктор Иванович', 'Данные респондента', 'karlov@mail.ru'),
 (3, 2, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
-(4, 3, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com');
+(4, 3, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
+(5, 4, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com');
 
 -- --------------------------------------------------------
 
@@ -594,7 +604,9 @@ CREATE TABLE `responds_mvp` (
 
 INSERT INTO `responds_mvp` (`id`, `confirm_mvp_id`, `name`, `info_respond`, `email`) VALUES
 (1, 1, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
-(2, 1, 'Карлов Виктор Иванович', 'Данные респондента', 'karlov@mail.ru');
+(2, 1, 'Карлов Виктор Иванович', 'Данные респондента', 'karlov@mail.ru'),
+(3, 2, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
+(4, 3, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com');
 
 -- --------------------------------------------------------
 
@@ -608,10 +620,14 @@ CREATE TABLE `segments` (
   `name` varchar(255) NOT NULL,
   `field_of_activity` varchar(255) DEFAULT NULL,
   `sort_of_activity` varchar(255) DEFAULT NULL,
-  `age` int(11) DEFAULT NULL,
-  `income` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `market_volume` int(11) DEFAULT NULL,
+  `age_from` int(11) DEFAULT NULL,
+  `age_to` int(11) DEFAULT NULL,
+  `income_from` int(11) DEFAULT NULL,
+  `income_to` int(11) DEFAULT NULL,
+  `quantity_from` int(11) DEFAULT NULL,
+  `quantity_to` int(11) DEFAULT NULL,
+  `market_volume_from` int(11) DEFAULT NULL,
+  `market_volume_to` int(11) DEFAULT NULL,
   `add_info` text,
   `creat_date` date DEFAULT NULL,
   `plan_gps` date DEFAULT NULL,
@@ -632,9 +648,11 @@ CREATE TABLE `segments` (
 -- Дамп данных таблицы `segments`
 --
 
-INSERT INTO `segments` (`id`, `project_id`, `name`, `field_of_activity`, `sort_of_activity`, `age`, `income`, `quantity`, `market_volume`, `add_info`, `creat_date`, `plan_gps`, `fact_gps`, `plan_ps`, `fact_ps`, `plan_dev_gcp`, `fact_dev_gcp`, `plan_gcp`, `fact_gcp`, `plan_dev_gmvp`, `fact_dev_gmvp`, `plan_gmvp`, `fact_gmvp`) VALUES
-(1, 1, 'Сегмент 1', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 56, 46464, 4643634, 346346, '', '2020-03-06', '2020-04-05', '2020-03-07', '2020-05-05', '2020-03-06', '2020-06-04', '2020-03-07', '2020-07-04', '2020-03-06', '2020-08-03', '2020-03-07', '2020-09-02', '2020-03-06'),
-(2, 1, 'Сегмент 2', '', '', NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `segments` (`id`, `project_id`, `name`, `field_of_activity`, `sort_of_activity`, `age_from`, `age_to`, `income_from`, `income_to`, `quantity_from`, `quantity_to`, `market_volume_from`, `market_volume_to`, `add_info`, `creat_date`, `plan_gps`, `fact_gps`, `plan_ps`, `fact_ps`, `plan_dev_gcp`, `fact_dev_gcp`, `plan_gcp`, `fact_gcp`, `plan_dev_gmvp`, `fact_dev_gmvp`, `plan_gmvp`, `fact_gmvp`) VALUES
+(1, 1, 'Сегмент 1', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 25, 50, 192, 534, 100, 400, 300, 700, '', '2020-03-06', '2020-04-05', '2020-03-15', '2020-05-05', '2020-03-06', '2020-06-04', '2020-03-16', '2020-07-04', '2020-03-06', '2020-08-03', '2020-03-07', '2020-09-02', '2020-03-06'),
+(2, 1, 'Сегмент 2', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 22, 39, 379, 805, 202, 328, 193, 463, '', '2020-03-16', '2020-04-15', NULL, '2020-05-15', NULL, '2020-06-14', NULL, '2020-07-14', NULL, '2020-08-13', NULL, '2020-09-12', NULL),
+(3, 2, 'Сегмент 1', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 1, 'Сегмент 3', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 25, 50, 200, 600, 100, 400, 300, 700, '', '2020-03-20', '2020-04-19', NULL, '2020-05-19', NULL, '2020-06-18', NULL, '2020-07-18', NULL, '2020-08-17', NULL, '2020-09-16', NULL);
 
 -- --------------------------------------------------------
 
@@ -665,7 +683,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone`, `email`, `username`, `password_hash`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Иванов', 'Иван', 'Иванович', '+7(999)99-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$zndk8lQ0OmizfSRa1xkUwuAikBaPngYMVt0cIypNdMxechCXJBLYK', '/images/avatar/default.jpg', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 'user', 10, 1582408272, 1583960676),
+(1, 'Иванов', 'Иван', 'Иванович', '+7(999)99-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$zndk8lQ0OmizfSRa1xkUwuAikBaPngYMVt0cIypNdMxechCXJBLYK', '/images/avatar/default.jpg', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 'user', 10, 1582408272, 1584696908),
 (8, 'Латухин', 'Алексей', 'Валерьевич', '+7(999)99-99-99', 'aleksejj.latukhin@rambler.ru', 'Latukhin', '$2y$13$tgy4EYw0.LGFXJfVFZYyvexkY0kPmfWcWdn9OPfCG9tgRW5Vd8rsS', '/images/avatar/default.jpg', 'IJn3g83GXf9aCWjZFelkBj3DaVP8Ixcf', NULL, 'user', 10, 1583760631, 1583760631),
 (9, 'Карпов', 'Антон', 'Петрович', '+7(999)99-99-99', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '/images/avatar/default.jpg', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 'user', 10, 1583859778, 1583859778);
 
@@ -851,13 +869,13 @@ ALTER TABLE `business_model`
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
 --
 ALTER TABLE `confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_problem`
@@ -887,7 +905,7 @@ ALTER TABLE `desc_interview_gcp`
 -- AUTO_INCREMENT для таблицы `desc_interview_mvp`
 --
 ALTER TABLE `desc_interview_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `feedback_expert`
@@ -917,13 +935,13 @@ ALTER TABLE `feedback_expert_mvp`
 -- AUTO_INCREMENT для таблицы `gcp`
 --
 ALTER TABLE `gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `generation_problem`
 --
 ALTER TABLE `generation_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `interview`
@@ -971,13 +989,13 @@ ALTER TABLE `responds_confirm`
 -- AUTO_INCREMENT для таблицы `responds_gcp`
 --
 ALTER TABLE `responds_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_mvp`
 --
 ALTER TABLE `responds_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `segments`
