@@ -40,8 +40,8 @@ use yii\widgets\ActiveForm;
             var maxAge = document.getElementById('age_to').value;
 
             if (minAge == 0 && maxAge == 0 || minAge != 0 && maxAge == 0){
-                minAge = 25;
-                maxAge = 50;
+                minAge = 0;
+                maxAge = 100;
             }
 
             $( "#slider_age" ).slider({
@@ -93,8 +93,8 @@ use yii\widgets\ActiveForm;
             var maxIncome = document.getElementById('income_to').value;
 
             if (minIncome == 0 && maxIncome == 0 || minIncome != 0 && maxIncome == 0){
-                minIncome = 200;
-                maxIncome = 600;
+                minIncome = 0;
+                maxIncome = 10000;
             }
 
             $( "#slider_income" ).slider({
@@ -102,7 +102,7 @@ use yii\widgets\ActiveForm;
                 //orientation: 'vertical',
                 step: 1,
                 min: 0,
-                max: 1000,
+                max: 10000,
                 values: [ minIncome, maxIncome ],
                 slide: function( event, ui ) {
                     $( "#income_from" ).val( ui.values[ 0 ] );
@@ -162,7 +162,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'income_from', [
                 'template' => '<div class="col-md-4" style="padding-top: 5px;margin-top: 15px;">{label}<div>{error}</div></div>
                 <div class="col-md-2" style="margin-top: 15px;">{input}</div>'
-        ])->label('<div>Доход потребителя (тыс. руб./мес.)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 1000)</div>')->textInput(['type' => 'number', 'id' => 'income_from']);?>
+        ])->label('<div>Доход потребителя (тыс. руб./мес.)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 10 000)</div>')->textInput(['type' => 'number', 'id' => 'income_from']);?>
 
         <?= $form->field($model, 'income_to', [
                 'template' => '<div class="col-md-2">{input}</div>'
@@ -185,8 +185,8 @@ use yii\widgets\ActiveForm;
             var maxQuantity = document.getElementById('quantity_to').value;
 
             if (minQuantity == 0 && maxQuantity == 0 || minQuantity != 0 && maxQuantity == 0){
-                minQuantity = 100;
-                maxQuantity = 400;
+                minQuantity = 0;
+                maxQuantity = 1000000;
             }
 
             $( "#slider_quantity" ).slider({
@@ -194,7 +194,7 @@ use yii\widgets\ActiveForm;
                 //orientation: 'vertical',
                 step: 1,
                 min: 0,
-                max: 1000,
+                max: 1000000,
                 values: [ minQuantity, maxQuantity ],
                 slide: function( event, ui ) {
                     $( "#quantity_from" ).val( ui.values[ 0 ] );
@@ -238,8 +238,8 @@ use yii\widgets\ActiveForm;
             var maxMarketVolume = document.getElementById('market_volume_to').value;
 
             if (minMarketVolume == 0 && maxMarketVolume == 0 || minMarketVolume != 0 && maxMarketVolume == 0){
-                minMarketVolume = 300;
-                maxMarketVolume = 700;
+                minMarketVolume = 0;
+                maxMarketVolume = 100000;
             }
 
             $( "#slider_market_volume" ).slider({
@@ -247,7 +247,7 @@ use yii\widgets\ActiveForm;
                 //orientation: 'vertical',
                 step: 1,
                 min: 0,
-                max: 1000,
+                max: 100000,
                 values: [ minMarketVolume, maxMarketVolume ],
                 slide: function( event, ui ) {
                     $( "#market_volume_from" ).val( ui.values[ 0 ] );
@@ -288,7 +288,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'quantity_from', [
                 'template' => '<div class="col-md-4" style="padding-top: 5px;margin-top: 15px;">{label}<div>{error}</div></div>
                 <div class="col-md-2" style="margin-top: 15px;">{input}</div>'
-        ])->label('<div>Потенциальное кол-во потребителей (тыс. чел.)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 1000)</div>')->textInput(['type' => 'number', 'id' => 'quantity_from']);?>
+        ])->label('<div>Потенциальное кол-во потребителей (тыс. чел.)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 1 000 000)</div>')->textInput(['type' => 'number', 'id' => 'quantity_from']);?>
 
         <?= $form->field($model, 'quantity_to', [
                 'template' => '<div class="col-md-2">{input}</div>'
@@ -307,7 +307,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'market_volume_from', [
                 'template' => '<div class="col-md-4" style="padding-top: 5px;margin-top: 15px;">{label}<div>{error}</div></div>
                 <div class="col-md-2" style="margin-top: 15px;">{input}</div>'
-        ])->label('<div>Объем рынка (млн. руб./год)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 1000)</div>')->textInput(['type' => 'number', 'id' => 'market_volume_from']);?>
+        ])->label('<div>Объем рынка (млн. руб./год)</div><div style="font-weight: 400;font-size: 13px;">(укажите значения в диапазоне от 0 до 100 000)</div>')->textInput(['type' => 'number', 'id' => 'market_volume_from']);?>
 
         <?= $form->field($model, 'market_volume_to', [
                 'template' => '<div class="col-md-2">{input}</div>'

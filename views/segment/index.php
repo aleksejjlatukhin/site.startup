@@ -43,50 +43,52 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '170'],
+                'options' => ['width' => '180'],
                 'enableSorting' => false,
             ],
 
             [
                 'attribute' => 'field_of_activity',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '170'],
+                'options' => ['width' => '180'],
                 'enableSorting' => false
             ],
 
             [
                 'attribute' => 'sort_of_activity',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '170'],
+                'options' => ['width' => '180'],
                 'enableSorting' => false
             ],
 
             [
                 'attribute' => 'age',
-                'label' => 'Возраст потребителя',
+                'label' => 'Возраст потреб.*',
                 'value' => function ($model) {
                     if ($model->age_from !== null && $model->age_to !== null){
-                        return 'от ' . number_format($model->age_from, 0, '', ' ') . ' до '
+                        return 'от ' . number_format($model->age_from, 0, '', ' ') . '<br> до '
                             . number_format($model->age_to, 0, '', ' ');
                     }
                 },
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '100'],
+                'options' => ['width' => '80'],
+                'format' => 'html',
             ],
 
 
 
             [
                 'attribute' => 'income',
-                'label' => 'Доход потребителя*',
+                'label' => 'Доход потреб.*',
                 'value' => function ($model) {
                     if ($model->income_from !== null && $model->income_to !== null){
-                        return 'от ' . number_format($model->income_from, 0, '', ' ') . ' до '
+                        return 'от ' . number_format($model->income_from, 0, '', ' ') . '<br> до '
                             . number_format($model->income_to, 0, '', ' ');
                     }
                 },
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '110'],
+                'options' => ['width' => '90'],
+                'format' => 'html',
             ],
 
 
@@ -95,12 +97,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Потенциал. кол. потреб.*',
                 'value' => function ($model) {
                     if ($model->quantity_from !== null && $model->quantity_to !== null){
-                        return 'от ' . number_format($model->quantity_from, 0, '', ' ') . ' до '
+                        return 'от ' . number_format($model->quantity_from, 0, '', ' ') . '<br> до '
                             . number_format($model->quantity_to, 0, '', ' ');
                     }
                 },
                 'contentOptions'=>['style'=>'white-space: normal;'],
                 'options' => ['width' => '110'],
+                'format' => 'html',
             ],
 
 
@@ -109,12 +112,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'V - рынка (млн/год)*',
                 'value' => function ($model) {
                     if ($model->market_volume_from !== null && $model->market_volume_to !== null){
-                        return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . ' до '
+                        return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . '<br> до '
                             . number_format($model->market_volume_to, 0, '', ' ');
                     }
                 },
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '110'],
+                'options' => ['width' => '100'],
+                'format' => 'html',
             ],
 
 
@@ -157,7 +161,11 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <div class="row">
-    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Доход потребителя*</span> — доход потребителя (тыс. руб./мес.).</p>
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Возраст потреб.*</span> — возраст потребителя.</p>
+</div>
+
+<div class="row">
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Доход потреб.*</span> — доход потребителя (тыс. руб./мес.).</p>
 </div>
 
 <div class="row">
