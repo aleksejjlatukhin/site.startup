@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div style="margin-top: -10px;"><?= Html::a('<< Программа генерации ГПС', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?></div>
 
-            <div style="font-style: italic;margin-top: 20px;"><span class="bolder">ГПС*</span> - гипотеза проблемы сегмента.</div>
+            <div style="font-style: italic;margin-top: 20px;"><span class="bolder">ГПС</span> - гипотеза проблемы сегмента.</div>
 
         </div>
     </div>

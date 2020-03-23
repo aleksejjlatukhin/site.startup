@@ -157,7 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <br>
 
 <div class="row">
-    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">ГЦС*</span> — гипотеза целевого сегмента.</p>
+    <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Генерация ГЦС</span> — генерация гипотез целевых сегментов.</p>
 </div>
 
 <div class="row">

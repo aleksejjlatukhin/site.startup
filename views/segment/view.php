@@ -33,9 +33,9 @@ $this->params['breadcrumbs'][] = $model->name;
         }?>
 
         <?php if(!($model->interview)) : ?>
-            <?= Html::a('Переход к генерации ГПС >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Переход к генерации ГПС* >>', ['interview/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?php else: ?>
-            <?= Html::a('Генерация ГПС >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Генерация ГПС* >>', ['interview/view', 'id' => $model->interview->id], ['class' => 'btn btn-success']) ?>
         <?php endif;?>
 
     </p>

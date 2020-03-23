@@ -18,11 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="respond-index">
 
-    <h2><?= Html::encode($this->title) ?></h2>
+    <h2>
+        <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+        <?= Html::a('<< Программа генерации ГПС', ['interview/view', 'id' => $interview->id], ['class' => 'btn btn-sm btn-default']) ?>
+    </h2>
 
-    <br>
 
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped" style="margin-top: 15px;">
         <thead>
         <tr>
             <th scope="col" rowspan="2" style="width: 20px;padding-bottom: 25px;text-align: center;">№</th>
@@ -104,8 +106,5 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php ActiveForm::end(); ?>
 
     </div>
-
-    <hr>
-    <?= Html::a('<< Программа генерации ГПС', ['interview/view', 'id' => $interview->id], ['class' => 'btn btn-default']) ?>
 
 </div>

@@ -90,9 +90,15 @@ class InterviewController extends AppController
 
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
+        $data_responds = 0;
+        $data_interview = 0;
         foreach ($responds as $respond){
             if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
                 $respond->exist_respond = 1;
+                $data_responds++;
+                if (!empty($respond->descInterview)){
+                    $data_interview++;
+                }
             }else{
                 $respond->exist_respond = 0;
             }
@@ -117,6 +123,8 @@ class InterviewController extends AppController
             'project' => $project,
             'responds' => $responds,
             'dataProvider' => $dataProvider,
+            'data_responds' => $data_responds,
+            'data_interview' => $data_interview,
         ]);
     }
 

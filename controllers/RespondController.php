@@ -70,6 +70,25 @@ class RespondController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
+        $not_exist_data = 0;
+        $exist_data = 0;
+        foreach ($models as $model){
+            if (empty($model->info_respond) || empty($model->place_interview) || empty($model->date_plan) || empty($model->descInterview)){
+                $not_exist_data++;
+            }
+            if (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && !empty($model->descInterview)){
+                $exist_data++;
+            }
+        }
+
+        if ($not_exist_data != 0){
+            Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
+        }
+
+        if ($exist_data == count($models)){
+            Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
+        }
+
         $newRespond = new Respond();
         $newRespond->interview_id = $id;
         if ($newRespond->load(Yii::$app->request->post()))
@@ -172,6 +191,14 @@ class RespondController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $desc_interview = DescInterview::find()->where(['respond_id' => $model->id])->one();
+
+        if (empty($model->info_respond) || empty($model->place_interview) || empty($model->date_plan)){
+            Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
+        }
+
+        if (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview)){
+            Yii::$app->session->setFlash('success', 'Для внесения данных интервью респондента пройдите по ссылке "Добавить интервью".');
+        }
 
         return $this->render('view', [
             'model' => $model,

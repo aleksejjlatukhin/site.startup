@@ -115,20 +115,6 @@ class GenerationProblemController extends AppController
     {
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
-        $count = 0;
-        foreach ($responds as $respond){
-
-            $descInterview = DescInterview::find()->where(['respond_id' => $respond->id])->one();
-            if($descInterview->status == 1){
-                $count++;
-            }
-        }
-
-        if ($count < 1){
-            Yii::$app->session->setFlash('error', "Необходимо добавить материалы интервью хотя бы с одним представителем сегмента!");
-            return $this->redirect(['interview/view', 'id' => $id]);
-        }
-
         $model = new GenerationProblem();
         $model->interview_id = $id;
         $model->date_gps = date('Y:m:d');
@@ -138,6 +124,21 @@ class GenerationProblemController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $count = 0;
+        foreach ($responds as $respond){
+
+            $descInterview = DescInterview::find()->where(['respond_id' => $respond->id])->one();
+            if($descInterview->status == 1){
+                $count++;
+            }
+        }
+
+        if ($count < $interview->count_positive){
+            Yii::$app->session->setFlash('error', "Набрано недостаточное количество представителей сегмента!");
+            return $this->redirect(['interview/view', 'id' => $id]);
+        }
+
 
         if (Yii::$app->request->isAjax){
 

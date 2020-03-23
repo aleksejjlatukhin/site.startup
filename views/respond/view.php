@@ -17,9 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="respond-view">
 
-    <h3><?= Html::encode($this->title) ?></h3>
-
-    <br>
+    <h3 style="margin-bottom: 20px;"><?= Html::encode($this->title) ?></h3>
 
     <p>
         <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -115,6 +113,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= Html::a('Программа генерации ГПС', ['interview/view', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
 
-    <?= Html::a('Информация о респондентах', ['respond/index', 'id' => $model->interview_id], ['class' => 'btn btn-default pull-right']) ?>
+    <?= Html::a('Информация о респондентах', ['respond/index', 'id' => $model->interview_id], ['class' => 'btn btn-default']) ?>
 
 </div>

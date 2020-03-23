@@ -166,8 +166,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th scope="col" style="width: 80px;text-align: center;padding-bottom: 20px;">Респонденты</th>
-            <th scope="col" style="text-align: center;width: 180px;">Данные респондентов</th>
+            <th scope="col" style="width: 130px;text-align: center;padding-bottom: 20px;">Респонденты</th>
+            <th scope="col" style="text-align: center;width: 170px;">Данные респондентов</th>
             <th scope="col" style="text-align: center;width: 180px;">Проведение интервью</th>
             <th scope="col" style="text-align: center;width: 180px;">Представители сегмента</th>
             <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">ГПС</th>
@@ -191,6 +191,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
 
                 }?>
+
+                <?php if ($data_responds === 0) : ?>
+
+                    <?= Html::a('Начать', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                <?php elseif ($data_responds == count($responds) && $data_interview == count($responds)) : ?>
+
+                    <?/*= Html::a('Добавить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']])*/ ?>
+
+                <?php else : ?>
+
+                    <?= Html::a('Продолжить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                <?php endif; ?>
+
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
@@ -225,9 +240,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
 
                 $sumPositive = 0;
-
+                $data_desc = 0;
                 foreach ($responds as $respond){
+
                     if (!empty($respond->descInterview)){
+                        $data_desc++;
 
                         if ($respond->descInterview->status == 1){
                             $sumPositive++;
@@ -246,6 +263,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
                 }
 
+                if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                    echo '<span style="color: red;">Недостаточное количество представителей сегмента</span>'
+                    . Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '20px', 'width' => '110px']]);
+                }
+
+                if ($model->count_positive <= $sumPositive && empty($model->problems)){
+                    echo '<span style="color: green;">Переходите <br>к созданию ГПС</span>';
+                }
 
                 ?>
             </td>
@@ -332,7 +357,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <div style="font-style: italic"><span class="bolder">ГПС*</span> - гипотеза проблемы сегмента.</div>
+    <div style="font-style: italic"><span class="bolder">Программа генерации ГПС</span> - программа генерации гипотез проблем сегмента.</div>
 
 </div>
 
