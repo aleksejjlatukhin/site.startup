@@ -143,9 +143,6 @@ class BusinessModelController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $model->quantity = $segment->quantity;
-        $model->sort_of_activity = $segment->sort_of_activity;
-
 
         if ($confirmMvp->business){
             return $this->redirect(['view', 'id' => $confirmMvp->business->id]);

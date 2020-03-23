@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="business-model-create">
 
-    <h2><?= Html::encode($this->title) ?></h2><br>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?= $this->render('_form', [
         'model' => $model,

@@ -40,11 +40,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <div style="display: flex; flex: auto; flex-wrap: wrap">
         <div>
             <div class="block-200"><h4 style="color: #3c3c3c">Потребительский сегмент</h4><?= $segment->name; ?></div>
-            <div class="block-200"><h4 style="color: #3c3c3c">Потенциальное количество потребителей</h4><?= number_format($model->quantity, 0, '', ' '); ?></div>
+            <div class="block-200"><h4 style="color: #3c3c3c">Потенциальное количество потребителей</h4>
+                <?= ' от ' . number_format($segment->quantity_from * 1000, 0, '', ' ') .
+                '<br> до ' . number_format($segment->quantity_to * 1000, 0, '', ' '); ?></div>
         </div>
         <div class="block-200"><h4 style="color: #3c3c3c">Ключевые партнеры: </h4><?= $model->partners; ?></div>
         <div>
-            <div class="block-200"><h4 style="color: #3c3c3c">Ключевые виды деятельности</h4><?= $model->sort_of_activity; ?></div>
+            <div class="block-200"><h4 style="color: #3c3c3c">Ключевые виды деятельности</h4><?= mb_strtolower($segment->sort_of_activity); ?></div>
             <div class="block-200"><h4 style="color: #3c3c3c">Ключевые ресурсы</h4><?= $model->resources; ?></div>
         </div>
         <div class="block-200"><h4 style="color: #3c3c3c">Ценностное предложение</h4><?= $gcp->description; ?></div>

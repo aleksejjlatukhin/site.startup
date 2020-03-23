@@ -39,10 +39,9 @@ class BusinessModel extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['confirm_mvp_id', 'quantity', 'sort_of_activity', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
+            [['confirm_mvp_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
             [['confirm_mvp_id'], 'integer'],
-            [['quantity',], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
-            [['sort_of_activity', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
+            [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
         ];
     }
 
@@ -54,8 +53,6 @@ class BusinessModel extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'confirm_mvp_id' => 'Confirm Mvp ID',
-            'quantity' => 'Потенциальное количество потребителей',
-            'sort_of_activity' => 'Ключевые виды деятельности',
             'relations' => 'Взаимоотношения с клиентами',
             'partners' => 'Ключевые партнеры',
             'distribution_of_sales' => 'Каналы коммуникации и сбыта',

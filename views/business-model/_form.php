@@ -12,26 +12,25 @@ use yii\helpers\Url;
 <div class="business-model-form">
 
     <?php $form = ActiveForm::begin(); ?>
-    <div class="row" style="margin-bottom: 5px">
-        <?= '<div class="col-md-8" style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Потребительский сегмент: ', Url::to(['segment/view', 'id' => $segment->id])) . '</span>' . mb_strtolower($segment->name) . '</div>' ?>
+
+    <div class="row" style="padding-top: 5px;">
+        <?= '<div class="col-md-8" style="margin-bottom: 5px;"><span style="font-weight: 700;">' . Html::a('Потребительский сегмент: ', Url::to(['segment/view', 'id' => $segment->id])) . '</span>' . mb_strtolower($segment->name) . '</div>' ?>
     </div>
 
-    <div class="row" style="margin-bottom: 5px">
+    <div class="row">
         <?= '<div class="col-md-8" style="margin-bottom: 10px;"><span style="font-weight: 700;">' . Html::a('Ценностное предложение: ', Url::to(['gcp/view', 'id' => $gcp->id])) . '</span>' . mb_strtolower($gcp->description) . '</div>' ?>
     </div>
 
-    <hr>
-    <div class="row" style="margin-bottom: 5px">
-        <?= $form->field($model, 'quantity', [
-            'template' => '<div class="col-md-4" style="padding-top: 5px;">{label}</div><div class="col-md-4">{input}</div>'
-        ])->textInput(['type' => 'number']); ?>
-    </div>
-    <br>
+    <div class="row">
 
-    <div class="row" style="margin-bottom: 15px;">
-        <?= $form->field($model, 'sort_of_activity', [
-            'template' => '<div class="col-md-12">{label}</div><div class="col-md-8">{input}</div>'
-        ])->textarea(['rows' => 1]) ?>
+        <?= '<div class="col-md-8" style="margin-bottom: 5px;"><span style="font-weight: 700;">Потенциальное количество потребителей:</span> от ' . number_format($segment->quantity_from * 1000, 0, '', ' ')
+        . ' до ' . number_format($segment->quantity_to * 1000, 0, '', ' ') . '</div>' ?>
+
+    </div>
+
+    <div class="row" style="margin-bottom: 5px">
+        <?= '<div class="col-md-8" style="margin-bottom: 15px;"><span style="font-weight: 700;">Ключевые виды деятельности:</span> ' . mb_strtolower($segment->sort_of_activity) . '</div>' ?>
+
     </div>
 
     <div class="row" style="margin-bottom: 15px;">
