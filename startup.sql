@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 21 2020 г., 11:09
+-- Время создания: Мар 23 2020 г., 18:33
 -- Версия сервера: 5.6.43
 -- Версия PHP: 5.6.38
 
@@ -53,8 +53,6 @@ INSERT INTO `authors` (`id`, `project_id`, `fio`, `role`, `experience`) VALUES
 CREATE TABLE `business_model` (
   `id` int(11) UNSIGNED NOT NULL,
   `confirm_mvp_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `sort_of_activity` varchar(255) NOT NULL,
   `relations` varchar(255) NOT NULL,
   `partners` varchar(255) NOT NULL,
   `distribution_of_sales` varchar(255) NOT NULL,
@@ -67,8 +65,9 @@ CREATE TABLE `business_model` (
 -- Дамп данных таблицы `business_model`
 --
 
-INSERT INTO `business_model` (`id`, `confirm_mvp_id`, `quantity`, `sort_of_activity`, `relations`, `partners`, `distribution_of_sales`, `resources`, `cost`, `revenue`) VALUES
-(1, 1, 4643634, 'Род деятельности потребителя', 'Взаимоотношения с клиентами', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры');
+INSERT INTO `business_model` (`id`, `confirm_mvp_id`, `relations`, `partners`, `distribution_of_sales`, `resources`, `cost`, `revenue`) VALUES
+(1, 1, 'Взаимоотношения с клиентами', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры', 'Ключевые партнеры'),
+(2, 4, 'Взаимоотношения с клиентами', 'Ключевые партнеры', 'Каналы коммуникации и сбыта', 'Ключевые ресурсы', 'Структура издержек', 'Потоки поступления доходов');
 
 -- --------------------------------------------------------
 
@@ -113,7 +112,8 @@ CREATE TABLE `confirm_mvp` (
 INSERT INTO `confirm_mvp` (`id`, `mvp_id`, `count_respond`, `count_positive`) VALUES
 (1, 1, 2, 2),
 (2, 3, 1, 1),
-(3, 4, 1, 1);
+(3, 4, 1, 1),
+(4, 2, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -226,7 +226,8 @@ CREATE TABLE `desc_interview_mvp` (
 INSERT INTO `desc_interview_mvp` (`id`, `responds_mvp_id`, `date_fact`, `status`) VALUES
 (1, 1, '2020-03-06', 2),
 (2, 2, '2020-03-06', 2),
-(3, 4, '2020-03-15', 2);
+(3, 4, '2020-03-15', 2),
+(4, 5, '2020-03-23', 2);
 
 -- --------------------------------------------------------
 
@@ -415,7 +416,7 @@ CREATE TABLE `mvp` (
 
 INSERT INTO `mvp` (`id`, `confirm_gcp_id`, `title`, `description`, `date_create`, `date_time_create`, `date_confirm`, `date_time_confirm`, `exist_confirm`) VALUES
 (1, 1, 'ГMVP 1', 'Макет', '2020-03-06', '2020-03-06 12:30:18', '2020-03-06', '2020-03-06 12:31:06', 1),
-(2, 1, 'ГMVP 2', 'Презентация', '2020-03-06', '2020-03-06 12:30:26', NULL, NULL, NULL),
+(2, 1, 'ГMVP 2', 'Презентация', '2020-03-06', '2020-03-06 12:30:26', '2020-03-23', '2020-03-23 17:09:40', 1),
 (3, 3, 'ГMVP 1', 'Макет', '2020-03-07', '2020-03-07 17:18:27', '2020-03-15', NULL, 0),
 (4, 3, 'ГMVP 2', 'презентация', '2020-03-07', '2020-03-07 17:18:34', '2020-03-15', '2020-03-15 22:15:39', 1);
 
@@ -477,7 +478,7 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `update_at`, `project_fullname`, `project_name`, `description`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`) VALUES
-(1, 1, '2020-03-06', '2020-03-20', 'Проект 1', 'Проект 1', '', '', '', 1584478800, '', '', '', '', 'Зарегистрированное юр. лицо', 1584392400, 'Адрес сайта', 'Инвестор', 1584219600, 6000000, 1584306000, 'Мероприятие, на котором проект анонсирован впервые'),
+(1, 1, '2020-03-06', '2020-03-23', 'Проект 1', 'Проект 1', '', '', '', 1584478800, '', '', '', '', 'Зарегистрированное юр. лицо', 1584392400, 'Адрес сайта', 'Инвестор', 1584219600, 6000000, 1584306000, 'Мероприятие, на котором проект анонсирован впервые'),
 (2, 1, '2020-03-15', '2020-03-15', '', 'Проект 2', '', '', '', NULL, '', '', '', '', '', NULL, '', '', NULL, NULL, NULL, '');
 
 -- --------------------------------------------------------
@@ -606,7 +607,9 @@ INSERT INTO `responds_mvp` (`id`, `confirm_mvp_id`, `name`, `info_respond`, `ema
 (1, 1, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
 (2, 1, 'Карлов Виктор Иванович', 'Данные респондента', 'karlov@mail.ru'),
 (3, 2, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
-(4, 3, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com');
+(4, 3, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
+(5, 4, 'Попов Игорь Игоревич', 'Данные респондента', 'popov@mail.com'),
+(6, 4, 'Карлов Виктор Иванович', 'Данные респондента', 'karlov@mail.ru');
 
 -- --------------------------------------------------------
 
@@ -649,7 +652,7 @@ CREATE TABLE `segments` (
 --
 
 INSERT INTO `segments` (`id`, `project_id`, `name`, `field_of_activity`, `sort_of_activity`, `age_from`, `age_to`, `income_from`, `income_to`, `quantity_from`, `quantity_to`, `market_volume_from`, `market_volume_to`, `add_info`, `creat_date`, `plan_gps`, `fact_gps`, `plan_ps`, `fact_ps`, `plan_dev_gcp`, `fact_dev_gcp`, `plan_gcp`, `fact_gcp`, `plan_dev_gmvp`, `fact_dev_gmvp`, `plan_gmvp`, `fact_gmvp`) VALUES
-(1, 1, 'Сегмент 1', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 25, 50, 192, 534, 100, 400, 300, 700, '', '2020-03-06', '2020-04-05', '2020-03-15', '2020-05-05', '2020-03-06', '2020-06-04', '2020-03-16', '2020-07-04', '2020-03-06', '2020-08-03', '2020-03-07', '2020-09-02', '2020-03-06'),
+(1, 1, 'Сегмент 1', 'Сфера деятельности потребителя', 'Род деятельности потребителя для сегмента 1', 43, 100, 6861, 10000, 569444, 1000000, 55556, 100000, '', '2020-03-06', '2020-04-05', '2020-03-15', '2020-05-05', '2020-03-06', '2020-06-04', '2020-03-16', '2020-07-04', '2020-03-06', '2020-08-03', '2020-03-07', '2020-09-02', '2020-03-06'),
 (2, 1, 'Сегмент 2', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 22, 39, 379, 805, 202, 328, 193, 463, '', '2020-03-16', '2020-04-15', NULL, '2020-05-15', NULL, '2020-06-14', NULL, '2020-07-14', NULL, '2020-08-13', NULL, '2020-09-12', NULL),
 (3, 2, 'Сегмент 1', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 1, 'Сегмент 3', 'Сфера деятельности потребителя', 'Род деятельности потребителя', 25, 50, 200, 600, 100, 400, 300, 700, '', '2020-03-20', '2020-04-19', NULL, '2020-05-19', NULL, '2020-06-18', NULL, '2020-07-18', NULL, '2020-08-17', NULL, '2020-09-16', NULL);
@@ -863,7 +866,7 @@ ALTER TABLE `authors`
 -- AUTO_INCREMENT для таблицы `business_model`
 --
 ALTER TABLE `business_model`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
@@ -875,7 +878,7 @@ ALTER TABLE `confirm_gcp`
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
 --
 ALTER TABLE `confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_problem`
@@ -905,7 +908,7 @@ ALTER TABLE `desc_interview_gcp`
 -- AUTO_INCREMENT для таблицы `desc_interview_mvp`
 --
 ALTER TABLE `desc_interview_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `feedback_expert`
@@ -995,7 +998,7 @@ ALTER TABLE `responds_gcp`
 -- AUTO_INCREMENT для таблицы `responds_mvp`
 --
 ALTER TABLE `responds_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `segments`
