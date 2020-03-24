@@ -21,15 +21,23 @@ use yii\widgets\ActiveForm;
 
             <?= $form->field($model, 'email')->textInput() ?>
 
-            <?= $form->field($model, 'date_plan')->label('Запланированная дата интервью')->widget(\yii\jui\DatePicker::class, [
-                'dateFormat' => 'yyyy-MM-dd',
+
+            <?= $form->field($model, 'date_plan', [
+                'template' => '<div style="padding-top: 5px;">{label}</div><div class="row"><div class="col-md-2">{input}</div></div>'
+            ])->label('Запланированная дата интервью')->widget(\yii\jui\DatePicker::class, [
+                'dateFormat' => 'dd.MM.yyyy',
                 //'inline' => true,
                 'clientOptions' => [
                     'autoclose' => true,
-                    'format' => 'yyyy-MM-dd',
+                    'format' => 'dd.MM.yyyy',
                 ],
                 //'language' => 'ru',
+                'options' => [
+                    'class' => 'form-control input-md',
+                    'readOnly'=>'readOnly'
+                ],
             ]) ?>
+
 
             <?= $form->field($model, 'place_interview')->textInput(['maxlength' => true]) ?>
 

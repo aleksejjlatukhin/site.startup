@@ -246,6 +246,12 @@ class RespondController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
+            /*Преобразование даты в число*/
+            if ($model->date_plan ){
+                $model->date_plan  = strtotime($model->date_plan );
+            }
+
+
             $kol = 0;
             foreach ($models as $item){
                 if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '',$model->name)) == mb_strtolower(str_replace(' ', '',$item->name))){

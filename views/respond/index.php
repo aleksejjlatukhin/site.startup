@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }?></td>
 
                 <td class="text-center"><?if (!empty($model->date_plan)) {
-                        echo date("d.m.Y", strtotime($model->date_plan));
+                        echo date("d.m.Y", $model->date_plan);
                     }?></td>
 
                 <td class="text-center"><? if (!empty($model->descInterview->date_fact)){
