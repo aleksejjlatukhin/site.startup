@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = 'Разработка ГЦП';
                     return Html::a($model->title, ['view', 'id' => $model->id]);
                 },
                 'format' => 'html',
+                'enableSorting' => false,
             ],
 
             [
@@ -71,6 +72,7 @@ $this->params['breadcrumbs'][] = 'Разработка ГЦП';
                     }
                 },
                 'format' => 'html',
+                'enableSorting' => false,
             ],
 
             //['class' => 'yii\grid\ActionColumn'],

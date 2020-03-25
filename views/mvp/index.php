@@ -59,12 +59,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::a($model->title, ['view', 'id' => $model->id]);
                 },
                 'format' => 'html',
-                'options' => ['width' => '200']
+                'options' => ['width' => '200'],
+                'enableSorting' => false,
             ],
 
             [
                 'attribute' => 'description',
                 'label' => 'Формулировка MVP',
+                'enableSorting' => false,
             ],
 
             [
@@ -97,6 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 },
                 'format' => 'html',
+                'enableSorting' => false,
                 //'options' => ['width' => '250'],
             ],
 
