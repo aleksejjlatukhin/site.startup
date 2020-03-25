@@ -281,13 +281,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach ($model->problems as $problem) {
 
                         echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id]));
-                        if (isset($problem->exist_confirm)){
-                            if ($problem->exist_confirm == 0){
+
+                        if (isset($problem->confirm)){
+                            if ($problem->exist_confirm === 0){
                                 echo '<br><span style="color:red">Гипотеза проблемы не подтверждена!</span>';
                             }
-                            if ($problem->exist_confirm == 1){
+                            if ($problem->exist_confirm === 1){
                                 echo '<br><span style="color:green">Гипотеза проблемы подтверждена!</span>';
                             }
+                            if ($problem->exist_confirm === null){
+                                echo Html::a('Подтвердить', ['confirm-problem/view', 'id' => $problem->confirm->id], ['class' => 'btn btn-primary', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                            }
+                        }else{
+
+                            echo Html::a('Подтвердить', ['confirm-problem/create', 'id' => $problem->id], ['class' => 'btn btn-primary', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
                         }
                         echo '<hr>';
                     }
@@ -306,7 +313,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (isset($problem->exist_confirm)){
                             echo '<div style="height: 40px;"></div>' . '<hr>';
                         }else{
-                            echo '<hr>';
+                            echo '<div style="height: 44px;"></div>' . '<hr>';
                         }
                     }
                 }
@@ -324,7 +331,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if (isset($problem->exist_confirm)){
                         $height[] = 40;
                     }else{
-                        $height[] = 0;
+                        $height[] = 44;
                     }
                 }
 
