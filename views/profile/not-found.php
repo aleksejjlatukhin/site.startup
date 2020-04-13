@@ -30,7 +30,7 @@ $this->title = 'Данные отсутствуют';
 
     <div style="text-align: center;">
 
-        <?= Html::a('Создать проект', Url::to(['/projects/create']), ['class' => 'btn btn-md btn-success'])?>
+        <?= Html::a('Создать проект', Url::to(['/projects/create', 'id' => Yii::$app->user->id]), ['class' => 'btn btn-md btn-success'])?>
 
     </div>
 

@@ -12,6 +12,7 @@ use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
+use app\models\User;
 use Yii;
 use app\models\Segment;
 use yii\data\ActiveDataProvider;
@@ -27,8 +28,21 @@ class SegmentController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update'])
-            || in_array($action->id, ['one-roadmap']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['one-roadmap'])){
+
+            $model = Segment::findOne(Yii::$app->request->get());
+            $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = Segment::findOne(Yii::$app->request->get());
             $project = Projects::find()->where(['id' => $model->project_id])->one();
@@ -47,7 +61,7 @@ class SegmentController extends AppController
             $project = Projects::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -68,7 +82,7 @@ class SegmentController extends AppController
     public function actionIndex($id)
     {
         $project = Projects::findOne($id);
-        $user = Yii::$app->user->identity;
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $dataProvider = new ActiveDataProvider([
             'query' => Segment::find()->where(['project_id' => $id]),
@@ -426,10 +440,15 @@ class SegmentController extends AppController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
         $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
 
+        if (empty($model->creat_date)){
+            Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о сегменте!");
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
             'project' => $project,
         ]);
     }
@@ -469,8 +488,16 @@ class SegmentController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $models = Segment::find()->where(['project_id' => $project->id])->all();
         $project->update_at = date('Y:m:d');
 
@@ -527,7 +554,14 @@ class SegmentController extends AppController
                             }
                         }
 
-                        Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
+                        if (!empty($model->creat_date) && !empty($model->interview)){
+                            Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
+                        }
+
+                        if (!empty($model->creat_date) && empty($model->interview)){
+                            Yii::$app->session->setFlash('success', "Переходите к генерации ГПС");
+                        }
+
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
@@ -549,11 +583,19 @@ class SegmentController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $project->update_at = date('Y:m:d');
         $interview = Interview::find()->where(['segment_id' => $model->id])->one();
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
@@ -639,7 +681,7 @@ class SegmentController extends AppController
             return $this->redirect(['index', 'id' => $project->id]);
 
         }
-    }
+    }*/
 
     /**
      * Finds the Segment model based on its primary key value.

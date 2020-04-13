@@ -43,19 +43,64 @@ class ProjectsController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['result'])
-            || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['result'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($model->user_id == Yii::$app->user->id){
+            if ($model->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
             }else{
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+        }elseif (in_array($action->id, ['create'])){
+
+
+            if (User::isUserSimple(Yii::$app->user->identity['username']) === false){
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+            $user = User::findOne(Yii::$app->request->get());
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($user->id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['index'])){
+
+            $user = User::findOne(Yii::$app->request->get());
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($user->id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
+
+            $project = Projects::findOne(Yii::$app->request->get());
+            $user = User::findOne(['id' => $project->user_id]);
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($user->id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
         }else{
             return parent::beforeAction($action);
         }
@@ -66,17 +111,17 @@ class ProjectsController extends AppController
      * Lists all Projects models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($id)
     {
-        $user = Yii::$app->user->identity;
 
         $dataProvider = new ActiveDataProvider([
-            'query' => Projects::find()->where(['user_id' => $user['id']]),
+            'query' => Projects::find()->where(['user_id' => $id]),
+            'sort' => false,
         ]);
 
-        $projects = Projects::find()->where(['user_id' => $user['id']])->all();
+        $projects = Projects::find()->where(['user_id' => $id])->all();
         if (count($projects) == 0){
-            return $this->redirect(['create']);
+            return $this->redirect(['create', 'id' => $id]);
         }
 
         return $this->render('index', [
@@ -88,8 +133,8 @@ class ProjectsController extends AppController
     public function actionDownload($id)
     {
         $model = PreFiles::findOne($id);
-        $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
             . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
@@ -106,8 +151,8 @@ class ProjectsController extends AppController
     public function actionDeleteFile($id)
     {
         $model = PreFiles::findOne($id);
-        $user = Yii::$app->user->identity;
         $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
             . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
@@ -183,17 +228,25 @@ class ProjectsController extends AppController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($id)
     {
         $model = new Projects();
 
         $modelsConcept = [new Segment];
         $modelsAuthors = [new Authors];
 
-        $user = Yii::$app->user->identity;
-        $models = Projects::find()->where(['user_id' => $user['id']])->all();
+        $_user = Yii::$app->user->identity;
+        $user = User::findOne(['id' => Yii::$app->user->identity['id']]);
 
-        $model->user_id = $user['id'];
+        if ($user->status === User::STATUS_ACTIVE){
+            //В зависимости от статуса пользователя
+            // создаем папку на сервере, если она ещё не создана
+            $user->createDirName();
+        }
+
+        $models = Projects::find()->where(['user_id' => $id])->all();
+
+        $model->user_id = $id;
         $model->created_at = date('Y:m:d');
         $model->update_at = date('Y:m:d');
 
@@ -344,8 +397,16 @@ class ProjectsController extends AppController
         $modelsConcept = Segment::find()->where(['project_id'=>$id])->all();
         $modelsAuthors = Authors::find()->where(['project_id'=>$id])->all();
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
+        $user = User::find()->where(['id' => $model->user_id])->one();
+        $_user = Yii::$app->user->identity;
 
-        $user = Yii::$app->user->identity;
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+
         $model->update_at = date('Y:m:d');
 
         if ($model->load(Yii::$app->request->post())) {
@@ -544,8 +605,14 @@ class ProjectsController extends AppController
     {
         $model = $this->findModel($id);
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $user = Yii::$app->user->identity;
+        $user = User::find()->where(['id' => $model->user_id])->one();
+        $_user = Yii::$app->user->identity;
 
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if(!empty($segments)){
             foreach ($segments as $segment){
@@ -684,7 +751,7 @@ class ProjectsController extends AppController
 
         $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'id' => $user->id]);
     }
 
     /**

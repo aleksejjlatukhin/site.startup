@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\FeedbackExpertGcp */
 
 $this->title = 'Редактирование отзыва №' . mb_substr($model->title, -2, 3);
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];

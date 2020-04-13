@@ -3,12 +3,13 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\Url;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ConfirmGcp */
 
 $this->title = 'Программа подтверждения ' . $gcp->title;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -30,8 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
+            <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
+        <?php endif; ?>
     </p>
 
     <div class="row">
@@ -147,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Формирование данных программы подтверждения <?= $gcp->title ?></div>
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px 5px 0 0;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Формирование данных программы подтверждения <?= $gcp->title ?></div>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -155,14 +159,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Респонденты</th>
             <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Данные респондентов</th>
             <th scope="col" style="text-align: center;width: 180px;">Позитивные ответы / всего опрошенных</th>
-            <th scope="col" style="text-align: center;width: 180px;">Результат подтверждения ГЦП</th>
+            <th scope="col" style="text-align: center;width: 190px;">Результат подтверждения ГЦП</th>
             <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Отзыв эксперта</th>
             <th scope="col" style="text-align: center;width: 180px;padding-bottom: 20px;">Дата отзыва</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td style="text-align: center; padding-top: 20px;">
+            <td style="text-align: center; padding-top: 20px;font-weight: 700;">
                 <?php if (!empty($responds)) {
                     if (count($responds)%10 == 1){
                         echo Html::a(count($responds) . ' респондент', Url::to(['responds-gcp/index', 'id' => $model->id]));
@@ -175,6 +179,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
 
                 }?>
+
+                <?php if ($data_responds === 0) : ?>
+
+                    <?= Html::a('Начать', ['responds-gcp/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                <?php elseif ($data_responds == count($responds) && $data_desc == count($responds)) : ?>
+
+                    <?/*= Html::a('Добавить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']])*/ ?>
+
+                <?php else : ?>
+
+                    <?= Html::a('Продолжить', ['responds-gcp/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                <?php endif; ?>
+
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
@@ -186,7 +205,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 $value = round(($sum / count($responds) * 100) * 100) / 100;
 
-                echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p>$value  %</p>", Url::to(['responds-gcp/exist', 'id' => $model->id]));
+                echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p style='font-weight: 700;font-size: 13px;'>$value  %</p>", Url::to(['responds-gcp/exist', 'id' => $model->id]));
                 ?>
 
             </td>
@@ -205,7 +224,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
 
-                echo $a . ' / ' . $b;
+                echo '<div style="font-weight: 700;font-size: 13px;">' . $a . ' / ' . $b . '</div>';
 
                 ?>
 
@@ -229,11 +248,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     $model->exist_confirm = 0;
 
-                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive %</p>",
+                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive %</p>",
                         Url::to(['responds-gcp/by-status-interview', 'id' => $model->id]));
 
                     if ($gcp->exist_confirm === 0){
-                        echo '<span style="color:red">Тест не пройден!</span>';
+                        echo '<span style="color:red; font-size: 13px; font-weight: 700;">Тест не пройден!</span><br>';
                     }
                 }
 
@@ -241,19 +260,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     $model->exist_confirm = 1;
 
-                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive %</p>",
+                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive %</p>",
                         Url::to(['responds-gcp/by-status-interview', 'id' => $model->id]));
 
                     if ($gcp->exist_confirm === 1){
-                        echo '<span style="color:green">Тест пройден</span>';
+                        echo '<span style="color:green; font-size: 13px; font-weight: 700;">Тест пройден!</span><br>';
                     }
+                }
+
+                if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                    echo '<div style="color: red; margin-top: 15px; font-size: 13px; font-weight: 700;">Недостаточное количество позитивных респондентов</div>';
+
+                    if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                        echo Html::a('Добавить!', ['responds-gcp/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                    }
+                }
+
+                if ($model->count_positive <= $sumPositive && empty($model->mvps)){
+                    echo '<span style="color: green; font-size: 13px; font-weight: 700;">Переходите <br>к разработке ГMVP</span>';
                 }
 
                 ?>
 
             </td>
 
-            <td style="text-align: center; padding-top: 20px;">
+            <td style="text-align: center; padding-top: 20px;font-weight: 700;">
 
                 <? if (!empty($model->feedbacks)){
                     foreach ($model->feedbacks as $feedback) {
@@ -263,11 +295,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
 
-                <div style="padding-bottom: 10px;"><?= Html::a("+ добавить", Url::to(['feedback-expert-gcp/create', 'id' => $model->id]));?></div>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
+                    <div style="padding-bottom: 10px;font-size: 13px;"><?= Html::a("+ добавить", Url::to(['feedback-expert-gcp/create', 'id' => $model->id]));?></div>
+
+                <?php endif; ?>
             </td>
 
-            <td style="text-align: center; padding-top: 20px;">
+            <td style="text-align: center; padding-top: 20px;font-weight: 700;">
 
                 <? if (!empty($model->feedbacks)){
                     foreach ($model->feedbacks as $feedback) {
@@ -287,24 +322,29 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?
 
-    if ($gcp->exist_confirm !== $model->exist_confirm){
+    if (User::isUserSimple(Yii::$app->user->identity['username'])){
 
-        if ($model->exist_confirm == 0){
+        if ($gcp->exist_confirm !== $model->exist_confirm){
 
-            echo Html::a('Закончить тест >>', ['not-exist-confirm', 'id' => $model->id], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Гипотеза не подтверждена! Вы действительно хотите закончить тест для "' . $gcp->title . '" ?',
-                    'method' => 'post',
-                ],
-            ]);
-        }
+            if ($model->exist_confirm == 0){
 
-        if ($model->exist_confirm == 1){
+                echo Html::a('Закончить программу >>', ['not-exist-confirm', 'id' => $model->id], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Гипотеза не подтверждена! Вы действительно хотите закончить тест для "' . $gcp->title . '" ?',
+                        'method' => 'post',
+                    ],
+                ]);
+            }
 
-            echo Html::a('Закончить тест >>', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
+            if ($model->exist_confirm == 1){
+
+                echo Html::a('Разработка ГMVP >>', ['exist-confirm', 'id' => $model->id], ['class' => 'btn btn-success',]);
+            }
         }
     }
+
+
 
     if ($model->exist_confirm == 1 && $gcp->exist_confirm == 1) {
 
@@ -314,7 +354,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         }else{
 
-            echo Html::a('Разработка ГMVP >>', ['mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']);
+            if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                echo Html::a('Разработка ГMVP >>', ['mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']);
+            }
+
         }
     }
 

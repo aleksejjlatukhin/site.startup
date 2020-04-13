@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\Projects */
 
 $this->title = 'Редактирование: ' . $model->project_name;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index', 'id' => $model->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $model->project_name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>

@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Результат подтверждения ' . $gcp->title;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -23,8 +23,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="respond-gcp by-status-interview">
 
-    <h2><?= Html::encode($this->title) ?></h2>
-
+    <h2 style="margin-bottom: 10px;">
+        <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+        <?= Html::a('<< Программа подтверждения', ['confirm-gcp/view', 'id' => $confirmGcp->id], ['class' => 'btn btn-sm btn-default']) ?>
+    </h2>
 
     <?php
     $i = 0;
@@ -70,9 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Респонденты',
                 'headerOptions' => ['class' => 'text-center'],
                 'value' => function ($model) {
-                    return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
+                    return '<div style="font-weight: 700;">' . Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id])) . '</div>';
                 },
                 'format' => 'raw',
+                'enableSorting' => false,
             ],
 
             [
@@ -98,7 +101,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
         ],
     ]); ?>
-
-    <?= Html::a('<< Программа подтверждения', ['confirm-gcp/view', 'id' => $confirmGcp->id], ['class' => 'btn btn-default']) ?>
 
 </div>

@@ -12,6 +12,9 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_NOT_ACTIVE = 1;
     const STATUS_ACTIVE = 10;
 
+    const ROLE_USER = 10;
+    const ROLE_ADMIN = 20;
+
     public $password;
 
     public static function tableName()
@@ -27,7 +30,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_image'], 'filter', 'filter' => 'trim'],
             [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_image'], 'string', 'max' => 255],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status'], 'required'],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status', 'role'], 'required'],
+            ['role', 'integer'],
             ['email', 'email'],
             ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
             ['username', 'string', 'min' => 3, 'max' => 32],
@@ -57,6 +61,7 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => 'Эл.почта',
             'password' => 'Password',
             'status' => 'Статус',
+            'role' => 'Проектная роль',
             'auth_key' => 'Auth Key',
             'created_at' => 'Дата регистрации',
             'updated_at' => 'Последнее изменение',
@@ -85,7 +90,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return static::findOne([
             'id' => $id,
-            'status' => self::STATUS_ACTIVE
+            //'status' => self::STATUS_ACTIVE
         ]);
     }
 
@@ -214,7 +219,7 @@ class User extends ActiveRecord implements IdentityInterface
     //Создание папки username
     public function createDirName()
     {
-        if ($this->role == 'user') {
+        if ($this->status === self::STATUS_ACTIVE) {
 
             $user_dir = UPLOAD . mb_convert_encoding($this->username, "windows-1251") . '/';
             $user_dir = mb_strtolower($user_dir, "windows-1251");
@@ -222,6 +227,39 @@ class User extends ActiveRecord implements IdentityInterface
                 mkdir($user_dir, 0777);
             }
 
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на пользователя
+    public static function isUserSimple($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_USER, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на Админа
+    public static function isUserAdmin($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на Админа
+    public static function isActiveStatus($username)
+    {
+        if (static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]))
+        {
             return true;
         } else {
             return false;

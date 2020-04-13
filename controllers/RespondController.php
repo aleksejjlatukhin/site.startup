@@ -6,6 +6,7 @@ use app\models\DescInterview;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\Respond;
 use yii\data\ActiveDataProvider;
@@ -21,7 +22,7 @@ class RespondController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['update'])){
 
             $respond = Respond::findOne(Yii::$app->request->get());
             $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
@@ -37,6 +38,22 @@ class RespondController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
+        }elseif (in_array($action->id, ['view'])){
+
+            $respond = Respond::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
         }elseif (in_array($action->id, ['by-date-interview']) || in_array($action->id, ['by-status-responds'])
             || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
 
@@ -45,7 +62,7 @@ class RespondController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -81,12 +98,15 @@ class RespondController extends AppController
             }
         }
 
-        if ($not_exist_data != 0){
-            Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
-        }
+        if (User::isUserSimple(Yii::$app->user->identity['username'])){
 
-        if ($exist_data == count($models)){
-            Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
+            if ($not_exist_data != 0){
+                Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
+            }
+
+            if ($exist_data == count($models)){
+                Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
+            }
         }
 
         $newRespond = new Respond();
@@ -192,12 +212,15 @@ class RespondController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $desc_interview = DescInterview::find()->where(['respond_id' => $model->id])->one();
 
-        if (empty($model->info_respond) || empty($model->place_interview) || empty($model->date_plan)){
-            Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
-        }
+        if (User::isUserSimple(Yii::$app->user->identity['username'])){
 
-        if (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview)){
-            Yii::$app->session->setFlash('success', 'Для внесения данных интервью респондента пройдите по ссылке "Добавить интервью".');
+            if (empty($model->info_respond) || empty($model->place_interview) || empty($model->date_plan)){
+                Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
+            }
+
+            if (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview)){
+                Yii::$app->session->setFlash('success', 'Для внесения данных интервью респондента пройдите по ссылке "Добавить интервью".');
+            }
         }
 
         return $this->render('view', [
@@ -236,13 +259,20 @@ class RespondController extends AppController
      */
     public function actionUpdate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
 
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $models = Respond::find()->where(['interview_id' => $interview->id])->all();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -317,14 +347,23 @@ class RespondController extends AppController
      */
     public function actionDelete($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $project->update_at = date('Y:m:d');
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+
 
         if (count($responds) == 1){
             Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');

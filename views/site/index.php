@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use app\models\User;
 
 /* @var $this yii\web\View */
 
@@ -17,7 +18,18 @@ $this->title = 'Главная';
     <div class="row">
         <div class="col-md-10">
 
-            <?= Html::a('<span style="text-transform: uppercase;font-weight: 700;">Создать проект</span>', ['projects/create'], ['class' => 'btn btn-success btn-block']) ?>
+            <?php
+            if (User::isUserSimple(Yii::$app->user->identity['username'])){
+                echo Html::a('<span style="text-transform: uppercase;font-weight: 700;">Создать проект</span>', ['projects/create', 'id' => Yii::$app->user->identity['id']], ['class' => 'btn btn-success btn-block']);
+            }
+            ?>
+
+            <?php if (empty(Yii::$app->user->identity)){
+                echo Html::a('<span style="text-transform: uppercase;font-weight: 700;">Создать проект</span>', ['site/login'], ['class' => 'btn btn-success btn-block']);
+            }
+            ?>
+
+            <?//= Html::a('<span style="text-transform: uppercase;font-weight: 700;">Создать проект</span>', ['projects/create', 'id' => Yii::$app->user->identity['id']], ['class' => 'btn btn-success btn-block']) ?>
 
             <h3 style="margin-bottom: 20px;">Мы рады приветствовать вас на портале <span style="font-weight: 700;">АКСЕЛЕРАТОРА СТАРТАП-ПРОЕКТОВ</span>!</h3>
 

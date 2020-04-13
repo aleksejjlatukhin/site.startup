@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\Projects */
 
 $this->title = 'Создание проекта';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index', 'id' => Yii::$app->user->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="projects-create">

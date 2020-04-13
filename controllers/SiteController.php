@@ -43,6 +43,12 @@ class SiteController extends AppController
     public function actionIndex()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('index', compact('user'));
     }
 
@@ -50,6 +56,12 @@ class SiteController extends AppController
     public function actionTargetSegment()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('target-segment', compact('user'));
     }
 
@@ -57,6 +69,12 @@ class SiteController extends AppController
     public function actionSegmentProblems()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('segment-problems', compact('user'));
     }
 
@@ -64,6 +82,12 @@ class SiteController extends AppController
     public function actionProblemConfirmation()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('problem-confirmation', compact('user'));
     }
 
@@ -71,6 +95,12 @@ class SiteController extends AppController
     public function actionValueProposition()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('value-proposition', compact('user'));
     }
 
@@ -78,6 +108,12 @@ class SiteController extends AppController
     public function actionOfferConfirmation()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('offer-confirmation', compact('user'));
     }
 
@@ -85,6 +121,12 @@ class SiteController extends AppController
     public function actionDevelopmentMvp()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('development-mvp', compact('user'));
     }
 
@@ -92,12 +134,24 @@ class SiteController extends AppController
     public function actionMvpConfirmation()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('mvp-confirmation', compact('user'));
     }
 
     public function actionBusinessModel()
     {
         $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
         return $this->render('business-model', compact('user'));
     }
 
@@ -116,16 +170,16 @@ class SiteController extends AppController
         $model = new SingupForm();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
+
             if ($user = $model->singup()){
-                if ($user->status === User::STATUS_ACTIVE){
 
-                    //В зависимости от роли пользователя
-                    // создаем папку на сервере
-                    $user->createDirName();
+                if (Yii::$app->getUser()->login($user)){
 
-                    if (Yii::$app->getUser()->login($user)){
-                        return $this->goHome();
+                    if ($user->status === User::STATUS_NOT_ACTIVE) {
+                        Yii::$app->session->setFlash('success', 'Поздравляем Вы успешно прошли регистрацию! Ожидайте активации вашего профиля администратором.');
                     }
+
+                    return $this->goHome();
                 }
             }else{
                 Yii::$app->session->setFlash('error', 'Возникла ошибка при регистрации.');
@@ -146,7 +200,6 @@ class SiteController extends AppController
      */
     public function actionLogin()
     {
-        //$this->layout = 'first';
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -155,6 +208,11 @@ class SiteController extends AppController
         $model = new LoginForm();
 
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
+            if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+                return $this->redirect('/admin');
+            }
+
             return $this->goBack();
         }
 
@@ -225,7 +283,7 @@ class SiteController extends AppController
      *
      * @return Response|string
      */
-    public function actionContact()
+    /*public function actionContact()
     {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
@@ -236,15 +294,15 @@ class SiteController extends AppController
         return $this->render('contact', [
             'model' => $model,
         ]);
-    }
+    }*/
 
     /**
      * Displays about page.
      *
      * @return string
      */
-    public function actionAbout()
+    /*public function actionAbout()
     {
         return $this->render('about');
-    }
+    }*/
 }

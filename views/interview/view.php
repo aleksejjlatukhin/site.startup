@@ -5,12 +5,13 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Interview */
 
 $this->title = 'Программа генерации ГПС';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -30,8 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
+            <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
+        <?php endif; ?>
     </p>
 
 
@@ -161,7 +165,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Таблица проведения программы генерации ГПС</div>
+    <!--<div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px 5px 0 0;height: 55px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Таблица проведения программы генерации ГПС</div>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -179,7 +183,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <tbody>
         <tr>
             <td style="text-align: center; padding-top: 20px;">
-                <?php if (!empty($responds)) {
+                <?php /*if (!empty($responds)) {
                     if (count($responds)%10 == 1){
                         echo Html::a(count($responds) . ' респондент', Url::to(['respond/index', 'id' => $model->id]));
                     }
@@ -190,55 +194,55 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::a(count($responds) . ' респондентов', Url::to(['respond/index', 'id' => $model->id]));
                     }
 
-                }?>
+                }*/?>
 
-                <?php if ($data_responds === 0) : ?>
+                <?php /*if ($data_responds === 0) : */?>
 
-                    <?= Html::a('Начать', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+                    <?/*= Html::a('Начать', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) */?>
 
-                <?php elseif ($data_responds == count($responds) && $data_interview == count($responds)) : ?>
+                <?php /*elseif ($data_responds == count($responds) && $data_interview == count($responds)) : */?>
 
-                    <?/*= Html::a('Добавить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']])*/ ?>
+                    <?/*//= Html::a('Добавить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]); */?>
 
-                <?php else : ?>
+                <?php /*else : */?>
 
-                    <?= Html::a('Продолжить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+                    <?/*= Html::a('Продолжить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) */?>
 
-                <?php endif; ?>
+                <?php /*endif; */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
                 <?php
-                $sum = 0;
+/*                $sum = 0;
                 foreach ($responds as $respond){
                     $sum += $respond->exist_respond;
                 }
                 $value = round(($sum / count($responds) * 100) * 100) / 100;
 
                 echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
-                ?>
+                */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
                 <?php
-                $sumInt = 0;
+/*                $sumInt = 0;
                 foreach ($responds as $respond){
                     $sumInt += $respond->descInterview->exist_desc;
                 }
                 $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
 
                 echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
-                ?>
+                */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
                 <?php
-
+/*
                 $sumPositive = 0;
                 $data_desc = 0;
                 foreach ($responds as $respond){
@@ -264,50 +268,58 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
 
                 if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
-                    echo '<span style="color: red;">Недостаточное количество представителей сегмента</span>'
-                    . Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '20px', 'width' => '110px']]);
+                    echo '<div style="color: red; font-size: 13px; font-weight: 700;">Недостаточное количество представителей сегмента</div>';
+
+                    if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                        echo Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                    }
                 }
 
                 if ($model->count_positive <= $sumPositive && empty($model->problems)){
-                    echo '<span style="color: green;">Переходите <br>к созданию ГПС</span>';
+                    echo '<span style="color: green;font-size: 13px; font-weight: 700;">Переходите <br>к созданию ГПС</span>';
                 }
 
-                ?>
+                */?>
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
-                <? if (!empty($model->problems)){
+                <?/* if (!empty($model->problems)){
                     foreach ($model->problems as $problem) {
 
                         echo Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id]));
 
                         if (isset($problem->confirm)){
                             if ($problem->exist_confirm === 0){
-                                echo '<br><span style="color:red">Гипотеза проблемы не подтверждена!</span>';
+                                echo '<br><span style="color:red; font-size: 13px; font-weight: 700;">Гипотеза проблемы не подтверждена!</span>';
                             }
                             if ($problem->exist_confirm === 1){
-                                echo '<br><span style="color:green">Гипотеза проблемы подтверждена!</span>';
+                                echo '<br><span style="color:green; font-size: 13px; font-weight: 700;">Гипотеза проблемы подтверждена!</span>';
                             }
                             if ($problem->exist_confirm === null){
-                                echo Html::a('Подтвердить', ['confirm-problem/view', 'id' => $problem->confirm->id], ['class' => 'btn btn-primary', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                                echo Html::a('Подтверждение', ['confirm-problem/view', 'id' => $problem->confirm->id], ['class' => 'btn btn-warning', 'style' => ['margin-top' => '10px', 'width' => '130px']]);
                             }
                         }else{
 
-                            echo Html::a('Подтвердить', ['confirm-problem/create', 'id' => $problem->id], ['class' => 'btn btn-primary', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                            echo Html::a('Подтвердить', ['confirm-problem/create', 'id' => $problem->id], ['class' => 'btn btn-primary', 'style' => ['margin-top' => '10px', 'width' => '130px']]);
                         }
                         echo '<hr>';
                     }
                 }
-                ?>
+                */?>
 
-                <div style="padding-bottom: 10px;"><?= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));?></div>
+                <?php /*if (User::isUserSimple(Yii::$app->user->identity['username'])) : */?>
+
+                    <div style="padding-bottom: 10px;"><?/*= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));*/?></div>
+
+                <?php /*endif;*/?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
-                <? if (!empty($model->problems)){
+                <?/* if (!empty($model->problems)){
                     foreach ($model->problems as $problem) {
                         echo date("d.m.Y", strtotime($problem->date_gps));
                         if (isset($problem->exist_confirm)){
@@ -317,7 +329,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }
                 }
-                ?>
+                */?>
 
                 <br>
 
@@ -325,7 +337,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <td style="text-align: center; padding-top: 20px;">
 
-                <?
+                <?/*
                 $height = [];
                 foreach ($model->problems as $i => $problem) {
                     if (isset($problem->exist_confirm)){
@@ -340,20 +352,24 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '<div style="height:'. $height[$k] .'px"></div><hr>';
                     }
                 }
-                ?>
+                */?>
 
-                <div style="padding-bottom: 10px;"><?= Html::a("+ добавить", Url::to(['feedback-expert/create', 'id' => $model->id]));?></div>
+                <?php /*if (User::isUserSimple(Yii::$app->user->identity['username'])) : */?>
+
+                    <div style="padding-bottom: 10px;"><?/*= Html::a("+ добавить", Url::to(['feedback-expert/create', 'id' => $model->id]));*/?></div>
+
+                <?php /*endif; */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
-                <? if (!empty($model->feedbacks)){
+                <?/* if (!empty($model->feedbacks)){
                     foreach ($model->feedbacks as $k => $feedback) {
                         echo date("d.m.Y", strtotime($feedback->date_feedback)) . '<div style="height:'. $height[$k] .'px"></div><hr>';
                     }
                 }
-                ?>
+                */?>
 
                 <br>
 
@@ -362,10 +378,594 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </tr>
         </tbody>
-    </table>
+    </table>-->
+
+
+
+
+    <div class="d-inline p-2 bg-primary" style="font-size: 22px;border-radius: 5px 5px 0 0;height: 65px;padding-top: 12px;padding-left: 20px;margin-top: 10px;">Таблица проведения программы генерации ГПС</div>
+    <!-- Tab links -->
+    <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'responds_of_segment')" id="defaultOpen">Сведения о респондентах</button>
+        <button class="tablinks" onclick="openCity(event, 'data_of_gps')">Сведения о генерации ГПС</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="responds_of_segment" class="tabcontent">
+        <table class="table table-bordered table-striped" style="margin: 0;">
+            <thead>
+            <tr>
+                <th scope="col" style="width: 250px;text-align: center; padding: 15px 0;">Респонденты</th>
+                <th scope="col" style="text-align: center;width: 250px; padding: 15px 0;">Данные респондентов</th>
+                <th scope="col" style="text-align: center;width: 250px; padding: 15px 0;">Проведение интервью</th>
+                <th scope="col" style="text-align: center;width: 250px; padding: 15px 0;">Представители сегмента</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="text-align: center;font-weight: 700;">
+                    <?php if (!empty($responds)) {
+                        if (count($responds)%10 == 1){
+                            echo Html::a(count($responds) . ' респондент', Url::to(['respond/index', 'id' => $model->id])) . '<br>';
+                        }
+                        if (count($responds)%10 == 2 || count($responds)%10 == 3 || count($responds)%10 == 4){
+                            echo Html::a(count($responds) . ' респондента', Url::to(['respond/index', 'id' => $model->id])) . '<br>';
+                        }
+                        if (count($responds)%10 == 0 || count($responds)%10 > 4){
+                            echo Html::a(count($responds) . ' респондентов', Url::to(['respond/index', 'id' => $model->id])) . '<br>';
+                        }
+
+                    }?>
+
+                    <?php if ($data_responds === 0) : ?>
+
+                        <?= Html::a('Начать', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                    <?php elseif ($data_responds == count($responds) && $data_interview == count($responds)) : ?>
+
+                        <?/*= Html::a('Добавить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']])*/ ?>
+
+                    <?php else : ?>
+
+                        <?= Html::a('Продолжить', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-top' => '20px', 'width' => '110px']]) ?>
+
+                    <?php endif; ?>
+
+                </td>
+
+                <td style="text-align: center; padding-top: 20px;">
+
+                    <?php
+                    $sum = 0;
+                    foreach ($responds as $respond){
+                        $sum += $respond->exist_respond;
+                    }
+                    $value = round(($sum / count($responds) * 100) * 100) / 100;
+
+                    echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p style='font-weight: 700;font-size: 13px;'>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
+                    ?>
+
+                </td>
+
+                <td style="text-align: center; padding-top: 20px;">
+
+                    <?php
+                    $sumInt = 0;
+                    foreach ($responds as $respond){
+                        $sumInt += $respond->descInterview->exist_desc;
+                    }
+                    $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
+
+                    echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p style='font-weight: 700;font-size: 13px;'>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
+                    ?>
+
+                </td>
+
+                <td style="text-align: center; padding-top: 20px;">
+                    <?php
+
+                    $sumPositive = 0;
+                    $data_desc = 0;
+                    foreach ($responds as $respond){
+
+                        if (!empty($respond->descInterview)){
+                            $data_desc++;
+
+                            if ($respond->descInterview->status == 1){
+                                $sumPositive++;
+                            }
+                        }
+                    }
+
+                    $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+
+                    if ($model->count_positive <= $sumPositive){
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
+                    }
+
+                    if ($sumPositive < $model->count_positive){
+
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
+                    }
+
+                    if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                        echo '<div style="color: red; font-size: 13px; font-weight: 700;">Недостаточное количество представителей сегмента</div>';
+
+                        if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                            echo Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                        }
+                    }
+
+                    if ($model->count_positive <= $sumPositive && empty($model->problems)){
+                        echo '<span style="color: green;font-size: 13px; font-weight: 700;">Переходите <br>к генерации ГПС</span>';
+                    }
+
+                    ?>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="data_of_gps" class="tabcontent">
+        <table class="table table-bordered table-striped" style="margin: 0;">
+            <thead>
+            <tr>
+                <th scope="col" rowspan="2" style="text-align: center;width: 180px;padding: 30px 0;">ГПС</th>
+                <th scope="col" rowspan="2" style="text-align: center;width: 180px;padding: 30px 0;">Дата ГПС</th>
+                <th scope="col" colspan="2" style="width: 300px; text-align: center;padding: 10px 0;">Проблема сегмента</th>
+                <th scope="col" rowspan="2" style="text-align: center;width: 180px;padding: 30px 0;">Отзыв эксперта</th>
+                <th scope="col" rowspan="2" style="text-align: center;width: 180px;padding: 30px 0;">Дата отзыва</th>
+            </tr>
+            <tr>
+                <td style="width: 150px;text-align: center;font-weight: 700;">Статус</td>
+                <td style="width: 150px;text-align: center;font-weight: 700;">Дата</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+
+                <?
+                $height = [];
+                foreach ($model->problems as $i => $problem) {
+                    if (isset($problem->confirm)){
+
+                        if ($problem->exist_confirm !== null){
+                            if ($problem->exist_confirm === 0){
+
+                                $height[] = 70;
+                            }else{
+
+                                $height[] = 70;
+                            }
+                        }else{
+                            $height[] = 100;
+                        }
+                    }else{
+                        $height[] = 100;
+                    }
+
+                }
+
+                $problems = [];
+                if (!empty($model->problems)){
+                    foreach ($model->problems as $problem){
+                        $problems[] = $problem;
+                    }
+                }
+
+                $feedbacks = [];
+                if (!empty($model->feedbacks)){
+                    foreach ($model->feedbacks as $k => $feedback) {
+                        $feedbacks[] = $feedback;
+                    }
+                }
+
+                ?>
+
+                <td style="text-align: center; padding: 0;font-size: 13px; font-weight: 700;">
+
+
+
+                    <?
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        if (!empty($model->problems)){
+                            foreach ($model->problems as $k => $problem) {
+
+                                if (isset($problem->confirm)){
+
+                                    /*Если есть подтверждение то выводим его результат*/
+                                    if ($problem->exist_confirm === 1) {
+
+                                        echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) .'</div>';
+                                    }
+                                    if ($problem->exist_confirm === 0) {
+
+                                        echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) .'</div>';
+                                    }
+
+                                    /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                    if ($problem->exist_confirm === null) {
+                                        echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) . '</div>';
+                                    }
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. Html::a($problem->title, Url::to(['generation-problem/view', 'id' => $problem->id])) . '</div>';
+                                }
+                            }
+                        }
+                    }else {
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 <= count($model->problems)){
+
+                                    echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;">'. Html::a($problems[$k]->title, Url::to(['generation-problem/view', 'id' => $problems[$k]->id])) . '</div>';
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                            }
+                        }
+                    }
+
+                    ?>
+
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                        <div style="padding-bottom: 10px; margin-top: 20px;"><?= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));?></div>
+
+                    <?php endif;?>
+
+                </td>
+
+                <td style="text-align: center; padding: 0; font-size: 13px; font-weight: 700;">
+
+                    <?
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        if (!empty($model->problems)){
+                            foreach ($model->problems as $k => $problem) {
+
+                                if (isset($problem->confirm)){
+
+                                    /*Если есть подтверждение то выводим его результат*/
+                                    if ($problem->exist_confirm === 1) {
+
+                                        echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date("d.m.Y", strtotime($problem->date_gps)) .'</div>';
+                                    }
+                                    if ($problem->exist_confirm === 0) {
+
+                                        echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date("d.m.Y", strtotime($problem->date_gps)) .'</div>';
+                                    }
+
+                                    /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                    if ($problem->exist_confirm === null) {
+                                        echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. date("d.m.Y", strtotime($problem->date_gps)) . '</div>';
+                                    }
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. date("d.m.Y", strtotime($problem->date_gps)) . '</div>';
+                                }
+                            }
+                        }
+                    }else {
+
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 <= count($model->problems)){
+
+                                    echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;">' . date("d.m.Y", strtotime($problem->date_gps)) . '</div>';
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                            }
+                        }
+                    }
+
+
+                    ?>
+
+                    <br>
+
+                </td>
+
+                <td style="text-align: center;padding: 0;">
+
+
+                    <?php
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        foreach ($model->problems as $i => $problem) {
+
+                            if (isset($problem->confirm)){
+
+                                /*Если есть подтверждение то выводим его результат*/
+                                if ($problem->exist_confirm === 1) {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"><div>'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div></div>';
+                                }
+                                if ($problem->exist_confirm === 0) {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
+                                }
+
+                                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                if ($problem->exist_confirm === null) {
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 15px;"><div>'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>' .
+                                        '<div>' . Html::a('Подтверждение', ['confirm-problem/view', 'id' => $problem->confirm->id], ['class' => 'btn btn-sm btn-warning', 'style' => ['margin-top' => '10px', 'width' => '130px', 'font-weight' => '700']]) . '</div></div>';
+                                }
+
+                            }else {
+
+                                echo '<div class="border-gray" style="height: 100px; padding-top: 15px;"><div>'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>'.
+                                    '<div>' . Html::a('Подтвердить', ['confirm-problem/create', 'id' => $problem->id], ['class' => 'btn btn-sm btn-primary', 'style' => ['margin-top' => '10px', 'width' => '130px', 'font-weight' => '700']]) . '</div></div>';
+                            }
+                        }
+                    }else {
+
+                        foreach ($model->problems as $i => $problem) {
+
+                            if (isset($problem->confirm)){
+
+                                /*Если есть подтверждение то выводим его результат*/
+                                if ($problem->exist_confirm === 1) {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"><div>'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div></div>';
+                                }
+                                if ($problem->exist_confirm === 0) {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
+                                }
+
+                                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                if ($problem->exist_confirm === null) {
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 15px;"><div>'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>' .
+                                        '<div>' . Html::a('Подтверждение', ['confirm-problem/view', 'id' => $problem->confirm->id], ['class' => 'btn btn-sm btn-warning', 'style' => ['margin-top' => '10px', 'width' => '130px', 'font-weight' => '700']]) . '</div></div>';
+                                }
+
+                            }else {
+
+                                echo '<div class="border-gray" style="height: 100px; padding-top: 15px;"><div>'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>'.
+                                    '<div>' . Html::a('Подтвердить', ['confirm-problem/create', 'id' => $problem->id], ['class' => 'btn btn-sm btn-primary', 'style' => ['margin-top' => '10px', 'width' => '130px', 'font-weight' => '700']]) . '</div></div>';
+                            }
+                        }
+
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 > count($model->problems)){
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+                    ?>
+                </td>
+
+                <td style="text-align: center; font-size: 13px; font-weight: 700;padding: 0;">
+
+                    <?php
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        foreach ($model->problems as $k => $problem) {
+
+                            if (isset($problem->confirm)){
+
+                                /*Если есть подтверждение то выводим его результат*/
+                                if ($problem->exist_confirm === 1) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date('d.m.yy', strtotime($problem->date_confirm)) .'</div>';
+                                }
+                                if ($problem->exist_confirm === 0) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date('d.m.yy', strtotime($problem->date_confirm)) .'</div>';
+                                }
+
+                                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                if ($problem->exist_confirm === null) {
+                                    echo '<div class="border-gray" style="height:100px;"></div>';
+                                }
+
+                            }else {
+
+                                echo '<div class="border-gray" style="height: 100px;"></div>';
+                            }
+                        }
+                    }else {
+
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 <= count($model->problems)){
+
+                                    if (!empty($problems[$k]->date_confirm)){
+
+                                        echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;">' . date('d.m.yy', strtotime($problems[$k]->date_confirm)) . '</div>';
+
+                                    }else {
+                                        echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;"></div>';
+                                    }
+
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+                    ?>
+
+                </td>
+
+                <td style="text-align: center; font-size: 13px; font-weight: 700;padding: 0;">
+
+
+
+                    <?
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        foreach ($model->problems as $k => $problem) {
+
+                            if (isset($problem->confirm)){
+
+                                /*Если есть подтверждение то выводим его результат*/
+                                if ($problem->exist_confirm === 1) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::a($feedbacks[$k]->title, Url::to(['feedback-expert/view', 'id' => $feedbacks[$k]->id])) .'</div>';
+                                }
+                                if ($problem->exist_confirm === 0) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. Html::a($feedbacks[$k]->title, Url::to(['feedback-expert/view', 'id' => $feedbacks[$k]->id])) .'</div>';
+                                }
+
+                                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                if ($problem->exist_confirm === null) {
+                                    echo '<div class="border-gray" style="height:100px; padding-top: 20px;">'. Html::a($feedbacks[$k]->title, Url::to(['feedback-expert/view', 'id' => $feedbacks[$k]->id])) .'</div>';
+                                }
+
+                            }else {
+
+                                echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. Html::a($feedbacks[$k]->title, Url::to(['feedback-expert/view', 'id' => $feedbacks[$k]->id])) .'</div>';
+                            }
+                        }
+                    }else {
+
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 <= count($model->problems)){
+
+                                    echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;">' . Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '</div>';
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">' . Html::a($feedback->title, Url::to(['feedback-expert/view', 'id' => $feedback->id])) . '</div>';
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+
+                    ?>
+
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                        <div style="padding: 20px 0;"><?= Html::a("+ добавить", Url::to(['feedback-expert/create', 'id' => $model->id]));?></div>
+
+                    <?php endif; ?>
+
+                </td>
+
+                <td style="text-align: center; font-size: 13px; font-weight: 700;padding: 0;">
+
+                    <?
+
+                    if (count($feedbacks) < count($model->problems)){
+
+                        foreach ($model->problems as $k => $problem) {
+
+                            if (isset($problem->confirm)){
+
+                                /*Если есть подтверждение то выводим его результат*/
+                                if ($problem->exist_confirm === 1 && !empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date("d.m.Y", strtotime($feedbacks[$k]->date_feedback)) .'</div>';
+                                }
+
+                                if ($problem->exist_confirm === 1 && empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                                if ($problem->exist_confirm === 0 && !empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">'. date("d.m.Y", strtotime($feedbacks[$k]->date_feedback)) .'</div>';
+                                }
+
+                                if ($problem->exist_confirm === 0 && empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;"></div>';
+                                }
+
+                                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
+                                if ($problem->exist_confirm === null && !empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height:100px; padding-top: 20px;">'. date("d.m.Y", strtotime($feedbacks[$k]->date_feedback)) .'</div>';
+                                }
+
+                                if ($problem->exist_confirm === null && empty($feedbacks[$k])) {
+                                    echo '<div class="border-gray" style="height:100px; padding-top: 20px;"></div>';
+                                }
+
+                            }else {
+
+                                if (!empty($feedbacks[$k])) {
+
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 20px;">'. date("d.m.Y", strtotime($feedbacks[$k]->date_feedback)) .'</div>';
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 100px; padding-top: 20px;"></div>';
+                                }
+                            }
+                        }
+                    }else {
+
+                        if (!empty($model->feedbacks)){
+                            foreach ($model->feedbacks as $k => $feedback) {
+
+                                if ($k+1 <= count($model->problems)){
+
+                                    echo '<div class="border-gray" style="height: '. $height[$k] .'px; padding-top: 20px;">' . date("d.m.Y", strtotime($feedback->date_feedback)) . '</div>';
+
+                                }else {
+
+                                    echo '<div class="border-gray" style="height: 70px; padding-top: 20px;">' . date("d.m.Y", strtotime($feedback->date_feedback)) . '</div>';
+                                }
+
+                            }
+                        }
+                    }
+                    ?>
+
+                    <br>
+
+                </td>
+
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 
     <div style="font-style: italic"><span class="bolder">Программа генерации ГПС</span> - программа генерации гипотез проблем сегмента.</div>
 
 </div>
+
+
+
+
+
 
 

@@ -17,10 +17,14 @@ class SingupForm extends Model
     public $username;
     public $password;
     public $status;
+    public $role;
+    public $exist_agree = true;
 
     public function rules()
     {
         return [
+            ['exist_agree','boolean'],
+            ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password'], 'required'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password'], 'trim'],
 
@@ -39,10 +43,16 @@ class SingupForm extends Model
                 'targetClass' => User::class,
                 'message' => 'Эта почта уже зарегистрирована.'],
 
-            ['status', 'default', 'value' => User::STATUS_ACTIVE, 'on' => 'default'],
+            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE, 'on' => 'default'],
             ['status', 'in', 'range' =>[
                 User::STATUS_NOT_ACTIVE,
-                User::STATUS_ACTIVE
+                User::STATUS_ACTIVE,
+                User::STATUS_DELETED,
+            ]],
+            ['role', 'default', 'value' => User::ROLE_USER],
+            ['role', 'in', 'range' =>[
+                User::ROLE_USER,
+                User::ROLE_ADMIN,
             ]],
 
         ];
@@ -58,8 +68,18 @@ class SingupForm extends Model
             'email' => 'Эл.почта',
             'username' => 'Логин',
             'password' => 'Пароль',
-            'rememberMe' => 'Запомнить'
+            'rememberMe' => 'Запомнить',
+            'role' => 'Проектная роль пользователя',
+            'exist_agree' => 'Я принимаю пользовательское соглашение'
         ];
+    }
+
+    /*Согласие на обработку данных*/
+    public function existAgree($attr)
+    {
+        if ($this->exist_agree != 1){
+            $this->addError($attr, 'Необходимо принять пользовательское соглашение');
+        }
     }
 
     /*Собственное правило для поля username*/
@@ -79,18 +99,21 @@ class SingupForm extends Model
 
     public function singup()
     {
-        $user = new User();
-        $user->second_name = $this->second_name;
-        $user->first_name = $this->first_name;
-        $user->middle_name = $this->middle_name;
-        $user->telephone = $this->telephone;
-        $user->username = $this->username;
-        $user->email = $this->email;
-        $user->status = $this->status;
-        $user->role = 'user';
-        $user->setPassword($this->password);
-        $user->generateAuthKey();
-        return $user->save() ? $user : null;
+        if ($this->exist_agree == 1){
+
+            $user = new User();
+            $user->second_name = $this->second_name;
+            $user->first_name = $this->first_name;
+            $user->middle_name = $this->middle_name;
+            $user->telephone = $this->telephone;
+            $user->username = $this->username;
+            $user->email = $this->email;
+            $user->status = $this->status;
+            $user->role = $this->role;
+            $user->setPassword($this->password);
+            $user->generateAuthKey();
+            return $user->save() ? $user : null;
+        }
     }
 
 }

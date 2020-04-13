@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Projects */
 
 $this->title = 'Проект: ' . $model->project_name;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['index', 'id' => $model->user_id]];
 $this->params['breadcrumbs'][] = $model->project_name;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -15,21 +15,33 @@ $this->params['breadcrumbs'][] = $model->project_name;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы точно хотите удалить проект ' . $model->project_name . '? 
-Все данные будут удалены безвозвратно!',
-                'method' => 'post',
-            ],
-        ]) ?>
+    <?php if (\app\models\User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-        <?= Html::a('Генерация ГЦС >>', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+        <p>
+            <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Вы точно хотите удалить проект ' . $model->project_name . '? 
+    Все данные будут удалены безвозвратно!',
+                    'method' => 'post',
+                ],
+            ]) ?>
 
-        <?= Html::a('Сводная таблица проекта', ['result', 'id' => $model->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-right' => '5px']]) ?>
-    </p>
+            <?= Html::a('Генерация ГЦС >>', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
+
+            <?= Html::a('Сводная таблица проекта', ['result', 'id' => $model->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-right' => '5px']]) ?>
+        </p>
+
+    <?php else : ?>
+
+        <p>
+            <?= Html::a('Сводная таблица проекта', ['result', 'id' => $model->id], ['class' => 'btn btn-default']) ?>
+
+            <?= Html::a('Генерация ГЦС >>', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        </p>
+
+    <?php endif; ?>
 
     <?= DetailView::widget([
         'model' => $model,

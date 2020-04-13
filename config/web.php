@@ -9,10 +9,20 @@ $config = [
     'bootstrap' => ['log'],
     'language' => 'ru-RU',
     'defaultRoute' => 'site/index',
+
+    'modules' => [
+        /*Подключение модуля админки*/
+        'admin' => [
+            'class' => 'app\modules\admin\Module',
+            'layout' => 'main',
+        ],
+    ],
+
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+
     'components' => [
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
@@ -47,7 +57,9 @@ $config = [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.mail.ru',
                 'username' => 'fedotov.michail@mail.ru',
-                'password' => 'Frctkthfnjhcnfhnfgghjtrnjd2020',
+                'password' => 'Frctkthfnjhcnfhnfgghjtrnjd2020+',
+                /*'username' => 'spaccel@mail.ru',
+                'password' => 'yjhbhdbvHVHVHjfgndj98975++',*/
                 'port' => '465',
                 'encryption' => 'ssl',
             ],
@@ -80,7 +92,8 @@ $config = [
                 'update-profile' => 'profile/update-profile',
                 'change-password' => 'profile/change-password',
                 'profile' => 'profile/index',
-                'projects' => 'projects/index',
+                /*'projects' => 'projects/index',*/
+                'admin' => 'admin/default/index',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],

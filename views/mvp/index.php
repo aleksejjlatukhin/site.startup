@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Разработка ГMVP';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -29,8 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
-        <?= Html::a('Добавить MVP', ['create', 'id' => $confirmGcp->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
+            <?= Html::a('Добавить MVP', ['create', 'id' => $confirmGcp->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
+        <?php endif; ?>
     </p>
 
     <p style="text-indent: 20px;">Minimum Viable Product(MVP) — минимально жизнеспособный продукт,
@@ -56,54 +60,93 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'title',
                 'value' => function($model){
-                    return Html::a($model->title, ['view', 'id' => $model->id]);
+                    return '<div style="text-align: center; font-size: 13px; font-weight: 700;">' . Html::a($model->title, ['view', 'id' => $model->id]) . '</div>';
                 },
                 'format' => 'html',
-                'options' => ['width' => '200'],
+                'options' => ['width' => '170'],
                 'enableSorting' => false,
             ],
 
             [
                 'attribute' => 'description',
-                'label' => 'Формулировка MVP',
+                'label' => 'Формулировка ГMVP',
+                'header' => '<div style="text-align: center;">Формулировка ГMVP</div>',
+                'value' => function ($model){
+                    return '<div style="text-align: center;">'. $model->description .'</div>';
+                },
                 'enableSorting' => false,
+                'format' => 'html',
             ],
 
             [
                 'attribute' => 'exist_confirm',
-                'label' => 'Результаты подтверждения',
+                'label' => 'Подтверждение ГMVP',
+                'header' => '<div style="text-align: center;">Подтверждение ГMVP</div>',
                 'value' => function($model){
 
-                    $c = 0; $d = 0; $e = 0;
+                    if ($model->exist_confirm === null && empty($model->confirm)){
+                        return '<div style="text-align: center;">'. Html::a('Подтвердить', ['confirm-mvp/create', 'id' => $model->id], ['class' => 'btn btn-sm btn-success', 'style' => ['width' => '220px', 'font-weight' => '700']]) .'</div>';
+                    }
 
-                    $responds = $model->confirm->responds;
+                    if ($model->exist_confirm === null && !empty($model->confirm)){
+                        return '<div style="text-align: center;">'. Html::a('Продолжить подтверждение', ['confirm-mvp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-sm btn-warning', 'style' => ['width' => '220px', 'font-weight' => '700']]) .'</div>';
+                    }
 
-                    if ($model->exist_confirm !== null){
-                        if ($responds){
-                            foreach ($responds as $respond){
-                                if ($respond->descInterview->status === 0){
-                                    $c++;
-                                }
-                                if ($respond->descInterview->status === 1){
-                                    $d++;
-                                }
-                                if ($respond->descInterview->status === 2){
-                                    $e++;
-                                }
-                            }
+                    if ($model->exist_confirm !== null && !empty($model->confirm)){
 
-                            return '<p>"Хочу купить": <span style="color: green">' . $e . '</span></p>
+                        $status = '';
+
+                        if ($model->exist_confirm === 0) {
+                            $status = '<div style="font-weight: 700; margin-bottom: 5px; font-size: 13px;">Статус: <span style="color:red; font-weight: 400;">ГMVP не подтверждена</span></div>';
+                        }
+                        if ($model->exist_confirm === 1) {
+                            $status = '<div style="font-weight: 700; margin-bottom: 5px; font-size: 13px;">Статус: <span style="color:green; font-weight: 400;">ГMVP подтверждена</span></div>';
+                        }
+
+
+                        $c = 0; $d = 0; $e = 0;
+
+                        $responds = $model->confirm->responds;
+
+                        if ($model->exist_confirm !== null){
+                            if ($responds){
+                                foreach ($responds as $respond){
+                                    if ($respond->descInterview->status === 0){
+                                        $c++;
+                                    }
+                                    if ($respond->descInterview->status === 1){
+                                        $d++;
+                                    }
+                                    if ($respond->descInterview->status === 2){
+                                        $e++;
+                                    }
+                                }
+
+                                /*return '<div style="text-align: center;">' . $status . '<div style="font-weight: 700;margin-bottom: 5px;font-size: 13px;">Результаты подтверждения:</div><p>"Хочу купить": <span style="color: green">' . $e . '</span></p>
                 <p>"Привлекательно": <span style="color: blue">' . $d . '</span></p>
-                <p>"Не интересно": <span style="color: red">' . $c . '</span></p>';
+                <p>"Не интересно": <span style="color: red">' . $c . '</span></p></div>';*/
+
+                                return '<div style="text-align: center;">' . $status .
+
+                                            '<div style="font-weight: 700;margin-bottom: 10px;font-size: 13px;">Результаты подтверждения:</div>
+                
+                                            <div style="display: flex; justify-content: space-around; width: 120px; margin: 0 80px;">
+                                                <div class="success-confirm">' . $e . '</div>
+                                                <div class="blue-confirm" >' . $d . '</div>
+                                                <div class="danger-confirm" >' . $c . '</div>
+                                            </div>
+                                        </div>';
+                            }
                         }
                     }
                 },
-                'format' => 'html',
+                'format' => 'raw',
+                'options' => ['width' => '300'],
                 'enableSorting' => false,
                 //'options' => ['width' => '250'],
             ],
 
-            [
+            /*[
                 'attribute' => 'statuses',
                 'label' => 'Статус подтверждения',
                 'value' => function($model) {
@@ -115,7 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 },
                 'format' => 'html',
-            ],
+            ],*/
 
             //['class' => 'yii\grid\ActionColumn'],
         ],

@@ -10,6 +10,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\RespondsGcp;
 use yii\data\ActiveDataProvider;
@@ -25,7 +26,7 @@ class RespondsGcpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['update'])){
 
             $model = RespondsGcp::findOne(Yii::$app->request->get());
             $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
@@ -45,7 +46,27 @@ class RespondsGcpController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['by-status-interview']) || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
+        }if (in_array($action->id, ['view'])){
+
+        $model = RespondsGcp::findOne(Yii::$app->request->get());
+        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
+        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        /*Ограничение доступа к проэктам пользователя*/
+        if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+            return parent::beforeAction($action);
+
+        }else{
+            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+        }
+
+    }elseif (in_array($action->id, ['by-status-interview']) || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
 
             $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
             $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -56,7 +77,7 @@ class RespondsGcpController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -84,6 +105,30 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+
+        $not_exist_data = 0;
+        $exist_data = 0;
+        foreach ($models as $model){
+            if (empty($model->info_respond) || empty($model->descInterview)){
+                $not_exist_data++;
+            }
+            if (!empty($model->info_respond) && !empty($model->descInterview)){
+                $exist_data++;
+            }
+        }
+
+        if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+            if ($not_exist_data != 0){
+                Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
+            }
+
+            if ($exist_data == count($models)){
+                Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
+            }
+        }
+
 
         $newRespond = new RespondsGcp();
         $newRespond->confirm_gcp_id = $id;
@@ -201,6 +246,19 @@ class RespondsGcpController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $desc_interview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
 
+
+        if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+            if (empty($model->info_respond)){
+                Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
+            }
+
+            if (!empty($model->info_respond) && empty($model->descInterview)){
+                Yii::$app->session->setFlash('success', 'Для внесения данных в анкету респондента пройдите по ссылке "Добавить анкету".');
+            }
+        }
+
+
         return $this->render('view', [
             'model' => $model,
             'confirmGcp' => $confirmGcp,
@@ -249,6 +307,15 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
 
         if ($model->load(Yii::$app->request->post())) {
@@ -306,6 +373,15 @@ class RespondsGcpController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
         $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
+
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if (count($responds) == 1){
             Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');

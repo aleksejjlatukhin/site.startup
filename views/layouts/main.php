@@ -64,7 +64,7 @@ AppAsset::register($this);
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
                 ['label' => 'Главная', 'url' => ['/']],
-                ['label' => 'Мои проекты', 'url' => ['/projects/index']],
+                ['label' => 'Мои проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
                 //['label' => 'Contact', 'url' => ['/site/contact']],
                 /*Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]

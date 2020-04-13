@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\models\User;
 
 $this->title = 'Регистрация пользователя';
 //$this->params['breadcrumbs'][] = $this->title;
@@ -24,6 +25,8 @@ $this->title = 'Регистрация пользователя';
                     'id' => 'form-signup',
             ]); ?>
 
+                <?= $form->field($model,'role', ['template' => '<div>{label}</div><div>{input}</div>'])->dropDownList([User::ROLE_USER => 'Проектант', /*User::ROLE_ADMIN => 'Администратор',*/]);?>
+
                 <?= $form->field($model, 'second_name')->textInput(['maxlength' => true]) ?>
 
                 <?= $form->field($model, 'first_name')->textInput(['maxlength' => true]) ?>
@@ -37,6 +40,10 @@ $this->title = 'Регистрация пользователя';
                 <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
                 <?= $form->field($model, 'password')->passwordInput() ?>
+
+                <?= $form->field($model, 'exist_agree')->checkbox(['value' => 1, 'checked ' => true,
+                    'template' => "<div>{input} {label} {error}</div>\n",
+                ]) ?>
 
             <div class="form-group" style="display:flex;">
                 <div style="margin: auto;">

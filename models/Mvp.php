@@ -59,7 +59,7 @@ class Mvp extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'confirm_gcp_id' => 'Confirm Gcp ID',
-            'title' => 'Наименование MVP',
+            'title' => 'Наименование ГMVP',
             'description' => 'Описание',
             'date_create' => 'Дата создания',
             'date_confirm' => 'Дата подтверждения',

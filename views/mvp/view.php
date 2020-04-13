@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Mvp */
 
 $this->title = 'Описание ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -25,29 +26,51 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <p>
-        <?= Html::a('Редактирование', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-        <?php if (empty($model->confirm)) : ?>
-            <?= Html::a('Подтвердить ГMVP >>', ['confirm-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-        <?php else: ?>
-            <?= Html::a('Подтверждение ГMVP', ['confirm-mvp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
-        <?php endif; ?>
+        <p>
+            <?= Html::a('Редактирование', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-        <?php if ($model->exist_confirm == 1){
+            <?php if (empty($model->confirm)) : ?>
+                <?= Html::a('Подтвердить ГMVP >>', ['confirm-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+            <?php else: ?>
+                <?= Html::a('Подтверждение ГMVP', ['confirm-mvp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
+            <?php endif; ?>
 
-            if (!empty($model->confirm->business)){
+            <?php if ($model->exist_confirm == 1){
 
-                echo Html::a('Показать бизнес-модель >>', ['business-model/view', 'id' => $model->confirm->business->id], ['class' => 'btn btn-default']);
+                if (!empty($model->confirm->business)){
 
-            }else{
+                    echo Html::a('Показать бизнес-модель >>', ['business-model/view', 'id' => $model->confirm->business->id], ['class' => 'btn btn-default']);
 
-                echo Html::a('Генерация бизнес-модели >>', ['business-model/create', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
-            }
+                }else{
 
-        }?>
+                    echo Html::a('Генерация бизнес-модели >>', ['business-model/create', 'id' => $model->confirm->id], ['class' => 'btn btn-default']);
+                }
 
-    </p>
+            }?>
+
+        </p>
+
+    <?php else : ?>
+
+        <p>
+            <?php if (!empty($model->confirm)) : ?>
+                <?= Html::a('Подтверждение ГMVP', ['confirm-mvp/view', 'id' => $model->confirm->id], ['class' => 'btn btn-success']) ?>
+            <?php endif; ?>
+
+            <?php if ($model->exist_confirm == 1){
+
+                if (!empty($model->confirm->business)){
+
+                    echo Html::a('Показать бизнес-модель >>', ['business-model/view', 'id' => $model->confirm->business->id], ['class' => 'btn btn-default']);
+
+                }
+            }?>
+
+        </p>
+
+    <?php endif; ?>
 
     <div class="row">
         <div class="col-md-8">
@@ -97,10 +120,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'visible' => ($model->exist_confirm !== null),
                         'value' => function($model) {
                             if ($model->exist_confirm == 0) {
-                                return '<span style="color:red">ГMVP не подтверждена</span>';
+                                return '<span style="color:red; font-size: 13px; font-weight: 700;">ГMVP не подтверждена</span>';
                             }
                             if ($model->exist_confirm == 1) {
-                                return '<span style="color:green">ГMVP подтверждена</span>';
+                                return '<span style="color:green; font-size: 13px; font-weight: 700;">ГMVP подтверждена</span>';
                             }
                         },
                         'format' => 'html',
@@ -113,6 +136,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ]) ?>
+
+            <div style="margin-top: -10px;"><?= Html::a('<< Разработка ГMVP', ['mvp/index', 'id' => $confirmGcp->id], ['class' => 'btn btn-default']) ?></div>
+
+            <div style="font-style: italic;margin-top: 20px;"><span class="bolder">ГMVP*</span> - гипотеза минимально жизнеспособного продукта.</div>
 
         </div>
     </div>

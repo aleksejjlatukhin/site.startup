@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\RespondsMvp */
 
 $this->title = 'Респондент: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -25,25 +26,50 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="responds-mvp-view">
 
-    <h3><?= Html::encode($this->title) ?></h3>
-    <br>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-    <p>
-        <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить респондента', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы действительно хотите удалить респондента "' . $model->name . '"?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <h3 style="margin-bottom: 10px;">
+            <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+            <p style="margin-top: 10px;">
+                <?= Html::a('Программа подтверждения', ['confirm-mvp/view', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-sm btn-default']) ?>
+                <?= Html::a('Информация о респондентах', ['responds-mvp/index', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-sm btn-default']) ?>
+            </p>
+        </h3>
 
-        <?if(!($desc_interview->responds_mvp_id == $model->id)){
-            echo Html::a('Добавить анкету', ['desc-interview-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success pull-right']);
-        }else{
-            echo Html::a('материалы анкеты', ['desc-interview-mvp/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success pull-right']);
-        }?>
-    </p>
+        <p>
+            <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Удалить респондента', ['delete', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Вы действительно хотите удалить респондента "' . $model->name . '"?',
+                    'method' => 'post',
+                ],
+            ]) ?>
+            <?if(!($desc_interview->responds_mvp_id == $model->id)){
+                echo Html::a('Добавить анкету', ['desc-interview-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']);
+            }else{
+                echo Html::a('материалы анкеты', ['desc-interview-mvp/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success']);
+            }?>
+        </p>
+
+    <?php else : ?>
+
+        <h3 style="margin-bottom: 10px;">
+            <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+            <p style="margin-top: 10px;">
+                <?= Html::a('Программа подтверждения', ['confirm-mvp/view', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-default']) ?>
+                <?= Html::a('Информация о респондентах', ['responds-mvp/index', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-default']) ?>
+
+                <?if(!($desc_interview->responds_mvp_id == $model->id)){
+                    //echo Html::a('Добавить анкету', ['desc-interview-mvp/create', 'id' => $model->id], ['class' => 'btn btn-success']);
+                }else{
+                    echo Html::a('материалы анкеты', ['desc-interview-mvp/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success']);
+                }?>
+            </p>
+        </h3>
+
+    <?php endif; ?>
+
 
     <?= DetailView::widget([
         'model' => $model,
@@ -90,10 +116,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
-
-    <?= Html::a('<< Программа подтверждения', ['confirm-mvp/view', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-default']) ?>
-
-    <?= Html::a('Информация о респондентах', ['responds-mvp/index', 'id' => $model->confirm_mvp_id], ['class' => 'btn btn-default pull-right']) ?>
 
 
 </div>

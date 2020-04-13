@@ -12,11 +12,19 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="projects-index">
 
-    <h2><?= Html::encode($this->title) ?></h2>
+    <?php if (\app\models\User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-    <p style="margin-bottom: 20px;">
-        <?= Html::a('Создать проект', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <h2><?= Html::encode($this->title) ?></h2>
+
+        <p style="margin-bottom: 20px;">
+            <?= Html::a('Создать проект', ['create', 'id' => Yii::$app->user->id], ['class' => 'btn btn-success']) ?>
+        </p>
+
+    <?php else : ?>
+
+        <h2 style="margin-bottom: 20px;"><?= Html::encode($this->title) ?></h2>
+
+    <?php endif; ?>
 
 
     <?= GridView::widget([

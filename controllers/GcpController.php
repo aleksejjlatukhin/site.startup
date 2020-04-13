@@ -7,6 +7,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\Gcp;
 use yii\data\ActiveDataProvider;
@@ -22,7 +23,25 @@ class GcpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = Gcp::findOne(Yii::$app->request->get());
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = Gcp::findOne(Yii::$app->request->get());
             $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
@@ -40,7 +59,7 @@ class GcpController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['create']) || in_array($action->id, ['index'])){
+        }elseif (in_array($action->id, ['create'])){
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
@@ -50,6 +69,23 @@ class GcpController extends AppController
 
             /*Ограничение доступа к проэктам пользователя*/
             if ($project->user_id == Yii::$app->user->id){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['index'])){
+
+            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -77,6 +113,7 @@ class GcpController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $Gcps = Gcp::find()->where(['confirm_problem_id' => $id])->all();
 
+
         if ($generationProblem->exist_confirm !== 1){
             Yii::$app->session->setFlash('error', "Отсутствует подтверждение проблемы с данным ID, поэтому вы не можете перейти к созданию ГЦП.");
             return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
@@ -84,6 +121,11 @@ class GcpController extends AppController
 
         if (count($Gcps) == 0){
             return $this->redirect(['create', 'id' => $id]);
+        }
+
+        if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+
+            Yii::$app->session->setFlash('success', 'Для редактирования и просмотра подробной информации о ГЦП пройдите по ссылке в столбце "Наименование ГЦП".');
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -137,13 +179,21 @@ class GcpController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = new Gcp();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['confirm-problem/view', 'id' => $confirmProblem->id]);
+        }
+
         $models = Gcp::find()->where(['confirm_problem_id' => $id])->all();
         $model->title = 'ГЦП ' . (count($models)+1);
         $model->confirm_problem_id = $id;
@@ -224,6 +274,14 @@ class GcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($generationProblem->exist_confirm !== 1){
             Yii::$app->session->setFlash('error', "У проблемы с данным ID отсутствует подтверждение, поэтому вы не можете перейти к редактированию ГЦП.");
@@ -261,7 +319,7 @@ class GcpController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = $this->findModel($id);
         $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
@@ -270,6 +328,14 @@ class GcpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $project->update_at = date('Y:m:d');
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($project->save()){
 
@@ -288,7 +354,7 @@ class GcpController extends AppController
                 return $this->redirect(['index', 'id' => $confirmProblem->id]);
             }
         }
-    }
+    }*/
 
     /**
      * Finds the Gcp model based on its primary key value.

@@ -9,6 +9,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\FeedbackExpertGcp;
 use yii\data\ActiveDataProvider;
@@ -25,7 +26,27 @@ class FeedbackExpertGcpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = FeedbackExpertGcp::findOne(Yii::$app->request->get());
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = FeedbackExpertGcp::findOne(Yii::$app->request->get());
             $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
@@ -88,7 +109,6 @@ class FeedbackExpertGcpController extends AppController
 
     public function actionDownload($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpertGcp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -97,6 +117,7 @@ class FeedbackExpertGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -116,7 +137,6 @@ class FeedbackExpertGcpController extends AppController
 
     public function actionDeleteFile($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpertGcp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -125,6 +145,7 @@ class FeedbackExpertGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -156,7 +177,6 @@ class FeedbackExpertGcpController extends AppController
      */
     public function actionView($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -165,6 +185,7 @@ class FeedbackExpertGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        //$user = User::find()->where(['id' => $project->user_id])->one();
 
         return $this->render('view', [
             'model' => $model,
@@ -185,7 +206,6 @@ class FeedbackExpertGcpController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = new FeedbackExpertGcp();
         $model->confirm_gcp_id = $id;
         $model->date_feedback = date('Y:m:d');
@@ -199,6 +219,14 @@ class FeedbackExpertGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['confirm-gcp/view', 'id' => $confirmGcp->id]);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -267,9 +295,7 @@ class FeedbackExpertGcpController extends AppController
      */
     public function actionUpdate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
-
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -277,6 +303,15 @@ class FeedbackExpertGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $models = FeedbackExpertGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
 
         if ($model->feedback_file !== null){
@@ -368,12 +403,29 @@ class FeedbackExpertGcpController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
+        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
-    }
+    }*/
 
     /**
      * Finds the FeedbackExpertGcp model based on its primary key value.

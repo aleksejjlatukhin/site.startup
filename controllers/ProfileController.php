@@ -51,6 +51,12 @@ class ProfileController extends AppController
      */
     public function actionIndex()
     {
+
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/admin/profile/index']);
+        }
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
 
         if (!empty($user->projects)){
@@ -79,6 +85,11 @@ class ProfileController extends AppController
     public function actionUpdateProfile()
     {
 
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/admin/profile/index']);
+        }
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
         $model = new ProfileForm();
 
@@ -106,6 +117,11 @@ class ProfileController extends AppController
 
     public function actionChangePassword()
     {
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/admin/profile/index']);
+        }
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
         $model = new PasswordChangeForm($user, []);
 
@@ -127,6 +143,7 @@ class ProfileController extends AppController
 
     public function actionProject($id)
     {
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
 
         $model = Projects::findOne($id);
@@ -222,6 +239,7 @@ class ProfileController extends AppController
 
     public function actionRoadmap($id)
     {
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
 
         $project = Projects::findOne($id);
@@ -336,6 +354,7 @@ class ProfileController extends AppController
 
 
         return $this->render('roadmap', [
+            'user' => $user,
             'project' => $project,
             'models' => $models,
             'gps' => $gps,
@@ -363,6 +382,16 @@ class ProfileController extends AppController
 
     public function actionNotFound()
     {
+        if (!User::isActiveStatus(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/profile/index']);
+        }
+
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/admin/profile/index']);
+        }
+
         $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
 
         return $this->render('not-found', [

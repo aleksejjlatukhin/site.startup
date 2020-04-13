@@ -9,6 +9,7 @@ use app\models\Projects;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\ConfirmProblem;
 use yii\data\ActiveDataProvider;
@@ -24,7 +25,24 @@ class ConfirmProblemController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = ConfirmProblem::findOne(Yii::$app->request->get());
+            $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
@@ -103,11 +121,28 @@ class ConfirmProblemController extends AppController
             }
         }
 
+
         foreach ($responds as $respond){
             if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
                 $respond->descInterview->exist_desc = 1;
             }
         }
+
+
+        $data_responds = 0;
+        $data_desc = 0;
+        foreach ($responds as $respond){
+            if (!empty($respond->name) && !empty($respond->info_respond)){
+                $respond->exist_respond = 1;
+                $data_responds++;
+                if (!empty($respond->descInterview)){
+                    $data_desc++;
+                }
+            }else{
+                $respond->exist_respond = 0;
+            }
+        }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => RespondsConfirm::find()->where(['confirm_problem_id' => $id]),
@@ -121,6 +156,8 @@ class ConfirmProblemController extends AppController
             'segment' => $segment,
             'project' => $project,
             'responds' => $responds,
+            'data_responds' => $data_responds,
+            'data_desc' => $data_desc,
         ]);
     }
 
@@ -174,7 +211,6 @@ class ConfirmProblemController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = new ConfirmProblem();
         $model->gps_id = $id;
 
@@ -183,6 +219,14 @@ class ConfirmProblemController extends AppController
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
+        }
 
 
         if (!empty($generationProblem->confirm)){
@@ -296,6 +340,14 @@ class ConfirmProblemController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
 
@@ -352,9 +404,8 @@ class ConfirmProblemController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
@@ -362,6 +413,14 @@ class ConfirmProblemController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $model->id])->all();
         $project->update_at = date('Y:m:d');
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         $gps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -394,7 +453,7 @@ class ConfirmProblemController extends AppController
 
             return $this->redirect(['create', 'id' => $model->gps_id]);
         }
-    }
+    }*/
 
     /**
      * Finds the ConfirmProblem model based on its primary key value.

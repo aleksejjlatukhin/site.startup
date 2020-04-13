@@ -6,6 +6,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\FeedbackExpert;
 use yii\data\ActiveDataProvider;
@@ -22,7 +23,23 @@ class FeedbackExpertController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = FeedbackExpert::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = FeedbackExpert::findOne(Yii::$app->request->get());
             $interview = Interview::find()->where(['id' => $model->interview_id])->one();
@@ -77,11 +94,11 @@ class FeedbackExpertController extends AppController
 
     public function actionDownload($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpert::findOne($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -100,11 +117,11 @@ class FeedbackExpertController extends AppController
 
     public function actionDeleteFile($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpert::findOne($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -171,7 +188,14 @@ class FeedbackExpertController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
 
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['interview/view', 'id' => $interview->id]);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -239,6 +263,14 @@ class FeedbackExpertController extends AppController
         $models = FeedbackExpert::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($model->feedback_file !== null){
             $model->loadFile = $model->feedback_file;
@@ -320,13 +352,21 @@ class FeedbackExpertController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $project->update_at = date('Y:m:d');
 
         $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
@@ -353,7 +393,7 @@ class FeedbackExpertController extends AppController
 
             return $this->redirect(['interview/view', 'id' => $interview->id]);
         }
-    }
+    }*/
 
     /**
      * Finds the FeedbackExpert model based on its primary key value.

@@ -5,7 +5,7 @@ use yii\grid\GridView;
 use yii\helpers\Url;
 
 $this->title = 'Проверка заполнения данных о респондентах';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -21,10 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="respond-gcp exist">
 
-    <h2><?= Html::encode($this->title) ?></h2>
-
-    <br>
-
+    <h2 style="margin-bottom: 15px;">
+        <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+        <?= Html::a('<< Программа подтверждения', ['confirm-gcp/view', 'id' => $confirmGcp->id], ['class' => 'btn btn-sm btn-default']) ?>
+    </h2>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -42,9 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Респонденты',
                 'headerOptions' => ['class' => 'text-center'],
                 'value' => function ($model) {
-                    return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
+                    return '<div style="font-weight: 700;">' . Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id])) . '</div>';
                 },
                 'format' => 'raw',
+                'enableSorting' => false,
             ],
 
             [
@@ -63,8 +64,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
         ],
     ]); ?>
-
-    <?= Html::a('<< Программа подтверждения', ['confirm-gcp/view', 'id' => $confirmGcp->id], ['class' => 'btn btn-default']) ?>
-
 
 </div>

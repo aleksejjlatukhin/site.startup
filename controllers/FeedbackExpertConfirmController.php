@@ -7,6 +7,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\FeedbackExpertConfirm;
 use yii\data\ActiveDataProvider;
@@ -23,7 +24,25 @@ class FeedbackExpertConfirmController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = FeedbackExpertConfirm::findOne(Yii::$app->request->get());
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = FeedbackExpertConfirm::findOne(Yii::$app->request->get());
             $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
@@ -82,13 +101,13 @@ class FeedbackExpertConfirmController extends AppController
 
     public function actionDownload($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpertConfirm::findOne($id);
         $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -108,13 +127,13 @@ class FeedbackExpertConfirmController extends AppController
 
     public function actionDeleteFile($id)
     {
-        $user = Yii::$app->user->identity;
         $model = FeedbackExpertConfirm::findOne($id);
         $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -169,7 +188,6 @@ class FeedbackExpertConfirmController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = new FeedbackExpertConfirm();
         $model->confirm_problem_id = $id;
         $model->date_feedback = date('Y:m:d');
@@ -181,6 +199,14 @@ class FeedbackExpertConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['confirm-problem/view', 'id' => $confirmProblem->id]);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -247,7 +273,6 @@ class FeedbackExpertConfirmController extends AppController
      */
     public function actionUpdate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
 
         $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
@@ -255,6 +280,15 @@ class FeedbackExpertConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $models = FeedbackExpertConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
 
         if ($model->feedback_file !== null){
@@ -343,7 +377,7 @@ class FeedbackExpertConfirmController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = $this->findModel($id);
         if ($model->feedback_file !== null){
@@ -355,6 +389,15 @@ class FeedbackExpertConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $project->update_at = date('Y:m:d');
 
         if ($project->save()) {
@@ -373,7 +416,7 @@ class FeedbackExpertConfirmController extends AppController
             return $this->redirect(['confirm-problem/view', 'id' => $confirmProblem->id]);
         }
 
-    }
+    }*/
 
     /**
      * Finds the FeedbackExpertConfirm model based on its primary key value.

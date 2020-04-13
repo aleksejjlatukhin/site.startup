@@ -11,6 +11,7 @@ use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\Interview;
 use yii\data\ActiveDataProvider;
@@ -26,7 +27,22 @@ class InterviewController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = Interview::findOne(Yii::$app->request->get());
             $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -104,6 +120,10 @@ class InterviewController extends AppController
             }
         }
 
+
+
+
+
         foreach ($responds as $respond){
             if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
                 $respond->descInterview->exist_desc = 1;
@@ -135,7 +155,6 @@ class InterviewController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $segment = Segment::findOne($id);
 
         if (empty($segment->creat_date)){
@@ -144,9 +163,16 @@ class InterviewController extends AppController
         }
 
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
         $model = new Interview();
         $model->segment_id = $id;
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['segment/view', 'id' => $segment->id]);
+        }
 
         $newQuestions = new Questions();
 
@@ -287,15 +313,19 @@ class InterviewController extends AppController
     public function actionUpdate($id)
     {
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
-
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
-
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         $questions = Questions::find()->where(['interview_id' => $id])->all();
-
         $newQuestions = new Questions();
-
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
         if ($model->load(Yii::$app->request->post())) {
@@ -369,12 +399,20 @@ class InterviewController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $user = Yii::$app->user->identity;
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         $responds = Respond::find()->where(['interview_id' => $model->id])->all();
         $generationProblems = GenerationProblem::find()->where(['interview_id' => $model->id])->all();
         $project->update_at = date('Y:m:d');
@@ -443,7 +481,7 @@ class InterviewController extends AppController
 
             return $this->redirect(['create', 'id' => $model->segment_id]);
         }
-    }
+    }*/
 
     /**
      * Finds the Interview model based on its primary key value.

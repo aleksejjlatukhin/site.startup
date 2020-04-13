@@ -24,7 +24,26 @@ class DescInterviewConfirmController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = DescInterviewConfirm::findOne(Yii::$app->request->get());
+            $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = DescInterviewConfirm::findOne(Yii::$app->request->get());
             $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
@@ -119,7 +138,6 @@ class DescInterviewConfirmController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = new DescInterviewConfirm();
         $model->responds_confirm_id = $id;
         $model->date_fact = date('Y:m:d');
@@ -130,6 +148,14 @@ class DescInterviewConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['responds-confirm/view', 'id' => $respond->id]);
+        }
 
         if (!empty($respond->descInterview)){
             return $this->redirect(['view', 'id' => $respond->descInterview->id]);
@@ -172,15 +198,21 @@ class DescInterviewConfirmController extends AppController
      */
     public function actionUpdate($id)
     {
-        $user = Yii::$app->user->identity;
         $model = $this->findModel($id);
-
         $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
 
         if ($model->load(Yii::$app->request->post())) {
@@ -213,7 +245,7 @@ class DescInterviewConfirmController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = DescInterviewConfirm::find()->where(['responds_confirm_id' => $id])->one();
 
@@ -223,6 +255,14 @@ class DescInterviewConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($project->save()) {
 
@@ -232,7 +272,7 @@ class DescInterviewConfirmController extends AppController
 
             return $this->redirect(['responds-confirm/view', 'id' => $respond->id]);
         }
-    }
+    }*/
 
     /**
      * Finds the DescInterviewConfirm model based on its primary key value.

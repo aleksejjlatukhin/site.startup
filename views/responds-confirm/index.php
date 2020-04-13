@@ -3,12 +3,13 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Информация о респондентах';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -19,13 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 
-
-
 <div class="responds-confirm-index">
 
-    <h2><?= Html::encode($this->title) ?></h2>
-
-    <br>
+    <h2>
+        <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>
+        <?= Html::a('<< Программа подтверждения', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-sm btn-default']) ?>
+    </h2>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <tr>
                 <th scope="row"><?= $j; ?></th>
 
-                <td>
+                <td style="font-weight: 700;">
                     <?php
                     if (!empty($model->name)){
                         $name = $model->name;
@@ -57,12 +57,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     ?>
                 </td>
 
-                <td><?if (!empty($model->info_respond)) {
+                <td>
+                    <?if (!empty($model->info_respond)) {
                         echo $model->info_respond;
-                    }?></td>
+                    }?>
+                </td>
 
 
-                <td class="text-center"><? if (!empty($model->descInterview->date_fact)){
+                <td class="text-center" style="font-weight: 700;">
+                    <? if (!empty($model->descInterview->date_fact)){
                         $date_fact = date("d.m.Y", strtotime($model->descInterview->date_fact));
                         echo Html::a(Html::encode($date_fact), Url::to(['desc-interview-confirm/view', 'id' => $model->descInterview->id]));
                     } ?></td>
@@ -76,29 +79,30 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <p class="open_fast">
-        <?= Html::submitButton('Добавить респондента', ['class' => 'btn btn-primary']) ?>
-    </p>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-    <div class="popap_fast">
+        <p class="open_fast">
+            <?= Html::submitButton('Добавить респондента', ['class' => 'btn btn-primary']) ?>
+        </p>
 
-        <?php $form = ActiveForm::begin(); ?>
+        <div class="popap_fast">
 
-        <div class="col-sm-9">
-            <?= $form->field($newRespond, 'name')->textInput(['maxlength' => true])->label('Напишите Ф.И.О. респондента') ?>
+            <?php $form = ActiveForm::begin(); ?>
+
+            <div class="col-sm-9">
+                <?= $form->field($newRespond, 'name')->textInput(['maxlength' => true])->label('Напишите Ф.И.О. респондента') ?>
+            </div>
+
+            <span class="cross-out glyphicon text-danger glyphicon-remove"></span>
+
+            <div class="col-sm-12 form-group">
+                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
+
         </div>
 
-        <span class="cross-out glyphicon text-danger glyphicon-remove"></span>
-
-        <div class="col-sm-12 form-group">
-            <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-        </div>
-
-        <?php ActiveForm::end(); ?>
-
-    </div>
-
-    <hr>
-    <?= Html::a('<< Программа подтверждения', ['confirm-problem/view', 'id' => $confirmProblem->id], ['class' => 'btn btn-default']) ?>
+    <?php endif; ?>
 
 </div>

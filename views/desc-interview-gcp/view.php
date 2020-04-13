@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\DescInterviewGcp */
 
 $this->title = 'Анкета респондента';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
@@ -23,18 +24,24 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="desc-interview-gcp-view">
 
-    <h2><?= Html::encode($this->title) ?></h2>
+    <h2><?= Html::encode($this->title  . ': ' . $respond->name) ?></h2>
 
-    <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?/*= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) */?>
-    </p>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+        <p>
+            <?= Html::a('<< Общие данные респондента', ['responds-gcp/view', 'id' => $model->responds_gcp_id], ['class' => 'btn btn-default']) ?>
+            <?= Html::a('Редактировать анкету', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+
+        </p>
+
+    <?php else : ?>
+
+        <p>
+            <?= Html::a('<< Общие данные респондента', ['responds-gcp/view', 'id' => $model->responds_gcp_id], ['class' => 'btn btn-default']) ?>
+        </p>
+
+    <?php endif; ?>
+
 
     <div class="row">
         <div class="col-md-8">
@@ -56,8 +63,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ]) ?>
-
-            <?= Html::a('Вернуться к общим данным респондента', ['responds-gcp/view', 'id' => $model->responds_gcp_id], ['class' => 'btn btn-default']) ?>
 
         </div>
     </div>

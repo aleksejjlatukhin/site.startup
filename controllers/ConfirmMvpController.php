@@ -12,6 +12,7 @@ use app\models\Projects;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\Segment;
+use app\models\User;
 use Yii;
 use app\models\ConfirmMvp;
 use yii\data\ActiveDataProvider;
@@ -27,7 +28,28 @@ class ConfirmMvpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['view'])){
+
+            $model = ConfirmMvp::findOne(Yii::$app->request->get());
+            $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
+            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['update'])){
 
             $model = ConfirmMvp::findOne(Yii::$app->request->get());
             $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
@@ -117,11 +139,28 @@ class ConfirmMvpController extends AppController
             }
         }
 
+
         foreach ($responds as $respond){
             if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
                 $respond->descInterview->exist_desc = 1;
             }
         }
+
+
+        $data_responds = 0;
+        $data_desc = 0;
+        foreach ($responds as $respond){
+            if (!empty($respond->name) && !empty($respond->info_respond)){
+                $respond->exist_respond = 1;
+                $data_responds++;
+                if (!empty($respond->descInterview)){
+                    $data_desc++;
+                }
+            }else{
+                $respond->exist_respond = 0;
+            }
+        }
+
 
         return $this->render('view', [
             'model' => $model,
@@ -134,6 +173,8 @@ class ConfirmMvpController extends AppController
             'segment' => $segment,
             'project' => $project,
             'responds' => $responds,
+            'data_responds' => $data_responds,
+            'data_desc' => $data_desc,
         ]);
     }
 
@@ -195,7 +236,8 @@ class ConfirmMvpController extends AppController
      */
     public function actionCreate($id)
     {
-        $user = Yii::$app->user->identity;
+        $model = new ConfirmMvp();
+        $model->mvp_id = $id;
         $mvp = Mvp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -204,9 +246,14 @@ class ConfirmMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
 
-        $model = new ConfirmMvp();
-        $model->mvp_id = $id;
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['mvp/view', 'id' => $mvp->id]);
+        }
 
         if (!empty($mvp->confirm)){
             return $this->redirect(['view', 'id' => $mvp->confirm->id]);
@@ -317,6 +364,14 @@ class ConfirmMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Действие доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
 
@@ -375,12 +430,30 @@ class ConfirmMvpController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model =$this->findModel($id);
+        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
+        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        //Удаление доступно только проектанту, который создал данную модель
+        if ($user->id != $_user['id']){
+            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
-    }
+    }*/
 
     /**
      * Finds the ConfirmMvp model based on its primary key value.
