@@ -107,9 +107,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             }
 
-                            return '<p>"Хочу купить": <span style="color: green">' . $e . '</span></p>
-                <p>"Привлекательно": <span style="color: blue">' . $d . '</span></p>
-                <p>"Не интересно": <span style="color: red">' . $c . '</span></p>';
+                            return '<div style="font-size: 13px; font-weight: 700;"><p>Хочу купить: <span style="color: green">' . $e . '</span></p>
+                <p>Привлекательно: <span style="color: blue">' . $d . '</span></p>
+                <p>Не интересно: <span style="color: red">' . $c . '</span></p></div>';
                         },
                         'format' => 'html',
                     ],
