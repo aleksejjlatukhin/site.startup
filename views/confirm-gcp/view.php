@@ -203,7 +203,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 foreach ($responds as $respond){
                     $sum += $respond->exist_respond;
                 }
-                $value = round(($sum / count($responds) * 100) * 100) / 100;
+
+                if ($sum !== 0){
+
+                    $value = round(($sum / count($responds) * 100) * 100) / 100;
+
+                }else{
+
+                    $value = 0;
+                }
+
 
                 echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p style='font-weight: 700;font-size: 13px;'>$value  %</p>", Url::to(['responds-gcp/exist', 'id' => $model->id]));
                 ?>
@@ -242,7 +251,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
 
-                $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+                if($sumPositive !== 0){
+
+                    $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+
+                }else {
+
+                    $valPositive = 0;
+                }
+
 
                 if ($sumPositive < $model->count_positive){
 

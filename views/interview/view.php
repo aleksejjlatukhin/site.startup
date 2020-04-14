@@ -215,72 +215,72 @@ $this->params['breadcrumbs'][] = $this->title;
             <td style="text-align: center; padding-top: 20px;">
 
                 <?php
-/*                $sum = 0;
-                foreach ($responds as $respond){
-                    $sum += $respond->exist_respond;
-                }
-                $value = round(($sum / count($responds) * 100) * 100) / 100;
+    /*                $sum = 0;
+                    foreach ($responds as $respond){
+                        $sum += $respond->exist_respond;
+                    }
+                    $value = round(($sum / count($responds) * 100) * 100) / 100;
 
-                echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
-                */?>
+                    echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
+                    */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
 
                 <?php
-/*                $sumInt = 0;
-                foreach ($responds as $respond){
-                    $sumInt += $respond->descInterview->exist_desc;
-                }
-                $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
+    /*                $sumInt = 0;
+                    foreach ($responds as $respond){
+                        $sumInt += $respond->descInterview->exist_desc;
+                    }
+                    $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
 
-                echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
-                */?>
+                    echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
+                    */?>
 
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
                 <?php
-/*
-                $sumPositive = 0;
-                $data_desc = 0;
-                foreach ($responds as $respond){
+    /*
+                    $sumPositive = 0;
+                    $data_desc = 0;
+                    foreach ($responds as $respond){
 
-                    if (!empty($respond->descInterview)){
-                        $data_desc++;
+                        if (!empty($respond->descInterview)){
+                            $data_desc++;
 
-                        if ($respond->descInterview->status == 1){
-                            $sumPositive++;
+                            if ($respond->descInterview->status == 1){
+                                $sumPositive++;
+                            }
                         }
                     }
-                }
 
-                $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+                    $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
 
-                if ($model->count_positive <= $sumPositive){
-                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
-                }
-
-                if ($sumPositive < $model->count_positive){
-
-                    echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
-                }
-
-                if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
-                    echo '<div style="color: red; font-size: 13px; font-weight: 700;">Недостаточное количество представителей сегмента</div>';
-
-                    if (User::isUserSimple(Yii::$app->user->identity['username'])){
-
-                        echo Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                    if ($model->count_positive <= $sumPositive){
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
                     }
-                }
 
-                if ($model->count_positive <= $sumPositive && empty($model->problems)){
-                    echo '<span style="color: green;font-size: 13px; font-weight: 700;">Переходите <br>к созданию ГПС</span>';
-                }
+                    if ($sumPositive < $model->count_positive){
 
-                */?>
+                        echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
+                    }
+
+                    if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                        echo '<div style="color: red; font-size: 13px; font-weight: 700;">Недостаточное количество представителей сегмента</div>';
+
+                        if (User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                            echo Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
+                        }
+                    }
+
+                    if ($model->count_positive <= $sumPositive && empty($model->problems)){
+                        echo '<span style="color: green;font-size: 13px; font-weight: 700;">Переходите <br>к созданию ГПС</span>';
+                    }
+
+                    */?>
             </td>
 
             <td style="text-align: center; padding-top: 20px;">
@@ -440,7 +440,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach ($responds as $respond){
                         $sum += $respond->exist_respond;
                     }
-                    $value = round(($sum / count($responds) * 100) * 100) / 100;
+
+                    if ($sum !== 0){
+
+                        $value = round(($sum / count($responds) * 100) * 100) / 100;
+
+                    }else{
+
+                        $value = 0;
+                    }
+
 
                     echo Html::a("<progress max='100' value='$value' id='info-respond'></progress><p style='font-weight: 700;font-size: 13px;'>$value  %</p>", Url::to(['respond/exist', 'id' => $model->id]));
                     ?>
@@ -454,7 +463,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach ($responds as $respond){
                         $sumInt += $respond->descInterview->exist_desc;
                     }
-                    $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
+
+                    if ($sumInt !== 0){
+
+                        $valueInt = round(($sumInt / count($responds) * 100) *100) / 100;
+
+                    }else{
+
+                        $valueInt = 0;
+                    }
+
 
                     echo Html::a("<progress max='100' value='$valueInt' id='info-interview'></progress><p style='font-weight: 700;font-size: 13px;'>$valueInt  %</p>", Url::to(['respond/by-date-interview', 'id' => $model->id]));
                     ?>
@@ -477,7 +495,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }
 
-                    $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+                    if($sumPositive !== 0){
+
+                        $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+
+                    }else {
+
+                        $valPositive = 0;
+                    }
+
 
                     if ($model->count_positive <= $sumPositive){
                         echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-green'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));

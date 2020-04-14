@@ -59,7 +59,7 @@ $config = [
                 'username' => 'fedotov.michail@mail.ru',
                 'password' => 'Frctkthfnjhcnfhnfgghjtrnjd2020+',
                 /*'username' => 'spaccel@mail.ru',
-                'password' => 'yjhbhdbvHVHVHjfgndj98975++',*/
+                'password' => 'InfoSpa20',*/
                 'port' => '465',
                 'encryption' => 'ssl',
             ],

@@ -25,7 +25,7 @@ $this->title = 'Регистрация пользователя';
                     'id' => 'form-signup',
             ]); ?>
 
-                <?= $form->field($model,'role', ['template' => '<div>{label}</div><div>{input}</div>'])->dropDownList([User::ROLE_USER => 'Проектант', /*User::ROLE_ADMIN => 'Администратор',*/]);?>
+                <?= $form->field($model,'role', ['template' => '<div>{label}</div><div>{input}</div>'])->dropDownList([User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Администратор',]);?>
 
                 <?= $form->field($model, 'second_name')->textInput(['maxlength' => true]) ?>
 
