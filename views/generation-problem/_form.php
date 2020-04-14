@@ -30,7 +30,7 @@ use yii\bootstrap\Modal;
                 <?php if ((!empty($respond->descInterview))) : ?>
                     <?php if (($respond->descInterview->status == 1)) : ?>
                         <tr>
-                            <td>
+                            <td style="font-weight: 700;">
                                 <?= Html::a($respond->name, Url::to(['respond/view', 'id' => $respond->id])); ?>
                             </td>
 
