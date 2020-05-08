@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
-        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
             <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
 
@@ -514,10 +514,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::a("<progress max='100' value='$valPositive' id='info-interview' class='info-red'></progress><p style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>", Url::to(['respond/by-status-responds', 'id' => $model->id]));
                     }
 
-                    if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                    if (/*$sumPositive != 0 && */$sumPositive < $model->count_positive && count($responds) == $data_desc){
                         echo '<div style="color: red; font-size: 13px; font-weight: 700;">Недостаточное количество представителей сегмента</div>';
 
-                        if (User::isUserSimple(Yii::$app->user->identity['username'])){
+                        if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                             echo Html::a('Добавить!', ['respond/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
                         }
@@ -644,9 +644,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     ?>
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
-                        <div style="padding-bottom: 10px; margin-top: 20px;"><?= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));?></div>
+                        <div style="padding: 20px;"><?= Html::a("+ добавить", Url::to(['generation-problem/create', 'id' => $model->id]));?></div>
 
                     <?php endif;?>
 
@@ -900,7 +900,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     ?>
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
                         <div style="padding: 20px 0;"><?= Html::a("+ добавить", Url::to(['feedback-expert/create', 'id' => $model->id]));?></div>
 

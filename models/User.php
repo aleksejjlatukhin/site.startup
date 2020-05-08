@@ -2,9 +2,11 @@
 
 namespace app\models;
 
+use app\modules\admin\models\ConversationMainAdmin;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
+use Yii;
 
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -14,6 +16,11 @@ class User extends ActiveRecord implements IdentityInterface
 
     const ROLE_USER = 10;
     const ROLE_ADMIN = 20;
+    const ROLE_MAIN_ADMIN = 30;
+    const ROLE_DEV = 100;
+
+    const CONFIRM = 20;
+    const NOT_CONFIRM = 10;
 
     public $password;
 
@@ -30,8 +37,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_image'], 'filter', 'filter' => 'trim'],
             [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_image'], 'string', 'max' => 255],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status', 'role'], 'required'],
-            ['role', 'integer'],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status', 'role', 'confirm'], 'required'],
+            [['role', 'status', 'confirm', 'id_admin'], 'integer'],
             ['email', 'email'],
             ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
             ['username', 'string', 'min' => 3, 'max' => 32],
@@ -90,7 +97,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return static::findOne([
             'id' => $id,
-            //'status' => self::STATUS_ACTIVE
+            'confirm' => self::CONFIRM,
         ]);
     }
 
@@ -203,7 +210,6 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     //Проверка срока действия секретного ключа
-    // для смены пароля через почту
     public static function isSecretKeyExpire($key)
     {
         if (empty($key)) {
@@ -233,6 +239,116 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
+
+    //Поиск пользователя по email или login
+    public static function findIdentityByUsernameOrEmail($identity)
+    {
+        $users = self::find()->all();
+        foreach ($users as $user) {
+            if (($identity == $user->username) || ($identity == $user->email)){
+                return $user;
+            }
+        }
+        return false;
+    }
+
+
+
+    //Получить объект главного Админа
+    public function getMainAdmin ()
+    {
+        return User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+    }
+
+
+    //Отправка письма на почту пользователю при изменении его статуса
+    public function sendEmailUserStatus()
+    {
+        /* @var $user User */
+        $user = User::findOne(
+            [
+                'email' => $this->email,
+            ]
+        );
+
+        if($user){
+
+            return Yii::$app->mailer->compose('change-status', ['user' => $user])
+                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+                ->setTo($this->email)
+                ->setSubject('Изменение Вашего статуса на сайте StartPool')
+                ->send();
+        }
+
+        return false;
+    }
+
+
+
+    //Создание беседы главного админа и админа при активации его статуса
+    public function createConversationMainAdmin ()
+    {
+
+        $convers = ConversationMainAdmin::findOne(['admin_id' => $this->id]);
+
+        if (!($convers)) {
+
+            $conversation = new ConversationMainAdmin();
+            $conversation->admin_id = $this->id;
+            $conversation->main_admin_id = $this->mainAdmin->id;
+            return $conversation->save() ? $conversation : null;
+
+        }else{
+
+            return $convers;
+        }
+
+    }
+
+
+
+    //Создание беседы админа и проектанта при активации его статуса
+    public function createConversationAdmin ($user)
+    {
+
+        $convers = ConversationAdmin::findOne(['user_id' => $user->id]);
+
+        if (!($convers)) {
+
+            $conversation = new ConversationAdmin();
+            $conversation->user_id = $user->id;
+            $conversation->admin_id = $user->id_admin;
+            return $conversation->save() ? $conversation : null;
+
+        }else{
+
+            return $convers;
+        }
+
+    }
+
+
+
+    //Отправка письма админу
+    public function sendEmailAdmin($user)
+    {
+
+        if($user) {
+
+            return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
+                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+                ->setTo([Yii::$app->params['adminEmail']])
+                ->setSubject('Регистрация нового пользователя на сайте StartPool')
+                ->send();
+        }
+
+        return false;
+    }
+
+
+
     //Проверка на пользователя
     public static function isUserSimple($username)
     {
@@ -255,7 +371,29 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Админа
+    //Проверка на Главного Админа
+    public static function isUserMainAdmin($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_MAIN_ADMIN, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на Разработчика
+    public static function isUserDev($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_DEV, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на Статус
     public static function isActiveStatus($username)
     {
         if (static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]))

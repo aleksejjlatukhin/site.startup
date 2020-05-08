@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="responds-gcp-view">
 
-    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <h3 style="margin-bottom: 10px;">
             <span style="margin-right: 30px;"><?= Html::encode($this->title) ?></span>

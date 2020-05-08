@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -14,6 +15,9 @@ use app\models\ResetPasswordForm;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use app\models\SendEmailForm;
+use yii\helpers\Html;
+use yii\helpers\Url;
+use app\models\AccountActivation;
 
 class SiteController extends AppController
 {
@@ -35,6 +39,7 @@ class SiteController extends AppController
         ];
     }
 
+
     /**
      * Displays homepage.
      *
@@ -45,7 +50,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])|| User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -58,7 +64,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -71,7 +78,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -84,7 +92,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -97,7 +106,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -110,7 +120,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -123,7 +134,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -136,7 +148,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -148,7 +161,8 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/base';
         }
 
@@ -167,22 +181,38 @@ class SiteController extends AppController
             return $this->goHome();
         }
 
-        $model = new SingupForm();
+        $emailActivation = Yii::$app->params['emailActivation'];
+        $model = $emailActivation ? new SingupForm(['scenario' => 'emailActivation']) : new SingupForm();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
 
             if ($user = $model->singup()){
 
-                if (Yii::$app->getUser()->login($user)){
+                if ($user->confirm == User::CONFIRM) {
 
-                    if ($user->status === User::STATUS_NOT_ACTIVE) {
-                        Yii::$app->session->setFlash('success', 'Поздравляем Вы успешно прошли регистрацию! Ожидайте активации вашего профиля администратором.');
+                    if (Yii::$app->getUser()->login($user)){
+
+                        return $this->goHome();
                     }
+                }else {
 
-                    return $this->goHome();
+                    try {
+
+                        $model->sendActivationEmail($user);
+                        Yii::$app->session->setFlash('success', '<div style="text-align: center">Письмо с подтверждением регистрации отправлено на указанный адрес: <strong>' .
+                            Html::encode($user->email).'</strong></div>');
+
+                    }catch (\Exception $e) {
+
+                        $user->delete();
+                        throw new \yii\web\HttpException('550','Ошибка. Не отправляются письма на указанный адрес эл.почты: '. $model->email .'.');
+                        //Yii::$app->session->setFlash('error', 'Ошибка. Письмо не отправлено.');
+                        //Yii::error('Ошибка отправки письма.');
+                    }
+                    return $this->refresh();
                 }
             }else{
-                Yii::$app->session->setFlash('error', 'Возникла ошибка при регистрации.');
+                Yii::$app->session->setFlash('error', '<div style="text-align: center">Возникла ошибка при регистрации.</div>');
                 Yii::error('Ошибка при регистрации');
                 return $this->refresh();
             }
@@ -191,6 +221,34 @@ class SiteController extends AppController
         return $this->render('singup', [
             'model' => $model,
         ]);
+    }
+
+
+
+    public function actionActivateAccount($key)
+    {
+        try {
+            $user = new AccountActivation($key);
+        }
+        catch(InvalidArgumentException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        if($user->activateAccount()) {
+
+            //Отправка письма админу после подтверждения регистрации
+            $_user = $user->user;
+            $_user->sendEmailAdmin($_user);
+
+            Yii::$app->session->setFlash('success', '<div style="text-align: center">Подтверждение регистрации прошло успешно.</div>');
+
+        } else {
+
+            Yii::$app->session->setFlash('error', '<div style="text-align: center">Ошибка подтверждения регистрации.</div>');
+            Yii::error('Ошибка при подтверждении регистрации.');
+        }
+
+        return $this->redirect(Url::to(['/site/login']));
     }
 
     /**
@@ -207,13 +265,39 @@ class SiteController extends AppController
 
         $model = new LoginForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            if (User::isUserAdmin(Yii::$app->user->identity['username'])){
-                return $this->redirect('/admin');
+            $user = $model->user;
+
+            if ($user->confirm == User::NOT_CONFIRM) {
+
+                $user->generateSecretKey();
+                $user->save();
+                if ($model->sendActivationEmail($user)) {
+
+                    Yii::$app->session->setFlash('success', '<div style="text-align: center">Письмо с подтверждением регистрации отправлено на указанный адрес: <strong>' .
+                        Html::encode($user->email).'</strong></div>');
+                    return $this->refresh();
+                }
+            }else {
+
+                if ($model->login()) {
+
+                    if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+                        || User::isUserDev(Yii::$app->user->identity['username'])){
+                        return $this->redirect('/admin');
+                    }
+
+                    if (User::isUserSimple(Yii::$app->user->identity['username'])){
+                        return $this->goBack();
+                    }
+
+                    if (($user->confirm == User::CONFIRM) && ($user->status == User::STATUS_NOT_ACTIVE)){
+                        Yii::$app->session->setFlash('success', '<p>Скоро Вы сможете приступить к работе на нашем сайте. Ожидайте активации вашего стутуса.</p><p>Мы отправим Вам письмо на электронную почту, когда будет принято данное решение</p>');
+                        return $this->goBack();
+                    }
+                }
             }
-
-            return $this->goBack();
         }
 
         return $this->render('login', [

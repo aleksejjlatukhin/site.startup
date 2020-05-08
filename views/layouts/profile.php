@@ -52,7 +52,7 @@ AppAsset::register($this);
                         data-placement="bottom"
                         data-title="<?= Yii::$app->user->identity['username'] ?>"
                         data-content="
-                                <p><a href='<?= Url::to(['/site/profile']) ?>' data-method='post'>Мой профиль</a></p>
+                                <p><a href='<?= Url::to(['/site/profile', 'id' => Yii::$app->user->identity['id']]) ?>' data-method='post'>Мой профиль</a></p>
                                 <p><a href='<?= Url::to(['/site/logout']) ?>' data-method='post'>Выход</a></p>
                             ">
                     <span class="glyphicon glyphicon-user"></span>
@@ -61,6 +61,7 @@ AppAsset::register($this);
         <?php
         endif;
 
+        $conversation = \app\models\ConversationAdmin::findOne(['user_id' => Yii::$app->user->id]);
 
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
@@ -69,6 +70,9 @@ AppAsset::register($this);
 
                 !Yii::$app->user->isGuest ? (
                 ['label' => 'Мои проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]]) : (''),
+
+                !Yii::$app->user->isGuest ? (
+                ['label' => 'Сообщения', 'url' => ['/message/view', 'id' => $conversation->id]]) : (''),
 
                 Yii::$app->user->isGuest ? (
                 ['label' => 'Войти', 'url' => ['/site/login']]) : (''),

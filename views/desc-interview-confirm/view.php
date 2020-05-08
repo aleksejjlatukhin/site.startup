@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title  . ': ' . $respond->name) ?></h2>
 
-    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <p>
             <?= Html::a('<< Общие данные респондента', ['responds-confirm/view', 'id' => $model->responds_confirm_id], ['class' => 'btn btn-default']) ?>

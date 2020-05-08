@@ -10,16 +10,11 @@ $this->title = 'Главная';
 ?>
 <div class="site-index">
 
-    <?//= $user['fio'];?>
-    <?/* foreach ($user['projects'] as $project) :*/?><!--
-        <a href="<?/*=\yii\helpers\Url::to(['projects/view', 'id' => $project->id])*/?>"><?/*= $project['project_name']*/?></a>
-    --><?/* endforeach;*/?>
-
     <div class="row">
         <div class="col-md-10">
 
             <?php
-            if (User::isUserSimple(Yii::$app->user->identity['username'])){
+            if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
                 echo Html::a('<span style="text-transform: uppercase;font-weight: 700;">Создать проект</span>', ['projects/create', 'id' => Yii::$app->user->identity['id']], ['class' => 'btn btn-success btn-block']);
             }
             ?>

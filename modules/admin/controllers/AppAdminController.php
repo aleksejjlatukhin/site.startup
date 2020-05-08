@@ -32,6 +32,22 @@ class AppAdminController extends Controller
                             return User::isUserAdmin(Yii::$app->user->identity['username']);
                         }
                     ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserMainAdmin(Yii::$app->user->identity['username']);
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserDev(Yii::$app->user->identity['username']);
+                        }
+                    ],
                 ]
 
             ]

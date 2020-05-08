@@ -55,5 +55,21 @@ $this->title = 'Регистрация пользователя';
 
         </div>
     </div>
+
+    <div class="row" style="display:flex;">
+
+        <div style="margin: auto;">
+
+            <?php
+            if($model->scenario === 'emailActivation'):
+                ?>
+                <i>*На указанный емайл будет отправлено письмо для подтверждения регистрации.</i>
+            <?php
+            endif;
+            ?>
+
+        </div>
+
+    </div>
 </div>
 

@@ -4,7 +4,7 @@ namespace app\widgets;
 use Yii;
 
 /**
- * Alert widget renders a message from session flash. All flash messages are displayed
+ * Alert widget renders a message from session flash. All flash message are displayed
  * in the sequence they were assigned using setFlash. You can set message as following:
  *
  * ```php
@@ -13,7 +13,7 @@ use Yii;
  * Yii::$app->session->setFlash('info', 'This is the message');
  * ```
  *
- * Multiple messages could be set as follows:
+ * Multiple message could be set as follows:
  *
  * ```php
  * Yii::$app->session->setFlash('error', ['Error 1', 'Error 2']);
@@ -25,7 +25,7 @@ use Yii;
 class Alert extends \yii\bootstrap\Widget
 {
     /**
-     * @var array the alert types configuration for the flash messages.
+     * @var array the alert types configuration for the flash message.
      * This array is setup as $key => $value, where:
      * - key: the name of the session flash variable
      * - value: the bootstrap alert type (i.e. danger, success, info, warning)

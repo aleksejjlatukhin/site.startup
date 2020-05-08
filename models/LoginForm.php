@@ -13,11 +13,13 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
-    public $username;
+    //public $username;
+    // login or email
+    public $identity;
     public $password;
-    public $email;
+    //public $email;
     public $rememberMe = true;
-    public $status;
+    //public $status;
 
     private $_user = false;
 
@@ -28,9 +30,12 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-            // username and password are both required
-            [['email', 'password'], 'required', 'on' => 'default'],
-            ['email', 'email'],
+
+            ['identity', 'filter', 'filter' => 'trim'],
+            ['identity', 'required'],
+
+            //[['email', 'password'], 'required', 'on' => 'default'],
+            //['email', 'email'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -42,7 +47,8 @@ class LoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'email' => 'Эл.почта',
+            'identity' => 'Логин или адрес эл.почты',
+            //'email' => 'Эл.почта',
             'password' => 'Пароль',
             'rememberMe' => 'Запомнить',
         ];
@@ -109,9 +115,23 @@ class LoginForm extends Model
     {
         if ($this->_user === false) {
             //$this->_user = User::findByUsername($this->username);
-            $this->_user = User::findByEmail($this->email);
+            //$this->_user = User::findByEmail($this->email);
+            $this->_user = User::findIdentityByUsernameOrEmail($this->identity);
         }
 
         return $this->_user;
+    }
+
+
+    /*Подтвреждение регистрации по email*/
+    public function sendActivationEmail($user)
+    {
+
+        return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+            ->setTo($user->email)
+            ->setSubject('Регистрация на сайте StartPool')
+            ->send();
+
     }
 }

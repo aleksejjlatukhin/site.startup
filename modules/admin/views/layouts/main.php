@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use app\models\User;
 use app\widgets\Alert;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -29,7 +30,7 @@ AppAsset::register($this);
 
 <div class="wrap">
 
-    <div style="margin-bottom: -15px;">
+    <div style="margin-bottom: -20px;">
 
         <?php
         NavBar::begin([
@@ -51,7 +52,7 @@ AppAsset::register($this);
                         data-placement="bottom"
                         data-title="<?= Yii::$app->user->identity['username'] ?>"
                         data-content="
-                                <p><a href='<?= Url::to(['/admin/profile']) ?>' data-method='post'>Мой профиль</a></p>
+                                <p><a href='<?= Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id]) ?>' data-method='post'>Мой профиль</a></p>
                                 <p><a href='<?= Url::to(['/site/logout']) ?>' data-method='post'>Выход</a></p>
                             ">
                     <span class="glyphicon glyphicon-user"></span>
@@ -60,28 +61,37 @@ AppAsset::register($this);
         <?php
         endif;
 
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => [
-                ['label' => 'Главная', 'url' => ['/']],
-                ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
-                ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
-                /*Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-                ) : (
-                    '<li>'
-                    . Html::beginForm(['/site/logout'], 'post')
-                    . Html::submitButton(
-                        'Выход (' . Yii::$app->user->identity['username'] . ')',
-                        ['class' => 'btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-                )*/
-            ],
-        ]);
+        if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) :
+
+            echo Nav::widget([
+                'options' => ['class' => 'navbar-nav navbar-right'],
+                'items' => [
+                    ['label' => 'Главная', 'url' => ['/']],
+                    ['label' => 'Сообщения', 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+                    ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
+                    ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
+                ],
+            ]);
+
+        elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) :
+
+            echo Nav::widget([
+                'options' => ['class' => 'navbar-nav navbar-right'],
+                'items' => [
+                    ['label' => 'Главная', 'url' => ['/']],
+                    ['label' => 'Сообщения', 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+                    ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
+                    ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
+                ],
+            ]);
+
+        endif;
+
+
         NavBar::end();
         ?>
+
+
 
     </div>
 

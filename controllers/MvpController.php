@@ -37,7 +37,8 @@ class MvpController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -57,7 +58,7 @@ class MvpController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -76,7 +77,7 @@ class MvpController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 if ($action->id == 'create') {
                     // ОТКЛЮЧАЕМ CSRF
@@ -100,12 +101,8 @@ class MvpController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
-
-                if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -125,7 +122,7 @@ class MvpController extends AppController
      */
     public function actionIndex($id)
     {
-        $user = Yii::$app->user->identity;
+        //$user = Yii::$app->user->identity;
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -222,10 +219,13 @@ class MvpController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Действие доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['confirm-gcp/view', 'id' => $confirmGcp->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['confirm-gcp/view', 'id' => $confirmGcp->id]);
+            }
         }
 
         if (Yii::$app->request->isAjax){
@@ -292,11 +292,15 @@ class MvpController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Действие доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -334,10 +338,13 @@ class MvpController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Удаление доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Удаление доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         $model->delete();

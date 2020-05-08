@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="feedback-expert-view">
 
-    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <h2><?= Html::encode($this->title) ?></h2>
 

@@ -48,7 +48,8 @@ class ProjectsController extends AppController
             $model = Projects::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($model->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+            if (($model->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -59,19 +60,30 @@ class ProjectsController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
 
-            if (User::isUserSimple(Yii::$app->user->identity['username']) === false){
+            if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
 
-            $user = User::findOne(Yii::$app->request->get());
+            }else {
 
-            /*Ограничение доступа к проэктам пользователя*/
-            if ($user->id == Yii::$app->user->id){
+                $user = User::findOne(Yii::$app->request->get());
 
-                return parent::beforeAction($action);
+                /*Ограничение доступа к проэктам пользователя*/
+                if ($user->id == Yii::$app->user->id){
 
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    return parent::beforeAction($action);
+
+                }else{
+
+                    if (User::isUserDev(Yii::$app->user->identity['username'])){
+
+                        return parent::beforeAction($action);
+
+                    }else {
+
+                        throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                }
             }
 
         }elseif (in_array($action->id, ['index'])){
@@ -79,7 +91,8 @@ class ProjectsController extends AppController
             $user = User::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($user->id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+            if (($user->id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -93,7 +106,7 @@ class ProjectsController extends AppController
             $user = User::findOne(['id' => $project->user_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($user->id == Yii::$app->user->id){
+            if (($user->id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -113,6 +126,7 @@ class ProjectsController extends AppController
      */
     public function actionIndex($id)
     {
+        $user = User::findOne($id);
 
         $dataProvider = new ActiveDataProvider([
             'query' => Projects::find()->where(['user_id' => $id]),
@@ -126,6 +140,7 @@ class ProjectsController extends AppController
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'user' => $user,
         ]);
     }
 
@@ -235,8 +250,7 @@ class ProjectsController extends AppController
         $modelsConcept = [new Segment];
         $modelsAuthors = [new Authors];
 
-        $_user = Yii::$app->user->identity;
-        $user = User::findOne(['id' => Yii::$app->user->identity['id']]);
+        $user = User::findOne(['id' => $id]);
 
         if ($user->status === User::STATUS_ACTIVE){
             //В зависимости от статуса пользователя
@@ -392,20 +406,12 @@ class ProjectsController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $user = Yii::$app->user->identity;
+        $user = User::find()->where(['id' => $model->user_id])->one();
+        $_user = Yii::$app->user->identity;
         $models = Projects::find()->where(['user_id' => $user['id']])->all();
         $modelsConcept = Segment::find()->where(['project_id'=>$id])->all();
         $modelsAuthors = Authors::find()->where(['project_id'=>$id])->all();
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $user = User::find()->where(['id' => $model->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        //Действие доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
 
         $model->update_at = date('Y:m:d');
 
@@ -608,10 +614,14 @@ class ProjectsController extends AppController
         $user = User::find()->where(['id' => $model->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Удаление доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Удаление доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         if(!empty($segments)){

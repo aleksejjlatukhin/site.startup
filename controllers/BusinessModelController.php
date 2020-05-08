@@ -41,7 +41,8 @@ class BusinessModelController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -63,7 +64,7 @@ class BusinessModelController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -84,7 +85,7 @@ class BusinessModelController extends AppController
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -168,11 +169,15 @@ class BusinessModelController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Действие доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['confirm-mvp/view', 'id' => $confirmMvp->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['confirm-mvp/view', 'id' => $confirmMvp->id]);
+            }
         }
+
 
 
         if ($confirmMvp->business){
@@ -225,11 +230,15 @@ class BusinessModelController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Действие доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -275,10 +284,13 @@ class BusinessModelController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        //Удаление доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Удаление доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         $model->delete();

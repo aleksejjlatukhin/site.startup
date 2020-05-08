@@ -52,10 +52,11 @@ class ProfileForm extends Model
     public function uniqUsername($attr)
     {
         $users = User::find()->all();
+        $_user = User::findOne(Yii::$app->request->get());
 
         foreach ($users as $user){
 
-            if ($user->id !== \Yii::$app->user->id){
+            if ($user->id !== $_user->id){
 
                 if (mb_strtolower($this->username) === mb_strtolower($user->username)){
                     $this->addError($attr, 'Этот логин уже занят.');
@@ -68,10 +69,11 @@ class ProfileForm extends Model
     public function uniqEmail($attr)
     {
         $users = User::find()->all();
+        $_user = User::findOne(Yii::$app->request->get());
 
         foreach ($users as $user){
 
-            if ($user->id !== \Yii::$app->user->id){
+            if ($user->id !== $_user->id){
 
                 if ($this->email === $user->email){
                     $this->addError($attr, 'Эта почта уже зарегистрирована.');
@@ -83,7 +85,7 @@ class ProfileForm extends Model
 
     public function update()
     {
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $user = User::findOne(Yii::$app->request->get());
 
         $user->second_name = $this->second_name;
         $user->first_name = $this->first_name;

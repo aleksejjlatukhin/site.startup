@@ -16,7 +16,8 @@ class BehaviorsController extends Controller
     public function beforeAction($action)
     {
         /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserAdmin(Yii::$app->user->identity['username'])){
             $this->layout = '@app/modules/admin/views/layouts/main-user';
         }
 
@@ -44,9 +45,9 @@ class BehaviorsController extends Controller
                     [
                         'allow' => true,
                         'controllers' => ['site'],
-                        'actions' => ['singup', 'login', 'index', 'target-segment', 'segment-problems', 'problem-confirmation',
+                        'actions' => ['singup', 'error', 'login', 'index', 'target-segment', 'segment-problems', 'problem-confirmation',
                             'value-proposition', 'offer-confirmation', 'development-mvp', 'mvp-confirmation', 'business-model','send-email',
-                            'reset-password'],
+                            'reset-password', 'activate-account'],
                         'verbs' => ['GET', 'POST'],
                         'roles' => ['?']
                     ],
@@ -68,6 +69,14 @@ class BehaviorsController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
+                            return User::isUserSimple(Yii::$app->user->identity['username']);
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
                             return User::isUserAdmin(Yii::$app->user->identity['username']);
                         }
                     ],
@@ -76,7 +85,15 @@ class BehaviorsController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserSimple(Yii::$app->user->identity['username']);
+                            return User::isUserMainAdmin(Yii::$app->user->identity['username']);
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserDev(Yii::$app->user->identity['username']);
                         }
                     ],
                 ]

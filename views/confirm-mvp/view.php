@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 
-        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
             <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right', 'style' => ['margin-right' => '5px']]) ?>
 
@@ -323,10 +323,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?php
 
-                if ($sumPositive != 0 && $sumPositive < $model->count_positive && count($responds) == $data_desc){
+                if (/*$sumPositive != 0 && */$sumPositive < $model->count_positive && count($responds) == $data_desc){
                     echo '<div style="color: red; margin-top: 15px; font-size: 13px; font-weight: 700;">Недостаточное количество позитивных респондентов</div>';
 
-                    if (User::isUserSimple(Yii::$app->user->identity['username'])){
+                    if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                         echo  Html::a('Добавить!', ['responds-mvp/index', 'id' => $model->id], ['class' => 'btn btn-danger', 'style' => ['margin-top' => '10px', 'width' => '110px']]);
                     }
@@ -351,7 +351,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
 
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
                     <div style="padding-bottom: 10px;font-size: 13px;"><?= Html::a("+ добавить", Url::to(['feedback-expert-mvp/create', 'id' => $model->id]));?></div>
 
@@ -378,7 +378,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?
 
-    if (User::isUserSimple(Yii::$app->user->identity['username'])){
+    if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
         if ($mvp->exist_confirm !== $model->exist_confirm){
 
@@ -409,7 +409,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         }else{
 
-            if (User::isUserSimple(Yii::$app->user->identity['username'])){
+            if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 echo Html::a('Генерация бизнес-модели >>', ['business-model/create', 'id' => $model->id], ['class' => 'btn btn-success', 'style' => ['margin-left' => '10px']]);
             }

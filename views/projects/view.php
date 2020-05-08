@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Projects */
@@ -15,7 +16,7 @@ $this->params['breadcrumbs'][] = $model->project_name;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <?php if (\app\models\User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <p>
             <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>

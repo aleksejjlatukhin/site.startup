@@ -19,7 +19,7 @@ $this->title = 'Админка | Проекты';
     <thead>
     <tr>
         <th scope="col" rowspan="2" style="width: 200px; height: 60px; text-align: center;padding-bottom: 20px;">Наименование проета</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 30px;">Автор проекта</th>
+        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 20px;">Автор проекта</th>
         <th scope="col" rowspan="2" style="width: 800px; height: 60px; text-align: center;padding-bottom: 30px;">Сегмент</th>
         <th scope="col" rowspan="2" style="width: 150px; height: 60px; text-align: center;padding-bottom: 30px;">ГПС</th>
         <th scope="col" colspan="2" style="width: 170px; height: 30px; text-align: center;padding-bottom: 2px;">Проблема сегмента</th>

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -12,12 +13,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="projects-index">
 
-    <?php if (\app\models\User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <h2><?= Html::encode($this->title) ?></h2>
 
         <p style="margin-bottom: 20px;">
-            <?= Html::a('Создать проект', ['create', 'id' => Yii::$app->user->id], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Создать проект', ['create', 'id' => $user['id']], ['class' => 'btn btn-success']) ?>
         </p>
 
     <?php else : ?>

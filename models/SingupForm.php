@@ -17,6 +17,7 @@ class SingupForm extends Model
     public $username;
     public $password;
     public $status;
+    public $confirm;
     public $role;
     public $exist_agree = true;
 
@@ -43,12 +44,19 @@ class SingupForm extends Model
                 'targetClass' => User::class,
                 'message' => 'Эта почта уже зарегистрирована.'],
 
-            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE, 'on' => 'default'],
+            ['confirm', 'default', 'value' => User::NOT_CONFIRM, 'on' => 'emailActivation'],
+            ['confirm', 'in', 'range' =>[
+                User::CONFIRM,
+                User::NOT_CONFIRM,
+            ]],
+
+            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE,],
             ['status', 'in', 'range' =>[
                 User::STATUS_NOT_ACTIVE,
                 User::STATUS_ACTIVE,
                 User::STATUS_DELETED,
             ]],
+
             ['role', 'default', 'value' => User::ROLE_USER],
             ['role', 'in', 'range' =>[
                 User::ROLE_USER,
@@ -109,11 +117,63 @@ class SingupForm extends Model
             $user->username = $this->username;
             $user->email = $this->email;
             $user->status = $this->status;
+            $user->confirm = $this->confirm;
             $user->role = $this->role;
             $user->setPassword($this->password);
             $user->generateAuthKey();
+
+            if($this->scenario === 'emailActivation') {
+                $user->generateSecretKey();
+            }
+
             return $user->save() ? $user : null;
         }
     }
+
+
+    /*Подтвреждение регистрации по email*/
+    public function sendActivationEmail($user)
+    {
+
+        return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+            ->setTo($this->email)
+            ->setSubject('Регистрация на сайте StartPool')
+            ->send();
+
+    }
+
+
+    /*public function sendEmailUser($user)
+    {
+
+        if($user){
+
+            return Yii::$app->mailer->compose('signup-user', ['user' => $user])
+                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+                ->setTo($user->email)
+                ->setSubject('Регистрация на сайте StartPool')
+                ->send();
+        }
+
+        return false;
+    }*/
+
+    /*public function sendEmailAdmin($user)
+    {
+
+        if($user) {
+
+            return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
+                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+                ->setTo([Yii::$app->params['adminEmail']])
+                ->setSubject('Регистрация нового пользователя на сайте StartPool')
+                ->send();
+        }
+
+        return false;
+    }*/
 
 }

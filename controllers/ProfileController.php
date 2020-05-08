@@ -32,11 +32,33 @@ class ProfileController extends AppController
             $model = Projects::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($model->user_id == Yii::$app->user->id){
+            if (($model->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])
+                || User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
             }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+        }elseif (in_array($action->id, ['index'])) {
+
+            $user = User::findOne(Yii::$app->request->get());
+            if ((Yii::$app->user->id == $user->id) || User::isUserDev(Yii::$app->user->identity['username'])
+                || User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+
+                return parent::beforeAction($action);
+
+            }else {
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+        }elseif (in_array($action->id, ['update-profile']) || in_array($action->id, ['change-password'])) {
+
+            $user = User::findOne(Yii::$app->request->get());
+            if ((Yii::$app->user->id == $user->id) || User::isUserDev(Yii::$app->user->identity['username'])) {
+
+                return parent::beforeAction($action);
+
+            }else {
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{
@@ -49,15 +71,25 @@ class ProfileController extends AppController
      * Lists all User models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($id)
     {
+        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
-
-            return $this->redirect(['/admin/profile/index']);
+            $this->layout = '@app/modules/admin/views/layouts/main';
         }
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        /*if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
+
+            return $this->redirect(['/admin/profile/index']);
+        }*/
+
+        $user = User::findOne($id);
+
+        if ((($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
+
+            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+        }
 
         if (!empty($user->projects)){
 
@@ -82,15 +114,20 @@ class ProfileController extends AppController
     }
 
 
-    public function actionUpdateProfile()
+    public function actionUpdateProfile($id)
     {
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
-
-            return $this->redirect(['/admin/profile/index']);
+            $this->layout = '@app/modules/admin/views/layouts/main';
         }
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $user = User::findOne($id);
+
+        if ((($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
+
+            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+        }
+
         $model = new ProfileForm();
 
         $model->second_name = $user->second_name;
@@ -104,7 +141,7 @@ class ProfileController extends AppController
 
             if ($model->update()){
 
-                return $this->redirect(['index']);
+                return $this->redirect(['index', 'id' => $user->id]);
             }
         }
 
@@ -115,14 +152,20 @@ class ProfileController extends AppController
 
     }
 
-    public function actionChangePassword()
+    public function actionChangePassword($id)
     {
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
-            return $this->redirect(['/admin/profile/index']);
+            $this->layout = '@app/modules/admin/views/layouts/main';
         }
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $user = User::findOne($id);
+
+        if ((($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
+
+            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+        }
+
         $model = new PasswordChangeForm($user, []);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
@@ -143,10 +186,14 @@ class ProfileController extends AppController
 
     public function actionProject($id)
     {
+        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+            $this->layout = '@app/modules/admin/views/layouts/main';
+        }
 
         $model = Projects::findOne($id);
+        $user = User::find()->where(['id' => $model->user_id])->one();
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
         $problems = [];
         $offers = [];
@@ -239,10 +286,15 @@ class ProfileController extends AppController
 
     public function actionRoadmap($id)
     {
+        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+            $this->layout = '@app/modules/admin/views/layouts/main';
+        }
 
         $project = Projects::findOne($id);
+
+        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $models = Segment::find()->where(['project_id' => $id])->all();
 
@@ -369,9 +421,15 @@ class ProfileController extends AppController
 
     public function actionPrefiles($id)
     {
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+
+        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+
+            $this->layout = '@app/modules/admin/views/layouts/main';
+        }
 
         $model = Projects::findOne($id);
+        $user = User::find()->where(['id' => $model->user_id])->one();
 
         return $this->render('prefiles', [
             'model' => $model,
@@ -380,19 +438,24 @@ class ProfileController extends AppController
     }
 
 
-    public function actionNotFound()
+    public function actionNotFound($id)
     {
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            $this->layout = '@app/modules/admin/views/layouts/main';
+        }
+
         if (!User::isActiveStatus(Yii::$app->user->identity['username'])){
 
-            return $this->redirect(['/profile/index']);
+            return $this->redirect(['/profile/index', 'id' => Yii::$app->user->id]);
         }
 
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])){
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
 
-            return $this->redirect(['/admin/profile/index']);
+            return $this->redirect(['/profile/index', 'id' => $id]);
         }
 
-        $user = User::find()->where(['id' => \Yii::$app->user->id])->one();
+        $user = User::find()->where(['id' => $id])->one();
 
         return $this->render('not-found', [
             'user' => $user,

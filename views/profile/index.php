@@ -32,11 +32,11 @@ $this->title = 'Данные пользователя';
             <?= Html::img([$user['avatar_image']],['width' => '200px', 'min-height' => '200px', 'max-height' => '300px'])?>
 
             <div class="row" style="margin: 10px 0;padding-left: 0;">
-                <?= Html::a('Редактировать данные',Url::to(['/profile/update-profile']), ['class' => 'btn btn-sm btn-primary col-md-12']);?>
+                <?= Html::a('Редактировать данные',Url::to(['/profile/update-profile', 'id' => $user['id']]), ['class' => 'btn btn-sm btn-primary col-md-12']);?>
             </div>
 
             <div class="row" style="margin: 10px 0;padding-left: 0;">
-                <?= Html::a('Сменить пароль',Url::to(['/profile/change-password']), ['class' => 'btn btn-sm btn-primary col-md-12']);?>
+                <?= Html::a('Сменить пароль',Url::to(['/profile/change-password', 'id' => $user['id']]), ['class' => 'btn btn-sm btn-primary col-md-12']);?>
             </div>
 
         </div>

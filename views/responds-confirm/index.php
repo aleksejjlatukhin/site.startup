@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
         <p class="open_fast">
             <?= Html::submitButton('Добавить респондента', ['class' => 'btn btn-primary']) ?>

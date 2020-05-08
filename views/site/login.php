@@ -32,7 +32,7 @@ $this->title = 'Страница входа';
         <div class="row" style="display: flex">
             <div class="col-md-3" style="margin: auto;">
 
-                <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'identity')->textInput(['maxlength' => true]) ?>
 
                 <?= $form->field($model, 'password')->passwordInput() ?>
 

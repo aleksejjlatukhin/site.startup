@@ -15,7 +15,7 @@ use yii\helpers\Url;
         </li>
 
         <li style="padding-bottom: 3px;">
-            <?= Html::a('Данные пользователя', Url::to(['/profile/index']))?>
+            <?= Html::a('Данные пользователя', Url::to(['/profile/index', 'id' => $user['id']]))?>
         </li>
 
         <?php if (!empty($user->projects)) : ?>
@@ -35,7 +35,7 @@ use yii\helpers\Url;
         <?php else : ?>
 
             <li style="margin-bottom: 3px;">
-                <?= Html::a('Сводные таблицы', Url::to(['/profile/not-found']))?>
+                <?= Html::a('Сводные таблицы', Url::to(['/profile/not-found', 'id' => $user['id']]))?>
             </li>
 
         <?php endif; ?>
@@ -58,7 +58,7 @@ use yii\helpers\Url;
         <?php else : ?>
 
             <li style="margin-bottom: 3px;">
-                <?= Html::a('Дорожные карты', Url::to(['/profile/not-found']))?>
+                <?= Html::a('Дорожные карты', Url::to(['/profile/not-found', 'id' => $user['id']]))?>
             </li>
 
         <?php endif; ?>
@@ -82,7 +82,7 @@ use yii\helpers\Url;
         <?php else : ?>
 
             <li style="margin-bottom: 3px;">
-                <?= Html::a('Презентации', Url::to(['/profile/not-found']))?>
+                <?= Html::a('Презентации', Url::to(['/profile/not-found', 'id' => $user['id']]))?>
             </li>
 
         <?php endif; ?>
