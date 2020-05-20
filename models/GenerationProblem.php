@@ -27,9 +27,34 @@ class GenerationProblem extends \yii\db\ActiveRecord
         return $this->hasOne(Interview::class, ['id' => 'interview_id']);
     }
 
+    public function getGcps()
+    {
+        return $this->hasMany(Gcp::class, ['problem_id' => 'id']);
+    }
+
+    public function getMvps()
+    {
+        return $this->hasMany(Mvp::class, ['problem_id' => 'id']);
+    }
+
+    public function getBusinessModel ()
+    {
+        return $this->hasOne(BusinessModel::class, ['problem_id' => 'id']);
+    }
+
     public function getConfirm()
     {
         return $this->hasOne(ConfirmProblem::class, ['gps_id' => 'id']);
+    }
+
+    public function getSegment()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+    }
+
+    public function getProject ()
+    {
+        return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
     /**
@@ -41,7 +66,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
             [['interview_id', 'description', 'date_gps', 'title'], 'required'],
             ['title', 'string', 'max' => 255],
             [['title', 'description'], 'trim'],
-            [['interview_id', 'exist_confirm'], 'integer'],
+            [['interview_id', 'exist_confirm', 'segment_id', 'project_id'], 'integer'],
             [['description'], 'string'],
             [['date_gps', 'date_confirm', 'date_time_confirm'], 'safe'],
         ];

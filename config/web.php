@@ -11,11 +11,21 @@ $config = [
     'defaultRoute' => 'site/index',
 
     'modules' => [
-        /*Подключение модуля админки*/
+        //Подключение модуля админки
         'admin' => [
             'class' => 'app\modules\admin\Module',
             'layout' => 'main',
         ],
+
+        //Поключение kartik yii2-grid
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+            // enter optional module parameters below - only if you need to
+            // use your own export download action or custom translation
+            // message source
+            // 'downloadAction' => 'gridview/export/download',
+            // 'i18n' => []
+        ]
     ],
 
     'aliases' => [

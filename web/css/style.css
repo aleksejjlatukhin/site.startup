@@ -821,3 +821,54 @@ progress.info-red::-moz-progress-bar{
 /*Блок прокрутки в сообщениях
 ---Конец---
 */
+
+
+/* /projects/upshot - таблица kartik yii2-grid
+---Начало---
+*/
+.table-project-kartik {
+    font-family: 'Roboto-Regular', serif;
+    color: #373737;
+}
+
+.font-header-table {
+     text-align: center;
+     color: #4F4F4F;
+}
+
+.font-segment-header-table {
+    color: #4F4F4F;
+}
+
+.table-kartik-link {
+    font-weight: 500;
+    text-decoration: none;
+    color: #373737;
+}
+
+.table-kartik-link:hover {
+    color: #373737;
+}
+
+.table-kartik-link:active {
+    color: #373737;
+}
+
+.style-header-table-kartik {
+    background: #F2F2F2;
+}
+
+.style-head-table-kartik-top {
+    background: #707F99;
+    border-radius: 3px 3px 0 0;
+    text-align: center;
+    padding: 7px 0;
+}
+
+.style-head-table-kartik-bottom {
+    background: #F2F2F2;
+}
+
+/* /projects/upshot - таблица kartik yii2-grid
+---Конец---
+*/

@@ -23,6 +23,7 @@ class AppAsset extends AssetBundle
         'css/site.css',
         '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
         'css/style.css',
+        'css/fonts.css',
     ];
     public $js = [
         'js/jquery.cookie.js',

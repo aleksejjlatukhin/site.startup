@@ -37,6 +37,26 @@ class Segment extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Interview::class, ['segment_id' => 'id']);
     }
+
+    public function getProblems ()
+    {
+        return $this->hasMany(GenerationProblem::class, ['segment_id' => 'id']);
+    }
+
+    public function getGcps ()
+    {
+        return $this->hasMany(Gcp::class, ['segment_id' => 'id']);
+    }
+
+    public function getMvps ()
+    {
+        return $this->hasMany(Mvp::class, ['segment_id' => 'id']);
+    }
+
+    public function getBusinessModel ()
+    {
+        return $this->hasOne(BusinessModel::class, ['segment_id' => 'id']);
+    }
     
 
     /**

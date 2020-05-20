@@ -113,6 +113,18 @@ class GenerationProblemController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
+        /*Временные файлы*/
+        if ($model->segment_id === null || $model->segment_id === 0) {
+            $model->segment_id = $segment->id;
+            $model->save();
+        }
+
+        if ($model->project_id === null || $model->project_id === 0) {
+            $model->project_id = $project->id;
+            $model->save();
+        }
+        /*Временные файлы --- конец*/
+
         return $this->render('view', [
             'model' => $model,
             'interview' => $interview,
@@ -142,6 +154,10 @@ class GenerationProblemController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $model->segment_id = $segment->id;
+        $model->project_id = $project->id;
+
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 

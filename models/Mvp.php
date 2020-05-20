@@ -35,6 +35,31 @@ class Mvp extends \yii\db\ActiveRecord
         return $this->hasOne(ConfirmMvp::class, ['mvp_id' => 'id']);
     }
 
+    public function getProject ()
+    {
+        return $this->hasOne(Projects::class, ['id' => 'project_id']);
+    }
+
+    public function getSegment ()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+    }
+
+    public function getProblem ()
+    {
+        return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
+    }
+
+    public function getValueProposition ()
+    {
+        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+    }
+
+    public function getBusinessModel ()
+    {
+        return $this->hasOne(BusinessModel::class, ['mvp_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -45,7 +70,7 @@ class Mvp extends \yii\db\ActiveRecord
             [['title', 'description'], 'trim'],
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
-            [['confirm_gcp_id', 'exist_confirm'], 'integer'],
+            [['confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id'], 'integer'],
             [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
 
         ];

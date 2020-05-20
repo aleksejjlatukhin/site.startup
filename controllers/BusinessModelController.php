@@ -133,6 +133,33 @@ class BusinessModelController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
+        /*Временные файлы*/
+        if ($model->project_id === null || $model->project_id === 0) {
+            $model->project_id = $project->id;
+            $model->save();
+        }
+
+        if ($model->segment_id === null || $model->segment_id === 0) {
+            $model->segment_id = $segment->id;
+            $model->save();
+        }
+
+        if ($model->problem_id === null || $model->problem_id === 0) {
+            $model->problem_id = $generationProblem->id;
+            $model->save();
+        }
+
+        if ($model->gcp_id === null || $model->gcp_id === 0) {
+            $model->gcp_id = $gcp->id;
+            $model->save();
+        }
+
+        if ($model->mvp_id === null || $model->mvp_id === 0) {
+            $model->mvp_id = $mvp->id;
+            $model->save();
+        }
+        /*Временные файлы --- конец*/
+
         return $this->render('view', [
             'model' => $model,
             'confirmMvp' => $confirmMvp,
@@ -166,6 +193,13 @@ class BusinessModelController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $model->project_id = $project->id;
+        $model->segment_id = $segment->id;
+        $model->problem_id = $generationProblem->id;
+        $model->gcp_id = $gcp->id;
+        $model->mvp_id = $mvp->id;
+
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 

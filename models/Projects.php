@@ -57,6 +57,26 @@ class Projects extends ActiveRecord
         return $this->hasMany(Segment::class, ['project_id' => 'id']);
     }
 
+    public function getProblems ()
+    {
+        return $this->hasMany(GenerationProblem::class, ['project_id' => 'id']);
+    }
+
+    public function getGcps ()
+    {
+        return $this->hasMany(Gcp::class, ['project_id' => 'id']);
+    }
+
+    public function getMvps ()
+    {
+        return $this->hasMany(Mvp::class, ['project_id' => 'id']);
+    }
+
+    public function getBusinessModel ()
+    {
+        return $this->hasOne(BusinessModel::class, ['project_id' => 'id']);
+    }
+
     public function getPreFiles()
     {
         return $this->hasMany(PreFiles::class, ['project_id' => 'id']);
@@ -144,6 +164,7 @@ class Projects extends ActiveRecord
             [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
             ['project_name', 'string', 'min' => 3, 'max' => 32],
             [['project_fullname', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
+            [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology'], 'trim'],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls', 'maxFiles' => 5 - count($this->preFiles)],
         ];
     }

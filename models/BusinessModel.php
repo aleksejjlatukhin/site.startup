@@ -28,6 +28,31 @@ class BusinessModel extends \yii\db\ActiveRecord
         return 'business_model';
     }
 
+    public function getProject ()
+    {
+        return $this->hasOne(Projects::class, ['id' => 'project_id']);
+    }
+
+    public function getSegment ()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+    }
+
+    public function getProblem ()
+    {
+        return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
+    }
+
+    public function getGcp ()
+    {
+        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+    }
+
+    public function getGmvp ()
+    {
+        return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
+    }
+
     public function getMvp()
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
@@ -40,7 +65,7 @@ class BusinessModel extends \yii\db\ActiveRecord
     {
         return [
             [['confirm_mvp_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
-            [['confirm_mvp_id'], 'integer'],
+            [['confirm_mvp_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id'], 'integer'],
             [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
         ];
     }

@@ -32,6 +32,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
+use yii\data\ArrayDataProvider;
 
 
 /**
@@ -43,7 +44,7 @@ class ProjectsController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['result'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['result']) || in_array($action->id, ['upshot'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
@@ -778,5 +779,207 @@ class ProjectsController extends AppController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    public function actionUpshot($id)
+    {
+
+        $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
+
+        $businessModels = [];
+
+        foreach ($segments as $i => $segment) {
+
+            if ($segment->interview && $segment->problems) {
+
+                $problems = GenerationProblem::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
+
+                foreach ($problems as $problem) {
+
+                    if ($segment->interview && $segment->problems && $problem->gcps) {
+
+                        $gcps = Gcp::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
+
+                        foreach ($gcps as $gcp) {
+
+                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps){
+
+                                $mvps = Mvp::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
+
+                                foreach ($mvps as $mvp) {
+
+                                    if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps && $mvp->businessModel) {
+
+                                        $businessModels[] = $mvp->businessModel;
+                                    }
+
+                                    if ((empty($mvp->confirm) && empty($mvp->businessModel))
+                                        || (empty($mvp->confirm) || empty($mvp->businessModel))) {
+
+                                        $businessModel = new BusinessModel();
+                                        $businessModel->mvp_id = $mvp->id;
+                                        $businessModel->gcp_id = $gcp->id;
+                                        $businessModel->problem_id = $problem->id;
+                                        $businessModel->segment_id = $segment->id;
+                                        $businessModels[] = $businessModel;
+                                    }
+                                }
+                            }
+                            if ((empty($gcp->confirm) && empty($gcp->mvps))
+                                || (empty($gcp->confirm) || empty($gcp->mvps))) {
+
+                                $businessModel = new BusinessModel();
+                                $businessModel->gcp_id = $gcp->id;
+                                $businessModel->problem_id = $problem->id;
+                                $businessModel->segment_id = $segment->id;
+                                $businessModels[] = $businessModel;
+                            }
+                        }
+                    }
+                    if ((empty($problem->confirm) && empty($problem->gcps))
+                        || (empty($problem->confirm) || empty($problem->gcps))) {
+
+                        $businessModel = new BusinessModel();
+                        $businessModel->problem_id = $problem->id;
+                        $businessModel->segment_id = $segment->id;
+                        $businessModels[] = $businessModel;
+                    }
+                }
+
+            }if ((empty($segment->interview) || empty($segment->problems))
+                || (empty($segment->interview) && empty($segment->problems))){
+
+                $businessModel = new BusinessModel();
+                $businessModel->segment_id = $segment->id;
+                $businessModels[] = $businessModel;
+            }
+        }
+
+
+
+
+        //Добавление номера сегмента
+        $j = 0;
+        foreach ($businessModels as $k => $businessModel) {
+            if ($businessModels[$k]->segment->id !== $businessModels[$k-1]->segment->id) {
+                $j++;
+                $businessModels[$k]->segment->name = $j . '. ' . $businessModels[$k]->segment->name;
+            }else {
+                $businessModels[$k]->segment->name = $businessModels[$k-1]->segment->name;
+            }
+        }
+
+
+        //Добавление номера ГПС
+        foreach ($businessModels as $k => $businessModel) {
+
+            if ($businessModels[$k]->problem->title !== '' && $businessModels[$k]->problem) {
+
+                $arrS = explode('. ' . $businessModels[$k]->problem->segment->name, $businessModels[$k]->segment->name);
+                $numberSegment = $arrS[0];
+
+                $arrP = explode('ГПС ', $businessModels[$k]->problem->title);
+                $numberProblem = $arrP[1];
+
+                $businessModels[$k]->problem->title = 'ГПС ' . $numberSegment . '.' . $numberProblem;
+            }
+        }
+
+
+        //Добавление номера ГЦП
+        foreach ($businessModels as $k => $businessModel) {
+
+            if ($businessModels[$k]->problem->gcps) {
+
+                $arrP = explode('ГПС ', $businessModels[$k]->problem->title);
+                $numberProblem = $arrP[1];
+
+                $arrG = explode('ГЦП ', $businessModels[$k]->gcp->title);
+                $numberGcp = $arrG[1];
+
+                $businessModels[$k]->gcp->title = 'ГЦП ' . $numberProblem . '.' . $numberGcp;
+            }
+        }
+
+
+        //Добавление номера сегмента ГMVP
+        foreach ($businessModels as $k => $businessModel) {
+
+            if ($businessModels[$k]->gcp->mvps) {
+
+                $arrP = explode('ГЦП ', $businessModels[$k]->gcp->title);
+                $numberGcp = $arrP[1];
+
+                $arrG = explode('ГMVP ', $businessModels[$k]->gmvp->title);
+                $numberMvp = $arrG[1];
+
+                $businessModels[$k]->gmvp->title = 'ГMVP ' . $numberGcp . '.' . $numberMvp;
+            }
+        }
+
+
+
+
+        foreach ($businessModels as $k => $businessModel) {
+
+            if ($businessModels[$k]->problem->gcps) {
+                $i = 0;
+                foreach ($businessModels[$k]->problem->gcps as $gcp) {
+                    //Если id следующего ГЦП равно id предыдущего, то выполняем следующее
+                    if ($businessModels[$k+1]->gcp->id === $businessModels[$k]->gcp->id) {
+
+                        $i++;
+                        if ($i > 1) {
+                            $businessModels[$k+1]->gcp->title = '';
+                            $businessModels[$k+1]->gcp->date_create = null;
+                            $businessModels[$k+1]->gcp->date_confirm = null;
+                        }
+                    }
+                }
+            }
+
+            if ($businessModels[$k]->segment->problems) {
+                $i = 0;
+                foreach ($businessModels[$k]->segment->problems as $problem) {
+                    //Если id следующего ГПС равно id предыдущего, то выполняем следующее
+                    if ($businessModels[$k+1]->problem->id === $businessModels[$k]->problem->id) {
+
+                        $i++;
+                        if ($i > 1) {
+                            $businessModels[$k+1]->problem->title = '';
+                            $businessModels[$k+1]->problem->date_gps = null;
+                            $businessModels[$k+1]->problem->date_confirm = null;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        //debug($businessModels);
+
+        /*foreach ($mvps as $mvp) {
+            //debug($mvp->valueProposition->exist_confirm);
+        }*/
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $businessModels,
+            /*'pagination' => [
+                'pageSize' => 100,
+            ],*/
+            'pagination' => false,
+            'sort' => false,
+        ]);
+
+
+
+        return $this->render('upshot', [
+            'dataProvider' => $dataProvider,
+            'project' => Projects::findOne($id),
+            ]
+        );
+
     }
 }

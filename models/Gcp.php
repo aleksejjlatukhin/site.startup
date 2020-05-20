@@ -25,6 +25,16 @@ class Gcp extends \yii\db\ActiveRecord
         return 'gcp';
     }
 
+    public function getBusinessModel ()
+    {
+        return $this->hasOne(BusinessModel::class, ['gcp_id' => 'id']);
+    }
+
+    public function getMvps ()
+    {
+        return $this->hasMany(Mvp::class, ['gcp_id' => 'id']);
+    }
+
     public function getProblem()
     {
         return $this->hasOne(ConfirmProblem::class, ['id' => 'confirm_problem_id']);
@@ -35,6 +45,21 @@ class Gcp extends \yii\db\ActiveRecord
         return $this->hasOne(ConfirmGcp::class, ['gcp_id' => 'id']);
     }
 
+    public function getGps ()
+    {
+        return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
+    }
+
+    public function getSegment ()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+    }
+
+    public function getProject ()
+    {
+        return $this->hasOne(Projects::class, ['id' => 'project_id']);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -43,7 +68,7 @@ class Gcp extends \yii\db\ActiveRecord
         return [
             [['good', 'benefit', 'contrast',], 'required'],
             [['title', 'good', 'benefit', 'contrast', 'description'], 'trim'],
-            [['confirm_problem_id', 'exist_confirm'], 'integer'],
+            [['confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id'], 'integer'],
             [['description'], 'string'],
             [['title', 'good', 'benefit', 'contrast'], 'string', 'max' => 255],
             [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
