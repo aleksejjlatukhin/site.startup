@@ -201,7 +201,7 @@ class ProjectsController extends AppController
     }
 
 
-    public function actionResult($id)
+    public function actionUpshot($id)
     {
         $model = Projects::findOne($id);
         $segments = Segment::find()->where(['project_id' => $model->id])->all();
@@ -227,7 +227,7 @@ class ProjectsController extends AppController
         }
 
 
-        return $this->render('result', [
+        return $this->render('upshot', [
             'model' => $model,
             'segments' => $segments,
             'generationProblems' => $generationProblems,
@@ -782,7 +782,7 @@ class ProjectsController extends AppController
     }
 
 
-    public function actionUpshot($id)
+    public function actionResult($id)
     {
 
         $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
@@ -975,7 +975,7 @@ class ProjectsController extends AppController
 
 
 
-        return $this->render('upshot', [
+        return $this->render('result', [
             'dataProvider' => $dataProvider,
             'project' => Projects::findOne($id),
             ]

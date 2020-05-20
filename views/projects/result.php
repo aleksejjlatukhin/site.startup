@@ -1,589 +1,682 @@
 <?php
+
+use kartik\grid\GridView;
+use yii\widgets\Pjax;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
 
+//use PhpOffice\PhpSpreadsheet\Spreadsheet;
+//use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+//use kartik\export\ExportMenu;
 ?>
 
-<?php
-
-$this->title = 'Сводная таблица проекта "' . mb_strtolower($model->project_name) . '"';
-
-?>
-
-
-
-<p>
-<h2><?= 'Сводная таблица проекта ' . Html::a(Html::encode(mb_strtolower('"' . $model->project_name . '"')), Url::to(['view', 'id' => $model->id])) ?>
-
-    <?= Html::a('Дорожная карта проекта', ['segment/roadmap', 'id' => $model->id], ['class' => 'btn btn-default pull-right']) ?></h2>
-</p>
-
-<br>
-
-<table class="table table-bordered table">
-    <thead>
-    <tr>
-        <th scope="col" rowspan="2" style="width: 250px; height: 60px; text-align: center;padding-bottom: 40px;">Сегмент</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 20px;">Гипотеза проблемы сегмента</th>
-        <th scope="col" colspan="2" style="width: 190px; height: 30px; text-align: center;padding-bottom: 20px;">Проблема сегмента</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 20px;">Гипотеза ценностного предложения</th>
-        <th scope="col" colspan="2" style="width: 180px; height: 30px; text-align: center;padding-bottom: 2px;">Ценностное предложение</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 20px;">Гипотеза MVP (продукт)</th>
-        <th scope="col" colspan="2" style="width: 180px; height: 30px; text-align: center;padding-bottom: 20px;">MVP (продукт)</th>
-        <th scope="col" rowspan="2" style="width: 140px; height: 60px; text-align: center;padding-bottom: 20px;">Бизнес-модель</th>
-    </tr>
-    <tr>
-        <td style="width: 70px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 120px;text-align: center;font-weight: 700;">Дата</td>
-        <td style="width: 70px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 110px;text-align: center;font-weight: 700;">Дата</td>
-        <td style="width: 70px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 110px;text-align: center;font-weight: 700;">Дата</td>
-    </tr>
-    </thead>
-    <tbody>
-
+<div class="table-project-kartik">
 
     <?
 
-    $countMvps = [];
-    $countGcps = [];
-    $countGcpsConfirm = [];
+    $gridColumns = [
 
-    foreach ($segments as $segment){
+        //['class' => 'kartik\grid\SerialColumn'],
 
-        foreach ($problems as $k => $problem){
+        [
+            'attribute' => 'segment',
+            'label' => 'Сегмент',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Наименование сегмента</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            'options' => ['colspan' => 1],
+            //'header' => false,
+            //'width' => '350px',
+            'value' => function ($model, $key, $index, $widget) {
 
-            /*Если ГПС относится к выбранному сегменту*/
-            if ($problem->interview_id == $segment->interview->id){
+                $str = "";
+                $substrings = mb_str_split($model->segment->name, 18);
+                foreach ($substrings as $s => $substring) {
+                    if ($s !== count($substrings)-1 ) {
 
-                /*Если подтверждения ГПС не существует*/
-                if (empty($problem->confirm)){
-                    $countGcps[] = 1;
+                        $str .= $substring . " - <br> ";
 
-                /*Если подтверждения ГПС существует*/
-                }else {
+                    }else {
 
-                    /*Если у ГПС существуют ГЦП и они являются массивом*/
-                    if (is_array($problem->confirm->gcps) && !empty($problem->confirm->gcps)){
+                        $str .= $substring;
+                    }
 
-                        /*Проходимся циклом по ГЦП*/
-                        foreach ($offers as $i => $offer) {
+                }
 
-                            /*Если у выбранной ГЦП существуют ГMVP и они являются массивом и ГЦП относится к выбранной ГПС*/
-                            if (is_array($offer->confirm->mvps) && !empty($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
+                return '<div style="padding: 0 5px;">' . Html::a($str, Url::to(['/segment/view', 'id' => $model->segment->id]), ['class' => 'table-kartik-link']) . '</div>';
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            'group' => true,  // enable grouping
+            //'groupedRow' => true, // Группировка по строке
+        ],
 
-                                $countGcps[$k] += count($offer->confirm->mvps);
+        [
+            'attribute' => 'segment_export',
+            'label' => 'Сегмент',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Наименование сегмента</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '350px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model, $key, $index, $widget) {
 
-                            /*Если у выбранной ГЦП не существуют ГMVP и ГЦП относится к выбранной ГПС*/
-                            }elseif (empty($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
+                return '<span class="table-kartik-link">' . $model->segment->name . '</span>';
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            'group' => true,  // enable grouping
+            //'groupedRow' => true, // Группировка по строке
+        ],
 
-                                $countGcps[$k]++;
-                            }
-                        }
+        [
+            'attribute' => 'date_segment',
+            'label' => 'Дата',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '120px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->segment->creat_date)) .'</div>';
+            },
+            'format' => 'html',
+            'group' => true,  // enable grouping
+            'subGroupOf' => 0 // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'gps',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->problem)) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+
+                } elseif ($model->problem->title) {
+
+                    return '<div class="text-center">' . Html::a($model->problem->title, Url::to(['/generation-problem/view', 'id' => $model->problem->id]), ['class' => 'table-kartik-link']) . '</div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 0, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'gps_export',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->problem)) {
+
+                    return '<div><span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</span></div>';
+
+                } elseif ($model->problem->title) {
+
+                    return '<div class="text-center"><span>' . $model->problem->title . '</span></div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 0, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'date_gps',
+            'label' => 'Дата',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '120px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                if ($model->problem && ($model->problem->date_gps !== null)) {
+
+                    return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->problem->date_gps)) .'</div>';
+                }
+            },
+            'format' => 'html',
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 2 // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_gps',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '250px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (($model->problem->exist_confirm === 1) && ($model->problem->date_confirm !== null)) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+
+                }elseif ($model->problem->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"> <span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+
+                }elseif ($model->problem && $model->problem->exist_confirm === null) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 2, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_gps_export',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '250px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (($model->problem->exist_confirm === 1) && ($model->problem->date_confirm !== null)) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+
+                }elseif ($model->problem->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+
+                }elseif ($model->problem && $model->problem->exist_confirm === null) {
+
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 2, // supplier column index is the parent group
+        ],
+
+        /*[
+            'attribute' => 'date_gps_confirm',
+            'label' => 'Дата',
+            //'width' => '250px',
+            'value' => function ($model) {
+                if ($model->problem->exist_confirm !== null) {
+                    return '<span class="" style="">'. date('d.m.yy', strtotime($model->problem->date_confirm)) .'</span>';
+                }
+            },
+            'format' => 'html',
+            'group' => true,  // enable grouping
+            'subGroupOf' => 2 // supplier column index is the parent group
+        ],*/
+
+        [
+            'attribute' => 'gcp',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->problem->gcps) && $model->problem->exist_confirm === 1) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+
+                } elseif ($model->gcp->title) {
+
+                    return '<div class="text-center">' . Html::a($model->gcp->title, Url::to(['/gcp/view', 'id' => $model->gcp->id]), ['class' => 'table-kartik-link']) . '</div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true,
+            //'group' => true,
+            //'subGroupOf' => 5,
+        ],
+
+        [
+            'attribute' => 'gcp_export',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->problem->gcps) && $model->problem->exist_confirm === 1) {
+
+                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) . '</span>';
+
+                } elseif ($model->gcp->title) {
+
+                    return '<div class="text-center">' . $model->gcp->title . '</div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true,
+            //'group' => true,
+            //'subGroupOf' => 5,
+        ],
+
+        [
+            'attribute' => 'date_gcp',
+            'label' => 'Дата',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Дата</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '120px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                if ($model->gcp && ($model->gcp->date_create !== null)) {
+
+                    return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->gcp->date_create)) .'</div>';
+                }
+            },
+            'format' => 'html',
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 7, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_gcp',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (($model->gcp->exist_confirm === 1) && ($model->gcp->date_confirm !== null)) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gcp->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gcp && $model->gcp->exist_confirm === null) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 7, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_gcp_export',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (($model->gcp->exist_confirm === 1) && ($model->gcp->date_confirm !== null)) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gcp->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gcp && $model->gcp->exist_confirm === null) {
+
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 7, // supplier column index is the parent group
+        ],
+
+        /*[
+            'attribute' => 'date_gcp_confirm',
+            'label' => 'Дата',
+            //'width' => '250px',
+            'value' => function ($model) {
+                if ($model->gcp->exist_confirm !== null) {
+                    return '<span class="" style="">'. date('d.m.yy', strtotime($model->gcp->date_confirm)) .'</span>';
+                }
+            },
+            'format' => 'html',
+            'group' => true,  // enable grouping
+            'subGroupOf' => 7, // supplier column index is the parent group
+        ],*/
+
+        [
+            'attribute' => 'mvp',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->gcp->mvps) && $model->gcp->exist_confirm === 1) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+
+                } elseif ($model->gmvp->title) {
+
+                    return '<div class="text-center">' . Html::a($model->gmvp->title, Url::to(['/mvp/view', 'id' => $model->gmvp->id]), ['class' => 'table-kartik-link']) . '</div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true,
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 1 // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'mvp_export',
+            'label' => 'Гипотеза',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if (empty($model->gcp->mvps) && $model->gcp->exist_confirm === 1) {
+
+                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) . '</span>';
+
+                } elseif ($model->gmvp->title) {
+
+                    return '<div class="text-center">' . $model->gmvp->title . '</div>';
+
+                } else {
+
+                    return '';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true,
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 1 // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'date_mvp',
+            'label' => 'Дата',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Дата</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '120px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                if ($model->gmvp) {
+
+                    return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->gmvp->date_create)) .'</div>';
+                }
+            },
+            'format' => 'html',
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 5, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_mvp',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if ($model->gmvp->exist_confirm === 1) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gmvp->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gmvp && $model->gmvp->exist_confirm === null) {
+
+                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                }
+            },
+            'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 5, // supplier column index is the parent group
+        ],
+
+        [
+            'attribute' => 'status_mvp_export',
+            'label' => 'Подтверждение',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'width' => '180px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+                if ($model->gmvp->exist_confirm === 1) {
+
+                    //Если подтверждение ГЦП положительное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gmvp->exist_confirm === 0) {
+
+                    //Если подтверждение ГЦП отрицательное выводим следующее
+                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+
+                } elseif ($model->gmvp && $model->gmvp->exist_confirm === null) {
+
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                }
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 5, // supplier column index is the parent group
+        ],
+
+        /*[
+            'attribute' => 'date_mvp_confirm',
+            'label' => 'Дата',
+            //'width' => '250px',
+            'value' => function ($model) {
+                if ($model->gmvp->exist_confirm !== null) {
+                    return '<span class="" style="">'. date('d.m.yy', strtotime($model->gmvp->date_confirm)) .'</span>';
+                }
+            },
+            'format' => 'html',
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 5, // supplier column index is the parent group
+        ],*/
+
+        [
+            'attribute' => 'businessModel',
+            'label' => 'Бизнес-модель',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Модель и презентация</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            //'header' => false,
+            //'width' => '120px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                if ($model->gmvp->exist_confirm === 1){
+
+                    if ($model->id) {
+
+                        return '<div class="text-center">' . Html::a(Html::img('@web/images/icons/icon-view-model.png', ['style' => ['width' => '20px', 'height' => '20px']]), ['business-model/view', 'id' => $model->id]) . '</div>';
+
+                    } else {
+
+                        return '<div class="text-center">' . Html::a(Html::img('@web/images/icons/icon-create-model.png', ['style' => ['width' => '20px', 'height' => '20px']]), ['business-model/create', 'id' => $model->gmvp->confirm->id]) . '</div>';
                     }
                 }
+            },
+            'format' => 'html',
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 1 // supplier column index is the parent group
+        ],
+    ];
+
+
+
+
+    // export menu
+    /*echo ExportMenu::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => $gridColumns,
+            'onRenderDataCell' => function(PhpOffice\PhpSpreadsheet\Cell\Cell $cell, $content, $model, $key, $index, kartik\export\ExportMenu $widget) {
+                $column = $cell->getColumn();
+                $columnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($column) - 1;
+                $value = '@web/images/icons/cross delete.png';
+                if(file_exists($value)) {   // change the condition as you prefer*/
+    /* @var PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet */
+    /*$firstRow = 2;  // skip header row
+    $imageName = "Image name";      // Add a name
+    $imageDescription = "Image description";    // Add a description
+    $padding = 5;
+    $imageWidth = 60;   // Image width
+    $imageHeight = 60;  // Image height
+    $cellID = $column . ($index + $firstRow);   // Get cell identifier
+    $worksheet = $cell->getWorksheet();
+    $worksheet->getRowDimension($index + $firstRow)->setRowHeight($imageHeight + ($padding * 2));
+    $worksheet->getColumnDimension($column)->setAutoSize(false);
+    $worksheet->getColumnDimension($column)->setWidth($imageWidth + ($padding * 2));
+    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+    $drawing->setName($imageName);
+    $drawing->setDescription($imageDescription);
+    $drawing->setPath($value); // put your path and image here
+    $drawing->setCoordinates($cellID);
+    $drawing->setOffsetX(200);
+    $drawing->setWidth($imageWidth);
+    $drawing->setHeight($imageHeight);
+    $drawing->setWidthAndHeight($imageWidth, $imageHeight);
+    $drawing->setWorksheet($worksheet);
+
+}
+},
+'dropdownOptions' => [
+'label' => 'Export All',
+'class' => 'btn btn-secondary'
+]
+]) . "<hr>\n";*/
+
+
+
+
+    echo GridView::widget([
+        'dataProvider' => $dataProvider,
+        'showPageSummary' => true,
+        'pjax' => true,
+        'striped' => false,
+        'bordered' => false,
+        'condensed' => true,
+        'summary' => false,
+        'hover' => true,
+
+        'panel' => [
+            'type' => 'default',
+            'heading' => false,
+            //'headingOptions' => ['class' => 'style-head-table-kartik-top'],
+            'before' => '<div style="font-size: 30px; font-weight: 700; color: #F2F2F2;">Проект: «'. $project->project_name . '» ' . Html::a('Посмотреть описание', ['/projects/view', 'id' => $project->id], ['style' => ['font-size' => '12px', 'color' => '#F2F2F2', 'font-weight' => '300']]) .'</div>',
+            'beforeOptions' => ['class' => 'style-head-table-kartik-top']
+        ],
+
+        'toolbar' => [
+            '{export}',
+        ],
+
+        'exportContainer' => ['class' => 'btn-group-sm', 'style' => ['padding' => '5px 5px']],
+        //'toggleDataContainer' => ['class' => 'btn-group mr-2'],
+
+        'export'=>[
+            'showConfirmAlert'=>false,
+            'target'=>GridView::TARGET_BLANK
+        ],
+
+        'columns' => $gridColumns,
+
+        'exportConfig' => [
+            GridView::PDF => [
+
+            ],
+            GridView::EXCEL => [
+
+            ],
+            GridView::HTML => [
+
+            ],
+        ],
+
+        //'floatHeader'=>true,
+        //'floatHeaderOptions'=>['top'=>'50'],
+        'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
+
+        'beforeHeader' => [
+            [
+                'columns' => [
+                    ['content' =>  Html::a(Html::img('@web/images/icons/icon-plus.png', ['style' => ['width' => '30px', 'margin-right' => '10px', 'margin-left' => '5px']]), ['/segment/index', 'id' => $project->id]) . ' Сегмент', 'options' => ['colspan' => 2, 'class' => 'font-segment-header-table']],
+                    ['content' => 'Проблема сегмента', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
+                    ['content' => 'Ценностное предложение', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
+                    ['content' => 'Гипотеза MVP (продукт)', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
+                    ['content' => 'Бизнес-модель', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
+                ],
+
+                'options' => [
+                    'class' => 'style-header-table-kartik',
+                ]
+            ]
+        ],
+    ]);
 
-                /*Если у ГПС не существует ГЦП*/
-                if (is_array($problem->confirm->gcps) && empty($problem->confirm->gcps)) {
-                    $countGcps[] = 1;
-                }
-
-
-                foreach ($offers as $y => $offer) {
-
-                    /*Если не существует подтверждение ГЦП и ГЦП относится к выбранной ГПС*/
-                    if (empty($offer->confirm) && $offer->confirm_problem_id == $problem->confirm->id){
-
-                        $countMvps[$y] = 1;
-
-                    /*Если у выбранной ГЦП существует массив ГMVP и ГЦП относится к выбранной ГПС*/
-                    }elseif (is_array($offer->confirm->mvps) && $offer->confirm_problem_id == $problem->confirm->id){
-
-                        $countMvps[] = count($offer->confirm->mvps);
-                        foreach ($countMvps as $i => $countMvp){
-                            if ($countMvps[$i] == 0){
-                                $countMvps[$i] = 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $countM = array_sum($countMvps);
-        $minHeight = 35;
-        //debug($countMvps);
-        //debug($countGcps);
-
-    }
-
-
-    foreach ($segments as $k => $segment){
-
-        /*Выводим названия сегментов*/
-        echo '<tr style="text-align: center"><td style="font-weight: 700; vertical-align: middle; height: ' . $minHeight *  $countM[$k] . 'px">' . Html::a(Html::encode($segment->name), Url::to(['segment/view', 'id' => $segment->id])). '</td>';
-
-        /*Выводим ГПС*/
-        echo '<td style="padding: 0;">';
-
-        /*Если у сегмента нет ГПС выводим следующее*/
-        if(empty($segment->interview->problems)){
-            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-        }
-
-        /*Если у сегмента есть ГПС выводим их названия*/
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">
-                
-                    <span data-toggle="tooltip" title="'.$problem->description.'">' . Html::a(Html::encode($problem->title), Url::to(['generation-problem/view', 'id' => $problem->id])) . '</span>
-                
-                </div>';
-            }
-        }
-
-        echo '</td>';
-
-        /*Выводим подтверждение ГПС*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                /*Если есть подтверждение то выводим его результат*/
-                if ($problem->exist_confirm === 1) {
-                    echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
-                }
-                if ($problem->exist_confirm === 0) {
-                    echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
-                }
-
-                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
-                if ($problem->exist_confirm === null && !empty($problem)) {
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                }
-            }
-
-        }
-
-        echo '</td>';
-
-        /*Выводим дату подтверждения ГПС*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                /*Если есть подтверждение то выводим его результат*/
-                if ($problem->exist_confirm === 1) {
-                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m.yy', strtotime($problem->date_confirm)) .'</div>';
-                }
-                if ($problem->exist_confirm === 0) {
-                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;">'. date('d.m.yy', strtotime($problem->date_confirm)) .'</div>';
-                }
-
-                /*Если у существующей ГПС нет подтверждения то выводим следующее*/
-                if ($problem->exist_confirm === null && !empty($problem)) {
-                    echo '<div class="border-gray" style="line-height: ' . $minHeight * $countGcps[$i] . 'px; height: ' . $minHeight * $countGcps[$i] . 'px;"></div>';
-                }
-            }
-
-        }
-
-        echo '</td>';
-
-        /*Выводим ГЦП*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-
-                /*Если не существует ГЦП*/
-                if (empty($problem->confirm->gcps)){
-
-                    if ($problem->exist_confirm === 0){
-
-                        /*Если подтверждение ГПС отрицательное выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-
-                    }elseif ($problem->exist_confirm === 1){
-
-                        /*Если подтверждение ГПС положительное выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-
-                    }elseif ($problem->exist_confirm === null){
-
-                        /*Если подтверждение ГПС отсутствует или не закончено выводим следующее*/
-                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                    }
-                }
-
-                /*Если существует ГЦП выводим названия*/
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-                        //debug($countMvps[$j]);
-                        echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">
-                        
-                            <span data-toggle="tooltip" title="'.$offer->description.'">' . Html::a(Html::encode($offer->title), Url::to(['gcp/view', 'id' => $offer->id])) . '</span>
-                        
-                        </div>';
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-        /*Выводим подтверждение ГЦП*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если не  существует ГЦП выводим следующее*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-
-                /*Если ГЦП существует*/
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        if ($offer->exist_confirm === 1) {
-
-                            /*Если подтверждение ГЦП положительное выводим следующее*/
-                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
-                        }
-                        if ($offer->exist_confirm === 0) {
-
-                            /*Если подтверждение ГЦП отрицательное выводим следующее*/
-                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
-                        }
-                        if ($offer->exist_confirm === null) {
-
-                            /*Если подтверждение ГЦП отсутствует или не закончено выводим следующее*/
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        /*Выводим дату подтверждения ГЦП*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если не  существует ГЦП выводим следующее*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-
-                /*Если ГЦП существует*/
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        if ($offer->exist_confirm === 1) {
-
-                            /*Если подтверждение ГЦП положительное выводим следующее*/
-                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m.yy', strtotime($offer->date_confirm)) .'</div>';
-                        }
-                        if ($offer->exist_confirm === 0) {
-
-                            /*Если подтверждение ГЦП отрицательное выводим следующее*/
-                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;">'. date('d.m.yy', strtotime($offer->date_confirm)) .'</div>';
-                        }
-                        if ($offer->exist_confirm === null) {
-
-                            /*Если подтверждение ГЦП отсутствует или не закончено выводим следующее*/
-                            echo '<div class="border-gray" style="line-height: ' . $minHeight * $countMvps[$j] . 'px; height: ' . $minHeight * $countMvps[$j] . 'px;"></div>';
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        /*Выводим ГMVP*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если отсутствует ГЦП выводим следующее*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-                /*Если ГЦП существует*/
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        /*Если ГMVP не существует*/
-                        if (empty($offer->confirm->mvps)){
-
-                            if ($offer->exist_confirm === 0){
-
-                                /*Если подтверждение ГЦП отрицательное выводим следующее*/
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-
-                            }elseif ($offer->exist_confirm === 1){
-
-                                /*Если подтверждение ГЦП положительное выводим следующее*/
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-
-                            }elseif ($offer->exist_confirm === null){
-
-                                /*Если подтверждение ГЦП отсутствует или не закончено выводим следующее*/
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                            }
-                        }
-
-                        /*Если ГMVP существует*/
-                        foreach ($mvProducts as $mvProduct) {
-
-                            if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                /*Выводим название соответствующего ГMVP*/
-                                echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">
-                                
-                                    <span data-toggle="tooltip" title="'.$mvProduct->description.'">' . Html::a(Html::encode($mvProduct->title), Url::to(['mvp/view', 'id' => $mvProduct->id])) . '</span>
-                                
-                                </div>';
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-        /*Выводим подтверждение ГMVP*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если отсутствует ГЦП*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        if (empty($offer->confirm->mvps)){
-
-                            /*Если отсутствует ГMVP*/
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        foreach ($mvProducts as $mvProduct) {
-                            if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                if ($mvProduct->exist_confirm === 1) {
-
-                                    /*Если подтверждение ГMVP положительное выводим следующее*/
-                                    echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                                if ($mvProduct->exist_confirm === 0) {
-
-                                    /*Если подтверждение ГMVP отрицательное выводим следующее*/
-                                    echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                                if ($mvProduct->exist_confirm === null) {
-
-                                    /*Если подтверждение ГMVP отсутствует или не закончено выводим следующее*/
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-
-        /*Выводим дату подтверждения ГMVP*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если отсутствует ГЦП*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        if (empty($offer->confirm->mvps)){
-
-                            /*Если отсутствует ГMVP*/
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        foreach ($mvProducts as $mvProduct) {
-                            if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                if ($mvProduct->exist_confirm === 1) {
-
-                                    /*Если подтверждение ГMVP положительное выводим следующее*/
-                                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m.yy', strtotime($mvProduct->date_confirm)) .'</div>';
-                                }
-                                if ($mvProduct->exist_confirm === 0) {
-
-                                    /*Если подтверждение ГMVP отрицательное выводим следующее*/
-                                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m.yy', strtotime($mvProduct->date_confirm)) .'</div>';
-                                }
-                                if ($mvProduct->exist_confirm === null) {
-
-                                    /*Если подтверждение ГMVP отсутствует или не закончено выводим следующее*/
-                                    echo '<div class="border-gray" style="line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;"> </div>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        /*Выводим бизнес-модель*/
-        echo '<td style="padding: 0;">';
-
-        foreach ($problems as $i => $problem) {
-
-            if ($problem->interview_id == $segment->interview->id) {
-
-                if (empty($problem->confirm->gcps)){
-
-                    /*Если не существует ГЦП выводим следующее*/
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                }
-
-                /*Если существует ГЦП*/
-                foreach ($offers as $j => $offer) {
-
-                    if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                        if (empty($offer->confirm->mvps)){
-
-                            /*Если не существует ГMVP выводим следующее*/
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-
-                        /*Если существует ГMVP*/
-                        foreach ($mvProducts as $k => $mvProduct) {
-
-                            if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                /*Если подтверждение ГMVP положительное*/
-                                if ($mvProduct->exist_confirm === 1) {
-
-                                    foreach ($confirmMvps as $confirmMvp){
-
-                                        if ($confirmMvp->id == $mvProduct->confirm->id){
-
-                                            if (empty($confirmMvp->business)){
-
-                                                echo '<div class="border-gray" style="display: flex; justify-content: center; align-items: center; height: ' . $minHeight . 'px;">'. Html::a('Создать', ['business-model/create', 'id' => $mvProducts[$k]->confirm->id], ['class' => 'btn btn-success btn-sm', 'style' => ['font-weight' => '700', 'width' => '90px']]) .'</div>';
-                                            }else{
-                                                echo '<div class="border-gray" style="display: flex; justify-content: center; align-items: center; height: ' . $minHeight . 'px;">'. Html::a('Посмотреть', ['business-model/view', 'id' => $confirmMvp->business->id], ['class' => 'btn btn-success btn-sm', 'style' => ['font-weight' => '700', 'width' => '90px']]) .'</div>';
-
-                                            }
-                                        }
-                                    }
-                                }
-                                if ($mvProduct->exist_confirm === 0) {
-
-                                    /*Если подтверждение ГMVP отрицательное*/
-                                    echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                }
-                                if ($mvProduct->exist_confirm === null) {
-
-                                    /*Если подтверждение ГMVP отсутствует или не закончено*/
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        echo '</tr>';
-    }
     ?>
 
-    </tbody>
-</table>
-
-<div style="font-size: 13px;">
-
-    <p><span class="bolder">Сегмент</span> - целевой сегмент, по которому проводится исследование.</p>
-    <p><span class="bolder">Проблема сегмента</span> - подтвержденная гипотеза проблемы целевого сегмента.</p>
-    <p><span class="bolder">Ценностное предложение</span> - подтвержденная гипотеза ценностного предложения.</p>
-    <p><span class="bolder">MVP (продукт)</span> - подтвержденный минимально жизнеспособный продукт.</p>
-    <p><span class="bolder">Бизнес-модель</span> - построение бизнес-модели по Остервальдеру.</p>
-
-    <p><span class="bolder">ГПС</span> - гипотеза проблемы целевого сегмента.</p>
-    <p><span class="bolder">ГЦП</span> - гипотеза ценностного предложения.</p>
-    <p><span class="bolder">ГMVP</span> - гипотеза минимально жизнеспособного продукта.</p>
-
-    <p style="padding-right: 80px;"><?= Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]])?> - этап подтвержден.</p>
-    <p style="padding-right: 80px;"><?= Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]])?> - этап не подтвержден.</p>
-    <p><?= Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]])?> - этап, который требует дальнейшей реализации.</p>
-
 </div>
-
-
-
-
-
-
-
