@@ -31,6 +31,8 @@ $this->params['breadcrumbs'][] = $model->project_name;
 
             <?= Html::a('Генерация ГЦС >>', ['segment/index', 'id' => $model->id], ['class' => 'btn btn-success pull-right']) ?>
 
+            <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $model->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-right' => '5px']]) ?>
+
             <?= Html::a('Сводная таблица проекта', ['result', 'id' => $model->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-right' => '5px']]) ?>
         </p>
 

@@ -11,6 +11,12 @@ use yii\helpers\ArrayHelper;
 //use kartik\export\ExportMenu;
 ?>
 
+<?php
+
+$this->title = 'Сводная таблица проекта "' . mb_strtolower($project->project_name) . '"';
+
+?>
+
 <div class="table-project-kartik">
 
     <?

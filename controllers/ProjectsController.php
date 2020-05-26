@@ -44,7 +44,7 @@ class ProjectsController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['result']) || in_array($action->id, ['upshot'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
@@ -981,5 +981,79 @@ class ProjectsController extends AppController
             ]
         );
 
+    }
+
+
+    public function actionReport ($id) {
+
+        $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
+
+        $statModels = [];
+
+        foreach ($segments as $s => $segment) {
+
+            if (empty($segment->problems)) {
+
+                $newProblem = new GenerationProblem();
+                $newProblem->segment_id = $segment->id;
+                $newProblem->project_id = $id;
+                $newProblem->description = 'У данного сегмента отсутствуют дальнейшие этапы';
+                $statModels[] = $newProblem;
+            }
+
+            if ($segment->interview && $segment->problems) {
+
+                $problems = GenerationProblem::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
+
+                foreach ($problems as $p => $problem) {
+
+                    $problem->description = 'ГПС ' . ($s+1) . '.' . ($p+1) . ': ' . $problem->description;
+
+                    $statModels[] = $problem;
+
+                    if ($segment->interview && $segment->problems && $problem->gcps) {
+
+                        $gcps = Gcp::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
+
+                        foreach ($gcps as $g => $gcp) {
+
+                            $gcp->description = 'ГЦП ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . ': ' . $gcp->description;
+
+                            $statModels[] = $gcp;
+
+                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps){
+
+                                $mvps = Mvp::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
+
+                                foreach ($mvps as $m => $mvp) {
+
+                                    $mvp->description = 'ГMVP ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . '.' . ($m+1) . ': ' . $mvp->description;
+
+                                    $statModels[] = $mvp;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $statModels,
+            /*'pagination' => [
+                'pageSize' => 100,
+            ],*/
+            'pagination' => false,
+            'sort' => false,
+        ]);
+
+
+
+        return $this->render('report', [
+                'dataProvider' => $dataProvider,
+                'project' => Projects::findOne($id),
+            ]
+        );
     }
 }
