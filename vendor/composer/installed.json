@@ -89,7 +89,7 @@
         "version_normalized": "3.3.11.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/RobinHerbots/Inputmask.git",
+            "url": "git@github.com:RobinHerbots/Inputmask.git",
             "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
         },
         "dist": {
@@ -112,7 +112,7 @@
         "version_normalized": "3.4.1.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/jquery/jquery-dist.git",
+            "url": "git@github.com:jquery/jquery-dist.git",
             "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
         },
         "dist": {
@@ -1047,8 +1047,8 @@
     },
     {
         "name": "kartik-v/yii2-mpdf",
-        "version": "v1.0.6",
-        "version_normalized": "1.0.6.0",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
             "url": "https://github.com/kartik-v/yii2-mpdf.git",
@@ -1070,7 +1070,7 @@
                 "dev-master": "1.0.x-dev"
             }
         },
-        "installation-source": "dist",
+        "installation-source": "source",
         "autoload": {
             "psr-4": {
                 "kartik\\mpdf\\": "src"

@@ -30,6 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <span style="font-size: 30px;"><?= $this->title; ?></span>
 
+        <?php echo Html::a( Html::img(['@web/images/icons/icon-pdf.png'], ['style' => ['width' => '30px', 'margin-bottom' => '15px', 'margin-left' => '5px']]), ['/business-model/mpdf-business-model', 'id' => $model->id], [
+            //'class'=>'btn btn-default',
+            'target'=>'_blank',
+            'data-toggle'=>'tooltip',
+            'title'=> 'Скачать в pdf',
+        ]);?>
+
         <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>

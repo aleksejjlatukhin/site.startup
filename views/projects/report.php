@@ -603,14 +603,16 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
 
         'export'=>[
             'showConfirmAlert'=>false,
-            'target'=>GridView::TARGET_BLANK
+            'target'=>GridView::TARGET_BLANK,
+            'label' => '<span class="font-header-table" style="font-weight: 700;">Экпорт таблицы</span>',
+            'options' => ['title' => false],
         ],
 
         'columns' => $gridColumns,
 
         'exportConfig' => [
             GridView::PDF => [
-
+                'filename' => 'Протокол_проекта_«'. $project_filename . '»',
             ],
             /*GridView::EXCEL => [
 

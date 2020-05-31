@@ -102,15 +102,6 @@ return array (
       '@kartik/grid' => $vendorDir . '/kartik-v/yii2-grid/src',
     ),
   ),
-  'kartik-v/yii2-mpdf' => 
-  array (
-    'name' => 'kartik-v/yii2-mpdf',
-    'version' => '1.0.6.0',
-    'alias' => 
-    array (
-      '@kartik/mpdf' => $vendorDir . '/kartik-v/yii2-mpdf/src',
-    ),
-  ),
   'kartik-v/yii2-sortable' => 
   array (
     'name' => 'kartik-v/yii2-sortable',
@@ -154,6 +145,15 @@ return array (
     'alias' => 
     array (
       '@kartik/export' => $vendorDir . '/kartik-v/yii2-export/src',
+    ),
+  ),
+  'kartik-v/yii2-mpdf' => 
+  array (
+    'name' => 'kartik-v/yii2-mpdf',
+    'version' => '9999999-dev',
+    'alias' => 
+    array (
+      '@kartik/mpdf' => $vendorDir . '/kartik-v/yii2-mpdf/src',
     ),
   ),
 );

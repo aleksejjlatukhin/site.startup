@@ -24,6 +24,7 @@ use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\Segment;
 use app\models\User;
+use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Projects;
 use yii\data\ActiveDataProvider;
@@ -47,6 +48,21 @@ class ProjectsController extends AppController
         if (in_array($action->id, ['view']) || in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($model->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['mpdf-business-model'])){
+
+            $businessModel = BusinessModel::findOne(Yii::$app->request->get());
+            $model = $businessModel->project;
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($model->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -974,10 +990,13 @@ class ProjectsController extends AppController
         ]);
 
 
+        $project = Projects::findOne($id);
+        $project_filename = str_replace(' ', '_', $project->project_name);
 
         return $this->render('result', [
             'dataProvider' => $dataProvider,
-            'project' => Projects::findOne($id),
+            'project' => $project,
+            'project_filename' => $project_filename,
             ]
         );
 
@@ -1048,12 +1067,64 @@ class ProjectsController extends AppController
             'sort' => false,
         ]);
 
-
+        $project = Projects::findOne($id);
+        $project_filename = str_replace(' ', '_', $project->project_name);
 
         return $this->render('report', [
                 'dataProvider' => $dataProvider,
-                'project' => Projects::findOne($id),
+                'project' => $project,
+                'project_filename' => $project_filename,
             ]
         );
+    }
+
+
+    /*export in pdf*/
+    public function actionMpdfBusinessModel($id) {
+
+        $model = BusinessModel::findOne($id);
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/business-model/viewpdf', ['model' => $model]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $filename = 'business-model-'. $model->id .'.pdf';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_LANDSCAPE,
+            //'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginFooter' => 5,
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => ['Бизнес-модель PDF'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Бизнес-модель для проекта «'.$model->project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
     }
 }

@@ -50,9 +50,9 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
                 }
 
-                return '<div style="padding: 0 5px;">' . Html::a($str, Url::to(['/segment/view', 'id' => $model->segment->id]), ['class' => 'table-kartik-link']) . '</div>';
+                return '<div style="padding: 0 5px;">' . Html::a($str, Url::to(['/segment/view', 'id' => $model->segment->id]), ['class' => 'table-kartik-link', 'target'=>'_blank',]) . '</div>';
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true, // Убрать столбец при скачивании
             'group' => true,  // enable grouping
             //'groupedRow' => true, // Группировка по строке
@@ -86,7 +86,14 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->segment->creat_date)) .'</div>';
+                if ($model->segment->creat_date) {
+
+                    return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->segment->creat_date)) .'</div>';
+                }else {
+                    return '<div class="text-center" style="color: #8c8c8c;">__.__.__</div>';
+                }
+
+
             },
             'format' => 'html',
             'group' => true,  // enable grouping
@@ -102,20 +109,31 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             //'width' => '180px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
-                if (empty($model->problem)) {
+                if (empty($model->segment->interview)){
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/interview/create', 'id' => $model->segment->id], ['target'=>'_blank',]);
+
+                } elseif (empty($model->problem) && !empty($model->segment->interview)) {
+
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/generation-problem/create', 'id' => $model->segment->interview->id], ['target'=>'_blank',]);
 
                 } elseif ($model->problem->title) {
 
-                    return '<div class="text-center">' . Html::a($model->problem->title, Url::to(['/generation-problem/view', 'id' => $model->problem->id]), ['class' => 'table-kartik-link']) . '</div>';
+                    return '<div class="text-center">' . Html::a($model->problem->title, Url::to(['/generation-problem/view', 'id' => $model->problem->id]), [
+                            'class' => 'table-kartik-link',
+                            'target'=>'_blank',
+                            'data-toggle'=>'tooltip',
+                            'title'=> $model->problem->description,
+                        ]) . '</div>';
 
                 } else {
 
                     return '';
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true, // Убрать столбец при скачивании
             //'group' => true,  // enable grouping
             //'subGroupOf' => 0, // supplier column index is the parent group
@@ -181,19 +199,26 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                 if (($model->problem->exist_confirm === 1) && ($model->problem->date_confirm !== null)) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]),
+                            ['/confirm-problem/view', 'id' => $model->problem->confirm->id], ['target'=>'_blank'])
+                        .'</span><span class="">'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
 
                 }elseif ($model->problem->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"> <span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"> <span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]),
+                            ['/confirm-problem/view', 'id' => $model->problem->confirm->id], ['target'=>'_blank'])
+                        .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
 
                 }elseif ($model->problem && $model->problem->exist_confirm === null) {
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/confirm-problem/create', 'id' => $model->problem->id], ['target'=>'_blank']);
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true, // Убрать столбец при скачивании
             //'group' => true,  // enable grouping
             //'subGroupOf' => 2, // supplier column index is the parent group
@@ -254,18 +279,24 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'value' => function ($model) {
                 if (empty($model->problem->gcps) && $model->problem->exist_confirm === 1) {
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/gcp/create', 'id' => $model->problem->confirm->id], ['target'=>'_blank']);
 
                 } elseif ($model->gcp->title) {
 
-                    return '<div class="text-center">' . Html::a($model->gcp->title, Url::to(['/gcp/view', 'id' => $model->gcp->id]), ['class' => 'table-kartik-link']) . '</div>';
+                    return '<div class="text-center">' . Html::a($model->gcp->title, Url::to(['/gcp/view', 'id' => $model->gcp->id]), [
+                            'class' => 'table-kartik-link',
+                            'target'=>'_blank',
+                            'data-toggle'=>'tooltip',
+                            'title'=> $model->gcp->description,
+                        ]) . '</div>';
 
                 } else {
 
                     return '';
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true,
             //'group' => true,
             //'subGroupOf' => 5,
@@ -331,19 +362,26 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                 if (($model->gcp->exist_confirm === 1) && ($model->gcp->date_confirm !== null)) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]),
+                            ['/confirm-gcp/view', 'id' => $model->gcp->confirm->id], ['target'=>'_blank'])
+                        .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gcp->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]),
+                            ['/confirm-gcp/view', 'id' => $model->gcp->confirm->id], ['target'=>'_blank'])
+                        .'</span><span class="">'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gcp && $model->gcp->exist_confirm === null) {
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/confirm-gcp/create', 'id' => $model->gcp->id], ['target'=>'_blank']);
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true, // Убрать столбец при скачивании
             //'group' => true,  // enable grouping
             //'subGroupOf' => 7, // supplier column index is the parent group
@@ -404,18 +442,24 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'value' => function ($model) {
                 if (empty($model->gcp->mvps) && $model->gcp->exist_confirm === 1) {
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/mvp/create', 'id' => $model->gcp->confirm->id], ['target'=>'_blank',]);
 
                 } elseif ($model->gmvp->title) {
 
-                    return '<div class="text-center">' . Html::a($model->gmvp->title, Url::to(['/mvp/view', 'id' => $model->gmvp->id]), ['class' => 'table-kartik-link']) . '</div>';
+                    return '<div class="text-center">' . Html::a($model->gmvp->title, Url::to(['/mvp/view', 'id' => $model->gmvp->id]), [
+                            'class' => 'table-kartik-link',
+                            'target'=>'_blank',
+                            'data-toggle'=>'tooltip',
+                            'title'=> $model->gmvp->description,
+                        ]) . '</div>';
 
                 } else {
 
                     return '';
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true,
             //'group' => true,  // enable grouping
             //'subGroupOf' => 1 // supplier column index is the parent group
@@ -481,19 +525,26 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                 if ($model->gmvp->exist_confirm === 1) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
+                            ['/confirm-mvp/view', 'id' => $model->gmvp->confirm->id], ['target'=>'_blank',])
+                        .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gmvp->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;">'. Html::a(
+                            Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]),
+                            ['/confirm-mvp/view', 'id' => $model->gmvp->confirm->id], ['target'=>'_blank',])
+                        .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gmvp && $model->gmvp->exist_confirm === null) {
 
-                    return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]);
+                    return Html::a( Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]),
+                        ['/confirm-mvp/create', 'id' => $model->gmvp->id], ['target'=>'_blank',]);
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             'hiddenFromExport' => true, // Убрать столбец при скачивании
             //'group' => true,  // enable grouping
             //'subGroupOf' => 5, // supplier column index is the parent group
@@ -558,15 +609,28 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
                     if ($model->id) {
 
-                        return '<div class="text-center">' . Html::a(Html::img('@web/images/icons/icon-view-model.png', ['style' => ['width' => '20px', 'height' => '20px']]), ['business-model/view', 'id' => $model->id]) . '</div>';
+                        return '<div style="display: flex; justify-content: space-around;">' . Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]), ['/business-model/view', 'id' => $model->id], [
+                                'target'=>'_blank',
+                                //'data-toggle'=>'tooltip',
+                                //'title'=> 'Открыть страницу бизнес-модели',
+                            ]) .
+                            Html::a(Html::img('@web/images/icons/icon-pdf-export.png', ['style' => ['width' => '20px',]]), ['/projects/mpdf-business-model', 'id' => $model->id], [
+                                'target'=>'_blank',
+                                //'data-toggle'=>'tooltip',
+                                //'title'=> 'Скачать презентацию',
+                                ]) . '</div>';
 
                     } else {
 
-                        return '<div class="text-center">' . Html::a(Html::img('@web/images/icons/icon-create-model.png', ['style' => ['width' => '20px', 'height' => '20px']]), ['business-model/create', 'id' => $model->gmvp->confirm->id]) . '</div>';
+                        return '<div style="padding-left: 25px;">' . Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]), ['/business-model/create', 'id' => $model->gmvp->confirm->id], [
+                                'target'=>'_blank',
+                                //'data-toggle'=>'tooltip',
+                                //'title'=> 'Создать бизнес-модель',
+                            ]) . '</div>';
                     }
                 }
             },
-            'format' => 'html',
+            'format' => 'raw',
             //'group' => true,  // enable grouping
             //'subGroupOf' => 1 // supplier column index is the parent group
         ],
@@ -621,7 +685,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
     echo GridView::widget([
         'dataProvider' => $dataProvider,
         'showPageSummary' => true,
-        'pjax' => true,
+        //'pjax' => true,
         'striped' => false,
         'bordered' => false,
         'condensed' => true,
@@ -645,20 +709,22 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
         'export'=>[
             'showConfirmAlert'=>false,
-            'target'=>GridView::TARGET_BLANK
+            'target'=>GridView::TARGET_BLANK,
+            'label' => '<span class="font-header-table" style="font-weight: 700;">Экпорт таблицы</span>',
+            'options' => ['title' => false],
         ],
 
         'columns' => $gridColumns,
 
         'exportConfig' => [
             GridView::PDF => [
-
+                'filename' => 'Сводная_таблица_проекта_«'. $project_filename . '»',
             ],
             GridView::EXCEL => [
-
+                'filename' => 'Сводная_таблица_проекта_«'. $project_filename . '»',
             ],
             GridView::HTML => [
-
+                'filename' => 'Сводная_таблица_проекта_«'. $project_filename . '»',
             ],
         ],
 
@@ -669,7 +735,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
         'beforeHeader' => [
             [
                 'columns' => [
-                    ['content' =>  Html::a(Html::img('@web/images/icons/icon-plus.png', ['style' => ['width' => '30px', 'margin-right' => '10px', 'margin-left' => '5px']]), ['/segment/index', 'id' => $project->id]) . ' Сегмент', 'options' => ['colspan' => 2, 'class' => 'font-segment-header-table']],
+                    ['content' =>  Html::a(Html::img('@web/images/icons/icon-plus.png', ['style' => ['width' => '30px', 'margin-right' => '10px', 'margin-left' => '5px']]), ['/segment/index', 'id' => $project->id], ['target'=>'_blank',]) . ' Сегмент', 'options' => ['colspan' => 2, 'class' => 'font-segment-header-table']],
                     ['content' => 'Проблема сегмента', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
                     ['content' => 'Ценностное предложение', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
                     ['content' => 'Гипотеза MVP (продукт)', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],

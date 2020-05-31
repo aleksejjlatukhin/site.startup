@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6d07ff8c565241b8bb834b0037a6b08",
+    "content-hash": "e7d50e3ef67d34cf82f7b4bf20170dd8",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -32,7 +32,7 @@
             "version": "3.3.11",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobinHerbots/Inputmask.git",
+                "url": "git@github.com:RobinHerbots/Inputmask.git",
                 "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "dist": {
@@ -53,7 +53,7 @@
             "version": "3.4.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
             },
             "dist": {
@@ -574,7 +574,7 @@
         },
         {
             "name": "kartik-v/yii2-mpdf",
-            "version": "v1.0.6",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-mpdf.git",
@@ -4411,7 +4411,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "kartik-v/yii2-grid": 20,
-        "kartik-v/yii2-export": 20
+        "kartik-v/yii2-export": 20,
+        "kartik-v/yii2-mpdf": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

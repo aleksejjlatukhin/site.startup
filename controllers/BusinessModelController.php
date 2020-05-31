@@ -17,6 +17,7 @@ use app\models\BusinessModel;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use kartik\mpdf\Pdf;
 
 /**
  * BusinessModelController implements the CRUD actions for BusinessModel model.
@@ -30,15 +31,7 @@ class BusinessModelController extends AppController
         if (in_array($action->id, ['view'])){
 
             $model = BusinessModel::findOne(Yii::$app->request->get());
-            $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -53,15 +46,7 @@ class BusinessModelController extends AppController
         }elseif (in_array($action->id, ['update'])){
 
             $model = BusinessModel::findOne(Yii::$app->request->get());
-            $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -75,14 +60,21 @@ class BusinessModelController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get());
-            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = $confirmMvp->mvp->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['mpdf-business-model'])){
+
+            $model = BusinessModel::findOne(Yii::$app->request->get());
+            $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -98,21 +90,6 @@ class BusinessModelController extends AppController
         }
 
     }
-
-    /**
-     * Lists all BusinessModel models.
-     * @return mixed
-     */
-    /*public function actionIndex()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => BusinessModel::find(),
-        ]);
-
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }*/
 
     /**
      * Displays a single BusinessModel model.
@@ -332,6 +309,56 @@ class BusinessModelController extends AppController
         return $this->redirect(['index']);
     }*/
 
+
+    /*export in pdf*/
+    public function actionMpdfBusinessModel($id) {
+
+        $model = $this->findModel($id);
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/business-model/viewpdf', ['model' => $model]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $filename = 'business-model-'. $model->id .'.pdf';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_LANDSCAPE,
+            //'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginFooter' => 5,
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => ['Бизнес-модель PDF'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Бизнес-модель для проекта «'.$model->project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
+    }
+
     /**
      * Finds the BusinessModel model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -347,4 +374,7 @@ class BusinessModelController extends AppController
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+
+
 }
