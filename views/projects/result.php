@@ -64,11 +64,11 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Наименование сегмента</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '350px',
+            'width' => '230px',
             'options' => ['colspan' => 1],
             'value' => function ($model, $key, $index, $widget) {
 
-                return '<span class="table-kartik-link">' . $model->segment->name . '</span>';
+                return '<div class="table-kartik-link">' . $model->segment->name . '</div>';
             },
             'format' => 'html',
             'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
@@ -96,9 +96,37 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
             },
             'format' => 'html',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
             'group' => true,  // enable grouping
             'subGroupOf' => 0 // supplier column index is the parent group
         ],
+
+
+        [
+            'attribute' => 'date_segment-export',
+            'label' => 'Дата',
+            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            'width' => '80px',
+            'options' => ['colspan' => 1],
+            'value' => function ($model) {
+
+                if ($model->segment->creat_date) {
+
+                    return '<div class="text-center" style="color: #8c8c8c;">'. date('d.m.y', strtotime($model->segment->creat_date)) .'</div>';
+                }else {
+                    return '<div class="text-center" style="color: #8c8c8c;">__.__.__</div>';
+                }
+
+
+            },
+            'format' => 'html',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
+            'group' => true,  // enable grouping
+            'subGroupOf' => 0 // supplier column index is the parent group
+        ],
+
 
         [
             'attribute' => 'gps',
@@ -145,7 +173,7 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Гипотеза</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '180px',
+            'width' => '100px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if (empty($model->problem)) {
@@ -230,22 +258,22 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '250px',
+            'width' => '130px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if (($model->problem->exist_confirm === 1) && ($model->problem->date_confirm !== null)) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
 
                 }elseif ($model->problem->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->problem->date_confirm)) .'</span></div>';
 
                 }elseif ($model->problem && $model->problem->exist_confirm === null) {
 
-                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) .'</span></div>';
                 }
             },
             'format' => 'html',
@@ -308,12 +336,12 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '180px',
+            'width' => '100px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if (empty($model->problem->gcps) && $model->problem->exist_confirm === 1) {
 
-                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) . '</span>';
+                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</span>';
 
                 } elseif ($model->gcp->title) {
 
@@ -393,22 +421,22 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '180px',
+            'width' => '130px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if (($model->gcp->exist_confirm === 1) && ($model->gcp->date_confirm !== null)) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">+</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gcp->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"> <span style="margin-right: 10px;" class="skip-export-pdf">-</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gcp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gcp && $model->gcp->exist_confirm === null) {
 
-                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) .'</span></div>';
                 }
             },
             'format' => 'html',
@@ -471,12 +499,12 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Гипотеза</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '180px',
+            'width' => '100px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if (empty($model->gcp->mvps) && $model->gcp->exist_confirm === 1) {
 
-                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) . '</span>';
+                    return '<span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</span>';
 
                 } elseif ($model->gmvp->title) {
 
@@ -556,22 +584,22 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Подтверждение</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'width' => '180px',
+            'width' => '130px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
                 if ($model->gmvp->exist_confirm === 1) {
 
                     //Если подтверждение ГЦП положительное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">+</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">+</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gmvp->exist_confirm === 0) {
 
                     //Если подтверждение ГЦП отрицательное выводим следующее
-                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">-</span><span style="margin-right: 10px;" class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
+                    return '<div class="text-center"><span style="margin-right: 10px;" class="skip-export-pdf">-</span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '10px']]) .'</span><span class="" >'. date('d.m.y', strtotime($model->gmvp->date_confirm)) .'</span></div>';
 
                 } elseif ($model->gmvp && $model->gmvp->exist_confirm === null) {
 
-                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-left' => '6px']]) .'</span></div>';
+                    return '<div> <span class="skip-export-pdf"> >> </span><span class="skip-export-xls skip-export-html">'. Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) .'</span></div>';
                 }
             },
             'format' => 'html',
@@ -600,8 +628,6 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Модель и презентация</div>',
             'groupOddCssClass' => 'kv',
             'groupEvenCssClass' => 'kv',
-            //'header' => false,
-            //'width' => '120px',
             'options' => ['colspan' => 1],
             'value' => function ($model) {
 
@@ -631,6 +657,39 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
                 }
             },
             'format' => 'raw',
+            'hiddenFromExport' => true, // Убрать столбец при скачивании
+            //'group' => true,  // enable grouping
+            //'subGroupOf' => 1 // supplier column index is the parent group
+        ],
+
+
+        [
+            'attribute' => 'businessModel-export',
+            'label' => 'Бизнес-модель',
+            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Модель и презентация</div>',
+            'groupOddCssClass' => 'kv',
+            'groupEvenCssClass' => 'kv',
+            'options' => ['colspan' => 1],
+            'width' => '180px',
+            'value' => function ($model) {
+
+                if ($model->gmvp->exist_confirm === 1){
+
+                    if ($model->id) {
+
+                        return '<div class="skip-export-pdf">БМ | Презентация</div>
+                                <div class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/positive-offer.png', ['class' => 'positive-business-model-export', 'style' => ['width' => '20px', 'margin' => '0 40px 0 20px']]) .
+                            Html::img('@web/images/icons/icon-pdf-export.png', ['class' => 'presentation-business-model-export', 'style' => ['width' => '20px']]) . '</div>';
+
+                    } else {
+
+                        return '<div class="skip-export-pdf"> >> </div>
+                            <div class="skip-export-xls skip-export-html">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',  'margin-left' => '20px']]) . '</div>';
+                    }
+                }
+            },
+            'format' => 'raw',
+            'hidden' => true, //Скрыть столбец со станицы, при этом при скачивании он будет виден
             //'group' => true,  // enable grouping
             //'subGroupOf' => 1 // supplier column index is the parent group
         ],
@@ -718,7 +777,31 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
 
         'exportConfig' => [
             GridView::PDF => [
+
                 'filename' => 'Сводная_таблица_проекта_«'. $project_filename . '»',
+
+                'config' => [
+
+                    'marginRight' => 10,
+                    'marginLeft' => 10,
+                    //'cssInline' => '.positive-business-model-export{margin-right: 20px;}' .
+                        //'.presentation-business-model-export{margin-left: 20px;}',
+
+                    'methods' => [
+                        'SetHeader' => ['<div style="color: #3c3c3c;">Сводная таблица проекта «'.$project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                        'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                    ],
+
+                    'options' => [
+                        //'title' => 'Сводная таблица проекта «'.$project->project_name.'»',
+                        //'subject' => Yii::t('kvgrid', 'PDF export generated by kartik-v/yii2-grid extension'),
+                        //'keywords' => Yii::t('kvgrid', 'krajee, grid, export, yii2-grid, pdf')
+                    ],
+
+                    //'contentBefore' => '',
+                    //'contentAfter' => '',
+                ],
+
             ],
             GridView::EXCEL => [
                 'filename' => 'Сводная_таблица_проекта_«'. $project_filename . '»',
@@ -736,10 +819,10 @@ $this->title = 'Сводная таблица проекта "' . mb_strtolower(
             [
                 'columns' => [
                     ['content' =>  Html::a(Html::img('@web/images/icons/icon-plus.png', ['style' => ['width' => '30px', 'margin-right' => '10px', 'margin-left' => '5px']]), ['/segment/index', 'id' => $project->id], ['target'=>'_blank',]) . ' Сегмент', 'options' => ['colspan' => 2, 'class' => 'font-segment-header-table']],
-                    ['content' => 'Проблема сегмента', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
-                    ['content' => 'Ценностное предложение', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
-                    ['content' => 'Гипотеза MVP (продукт)', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
-                    ['content' => 'Бизнес-модель', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
+                    ['content' => 'Проблема сегмента', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
+                    ['content' => 'Ценностное предложение', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
+                    ['content' => 'Гипотеза MVP (продукт)', 'options' => ['colspan' => 3, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
+                    ['content' => 'Бизнес-модель', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
                 ],
 
                 'options' => [
