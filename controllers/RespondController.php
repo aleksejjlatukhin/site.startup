@@ -258,7 +258,7 @@ class RespondController extends AppController
         {
             $kol = 0;
             foreach ($models as $elem){
-                if ($newRespond->id !== $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
+                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
                     $kol++;
                 }
             }
@@ -503,7 +503,7 @@ class RespondController extends AppController
 
             $kol = 0;
             foreach ($models as $item){
-                if ($updateRespondForm->id !== $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
                     $kol++;
                 }
             }
@@ -514,7 +514,7 @@ class RespondController extends AppController
 
                     foreach ($models as $elem){
 
-                        if ($updateRespondForm->id == $elem->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) !== mb_strtolower(str_replace(' ', '',$elem->name))){
+                        if ($updateRespondForm->id == $elem->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) != mb_strtolower(str_replace(' ', '',$elem->name))){
 
                             $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                                 mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
