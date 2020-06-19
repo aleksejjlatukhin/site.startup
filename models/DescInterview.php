@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -70,7 +71,7 @@ class DescInterview extends \yii\db\ActiveRecord
     {
         return [
             [['respond_id', 'date_fact', 'description', 'result'], 'required'],
-            [['respond_id'], 'integer'],
+            [['respond_id', 'created_at', 'updated_at'], 'integer'],
             [['date_fact'], 'safe'],
             [['description'], 'string'],
             [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
@@ -93,6 +94,14 @@ class DescInterview extends \yii\db\ActiveRecord
             'interview_file' => 'Файл',
             'result' => 'Вывод',
             'status' => 'Данный респондент является представителем сегмента?',
+        ];
+    }
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

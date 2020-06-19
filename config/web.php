@@ -19,7 +19,8 @@ $config = [
 
         //Поключение kartik yii2-grid
         'gridview' =>  [
-            'class' => '\kartik\grid\Module'
+            'class' => '\kartik\grid\Module',
+            'downloadAction' => 'gridview/export/download',
             // enter optional module parameters below - only if you need to
             // use your own export download action or custom translation
             // message source

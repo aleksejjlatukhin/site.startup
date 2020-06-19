@@ -52,6 +52,11 @@ class DescInterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
+                if ($action->id == 'update') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
+
                 return parent::beforeAction($action);
 
             }else{
@@ -68,6 +73,11 @@ class DescInterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if ($project->user_id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])){
 
+                if ($action->id == 'create') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
+
                 return parent::beforeAction($action);
 
             }else{
@@ -79,21 +89,6 @@ class DescInterviewController extends AppController
         }
 
     }
-
-    /**
-     * Lists all DescInterview models.
-     * @return mixed
-     */
-    /*public function actionIndex()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => DescInterview::find(),
-        ]);
-
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }*/
 
 
     public function actionDownload($id)
@@ -143,7 +138,7 @@ class DescInterviewController extends AppController
 
         if (Yii::$app->request->isAjax)
         {
-            return 'Delete';
+            return '';
         }else{
             return $this->redirect(['update', 'id' => $model->id]);
         }
@@ -180,69 +175,52 @@ class DescInterviewController extends AppController
         $model = new DescInterview();
         $model->respond_id = $id;
         $model->date_fact = date('Y:m:d');
-
         $respond = Respond::find()->where(['id' => $id])->one();
+
+        //Если у респондента уже есть интервью, то отменить действие
+        if ($respond->descInterview){
+            return false;
+        }
+
         $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!empty($respond->descInterview)){
-            return $this->redirect(['view', 'id' => $respond->descInterview->id]);
-        }
-
-        if ($respond->name == null || $respond->info_respond == null || $respond->place_interview == null ||
-            $respond->date_plan == null){
-            Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о респонденте!");
-            return $this->redirect(['respond/view', 'id' => $id]);
-        }
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])){
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['respond/view', 'id' => $respond->id]);
-            }
-        }
-
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-            if (!file_exists($respond_dir)){
-                mkdir($respond_dir, 0777);
-            }
+            if(Yii::$app->request->isAjax) {
 
-            if ($model->validate() && $model->save()){
-
-                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                if ($model->loadFile !== null){
-                    if ($model->upload($respond_dir)){
-                        $model->interview_file = $model->loadFile;
-                        $model->save(false);
-                    }
+                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
+                if (!file_exists($respond_dir)){
+                    mkdir($respond_dir, 0777);
                 }
 
-                $project->update_at = date('Y:m:d');
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью добавлены!");
-                    return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+                if ($model->validate() && $model->save()){
+
+                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                    if ($model->loadFile !== null){
+                        if ($model->upload($respond_dir)){
+                            $model->interview_file = $model->loadFile;
+                            $model->save(false);
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()){
+
+                        $response = $model;
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
-
-        return $this->render('create', [
-            'model' => $model,
-            'respond' => $respond,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**
@@ -260,16 +238,6 @@ class DescInterviewController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])){
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
 
 
         if ($model->interview_file !== null){
@@ -278,39 +246,39 @@ class DescInterviewController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-            if (!file_exists($respond_dir)){
-                mkdir($respond_dir, 0777);
-            }
+            if(Yii::$app->request->isAjax) {
 
-            if ($model->validate() && $model->save()){
-
-                $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                if ($model->loadFile !== null){
-                    if ($model->upload($respond_dir)){
-                        $model->interview_file = $model->loadFile;
-                        $model->save(false);
-                    }
+                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
+                if (!file_exists($respond_dir)){
+                    mkdir($respond_dir, 0777);
                 }
 
-                $project->update_at = date('Y:m:d');
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Материалы полученные во время интервью обновлены");
-                    return $this->redirect(['respond/view', 'id' => $model->respond_id]);
+
+                if ($model->validate() && $model->save()){
+
+                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                    if ($model->loadFile !== null){
+                        if ($model->upload($respond_dir)){
+                            $model->interview_file = $model->loadFile;
+                            $model->save(false);
+                        }
+                    }
+
+                    $project->update_at = date('Y:m:d');
+                    if ($project->save()){
+
+                        $response = $model;
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-            'respond' => $respond,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**
@@ -328,16 +296,6 @@ class DescInterviewController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
 
 
         $project->update_at = date('Y:m:d');

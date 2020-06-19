@@ -29,21 +29,21 @@ $this->params['breadcrumbs'][] = $this->title;
             </p>
         </h3>
 
-        <p>
-            <?= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('Удалить респондента', ['delete', 'id' => $model->id], [
+        <!--<p>
+            <?/*= Html::a('Редактировать данные', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) */?>
+            <?/*= Html::a('Удалить респондента', ['delete', 'id' => $model->id], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Вы действительно хотите удалить респондента "' . $model->name . '"?',
                     'method' => 'post',
                 ],
-            ]) ?>
-            <?if(!($desc_interview->respond_id == $model->id)){
+            ]) */?>
+            <?/*if(!($desc_interview->respond_id == $model->id)){
                 echo Html::a('Добавить интервью', ['desc-interview/create', 'id' => $model->id], ['class' => 'btn btn-success']);
             }else{
                 echo Html::a('материалы интервью', ['desc-interview/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success']);
-            }?>
-        </p>
+            }*/?>
+        </p>-->
 
     <?php else : ?>
 
@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?if(!($desc_interview->respond_id == $model->id)){
                     //echo Html::a('Добавить интервью', ['desc-interview/create', 'id' => $model->id], ['class' => 'btn btn-success']);
                 }else{
-                    echo Html::a('материалы интервью', ['desc-interview/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success']);
+                    //echo Html::a('материалы интервью', ['desc-interview/view', 'id' => $desc_interview->id], ['class' => 'btn btn-success']);
                 }?>
             </p>
         </h3>
@@ -69,7 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'name',
-                'label' => 'Ф.И.О. респондента'
+                'label' => 'Ф.И.О. респондента',
+                'value' => function($model){
+                    return '<div id="respond_name_'.$model->id.'">'.$model->name.'</div>';
+                },
+                'format' => 'raw',
             ],
             'info_respond',
 

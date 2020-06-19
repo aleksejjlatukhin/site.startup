@@ -10,10 +10,13 @@ use yii\widgets\ActiveForm;
 
 <div class="respond-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+            'action' => "/respond/update?id=$model->id",
+            'id' => 'formUpdateRespond',
+        ]); ?>
 
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-md-8">
 
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -23,7 +26,7 @@ use yii\widgets\ActiveForm;
 
 
             <?= $form->field($model, 'date_plan', [
-                'template' => '<div style="padding-top: 5px;">{label}</div><div class="row"><div class="col-md-2">{input}</div></div>'
+                'template' => '<div style="padding-top: 5px;">{label}</div><div class="row"><div class="col-md-3">{input}</div></div>'
             ])->label('Запланированная дата интервью')->widget(\yii\jui\DatePicker::class, [
                 'dateFormat' => 'dd.MM.yyyy',
                 //'inline' => true,

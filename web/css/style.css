@@ -848,6 +848,11 @@ progress.info-red::-moz-progress-bar{
     color: #373737;
 }
 
+.table-respond-index-kartik {
+    font-family: 'Roboto-Regular', serif;
+    color: #373737;
+}
+
 .font-header-table {
      text-align: center;
      color: #4F4F4F;

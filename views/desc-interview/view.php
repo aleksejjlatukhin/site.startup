@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p>
             <?= Html::a('<< Общие данные респондента', ['respond/view', 'id' => $model->respond_id], ['class' => 'btn btn-default']) ?>
-            <?= Html::a('Редактировать интервью', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?//= Html::a('Редактировать интервью', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
             <?/*= Html::a('Удалить', ['delete', 'id' => $model->respond_id], [
                 'class' => 'btn btn-danger',
                 'data' => [
