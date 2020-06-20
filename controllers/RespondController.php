@@ -352,10 +352,7 @@ class RespondController extends AppController
 
             $createDescInterviewForms[] = new DescInterview();
 
-
-            if($model->descInterview){
-                $updateDescInterviewForms[] = $model->descInterview;
-            }
+            $updateDescInterviewForms[] = $model->descInterview;
         }
 
 
