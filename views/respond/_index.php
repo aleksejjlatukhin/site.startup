@@ -297,7 +297,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         echo GridView::widget([
             'dataProvider' => $dataProvider,
-            'showPageSummary' => true,
+            'showPageSummary' => false, //whether to display the page summary row for the grid view.
             'pjax' => true,
             'hashExportConfig' => false,
             'pjaxSettings' => [
@@ -333,19 +333,39 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
                         'title' => 'Посмотреть описание',
                     ]) . '
 </div>',
-                'beforeOptions' => ['class' => 'style-head-table-kartik-top']
+                'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
+                //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
+                //'footer' => '{export}',
+                'after' => false,
+                //'footer' => false,
             ],
 
             'toolbar' => [
+                '{toggleData}',
                 '{export}',
             ],
 
-            'exportContainer' => ['class' => 'btn-group-sm', 'style' => ['padding' => '5px 5px']],
-            //'toggleDataContainer' => ['class' => 'btn-group mr-2'],
+            'exportContainer' => ['class' => 'btn btn-group-sm', 'style' => ['padding' => '5px 5px']],
+            'toggleDataContainer' => ['class' => 'btn btn-group-sm mr-2', 'style' => ['padding' => '5px 5px']],
 
-            'export'=>[
-                'showConfirmAlert'=>false,
-                'target'=>GridView::TARGET_BLANK,
+            'toggleDataOptions' => [
+                'all' => [
+                    //'icon' => 'resize-full',
+                    'label' => '<span class="font-header-table" style="font-weight: 700;">Все страницы</span>',
+                    'class' => 'btn btn-default',
+                    'title' => 'Show all data'
+                ],
+                'page' => [
+                    //'icon' => 'resize-small',
+                    'label' => '<span class="font-header-table" style="font-weight: 700;">Одна страница</span>',
+                    'class' => 'btn btn-default',
+                    'title' => 'Show first page data'
+                ],
+            ],
+
+            'export' => [
+                'showConfirmAlert' => false,
+                'target' => GridView::TARGET_BLANK,
                 'label' => '<span class="font-header-table" style="font-weight: 700;">Экпорт таблицы</span>',
                 'options' => ['title' => false],
             ],
