@@ -125,9 +125,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options' => ['colspan' => 1],
                 'value' => function ($model, $key, $index, $widget) {
 
-                    if (!empty($model->descInterview->created_at)){
+                    if (!empty($model->descInterview->updated_at)){
 
-                        $date_fact = date("d.m.y", $model->descInterview->created_at);
+                        $date_fact = date("d.m.y", $model->descInterview->updated_at);
                         return '<div class="text-center">' . Html::a(Html::encode($date_fact), Url::to(['#']), [
                             'class' => 'table-kartik-link',
                             'data-toggle' => 'modal',
@@ -135,7 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'style' => ['padding' => '0 5px']
                         ]) . '</div>';
 
-                    }elseif (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview->date_fact)){
+                    }elseif (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview->updated_at)){
 
                         return '<div class="text-center">' . Html::a(
                                 Html::img(['@web/images/icons/next-step.png'], ['style' => ['width' => '20px']]),
@@ -190,8 +190,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options' => ['colspan' => 1],
                 'value' => function ($model, $key, $index, $widget) {
 
-                    if (!empty($model->descInterview->date_fact)){
-                        $date_fact = date("d.m.y", strtotime($model->descInterview->date_fact));
+                    if (!empty($model->descInterview->updated_at)){
+                        $date_fact = date("d.m.y", $model->descInterview->updated_at);
                         return '<div class="text-center">' . Html::encode($date_fact). '</div>';
                     }
                 },
