@@ -208,7 +208,7 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         ),
         'wbraganca\\dynamicform\\' => 
         array (
-            0 => __DIR__ . '/..' . '/wbraganca/yii2-dynamicform',
+            0 => __DIR__ . '/..' . '/wbraganca/yii2-dynamicform/src',
         ),
         'setasign\\Fpdi\\' => 
         array (

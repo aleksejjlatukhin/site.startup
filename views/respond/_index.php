@@ -236,7 +236,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
 
-            ['class' => 'kartik\grid\ActionColumn',
+            /*['class' => 'kartik\grid\ActionColumn',
                 'header' => '',
                 'template' => '{delete}',
                 'buttons' => [
@@ -248,7 +248,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'data-confirm' => Yii::t('yii', 'Вы уверены, что хотите удалить все данные о респонденте «'.$model->name.'»?'),
                             'data-method' => 'post',
                             'class' => 'delete-link',
+                            //'onClick' => 'return confirm("Your confirmation message?")'
                             'data-pjax' => '#respPjax',
+                            //'data-pjax'=> '0',
                         ]);
                     },
                 ],
@@ -259,7 +261,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     return $url;
                 },
+            ],*/
+
+
+            ['class' => 'kartik\grid\ActionColumn',
+                'header' => '',
+                'template' => '{delete}',
+                'buttons' => [
+                    'delete' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['#'],[
+                            'title' => Yii::t('yii', 'Delete'),
+                            'data-toggle' => 'modal',
+                            'data-target' => "#delete-respond-modal-$model->id",
+                        ]);
+                    },
+                ],
             ],
+
 
             [
                 'attribute' => 'delete_export',
@@ -968,6 +986,43 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
 
         Modal::end();
 
+
+
+
+        // Подтверждение удаления респондента
+        Modal::begin([
+            'options' => [
+                'id' => "delete-respond-modal-$model->id",
+                'class' => 'delete_respond_modal',
+            ],
+            'size' => 'modal-md',
+            'header' => '<h3 class="text-center header-update-modal">Подтверждение</h3>',
+            'footer' => '<div class="text-center">'.
+
+                Html::a('Отмена', ['#'],[
+                    'class' => 'btn btn-default',
+                    'style' => ['width' => '120px'],
+                    'id' => "cancel-delete-respond-$model->id",
+                ]).
+
+                Html::a('Ок', ['/respond/delete-respond', 'id' =>$model->id],[
+                    'class' => 'btn btn-default',
+                    'style' => ['width' => '120px'],
+                    'id' => "confirm-delete-respond-$model->id",
+                ]).
+
+                '</div>'
+        ]);
+
+        // Контент страницы - подтверждение удаления респондента
+        ?>
+
+        <h4 class="text-center">Вы уверены, что хотите удалить все данные<br>о респонденте «<?= $model->name ?>»?</h4>
+
+        <?php
+
+        Modal::end();
+
         endforeach;
 
         ?>
@@ -1118,6 +1173,53 @@ $this->registerJs($script, $position);
 foreach ($models as $i => $model) :
 
 $script2 = "
+
+    $(document).ready(function() {
+
+        //Стилизация модального окна для удаления респондента
+        var modal_header_delete_respond = $('#delete-respond-modal-".$model->id."').find('.modal-header');
+        modal_header_delete_respond.css('background-color', '#ffb02e');
+        modal_header_delete_respond.css('color', '#ffffff');
+        modal_header_delete_respond.css('border-radius', '5px 5px 0 0');
+        
+        var modal_footer_delete_respond = $('#delete-respond-modal-".$model->id."').find('.modal-footer');
+        modal_footer_delete_respond.css('background-color', '#ffb02e');
+        modal_footer_delete_respond.css('border-radius', '0 0 5px 5px');
+    });
+
+    // CONFIRM RESPOND DELETE
+    $('#confirm-delete-respond-".$model->id."').on('click',function(e) {
+        
+         var url = $(this).attr('href');
+         $.ajax({
+              url: url,
+              method: 'POST',
+              cache: false,
+              success: function() {
+                   
+                   //Закрываем окно подтверждения
+                   $('#delete-respond-modal-".$model->id."').modal('hide');
+                            
+                   //Обновляем страницу
+                   $.pjax({container: '#respPjax', url: location.href});
+              }
+         });
+         e.preventDefault();
+         return false;
+    });
+
+
+
+    // CANCEL RESPOND DELETE
+    $('#cancel-delete-respond-".$model->id."').on('click',function(e) {
+        
+         //Закрываем окно подтверждения
+         $('#delete-respond-modal-".$model->id."').modal('hide');
+         
+         e.preventDefault();
+         return false;
+    });
+    
     
     //Сохранении данных из формы редактирование дынных респондента и 
     //передача новых данных в модальное окно view

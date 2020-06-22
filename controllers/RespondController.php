@@ -88,7 +88,7 @@ class RespondController extends AppController
             || in_array($action->id, ['exist']) || in_array($action->id, ['index']) || in_array($action->id, ['create'])
             || in_array($action->id, ['data-availability'])){
 
-            $interview = Interview::findOne(Yii::$app->request->get());
+            $interview = Interview::findOne(Yii::$app->request->get('id'));
             $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
@@ -353,6 +353,7 @@ class RespondController extends AppController
             $createDescInterviewForms[] = new DescInterview();
 
             $updateDescInterviewForms[] = $model->descInterview;
+
         }
 
 
@@ -361,7 +362,7 @@ class RespondController extends AppController
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 100,
+                'pageSize' => 10,
             ],
             'sort' => [
                 'defaultOrder' => [
