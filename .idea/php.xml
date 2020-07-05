@@ -85,6 +85,7 @@
       <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-export" />
       <path value="$PROJECT_DIR$/vendor/phpoffice/phpspreadsheet" />
       <path value="$PROJECT_DIR$/vendor/mpdf/mpdf" />
+      <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-detail-view" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="5.4.0" />

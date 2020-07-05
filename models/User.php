@@ -17,6 +17,7 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_USER = 10;
     const ROLE_ADMIN = 20;
     const ROLE_MAIN_ADMIN = 30;
+    const ROLE_EXPERT = 40;
     const ROLE_DEV = 100;
 
     const CONFIRM = 20;
@@ -375,6 +376,17 @@ class User extends ActiveRecord implements IdentityInterface
     public static function isUserMainAdmin($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_MAIN_ADMIN, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Проверка на Эксперта
+    public static function isUserExpert($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_EXPERT, 'status' => self::STATUS_ACTIVE]))
         {
             return true;
         } else {

@@ -72,26 +72,70 @@ class InterviewController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
+        } elseif (in_array($action->id, ['add-questions'])){
+
+            $model = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        } elseif (in_array($action->id, ['delete-question'])){
+
+            $question = Questions::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $question->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                if ($action->id == 'delete-question') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['data-availability-for-next-step'])){
+
+            $interview = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                if ($action->id == 'data-availability-for-next-step') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
         }else{
             return parent::beforeAction($action);
         }
 
     }
 
-    /**
-     * Lists all Interview models.
-     * @return mixed
-     */
-    /*public function actionIndex()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Interview::find(),
-        ]);
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }*/
 
     /**
      * Displays a single Interview model.
@@ -105,36 +149,64 @@ class InterviewController extends AppController
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $responds = Respond::find()->where(['interview_id' => $id])->all();
 
-        $data_responds = 0;
-        $data_interview = 0;
-        foreach ($responds as $respond){
-            if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
-                $respond->exist_respond = 1;
-                $data_responds++;
-                if (!empty($respond->descInterview)){
-                    $data_interview++;
-                }
-            }else{
-                $respond->exist_respond = 0;
-            }
-        }
-
-
-
-
-
-        foreach ($responds as $respond){
-            if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
-                $respond->descInterview->exist_desc = 1;
-            }
-        }
-
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => Respond::find()->where(['interview_id' => $id]),
+        //Выбор респондентов, которые являются представителями сегмента
+        $dataProviderRespondsPositive = new ActiveDataProvider([
+            'query' => Respond::find()->with('descInterview')
+                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                ->where(['interview_id' => $id, 'desc_interview.status' => '1']),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
         ]);
+
+
+
+        $dataProviderProblems = new ActiveDataProvider([
+            'query' => GenerationProblem::find()->where(['interview_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+        $dataProviderResponds = new ActiveDataProvider([
+            'query' => Respond::find()->where(['interview_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+
+        $dataProviderQuestions = new ActiveDataProvider([
+            'query' => Questions::find()->where(['interview_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'title' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+        $newQuestion = new Questions();
+        $newQuestion->interview_id = $id;
+
+        $newProblem = new GenerationProblem();
+        $newProblem->interview_id = $id;
 
 
 
@@ -142,11 +214,50 @@ class InterviewController extends AppController
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
-            'responds' => $responds,
-            'dataProvider' => $dataProvider,
-            'data_responds' => $data_responds,
-            'data_interview' => $data_interview,
+            'dataProviderRespondsPositive' => $dataProviderRespondsPositive,
+            'dataProviderProblems' => $dataProviderProblems,
+            'dataProviderResponds' => $dataProviderResponds,
+            'dataProviderQuestions' => $dataProviderQuestions,
+            'newQuestion' => $newQuestion,
+            'newProblem' => $newProblem,
         ]);
+    }
+
+
+    public function actionDataAvailabilityForNextStep($id)
+    {
+        $model = Interview::findOne($id);
+
+        $count_descInterview = 0;
+        $count_positive = 0;
+
+        foreach ($model->responds as $respond) {
+
+            if ($respond->descInterview){
+                $count_descInterview++;
+
+                if ($respond->descInterview->status == 1){
+                    $count_positive++;
+                }
+            }
+        }
+
+        if(Yii::$app->request->isAjax) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems)  && $model->count_positive <= $count_positive)) {
+
+                $response =  ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }else{
+
+                $response = ['error' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
     }
 
     /**
@@ -164,6 +275,7 @@ class InterviewController extends AppController
         }
 
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
         $model = new Interview();
         $model->segment_id = $id;
         $user = User::find()->where(['id' => $project->user_id])->one();
@@ -178,9 +290,6 @@ class InterviewController extends AppController
             }
         }
 
-
-        $newQuestions = new Questions();
-
         $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
         if (!empty($modelInterview)){
             return $this->redirect(['view', 'id' => $modelInterview->id]);
@@ -193,106 +302,42 @@ class InterviewController extends AppController
                 if ($model->save()){
 
                     $interviews_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/';
-                    if (!file_exists($interviews_dir)){
+                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/';
+                    if (!file_exists($interviews_dir)) {
                         mkdir($interviews_dir, 0777);
                     }
 
                     $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/feedbacks/';
-                    if (!file_exists($feedbacks_dir)){
+                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/feedbacks/';
+                    if (!file_exists($feedbacks_dir)) {
                         mkdir($feedbacks_dir, 0777);
                     }
 
                     $generation_problems_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/';
-                    if (!file_exists($generation_problems_dir)){
+                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/generation problems/';
+                    if (!file_exists($generation_problems_dir)) {
                         mkdir($generation_problems_dir, 0777);
                     }
 
-                    for ($i = 1; $i <= $model->count_respond; $i++ )
-                    {
-                        $newRespond[$i] = new Respond();
-                        $newRespond[$i]->interview_id = $model->id;
-                        $newRespond[$i]->name = 'Респондент ' . $i;
-                        $newRespond[$i]->save();
-                    }
+                    //Создание респондентов по заданному значению count_respond
+                    $model->createRespond();
 
-                    if ($model->question_1 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?';
-                        $question->save();
-                    }
-                    if ($model->question_2 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что нравится / не нравится в текущем положении вещей?';
-                        $question->save();
-                    }
-                    if ($model->question_3 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Вас беспокоит данная ситуация?';
-                        $question->save();
-                    }
-                    if ($model->question_4 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что вы пытались с этим сделать?';
-                        $question->save();
-                    }
-                    if ($model->question_5 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Что вы делали с этим в последний раз, какие шаги предпринимали?';
-                        $question->save();
-                    }
-                    if ($model->question_6 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Если ничего не делали, то почему?';
-                        $question->save();
-                    }
-                    if ($model->question_7 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Сколько денег / времени на это тратится сейчас?';
-                        $question->save();
-                    }
-                    if ($model->question_8 == 1){
-                        $question = new Questions();
-                        $question->interview_id = $model->id;
-                        $question->status = 1;
-                        $question->title = 'Есть ли деньги на решение сложившейся ситуации сейчас?';
-                        $question->save();
-                    }
+                    //Вопросы, которые будут добавлены по-умолчания
+                    $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
+                    $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
+                    $model->addQuestionDefault('Вас беспокоит данная ситуация?');
+                    $model->addQuestionDefault('Что вы пытались с этим сделать?');
+                    $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
+                    $model->addQuestionDefault('Если ничего не делали, то почему?');
+                    $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
+                    $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
 
-                    if ($newQuestions->load(Yii::$app->request->post())){
-                        if (!empty($newQuestions->title)){
-                            $newQuestions->interview_id = $model->id;
-                            $newQuestions->status = 1;
-                            //debug($newQuestions);
-                            $newQuestions->save();
-                        }
-                    }
+                    if ($project->save()) {
 
-                    $project->update_at = date('Y:m:d');
-
-                    if ($project->save()){
-
-                        Yii::$app->session->setFlash('success', "Данные для программы генерации ГПС загружены");
-                        return $this->redirect(['view', 'id' => $model->id]);
+                        return $this->redirect(['add-questions', 'id' => $model->id]);
                     }
                 }
             }else{
@@ -304,8 +349,130 @@ class InterviewController extends AppController
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
-            'newQuestions' => $newQuestions,
         ]);
+    }
+
+    public function actionAddQuestions($id)
+    {
+        $interview = Interview::find()->with('questions')->where(['id' => $id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $dataProviderQuestions = new ActiveDataProvider([
+            'query' => Questions::find()->where(['interview_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'title' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+        $newQuestion = new Questions();
+        $newQuestion->interview_id = $id;
+
+        return $this->render('add-questions', [
+            'dataProviderQuestions' => $dataProviderQuestions,
+            'newQuestion' => $newQuestion,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+    public function actionUpdateDataInterview ($id)
+    {
+        $model = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        $responds = Respond::find()->where(['interview_id' => $id])->all();
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->count_respond >= $model->count_positive){
+
+                    if ($model->save()){
+
+                        if ((count($responds)+1) <= $model->count_respond){
+                            for ($count = count($responds) + 1; $count <= $model->count_respond; $count++ )
+                            {
+                                $newRespond[$count] = new Respond();
+                                $newRespond[$count]->interview_id = $model->id;
+                                $newRespond[$count]->name = 'Респондент ' . $count;
+                                $newRespond[$count]->save();
+                            }
+                        }else{
+                            $minus = count($responds) - $model->count_respond;
+                            $respond = Respond::find()->where(['interview_id' => $id])->orderBy(['id' => SORT_DESC])->limit($minus)->all();
+                            foreach ($respond as $item)
+                            {
+                                $descInterview = DescInterview::find()->where(['respond_id' => $item->id])->one();
+
+                                if ($descInterview) {
+                                    $descInterview->delete();
+                                }
+
+                                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
+                                    mb_convert_encoding($this->translit($item->name), "windows-1251") . '/';
+
+                                if (file_exists($del_dir)) {
+                                    $this->delTree($del_dir);
+                                }
+
+                                $item->delete();
+                            }
+                        }
+
+                        $project->update_at = date('Y:m:d');
+
+                        if ($project->save()){
+
+                            $descInterviews = [];
+                            foreach ($model->responds as $respond) {
+                                if($respond->descInterview) {
+                                    $descInterviews[] = $respond->descInterview;
+                                }
+                            }
+
+                            $response = [
+                                'model' => $model,
+                                'responds' => $model->responds,
+                                'descInterviews' => $descInterviews,
+                                'problems' => $model->problems,
+                                ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        }
+                    }
+                }else{
+
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
     }
 
     /**
@@ -353,7 +520,7 @@ class InterviewController extends AppController
                         }
                     }else{
                         $minus = count($responds) - $model->count_respond;
-                        $respond = Respond::find()->orderBy(['id' => SORT_DESC])->limit($minus)->all();
+                        $respond = Respond::find()->where(['interview_id' => $id])->orderBy(['id' => SORT_DESC])->limit($minus)->all();
                         foreach ($respond as $item)
                         {
                             $item->delete();
@@ -399,6 +566,66 @@ class InterviewController extends AppController
             'project' => $project,
             'newQuestions' => $newQuestions,
         ]);
+    }
+
+
+    public function actionAddQuestion($id)
+    {
+        $model = new Questions();
+        $model->interview_id = $id;
+
+        if ($model->load(Yii::$app->request->post())){
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->save()){
+
+                    $interviewNew = Interview::findOne($id);
+                    $showListQuestions = $interviewNew->showListQuestions;
+                    $questions = $interviewNew->questions;
+
+                    $response = [
+                        'model' => $model,
+                        'questions' => $questions,
+                        'showListQuestions' => $showListQuestions,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
+
+    public function actionDeleteQuestion ($id)
+    {
+        $model = Questions::findOne($id);
+        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        if(Yii::$app->request->isAjax) {
+
+            if ($model->delete()){
+
+                $project->update_at = date('Y:m:d');
+                $project->save();
+
+                $interviewNew = Interview::find()->where(['id' => $model->interview_id])->one();
+                $showListQuestions = $interviewNew->showListQuestions;
+                $questions = $interviewNew->questions;
+
+
+                $response = [
+                    'showListQuestions' => $showListQuestions,
+                    'questions' => $questions
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
     }
 
     /**

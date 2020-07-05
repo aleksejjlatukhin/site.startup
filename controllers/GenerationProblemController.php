@@ -68,10 +68,10 @@ class GenerationProblemController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'create') {
+                /*if ($action->id == 'create') {
                     // ОТКЛЮЧАЕМ CSRF
                     $this->enableCsrfValidation = false;
-                }
+                }*/
 
                 return parent::beforeAction($action);
 
@@ -141,7 +141,7 @@ class GenerationProblemController extends AppController
 
 
 
-    public function actionCreate($id)
+    /*public function actionCreate($id)
     {
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
@@ -213,6 +213,54 @@ class GenerationProblemController extends AppController
             'project' => $project,
             'responds' => $responds,
         ]);
+    }*/
+
+
+    public function actionCreate($id)
+    {
+
+        $model = new GenerationProblem();
+        $model->interview_id = $id;
+        $model->date_gps = date('Y:m:d');
+        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
+        $model->title = 'ГПС ' . (count($models)+1);
+
+        $interview = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $model->segment_id = $segment->id;
+        $model->project_id = $project->id;
+
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['interview/view', 'id' => $interview->id]);
+            }
+        }
+
+
+
+
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->description = $_POST['GenerationProblem']['description'];
+
+            if ($model->save()){
+
+                $project->update_at = date('Y:m:d');
+                if ($project->save()){
+
+                    return $this->redirect(['/interview/view', 'id' => $id]);
+                }
+            }
+        }
+
     }
 
 

@@ -111,6 +111,7 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
             'kartik\\export\\' => 14,
             'kartik\\dynagrid\\' => 16,
             'kartik\\dialog\\' => 14,
+            'kartik\\detail\\' => 14,
             'kartik\\bs4dropdown\\' => 19,
             'kartik\\base\\' => 12,
         ),
@@ -251,6 +252,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'kartik\\dialog\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-dialog/src',
+        ),
+        'kartik\\detail\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-detail-view/src',
         ),
         'kartik\\bs4dropdown\\' => 
         array (

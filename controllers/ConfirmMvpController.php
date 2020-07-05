@@ -97,20 +97,6 @@ class ConfirmMvpController extends AppController
 
     }
 
-    /**
-     * Lists all ConfirmMvp models.
-     * @return mixed
-     */
-    /*public function actionIndex()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => ConfirmMvp::find(),
-        ]);
-
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }*/
 
     /**
      * Displays a single ConfirmMvp model.
@@ -317,14 +303,6 @@ class ConfirmMvpController extends AppController
                         mkdir($feedbacks_dir, 0777);
                     }
 
-                    /*for ($i = 1; $i <= $model->count_respond; $i++ )
-                    {
-                        $newRespond[$i] = new RespondsGcp();
-                        $newRespond[$i]->confirm_gcp_id = $model->id;
-                        $newRespond[$i]->name = 'Респондент ' . $i;
-                        $newRespond[$i]->save();
-                    }*/
-
                     $project->update_at = date('Y:m:d');
 
                     if ($project->save()){
@@ -382,29 +360,11 @@ class ConfirmMvpController extends AppController
         }
 
 
-        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
-
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->count_respond >= $model->count_positive) {
 
                 if ($model->save()) {
-
-                    /*if ((count($responds) + 1) <= $model->count_respond) {
-                        for ($count = count($responds) + 1; $count <= $model->count_respond; $count++) {
-                            $newRespond[$count] = new RespondsGcp();
-                            $newRespond[$count]->confirm_gcp_id = $model->id;
-                            $newRespond[$count]->name = 'Респондент ' . $count;
-                            $newRespond[$count]->save();
-                        }
-                    } else {
-                        $minus = count($responds) - $model->count_respond;
-                        $respond = RespondsGcp::find()->orderBy(['id' => SORT_DESC])->limit($minus)->all();
-                        foreach ($respond as $item) {
-                            $item->delete();
-                        }
-                    }*/
-
 
                     $project->update_at = date('Y:m:d');
 

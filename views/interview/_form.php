@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\ActiveForm;
+use yii\bootstrap\Modal;
 
 ?>
 
@@ -10,8 +11,32 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <div class="row">
-        <div class="col-md-8">
+    <div class="row" style="font-size: 24px; font-weight: 700; color: #F2F2F2; background: #707F99; margin: 0; padding: 10px; border-radius: 3px 3px 0 0">
+        <div class="col-md-12" style="margin: 5px 0;">
+
+            <?= $this->title
+
+            . Html::a('i', ['#'], [
+                'style' => ['margin-left' => '20px', 'font-size' => '13px', 'font-weight' => '700', 'padding' => '2px 8px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
+                'class' => 'table-kartik-link',
+                'data-toggle' => 'modal',
+                'data-target' => "#information-table-interview",
+                'title' => 'Посмотреть описание',])
+
+            . Html::a('Данные сегмента', ['#'], [
+                'class' => 'btn btn-sm btn-default pull-right col-xs-12 col-sm-2',
+                'style' => ['font-weight' => '700', 'color' => '#373737', 'margin-top' => '3px'],
+                'data-toggle' => 'modal',
+                'data-target' => '#data_segment_modal',
+            ]);  ?>
+
+        </div>
+    </div>
+
+    <div class="row style-header-table-kartik" style="padding: 20px 10px; margin: 0; border-radius: 0 0 3px 3px;">
+        <div class="col-md-12">
+
+            <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">Количественные данные респондентов, которые участвуют в интервью</h4>
 
             <div class="row">
                 <?= $form->field($model, 'count_respond', [
@@ -25,7 +50,7 @@ use yii\widgets\ActiveForm;
                 ])->textInput(['type' => 'number']);?>
             </div>
 
-            <h4><u>Текст легенды проблемного интервью</u></h4>
+            <h4 style="margin: 30px 0 15px 0; border-bottom: 1px solid #ccc; padding-bottom: 10px;">Текст легенды проблемного интервью</h4>
 
             <div class="row">
 
@@ -54,74 +79,134 @@ use yii\widgets\ActiveForm;
                 ])->textarea(['rows' => 2, 'placeholder' => $placeholder]) ?>
             </div>
 
-
-            <div class="d-inline p-2 bg-success text-center" style="font-size: 18px;border-radius: 5px;height: 50px;padding-top: 12px;margin: 20px 0;">Примерный список вопросов для проведения интервью</div>
-
-            <?= $form->field($model, 'question_1', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("1. Как и посредством какого инструмента / процесса вы справляетесь с задачей?") ?>
-
-            <?= $form->field($model, 'question_2', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("2. Что нравится / не нравится в текущем положении вещей?") ?>
-
-            <?= $form->field($model, 'question_3', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("3. Вас беспокоит данная ситуация?") ?>
-
-            <?= $form->field($model, 'question_4', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("4. Что вы пытались с этим сделать?") ?>
-
-            <?= $form->field($model, 'question_5', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("5. Что вы делали с этим в последний раз, какие шаги предпринимали?") ?>
-
-            <?= $form->field($model, 'question_6', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("6. Если ничего не делали, то почему?") ?>
-
-            <?= $form->field($model, 'question_7', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("7. Сколько денег / времени на это тратится сейчас?") ?>
-
-            <?= $form->field($model, 'question_8', [
-                'template' => '<div class="col-md-11">{label} </div><div class="col-md-1">{input}</div>'
-            ])->checkbox(['value' => '1', 'checked ' => true])
-                ->label("8. Есть ли деньги на решение сложившейся ситуации сейчас?") ?>
-
-
-
-
-            <p class="col-sm-12" style="margin: 10px 0;">
-                <div class="btn btn-primary open_fast col-md-1" style="width: 150px;margin-left: 15px;">Добавить вопрос</div>
-            </p>
-
-            <div class="popap_fast">
-
-                <div class="col-sm-9">
-                    <?= $form->field($newQuestions, 'title')->textInput(['maxlength' => true])->label('Напишите новый вопрос') ?>
-                </div>
-
-                <span class="cross-out glyphicon text-danger glyphicon-remove"></span>
-
+            <div class="form-group">
+                <?= Html::submitButton('Сохранить', [
+                    'class' => 'btn btn-success',
+                    'style' => ['margin-top' => '20px'],
+                ]) ?>
             </div>
 
         </div>
     </div>
 
-    <div class="form-group col-sm-12">
-        <hr>
-        <?= Html::submitButton('Сохранить данные', ['class' => 'btn btn-success']) ?>
-    </div>
-
     <?php ActiveForm::end(); ?>
 
+    <?php
+    // Модальное окно - Данные сегмента
+    Modal::begin([
+        'options' => [
+            'id' => 'data_segment_modal',
+            'class' => 'data_segment_modal',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Информация о сегменте</h3>',
+    ]);
+    ?>
+
+
+    <?= DetailView::widget([
+        'model' => $segment,
+        'attributes' => [
+
+            'name',
+            'field_of_activity:ntext',
+            'sort_of_activity:ntext',
+
+            [
+                'attribute' => 'age',
+                'label' => 'Возраст потребителя',
+                'value' => function ($model) {
+                    if ($model->age_from !== null && $model->age_to !== null){
+                        return 'от ' . number_format($model->age_from, 0, '', ' ') . ' до '
+                            . number_format($model->age_to, 0, '', ' ');
+                    }
+                },
+            ],
+
+
+            [
+                'attribute' => 'income',
+                'label' => 'Доход потребителя (тыс. руб./мес.)',
+                'value' => function ($model) {
+                    if ($model->income_from !== null && $model->income_to !== null){
+                        return 'от ' . number_format($model->income_from, 0, '', ' ') . ' до '
+                            . number_format($model->income_to, 0, '', ' ');
+                    }
+                },
+            ],
+
+
+            [
+                'attribute' => 'quantity',
+                'label' => 'Потенциальное количество потребителей (тыс. чел.)',
+                'value' => function ($model) {
+                    if ($model->quantity_from !== null && $model->quantity_to !== null){
+                        return 'от ' . number_format($model->quantity_from, 0, '', ' ') . ' до '
+                            . number_format($model->quantity_to, 0, '', ' ');
+                    }
+                },
+            ],
+
+
+            [
+                'attribute' => 'market_volume',
+                'label' => 'Объем рынка (млн. руб./год)',
+                'value' => function ($model) {
+                    if ($model->market_volume_from !== null && $model->market_volume_to !== null){
+                        return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . ' до '
+                            . number_format($model->market_volume_to, 0, '', ' ');
+                    }
+                },
+            ],
+
+
+            [
+                'attribute' => 'add_info',
+                'visible' => !empty($model->add_info),
+            ],
+
+        ],
+    ]) ?>
+
+
+    <?php
+    Modal::end();
+    ?>
+
+    <?php
+    // Описание выполнения задачи на данной странице
+    Modal::begin([
+        'options' => [
+            'id' => 'information-table-interview',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+         Необходимо заполнить все поля данной формы.
+    </h4>
+
+    <?php
+    Modal::end();
+    ?>
+
 </div>
+
+<?php
+$script = "
+
+     $(document).ready(function() {
+    
+        //Фон для модального окна информации
+        var information_modal = $('#information-table-interview').find('.modal-content');
+        information_modal.css('background-color', '#707F99');
+        
+    });
+    
+";
+$position = \yii\web\View::POS_READY;
+$this->registerJs($script, $position);
+
+?>

@@ -33,7 +33,7 @@ class Questions extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['interview_id'], 'required'],
+            [['interview_id', 'title'], 'required'],
             [['interview_id'], 'integer'],
             [['status'], 'boolean'],
             [['status'], 'default', 'value' => '1'],
@@ -50,7 +50,7 @@ class Questions extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'interview_id' => 'Interview ID',
-            'title' => 'Title',
+            'title' => 'Описание вопроса',
             'status' => 'Status',
         ];
     }

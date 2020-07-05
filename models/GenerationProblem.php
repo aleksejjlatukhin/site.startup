@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "generation_problem".
@@ -66,7 +67,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
             [['interview_id', 'description', 'date_gps', 'title'], 'required'],
             ['title', 'string', 'max' => 255],
             [['title', 'description'], 'trim'],
-            [['interview_id', 'exist_confirm', 'segment_id', 'project_id'], 'integer'],
+            [['interview_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string'],
             [['date_gps', 'date_confirm', 'date_time_confirm'], 'safe'],
         ];
@@ -84,6 +85,14 @@ class GenerationProblem extends \yii\db\ActiveRecord
             'description' => 'Описание',
             'date_gps' => 'Дата создания',
             'date_confirm' => 'Дата подтверждения'
+        ];
+    }
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

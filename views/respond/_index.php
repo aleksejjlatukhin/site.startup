@@ -534,7 +534,6 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
                         'attribute' =>'email',
                         'contentOptions' => ['id' => "email_respond_$model->id"],
                         'format' => 'raw',
-                        //'visible' => ($model->email != null),
                     ],
 
                     [
@@ -549,57 +548,6 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
                         'contentOptions' => ['id' => "date_plan_respond_$model->id"],
                         'format' => ['date', 'dd.MM.yyyy'],
                     ],
-
-                    /*[
-                        'attribute' => 'date_fact',
-                        'label' => 'Фактическая дата интервью',
-                        'value' => function($model){
-                            return $model->descInterview->date_fact;
-                        },
-                        'visible' => !empty($model->descInterview->date_fact),
-                        'contentOptions' => ['id' => "date_fact_respond_$model->id"],
-                        'format' => ['date', 'dd.MM.yyyy'],
-                    ],
-
-                    [
-                        'attribute' => 'description',
-                        'label' => 'Материалы интервью',
-                        'value' => function($model){
-                            return $model->descInterview->description;
-                        },
-                        'visible' => !empty($model->descInterview->description),
-                    ],
-
-                    [
-                        'attribute' => 'interview_file',
-                        'label' => 'Файл',
-                        'value' => function($model){
-                            $string = '';
-                            $string .= Html::a($model->descInterview->interview_file, ['desc-interview/download', 'id' => $model->descInterview->id], ['class' => '']);
-                            return $string;
-                        },
-                        'visible' => !empty($model->descInterview->interview_file),
-                        'format' => 'html',
-                    ],
-
-                    [
-                        'attribute' => 'result',
-                        'label' => 'Вывод из интервью',
-                        'value' => function($model){
-                            return $model->descInterview->result;
-                        },
-                        'visible' => !empty($model->descInterview->result),
-                    ],
-
-                    [
-                        'attribute' => 'respond_status',
-                        'label' => 'Является ли респондент представителем сегмента?',
-                        'value' => function($model){
-                            return !$model->descInterview->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>';
-                        },
-                        'visible' => !empty($model->descInterview),
-                        'format' => 'html',
-                    ],*/
 
                 ],
             ]) ?>

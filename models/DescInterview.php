@@ -19,7 +19,7 @@ class DescInterview extends \yii\db\ActiveRecord
 
     public $loadFile;
 
-    public $exist_desc;
+    //public $exist_desc;
 
     /**
      * {@inheritdoc}
@@ -76,7 +76,7 @@ class DescInterview extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
-            ['exist_desc', 'boolean'],
+            //['exist_desc', 'boolean'],
             ['status', 'boolean'],
         ];
     }

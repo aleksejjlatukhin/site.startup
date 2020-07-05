@@ -25,6 +25,7 @@ return array(
     'kartik\\export\\' => array($vendorDir . '/kartik-v/yii2-export/src'),
     'kartik\\dynagrid\\' => array($vendorDir . '/kartik-v/yii2-dynagrid/src'),
     'kartik\\dialog\\' => array($vendorDir . '/kartik-v/yii2-dialog/src'),
+    'kartik\\detail\\' => array($vendorDir . '/kartik-v/yii2-detail-view/src'),
     'kartik\\bs4dropdown\\' => array($vendorDir . '/kartik-v/yii2-bootstrap4-dropdown/src'),
     'kartik\\base\\' => array($vendorDir . '/kartik-v/yii2-krajee-base/src'),
     'cebe\\markdown\\' => array($vendorDir . '/cebe/markdown'),
