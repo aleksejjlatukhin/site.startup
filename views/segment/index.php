@@ -5,6 +5,8 @@ use yii\grid\GridView;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\User;
+use yii\bootstrap\Modal;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -14,7 +16,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="segment-index">
+<div class="segment-index table-project-kartik">
 
     <p>
 
@@ -22,7 +24,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
 
-        <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-success pull-right']) ?>
+        <?= Html::a('Дорожная карта сегментов', ['roadmap', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+
+        <?= Html::a('Данные проекта', ['#'], [
+            'class' => 'btn btn-default pull-right',
+            'data-toggle' => 'modal',
+            'data-target' => "#data_project_modal",
+        ]) ?>
 
     </p>
 
@@ -42,11 +50,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     if (empty($model->creat_date)){
 
-                        return Html::a(Html::encode($model->name), Url::to(['update', 'id' => $model->id]));
+                        return Html::a(Html::encode($model->name), Url::to(['/segment/update', 'id' => $model->id]), [
+                            'class' => 'table-kartik-link',
+                            'title' => 'Редактирование'
+                        ]);
 
                     } else {
 
-                        return Html::a(Html::encode($model->name), Url::to(['view', 'id' => $model->id]));
+                        if ($model->interview) {
+
+                            return Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
+                                'class' => 'table-kartik-link',
+                                'title' => 'Переход к программе генерации ГПС'
+                            ]);
+
+                        } else {
+
+                            return Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
+                                'class' => 'table-kartik-link',
+                                'title' => 'Создание программы генерации ГПС'
+                            ]);
+                        }
                     }
                 },
                 'format' => 'raw',
@@ -78,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             . number_format($model->age_to, 0, '', ' ');
                     }
                 },
-                'contentOptions'=>['style'=>'white-space: normal;'],
+                'contentOptions' => ['style'=>'white-space: normal;'],
                 'options' => ['width' => '80'],
                 'format' => 'html',
             ],
@@ -148,15 +172,17 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::submitButton('Добавить целевой семент', ['class' => 'btn btn-primary']) ?>
         </p>
 
-        <div class="popap_fast">
+        <div class="popap_fast row">
 
             <?php $form = ActiveForm::begin(); ?>
 
             <div class="col-sm-6">
-                <?= $form->field($newModel, 'name')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($newModel, 'name', [
+                    'template' => '<div class="row" style="padding: 0;"><div class="col-xs-12">{label}</div><div class="col-xs-10">{input}</div><div class="col-xs-2 cross-out glyphicon text-danger glyphicon-remove" style="margin: 0;padding: 0;"></div><div class="col-xs-12">{error}</div></div>'
+                ])->textInput(['maxlength' => true]) ?>
             </div>
 
-            <span class="cross-out glyphicon text-danger glyphicon-remove"></span>
+
 
             <div class="col-sm-12 form-group">
                 <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
@@ -168,6 +194,111 @@ $this->params['breadcrumbs'][] = $this->title;
         <br>
 
     <?php endif; ?>
+
+
+    <?php
+    // Сообщение о том, что респондент с таким именем уже есть
+    Modal::begin([
+        'options' => [
+            'id' => 'data_project_modal',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Данные проекта «'. $project->project_name .'»</h3>',
+    ]);
+    ?>
+
+    <?= DetailView::widget([
+        'model' => $project,
+        'attributes' => [
+
+            'project_name',
+            'project_fullname:ntext',
+            'description:ntext',
+            'rid',
+            'core_rid:ntext',
+            'patent_number',
+
+            [
+                'attribute' => 'patent_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'patent_name:ntext',
+
+            [
+                'attribute'=>'Целевые сегменты',
+                'value' => $project->getConceptDesc($project),
+                'format' => 'html',
+            ],
+
+            [
+                'attribute'=>'Команда проекта',
+                'value' => $project->getAuthorInfo($project),
+                'format' => 'html',
+            ],
+
+            'technology',
+            'layout_technology:ntext',
+            'register_name',
+
+            [
+                'attribute' => 'register_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'site',
+            'invest_name',
+
+            [
+                'attribute' => 'invest_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'invest_amount',
+                'value' => function($project){
+                    if($project->invest_amount !== null){
+                        return number_format($project->invest_amount, 0, '', ' ');
+                    }
+                },
+            ],
+
+            [
+                'attribute' => 'date_of_announcement',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'announcement_event',
+
+            [
+                'attribute' => 'created_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'update_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'pre_files',
+                'label' => 'Презентационные файлы',
+                'value' => function($model){
+                    $string = '';
+                    foreach ($model->preFiles as $file){
+                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
+                    }
+                    return $string;
+                },
+                'format' => 'html',
+            ]
+
+        ],
+    ]) ?>
+
+    <?php
+    Modal::end();
+    ?>
 
 
 

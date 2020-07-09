@@ -391,7 +391,7 @@ class ProjectsController extends AppController
 
                                         $model->upload($present_files_dir);
 
-                                        return $this->redirect(['view', 'id' => $model->id]);
+                                        return $this->redirect(['/segment/index', 'id' => $model->id]);
                                     }
                                 } catch (Exception $e) {
                                     $transaction->rollBack();

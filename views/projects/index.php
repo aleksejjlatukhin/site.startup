@@ -11,7 +11,7 @@ use app\models\User;
 $this->title = 'Мои проекты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="projects-index">
+<div class="projects-index table-project-kartik">
 
     <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
 
@@ -42,19 +42,22 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'project_name',
                 'value' => function ($data) {
-                    return Html::a(Html::encode($data->project_name), Url::to(['view', 'id' => $data->id]));
+                    return Html::a(Html::encode($data->project_name), Url::to(['/segment/index', 'id' => $data->id]), [
+                        'class' => 'table-kartik-link',
+                        'title' => 'Переход к генерации ГЦС'
+                    ]);
                 },
                 'format' => 'raw',
             ],
 
             'project_fullname:ntext',
             'rid',
-            'patent_number',
+            //'patent_number',
 
-            [
-                'attribute' => 'patent_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
+            //[
+                //'attribute' => 'patent_date',
+                //'format' => ['date', 'dd.MM.yyyy'],
+            //],
 
             'patent_name:ntext',
             'technology',
@@ -67,6 +70,39 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'update_at',
                 'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'class' => 'yii\grid\ActionColumn',
+                //'header'=>'Действия',
+                'template' => '{view} {update} {delete}',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        return Html::a('Просмотр', ['/projects/view', 'id' => $model->id], [
+                            'class' => 'btn btn-sm btn-default',
+                            'style' => ['width' => '130px'],
+                            'title' => 'Просмотр',
+                        ]);
+                    },
+                    'update' => function ($url, $model) {
+                        return Html::a('Редактирование', ['/projects/update', 'id' => $model->id], [
+                            'class' => 'btn btn-sm btn-primary',
+                            'style' => ['width' => '130px', 'margin' => '5px 0'],
+                            'title' => 'Редактирование',
+                        ]);
+                    },
+                    'delete' => function ($url, $model) {
+                        return Html::a('Удаление', ['/projects/delete', 'id' => $model->id], [
+                            'class' => 'btn btn-sm btn-danger',
+                            'style' => ['width' => '130px'],
+                            'title' => 'Удаление',
+                            'data' => [
+                                'method' => 'post',
+                                'confirm' =>'Вы уверены что хотите удалить этот проект?',
+                            ]
+                        ]);
+                    },
+                ],
             ],
 
         ],

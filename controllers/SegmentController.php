@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
+use app\models\FormCreateSegment;
+use app\models\FormUpdateSegment;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -85,13 +87,14 @@ class SegmentController extends AppController
     {
         $project = Projects::findOne($id);
         $user = User::find()->where(['id' => $project->user_id])->one();
+        $models = Segment::findAll(['project_id' => $project->id]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => Segment::find()->where(['project_id' => $id]),
         ]);
 
-        $models = Segment::find()->where(['project_id' => $project->id])->all();
 
+        //Проверка и создание необходимых папок на сервере --- начало ---
         $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
 
@@ -107,29 +110,20 @@ class SegmentController extends AppController
                 mkdir($segment_dir, 0777);
             }
         }
+        //Проверка и создание необходимых папок на сервере --- конец ---
 
-        $newModel = new Segment();
+
+        $newModel = new FormCreateSegment();
         $newModel->project_id = $id;
 
         if ($newModel->load(Yii::$app->request->post())){
 
-            $countSeg = 0;
-            foreach ($models as $model){
-                if(mb_strtolower(str_replace(' ', '', $newModel->name)) == mb_strtolower(str_replace(' ', '', $model->name))){
-                    $countSeg++;
-                }
-            }
+            if ($newModel->create()){
 
-            if ($countSeg == 0){
-                if ($newModel->save()){
-
-                    if ($project->save()){
-                        $project->update_at = date('Y:m:d');
-                        return $this->redirect(['index', 'id' => $newModel->project_id]);
-                    }
+                if ($project->save()){
+                    $project->update_at = date('Y:m:d');
+                    return $this->redirect(['/segment/index', 'id' => $id]);
                 }
-            }else{
-                Yii::$app->session->setFlash('error', 'Сегмент с названием "'. $newModel->name .'" уже существует!');
             }
         }
 
@@ -489,8 +483,9 @@ class SegmentController extends AppController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $segment = $this->findModel($id);
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -500,86 +495,35 @@ class SegmentController extends AppController
             //Действие доступно только проектанту, который создал данную модель
             if ($user->id != $_user['id']){
                 Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['/segment/view', 'id' => $segment->id]);
             }
         }
 
-
-        $models = Segment::find()->where(['project_id' => $project->id])->all();
-        $project->update_at = date('Y:m:d');
+        $model = new FormUpdateSegment($id);
 
         if ($model->load(Yii::$app->request->post())) {
 
-            $kol = 0;
-            foreach ($models as $item){
-                if (mb_strtolower(str_replace(' ', '', $model->name)) == mb_strtolower(str_replace(' ', '',$item->name)) && $model->id !== $item->id){
+            if ($model->update()){
 
-                    $kol++;
-                }
-            }
+                if ($project->save()) {
 
-            if ($kol == 0){
+                    if ($segment->interview){
 
-                foreach ($models as $item){
+                        return $this->redirect(['/segment/view', 'id' => $id]);
+                    }
 
-                    if ($model->id == $item->id && mb_strtolower($model->name) !== mb_strtolower($item->name)){
+                    elseif (empty($segment->interview)){
 
-                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                            . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($item->name) , "windows-1251") . '/';
-
-                        $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                            . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-
-                        $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                        rename($old_dir, $new_dir);
+                        return $this->redirect(['/interview/create', 'id' => $id]);
                     }
                 }
-
-                if ($model->validate() && $model->save()){
-
-                    if ($project->save()) {
-
-                        if ($_POST['Segment']['field_of_activity'] && $_POST['Segment']['sort_of_activity'] && $_POST['Segment']['age_from'] && $_POST['Segment']['age_to']
-                            && $_POST['Segment']['income_from'] && $_POST['Segment']['income_to'] && $_POST['Segment']['quantity_from'] && $_POST['Segment']['quantity_to']
-                            && $_POST['Segment']['market_volume_from'] && $_POST['Segment']['market_volume_to'])
-                        {
-                            if (empty($model->creat_date))
-                            {
-                                $model->creat_date = date('Y:m:d');
-                                $model->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-                                $model->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-                                $model->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-                                $model->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-                                $model->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-                                $model->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
-                                $model->save();
-                            }
-                        }
-
-                        if (!empty($model->creat_date) && !empty($model->interview)){
-                            Yii::$app->session->setFlash('success', "Сегмент {$model->name} обновлен");
-                        }
-
-                        if (!empty($model->creat_date) && empty($model->interview)){
-                            Yii::$app->session->setFlash('success', "Переходите к генерации ГПС");
-                        }
-
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    }
-                }
-            }else{
-                Yii::$app->session->setFlash('error', 'Сегмент с названием "'. $model->name .'" уже существует!');
             }
         }
 
         return $this->render('update', [
             'model' => $model,
             'project' => $project,
+            'segment' => $segment,
         ]);
     }
 

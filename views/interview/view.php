@@ -1525,13 +1525,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'problem_create_modal_error',
             ],
             'size' => 'modal-md',
-            'header' => '<h3 class="text-center">Внимание!</h3>',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания ГПС.</h3>',
         ]);
         ?>
 
-        <h4 class="text-center text-danger">Недостаточно данных для создания ГПС.</h4>
-        <h4 class="text-center text-danger">Вернитесь на «Шаг 2» и следуйте инструкциям.</h4>
-
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            Вернитесь на «Шаг 2» и следуйте инструкциям.
+        </h4>
 
         <?php
         Modal::end();
@@ -1672,6 +1672,10 @@ $script = "
         //Фон для модального окна информации при заголовке таблицы
         var information_modal_problem_view = $('#information-table-problem-view').find('.modal-content');
         information_modal_problem_view.css('background-color', '#707F99');
+        
+        //Фон для модального окна информации при отказе в добавлении ГПС
+        var info_problem_create_modal_error = $('#problem_create_modal_error').find('.modal-content');
+        info_problem_create_modal_error.css('background-color', '#707F99');
     
         //Добавляем одинаковую высоту для элементов меню 
         //таблицы - Программа генерации ГПС 
