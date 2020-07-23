@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\AllQuestions;
 use app\models\DescInterview;
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
@@ -208,7 +209,8 @@ class InterviewController extends AppController
         $newProblem = new GenerationProblem();
         $newProblem->interview_id = $id;
 
-
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $model->queryQuestionsGeneralList();
 
         return $this->render('view', [
             'model' => $model,
@@ -220,6 +222,7 @@ class InterviewController extends AppController
             'dataProviderQuestions' => $dataProviderQuestions,
             'newQuestion' => $newQuestion,
             'newProblem' => $newProblem,
+            'queryQuestions' => $queryQuestions
         ]);
     }
 
@@ -352,6 +355,7 @@ class InterviewController extends AppController
         ]);
     }
 
+    //Страница со списком вопросов
     public function actionAddQuestions($id)
     {
         $interview = Interview::find()->with('questions')->where(['id' => $id])->one();
@@ -372,9 +376,13 @@ class InterviewController extends AppController
         $newQuestion = new Questions();
         $newQuestion->interview_id = $id;
 
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $interview->queryQuestionsGeneralList();
+
         return $this->render('add-questions', [
             'dataProviderQuestions' => $dataProviderQuestions,
             'newQuestion' => $newQuestion,
+            'queryQuestions' => $queryQuestions,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
@@ -569,6 +577,7 @@ class InterviewController extends AppController
     }
 
 
+    //Метод для добавления новых вопросов
     public function actionAddQuestion($id)
     {
         $model = new Questions();
@@ -584,9 +593,15 @@ class InterviewController extends AppController
                     $showListQuestions = $interviewNew->showListQuestions;
                     $questions = $interviewNew->questions;
 
+                    //Добавляем вопрос в общую базу вопросов
+                    $interviewNew->addQuestionToGeneralList($model->title);
+                    //Передаем обновленный список вопросов для добавления в программу
+                    $queryQuestions = $interviewNew->queryQuestionsGeneralList();
+
                     $response = [
                         'model' => $model,
                         'questions' => $questions,
+                        'queryQuestions' => $queryQuestions,
                         'showListQuestions' => $showListQuestions,
                     ];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -616,10 +631,13 @@ class InterviewController extends AppController
                 $showListQuestions = $interviewNew->showListQuestions;
                 $questions = $interviewNew->questions;
 
+                //Передаем обновленный список вопросов для добавления в программу
+                $queryQuestions = $interviewNew->queryQuestionsGeneralList();
 
                 $response = [
                     'showListQuestions' => $showListQuestions,
-                    'questions' => $questions
+                    'questions' => $questions,
+                    'queryQuestions' => $queryQuestions,
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;

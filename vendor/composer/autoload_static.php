@@ -103,8 +103,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         ),
         'k' => 
         array (
+            'kartik\\switchinput\\' => 19,
             'kartik\\sortable\\' => 16,
             'kartik\\select2\\' => 15,
+            'kartik\\plugins\\depdrop\\' => 23,
             'kartik\\mpdf\\' => 12,
             'kartik\\grid\\' => 12,
             'kartik\\form\\' => 12,
@@ -112,6 +114,7 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
             'kartik\\dynagrid\\' => 16,
             'kartik\\dialog\\' => 14,
             'kartik\\detail\\' => 14,
+            'kartik\\depdrop\\' => 15,
             'kartik\\bs4dropdown\\' => 19,
             'kartik\\base\\' => 12,
         ),
@@ -221,6 +224,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
         ),
+        'kartik\\switchinput\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-switchinput',
+        ),
         'kartik\\sortable\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-sortable/src',
@@ -228,6 +235,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'kartik\\select2\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-select2/src',
+        ),
+        'kartik\\plugins\\depdrop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/dependent-dropdown',
         ),
         'kartik\\mpdf\\' => 
         array (
@@ -256,6 +267,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'kartik\\detail\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-detail-view/src',
+        ),
+        'kartik\\depdrop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-depdrop/src',
         ),
         'kartik\\bs4dropdown\\' => 
         array (

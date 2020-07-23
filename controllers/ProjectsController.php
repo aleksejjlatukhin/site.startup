@@ -264,7 +264,6 @@ class ProjectsController extends AppController
     {
         $model = new Projects();
 
-        $modelsConcept = [new Segment];
         $modelsAuthors = [new Authors];
 
         $user = User::findOne(['id' => $id]);
@@ -297,109 +296,71 @@ class ProjectsController extends AppController
                 $model->date_of_announcement = strtotime($model->date_of_announcement);
             }
 
-            $modelsConcept = Model::createMultiple(Segment::class);
-            Model::loadMultiple($modelsConcept, Yii::$app->request->post());
-
             $modelsAuthors = Model::createMultiple(Authors::class);
             Model::loadMultiple($modelsAuthors, Yii::$app->request->post());
 
 
-            $countMod = 1;
+            $countMod = 0;
             foreach ($models as $item) {
                 if (mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
                     $countMod++;
                 }
             }
 
-            if ($countMod < 2){
-                $equally = array();
-                foreach ($modelsConcept as $k=>$modelConcept){
-                    $equally[mb_strtolower(str_replace(' ', '',$modelConcept->name))][] = $modelConcept->name;
-                }
+            if ($countMod === 0){
 
-                foreach ($equally as $k=>$modelConcept){
-                    if (count($modelConcept) < 2){
+                if ($model->save()){
 
-                        if ($model->save()){
+                    $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
+                    $user_dir = mb_strtolower($user_dir, "windows-1251");
+                    if (!file_exists($user_dir)){
+                        mkdir($user_dir, 0777);
+                    }
 
-                            $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
-                            $user_dir = mb_strtolower($user_dir, "windows-1251");
-                            if (!file_exists($user_dir)){
-                                mkdir($user_dir, 0777);
-                            }
+                    $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
+                    $project_dir = mb_strtolower($project_dir, "windows-1251");
+                    if (!file_exists($project_dir)){
+                        mkdir($project_dir, 0777);
+                    }
 
-                            $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
-                            $project_dir = mb_strtolower($project_dir, "windows-1251");
-                            if (!file_exists($project_dir)){
-                                mkdir($project_dir, 0777);
-                            }
+                    $present_files_dir = $project_dir . '/present files/';
+                    if (!file_exists($present_files_dir)){
+                        mkdir($present_files_dir, 0777);
+                    }
 
-                            $present_files_dir = $project_dir . '/present files/';
-                            if (!file_exists($present_files_dir)){
-                                mkdir($present_files_dir, 0777);
-                            }
+                    $segments_dir = $project_dir . '/segments/';
+                    if (!file_exists($segments_dir)){
+                        mkdir($segments_dir, 0777);
+                    }
 
+                    // validate all models
+                    $valid = $model->validate();
+                    $valid = Model::validateMultiple($modelsAuthors) && $valid;
 
-                            $segments_dir = $project_dir . '/segments/';
-                            if (!file_exists($segments_dir)){
-                                mkdir($segments_dir, 0777);
-                            }
-
-                            foreach ($modelsConcept as $modelConcept){
-                                $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($modelConcept->name) , "windows-1251") . '/';
-                                $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-                                if (!file_exists($segment_dir)){
-                                    mkdir($segment_dir, 0777);
+                    if ($valid) {
+                        $transaction = \Yii::$app->db->beginTransaction();
+                        try {
+                            if ($flag = $model->save(false)) {
+                                foreach ($modelsAuthors as $modelsAuthors) {
+                                    $modelsAuthors->project_id = $model->id;
+                                    if (! ($flag = $modelsAuthors->save(false))) {
+                                        $transaction->rollBack();
+                                        break;
+                                    }
                                 }
                             }
+                            if ($flag) {
+                                $transaction->commit();
 
+                                $model->present_files = UploadedFile::getInstances($model, 'present_files');
 
+                                $model->upload($present_files_dir);
 
-                            // validate all models
-                            $valid = $model->validate();
-                            $valid = Model::validateMultiple($modelsConcept) && $valid;
-                            $valid = Model::validateMultiple($modelsAuthors) && $valid;
-
-
-                            if ($valid) {
-                                $transaction = \Yii::$app->db->beginTransaction();
-                                try {
-                                    if ($flag = $model->save(false)) {
-                                        foreach ($modelsConcept as $modelsConcept) {
-                                            $modelsConcept->project_id = $model->id;
-                                            if (! ($flag = $modelsConcept->save(false))) {
-                                                $transaction->rollBack();
-                                                break;
-                                            }
-                                        }
-
-
-                                        foreach ($modelsAuthors as $modelsAuthors) {
-                                            $modelsAuthors->project_id = $model->id;
-                                            if (! ($flag = $modelsAuthors->save(false))) {
-                                                $transaction->rollBack();
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if ($flag) {
-                                        $transaction->commit();
-
-                                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
-
-                                        $model->upload($present_files_dir);
-
-                                        return $this->redirect(['/segment/index', 'id' => $model->id]);
-                                    }
-                                } catch (Exception $e) {
-                                    $transaction->rollBack();
-                                }
+                                return $this->redirect(['/segment/index', 'id' => $model->id]);
                             }
+                        } catch (Exception $e) {
+                            $transaction->rollBack();
                         }
-                    }else{
-                        Yii::$app->session->setFlash('error', 'Введено ' . count($modelConcept) . ' одинаковых названия сегментов. Это недопустимо, название сегмента должно быть уникальным!');
                     }
                 }
             }else{
@@ -408,7 +369,6 @@ class ProjectsController extends AppController
         }
         return $this->render('create', [
             'model' => $model,
-            'modelsConcept' => (empty($modelsConcept)) ? [new Segment] : $modelsConcept,
             'modelsAuthors' => (empty($modelsAuthors)) ? [new Authors] : $modelsAuthors,
         ]);
     }
@@ -426,9 +386,7 @@ class ProjectsController extends AppController
         $user = User::find()->where(['id' => $model->user_id])->one();
         $_user = Yii::$app->user->identity;
         $models = Projects::find()->where(['user_id' => $user['id']])->all();
-        $modelsConcept = Segment::find()->where(['project_id'=>$id])->all();
         $modelsAuthors = Authors::find()->where(['project_id'=>$id])->all();
-        $segments = Segment::find()->where(['project_id' => $model->id])->all();
 
         $model->update_at = date('Y:m:d');
 
@@ -449,170 +407,93 @@ class ProjectsController extends AppController
             }
 
 
-            $oldIDs = ArrayHelper::map($modelsConcept, 'id', 'id');
-            $modelsConcept = Model::createMultiple(Segment::class, $modelsConcept);
-            Model::loadMultiple($modelsConcept, Yii::$app->request->post());
-            $deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsConcept, 'id', 'id')));
-
             $oldIDs = ArrayHelper::map($modelsAuthors, 'id', 'id');
             $modelsAuthors = Model::createMultiple(Authors::class, $modelsAuthors);
             Model::loadMultiple($modelsAuthors, Yii::$app->request->post());
             $deletedIDs1 = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsAuthors, 'id', 'id')));
 
 
-            $equally = array();
-            foreach ($modelsConcept as $k=>$modelConcept){
-                $equally[mb_strtolower(str_replace(' ', '',$modelConcept->name))][] = $modelConcept->name;
-            }
-
-
-            $countConcept = 1;
-            foreach ($equally as $k=>$modelConcept){
-                if (count($modelConcept) > 1){
-                    $countConcept++;
+            $countCon = 0;
+            foreach ($models as $item) {
+                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                    $countCon++;
                 }
             }
 
-            if ($countConcept < 2){
+            if ($countCon === 0){
+                foreach ($models as $elem){
+                    if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
 
-                $countCon = 1;
-                foreach ($models as $item) {
-                    if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                        $countCon++;
+                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                            . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
+
+                        $old_dir = mb_strtolower($old_dir, "windows-1251");
+
+                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                            . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
+
+                        $new_dir = mb_strtolower($new_dir, "windows-1251");
+
+                        rename($old_dir, $new_dir);
                     }
                 }
 
-                if ($countCon < 2){
-                    foreach ($models as $elem){
-                        if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
+                if ($model->save()){
 
-                            $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
+                    $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                        mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
 
-                            $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                            $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
-
-                            $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                            rename($old_dir, $new_dir);
-                        }
+                    if (!file_exists($segments_dir)){
+                        mkdir($segments_dir, 0777);
                     }
 
-                    if ($model->save()){
+                    // validate all models
+                    $valid = $model->validate();
+                    $valid = Model::validateMultiple($modelsAuthors) && $valid;
 
-                        foreach ($segments as $segment){
-                            foreach ($modelsConcept as $modelConcept){
-                                if ($segment->id == $modelConcept->id && $segment->name !== $modelConcept->name){
-
-                                    $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                        . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251")
-                                        . '/segments/' . mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/';
-
-                                    $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                                    $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                        . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251")
-                                        . '/segments/' . mb_convert_encoding($this->translit($modelConcept->name), "windows-1251") . '/';
-
-                                    $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                                    rename($old_dir, $new_dir);
-                                }
-                            }
-                        }
-
-
-                        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
-
-                        if (!file_exists($segments_dir)){
-                            mkdir($segments_dir, 0777);
-                        }
-
-                        foreach ($modelsConcept as $modelConcept){
-                            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($modelConcept->name) , "windows-1251") . '/';
-                            $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-                            if (!file_exists($segment_dir)){
-                                mkdir($segment_dir, 0777);
-                            }
-                        }
-
-
-                        // validate all models
-                        $valid = $model->validate();
-                        $valid = Model::validateMultiple($modelsConcept) && $valid;
-                        $valid = Model::validateMultiple($modelsAuthors) && $valid;
-
-
-                        if ($valid) {
-                            $transaction = \Yii::$app->db->beginTransaction();
-                            try {
-                                if ($flag = $model->save(false)) {
-                                    if (! empty($deletedIDs)) {
-
-                                        $seg = Segment::find()->where(['id' => $deletedIDs])->one();
-                                        $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($seg->name) , "windows-1251") . '/';
-                                        $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-                                        $this->delTree($segment_dir);
-
-                                        Segment::deleteAll(['id' => $deletedIDs]);
-                                    }
-                                    if (! empty($deletedIDs1)) {
-                                        Authors::deleteAll(['id' => $deletedIDs1]);
-                                    }
-                                    foreach ($modelsConcept as $modelsConcept) {
-                                        $modelsConcept->project_id = $model->id;
-                                        if (! ($flag = $modelsConcept->save(false))) {
-                                            $transaction->rollBack();
-                                            break;
-                                        }
-                                    }
-
-                                    foreach ($modelsAuthors as $modelsAuthors) {
-                                        $modelsAuthors->project_id = $model->id;
-                                        if (! ($flag = $modelsAuthors->save(false))) {
-                                            $transaction->rollBack();
-                                            break;
-                                        }
-                                    }
-
+                    if ($valid) {
+                        $transaction = \Yii::$app->db->beginTransaction();
+                        try {
+                            if ($flag = $model->save(false)) {
+                                if (! empty($deletedIDs1)) {
+                                    Authors::deleteAll(['id' => $deletedIDs1]);
                                 }
 
-                                if ($flag) {
-                                    $transaction->commit();
-
-                                    $model->present_files = UploadedFile::getInstances($model, 'present_files');
-
-                                    $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-                                        . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
-
-
-                                    $model->upload($present_files_dir);
-
-                                     Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
-                                     return $this->redirect(['view', 'id' => $model->id]);
-
-
+                                foreach ($modelsAuthors as $modelsAuthors) {
+                                    $modelsAuthors->project_id = $model->id;
+                                    if (! ($flag = $modelsAuthors->save(false))) {
+                                        $transaction->rollBack();
+                                        break;
+                                    }
                                 }
-                            } catch (Exception $e) {
-                                $transaction->rollBack();
                             }
+
+                            if ($flag) {
+                                $transaction->commit();
+
+                                $model->present_files = UploadedFile::getInstances($model, 'present_files');
+
+                                $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
+                                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
+
+
+                                $model->upload($present_files_dir);
+
+                                Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
+                                return $this->redirect(['view', 'id' => $model->id]);
+                            }
+                        } catch (Exception $e) {
+                            $transaction->rollBack();
                         }
                     }
-                } else{
-                    Yii::$app->session->setFlash('error', 'Проект с названием "'. $model->project_name .'" уже существует!');
                 }
-            }else{
-                Yii::$app->session->setFlash('error', 'Введены одинаковые названия сегментов. Это недопустимо, название сегмента должно быть уникальным!');
+            } else{
+                Yii::$app->session->setFlash('error', 'Проект с названием "'. $model->project_name .'" уже существует!');
             }
         }
 
         return $this->render('update', [
             'model' => $model,
-            'modelsConcept' => (empty($modelsConcept)) ? [new Segment] : $modelsConcept,
             'modelsAuthors' => (empty($modelsAuthors)) ? [new Authors] : $modelsAuthors,
         ]);
     }

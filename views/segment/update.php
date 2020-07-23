@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use app\models\Segment;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Segment */
@@ -12,12 +13,15 @@ $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦC', 'url' =
 $this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['view', 'id' => $segment->id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>
-<div class="segment-update">
+<div class="segment-update table-project-kartik">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
+
 
     <?= $this->render('_form', [
         'model' => $model,
+        'project' => $project,
     ]) ?>
+
 
 </div>

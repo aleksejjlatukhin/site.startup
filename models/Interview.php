@@ -79,6 +79,52 @@ class Interview extends \yii\db\ActiveRecord
         $question->interview_id = $this->id;
         $question->title = $title;
         $question->save();
+        $this->addQuestionToGeneralList($title);
+    }
+
+
+    public function addQuestionToGeneralList($title)
+    {
+        //Добавляем вопрос в общую базу, если его там ещё нет
+        $baseQuestions = AllQuestions::find()->select('title')->all();
+
+        $existQuestions = 0;
+
+        foreach ($baseQuestions as $baseQuestion){
+            if ($baseQuestion->title == $title){
+                $existQuestions++;
+            }
+        }
+
+        if ($existQuestions == 0){
+
+            $allQuestions = new AllQuestions();
+            $allQuestions->title = $title;
+            $allQuestions->save();
+        }
+    }
+
+
+    public function queryQuestionsGeneralList()
+    {
+        //Добавляем в массив $questions вопросы уже привязанные к данной программе
+        $questions = [];
+        foreach ($this->questions as $question) {
+            $questions[] = $question['title'];
+        }
+
+        $allQuestions = AllQuestions::find()->orderBy(['id' => SORT_DESC])->all();
+        $queryQuestions = $allQuestions;
+
+        //Убираем из списка для добавления вопросов,
+        //вопросы уже привязанные к данной программе
+        foreach ($queryQuestions as $key => $queryQuestion) {
+            if (in_array($queryQuestion['title'], $questions)) {
+                unset($queryQuestions[$key]);
+            }
+        }
+
+        return $queryQuestions;
     }
 
 

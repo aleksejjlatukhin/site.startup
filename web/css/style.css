@@ -960,3 +960,24 @@ progress.info-red::-moz-progress-bar{
 /* /interview/view - таблица (Шаг 2)
 ---Конец---
 */
+
+/*
+Стилизация предупреждений валидации форм добавления и выбора вопроса
+Программа генерации ГПС
+---Начало---
+*/
+
+#addNewQuestion .has-error .form-control {
+    border-color: #ccc;
+    box-shadow: none;
+}
+#addNewQuestionOfGeneralList .has-error .form-control {
+    border-color: #ccc;
+    box-shadow: none;
+}
+
+/*
+Стилизация предупреждений валидации форм добавления и выбора вопроса
+Программа генерации ГПС
+---Конец---
+*/

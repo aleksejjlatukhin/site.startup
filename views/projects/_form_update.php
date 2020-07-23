@@ -112,65 +112,6 @@ use yii\helpers\Url;
     </div>
 
 
-    <div class="row">
-        <div class="panel-body col-sm-8">
-            <div class="panel panel-default"><!-- widgetBody -->
-                <div class="panel-heading">
-                    <h4>Целевые сегменты</h4>
-                </div>
-            </div>
-
-            <?php DynamicFormWidget::begin([
-                'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
-                'widgetBody' => '.container-items', // required: css class selector
-                'widgetItem' => '.item', // required: css class
-                'limit' => 10, // the maximum times, an element can be cloned (default 999)
-                'min' => 1, // 0 or 1 (default 1)
-                'insertButton' => '.add-item', // css class
-                'deleteButton' => '.remove-item', // css class
-                'model' => $modelsConcept[0],
-                'formId' => 'dynamic-form',
-                'formFields' => [
-                    'name',
-                ],
-            ]); ?>
-
-            <div class="container-items"><!-- widgetContainer -->
-                <?php foreach ($modelsConcept as $i => $modelsConcept): ?>
-
-                    <div class="item panel-body"><!-- widgetBody -->
-                        <?php
-                        // necessary for update action.
-                        if (! $modelsConcept->isNewRecord) {
-                            echo Html::activeHiddenInput($modelsConcept, "[{$i}]id");
-                        }
-                        ?>
-
-                        <div style="margin-left: -30px;">
-                            <!--<div class="pull-right">
-                                <button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
-                            </div>-->
-
-                            <p style="padding-left: 15px;font-weight: 700;margin: -15px 0 5px 0">Сегмент №<?= $i+1; ?></p>
-
-                            <?= $form->field($modelsConcept, "[{$i}]name", [
-                                'template' => '<div class="col-md-12">{input}</div><div class="col-md-12">{error}</div>'
-                            ])->textInput(['maxlength' => true])?>
-
-                        </div><!-- .row -->
-
-                    </div>
-
-                <?php endforeach; ?>
-
-            </div>
-
-            <!--<p><button type="button" class="add-item btn btn-primary btn-md">Добавить сегмент </i></button></p>-->
-
-            <?php DynamicFormWidget::end(); ?>
-        </div>
-    </div>
-
 
     <div class="row">
         <div class="panel-body col-sm-8">

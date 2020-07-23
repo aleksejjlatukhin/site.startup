@@ -28,8 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Данные проекта', ['#'], [
             'class' => 'btn btn-default pull-right',
+            'style' => ['margin-left' => '5px'],
             'data-toggle' => 'modal',
             'data-target' => "#data_project_modal",
+        ]) ?>
+
+        <?= Html::a('Создать сегмент', Url::to(['/segment/create', 'id' => $project->id]), [
+            'class' => 'btn btn-success pull-right',
         ]) ?>
 
     </p>
@@ -37,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'options' => ['width' => '70'],
+        //'options' => ['width' => '70'],
         'summary' => false,
         'columns' => [
             [
@@ -75,129 +80,57 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '180'],
+                //'options' => ['width' => '180'],
                 'enableSorting' => false,
             ],
 
             [
                 'attribute' => 'field_of_activity',
+                'label' => 'Сфера деятельности',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '180'],
+                //'options' => ['width' => '180'],
                 'enableSorting' => false,
             ],
 
             [
                 'attribute' => 'sort_of_activity',
+                'label' => 'Вид деятельности',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '180'],
+                //'options' => ['width' => '180'],
                 'enableSorting' => false
             ],
 
             [
-                'attribute' => 'age',
-                'label' => 'Возраст потреб.*',
-                'value' => function ($model) {
-                    if ($model->age_from !== null && $model->age_to !== null){
-                        return 'от ' . number_format($model->age_from, 0, '', ' ') . '<br>до '
-                            . number_format($model->age_to, 0, '', ' ');
-                    }
-                },
-                'contentOptions' => ['style'=>'white-space: normal;'],
-                'options' => ['width' => '80'],
-                'format' => 'html',
-            ],
-
-
-
-            [
-                'attribute' => 'income',
-                'label' => 'Доход потреб.*',
-                'value' => function ($model) {
-                    if ($model->income_from !== null && $model->income_to !== null){
-                        return 'от ' . number_format($model->income_from, 0, '', ' ') . '<br> до '
-                            . number_format($model->income_to, 0, '', ' ');
-                    }
-                },
-                'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '90'],
-                'format' => 'html',
-            ],
-
-
-            [
-                'attribute' => 'quantity',
-                'label' => 'Потенциал. кол. потреб.*',
-                'value' => function ($model) {
-                    if ($model->quantity_from !== null && $model->quantity_to !== null){
-                        return 'от ' . number_format($model->quantity_from, 0, '', ' ') . '<br> до '
-                            . number_format($model->quantity_to, 0, '', ' ');
-                    }
-                },
-                'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '110'],
-                'format' => 'html',
-            ],
-
-
-            [
                 'attribute' => 'market_volume',
-                'label' => 'V - рынка (млн/год)*',
-                'value' => function ($model) {
-                    if ($model->market_volume_from !== null && $model->market_volume_to !== null){
-                        return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . '<br> до '
-                            . number_format($model->market_volume_to, 0, '', ' ');
-                    }
-                },
-                'contentOptions'=>['style'=>'white-space: normal;'],
-                'options' => ['width' => '100'],
-                'format' => 'html',
+                'contentOptions'=>['style'=>'white-space: normal;', 'class' => 'text-center'],
+                'enableSorting' => false
             ],
-
 
             [
-                'attribute' => 'add_info',
-                'enableSorting' => false,
+                 'attribute' => 'detail',
+                 'label' => 'Детальная информация по сегменту',
+                 'value' => function($model){
+                    if ($model->type_of_interaction_between_subjects === \app\models\Segment::TYPE_B2C) {
+                        return '<div class="text-center">' . Html::a('B2C',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'style' => ['width' => '135px'], 'title' => 'Просмотр / Редактирование']) . '</div>';
+                    }
+                    elseif ($model->type_of_interaction_between_subjects === \app\models\Segment::TYPE_B2B) {
+                        return '<div class="text-center">' . Html::a('B2B',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'style' => ['width' => '135px'], 'title' => 'Просмотр / Редактирование']) . '</div>';
+                    }
+                    else {
+                        return '';
+                    }
+                 },
+                 'format' => 'raw',
+                 'contentOptions'=>['style'=>'white-space: normal;'],
+                 'enableSorting' => false
             ],
-
 
         ],
     ]); ?>
 
 
-    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) : ?>
-
-        </div>
-
-        <p class="open_fast">
-            <?= Html::submitButton('Добавить целевой семент', ['class' => 'btn btn-primary']) ?>
-        </p>
-
-        <div class="popap_fast row">
-
-            <?php $form = ActiveForm::begin(); ?>
-
-            <div class="col-sm-6">
-                <?= $form->field($newModel, 'name', [
-                    'template' => '<div class="row" style="padding: 0;"><div class="col-xs-12">{label}</div><div class="col-xs-10">{input}</div><div class="col-xs-2 cross-out glyphicon text-danger glyphicon-remove" style="margin: 0;padding: 0;"></div><div class="col-xs-12">{error}</div></div>'
-                ])->textInput(['maxlength' => true]) ?>
-            </div>
-
-
-
-            <div class="col-sm-12 form-group">
-                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-            </div>
-
-            <?php ActiveForm::end(); ?>
-        </div>
-
-        <br>
-
-    <?php endif; ?>
-
-
     <?php
-    // Сообщение о том, что респондент с таким именем уже есть
+    // Модальное окно - данные проекта
     Modal::begin([
         'options' => [
             'id' => 'data_project_modal',
@@ -224,12 +157,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             'patent_name:ntext',
-
-            [
-                'attribute'=>'Целевые сегменты',
-                'value' => $project->getConceptDesc($project),
-                'format' => 'html',
-            ],
 
             [
                 'attribute'=>'Команда проекта',
@@ -300,25 +227,4 @@ $this->params['breadcrumbs'][] = $this->title;
     Modal::end();
     ?>
 
-
-
-    <div class="row">
-        <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Генерация ГЦС</span> — генерация гипотез целевых сегментов.</p>
-    </div>
-
-    <div class="row">
-        <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Возраст потреб.*</span> — возраст потребителя.</p>
-    </div>
-
-    <div class="row">
-        <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Доход потреб.*</span> — доход потребителя (тыс. руб./мес.).</p>
-    </div>
-
-    <div class="row">
-        <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">Потенциал. кол. потреб.*</span> — потенциальное количество потребителей (тыс. чел.).</p>
-    </div>
-
-    <div class="row">
-        <p class="col-sm-6" style="font-style: italic; font-size: 13px;"><span class="bolder">V - рынка (млн/год)*</span> — объем рынка (млн. руб./год).</p>
-    </div>
 

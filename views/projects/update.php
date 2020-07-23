@@ -16,7 +16,6 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?= $this->render('_form_update', [
         'model' => $model,
-        'modelsConcept' => $modelsConcept,
         'modelsAuthors' => $modelsAuthors,
     ]) ?>
 

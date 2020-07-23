@@ -82,20 +82,6 @@ class Projects extends ActiveRecord
         return $this->hasMany(PreFiles::class, ['project_id' => 'id']);
     }
 
-    public function getConceptDesc($model)
-    {
-        $string = '';
-        $j = 0;
-        foreach ($model->segments as $segment) {
-            if (!empty($segment->name)){
-                $j++;
-                $string .= "<i>Сегмент №$j:</i> <br>";
-                $string .= $segment->name . "<br><br>";
-            }
-        }
-        return $string;
-    }
-
     public function getAuthorInfo($model)
     {
         $string = '';

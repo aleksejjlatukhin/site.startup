@@ -7,6 +7,8 @@ use yii\helpers\Url;
 use app\models\User;
 use kartik\grid\GridView;
 use yii\bootstrap\Modal;
+use yii\helpers\ArrayHelper;
+use app\models\Segment;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Interview */
@@ -94,67 +96,246 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
 
 
-    <?= yii\widgets\DetailView::widget([
+    <?= \yii\widgets\DetailView::widget([
         'model' => $segment,
         'attributes' => [
 
             'name',
-            'field_of_activity:ntext',
-            'sort_of_activity:ntext',
+            'description:ntext',
+
+            [
+                'attribute' => 'type_of_interaction_between_subjects',
+                'label' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
+                'value' => function ($segment) {
+                    if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
+                        return 'Коммерческие взаимоотношения между организацией и частным потребителем (B2C)';
+                    }
+                    elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B){
+                        return 'Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)';
+                    }
+                    else{
+                        return '';
+                    }
+                },
+                'format' => 'raw',
+            ],
+
+            [
+                'attribute' => 'field_of_activity_b2c',
+                'label' => 'Сфера деятельности потребителя',
+                'value' => function ($segment) {
+                    return $segment->field_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+            [
+                'attribute' => 'field_of_activity_b2b',
+                'label' => 'Сфера деятельности предприятия',
+                'value' => function ($segment) {
+                    return $segment->field_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
+
+            [
+                'attribute' => 'sort_of_activity_b2c',
+                'label' => 'Вид деятельности потребителя',
+                'value' => function ($segment) {
+                    return $segment->sort_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+            [
+                'attribute' => 'sort_of_activity_b2b',
+                'label' => 'Вид деятельности предприятия',
+                'value' => function ($segment) {
+                    return $segment->sort_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
+
+            [
+                'attribute' => 'specialization_of_activity_b2c',
+                'label' => 'Специализация вида деятельности потребителя',
+                'value' => function ($segment) {
+                    return $segment->specialization_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+            [
+                'attribute' => 'specialization_of_activity_b2b',
+                'label' => 'Специализация вида деятельности предприятия',
+                'value' => function ($segment) {
+                    return $segment->specialization_of_activity;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
+
+            [
+                'attribute' => 'company_products',
+                'label' => 'Продукция / услуги предприятия',
+                'value' => function ($segment) {
+                    return $segment->company_products;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
+
+            [
+                'attribute' => 'company_partner',
+                'label' => 'Партнеры предприятия',
+                'value' => function ($segment) {
+                    return $segment->company_partner;
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
 
             [
                 'attribute' => 'age',
                 'label' => 'Возраст потребителя',
-                'value' => function ($model) {
-                    if ($model->age_from !== null && $model->age_to !== null){
-                        return 'от ' . number_format($model->age_from, 0, '', ' ') . ' до '
-                            . number_format($model->age_to, 0, '', ' ');
+                'value' => function ($segment) {
+                    if ($segment->age_from !== null && $segment->age_to !== null){
+                        return 'от ' . number_format($segment->age_from, 0, '', ' ') . ' до '
+                            . number_format($segment->age_to, 0, '', ' ');
+                    } else {
+                        return '';
                     }
                 },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+            [
+                'attribute' => 'gender_consumer',
+                'label' => 'Пол потребителя',
+                'value' => function ($segment) {
+                    if ($segment->gender_consumer == Segment::GENDER_WOMAN) {
+                        return 'Женский';
+                    }else {
+                        return 'Мужской';
+                    }
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+            [
+                'attribute' => 'education_of_consumer',
+                'label' => 'Образование потребителя',
+                'value' => function ($segment) {
+                    if ($segment->education_of_consumer == Segment::SECONDARY_EDUCATION) {
+                        return 'Среднее образование';
+                    }elseif ($segment->education_of_consumer == Segment::SECONDARY_SPECIAL_EDUCATION) {
+                        return 'Среднее образование (специальное)';
+                    }elseif ($segment->education_of_consumer == Segment::HIGHER_INCOMPLETE_EDUCATION) {
+                        return 'Высшее образование (незаконченное)';
+                    }elseif ($segment->education_of_consumer == Segment::HIGHER_EDUCATION) {
+                        return 'Высшее образование';
+                    }else {
+                        return '';
+                    }
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
             ],
 
 
             [
-                'attribute' => 'income',
+                'attribute' => 'income_b2c',
                 'label' => 'Доход потребителя (тыс. руб./мес.)',
-                'value' => function ($model) {
-                    if ($model->income_from !== null && $model->income_to !== null){
-                        return 'от ' . number_format($model->income_from, 0, '', ' ') . ' до '
-                            . number_format($model->income_to, 0, '', ' ');
+                'value' => function ($segment) {
+                    if ($segment->income_from !== null && $segment->income_to !== null){
+                        return 'от ' . number_format($segment->income_from, 0, '', ' ') . ' до '
+                            . number_format($segment->income_to, 0, '', ' ');
+                    } else {
+                        return '';
                     }
                 },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
             ],
 
 
             [
-                'attribute' => 'quantity',
-                'label' => 'Потенциальное количество потребителей (тыс. чел.)',
-                'value' => function ($model) {
-                    if ($model->quantity_from !== null && $model->quantity_to !== null){
-                        return 'от ' . number_format($model->quantity_from, 0, '', ' ') . ' до '
-                            . number_format($model->quantity_to, 0, '', ' ');
+                'attribute' => 'income_b2b',
+                'label' => 'Доход предприятия (млн. руб./год)',
+                'value' => function ($segment) {
+                    if ($segment->income_from !== null && $segment->income_to !== null){
+                        return 'от ' . number_format($segment->income_from, 0, '', ' ') . ' до '
+                            . number_format($segment->income_to, 0, '', ' ');
+                    } else {
+                        return '';
                     }
                 },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
+            ],
+
+
+            [
+                'attribute' => 'quantity_b2c',
+                'label' => 'Потенциальное количество потребителей (тыс. чел.)',
+                'value' => function ($segment) {
+                    if ($segment->quantity_from !== null && $segment->quantity_to !== null){
+                        return 'от ' . number_format($segment->quantity_from, 0, '', ' ') . ' до '
+                            . number_format($segment->quantity_to, 0, '', ' ');
+                    } else {
+                        return '';
+                    }
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C)
+            ],
+
+
+            [
+                'attribute' => 'quantity_b2b',
+                'label' => 'Потенциальное количество представителей сегмента (ед.)',
+                'value' => function ($segment) {
+                    if ($segment->quantity_from !== null && $segment->quantity_to !== null){
+                        return 'от ' . number_format($segment->quantity_from, 0, '', ' ') . ' до '
+                            . number_format($segment->quantity_to, 0, '', ' ');
+                    } else {
+                        return '';
+                    }
+                },
+                'format' => 'raw',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B)
             ],
 
 
             [
                 'attribute' => 'market_volume',
                 'label' => 'Объем рынка (млн. руб./год)',
-                'value' => function ($model) {
-                    if ($model->market_volume_from !== null && $model->market_volume_to !== null){
-                        return 'от ' . number_format($model->market_volume_from, 0, '', ' ') . ' до '
-                            . number_format($model->market_volume_to, 0, '', ' ');
+                'value' => function ($segment) {
+                    if ($segment->market_volume !== null){
+                        return number_format($segment->market_volume, 0, '', ' ');
+                    } else {
+                        return '';
                     }
                 },
+                'format' => 'raw',
             ],
 
+            [
+                'attribute' => 'main_problems_consumer',
+                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C),
+            ],
 
             [
                 'attribute' => 'add_info',
-                'visible' => !empty($model->add_info),
+                'visible' => !empty($segment->add_info),
             ],
-
         ],
     ]) ?>
 
@@ -381,14 +562,30 @@ $this->params['breadcrumbs'][] = $this->title;
             'panel' => [
                 'type' => 'default',
                 'heading' => false,
-                'before' => '<div class="col-md-12" style="font-size: 24px; font-weight: 700; color: #F2F2F2;"><span>Список вопросов для интервью</span>' .
+                'before' => '<div class="row" style="margin: 0; font-size: 24px; padding: 10px;"><div class="col-md-12 col-lg-8 text-center" style="margin-bottom: 5px; font-weight: 700; color: #F2F2F2;">Список вопросов для интервью</div>'
 
-                    Html::button( 'Добавить вопрос', [
-                        'style' => ['font-weight' => '700', 'margin' => '5px'],
-                        'class' => 'btn btn-sm btn-default pull-right',
-                        'id' => 'buttonAddQuestion'])
+                    .   Html::button( 'Добавить вопрос', [
+                        'style' => [
+                            'font-weight' => '700',
+                            'border' => 'solid 5px #707F99',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-sm btn-default col-xs-12 col-sm-6 col-lg-2',
+                        'id' => 'buttonAddQuestion',
+                        ])
 
-                    . '</div><div class="row form-newQuestion-panel kv-hide"></div>',
+                    .   Html::button( 'Выбрать из списка', [
+                        'style' => [
+                            'font-weight' => '700',
+                            'border' => 'solid 5px #707F99',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-sm btn-default col-xs-12 col-sm-6 col-lg-2',
+                        'id' => 'buttonAddQuestionToGeneralList',
+                        ])
+
+                    .   '</div><div class="row form-newQuestion-panel kv-hide"></div>
+                        <div class="row form-QuestionsOfGeneralList-panel kv-hide" style="display: none;"></div>',
 
                 'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
                 //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
@@ -402,15 +599,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <!--Форма для добаления нового вопроса-->
         <div class="row" style="display: none;">
-            <div class="col-md-12 form-newQuestion" style="margin-top: 15px;">
+            <div class="col-md-12 form-newQuestion" style="margin-top: 5px;">
 
                 <? $form = ActiveForm::begin(['id' => 'addNewQuestion', 'action' => Url::to(['/interview/add-question', 'id' => $model->id])]);?>
 
                 <div class="col-md-10">
-                    <?= $form->field($newQuestion, 'title')->textInput(['maxlength' => true, 'required' => true])->label(false); ?>
+                    <?= $form->field($newQuestion, 'title', ['template' => '{input}'])->textInput(['maxlength' => true, 'required' => true])->label(false); ?>
                 </div>
                 <div class="col-md-2">
-                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-sm btn-success pull-right', 'style' => ['font-weight' => '700', 'margin' => '2px 5px', 'width' => '120px']]); ?>
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-sm btn-success col-xs-12', 'style' => ['font-weight' => '700', 'margin-bottom' => '15px']]); ?>
                 </div>
 
                 <? ActiveForm::end(); ?>
@@ -436,6 +633,44 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
             </tbody>
         </table>
+
+
+        <!--Форма для выбора вопроса из общксписка для  добавления в интервью-->
+        <div class="row" style="display: none;">
+            <div class="col-md-12 form-QuestionsOfGeneralList" style="margin-top: 5px;">
+
+                <? $form = ActiveForm::begin(['id' => 'addNewQuestionOfGeneralList', 'action' => Url::to(['/interview/add-question', 'id' => $model->id])]);?>
+
+                <div class="col-xs-12 col-md-10 col-lg-10">
+
+                    <?php
+                    $items = ArrayHelper::map($queryQuestions,'title','title');
+                    //$params = ['prompt' => 'Выберите вариант из списка готовых вопросов'];
+                    $params = ['prompt' => [
+                        'text' => 'Выберите вариант из списка готовых вопросов',
+                        'options' => [
+                            'style' => [
+                                'font-weight' => '700',
+                            ],
+                            //'class' => 'prompt-class',
+                            //'value' => '',
+                            //'selected' => true,
+                        ]
+                    ]]
+                    ?>
+
+                    <?= $form->field($newQuestion, 'title', ['template' => '{input}'])->dropDownList($items,$params)->label(false); ?>
+
+                </div>
+
+                <div class="col-xs-12 col-md-2 col-lg-2">
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-sm btn-success col-xs-12', 'style' => ['font-weight' => '700', 'margin-bottom' => '15px']]); ?>
+                </div>
+
+                <? ActiveForm::end(); ?>
+
+            </div>
+        </div>
 
 
     </div>
@@ -1697,7 +1932,18 @@ $script = "
         //Показываем и скрываем форму добавления вопроса 
         //при нажатии на кнопку добавить вопрос (Шаг 1)
         $('#buttonAddQuestion').on('click', function(){
+            $('.form-QuestionsOfGeneralList-panel').hide();
             $('.form-newQuestion-panel').toggle();
+        });
+        
+        //Вырезаем и вставляем форму для выбора вопроса в панель таблицы (Шаг 1)
+        $('.form-QuestionsOfGeneralList-panel').append($('.form-QuestionsOfGeneralList').first());
+        
+        //Показываем и скрываем форму для выбора вопроса 
+        //при нажатии на кнопку выбрать из списка (Шаг 1)
+        $('#buttonAddQuestionToGeneralList').on('click', function(){
+            $('.form-newQuestion-panel').hide();
+            $('.form-QuestionsOfGeneralList-panel').toggle();
         });
         
         
@@ -2195,9 +2441,73 @@ $script = "
                 //Обновляем список вопросов на странице (Шаг 1)
                 $('#table-data-interview').find('.list-questions').html(response.showListQuestions);
                 
+                //Обновляем список вопросов для добавления (Шаг 1)
+                var queryQuestions = response.queryQuestions;
+                $('#addNewQuestionOfGeneralList').find('select').html('');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $.each(queryQuestions, function(index, value) {
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
+                });
+                
                 //Скрываем и очищием форму (Шаг 1)
                 $('.form-newQuestion-panel').hide();
                 $('#addNewQuestion')[0].reset();
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
+    
+    
+    //Добавление нового вопроса из списка предложенных (Шаг 1)
+    $('#addNewQuestionOfGeneralList').on('beforeSubmit', function(e){
+        
+        var data = $(this).serialize();
+        var url = $(this).attr('action');
+
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            cache: false,
+            success: function(response){
+                
+                //Добавление строки для нового вопроса (Шаг 1)
+                var container = $('#QuestionsTable-container').find('tbody');
+                $('.new-string-table-questions').find('tr').attr('data-key', response.model.id);
+                $('.new-string-table-questions').find('td[data-col-seq=\"1\"]').html(response.model.title);
+                $('.new-string-table-questions').find('.delete-question-interview').attr('id', 'delete_question-' + response.model.id);
+                $('.new-string-table-questions').find('.delete-question-interview').attr('href', '/interview/delete-question?id=' + response.model.id);
+                var newString = $('.new-string-table-questions').html();
+                container.append(newString);
+                
+                //Изменение нумерации строк (Шаг 1)
+                var questions = response.questions;
+                $.each(questions, function(index, value) {
+                    $('#QuestionsTable-container').find('tr[data-key=\"' + value['id'] + '\"]').find('td:first').html(index+1);
+                });
+                
+                //Скрываем форму (Шаг 1)
+                $('.form-QuestionsOfGeneralList-panel').hide();
+                
+                //Обновляем список вопросов на странице (Шаг 1)
+                $('#table-data-interview').find('.list-questions').html(response.showListQuestions);
+                
+                //Обновляем список вопросов для добавления (Шаг 1)
+                var queryQuestions = response.queryQuestions;
+                $('#addNewQuestionOfGeneralList').find('select').html('');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $.each(queryQuestions, function(index, value) {
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
+                });
+                
+                
             },
             error: function(){
                 alert('Ошибка');
@@ -2244,6 +2554,14 @@ $script = "
                 
                 //Обновляем список вопросов на странице (Шаг 1)
                 $('#table-data-interview').find('.list-questions').html(response.showListQuestions);
+                
+                //Обновляем список вопросов для добавления (Шаг 1)
+                var queryQuestions = response.queryQuestions;
+                $('#addNewQuestionOfGeneralList').find('select').html('');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $.each(queryQuestions, function(index, value) {
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
+                });
                 
             },
             error: function(){

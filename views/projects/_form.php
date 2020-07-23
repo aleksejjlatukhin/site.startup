@@ -112,129 +112,75 @@ use yii\helpers\Url;
     </div>
 
 
-        <div class="row">
-            <div class="panel-body col-sm-8">
-                <div class="panel panel-default"><!-- widgetBody -->
-                    <div class="panel-heading">
-                        <h4>Целевые сегменты</h4>
-                    </div>
+
+    <div class="row">
+        <div class="panel-body col-sm-8">
+            <div class="panel panel-default"><!-- widgetBody -->
+                <div class="panel-heading">
+                    <h4>Команда проекта</h4>
                 </div>
+            </div>
 
-                <?php DynamicFormWidget::begin([
-                    'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
-                    'widgetBody' => '.container-items', // required: css class selector
-                    'widgetItem' => '.item', // required: css class
-                    'limit' => 10, // the maximum times, an element can be cloned (default 999)
-                    'min' => 1, // 0 or 1 (default 1)
-                    'insertButton' => '.add-item', // css class
-                    'deleteButton' => '.remove-item', // css class
-                    'model' => $modelsConcept[0],
-                    'formId' => 'dynamic-form',
-                    'formFields' => [
-                        'name',
-                    ],
-                ]); ?>
+            <?php DynamicFormWidget::begin([
+                'widgetContainer' => 'dynamicform_inner', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
+                'widgetBody' => '.container-authors', // required: css class selector
+                'widgetItem' => '.item-authors', // required: css class
+                'limit' => 10, // the maximum times, an element can be cloned (default 999)
+                'min' => 1, // 0 or 1 (default 1)
+                'insertButton' => '.add-authors', // css class
+                'deleteButton' => '.remove-authors', // css class
+                'model' => $modelsAuthors[0],
+                'formId' => 'dynamic-form',
+                'formFields' => [
+                    'fio',
+                    'role',
+                    'experience',
+                ],
+            ]); ?>
 
-                <div class="container-items"><!-- widgetContainer -->
-                    <?php foreach ($modelsConcept as $i => $modelsConcept): ?>
+            <div class="container-authors"><!-- widgetContainer -->
 
-                        <div class="item panel-body"><!-- widgetBody -->
-                            <?php
-                            // necessary for update action.
-                            if (! $modelsConcept->isNewRecord) {
-                                echo Html::activeHiddenInput($modelsConcept, "[{$i}]id");
-                            }
+                <?php foreach ($modelsAuthors as $i => $modelsAuthors): ?>
+
+                    <div class="item-authors panel-body"><!-- widgetBody -->
+                        <?php
+                        // necessary for update action.
+                        if (! $modelsAuthors->isNewRecord) {
+                            echo Html::activeHiddenInput($modelsAuthors, "[{$i}]id");
+                        }
+                        ?>
+
+                        <div class="row">
+                            <div class="pull-right">
+                                <button type="button" class="remove-authors btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
+                            </div>
+
+                            <?= $form->field($modelsAuthors, "[{$i}]fio", [
+                                'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textInput(['maxlength' => true]);
                             ?>
 
-                            <div class="row">
-                                <div class="pull-right">
-                                    <button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
-                                </div>
-
-                                <?= $form->field($modelsConcept, "[{$i}]name", [
-                                    'template' => '<div class="col-md-6">{input}</div><div class="col-md-11">{error}</div>'
-                                ])->textInput(['maxlength' => true])?>
-
-                            </div><!-- .row -->
-
-                        </div>
-
-                    <?php endforeach; ?>
-
-                </div>
-
-                <p class="col-sm-3"><button type="button" class="add-item btn btn-primary btn-md">Добавить сегмент </i></button></p>
-
-                <?php DynamicFormWidget::end(); ?>
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="panel-body col-sm-8">
-                <div class="panel panel-default"><!-- widgetBody -->
-                    <div class="panel-heading">
-                        <h4>Команда проекта</h4>
-                    </div>
-                </div>
-
-                <?php DynamicFormWidget::begin([
-                    'widgetContainer' => 'dynamicform_inner', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
-                    'widgetBody' => '.container-authors', // required: css class selector
-                    'widgetItem' => '.item-authors', // required: css class
-                    'limit' => 10, // the maximum times, an element can be cloned (default 999)
-                    'min' => 1, // 0 or 1 (default 1)
-                    'insertButton' => '.add-authors', // css class
-                    'deleteButton' => '.remove-authors', // css class
-                    'model' => $modelsAuthors[0],
-                    'formId' => 'dynamic-form',
-                    'formFields' => [
-                        'fio',
-                        'role',
-                        'experience',
-                    ],
-                ]); ?>
-
-                <div class="container-authors"><!-- widgetContainer -->
-
-                    <?php foreach ($modelsAuthors as $i => $modelsAuthors): ?>
-
-                        <div class="item-authors panel-body"><!-- widgetBody -->
-                            <?php
-                            // necessary for update action.
-                            if (! $modelsAuthors->isNewRecord) {
-                                echo Html::activeHiddenInput($modelsAuthors, "[{$i}]id");
-                            }
+                            <?= $form->field($modelsAuthors, "[{$i}]role", [
+                                'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textInput(['maxlength' => true]);
                             ?>
 
-                            <div class="row">
-                                <div class="pull-right">
-                                    <button type="button" class="remove-authors btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
-                                </div>
+                            <?= $form->field($modelsAuthors, "[{$i}]experience", [
+                                'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
+                                ])->textarea(['rows' => 1]);
+                            ?>
 
-                                <?= $form->field($modelsAuthors, "[{$i}]fio", [
-                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                                ])->textInput(['maxlength' => true]) ?>
+                        </div><!-- .row -->
 
-                                <?= $form->field($modelsAuthors, "[{$i}]role", [
-                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                                ])->textInput(['maxlength' => true]) ?>
-
-                                <?= $form->field($modelsAuthors, "[{$i}]experience", [
-                                    'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                                ])->textarea(['rows' => 1]) ?>
-
-                            </div><!-- .row -->
-
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-
-                <p class="col-sm-3"><button type="button" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
-
-                <?php DynamicFormWidget::end(); ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
+
+            <p class="col-sm-3"><button type="button" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
+
+            <?php DynamicFormWidget::end(); ?>
         </div>
+    </div>
 
 
 

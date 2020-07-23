@@ -66,12 +66,6 @@ $this->params['breadcrumbs'][] = $model->project_name;
             'patent_name:ntext',
 
             [
-                'attribute'=>'Целевые сегменты',
-                'value' => $model->getConceptDesc($model),
-                'format' => 'html',
-            ],
-
-            [
                 'attribute'=>'Команда проекта',
                 'value' => $model->getAuthorInfo($model),
                 'format' => 'html',

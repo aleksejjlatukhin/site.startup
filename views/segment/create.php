@@ -11,12 +11,13 @@ $this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['
 $this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦC', 'url' => ['index', 'id' => $project->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="segment-create">
+<div class="segment-create table-project-kartik">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
-    <?= $this->render('_form', [
+    <?= $this->render('_formCreate', [
         'model' => $model,
+        'project' => $project,
     ]) ?>
 
 </div>
