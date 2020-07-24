@@ -32,7 +32,6 @@ class FormUpdateSegment extends Model
     public $education_of_consumer;
     public $market_volume_b2c;
     public $market_volume_b2b;
-    public $main_problems_consumer;
     public $company_products;
     public $company_partner;
     public $add_info;
@@ -44,8 +43,8 @@ class FormUpdateSegment extends Model
     {
         return [
             [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c'], 'safe'],
-            [['description', 'specialization_of_activity_b2b', 'main_problems_consumer', 'company_products', 'company_partner'], 'string', 'max' => 255],
-            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b', 'add_info', 'main_problems_consumer', 'company_products', 'company_partner'], 'trim'],
+            [['description', 'specialization_of_activity_b2b', 'company_products', 'company_partner'], 'string', 'max' => 255],
+            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
             ['name', 'string', 'min' => 6, 'max' => 48],
             ['name', 'uniqueName'],
             [['add_info'], 'string'],
@@ -93,7 +92,6 @@ class FormUpdateSegment extends Model
             $this->quantity_from = $model->quantity_from;
             $this->quantity_to = $model->quantity_to;
             $this->market_volume_b2c = $model->market_volume;
-            $this->main_problems_consumer = $model->main_problems_consumer;
 
         }elseif ($model->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
@@ -154,7 +152,6 @@ class FormUpdateSegment extends Model
                 $segment->quantity_to = $this->quantity_to;
 
                 $segment->market_volume = $this->market_volume_b2c;
-                $segment->main_problems_consumer = $this->main_problems_consumer;
 
                 $segment->createRoadmap();
                 $this->updateDirName();
@@ -280,7 +277,6 @@ class FormUpdateSegment extends Model
             'education_of_consumer' => 'Образование потребителя',
             'market_volume_b2c' => 'Объем рынка (млн. руб./год)',
             'market_volume_b2b' => 'Объем рынка (млн. руб./год)',
-            'main_problems_consumer' => 'Основные проблемы потребителя',
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
             'add_info' => 'Дополнительная информация',

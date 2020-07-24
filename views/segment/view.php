@@ -300,11 +300,6 @@ $this->params['breadcrumbs'][] = $model->name;
             ],
 
             [
-                'attribute' => 'main_problems_consumer',
-                'visible' => ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C),
-            ],
-
-            [
                 'attribute' => 'add_info',
                 'visible' => !empty($model->add_info),
             ],

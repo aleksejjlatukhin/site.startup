@@ -86,7 +86,7 @@ class Segment extends \yii\db\ActiveRecord
             [['market_volume'], 'integer'],
             [['add_info'], 'string'],
             [['name',], 'string', 'min' => 6, 'max' => 48],
-            [['field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'description', 'main_problems_consumer', 'company_products', 'company_partner'], 'string', 'max' => 255],
+            [['field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'description', 'company_products', 'company_partner'], 'string', 'max' => 255],
             [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
     }
@@ -112,7 +112,6 @@ class Segment extends \yii\db\ActiveRecord
             'income_from' => 'Доход потребителя (тыс. руб./мес.)',
             'quantity_from' => 'Потенциальное количество потребителей (тыс. чел.)',
             'market_volume' => 'Объем рынка (млн. руб./год)',
-            'main_problems_consumer' => 'Основные проблемы потребителя',
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
             'add_info' => 'Дополнительная информация',

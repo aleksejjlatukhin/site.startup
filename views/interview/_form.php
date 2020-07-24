@@ -377,11 +377,6 @@ use app\models\Segment;
             ],
 
             [
-                'attribute' => 'main_problems_consumer',
-                'visible' => ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C),
-            ],
-
-            [
                 'attribute' => 'add_info',
                 'visible' => !empty($segment->add_info),
             ],

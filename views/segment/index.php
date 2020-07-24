@@ -80,7 +80,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                //'options' => ['width' => '180'],
                 'enableSorting' => false,
             ],
 
@@ -88,7 +87,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'field_of_activity',
                 'label' => 'Сфера деятельности',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                //'options' => ['width' => '180'],
                 'enableSorting' => false,
             ],
 
@@ -96,25 +94,32 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sort_of_activity',
                 'label' => 'Вид деятельности',
                 'contentOptions'=>['style'=>'white-space: normal;'],
-                //'options' => ['width' => '180'],
+                'enableSorting' => false
+            ],
+
+            [
+                'attribute' => 'specialization_of_activity',
+                'label' => 'Специализация',
+                'contentOptions'=>['style'=>'white-space: normal;'],
                 'enableSorting' => false
             ],
 
             [
                 'attribute' => 'market_volume',
+                'label' => 'Объем рынка (млн. руб./год)',
                 'contentOptions'=>['style'=>'white-space: normal;', 'class' => 'text-center'],
                 'enableSorting' => false
             ],
 
             [
                  'attribute' => 'detail',
-                 'label' => 'Детальная информация по сегменту',
+                 'label' => false,
                  'value' => function($model){
                     if ($model->type_of_interaction_between_subjects === \app\models\Segment::TYPE_B2C) {
-                        return '<div class="text-center">' . Html::a('B2C',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'style' => ['width' => '135px'], 'title' => 'Просмотр / Редактирование']) . '</div>';
+                        return '<div class="text-center">' . Html::a('B2C',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'title' => 'Просмотр / Редактирование']) . '</div>';
                     }
                     elseif ($model->type_of_interaction_between_subjects === \app\models\Segment::TYPE_B2B) {
-                        return '<div class="text-center">' . Html::a('B2B',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'style' => ['width' => '135px'], 'title' => 'Просмотр / Редактирование']) . '</div>';
+                        return '<div class="text-center">' . Html::a('B2B',['/segment/view', 'id' => $model->id], ['class' => 'btn btn-primary', 'title' => 'Просмотр / Редактирование']) . '</div>';
                     }
                     else {
                         return '';

@@ -317,17 +317,6 @@ use yii\bootstrap\Modal;
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 15px;">
-
-            <?= $form->field($model, 'main_problems_consumer', [
-                'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div><div class="col-md-12">{error}</div>'
-                ])->label('Основные проблемы потребителя *')->textarea(['rows' => 2]);
-            ?>
-
-        </div>
-
-
     </div>
 
 
