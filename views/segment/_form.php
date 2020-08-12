@@ -185,11 +185,27 @@ use yii\bootstrap\Modal;
 
         <div class="row" style="margin-bottom: 10px;">
 
+            <?php
+            $list_gender = [
+                Segment::GENDER_ANY => 'Не важно',
+                Segment::GENDER_MAN => 'Мужской',
+                Segment::GENDER_WOMAN => 'Женский',
+            ];
+            ?>
+
             <?= $form->field($model, 'gender_consumer', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px;">{label}</div>
-                <div class="col-md-4">{input}<div>{error}</div></div>'
-            ])->label('<div>Пол потребителя *</div><div style="font-weight: 400;font-size: 13px;">(укажите нужное значение)</div>')
-                ->widget(SwitchInput::class, ['value' => true, 'pluginOptions' => ['handleWidth' => 155, 'onColor' => 'danger', 'onText' => 'Женский', 'offColor' => 'primary', 'offText' => 'Мужской', 'inlineLabel' => false]]);
+                'template' => '<div class="col-md-4">{label}</div><div class="col-md-8">{input}</div><div class="col-md-12">{error}</div>'
+            ])->label('<div>Пол потребителя *</div><div style="font-weight: 400;font-size: 13px;padding-bottom: 10px;">(укажите нужное значение)</div>')
+                ->widget(Select2::class, [
+                    'data' => $list_gender,
+                    'pluginOptions' => ['allowClear' => true],
+                    'options' => [
+                        //'id' => 'type-interaction',
+                        'placeholder' => 'Выберите пол потребителя',
+                    ],
+                    'disabled' => false,  //Сделать поле неактивным
+                    'hideSearch' => true, //Скрытие поиска
+                ]);
             ?>
 
         </div>

@@ -105,6 +105,7 @@ class SegmentController extends AppController
      */
     public function actionIndex($id)
     {
+
         $project = Projects::findOne($id);
         $user = User::find()->where(['id' => $project->user_id])->one();
         $models = Segment::findAll(['project_id' => $project->id]);
@@ -477,7 +478,7 @@ class SegmentController extends AppController
                 if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
 
                     if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2c) && !empty($model->sort_of_activity_b2c)
-                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->education_of_consumer)
+                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->gender_consumer) && !empty($model->education_of_consumer)
                         && !empty($model->income_from) && !empty($model->income_to) && !empty($model->quantity_from) && !empty($model->quantity_to) && !empty($model->market_volume_b2c)) {
 
                         if ($model->validate()) {
@@ -706,7 +707,7 @@ class SegmentController extends AppController
                 if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
 
                     if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2c) && !empty($model->sort_of_activity_b2c)
-                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->education_of_consumer)
+                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->gender_consumer) && !empty($model->education_of_consumer)
                         && !empty($model->income_from) && !empty($model->income_to) && !empty($model->quantity_from) && !empty($model->quantity_to) && !empty($model->market_volume_b2c)) {
 
                         if ($model->validate()) {

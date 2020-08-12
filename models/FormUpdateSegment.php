@@ -79,13 +79,7 @@ class FormUpdateSegment extends Model
             $this->specialization_of_activity_b2c = $model->specialization_of_activity;
             $this->age_from = $model->age_from;
             $this->age_to = $model->age_to;
-
-            if($model->gender_consumer == Segment::GENDER_MAN){
-                $this->gender_consumer = false;
-            }else {
-                $this->gender_consumer = true;
-            }
-
+            $this->gender_consumer = $model->gender_consumer;
             $this->education_of_consumer = $model->education_of_consumer;
             $this->income_from = $model->income_from;
             $this->income_to = $model->income_to;
@@ -137,12 +131,7 @@ class FormUpdateSegment extends Model
                 $segment->age_from = $this->age_from;
                 $segment->age_to = $this->age_to;
 
-                if ($this->gender_consumer == false) {
-                    $segment->gender_consumer = Segment::GENDER_MAN;
-                } else {
-                    $segment->gender_consumer = Segment::GENDER_WOMAN;
-                }
-
+                $segment->gender_consumer = $this->gender_consumer;
                 $segment->education_of_consumer = $this->education_of_consumer;
 
                 $segment->income_from = $this->income_from;

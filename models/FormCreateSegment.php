@@ -124,12 +124,7 @@ class FormCreateSegment extends Model
                 $segment->age_from = $this->age_from;
                 $segment->age_to = $this->age_to;
 
-                if ($this->gender_consumer == false) {
-                    $segment->gender_consumer = Segment::GENDER_MAN;
-                } else {
-                    $segment->gender_consumer = Segment::GENDER_WOMAN;
-                }
-
+                $segment->gender_consumer = $this->gender_consumer;
                 $segment->education_of_consumer = $this->education_of_consumer;
 
                 $segment->income_from = $this->income_from;
