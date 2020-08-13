@@ -328,7 +328,7 @@ class InterviewController extends AppController
                     //Создание респондентов по заданному значению count_respond
                     $model->createRespond();
 
-                    //Вопросы, которые будут добавлены по-умолчания
+                    //Вопросы, которые будут добавлены по-умолчанию
                     $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
                     $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
                     $model->addQuestionDefault('Вас беспокоит данная ситуация?');
@@ -337,6 +337,8 @@ class InterviewController extends AppController
                     $model->addQuestionDefault('Если ничего не делали, то почему?');
                     $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
                     $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
+                    $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
+                    $model->addQuestionDefault('Как принимается решение о покупке?');
 
                     if ($project->save()) {
 
