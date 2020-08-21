@@ -183,67 +183,6 @@ class RespondController extends AppController
     }*/
 
 
-    public function actionIndex($id)
-    {
-        return $this->renderList($id);
-    }
-
-
-    public function actionDeleteRespond ($id) {
-
-        $model = Respond::findOne($id);
-        $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-
-
-        if ($interview->count_respond == $interview->count_positive){
-
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
-            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
-        }
-
-        if (count($responds) == 1){
-
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
-        }
-
-        if (Yii::$app->request->isAjax){
-
-            $project->update_at = date('Y:m:d');
-
-            if ($project->save()) {
-
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                    mb_convert_encoding($this->translit($model->name), "windows-1251") . '/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
-
-                if ($model->delete()) {
-                    $interview->count_respond = $interview->count_respond - 1;
-                    $interview->save();
-                }
-
-                return $this->renderList($id = $interview->id);
-            }
-
-        }
-        return false;
-    }
-
 
     public function actionCreate($id)
     {
@@ -328,6 +267,12 @@ class RespondController extends AppController
                 return $response;
             }
         }
+    }
+
+
+    public function actionIndex($id)
+    {
+        return $this->renderList($id);
     }
 
 
@@ -558,6 +503,64 @@ class RespondController extends AppController
             }
         }
     }
+
+
+
+    public function actionDeleteRespond ($id) {
+
+        $model = Respond::findOne($id);
+        $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
+        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
+        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+
+
+        if ($interview->count_respond == $interview->count_positive){
+
+            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
+            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
+        }
+
+        if (count($responds) == 1){
+
+            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
+            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
+        }
+
+        if (Yii::$app->request->isAjax){
+
+            $project->update_at = date('Y:m:d');
+
+            if ($project->save()) {
+
+                if ($descInterview) {
+                    $descInterview->delete();
+                }
+
+                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
+                    mb_convert_encoding($this->translit($model->name), "windows-1251") . '/';
+
+                if (file_exists($del_dir)) {
+                    $this->delTree($del_dir);
+                }
+
+
+                if ($model->delete()) {
+                    $interview->count_respond = $interview->count_respond - 1;
+                    $interview->save();
+                }
+
+                return $this->renderList($id = $interview->id);
+            }
+
+        }
+        return false;
+    }
+
 
     /**
      * Deletes an existing Respond model.

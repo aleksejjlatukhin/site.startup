@@ -342,7 +342,7 @@ class InterviewController extends AppController
 
                     if ($project->save()) {
 
-                        return $this->redirect(['add-questions', 'id' => $model->id]);
+                        return $this->redirect(['/interview/add-questions', 'id' => $model->id]);
                     }
                 }
             }else{

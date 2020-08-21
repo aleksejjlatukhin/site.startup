@@ -501,7 +501,7 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
                 'class' => 'respond_view_modal',
             ],
             'size' => 'modal-lg',
-            'header' => '<h3 class="text-center header-view-modal">Сведения о респонденте «'.$model->name.'»'.Html::a('Редактировать', ['#'],[
+            'header' => '<h3 class="text-center header-view-modal">Сведения о респонденте'.Html::a('Редактировать', ['#'],[
                     'id' => 'go_to_update_respond',
                     'class' => 'btn btn-success pull-left go_to_update_respond',
                     'data-toggle' => 'modal',
@@ -566,7 +566,7 @@ Html::a('Программа генерации ГПС', ['interview/view', 'id' 
                 'class' => 'respond_update_modal',
             ],
             'size' => 'modal-lg',
-            'header' => '<h3 class="text-center header-update-modal">Редактирование информации: «'.$model->name.'»'.Html::a('Назад', ['#'],[
+            'header' => '<h3 class="text-center header-update-modal">Редактирование информации о респонденте'.Html::a('Назад', ['#'],[
                     'id' => 'go_to_the_viewing_respond',
                     'class' => 'btn btn-default pull-left go_to_the_viewing_respond',
                     'data-toggle' => 'modal',

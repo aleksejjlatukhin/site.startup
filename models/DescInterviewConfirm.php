@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "desc_interview_confirm".
@@ -38,7 +39,7 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
     {
         return [
             [['responds_confirm_id', 'date_fact'], 'required'],
-            [['responds_confirm_id'], 'integer'],
+            [['responds_confirm_id', 'created_at', 'updated_at'], 'integer'],
             [['date_fact'], 'safe'],
             ['exist_desc', 'boolean'],
             ['status', 'boolean'],
@@ -55,6 +56,14 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
             'responds_confirm_id' => 'Responds Confirm ID',
             'date_fact' => 'Дата Анкеты',
             'status' => 'Значимость проблемы'
+        ];
+    }
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

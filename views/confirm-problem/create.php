@@ -16,60 +16,11 @@ $this->params['breadcrumbs'][] = ['label' => 'Программа генерац�
 $this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="confirm-problem-create">
-
-    <h2><?= $this->title; ?></h2>
-
-    <div class="row">
-        <div class="col-md-8">
-            <div class="faq_list">
-                <div class="faq_item">
-                    <div class="faq_item_title">
-                        <div class="faq_item_title_inner">Данные сегмента</div>
-                    </div>
-                    <div class="faq_item_body">
-
-                        <?= $segment->allInformation; ?>
-
-                    </div>
-                </div>
-
-                <div class="faq_item">
-                    <div class="faq_item_title">
-                        <div class="faq_item_title_inner">Формулировка гипотезы проблемы</div>
-                    </div>
-                    <div class="faq_item_body">
-
-                        <p style="margin-top: 0; padding: 10px;background-color: #d9d6c4;">
-                            <?= $generationProblem->description; ?>
-                        </p>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="row" style="margin-top: 15px;">
-        <div class="col-md-8">
-
-            <?= DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    [
-                        'attribute' => 'count_respond',
-                        'label' => 'Количество респондентов (представителей сегмента)'
-                    ],
-                ],
-            ]) ?>
-
-        </div>
-    </div>
+<div class="confirm-problem-create table-project-kartik">
 
     <?= $this->render('_form', [
         'model' => $model,
-        'genarationProblem' => $generationProblem,
+        'generationProblem' => $generationProblem,
         'interview' => $interview,
         'segment' => $segment,
         'project' => $project,
