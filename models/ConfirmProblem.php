@@ -467,7 +467,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
             if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                return '<div class="text-center" style="padding: 50px 0;">' . Html::a('Переходите к генерации ценностных предложений', ['/gcp/create', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>';
+                return '<div class="text-center" style="padding: 50px 0;">' . Html::a('Переходите к генерации ценностных предложений', ['/gcp/index', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>';
 
             }else {
 

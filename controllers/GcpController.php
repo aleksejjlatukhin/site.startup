@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\ConfirmProblem;
+use app\models\FormCreateGcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -53,6 +54,11 @@ class GcpController extends AppController
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                if ($action->id == 'update') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
 
                 return parent::beforeAction($action);
 
@@ -108,39 +114,30 @@ class GcpController extends AppController
     public function actionIndex($id)
     {
         $user = Yii::$app->user->identity;
+        $models = Gcp::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $Gcps = Gcp::find()->where(['confirm_problem_id' => $id])->all();
 
-
-        if ($generationProblem->exist_confirm !== 1){
-            Yii::$app->session->setFlash('error', "Отсутствует подтверждение проблемы с данным ID, поэтому вы не можете перейти к созданию ГЦП.");
-            return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
-        }
-
-        if (count($Gcps) == 0){
-            return $this->redirect(['create', 'id' => $id]);
-        }
-
-        if (User::isUserSimple(Yii::$app->user->identity['username'])) {
-
-            Yii::$app->session->setFlash('success', 'Для редактирования и просмотра подробной информации о ГЦП пройдите по ссылке в столбце "Наименование ГЦП".');
-        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => Gcp::find()->where(['confirm_problem_id' => $id]),
         ]);
 
+
+        $formCreateGcp = new FormCreateGcp();
+
         return $this->render('index', [
+            'models' => $models,
             'dataProvider' => $dataProvider,
             'confirmProblem' => $confirmProblem,
             'generationProblem' => $generationProblem,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
+            'formCreateGcp' => $formCreateGcp,
         ]);
     }
 
@@ -164,23 +161,6 @@ class GcpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        /*Временные файлы*/
-        if ($model->project_id === null || $model->project_id === 0) {
-            $model->project_id = $project->id;
-            $model->save();
-        }
-
-        if ($model->segment_id === null || $model->segment_id === 0) {
-            $model->segment_id = $segment->id;
-            $model->save();
-        }
-
-        if ($model->problem_id === null || $model->problem_id === 0) {
-            $model->problem_id = $generationProblem->id;
-            $model->save();
-        }
-        /*Временные файлы --- конец*/
-
         return $this->render('view', [
             'model' => $model,
             'confirmProblem' => $confirmProblem,
@@ -198,93 +178,27 @@ class GcpController extends AppController
      */
     public function actionCreate($id)
     {
-        $model = new Gcp();
+        $formCreateGcp = new FormCreateGcp();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $model->project_id = $project->id;
-        $model->segment_id = $segment->id;
-        $model->problem_id = $generationProblem->id;
-
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        if ($formCreateGcp->load(Yii::$app->request->post())) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['confirm-problem/view', 'id' => $confirmProblem->id]);
-            }
-        }
-
-
-        $models = Gcp::find()->where(['confirm_problem_id' => $id])->all();
-        $model->title = 'ГЦП ' . (count($models)+1);
-        $model->confirm_problem_id = $id;
-        $model->date_create = date('Y:m:d');
-        $model->date_time_create = date('Y-m-d H:i:s');
-
-        if ($generationProblem->exist_confirm !== 1){
-            Yii::$app->session->setFlash('error', "У проблемы с данным ID отсутствует подтверждение, поэтому вы не можете перейти к созданию ГЦП.");
-            return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
-        }
-
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            $model->description = 'Наш продукт ' . mb_strtolower($model->good) . ' ';
-            $model->description .= 'помогает ' . mb_strtolower($segment->name) . ', ';
-            $model->description .= 'который хочет удовлетворить проблему ' . mb_strtolower($generationProblem->description) . ', ';
-            $model->description .= 'избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, ' . mb_strtolower($model->benefit) . ', ';
-            $model->description .= 'в отличии от ' . mb_strtolower($model->contrast) . '.';
-
-            if ($model->save()){
-
-                $gcps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
-
-                $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
-
-                if (!file_exists($gcps_dir)){
-                    mkdir($gcps_dir, 0777);
-                }
-
-                $gcp_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
-                    . mb_convert_encoding($this->translit($model->title) , "windows-1251");
-
-                $gcp_dir = mb_strtolower($gcp_dir, "windows-1251");
-
-                if (!file_exists($gcp_dir)){
-                    mkdir($gcp_dir, 0777);
-                }
+            if ($formCreateGcp->create($id, $generationProblem->id, $segment->id, $project->id)){
 
                 $project->update_at = date('Y:m:d');
 
                 if ($project->save()){
 
-                    Yii::$app->session->setFlash('success', "Вы успешно создали " . $model->title);
-                    return $this->redirect(['index', 'id' => $model->confirm_problem_id]);
+                    return $this->redirect(['/gcp/index', 'id' => $id]);
                 }
             }
         }
-
-        return $this->render('create', [
-            'model' => $model,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**
@@ -305,43 +219,41 @@ class GcpController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-
-        if ($generationProblem->exist_confirm !== 1){
-            Yii::$app->session->setFlash('error', "У проблемы с данным ID отсутствует подтверждение, поэтому вы не можете перейти к редактированию ГЦП.");
-            return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
-        }
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->save()){
+            if(Yii::$app->request->isAjax) {
 
-                $project->update_at = date('Y:m:d');
+                if ($model->save()){
 
-                if ($project->save()){
+                    $project->update_at = date('Y:m:d');
 
-                    Yii::$app->session->setFlash('success', "Вы успешно отредактировали " . $model->title);
-                    return $this->redirect(['index', 'id' => $model->confirm_problem_id]);
+                    if ($project->save()){
+
+                        $response = $model;
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+
+                    }else{
+
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
+                }else{
+
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
+        return false;
     }
 
     /**

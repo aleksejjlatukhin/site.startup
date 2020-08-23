@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "gcp".
@@ -66,11 +67,10 @@ class Gcp extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['good', 'benefit', 'contrast',], 'required'],
-            [['title', 'good', 'benefit', 'contrast', 'description'], 'trim'],
-            [['confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id'], 'integer'],
+            [['title', 'description'], 'trim'],
+            [['confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string'],
-            [['title', 'good', 'benefit', 'contrast'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 255],
             [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
         ];
     }
@@ -84,12 +84,18 @@ class Gcp extends \yii\db\ActiveRecord
             'id' => 'ID',
             'confirm_problem_id' => 'Confirm Problem ID',
             'title' => 'Наименование ГЦП',
-            'good' => 'товар/услуга',
-            'benefit' => 'выгода',
-            'contrast' => 'с чем сравнивается',
             'description' => 'Формулировка ГЦП',
             'date_create' => 'Дата создания',
             'date_confirm' => 'Дата подтверждения'
+        ];
+    }
+
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }
