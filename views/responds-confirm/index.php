@@ -139,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         return '<div class="text-center">' . Html::a(
                                 Html::img(['@web/images/icons/next-step.png'], ['style' => ['width' => '20px']]),
-                                ['/respond/data-availability', 'id' => Yii::$app->request->get('id')],
+                                ['/responds-confirm/data-availability', 'id' => Yii::$app->request->get('id')],
                                 ['onclick'=>
                                     "$.ajax({
         
@@ -281,8 +281,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         'data-toggle' => 'modal',
                         'data-target' => "#information-table-responds",
                         'title' => 'Посмотреть описание',
-                    ]) . '
-</div>',
+                    ]) . '</div>',
+
                 'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
                 //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
                 //'footer' => '{export}',

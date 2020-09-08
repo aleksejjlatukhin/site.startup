@@ -45,7 +45,7 @@ class FormUpdateSegment extends Model
             [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c'], 'safe'],
             [['description', 'specialization_of_activity_b2b', 'company_products', 'company_partner'], 'string', 'max' => 255],
             [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
-            ['name', 'string', 'min' => 6, 'max' => 48],
+            ['name', 'string', 'min' => 6, 'max' => 65],
             ['name', 'uniqueName'],
             [['add_info'], 'string'],
             [['age_from', 'age_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '100'],
@@ -114,19 +114,9 @@ class FormUpdateSegment extends Model
             $segment = Segment::findOne($this->id);
             $segment->name = $this->name;
             $segment->description = $this->description;
-            //$segment->type_of_interaction_between_subjects = $this->type_of_interaction_between_subjects;
             $segment->add_info = $this->add_info;
 
             if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
-
-                /*$field_of_activity = TypeOfActivityB2C::findOne($this->field_of_activity_b2c);
-                $segment->field_of_activity = $field_of_activity->name;
-
-                $sort_of_activity = TypeOfActivityB2C::findOne($this->sort_of_activity_b2c);
-                $segment->sort_of_activity = $sort_of_activity->name;
-
-                $specialization_of_activity = TypeOfActivityB2C::findOne($this->specialization_of_activity_b2c);
-                $segment->specialization_of_activity = $specialization_of_activity->name;*/
 
                 $segment->age_from = $this->age_from;
                 $segment->age_to = $this->age_to;
@@ -142,20 +132,11 @@ class FormUpdateSegment extends Model
 
                 $segment->market_volume = $this->market_volume_b2c;
 
-                $segment->createRoadmap();
                 $this->updateDirName();
 
                 return $segment->save() ? $segment : null;
 
             }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
-
-                /*$field_of_activity = TypeOfActivityB2B::findOne($this->field_of_activity_b2b);
-                $segment->field_of_activity = $field_of_activity->name;
-
-                $sort_of_activity = TypeOfActivityB2B::findOne($this->sort_of_activity_b2b);
-                $segment->sort_of_activity = $sort_of_activity->name;
-
-                $segment->specialization_of_activity = $this->specialization_of_activity_b2b;*/
 
                 $segment->company_products = $this->company_products;
 
@@ -169,7 +150,6 @@ class FormUpdateSegment extends Model
 
                 $segment->market_volume = $this->market_volume_b2b;
 
-                $segment->createRoadmap();
                 $this->updateDirName();
 
                 return $segment->save() ? $segment : null;

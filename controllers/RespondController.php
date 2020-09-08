@@ -554,7 +554,10 @@ class RespondController extends AppController
                     $interview->save();
                 }
 
-                return $this->renderList($id = $interview->id);
+                $response = ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
             }
 
         }

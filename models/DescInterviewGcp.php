@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "desc_interview_gcp".
@@ -53,6 +54,15 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
             'responds_gcp_id' => 'Responds Gcp ID',
             'date_fact' => 'Дата Анкеты',
             'status' => 'Значимость предложения'
+        ];
+    }
+
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

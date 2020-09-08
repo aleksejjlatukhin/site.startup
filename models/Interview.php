@@ -166,23 +166,31 @@ class Interview extends \yii\db\ActiveRecord
 
         if ($data_responds == 0){
 
-            return Html::a('Начать', ['/respond/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+            return '<div style="font-weight: 700; margin: 25px 0 0 0;">Рекомендации</div>';
 
-        }elseif ($data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status >= $this->count_positive){
+        }elseif ($data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status >= $this->count_positive && ($this->segment->exist_confirm === null || $this->segment->exist_confirm === 0)){
 
-            return Html::a('Редактировать <span class="glyphicon glyphicon-pencil"></span>', ['/respond/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+            return Html::a('Завершить', ['/interview/exist-confirm', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
 
         }elseif (count($this->problems) != 0){
 
-            return Html::a('Редактировать <span class="glyphicon glyphicon-pencil"></span>', ['/respond/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+            return Html::a('Генерация ГПС', ['/generation-problem/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+
+        }elseif ($this->segment->exist_confirm === 1 && $data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status >= $this->count_positive){
+
+            return Html::a('Генерация ГПС', ['/generation-problem/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+
+        }elseif ($this->segment->exist_confirm === 0 && $data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status < $this->count_positive){
+
+            return '';
 
         }elseif ($data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status < $this->count_positive){
 
-            return Html::a('Добавить', ['/respond/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-danger', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+            return Html::a('Завершить', ['/interview/not-exist-confirm', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-danger', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
 
         }elseif ((count($this->problems) == 0) && ($data_responds != count($this->responds) || $data_interview != count($this->responds))){
 
-            return Html::a('Продолжить', ['/respond/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
+            return '<div style="font-weight: 700; margin: 25px 0 0 0;">Рекомендации</div>';
 
         }else{
 
@@ -290,11 +298,22 @@ class Interview extends \yii\db\ActiveRecord
         }
 
         if ($sumPositive < $this->count_positive && count($this->responds) == $data_desc){
-            return '<span id="messageAboutTheNextStep" class="text-danger">Недостаточное количество представителей сегмента</span>';
+            return '<span id="messageAboutTheNextStep" class="text-danger">Недостаточное количество представителей сегмента, добавьте новых респондентов или завершите подтверждение</span>';
         }
 
-        if ($this->count_positive <= $sumPositive && empty($this->problems) && $data_desc == count($this->responds)){
-            return '<span id="messageAboutTheNextStep" class="text-success">Переходите к генерации ГПС</span>';
+        if ($this->count_positive <= $sumPositive && empty($this->problems) && $data_desc == count($this->responds) && ($this->segment->exist_confirm === null || $this->segment->exist_confirm === 0)){
+            return '<span id="messageAboutTheNextStep" class="text-success">Завершите подтверждение и переходите к генерации ГПС</span>';
+        }
+
+        if (count($this->problems) != 0){
+
+            return '<span id="messageAboutTheNextStep" class="text-success">Перейдите на страницу генерации гипотез проблем сегмента</span>';
+        }
+
+        if ($this->segment->exist_confirm === 1 && $data_respond == count($this->responds) && $data_desc == count($this->responds) && $sumPositive >= $this->count_positive){
+
+            return '<span id="messageAboutTheNextStep" class="text-success">Перейдите на страницу генерации гипотез проблем сегмента</span>';
+
         }
     }
 

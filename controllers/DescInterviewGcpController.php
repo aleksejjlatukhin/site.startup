@@ -13,6 +13,7 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\DescInterviewGcp;
+use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -95,20 +96,7 @@ class DescInterviewGcpController extends AppController
 
     }
 
-    /**
-     * Lists all DescInterviewGcp models.
-     * @return mixed
-     */
-    /*public function actionIndex()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => DescInterviewGcp::find(),
-        ]);
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
-    }*/
 
     /**
      * Displays a single DescInterviewGcp model.
@@ -154,57 +142,54 @@ class DescInterviewGcpController extends AppController
 
         $respond = RespondsGcp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
+
+        $answers = $respond->answers;
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['responds-gcp/view', 'id' => $respond->id]);
-            }
-        }
+        if(Yii::$app->request->isAjax) {
 
+            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-        if (!empty($respond->descInterview)){
-            return $this->redirect(['view', 'id' => $respond->descInterview->id]);
-        }
+                foreach ($answers as $answer) {
+                    $answer->save(false);
+                }
 
-        if ($respond->name == null || $respond->info_respond == null){
-            Yii::$app->session->setFlash('error', "Необходимо заполнить данные о респонденте!");
-            return $this->redirect(['responds-gcp/view', 'id' => $id]);
-        }
+                if ($model->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save()) {
 
-            if ($model->save()) {
+                        if ($project->save()){
 
-                $project->update_at = date('Y:m:d');
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Анкета добавлена!");
-                    return $this->redirect(['responds-gcp/view', 'id' => $model->responds_gcp_id]);
+                            $response =  ['success' => true];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        } else {
+
+                            $response = ['error' => true];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        }
+                    }else {
+
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
-
-        return $this->render('create', [
-            'model' => $model,
-            'respond' => $respond,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**
@@ -219,48 +204,54 @@ class DescInterviewGcpController extends AppController
         $model = $this->findModel($id);
         $respond = RespondsGcp::find()->where(['id' => $model->responds_gcp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
+
+        $answers = $respond->answers;
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
+        if(Yii::$app->request->isAjax) {
 
+            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-        if ($model->load(Yii::$app->request->post())) {
+                foreach ($answers as $answer) {
+                    $answer->save(false);
+                }
 
-            if ($model->save()) {
+                if ($model->load(Yii::$app->request->post())) {
 
-                $project->update_at = date('Y:m:d');
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', "Анкета обновлена!");
-                    return $this->redirect(['responds-gcp/view', 'id' => $model->responds_gcp_id]);
+                    if ($model->save()) {
+
+                        if ($project->save()){
+
+                            $response =  ['success' => true];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        } else {
+
+                            $response = ['error' => true];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        }
+                    }else {
+
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-            'respond' => $respond,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**

@@ -37,6 +37,11 @@ class RespondsGcp extends \yii\db\ActiveRecord
         return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
     }
 
+    public function getAnswers()
+    {
+        return $this->hasMany(AnswersQuestionsConfirmGcp::class, ['respond_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -64,5 +69,40 @@ class RespondsGcp extends \yii\db\ActiveRecord
             'info_respond' => 'Данные респондента',
             'email' => 'Адрес электронной почты',
         ];
+    }
+
+
+    public function addAnswersForNewRespond()
+    {
+        $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $this->confirm_gcp_id])->all();
+
+        foreach ($questions as $question){
+
+            $answer = new AnswersQuestionsConfirmGcp();
+            $answer->question_id = $question->id;
+            $answer->respond_id = $this->id;
+            $answer->save();
+        }
+    }
+
+
+    public function listQuestions()
+    {
+        $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $this->confirm_gcp_id])->all();
+
+        $answers = $this->answers;
+
+        $listQuestions = '';
+
+        foreach ($questions as $i => $question){
+
+            $listQuestions .= '<p>' . ($i+1) . '. ' . $question->title . '</p><p style="padding-left: 15px;">' . $answers[$i]->answer . '</p>';
+
+            if (($i+1) != count($questions)){
+                $listQuestions .= '<hr>';
+            }
+        }
+
+        return $listQuestions;
     }
 }

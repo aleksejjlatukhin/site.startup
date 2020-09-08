@@ -397,7 +397,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             }
         }
 
-        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->problems) && $this->count_positive <= $count_positive)){
+        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->gcps) && $this->count_positive <= $count_positive)){
             return true;
         }else{
             return false;
@@ -446,7 +446,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         }
 
 
-        if ($this->count_positive <= $sumPositive && empty($this->gcps) && $data_desc == count($this->responds) && $this->problem->exist_confirm != 1 && empty($this->gcps)){
+        if ($this->count_positive <= $sumPositive && $data_desc == count($this->responds) && $this->problem->exist_confirm != 1 && empty($this->gcps)){
 
             if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
@@ -471,7 +471,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
             }else {
 
-                return '<div class="text-center text-warning" style="padding: 50px 0;">Пользователь пока не сгенерировал ни одной гипотезы ценностного предложения ' . $this->problem->title . '.</div>';
+                return '<div class="text-center text-warning" style="padding: 50px 0;">Пользователь пока не сгенерировал ни одной гипотезы ценностного предложения</div>';
             }
         }
 

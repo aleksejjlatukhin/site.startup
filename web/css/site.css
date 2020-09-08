@@ -11,9 +11,48 @@ body {
     margin-bottom: 70px;
 }
 
-.wrap > .container {
+.wrap > .container-fluid {
     padding: 70px 15px 20px;
 }
+
+/*Фон главного меню*/
+#main_menu {
+    background-color: #4F4F4F;
+    border-color: #4F4F4F;
+}
+/*Фон для ссылок главного меню*/
+.navbar-inverse .navbar-nav > .active > a {
+    background-color: #4F4F4F;
+}
+.navbar-inverse .navbar-nav > .active > a:hover {
+    background-color: #4F4F4F;
+}
+.navbar-inverse .navbar-nav > .active > a:focus {
+    background-color: #4F4F4F;
+}
+/*Фон для иконки личного кабинета*/
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: #4F4F4F;
+}
+/*Логотип*/
+.font_nav_menu_brand {
+    font-size: 32px;
+    padding-left: 50px;
+}
+.navbar-inverse .navbar-brand {
+    color: #ffffff;
+}
+/*Ссылки глвного меню*/
+.font_nav_menu_link {
+    font-size: 20px;
+    padding-right: 50px;
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: #ffffff;
+}
+
 
 .footer {
     position: absolute;
@@ -23,7 +62,7 @@ body {
     background-color: #f5f5f5;
     border-top: 1px solid #ddd;
 }
-.footer > .container > p {
+.footer > .container-fluid > p {
     padding-top: 20px;
     font-size: 15px;
 }
@@ -48,7 +87,6 @@ a.asc:after, a.desc:after {
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'Glyphicons Halflings';
     font-style: normal;
     font-weight: normal;
     line-height: 1;
@@ -120,3 +158,28 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+
+/*Скрытие стилей сортировки gridview - начало*/
+a.asc::after {
+    display: none;
+}
+a.desc::after {
+    display: none;
+}
+/*Скрытие стилей сортировки gridview - конец*/
+
+
+/*
+@media screen and (min-width:450px) {
+    .navbar-fixed-top .navbar-collapse, .navbar-static-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
+        padding-right: 50px;
+    }
+}
+
+
+@media screen and (min-width:100px) and (max-width:450px) {
+    .navbar-fixed-top .navbar-collapse, .navbar-static-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
+        padding-right: 0;
+    }
+}*/

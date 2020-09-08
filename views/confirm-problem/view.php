@@ -200,7 +200,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     //Заголовок для группы
                     'attribute' => 'count_respond',
-                    'label' => 'Количественные данные респондентов, которые участвуют в интервью ' .
+                    'label' => 'Количественные данные респондентов, которые участвуют в опросе ' .
                         Html::a('i', ['#'], [
                             'style' => [
                                 'margin-left' => '20px',
@@ -235,7 +235,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         [
                             'attribute' => 'count_positive',
-                            'label' => 'Количество респондентов, соответствующих сегменту:',
+                            'label' => 'Количество респондентов, подтверждающих проблему:',
                             'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
                             'valueColOptions' => ['class' => 'text-center', 'id' => 'count_positive-view'],
                             'type' => DetailView::INPUT_HTML5 ,
@@ -500,7 +500,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-3" style="margin-bottom: 10px; font-weight: 700;">
-                Подтверждение проблемы
+                Подтверждение гипотезы
             </div>
 
             <div class="col-md-9">
@@ -783,6 +783,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'status',
                     'headerOptions' => ['class' => 'text-center'],
                     'label' => 'Вывод о текущей проблеме',
+                    'header' => '<div style="padding: 5px; color: #4F4F4F;">Вывод о текущей проблеме</div>',
                     'value' => function($model){
 
                         if ($model->descInterview->status == 1){

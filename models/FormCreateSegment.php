@@ -51,7 +51,7 @@ class FormCreateSegment extends Model
             [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c'], 'integer'],
             [['description', 'specialization_of_activity_b2b', 'company_products', 'company_partner'], 'string', 'max' => 255],
             [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
-            ['name', 'string', 'min' => 6, 'max' => 48],
+            ['name', 'string', 'min' => 6, 'max' => 65],
             ['name', 'uniqueName'],
             [['add_info'], 'string'],
             [['age_from', 'age_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '100'],
@@ -136,6 +136,7 @@ class FormCreateSegment extends Model
                 $segment->market_volume = $this->market_volume_b2c;
 
                 $segment->createRoadmap();
+                $this->createDirName();
 
                 return $segment->save() ? $segment : null;
 
@@ -162,6 +163,7 @@ class FormCreateSegment extends Model
                 $segment->market_volume = $this->market_volume_b2b;
 
                 $segment->createRoadmap();
+                $this->createDirName();
 
                 return $segment->save() ? $segment : null;
             }
@@ -170,6 +172,40 @@ class FormCreateSegment extends Model
 
         return false;
     }
+
+
+    public function createDirName()
+    {
+        $project = Projects::findOne(['id' => $this->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
+
+        $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($this->name) , "windows-1251") . '/';
+        $segment_dir = mb_strtolower($segment_dir, "windows-1251");
+
+        if (!file_exists($segment_dir)){
+            mkdir($segment_dir, 0777);
+        }
+    }
+
+
+    public function translit($s)
+    {
+        $s = (string) $s; // преобразуем в строковое значение
+        $s = strip_tags($s); // убираем HTML-теги
+        $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
+        $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
+        $s = trim($s); // убираем пробелы в начале и конце строки
+        $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
+        $s = strtr($s, array('а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','ш'=>'sh','щ'=>'shch','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>''));
+        $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
+        $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
+        return $s; // возвращаем результат
+
+    }
+
 
     public function uniqueName($attr)
     {

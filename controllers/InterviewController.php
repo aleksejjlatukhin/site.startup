@@ -12,6 +12,7 @@ use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
+use app\models\UpdateRespondForm;
 use app\models\User;
 use Yii;
 use app\models\Interview;
@@ -66,6 +67,25 @@ class InterviewController extends AppController
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['save-interview'])){
+
+            $segment = Segment::findOne(Yii::$app->request->get());
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                if ($action->id == 'save-interview') {
+                    // ОТКЛЮЧАЕМ CSRF
+                    $this->enableCsrfValidation = false;
+                }
 
                 return parent::beforeAction($action);
 
@@ -148,7 +168,10 @@ class InterviewController extends AppController
     {
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+        $segment_name = str_replace(' ', '_', $segment->name);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project_filename = str_replace(' ', '_', $project->project_name);
+        $responds = Respond::find()->where(['interview_id' => $id])->all();
 
 
         //Выбор респондентов, которые являются представителями сегмента
@@ -170,6 +193,21 @@ class InterviewController extends AppController
         $dataProviderProblems = new ActiveDataProvider([
             'query' => GenerationProblem::find()->where(['interview_id' => $id]),
             'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+        $queryResponds = Respond::find()->where(['interview_id' => $id]);
+
+        $dataProviderQueryResponds = new ActiveDataProvider([
+            'query' => $queryResponds,
+            'pagination' => false,
+            //'pagination' => ['pageSize' => 10],
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_ASC,
@@ -206,23 +244,47 @@ class InterviewController extends AppController
         $newQuestion = new Questions();
         $newQuestion->interview_id = $id;
 
-        $newProblem = new GenerationProblem();
-        $newProblem->interview_id = $id;
-
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
+
+
+        $newRespond = new Respond();
+        $newRespond->interview_id = $model->id;
+
+        $updateRespondForms = [];
+        $createDescInterviewForms = [];
+        $updateDescInterviewForms = [];
+        foreach ($responds as $i => $respond) {
+
+            $updateRespondForms[] = new UpdateRespondForm($respond->id);
+
+            $createDescInterviewForms[] = new DescInterview();
+
+            $updateDescInterviewForms[] = $respond->descInterview;
+
+        }
+
+
+
 
         return $this->render('view', [
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
+            'responds' => $responds,
             'dataProviderRespondsPositive' => $dataProviderRespondsPositive,
             'dataProviderProblems' => $dataProviderProblems,
             'dataProviderResponds' => $dataProviderResponds,
+            'dataProviderQueryResponds' => $dataProviderQueryResponds,
             'dataProviderQuestions' => $dataProviderQuestions,
             'newQuestion' => $newQuestion,
-            'newProblem' => $newProblem,
-            'queryQuestions' => $queryQuestions
+            'newRespond' => $newRespond,
+            'queryQuestions' => $queryQuestions,
+            'updateRespondForms' => $updateRespondForms,
+            'createDescInterviewForms' => $createDescInterviewForms,
+            'updateDescInterviewForms' => $updateDescInterviewForms,
+            'project_filename' => $project_filename,
+            'segment_name' => $segment_name,
         ]);
     }
 
@@ -271,14 +333,7 @@ class InterviewController extends AppController
     public function actionCreate($id)
     {
         $segment = Segment::findOne($id);
-
-        if (empty($segment->creat_date)){
-            Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о сегменте!");
-            return $this->redirect(['segment/view', 'id' => $id]);
-        }
-
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
         $model = new Interview();
         $model->segment_id = $id;
         $user = User::find()->where(['id' => $project->user_id])->one();
@@ -293,68 +348,130 @@ class InterviewController extends AppController
             }
         }
 
+        if (empty($segment->creat_date)){
+
+            //Отсутствуют данные сегмента
+            return $this->redirect(['/segment/index', 'id' => $project->id]);
+        }
+
         $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
         if (!empty($modelInterview)){
-            return $this->redirect(['view', 'id' => $modelInterview->id]);
+
+            //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
+            return $this->redirect(['/interview/view', 'id' => $modelInterview->id]);
         }
 
-        if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->count_respond >= $model->count_positive){
-
-                if ($model->save()){
-
-                    $interviews_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/';
-                    if (!file_exists($interviews_dir)) {
-                        mkdir($interviews_dir, 0777);
-                    }
-
-                    $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/feedbacks/';
-                    if (!file_exists($feedbacks_dir)) {
-                        mkdir($feedbacks_dir, 0777);
-                    }
-
-                    $generation_problems_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                        mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/generation problems/';
-                    if (!file_exists($generation_problems_dir)) {
-                        mkdir($generation_problems_dir, 0777);
-                    }
-
-                    //Создание респондентов по заданному значению count_respond
-                    $model->createRespond();
-
-                    //Вопросы, которые будут добавлены по-умолчанию
-                    $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
-                    $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
-                    $model->addQuestionDefault('Вас беспокоит данная ситуация?');
-                    $model->addQuestionDefault('Что вы пытались с этим сделать?');
-                    $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
-                    $model->addQuestionDefault('Если ничего не делали, то почему?');
-                    $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
-                    $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
-                    $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
-                    $model->addQuestionDefault('Как принимается решение о покупке?');
-
-                    if ($project->save()) {
-
-                        return $this->redirect(['/interview/add-questions', 'id' => $model->id]);
-                    }
-                }
-            }else{
-                Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества респондентов соответствующих сенгменту!");
-            }
-        }
 
         return $this->render('create', [
             'model' => $model,
             'segment' => $segment,
             'project' => $project,
         ]);
+    }
+
+
+    public function actionSaveInterview($id)
+    {
+        $segment = Segment::findOne($id);
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = new Interview();
+        $model->segment_id = $id;
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['segment/view', 'id' => $segment->id]);
+            }
+        }
+
+        if (empty($segment->creat_date)){
+
+            //Отсутствуют данные сегмента
+            return $this->redirect(['/segment/index', 'id' => $project->id]);
+        }
+
+        $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
+        if (!empty($modelInterview)){
+
+            //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
+            return $this->redirect(['/interview/view', 'id' => $modelInterview->id]);
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->count_respond >= $model->count_positive){
+
+                    if ($model->save()){
+
+                        $interviews_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/';
+                        if (!file_exists($interviews_dir)) {
+                            mkdir($interviews_dir, 0777);
+                        }
+
+                        $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/feedbacks/';
+                        if (!file_exists($feedbacks_dir)) {
+                            mkdir($feedbacks_dir, 0777);
+                        }
+
+                        $generation_problems_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/generation problems/';
+                        if (!file_exists($generation_problems_dir)) {
+                            mkdir($generation_problems_dir, 0777);
+                        }
+
+                        //Создание респондентов по заданному значению count_respond
+                        $model->createRespond();
+
+                        //Вопросы, которые будут добавлены по-умолчанию
+                        $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
+                        $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
+                        $model->addQuestionDefault('Вас беспокоит данная ситуация?');
+                        $model->addQuestionDefault('Что вы пытались с этим сделать?');
+                        $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
+                        $model->addQuestionDefault('Если ничего не делали, то почему?');
+                        $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
+                        $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
+                        $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
+                        $model->addQuestionDefault('Как принимается решение о покупке?');
+
+                        $project->update_at = date('Y:m:d');
+
+                        if ($project->save()) {
+
+                            $response =  [
+                                'success' => true,
+                                'id' => $model->id,
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+
+                        }
+                    }
+                }else{
+
+                    $response =  [
+                        'error' => true,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+
+                }
+            }
+        }
     }
 
     //Страница со списком вопросов
@@ -392,7 +509,7 @@ class InterviewController extends AppController
     }
 
 
-    public function actionUpdateDataInterview ($id)
+    public function actionUpdate ($id)
     {
         $model = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -492,7 +609,7 @@ class InterviewController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    /*public function actionUpdate($id)
     {
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -576,7 +693,7 @@ class InterviewController extends AppController
             'project' => $project,
             'newQuestions' => $newQuestions,
         ]);
-    }
+    }*/
 
 
     //Метод для добавления новых вопросов
@@ -644,6 +761,44 @@ class InterviewController extends AppController
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;
+            }
+        }
+    }
+
+
+    public function actionNotExistConfirm($id)
+    {
+        $model = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $segment->exist_confirm = 0;
+        $segment->date_time_confirm = date('Y-m-d H:i:s');
+
+        if ($segment->save()){
+
+            $project->update_at = date('Y:m:d');
+            if ($project->save()){
+                return $this->redirect(['/segment/index', 'id' => $project->id]);
+            }
+        }
+    }
+
+
+    public function actionExistConfirm($id)
+    {
+        $model = Interview::findOne($id);
+        $segment = Segment::find()->where(['id' => $model->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $segment->exist_confirm = 1;
+        $segment->date_time_confirm = date('Y-m-d H:i:s');
+
+        if ($segment->save()){
+
+            $project->update_at = date('Y:m:d');
+            if ($project->save()){
+                return $this->redirect(['/interview/view', 'id' => $id]);
             }
         }
     }

@@ -38,7 +38,7 @@ class RespondsConfirmController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'create') {
+                if ($action->id == 'update') {
                     // ОТКЛЮЧАЕМ CSRF
                     $this->enableCsrfValidation = false;
                 }
@@ -414,6 +414,7 @@ class RespondsConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
 
 
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
@@ -439,7 +440,6 @@ class RespondsConfirmController extends AppController
                         $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
                         $confirmProblem->save();
 
-                        $project->update_at = date('Y:m:d');
                         if ($project->save()) {
 
                             $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
@@ -482,6 +482,8 @@ class RespondsConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->update_at = date('Y:m:d');
+
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
@@ -502,7 +504,6 @@ class RespondsConfirmController extends AppController
 
                     if ($updateRespondForm->updateRespond($model)){
 
-                        $project->update_at = date('Y:m:d');
                         if ($project->save()){
 
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -542,7 +543,7 @@ class RespondsConfirmController extends AppController
 
         if ($confirmProblem->count_respond == $confirmProblem->count_positive){
 
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
+            Yii::$app->session->setFlash('error', "Общее количество респондентов не должно быть меньше количества респондентов подтверждающих проблему!");
             return $this->redirect(['/responds-confirm/index', 'id' => $confirmProblem->id]);
         }
 

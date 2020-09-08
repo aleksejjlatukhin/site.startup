@@ -595,57 +595,101 @@ progress.info-red::-moz-progress-bar{
 /* Style the tab */
 .tab {
     overflow: hidden;
-    /*border: 1px solid rgb(52,122,182);*/
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#347ab6+0,347ab6+100 */
-    /*background: rgb(52,122,182);*/ /* Old browsers */
-    /*background: -moz-linear-gradient(left,  rgba(52,122,182,1) 0%, rgba(52,122,182,1) 100%);*/ /* FF3.6-15 */
-    /*background: -webkit-linear-gradient(left,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%);*/ /* Chrome10-25,Safari5.1-6 */
-    /*background: linear-gradient(to right,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%);*/ /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#347ab6', endColorstr='#347ab6',GradientType=1 );*/ /* IE6-9 */
-    background: #707F99;
+    padding: 0;
+    margin-top: 10px;
 }
-
-
 /* Style the buttons that are used to open the tab content */
 .tab button {
-    /*width: 25%;*/
-    background-color: inherit;
-    font-weight: 700;
-    color: #F2F2F2;
+    width: 20%;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+    height: 50px;
+    overflow: hidden;
+    background: #828282;
+    color: #ffffff;
     float: left;
-    border: none;
+    border: 1px solid #F2F2F2;
     outline: none;
     cursor: pointer;
-    padding: 12px 16px;
     transition: 0.3s;
 }
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-    background-color: #ddd;
-    color: #4F4F4F;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#707f99+0,707f99+100 */
+    background: #707f99; /* Old browsers */
+    background: -moz-linear-gradient(top,  #707f99 0%, #707f99 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #707f99 0%,#707f99 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #707f99 0%,#707f99 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707f99', endColorstr='#707f99',GradientType=0 ); /* IE6-9 */
+    color: #ffffff;
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
-    /*background-color: #ccc;*/
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f1f1f1+0,f1f1f1+100 */
-    background: rgb(241,241,241); /* Old browsers */
-    background: -moz-linear-gradient(left,  rgba(241,241,241,1) 0%, rgba(241,241,241,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(241,241,241,1) 0%,rgba(241,241,241,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(241,241,241,1) 0%,rgba(241,241,241,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#f1f1f1',GradientType=1 ); /* IE6-9 */
-
-    color: #2b2b2b;
+    background: #707f99; /* Old browsers */
+    background: -moz-linear-gradient(top,  #707f99 0%, #707f99 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #707f99 0%,#707f99 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #707f99 0%,#707f99 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707f99', endColorstr='#707f99',GradientType=0 ); /* IE6-9 */
+    color: #ffffff;
+    overflow: hidden;
+    float: left;
+    border: 1px solid #F2F2F2;
+    outline: none;
+    cursor: pointer;
 }
 
 /* Style the tab content */
 .tabcontent {
     display: none;
-    padding: 0;
+    /*padding: 0;
     margin-bottom: 20px;
     border: 1px solid #ccc;
-    border-top: none;
+    border-top: none;*/
+}
+
+@media screen and (max-width: 1140px) {
+
+    .tab button {
+        width: 50%;
+        border-radius: 0;
+    }
+
+    .tab button:last-child {
+        width: 100%;
+    }
+
+    .step_five_button > .link_create_interview-block_text > .link_create_interview-text_left {
+        width: 42%;
+        text-align: right;
+        padding-right: 20px;
+    }
+
+    .step_five > .link_create_interview-text_left {
+        width: 42%;
+        text-align: right;
+        padding-right: 20px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .tab button {
+        width: 100%;
+    }
+
+    .step_five_button > .link_create_interview-block_text > .link_create_interview-text_left {
+        width: 100px;
+        text-align: left;
+        padding-left: 0;
+    }
+
+    .step_five > .link_create_interview-text_left {
+        width: 100px;
+        text-align: left;
+        padding-left: 0;
+    }
 }
 
 /*
@@ -660,48 +704,82 @@ progress.info-red::-moz-progress-bar{
 
 .block-link-create-interview {
     padding: 0;
-    margin: 0;
+    margin-top: 10px;
+    /*font-family: 'RobotoCondensed-Regular', serif;
+    font-size: 16px;*/
+}
+
+.link_create_interview {
+    width: 20%;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+    height: 50px;
+}
+
+@media screen and (max-width: 1140px) {
+
+    .link_create_interview {
+        width: 50%;
+        border-radius: 0;
+    }
+
+    .link_create_interview:last-child {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .link_create_interview {
+        width: 100%;
+    }
 }
 
 .link_active_create_interview {
-    background: rgb(241,241,241); /* Old browsers */
-    background: -moz-linear-gradient(left,  rgba(241,241,241,1) 0%, rgba(241,241,241,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(241,241,241,1) 0%,rgba(241,241,241,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(241,241,241,1) 0%,rgba(241,241,241,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#f1f1f1',GradientType=1 ); /* IE6-9 */
-    color: #2b2b2b;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#707f99+0,707f99+100 */
+    background: #707f99; /* Old browsers */
+    background: -moz-linear-gradient(top,  #707f99 0%, #707f99 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #707f99 0%,#707f99 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #707f99 0%,#707f99 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707f99', endColorstr='#707f99',GradientType=0 ); /* IE6-9 */
+    color: #ffffff;
     overflow: hidden;
-    font-weight: 700;
     float: left;
-    border: none;
+    border: 1px solid #F2F2F2;
     outline: none;
     cursor: pointer;
-    padding: 12px 16px;
 }
 
 .link_passive_create_interview {
-    /*overflow: hidden;*/
-    background: #707F99;
-    font-weight: 700;
-    color: #F2F2F2;
+    background: #828282;
+    color: #ffffff;
     float: left;
-    border: none;
+    border: 1px solid #F2F2F2;
     outline: none;
     cursor: pointer;
-    padding: 12px 16px;
     transition: 0.3s;
 }
 
-.link_passive_create_interview:hover {
-    background-color: #ddd;
-    color: #4F4F4F;
-    cursor: pointer;
+.link_create_interview-block_text {
+    display:flex;
+    align-items: center;
+}
+
+.link_create_interview-text_left {
+    width: 100px;
+    font-size: 20px;
+    text-align: left;
+}
+
+.link_create_interview-text_right {
+    line-height: 16px;
 }
 
 /*
 Стилизация подобия вкладок на странице "Создание Программы генерации ГПС"
 ---Конец--
 */
+
 
 /*
 Кватратики результата подтверждения ГMVP (mvp/index)
@@ -947,19 +1025,7 @@ progress.info-red::-moz-progress-bar{
 */
 
 
-/* /interview/view - таблица (Шаг 2)
----Начало---
-*/
 
-.step_two{
-    background-color: #F2F2F2;
-    padding: 10px;
-    margin: 0;
-}
-
-/* /interview/view - таблица (Шаг 2)
----Конец---
-*/
 
 /*
 Стилизация предупреждений валидации форм добавления и выбора вопроса

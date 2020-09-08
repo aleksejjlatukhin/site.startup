@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\widgets\DetailView;
 
 /**
@@ -323,14 +324,15 @@ class Segment extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['created_at', 'update_at', 'date_time_confirm'], 'safe'],
             [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'description', 'specialization_of_activity'], 'trim'],
-            [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer'], 'integer'],
+            [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm'], 'integer'],
             [['age_from', 'age_to'], 'integer'],
             [['income_from', 'income_to'], 'integer'],
             [['quantity_from', 'quantity_to'], 'integer'],
             [['market_volume'], 'integer'],
             [['add_info'], 'string'],
-            [['name',], 'string', 'min' => 6, 'max' => 48],
+            [['name',], 'string', 'min' => 6, 'max' => 65],
             [['field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'description', 'company_products', 'company_partner'], 'string', 'max' => 255],
             [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
@@ -389,5 +391,14 @@ class Segment extends \yii\db\ActiveRecord
             $this->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
             $this->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
         }
+    }
+
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
+        ];
     }
 }

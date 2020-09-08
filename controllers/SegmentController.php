@@ -14,6 +14,7 @@ use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
+use app\models\SegmentSearch;
 use app\models\TypeOfActivityB2B;
 use app\models\TypeOfActivityB2C;
 use app\models\User;
@@ -63,9 +64,9 @@ class SegmentController extends AppController
 
         }elseif (in_array($action->id, ['index']) || in_array($action->id, ['roadmap'])){
 
-            $project = Projects::findOne(Yii::$app->request->get());
+            $project = Projects::findOne(Yii::$app->request->get('id'));
 
-            /*Ограничение доступа к проэктам пользователя*/
+            //Ограничение доступа к проэктам пользователя
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
@@ -105,14 +106,68 @@ class SegmentController extends AppController
      */
     public function actionIndex($id)
     {
+        //Установить статус подтверждения и время для всех сегментов
+        /*$allSegments = Segment::find()->all();
+        foreach ($allSegments as $segment){
+
+            $data_responds = 0;
+            $data_interview = 0;
+            $data_interview_status = 0;
+
+            if ($interview = $segment->interview) {
+
+                foreach ($interview->responds as $respond){
+
+                    if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
+                        $data_responds++;
+
+                        if (!empty($respond->descInterview)){
+                            $data_interview++;
+
+                            if ($respond->descInterview->status == 1){
+                                $data_interview_status++;
+                            }
+                        }
+                    }
+                }
+
+                if ($data_responds == 0){
+                    $segment->exist_confirm = null;
+                }elseif ($data_responds == count($segment->interview->responds) && $data_interview == count($segment->interview->responds) && $data_interview_status >= $segment->interview->count_positive){
+                    $segment->exist_confirm = 1;
+                    $segment->date_time_confirm = date('Y-m-d H:i:s');
+                }elseif (count($segment->interview->problems) != 0){
+                    $segment->exist_confirm = 1;
+                    $segment->date_time_confirm = date('Y-m-d H:i:s');
+                }elseif ($data_responds == count($segment->interview->responds) && $data_interview == count($segment->interview->responds) && $data_interview_status < $segment->interview->count_positive){
+                    $segment->exist_confirm = 0;
+                    $segment->date_time_confirm = date('Y-m-d H:i:s');
+                }elseif ((count($segment->interview->problems) == 0) && ($data_responds != count($segment->interview->responds) || $data_interview != count($segment->interview->responds))){
+                    $segment->exist_confirm = null;
+                }else{
+                    $segment->exist_confirm = null;
+                }
+                $segment->save();
+            }
+        }*/
+
+
+
 
         $project = Projects::findOne($id);
         $user = User::find()->where(['id' => $project->user_id])->one();
         $models = Segment::findAll(['project_id' => $project->id]);
+        $searchModel = new SegmentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $newSegment = new FormCreateSegment();
+        $updateSegments = [];
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => Segment::find()->where(['project_id' => $id]),
-        ]);
+        foreach ($models as $model){
+
+            $updateSegments[] = new FormUpdateSegment($model->id);
+        }
+
+
 
 
         //Проверка и создание необходимых папок на сервере --- начало ---
@@ -136,7 +191,11 @@ class SegmentController extends AppController
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
             'project' => $project,
+            'newSegment' => $newSegment,
+            'updateSegments' => $updateSegments,
+            'models' => $models,
         ]);
     }
 
@@ -469,6 +528,17 @@ class SegmentController extends AppController
         $project->update_at = date('Y:m:d');
 
         $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['/segment/index', 'id' => $project->id]);
+            }
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -483,20 +553,10 @@ class SegmentController extends AppController
 
                         if ($model->validate()) {
 
-                            //Создание дирректории для сегмента на сервере ---начало---
-                            $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
-
-                            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-                            $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-                            if (!file_exists($segment_dir)){
-                                mkdir($segment_dir, 0777);
-                            }
-                            //Создание дирректории для сегмента на сервере ---конец---
-
                             if ($model->create()) {
+
                                 if ($project->save()){
+
                                     $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
 
                                     $response =  ['success' => true, 'new_segment_id' => $new_segment->id];
@@ -534,23 +594,17 @@ class SegmentController extends AppController
 
                         if ($model->validate()) {
 
-                            //Создание дирректории для сегмента на сервере ---начало---
-                            $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
-
-                            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-                            $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-                            if (!file_exists($segment_dir)){
-                                mkdir($segment_dir, 0777);
-                            }
-                            //Создание дирректории для сегмента на сервере ---конец---
-
                             if ($model->create()) {
+
                                 if ($project->save()){
+
                                     $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
 
-                                    $response =  ['success' => true, 'new_segment_id' => $new_segment->id];
+                                    $response =  [
+                                        'success' => true,
+                                        'new_segment_id' => $new_segment->id,
+                                        'project_id' => $project->id
+                                    ];
                                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                                     \Yii::$app->response->data = $response;
                                     return $response;
@@ -693,7 +747,7 @@ class SegmentController extends AppController
             //Действие доступно только проектанту, который создал данную модель
             if ($user->id != $_user['id']){
                 Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['/segment/view', 'id' => $segment->id]);
+                return $this->redirect(['/segment/index', 'id' => $project->id]);
             }
         }
 
@@ -713,6 +767,7 @@ class SegmentController extends AppController
                         if ($model->validate()) {
 
                             if ($model->update()) {
+
                                 if ($project->save()){
 
                                     $response =  ['success' => true, 'model_id' => $model->id];
@@ -747,6 +802,7 @@ class SegmentController extends AppController
                         if ($model->validate()) {
 
                             if ($model->update()) {
+
                                 if ($project->save()){
 
                                     $response =  ['success' => true, 'model_id' => $model->id];
@@ -763,14 +819,14 @@ class SegmentController extends AppController
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }
-                } else {
+                    } else {
 
-                    //Данные не загружены
-                    $response =  ['data_not_loaded' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                        //Данные не загружены
+                        $response =  ['data_not_loaded' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }

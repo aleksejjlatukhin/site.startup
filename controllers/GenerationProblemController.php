@@ -68,10 +68,21 @@ class GenerationProblemController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                /*if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }*/
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['index'])){
+
+            $interview = Interview::findOne(Yii::$app->request->get());
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -89,16 +100,51 @@ class GenerationProblemController extends AppController
      * Lists all GenerationProblem models.
      * @return mixed
      */
-    /*public function actionIndex()
+    public function actionIndex($id)
     {
+
+        $interview = Interview::find()->with('questions')->where(['id' => $id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
         $dataProvider = new ActiveDataProvider([
-            'query' => GenerationProblem::find(),
+            'query' => GenerationProblem::find()->where(['interview_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
         ]);
+
+        //Выбор респондентов, которые являются представителями сегмента
+        $dataProviderRespondsPositive = new ActiveDataProvider([
+            'query' => Respond::find()->with('descInterview')
+                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                ->where(['interview_id' => $id, 'desc_interview.status' => '1']),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+        $newProblem = new GenerationProblem();
+        $newProblem->interview_id = $id;
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'dataProviderRespondsPositive' => $dataProviderRespondsPositive,
+            'newProblem' => $newProblem,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
         ]);
-    }*/
+    }
 
     /**
      * Displays a single GenerationProblem model.
@@ -256,7 +302,7 @@ class GenerationProblemController extends AppController
                 $project->update_at = date('Y:m:d');
                 if ($project->save()){
 
-                    return $this->redirect(['/interview/view', 'id' => $id]);
+                    return $this->redirect(['/generation-problem/index', 'id' => $id]);
                 }
             }
         }

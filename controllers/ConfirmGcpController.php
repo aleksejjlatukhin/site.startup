@@ -7,6 +7,7 @@ use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
+use app\models\QuestionsConfirmGcp;
 use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
 use app\models\Segment;
@@ -108,21 +109,6 @@ class ConfirmGcpController extends AppController
 
         $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
 
-        foreach ($responds as $respond){
-            if (!empty($respond->name) && !empty($respond->info_respond)){
-                $respond->exist_respond = 1;
-            }else{
-                $respond->exist_respond = 0;
-            }
-        }
-
-        foreach ($responds as $respond){
-            if (!empty($respond->descInterview->date_fact) && !empty($respond->descInterview->description)){
-                $respond->descInterview->exist_desc = 1;
-            }
-        }
-
-
         $data_responds = 0;
         $data_desc = 0;
         foreach ($responds as $respond){
@@ -138,6 +124,37 @@ class ConfirmGcpController extends AppController
         }
 
 
+        $dataProviderResponds = new ActiveDataProvider([
+            'query' => RespondsGcp::find()->where(['confirm_gcp_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'name' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+        $dataProviderQuestions = new ActiveDataProvider([
+            'query' => QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'title' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+
+        $newQuestion = new QuestionsConfirmGcp();
+        $newQuestion->confirm_gcp_id = $id;
+
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $model->queryQuestionsGeneralList();
+
+
         return $this->render('view', [
             'model' => $model,
             'gcp' => $gcp,
@@ -149,6 +166,10 @@ class ConfirmGcpController extends AppController
             'responds' => $responds,
             'data_responds' => $data_responds,
             'data_desc' => $data_desc,
+            'dataProviderResponds' => $dataProviderResponds,
+            'dataProviderQuestions' => $dataProviderQuestions,
+            'newQuestion' => $newQuestion,
+            'queryQuestions' => $queryQuestions,
         ]);
     }
 
@@ -170,7 +191,7 @@ class ConfirmGcpController extends AppController
 
             $project->update_at = date('Y:m:d');
             if ($project->save()){
-                return $this->redirect(['gcp/index', 'id' => $confirmProblem->id]);
+                return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
             }
         }
     }
@@ -194,7 +215,7 @@ class ConfirmGcpController extends AppController
 
             $project->update_at = date('Y:m:d');
             if ($project->save()){
-                return $this->redirect(['mvp/create', 'id' => $model->id]);
+                return $this->redirect(['/mvp/index', 'id' => $model->id]);
             }
         }
     }
@@ -206,15 +227,16 @@ class ConfirmGcpController extends AppController
      */
     public function actionCreate($id)
     {
+        $model = new ConfirmGcp();
+        $model->gcp_id = $id;
+
         $gcp = Gcp::find()->where(['id' => $id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $model = new ConfirmGcp();
-        $model->gcp_id = $id;
-
+        $project->update_at = date('Y:m:d');
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -241,23 +263,12 @@ class ConfirmGcpController extends AppController
 
         $model->count_respond = count($respondsPre);
 
+
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->count_respond >= $model->count_positive){
 
                 if ($model->save()) {
-
-                    foreach ($responds as $respond) {
-                        if ($respond->descInterview->status == 1){
-
-                            $respondConfirm = new RespondsGcp();
-                            $respondConfirm->confirm_gcp_id = $model->id;
-                            $respondConfirm->name = $respond->name;
-                            $respondConfirm->info_respond = $respond->info_respond;
-                            $respondConfirm->email = $respond->email;
-                            $respondConfirm->save();
-                        }
-                    }
 
                     $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -271,12 +282,19 @@ class ConfirmGcpController extends AppController
                         mkdir($feedbacks_dir, 0777);
                     }
 
-                    $project->update_at = date('Y:m:d');
+
+                    //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
+                    $model->createRespondConfirm($responds);
+
+                    //Вопросы, которые будут добавлены по-умолчанию
+                    $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
+                    $model->addQuestionDefault('Как принимается решение о покупке?');
+
+
 
                     if ($project->save()){
 
-                        Yii::$app->session->setFlash('success', "Данные для подтверждения загружены");
-                        return $this->redirect(['view', 'id' => $model->id]);
+                        return $this->redirect(['/confirm-gcp/add-questions', 'id' => $model->id]);
                     }
                 }
             }else{
@@ -294,6 +312,198 @@ class ConfirmGcpController extends AppController
             'project' => $project,
         ]);
     }
+
+
+
+    //Страница со списком вопросов
+    public function actionAddQuestions($id)
+    {
+        $confirmGcp = ConfirmGcp::findOne($id);
+        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $problem->interview_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+
+        $dataProviderQuestions = new ActiveDataProvider([
+            'query' => QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $id]),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                    //'title' => SORT_ASC,
+                ]
+            ],
+        ]);
+
+        $newQuestion = new QuestionsConfirmGcp();
+        $newQuestion->confirm_gcp_id = $id;
+
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $confirmProblem->queryQuestionsGeneralList();
+
+        return $this->render('add-questions', [
+            'dataProviderQuestions' => $dataProviderQuestions,
+            'newQuestion' => $newQuestion,
+            'queryQuestions' => $queryQuestions,
+            'confirmGcp' => $confirmGcp,
+            'gcp' => $gcp,
+            'confirmProblem' => $confirmProblem,
+            'problem' => $problem,
+            'interview' => $interview,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+
+    //Метод для добавления новых вопросов
+    public function actionAddQuestion($id)
+    {
+        $model = new QuestionsConfirmGcp();
+        $model->confirm_gcp_id = $id;
+        $confirmGcp = ConfirmGcp::findOne($id);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+
+        if ($model->load(Yii::$app->request->post())){
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->save()){
+
+                    $confirmGcpNew = ConfirmGcp::findOne($id);
+                    $showListQuestions = $confirmGcpNew->showListQuestions;
+                    $questions = $confirmGcpNew->questions;
+
+                    //Создание пустого ответа для нового вопроса для каждого респондента
+                    $confirmGcpNew->addAnswerConfirmGcp($model->id);
+                    //Добавляем вопрос в общую базу вопросов
+                    $confirmGcpNew->addQuestionToGeneralList($model->title);
+                    //Передаем обновленный список вопросов для добавления в программу
+                    $queryQuestions = $confirmGcpNew->queryQuestionsGeneralList();
+
+                    $project->update_at = date('Y:m:d');
+                    $project->save();
+
+                    $response = [
+                        'model' => $model,
+                        'questions' => $questions,
+                        'queryQuestions' => $queryQuestions,
+                        'showListQuestions' => $showListQuestions,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
+
+    public function actionDeleteQuestion($id)
+    {
+        $model = QuestionsConfirmGcp::findOne($id);
+        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+
+        if(Yii::$app->request->isAjax) {
+
+            if ($model->delete()){
+
+                $project->update_at = date('Y:m:d');
+                $project->save();
+
+                $confirmGcpNew = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
+                $showListQuestions = $confirmGcpNew->showListQuestions;
+                $questions = $confirmGcpNew->questions;
+
+                //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
+                $confirmGcpNew->deleteAnswerConfirmGcp($id);
+
+                //Передаем обновленный список вопросов для добавления в программу
+                $queryQuestions = $confirmGcpNew->queryQuestionsGeneralList();
+
+                $response = [
+                    'showListQuestions' => $showListQuestions,
+                    'questions' => $questions,
+                    'queryQuestions' => $queryQuestions,
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+    }
+
+
+
+    public function actionUpdateDataInterview ($id)
+    {
+        $model = ConfirmGcp::findOne($id);
+        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::find()->where(['id' => $project->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Действие доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->count_respond >= $model->count_positive){
+
+                    if ($model->save()){
+
+                        $project->update_at = date('Y:m:d');
+
+                        if ($project->save()){
+
+                            $descInterviews = [];
+                            foreach ($model->responds as $respond) {
+                                if($respond->descInterview) {
+                                    $descInterviews[] = $respond->descInterview;
+                                }
+                            }
+
+                            $response = [
+                                'model' => $model,
+                                'responds' => $model->responds,
+                                'descInterviews' => $descInterviews,
+                                'mvps' => $model->mvps,
+                                'gcp' => $gcp,
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
+                        }
+                    }
+                }else{
+
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
 
     /**
      * Updates an existing ConfirmGcp model.

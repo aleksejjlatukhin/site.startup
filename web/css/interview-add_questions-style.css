@@ -1,0 +1,89 @@
+.interview-add-questions {
+
+}
+
+.project_name_link {
+    /*color: #F2F2F2;*/
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 8px 10px;
+}
+.segment_header_links {
+    /*color: #F2F2F2;*/
+    color: #ffffff;
+    padding: 10px;
+    /*font-size: 16px;*/
+    text-decoration: none;
+}
+.segment_header_links:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+.segment_header_links:visited {
+    color: #ffffff;
+    text-decoration: none;
+}
+.segment_header_links:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.add_new_question_button {
+    font-size: 15px;
+    padding: 5px;
+    color: #52BE7F;
+    text-decoration: none;
+}
+.add_new_question_button:hover {
+    color: #52BE7F;
+    text-decoration: none;
+}
+.add_new_question_button:visited {
+    color: #52BE7F;
+    text-decoration: none;
+}
+.add_new_question_button:focus {
+    color: #52BE7F;
+    text-decoration: none;
+}
+
+.header-table {
+    background: #707F99;
+    border-radius: 3px 3px 0 0;
+    padding: 7px 0;
+}
+
+@media screen and (min-width: 1140px) {
+    .segment_header_links {
+        text-align: right;
+    }
+}
+
+@media screen and (max-width: 1140px) {
+
+    .project_name_link {
+        text-align: center;
+    }
+
+    .segment_header_links {
+        text-align: center;
+        padding: 0 10px 15px 10px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .segment_header_links {
+        text-align: center;
+        padding: 0 10px 5px 10px;
+    }
+
+    .project_info_data > .segment_header_links:last-child {
+        padding-bottom: 15px;
+    }
+
+    .segment_info_data > .segment_header_links:last-child {
+        padding-bottom: 15px;
+    }
+}
