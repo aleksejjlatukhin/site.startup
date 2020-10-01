@@ -23,6 +23,8 @@ use app\models\Segment;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\SortForm;
+use app\models\SegmentSort;
 
 /**
  * SegmentController implements the CRUD actions for Segment model.
@@ -106,53 +108,6 @@ class SegmentController extends AppController
      */
     public function actionIndex($id)
     {
-        //Установить статус подтверждения и время для всех сегментов
-        /*$allSegments = Segment::find()->all();
-        foreach ($allSegments as $segment){
-
-            $data_responds = 0;
-            $data_interview = 0;
-            $data_interview_status = 0;
-
-            if ($interview = $segment->interview) {
-
-                foreach ($interview->responds as $respond){
-
-                    if (!empty($respond->name) && !empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
-                        $data_responds++;
-
-                        if (!empty($respond->descInterview)){
-                            $data_interview++;
-
-                            if ($respond->descInterview->status == 1){
-                                $data_interview_status++;
-                            }
-                        }
-                    }
-                }
-
-                if ($data_responds == 0){
-                    $segment->exist_confirm = null;
-                }elseif ($data_responds == count($segment->interview->responds) && $data_interview == count($segment->interview->responds) && $data_interview_status >= $segment->interview->count_positive){
-                    $segment->exist_confirm = 1;
-                    $segment->date_time_confirm = date('Y-m-d H:i:s');
-                }elseif (count($segment->interview->problems) != 0){
-                    $segment->exist_confirm = 1;
-                    $segment->date_time_confirm = date('Y-m-d H:i:s');
-                }elseif ($data_responds == count($segment->interview->responds) && $data_interview == count($segment->interview->responds) && $data_interview_status < $segment->interview->count_positive){
-                    $segment->exist_confirm = 0;
-                    $segment->date_time_confirm = date('Y-m-d H:i:s');
-                }elseif ((count($segment->interview->problems) == 0) && ($data_responds != count($segment->interview->responds) || $data_interview != count($segment->interview->responds))){
-                    $segment->exist_confirm = null;
-                }else{
-                    $segment->exist_confirm = null;
-                }
-                $segment->save();
-            }
-        }*/
-
-
-
 
         $project = Projects::findOne($id);
         $user = User::find()->where(['id' => $project->user_id])->one();
@@ -166,8 +121,6 @@ class SegmentController extends AppController
 
             $updateSegments[] = new FormUpdateSegment($model->id);
         }
-
-
 
 
         //Проверка и создание необходимых папок на сервере --- начало ---
@@ -188,6 +141,9 @@ class SegmentController extends AppController
         }
         //Проверка и создание необходимых папок на сервере --- конец ---
 
+        //Модель сортировки
+        $sortModel = new SortForm();
+
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -196,6 +152,7 @@ class SegmentController extends AppController
             'newSegment' => $newSegment,
             'updateSegments' => $updateSegments,
             'models' => $models,
+            'sortModel' => $sortModel,
         ]);
     }
 
@@ -525,7 +482,7 @@ class SegmentController extends AppController
         $model->project_id = $id;
 
         $project = Projects::find()->where(['id' => $model->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
 
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
@@ -639,6 +596,25 @@ class SegmentController extends AppController
     }
 
 
+    public function actionListTypeSort()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        if (isset($_POST['depdrop_parents'])) {
+
+            $parents = $_POST['depdrop_parents'];
+
+            if ($parents != null && $parents[0] != 0) {
+
+                $cat_id = $parents[0];
+                $out = SegmentSort::getListTypes($cat_id);
+                return ['output' => $out, 'selected' => ''];
+            }
+        }
+        return ['output' => '', 'selected' => ''];
+    }
+
+
     public function actionListOfActivitiesForSelectedAreaB2c()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -737,7 +713,7 @@ class SegmentController extends AppController
     {
         $segment = $this->findModel($id);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -830,12 +806,6 @@ class SegmentController extends AppController
                 }
             }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-            'project' => $project,
-            'segment' => $segment,
-        ]);
     }
 
     /**
@@ -858,7 +828,7 @@ class SegmentController extends AppController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $interview = Interview::find()->where(['segment_id' => $model->id])->one();
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();

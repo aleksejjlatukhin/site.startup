@@ -27,7 +27,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap table-project-kartik">
+<div class="wrap">
 
     <div class="" style="margin-bottom: -20px;">
 
@@ -71,11 +71,10 @@ AppAsset::register($this);
             'items' => [
                 ['label' => 'Главная', 'url' => ['/']],
                 ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
-                ['label' => 'О проекте', 'url' => ['/site/#']],
-                //['label' => 'Сообщения', 'url' => ['/message/view', 'id' => $conversation->id]],
+                ['label' => 'О сервисе', 'url' => ['/site/#']],
 
                 !Yii::$app->user->isGuest ? ([
-                    'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '35px', 'padding' => '0', 'margin' => '-10px 0']]),
+                    'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
                     'items' => [
                         ['label' => 'Мой профиль', 'url' => Url::to(['/site/profile', 'id' => Yii::$app->user->identity['id']])],
                         /*'<li class="divider" style="padding: 0; margin: 0;"></li>',*/
@@ -83,6 +82,8 @@ AppAsset::register($this);
                         ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
                     ],
                 ]) : (''),
+
+                ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/message/view', 'id' => $conversation->id]],
             ],
             'encodeLabels' => false,
         ]);
@@ -237,7 +238,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container-fluid">
-        <p class="pull-left">&copy; Spaccel <?= date('Y') ?></p>
+        <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
 
         <!--<p class="pull-right"><?/*= Yii::powered() */?></p>-->
     </div>

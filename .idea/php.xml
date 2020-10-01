@@ -89,6 +89,7 @@
       <path value="$PROJECT_DIR$/vendor/kartik-v/dependent-dropdown" />
       <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-widget-depdrop" />
       <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-widget-switchinput" />
+      <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-widget-datepicker" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="5.4.0" />

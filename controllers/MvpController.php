@@ -276,7 +276,7 @@ class MvpController extends AppController
                     }
 
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
                     $project->save();
 
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -331,6 +331,10 @@ class MvpController extends AppController
 
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $project->updated_at = time();
+            $project->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -363,6 +367,7 @@ class MvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -375,7 +380,9 @@ class MvpController extends AppController
             }
         }
 
-        $model->delete();
+        if ($model->delete()){
+            $project->save();
+        }
 
         return $this->redirect(['index']);
     }*/

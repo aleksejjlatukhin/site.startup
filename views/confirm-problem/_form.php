@@ -4,70 +4,135 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\DetailView;
 use yii\bootstrap\Modal;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ConfirmProblem */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="confirm-problem-form">
+<div class="confirm-problem-create">
 
 
-    <div class="row d-inline p-2" style="background: #707F99; font-size: 26px; font-weight: 700; color: #F2F2F2; border-radius: 5px 5px 0 0; padding: 0; margin: 0; padding-top: 20px; padding-bottom: 10px;/*height: 80px;*//*padding-top: 12px;padding-left: 20px;margin-top: 10px;*/">
+    <div class="row project_info_data">
 
-        <div class="col-md-12 col-lg-6" style="padding: 0 20px; text-align: center;">
 
-            <?php
-            echo 'Программа подтверждения ' . $generationProblem->title .
-
-                Html::a('i', ['#'], [
-                    'style' => ['margin-left' => '20px', 'font-size' => '13px', 'font-weight' => '700', 'padding' => '2px 8px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information-table-confirm-problem",
-                    'title' => 'Посмотреть описание'
-                ])
-            ?>
+        <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
+            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
+            <?= $project->project_name; ?>
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Данные сегмента', ['#'], [
-                'class' => 'btn btn-sm btn-default',
-                'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px'],
-                'data-toggle' => 'modal',
-                'data-target' => '#data_segment_modal',
-            ]); ?>
+        <?= Html::a('Данные проекта', ['#'], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links',
+            'data-toggle' => 'modal',
+            'data-target' => "#data_project_modal",
+        ]) ?>
+
+        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+        ]) ?>
+
+        <?= Html::a('Дорожная карта сегментов', ['/segment/roadmap', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+        ]) ?>
+
+        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+        ]) ?>
+
+    </div>
+
+
+    <div class="row navigation_blocks">
+
+        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+            ['/segment/index', 'id' => $project->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
+            ['/interview/view', 'id' => $interview->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
+            ['/generation-problem/index', 'id' => $interview->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <div class="active_navigation_block navigation_block">
+            <div class="stage_number">4</div>
+            <div>Подтверждение гипотез проблем сегментов</div>
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">5</div>
+            <div>Разработка гипотез ценностных предложений</div>
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">6</div>
+            <div>Подтверждение гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">7</div>
+            <div>Разработка гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">8</div>
+            <div>Подтверждение гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">9</div>
+            <div>Генерация бизнес-модели</div>
         </div>
 
     </div>
+
+
+    <div class="row segment_info_data">
+
+        <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
+            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
+            <?= $segment->name; ?>
+        </div>
+
+        <?= Html::a('Данные сегмента', ['#'], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links',
+            'data-toggle' => 'modal',
+            'data-target' => '#data_segment_modal',
+        ]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['/segment/one-roadmap', 'id' => $segment->id], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+        ]) ?>
+
+    </div>
+
+
 
     <div class="block-link-create-interview row">
 
-        <?= Html::button('Шаг 1. Заполнить исходные данные для подтверждения проблемы', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
             'class' => 'link_create_interview link_active_create_interview col-xs-12 col-md-6 col-lg-3',
         ]); ?>
 
-        <?= Html::button('Шаг 2. Заполнить анкетные данные респондентов', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 2</div><div class="link_create_interview-text_right">Сформировать список вопросов</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
-        <?= Html::button('Шаг 3. Переход к генерации ценностных предложений', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить анкетные данные респондентов</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
-        <?= Html::button('Отзывы экспертов', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
@@ -76,81 +141,298 @@ use yii\bootstrap\Modal;
     </div>
 
 
-    <div class="row style-header-table-kartik" style="padding: 20px 10px; margin: 0; border-radius: 0 0 3px 3px;">
-        <div class="col-md-12">
 
-            <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;margin-top: 20px;">Определение данных, которые необходимо подтвердить</h4>
+    <div class="row">
 
-            <?php $form = ActiveForm::begin(); ?>
+        <div class="container-fluid container-data">
 
-                <div class="row" style="margin-top: 20px;">
+            <div class="row row_header_data">
 
-                    <?= $form->field($generationProblem, 'description', [
-                        'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                    ])->label('Формулировка проблемы, которую проверяем')->textarea(['rows' => 1, 'readonly' => true]) ?>
+                <div class="col-md-12" style="padding: 10px 0 0 0;">
+
+                    <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
+
+                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
+                        'data-toggle' => 'modal',
+                        'data-target' => "#information-add-new-responds",
+                        'title' => 'Посмотреть описание',
+                    ]); ?>
 
                 </div>
 
-            <?php ActiveForm::end(); ?>
-
-
-            <?php $form = ActiveForm::begin(); ?>
-
-            <div class="row" style="margin-top: 20px;">
-
-                <?= $form->field($model, 'need_consumer', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Какую потребность потребителя сегмента проверяем')->textarea(['rows' => 2, 'placeholder' => $placeholder]) ?>
-
             </div>
 
-            <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;margin-top: 20px;">Количественные данные респондентов, которые участвуют в опросе
+            <div class="container-fluid">
 
-                <?= Html::a('i', ['#'], [
-                    'style' => [
-                        'margin-left' => '20px',
-                        'font-size' => '13px',
-                        'font-weight' => '700',
-                        'padding' => '2px 8px',
-                        'background-color' => '#707F99',
-                        'border-radius' => '50%',
-                        'text-decoration' => 'none',
-                        'color' => '#F2F2F2',
-                    ],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information-add-new-responds",
-                    'title' => 'Посмотреть описание',
-                ])?>
+                <?php $form = ActiveForm::begin([
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]); ?>
 
-            </h4>
+                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
 
-            <div class="row" style="margin-top: 20px;">
+                    <?= $form->field($generationProblem, 'description', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->label('Формулировка проблемы, которую проверяем')
+                        ->textarea([
+                            'rows' => 1,
+                            'readonly' => true,
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ])
+                    ?>
 
-                <?= $form->field($model, 'count_respond', [
-                    'template' => '<div class="col-md-9">{label}</div><div class="col-md-3">{input}</div>'
-                ])->label('Количество респондентов (представителей сегмента)')->textInput(['type' => 'number', 'readonly' => true]);?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
+
+                <?php
+
+                $form = ActiveForm::begin([
+                    'id' => 'new_confirm_problem',
+                    'action' => Url::to(['/confirm-problem/save-confirm-problem', 'id' => $generationProblem->id]),
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]);
+
+                ?>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($model, 'need_consumer', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->label('Какую потребность потребителя сегмента проверяем')
+                        ->textarea([
+                            'rows' => 1,
+                            'placeholder' => '',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($model, 'count_respond', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                        ->textInput([
+                            'type' => 'number',
+                            'readonly' => true,
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_respond',
+                        ]);
+                    ?>
+
+                </div>
+
+                <div class="row">
+
+                    <?= $form->field($model, 'count_positive', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('Необходимое количество респондентов, подтверждающих проблему')
+                        ->textInput([
+                            'type' => 'number',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_positive',
+                        ]);
+                    ?>
+
+                </div>
+
+
+                <script>
+
+                    $( function() {
+
+                        //Если задано, что count_respond < count_positive, то count_respond = count_positive
+                        $("input#confirm_count_respond").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value2) < parseInt(value1)){
+                                value2 = value1;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) > parseInt(valueMax)){
+                                value2 = valueMax;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) < parseInt(valueMin)){
+                                value2 = valueMin;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+                        });
+
+                        //Если задано, что count_positive > count_respond, то count_positive = count_respond
+                        $("input#confirm_count_positive").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value1) > parseInt(value2)){
+                                value1 = value2;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) > parseInt(valueMax)){
+                                value1 = valueMax;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) < parseInt(valueMin)){
+                                value1 = valueMin;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+                        });
+
+                    } );
+                </script>
+
+
+                <div class="form-group">
+                    <?= Html::submitButton('Далее', [
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#52BE7F',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                            'margin-top' => '30px'
+                        ],
+                        'class' => 'btn btn-lg btn-success pull-right',
+                    ]) ?>
+                </div>
+
+
+                <?php
+                ActiveForm::end();
+                ?>
 
             </div>
-
-            <div class="row">
-
-                <?= $form->field($model, 'count_positive', [
-                    'template' => '<div class="col-md-9">{label}</div><div class="col-md-3">{input}</div>'
-                ])->label('Необходимое количество респондентов, подтверждающих проблему')->textInput(['type' => 'number']);?>
-
-            </div>
-
-            <div class="form-group" style="margin-top: 10px">
-                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-            </div>
-
-            <?php ActiveForm::end(); ?>
-
 
         </div>
     </div>
 
+
+
+
+
+
+
+
+
+    <?php
+    // Модальное окно - данные проекта
+    Modal::begin([
+        'options' => [
+            'id' => 'data_project_modal',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+    ]);
+    ?>
+
+    <?= DetailView::widget([
+        'model' => $project,
+        //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
+        'attributes' => [
+
+            'project_name',
+            'project_fullname:ntext',
+            'description:ntext',
+            'rid',
+            'core_rid:ntext',
+            'patent_number',
+
+            [
+                'attribute' => 'patent_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'patent_name:ntext',
+
+            [
+                'attribute'=>'Команда проекта',
+                'value' => $project->getAuthorInfo($project),
+                'format' => 'html',
+            ],
+
+            'technology',
+            'layout_technology:ntext',
+            'register_name',
+
+            [
+                'attribute' => 'register_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'site',
+            'invest_name',
+
+            [
+                'attribute' => 'invest_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'invest_amount',
+                'value' => function($model){
+                    if($model->invest_amount !== null){
+                        return number_format($model->invest_amount, 0, '', ' ');
+                    }
+                },
+            ],
+
+            [
+                'attribute' => 'date_of_announcement',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'announcement_event',
+
+            [
+                'attribute' => 'created_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'updated_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'pre_files',
+                'label' => 'Презентационные файлы',
+                'value' => function($model){
+                    $string = '';
+                    foreach ($model->preFiles as $file){
+                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
+                    }
+                    return $string;
+                },
+                'format' => 'html',
+            ]
+
+        ],
+    ]) ?>
+
+    <?php
+    Modal::end();
+    ?>
 
 
     <?php
@@ -171,25 +453,6 @@ use yii\bootstrap\Modal;
     Modal::end();
     ?>
 
-    <?php
-    // Описание выполнения задачи на данной странице
-    Modal::begin([
-        'options' => [
-            'id' => 'information-table-confirm-problem',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Пройдите три шага подтверждения проблемы сегмента. Далее переходите к генерации ценностных предложений.
-    </h4>
-
-    <?php
-    Modal::end();
-    ?>
-
 
     <?php
     // Модальное окно - Запрет на следующий шаг
@@ -203,7 +466,7 @@ use yii\bootstrap\Modal;
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Для перехода на следующий этап Вам необходимо заполнить данные и нажать кнопку «Сохранить».
+        Пройдите последовательно этапы подтверждения гипотезы проблемы сегмента. Далее переходите к генерации гипотез ценностных предложений.
     </h4>
 
     <?php
@@ -223,7 +486,31 @@ use yii\bootstrap\Modal;
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Добавить новых респондентов можно в «Шаге 2» на этапе заполнения анкетных данных.
+        Добавить новых респондентов возможно на этапе заполнения анкетных данных.
+    </h4>
+
+    <?php
+    Modal::end();
+    ?>
+
+
+    <?php
+    // Модальное окно - некорректное внесение данных
+    Modal::begin([
+        'options' => [
+            'id' => 'error_form',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        - общее количество респондентов не может быть меньше количества респондентов, подтверждающих проблему;
+    </h4>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        - количественные данные респондентов не могут быть меньше 1.
     </h4>
 
     <?php
@@ -237,14 +524,14 @@ use yii\bootstrap\Modal;
 $script = "
 
      $(document).ready(function() {
-    
-          //Фон для модального окна информации
-          var information_modal = $('#information-table-confirm-problem').find('.modal-content');
-          information_modal.css('background-color', '#707F99');
         
           //Фон для модального окна о невозможности перехода на следующий этап
           var info_next_step_error_modal = $('#next_step_error').find('.modal-content');
           info_next_step_error_modal.css('background-color', '#707F99');
+          
+          //Фон для модального окна - некорректное внесение данных
+          var error_form_modal = $('#error_form').find('.modal-content');
+          error_form_modal.css('background-color', '#707F99');
           
           //Фон для модального окна информации о месте добавления новых респондентов
           var information_add_new_responds = $('#information-add-new-responds').find('.modal-content');
@@ -258,8 +545,50 @@ $script = "
               $('.link_create_interview').css('height', height);
         
           });
+          
+          
+          //Плавное изменение цвета ссылки этапа подтверждения
+          $('.link_passive_create_interview').hover(function() {
+             $(this).stop().animate({ backgroundColor: '#707f99'}, 300);
+          },function() {
+             $(this).stop().animate({ backgroundColor: '#828282' }, 300);
+          });
         
      });
+     
+     
+     //Форма создания модели подтверждения
+     $('#new_confirm_problem').on('beforeSubmit', function(e){
+        
+        var data = $(this).serialize();
+        var url = $(this).attr('action');
+
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            cache: false,
+            success: function(response){
+                
+                if (!response['error']) {
+                
+                    window.location.href = '/confirm-problem/add-questions?id=' + response['id'];
+                }
+                else {
+                
+                    $('#error_form').modal('show');
+                }
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
     
 ";
 $position = \yii\web\View::POS_READY;

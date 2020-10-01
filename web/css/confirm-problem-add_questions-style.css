@@ -1,0 +1,132 @@
+.confirm-problem-add-questions {
+
+}
+
+.project_info_data {
+    background: #707F99;
+}
+
+.segment_info_data {
+    border-radius: 0 0 12px 12px;
+    background: #707F99;
+}
+
+.project_name_link {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 8px 10px;
+}
+.segment_header_links {
+    color: #ffffff;
+    padding: 14px 10px;
+    font-size: 16px;
+    text-decoration: none;
+}
+.segment_header_links:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+.segment_header_links:visited {
+    color: #ffffff;
+    text-decoration: none;
+}
+.segment_header_links:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.add_new_question_button {
+    color: #52BE7F;
+    font-size: 24px;
+}
+.add_new_question_button:hover {
+    color: #52BE7F;
+    text-decoration: none;
+}
+.add_new_question_button:visited {
+    color: #52BE7F;
+    text-decoration: none;
+}
+.add_new_question_button:focus {
+    color: #52BE7F;
+    text-decoration: none;
+}
+
+.header-table {
+    background: #707F99;
+    border-radius: 3px 3px 0 0;
+    padding: 7px 0;
+}
+
+.row.row_header_data {
+    margin: 0 15px;
+}
+
+.form-update-data-confirm {
+    padding: 10px 15px 30px 15px;
+    background: #F2F2F2;
+    display: none;
+    min-height: calc(100vh - 200px);
+}
+
+.form-view-data-confirm {
+    padding: 10px 15px 30px 15px;
+    background: #F2F2F2;
+    min-height: calc(100vh - 200px);
+}
+
+.block-buttons-update-data-confirm {
+    padding: 0;
+    text-align: right;
+}
+
+.container-data {
+    padding: 10px 15px 30px 15px;
+    background: #F2F2F2;
+    min-height: calc(100vh - 200px);
+}
+
+.row_header_data {
+    font-size: 24px;
+    padding: 5px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+@media screen and (min-width: 1140px) {
+    .segment_header_links {
+        text-align: right;
+    }
+}
+
+@media screen and (max-width: 1140px) {
+
+    .project_name_link {
+        text-align: center;
+    }
+
+    .segment_header_links {
+        text-align: center;
+        padding: 0 10px 15px 10px;
+    }
+
+    .block-buttons-update-data-confirm {
+        text-align: left;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .segment_header_links {
+        text-align: center;
+        padding: 0 10px 5px 10px;
+    }
+
+    .project_info_data > .segment_header_links:last-child {
+        padding-bottom: 15px;
+    }
+
+    .segment_info_data > .segment_header_links:last-child {
+        padding-bottom: 15px;
+    }
+}

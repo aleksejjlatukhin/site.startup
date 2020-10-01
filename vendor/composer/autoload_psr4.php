@@ -29,6 +29,7 @@ return array(
     'kartik\\dialog\\' => array($vendorDir . '/kartik-v/yii2-dialog/src'),
     'kartik\\detail\\' => array($vendorDir . '/kartik-v/yii2-detail-view/src'),
     'kartik\\depdrop\\' => array($vendorDir . '/kartik-v/yii2-widget-depdrop/src'),
+    'kartik\\date\\' => array($vendorDir . '/kartik-v/yii2-widget-datepicker/src'),
     'kartik\\bs4dropdown\\' => array($vendorDir . '/kartik-v/yii2-bootstrap4-dropdown/src'),
     'kartik\\base\\' => array($vendorDir . '/kartik-v/yii2-krajee-base/src'),
     'cebe\\markdown\\' => array($vendorDir . '/cebe/markdown'),

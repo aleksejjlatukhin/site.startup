@@ -184,14 +184,20 @@ class ConfirmGcpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $gcp->exist_confirm = 0;
-        $gcp->date_confirm = date('Y:m:d');
+        if ($gcp->exist_confirm === 0) {
 
-        if ($gcp->save()){
+            return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
+        } else {
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
+            $gcp->exist_confirm = 0;
+            $gcp->date_confirm = date('Y:m:d');
+
+            if ($gcp->save()){
+
+                $project->updated_at = time();
+                if ($project->save()){
+                    return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
+                }
             }
         }
     }
@@ -213,7 +219,7 @@ class ConfirmGcpController extends AppController
 
         if ($gcp->save()){
 
-            $project->update_at = date('Y:m:d');
+            $project->updated_at = time();
             if ($project->save()){
                 return $this->redirect(['/mvp/index', 'id' => $model->id]);
             }
@@ -236,7 +242,7 @@ class ConfirmGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -385,7 +391,7 @@ class ConfirmGcpController extends AppController
                     //Передаем обновленный список вопросов для добавления в программу
                     $queryQuestions = $confirmGcpNew->queryQuestionsGeneralList();
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
                     $project->save();
 
                     $response = [
@@ -414,7 +420,7 @@ class ConfirmGcpController extends AppController
 
             if ($model->delete()){
 
-                $project->update_at = date('Y:m:d');
+                $project->updated_at = time();
                 $project->save();
 
                 $confirmGcpNew = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
@@ -470,7 +476,7 @@ class ConfirmGcpController extends AppController
 
                     if ($model->save()){
 
-                        $project->update_at = date('Y:m:d');
+                        $project->updated_at = time();
 
                         if ($project->save()){
 
@@ -540,7 +546,7 @@ class ConfirmGcpController extends AppController
 
                 if ($model->save()) {
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
 
                     if ($project->save()) {
 

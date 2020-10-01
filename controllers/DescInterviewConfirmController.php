@@ -136,7 +136,7 @@ class DescInterviewConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -196,7 +196,7 @@ class DescInterviewConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 

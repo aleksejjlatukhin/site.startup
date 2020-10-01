@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
@@ -29,6 +30,7 @@ class Interview extends \yii\db\ActiveRecord
             [['segment_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
             [['segment_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => 255],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'trim'],
         ];
@@ -78,15 +80,27 @@ class Interview extends \yii\db\ActiveRecord
         $question = new Questions();
         $question->interview_id = $this->id;
         $question->title = $title;
-        $question->save();
-        $this->addQuestionToGeneralList($title);
+
+        if ($question->save()) {
+            $this->addQuestionToGeneralList($title);
+        }
     }
 
 
     public function addQuestionToGeneralList($title)
     {
+        $segment = $this->segment;
+        $user = $this->segment->project->user;
+
         //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestions::find()->select('title')->all();
+        $baseQuestions = AllQuestions::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity,
+                /*'user_id' => $user->id*/
+            ])->select('title')->all();
 
         $existQuestions = 0;
 
@@ -98,22 +112,40 @@ class Interview extends \yii\db\ActiveRecord
 
         if ($existQuestions == 0){
 
-            $allQuestions = new AllQuestions();
-            $allQuestions->title = $title;
-            $allQuestions->save();
+            $general_question = new AllQuestions();
+            $general_question->title = $title;
+            $general_question->user_id = $user->id;
+            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
+            $general_question->field_of_activity = $segment->field_of_activity;
+            $general_question->sort_of_activity = $segment->sort_of_activity;
+            $general_question->specialization_of_activity = $segment->specialization_of_activity;
+            $general_question->save();
         }
     }
 
 
     public function queryQuestionsGeneralList()
     {
+        $segment = $this->segment;
+
         //Добавляем в массив $questions вопросы уже привязанные к данной программе
         $questions = [];
         foreach ($this->questions as $question) {
             $questions[] = $question['title'];
         }
 
-        $allQuestions = AllQuestions::find()->orderBy(['id' => SORT_DESC])->all();
+        $allQuestions = AllQuestions::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->select('title')
+            ->asArray()
+            ->all();
+
         $queryQuestions = $allQuestions;
 
         //Убираем из списка для добавления вопросов,
@@ -125,23 +157,6 @@ class Interview extends \yii\db\ActiveRecord
         }
 
         return $queryQuestions;
-    }
-
-
-    public function getShowListQuestions()
-    {
-        $showListQuestions = '';
-
-        if ($this->questions){
-
-            $i = 0;
-            foreach ($this->questions as $question){
-                $i++;
-                $showListQuestions .= '<p style="font-weight: 400;">'. $i . '. '.$question->title.'</p>';
-            }
-        }
-
-        return $showListQuestions;
     }
 
 
@@ -199,6 +214,30 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    public function getButtonMovingNextStage()
+    {
+        $count_descInterview = 0;
+        $count_positive = 0;
+
+        foreach ($this->responds as $respond) {
+
+            if ($respond->descInterview){
+                $count_descInterview++;
+
+                if ($respond->descInterview->status == 1){
+                    $count_positive++;
+                }
+            }
+        }
+
+        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->problems))) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
     public function getDataRespondsOfModel()
     {
         $sum = 0;
@@ -208,14 +247,7 @@ class Interview extends \yii\db\ActiveRecord
             }
         }
 
-        if ($sum !== 0){
-            $value = round(($sum / count($this->responds) * 100) * 100) / 100;
-        }else{
-            $value = 0;
-        }
-
-
-        return "<progress max='100' value='$value' id='info-respond'></progress><p id='info-respond-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$value  %</p>";
+        return $sum;
     }
 
 
@@ -228,14 +260,7 @@ class Interview extends \yii\db\ActiveRecord
             }
         }
 
-        if ($sum !== 0){
-            $value = round(($sum / count($this->responds) * 100) *100) / 100;
-        }else{
-            $value = 0;
-        }
-
-
-        return "<progress max='100' value='$value' id='info-interview'></progress><p id='info-interview-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$value  %</p>";
+        return $sum;
     }
 
 
@@ -251,20 +276,7 @@ class Interview extends \yii\db\ActiveRecord
             }
         }
 
-        if($sumPositive !== 0){
-            $valPositive = round(($sumPositive / count($this->responds) * 100) *100) / 100;
-        }else {
-            $valPositive = 0;
-        }
-
-
-        if ($this->count_positive <= $sumPositive){
-            return "<progress max='100' value='$valPositive' id='info-status' class='info-green'></progress><p id='info-status-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>";
-        }
-
-        if ($sumPositive < $this->count_positive){
-            return "<progress max='100' value='$valPositive' id='info-status' class='info-red'></progress><p id='info-status-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>";
-        }
+        return $sumPositive;
     }
 
 
@@ -355,14 +367,6 @@ class Interview extends \yii\db\ActiveRecord
             'greeting_interview' => 'Приветствие в начале встречи',
             'view_interview' => 'Представление интервьюера',
             'reason_interview' => 'Почему мне интересно',
-            'question_1' => '',
-            'question_2' => '',
-            'question_3' => '',
-            'question_4' => '',
-            'question_5' => '',
-            'question_6' => '',
-            'question_7' => '',
-            'question_8' => '',
         ];
     }
 }

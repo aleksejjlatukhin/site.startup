@@ -93,16 +93,16 @@ class ProfileController extends AppController
 
         if (!empty($user->projects)){
 
-            $project_update_at = [];
+            $project_updated_at = [];
 
             foreach ($user->projects as $project) {
 
-                $project_update_at[] = strtotime($project->update_at);
+                $project_updated_at[] = $project->updated_at;
             }
 
-            if (max($project_update_at) > $user->updated_at){
+            if (max($project_updated_at) > $user->updated_at){
 
-                $user->updated_at = max($project_update_at);
+                $user->updated_at = max($project_updated_at);
                 $user->save();
             }
 

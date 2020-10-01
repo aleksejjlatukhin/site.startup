@@ -30,6 +30,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-mpdf" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-sortable" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-widget-activeform" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-widget-datepicker" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-widget-depdrop" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-widget-select2" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/kartik-v/yii2-widget-switchinput" />

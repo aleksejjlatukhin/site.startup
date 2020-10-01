@@ -115,6 +115,7 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
             'kartik\\dialog\\' => 14,
             'kartik\\detail\\' => 14,
             'kartik\\depdrop\\' => 15,
+            'kartik\\date\\' => 12,
             'kartik\\bs4dropdown\\' => 19,
             'kartik\\base\\' => 12,
         ),
@@ -271,6 +272,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'kartik\\depdrop\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-depdrop/src',
+        ),
+        'kartik\\date\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-widget-datepicker/src',
         ),
         'kartik\\bs4dropdown\\' => 
         array (

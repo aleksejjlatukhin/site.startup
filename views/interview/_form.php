@@ -11,11 +11,11 @@ use app\models\Segment;
 <div class="segment-confirm-create">
 
 
-    <div class="row project_info_data" style="background: #707F99;">
+    <div class="row project_info_data">
 
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Проект:</span>
+            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
             <?= $project->project_name; ?>
         </div>
 
@@ -40,11 +40,61 @@ use app\models\Segment;
     </div>
 
 
-    <div class="row segment_info_data" style="border-radius: 0 0 12px 12px; background: #707F99;margin-top: 50px;">
+    <div class="row navigation_blocks">
 
+        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+            ['/segment/index', 'id' => $project->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+
+        <div class="active_navigation_block navigation_block">
+            <div class="stage_number">2</div>
+            <div>Подтверждение гипотез целевых сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">3</div>
+            <div>Генерация гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">4</div>
+            <div>Подтверждение гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">5</div>
+            <div>Разработка гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">6</div>
+            <div>Подтверждение гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">7</div>
+            <div>Разработка гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">8</div>
+            <div>Подтверждение гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">9</div>
+            <div>Генерация бизнес-модели</div>
+        </div>
+
+    </div>
+
+
+    <div class="row segment_info_data">
 
         <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Сегмент:</span>
+            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
             <?= $segment->name; ?>
         </div>
 
@@ -61,120 +111,224 @@ use app\models\Segment;
     </div>
 
 
-    <?php $form = ActiveForm::begin(['id' => 'new_confirm_segment', 'action' => \yii\helpers\Url::to(['/interview/save-interview', 'id' => $segment->id])]); ?>
-
-
     <div class="block-link-create-interview row">
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
-            'class' => 'link_create_interview link_active_create_interview',
+            'class' => 'link_create_interview link_active_create_interview col-xs-12 col-md-6 col-lg-3',
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 2</div><div class="link_create_interview-text_right">Сформировать список вопросов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Завершение подтверждения</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
-            'data-toggle' => 'modal',
-            'data-target' => '#next_step_error',
-        ]); ?>
-
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 5</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
     </div>
 
+    <div class="row">
 
-    <div class="d-inline-block header-table row" style="font-size: 24px; color: #ffffff; border-top: 1px solid #fff;">
-        <div class="col-md-12">Текст легенды проблемного интервью</div>
-    </div>
+        <div class="container-fluid container-data">
 
+            <div class="row row_header_data">
 
-    <div class="row style-header-table-kartik" style="padding: 20px 10px; border-radius: 0 0 3px 3px;">
-        <div class="col-md-12">
+                <div class="col-md-12" style="padding: 10px 0 0 0;">
 
-            <div class="row">
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
 
-                <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
+                </div>
 
-                <?= $form->field($model, 'greeting_interview', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textarea(['rows' => 2, 'placeholder' => $placeholder, 'required' => true,]) ?>
             </div>
 
-            <div class="row" style="margin-top: 15px;">
+            <div class="container-fluid">
 
-                <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+                <?php
 
-                <?= $form->field($model, 'view_interview', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textarea(['rows' => 2, 'placeholder' => $placeholder, 'required' => true,]) ?>
-            </div>
+                $form = ActiveForm::begin([
+                    'id' => 'new_confirm_segment',
+                    'action' => \yii\helpers\Url::to(['/interview/save-interview', 'id' => $segment->id]),
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]);
 
-            <div class="row" style="margin-top: 15px;">
-
-                <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
-
-                <?= $form->field($model, 'reason_interview', [
-                    'template' => '<div class="col-md-12">{label}</div><div class="col-md-12">{input}</div>'
-                ])->textarea(['rows' => 2, 'placeholder' => $placeholder, 'required' => true,]) ?>
-            </div>
+                ?>
 
 
+                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
 
-            <div class="row" style="margin-top: 30px;">
+                    <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
 
-                <div class="col-md-5 row">
+                    <?= $form->field($model, 'greeting_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+
+                    <?= $form->field($model, 'view_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
+
+                    <?= $form->field($model, 'reason_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
 
                     <?= $form->field($model, 'count_respond', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-8" style="margin-top: 5px; ">{label}</div><div class="col-xs-12 col-sm-3 col-md-4">{input}</div>'
-                    ])->label('Планируемое количество респондентов')->textInput(['type' => 'number', 'required' => true,]);?>
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div>Планируемое количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                        ->textInput([
+                            'type' => 'number',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_respond',
+                        ]);
+                    ?>
 
                 </div>
 
-                <div class="col-md-7 row">
+                <div class="row">
 
                     <?= $form->field($model, 'count_positive', [
-                        'template' => '<div class="col-xs-12 col-sm-9" style="margin-top: 5px;">{label}</div><div class="col-xs-12 col-sm-3">{input}</div>'
-                    ])->label('Необходимое количество респондентов, соответствующих сегменту')->textInput(['type' => 'number', 'required' => true,]);?>
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('Необходимое количество респондентов, соответствующих сегменту')
+                        ->textInput([
+                            'type' => 'number',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_positive',
+                        ]);
+                    ?>
 
                 </div>
 
-            </div>
+
+                <script>
+
+                    $( function() {
+
+                        //Если задано, что count_respond < count_positive, то count_respond = count_positive
+                        $("input#confirm_count_respond").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value2) < parseInt(value1)){
+                                value2 = value1;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) > parseInt(valueMax)){
+                                value2 = valueMax;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) < parseInt(valueMin)){
+                                value2 = valueMin;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+                        });
+
+                        //Если задано, что count_positive > count_respond, то count_positive = count_respond
+                        $("input#confirm_count_positive").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value1) > parseInt(value2)){
+                                value1 = value2;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) > parseInt(valueMax)){
+                                value1 = valueMax;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) < parseInt(valueMin)){
+                                value1 = valueMin;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+                        });
+
+                    } );
+                </script>
 
 
 
-            <div class="form-group">
-                <?= Html::submitButton('Далее', [
-                    'class' => 'btn btn-lg btn-success pull-right',
-                    'style' => [
-                        'margin-top' => '20px',
-                        'margin-right' => '60px',
-                        'background' => '#52BE7F',
-                        'width' => '130px',
-                        'height' => '35px',
-                        'padding-top' => '4px',
-                        'padding-bottom' => '4px'
-                    ],
-                ]) ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Далее', [
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#52BE7F',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                            'margin-top' => '30px'
+                        ],
+                        'class' => 'btn btn-lg btn-success pull-right',
+                    ]) ?>
+                </div>
+
+                <?php
+                ActiveForm::end();
+                ?>
+
             </div>
 
         </div>
+
     </div>
 
-    <?php ActiveForm::end(); ?>
+
+
 
 
     <?php
@@ -232,9 +386,9 @@ use app\models\Segment;
 
             [
                 'attribute' => 'invest_amount',
-                'value' => function($project){
-                    if($project->invest_amount !== null){
-                        return number_format($project->invest_amount, 0, '', ' ');
+                'value' => function($model){
+                    if($model->invest_amount !== null){
+                        return number_format($model->invest_amount, 0, '', ' ');
                     }
                 },
             ],
@@ -252,7 +406,7 @@ use app\models\Segment;
             ],
 
             [
-                'attribute' => 'update_at',
+                'attribute' => 'updated_at',
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 
@@ -328,11 +482,11 @@ use app\models\Segment;
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        - общее количество респондентов не может быть меньше количества респондентов, соответствующих сегменту.
+        - общее количество респондентов не может быть меньше количества респондентов, соответствующих сегменту;
     </h4>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        - количественные данные респондентов не могут быть равны нулю;
+        - количественные данные респондентов не могут быть меньше 1.
     </h4>
 
     <?php
@@ -350,7 +504,7 @@ $script = "
           var info_next_step_error_modal = $('#next_step_error').find('.modal-content');
           info_next_step_error_modal.css('background-color', '#707F99');
           
-          //
+          //Фон для модального окна - некорректное внесение данных
           var error_form_modal = $('#error_form').find('.modal-content');
           error_form_modal.css('background-color', '#707F99');
         

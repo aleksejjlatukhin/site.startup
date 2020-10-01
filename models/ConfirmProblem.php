@@ -75,6 +75,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             ['need_consumer', 'trim'],
             ['need_consumer', 'string', 'max' => 255],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
 
@@ -124,8 +125,18 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
     public function addQuestionToGeneralList($title)
     {
+        $segment = $this->problem->segment;
+        $user = $this->problem->project->user;
+
         //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmProblem::find()->select('title')->all();
+        $baseQuestions = AllQuestionsConfirmProblem::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity,
+                /*'user_id' => $user->id*/
+            ])->select('title')->all();
 
         $existQuestions = 0;
 
@@ -137,9 +148,14 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
         if ($existQuestions == 0){
 
-            $allQuestions = new AllQuestionsConfirmProblem();
-            $allQuestions->title = $title;
-            $allQuestions->save();
+            $general_question = new AllQuestionsConfirmProblem();
+            $general_question->title = $title;
+            $general_question->user_id = $user->id;
+            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
+            $general_question->field_of_activity = $segment->field_of_activity;
+            $general_question->sort_of_activity = $segment->sort_of_activity;
+            $general_question->specialization_of_activity = $segment->specialization_of_activity;
+            $general_question->save();
         }
     }
 
@@ -169,13 +185,26 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
     public function queryQuestionsGeneralList()
     {
+        $segment = $this->problem->segment;
+
         //Добавляем в массив $questions вопросы уже привязанные к данной программе
         $questions = [];
         foreach ($this->questions as $question) {
             $questions[] = $question['title'];
         }
 
-        $allQuestions = AllQuestionsConfirmProblem::find()->orderBy(['id' => SORT_DESC])->all();
+        $allQuestions = AllQuestionsConfirmProblem::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->select('title')
+            ->asArray()
+            ->all();
+
         $queryQuestions = $allQuestions;
 
         //Убираем из списка для добавления вопросов,
@@ -187,23 +216,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         }
 
         return $queryQuestions;
-    }
-
-
-    public function getShowListQuestions()
-    {
-        $showListQuestions = '';
-
-        if ($this->questions){
-
-            $i = 0;
-            foreach ($this->questions as $question){
-                $i++;
-                $showListQuestions .= '<p style="font-weight: 400;">'. $i . '. '.$question->title.'</p>';
-            }
-        }
-
-        return $showListQuestions;
     }
 
 

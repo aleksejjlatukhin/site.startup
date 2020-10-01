@@ -50,7 +50,7 @@ class Authors extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'project_id' => 'Project ID',
-            'fio' => 'ФИО',
+            'fio' => 'Фамилия, имя, отчество',
             'role' => 'Роль в проекте',
             'experience' => 'Опыт работы',
         ];

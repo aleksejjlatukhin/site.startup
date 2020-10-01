@@ -13,14 +13,14 @@ $this->title = 'Генерация гипотез проблем сегмент�
 
 $this->registerCssFile('@web/css/problem-index-style.css');
 ?>
-<div class="generation-problem-index table-project-kartik">
+<div class="generation-problem-index">
 
 
-    <div class="row project_info_data" style="background: #707F99;">
+    <div class="row project_info_data">
 
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Проект:</span>
+            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
             <?= $project->project_name; ?>
         </div>
 
@@ -121,7 +121,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
             ],
 
             [
-                'attribute' => 'update_at',
+                'attribute' => 'updated_at',
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 
@@ -146,11 +146,60 @@ $this->registerCssFile('@web/css/problem-index-style.css');
     ?>
 
 
-    <div class="row segment_info_data" style="border-radius: 0 0 12px 12px; background: #707F99;margin-top: 50px;">
+    <div class="row navigation_blocks">
 
+        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+            ['/segment/index', 'id' => $project->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
+            ['/interview/view', 'id' => $interview->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <div class="active_navigation_block navigation_block">
+            <div class="stage_number">3</div>
+            <div>Генерация гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">4</div>
+            <div>Подтверждение гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">5</div>
+            <div>Разработка гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">6</div>
+            <div>Подтверждение гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">7</div>
+            <div>Разработка гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">8</div>
+            <div>Подтверждение гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">9</div>
+            <div>Генерация бизнес-модели</div>
+        </div>
+
+    </div>
+
+
+    <div class="row segment_info_data">
 
         <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Сегмент:</span>
+            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
             <?= $segment->name; ?>
         </div>
 

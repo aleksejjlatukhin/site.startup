@@ -3,3 +3,15 @@
     src: url('../fonts/roboto/Roboto-Regular.ttf') format('truetype');
     font-weight: normal;
 }
+
+@font-face {
+    font-family: 'RobotoCondensed-Light';
+    src: url('../fonts/robotocondensed/RobotoCondensed-Light.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'RobotoCondensed-Bold';
+    src: url('../fonts/robotocondensed/RobotoCondensed-Bold.ttf') format('truetype');
+    font-weight: bold;
+}

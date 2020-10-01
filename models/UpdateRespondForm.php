@@ -24,7 +24,7 @@ class UpdateRespondForm extends Model
         return [
             [['name', 'info_respond', 'place_interview', 'date_plan'], 'required'],
             [['name', 'info_respond', 'place_interview', 'email'], 'trim'],
-            [['date_plan'], 'date'],
+            [['date_plan'], 'safe'],
             [['name', 'info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
@@ -36,11 +36,11 @@ class UpdateRespondForm extends Model
     public function attributeLabels()
     {
         return [
-            'name' => 'Респондент',
+            'name' => 'Фамилия, имя, отчество',
             'info_respond' => 'Данные респондента',
-            'email' => 'Адрес электронной почты',
-            'date_plan' => 'План',
-            'place_interview' => 'Место проведения',
+            'email' => 'E-mail',
+            'date_plan' => 'Плановая дата интервью',
+            'place_interview' => 'Место проведения интервью',
         ];
     }
 
@@ -65,6 +65,7 @@ class UpdateRespondForm extends Model
         $respond->info_respond = $this->info_respond;
         $respond->place_interview = $this->place_interview;
         $respond->email = $this->email;
+        /*$respond->date_plan = $this->date_plan;*/
         $respond->date_plan = strtotime($this->date_plan);
         return $respond->save() ? $respond : null;
     }

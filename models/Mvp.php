@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "mvp".
@@ -70,7 +71,7 @@ class Mvp extends \yii\db\ActiveRecord
             [['title', 'description'], 'trim'],
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
-            [['confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id'], 'integer'],
+            [['confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'created_at', 'updated_at'], 'integer'],
             [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
 
         ];
@@ -88,6 +89,14 @@ class Mvp extends \yii\db\ActiveRecord
             'description' => 'Описание',
             'date_create' => 'Дата создания',
             'date_confirm' => 'Дата подтверждения',
+        ];
+    }
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

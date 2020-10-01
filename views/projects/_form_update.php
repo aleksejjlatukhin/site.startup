@@ -121,51 +121,30 @@ use yii\helpers\Url;
                 </div>
             </div>
 
-            <?php DynamicFormWidget::begin([
-                'widgetContainer' => 'dynamicform_inner', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
-                'widgetBody' => '.container-authors', // required: css class selector
-                'widgetItem' => '.item-authors', // required: css class
-                'limit' => 10, // the maximum times, an element can be cloned (default 999)
-                'min' => 1, // 0 or 1 (default 1)
-                'insertButton' => '.add-authors', // css class
-                'deleteButton' => '.remove-authors', // css class
-                'model' => $modelsAuthors[0],
-                'formId' => 'dynamic-form',
-                'formFields' => [
-                    'fio',
-                    'role',
-                    'experience',
-                ],
-            ]); ?>
 
             <div class="container-authors"><!-- widgetContainer -->
 
-                <?php foreach ($modelsAuthors as $i => $modelsAuthors): ?>
+                <?php foreach ($workers as $i => $worker): ?>
 
                     <div class="item-authors panel-body"><!-- widgetBody -->
-                        <?php
-                        // necessary for update action.
-                        if (! $modelsAuthors->isNewRecord) {
-                            echo Html::activeHiddenInput($modelsAuthors, "[{$i}]id");
-                        }
-                        ?>
 
-                        <div class="row">
+
+                        <div class="row row-author">
                             <div class="pull-right">
                                 <button type="button" class="remove-authors btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
                             </div>
 
-                            <?= $form->field($modelsAuthors, "[{$i}]fio", [
+                            <?= $form->field($worker, "[$i]fio", [
                                 'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                            ])->textInput(['maxlength' => true]) ?>
+                            ])->textInput(['maxlength' => true, 'required' => true, 'id' => 'author_fio-' . $i,]) ?>
 
-                            <?= $form->field($modelsAuthors, "[{$i}]role", [
+                            <?= $form->field($worker, "[$i]role", [
                                 'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                            ])->textInput(['maxlength' => true]) ?>
+                            ])->textInput(['maxlength' => true, 'required' => true, 'id' => 'author_role-' . $i,]) ?>
 
-                            <?= $form->field($modelsAuthors, "[{$i}]experience", [
+                            <?= $form->field($worker, "[$i]experience", [
                                 'template' => '<div class="col-md-11">{label}</div><div class="col-md-11">{input}</div><div class="col-md-11">{error}</div>'
-                            ])->textarea(['rows' => 1]) ?>
+                            ])->textarea(['rows' => 1, 'id' => 'author_experience-' . $i,]) ?>
 
                         </div><!-- .row -->
 
@@ -173,12 +152,26 @@ use yii\helpers\Url;
                 <?php endforeach; ?>
             </div>
 
-            <p class="col-sm-3"><button type="button" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
+            <p class="col-sm-3"><button type="button" id="add_author" class="add-authors btn btn-primary btn-md">Добавить автора</i></button></p>
 
-            <?php DynamicFormWidget::end(); ?>
         </div>
     </div>
 
+    <script>
+        $(function () {
+            $('#add_author').click(function(){
+
+                var id = $('.row-author').length;
+
+                var str = '<div class="row row-author"><li>';
+                str+= '<label>ФИО</label><input name="Authors['+id+'][fio]" class="style_form_field_respond form-control fio_author-'+id+'" type="text" value=""/> ';
+                str+= '<input type="button" value="Удалить" class="remove"/>';
+                str+= '</li></div>';
+
+                $('.item-authors').append(str);
+            });
+        })
+    </script>
 
 
     <div class="row">
@@ -403,4 +396,3 @@ use yii\helpers\Url;
     <?php ActiveForm::end(); ?>
 
 </div>
-

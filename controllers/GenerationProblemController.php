@@ -159,18 +159,6 @@ class GenerationProblemController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        /*Временные файлы*/
-        if ($model->segment_id === null || $model->segment_id === 0) {
-            $model->segment_id = $segment->id;
-            $model->save();
-        }
-
-        if ($model->project_id === null || $model->project_id === 0) {
-            $model->project_id = $project->id;
-            $model->save();
-        }
-        /*Временные файлы --- конец*/
-
         return $this->render('view', [
             'model' => $model,
             'interview' => $interview,
@@ -185,81 +173,6 @@ class GenerationProblemController extends AppController
      * @return mixed
      */
 
-
-
-    /*public function actionCreate($id)
-    {
-        $responds = Respond::find()->where(['interview_id' => $id])->all();
-
-        $model = new GenerationProblem();
-        $model->interview_id = $id;
-        $model->date_gps = date('Y:m:d');
-        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
-        $model->title = 'ГПС ' . (count($models)+1);
-
-        $interview = Interview::findOne($id);
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $model->segment_id = $segment->id;
-        $model->project_id = $project->id;
-
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['interview/view', 'id' => $interview->id]);
-            }
-        }
-
-
-        $count = 0;
-        foreach ($responds as $respond){
-
-            $descInterview = DescInterview::find()->where(['respond_id' => $respond->id])->one();
-            if($descInterview->status == 1){
-                $count++;
-            }
-        }
-
-        if ($count < $interview->count_positive){
-            Yii::$app->session->setFlash('error', "Набрано недостаточное количество представителей сегмента!");
-            return $this->redirect(['interview/view', 'id' => $id]);
-        }
-
-
-        if (Yii::$app->request->isAjax){
-
-            if ($model->load(Yii::$app->request->post())) {
-                $model->description = $_POST['GenerationProblem']['description'];
-
-                if ($model->save()){
-
-                    $project->update_at = date('Y:m:d');
-                    $project->save();
-
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $model;
-                    return $model;
-
-                }
-            }
-        }
-
-
-        return $this->render('create', [
-            'model' => $model,
-            'models' => $models,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'responds' => $responds,
-        ]);
-    }*/
 
 
     public function actionCreate($id)
@@ -290,16 +203,12 @@ class GenerationProblemController extends AppController
             }
         }
 
-
-
-
-
         if ($model->load(Yii::$app->request->post())) {
             $model->description = $_POST['GenerationProblem']['description'];
 
             if ($model->save()){
 
-                $project->update_at = date('Y:m:d');
+                $project->updated_at = time();
                 if ($project->save()){
 
                     return $this->redirect(['/generation-problem/index', 'id' => $id]);
@@ -309,33 +218,6 @@ class GenerationProblemController extends AppController
 
     }
 
-
-    /*public function actionTest($id){
-
-
-        $model = new GenerationProblem();
-        $model->interview_id = $id;
-        $model->date_gps = date('Y:m:d');
-        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
-        $model->title = 'ГПС ' . (count($models)+1);
-
-
-        if (Yii::$app->request->isAjax){
-
-            if($model->load(\Yii::$app->request->post())){
-                $model->description = $_POST['GenerationProblem']['description'];
-
-                if ($model->save()) {
-
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $model;
-                    return $model;
-                }
-            }
-        }
-
-        return $this->render('test', compact('model', 'models'));
-    }*/
 
     /**
      * Updates an existing GenerationProblem model.
@@ -365,7 +247,7 @@ class GenerationProblemController extends AppController
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-            $project->update_at = date('Y:m:d');
+            $project->updated_at = time();
             if ($project->save()) {
                 Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
                 return $this->redirect(['generation-problem/view', 'id' => $model->id]);
@@ -395,7 +277,7 @@ class GenerationProblemController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['gps_id' => $model->id])->one();
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 

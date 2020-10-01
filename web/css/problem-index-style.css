@@ -2,18 +2,25 @@
 
 }
 
+.project_info_data {
+    background: #707F99;
+}
+
+.segment_info_data {
+    border-radius: 0 0 12px 12px;
+    background: #707F99;
+}
+
 .project_name_link {
-    /*color: #F2F2F2;*/
     color: #ffffff;
-    font-size: 17px;
+    font-size: 24px;
     font-weight: 700;
     padding: 8px 10px;
 }
 .segment_header_links {
-    /*color: #F2F2F2;*/
     color: #ffffff;
-    padding: 10px;
-    /*font-size: 16px;*/
+    padding: 14px 10px;
+    font-size: 16px;
     text-decoration: none;
 }
 .segment_header_links:hover {

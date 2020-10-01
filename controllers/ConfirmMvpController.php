@@ -178,14 +178,20 @@ class ConfirmMvpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $mvp->exist_confirm = 0;
-        $mvp->date_confirm = date('Y:m:d');
+        if ($mvp->exist_confirm === 0) {
 
-        if ($mvp->save()){
+            return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
+        }else {
 
-            $project->update_at = date('Y:m:d');
-            if ($project->save()){
-                return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
+            $mvp->exist_confirm = 0;
+            $mvp->date_confirm = date('Y:m:d');
+
+            if ($mvp->save()){
+
+                $project->updated_at = time();
+                if ($project->save()){
+                    return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
+                }
             }
         }
     }
@@ -209,7 +215,7 @@ class ConfirmMvpController extends AppController
 
         if ($mvp->save()){
 
-            $project->update_at = date('Y:m:d');
+            $project->updated_at = time();
             if ($project->save()){
                 return $this->redirect(['business-model/create', 'id' => $model->id]);
             }
@@ -303,7 +309,7 @@ class ConfirmMvpController extends AppController
                         mkdir($feedbacks_dir, 0777);
                     }
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
 
                     if ($project->save()){
 
@@ -366,7 +372,7 @@ class ConfirmMvpController extends AppController
 
                 if ($model->save()) {
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
 
                     if ($project->save()) {
 
@@ -410,6 +416,7 @@ class ConfirmMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -422,7 +429,9 @@ class ConfirmMvpController extends AppController
             }
         }
 
-        $model->delete();
+        if ($model->delete()) {
+            $project->save();
+        }
 
         return $this->redirect(['index']);
     }*/

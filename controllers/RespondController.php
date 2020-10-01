@@ -190,6 +190,7 @@ class RespondController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $limit_count_respond = 100;
 
         $newRespond = new Respond();
         $newRespond->interview_id = $id;
@@ -203,28 +204,37 @@ class RespondController extends AppController
             }
 
             if(Yii::$app->request->isAjax) {
-                if ($kol == 0) {
-                    if ($newRespond->save()) {
-                        $interview->count_respond = $interview->count_respond + 1;
-                        $interview->save();
 
-                        $project->update_at = date('Y:m:d');
-                        if ($project->save()) {
+                if (count($models) < $limit_count_respond) {
 
-                            $responds = Respond::find()->where(['interview_id' => $id])->all();
+                    if ($kol == 0) {
+                        if ($newRespond->save()) {
+                            $interview->count_respond = $interview->count_respond + 1;
+                            $interview->save();
 
-                            $response =  [
-                                'newRespond' => $newRespond,
-                                'responds' => $responds,
-                            ];
+                            $project->updated_at = time();
+                            if ($project->save()) {
 
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
+                                $responds = Respond::find()->where(['interview_id' => $id])->all();
+
+                                $response =  [
+                                    'newRespond' => $newRespond,
+                                    'responds' => $responds,
+                                ];
+
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
                         }
+                    } else {
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 } else {
-                    $response = ['error' => true];
+                    $response = ['limit_count_respond' => true];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
                     return $response;
@@ -485,7 +495,7 @@ class RespondController extends AppController
 
                     if ($updateRespondForm->updateRespond($model)){
 
-                        $project->update_at = date('Y:m:d');
+                        $project->updated_at = time();
                         if ($project->save()){
 
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -516,22 +526,25 @@ class RespondController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
 
-
-        if ($interview->count_respond == $interview->count_positive){
-
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
-            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
-        }
-
-        if (count($responds) == 1){
-
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['/respond/index', 'id' => $model->interview_id]);
-        }
-
         if (Yii::$app->request->isAjax){
 
-            $project->update_at = date('Y:m:d');
+            if (count($responds) == 1){
+
+                $response = ['zero_value_responds' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+            if ($interview->count_respond == $interview->count_positive){
+
+                $response = ['number_less_than_allowed' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+            $project->updated_at = time();
 
             if ($project->save()) {
 
@@ -582,7 +595,7 @@ class RespondController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
 
 
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
 
 

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "business_model".
@@ -65,7 +66,7 @@ class BusinessModel extends \yii\db\ActiveRecord
     {
         return [
             [['confirm_mvp_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
-            [['confirm_mvp_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id'], 'integer'],
+            [['confirm_mvp_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id', 'created_at', 'updated_at'], 'integer'],
             [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
         ];
     }
@@ -84,6 +85,15 @@ class BusinessModel extends \yii\db\ActiveRecord
             'resources' => 'Ключевые ресурсы',
             'cost' => 'Структура издержек',
             'revenue' => 'Потоки поступления доходов',
+        ];
+    }
+
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

@@ -200,7 +200,7 @@ class DescInterviewMvpController extends AppController
 
             if ($model->save()) {
 
-                $project->update_at = date('Y:m:d');
+                $project->updated_at = time();
                 if ($project->save()){
                     Yii::$app->session->setFlash('success', "Анкета добавлена!");
                     return $this->redirect(['responds-mvp/view', 'id' => $model->responds_mvp_id]);
@@ -258,7 +258,7 @@ class DescInterviewMvpController extends AppController
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-            $project->update_at = date('Y:m:d');
+            $project->updated_at = time();
 
             if ($project->save()){
                 Yii::$app->session->setFlash('success', "Анкета обновлена!");
@@ -301,6 +301,7 @@ class DescInterviewMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
 
@@ -313,7 +314,9 @@ class DescInterviewMvpController extends AppController
             }
         }
 
-        $model->delete();
+        if ($model->delete()) {
+            $project->save();
+        }
 
         return $this->redirect(['index']);
     }*/

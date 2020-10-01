@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "desc_interview_mvp".
@@ -52,6 +53,14 @@ class DescInterviewMvp extends \yii\db\ActiveRecord
             'responds_mvp_id' => 'Responds Mvp ID',
             'date_fact' => 'Дата Анкеты',
             'status' => 'Значимость MVP',
+        ];
+    }
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

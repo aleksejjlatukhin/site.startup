@@ -8,6 +8,7 @@ use yii\bootstrap\Modal;
 use yii\widgets\DetailView;
 use yii\helpers\ArrayHelper;
 use app\models\Segment;
+use kartik\select2\Select2;
 
 $this->title = 'Подтверждение гипотезы целевого сегмента';
 $this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
@@ -22,11 +23,11 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
 <div class="interview-add-questions">
 
 
-    <div class="row project_info_data" style="background: #707F99;">
+    <div class="row project_info_data">
 
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Проект:</span>
+            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
             <?= $project->project_name; ?>
         </div>
 
@@ -51,11 +52,61 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
     </div>
 
 
-    <div class="row segment_info_data" style="border-radius: 0 0 12px 12px; background: #707F99;margin-top: 50px;">
+    <div class="row navigation_blocks">
 
+        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+            ['/segment/index', 'id' => $project->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+
+        <div class="active_navigation_block navigation_block">
+            <div class="stage_number">2</div>
+            <div>Подтверждение гипотез целевых сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">3</div>
+            <div>Генерация гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">4</div>
+            <div>Подтверждение гипотез проблем сегментов</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">5</div>
+            <div>Разработка гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">6</div>
+            <div>Подтверждение гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">7</div>
+            <div>Разработка гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">8</div>
+            <div>Подтверждение гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">9</div>
+            <div>Генерация бизнес-модели</div>
+        </div>
+
+    </div>
+
+
+    <div class="row segment_info_data">
 
         <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400;">Сегмент:</span>
+            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
             <?= $segment->name; ?>
         </div>
 
@@ -76,7 +127,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
     <div class="block-link-create-interview row tab">
 
 
-        <button class="tablinks step_one_button link_create_interview" onclick="openCity(event, 'step_one')">
+        <button class="tablinks step_one_button link_create_interview col-xs-12 col-md-6 col-lg-3" onclick="openCity(event, 'step_one')">
             <div class="link_create_interview-block_text">
                 <div class="link_create_interview-text_left">Шаг 1</div>
                 <div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div>
@@ -84,7 +135,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
         </button>
 
 
-        <button class="tablinks step_two_button link_create_interview" onclick="openCity(event, 'step_two')" id="defaultOpen">
+        <button class="tablinks step_two_button link_create_interview col-xs-12 col-md-6 col-lg-3" onclick="openCity(event, 'step_two')" id="defaultOpen">
             <div class="link_create_interview-block_text">
                 <div class="link_create_interview-text_left">Шаг 2</div>
                 <div class="link_create_interview-text_right">Сформировать список вопросов</div>
@@ -92,19 +143,13 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
         </button>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
 
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Завершение подтверждения</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
-            'data-toggle' => 'modal',
-            'data-target' => '#next_step_error',
-        ]); ?>
-
-        <?= Html::button('<div class="link_create_interview-block_text step_five"><div class="link_create_interview-text_left">Шаг 5</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview',
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
             'data-toggle' => 'modal',
             'data-target' => '#next_step_error',
         ]); ?>
@@ -116,86 +161,334 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
     <!--ШАГ 1-->
     <div id="step_one" class="tabcontent row">
 
-        <?php
 
-        echo kartik\detail\DetailView::widget([
-            'model' => $interview,
-            'id' => 'table-data-interview',
-            'condensed' => true,
-            'striped' => false,
-            'bordered' => true,
-            'hover' => true,
-            'enableEditMode' => true,
-            'mode' => kartik\detail\DetailView::MODE_VIEW,
-            'fadeDelay' => 300,
-            'buttons1' => "{update}",
-            'buttons2' => "{view}{save}",
-            'updateOptions' => ['label' => 'Редактировать <span class="glyphicon glyphicon-pencil"></span>', 'title' => '', 'class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'margin' => '10px']],
-            'viewOptions' => ['label' => 'Просмотр', 'title' => '', 'class' => 'btn btn-sm btn-default' , 'style' => ['margin' => '10px', 'font-weight' => '700']],
-            'saveOptions' => ['label' => 'Сохранить', 'title' => '', 'class' => 'btn btn-sm btn-success', 'style' => ['font-weight' => '700', 'margin' => '10px']],
-            'panel' => [
-                'heading' => '<div style="font-size: 24px; color: #ffffff; padding: 11px 20px 11px 30px;">Текст легенды проблемного интервью</div>',
-                'type' => kartik\detail\DetailView::TYPE_DEFAULT,
-                'before' => false,
-                'headingOptions' => ['class' => 'header-table'],
-            ],
-            'formOptions' => [
+        <div class="container-fluid form-view-data-confirm">
+
+            <div class="row row_header_data">
+
+                <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
+
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+
+                </div>
+
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3">
+
+                    <?= Html::button('Редактировать', [
+                        'id' => 'show_form_update_data',
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'color' => '#FFFFFF',
+                            'background' => '#707F99',
+                            'padding' => '0 7px',
+                            'width' => '190px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ]
+                    ])?>
+
+                </div>
+
+            </div>
+
+
+            <?php
+            $form = ActiveForm::begin([
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]);
+            ?>
+
+
+            <div class="container-fluid">
+
+
+                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'greeting_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'readonly' => true,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                        'id' => 'greeting_interview-view',
+                        'placeholder' => '',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'view_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'readonly' => true,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                        'id' => 'view_interview-view',
+                        'placeholder' => '',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'reason_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'readonly' => true,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                        'id' => 'reason_interview-view',
+                        'placeholder' => '',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'count_respond', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div>Планируемое количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                        ->textInput([
+                            'type' => 'number',
+                            'readonly' => true,
+                            'required' => true,
+                            'id' => 'count_respond-view',
+                            'class' => 'style_form_field_respond form-control'
+                        ]);?>
+
+                </div>
+
+                <div class="row">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'count_positive', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('Необходимое количество респондентов, соответствующих сегменту')
+                        ->textInput([
+                            'type' => 'number',
+                            'readonly' => true,
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'count_positive-view'
+                        ]);?>
+
+                </div>
+
+            </div>
+
+            <?php
+            ActiveForm::end();
+            ?>
+
+        </div>
+
+        <div class="container-fluid form-update-data-confirm">
+
+            <?php
+            $form = ActiveForm::begin([
                 'id' => 'update_data_interview',
-                'action' => Url::to(['/interview/update', 'id' => $interview->id]),
-            ],
-            'attributes' => [
-
-                [
-                    'attribute' => 'greeting_interview',
-                    'label' => 'Приветствие в начале встречи:',
-                    'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
-                    'valueColOptions' => ['id' => 'greeting_interview-view', 'style' => ['padding' => '10px']],
-                    'type' => kartik\detail\DetailView::INPUT_TEXTAREA,
-                ],
-
-                [
-                    'attribute' => 'view_interview',
-                    'label' => 'Представление интервьюера:',
-                    'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
-                    'valueColOptions' => ['id' => 'view_interview-view', 'style' => ['padding' => '10px']],
-                    'type' => kartik\detail\DetailView::INPUT_TEXTAREA,
-                ],
-
-                [
-                    'attribute' => 'reason_interview',
-                    'label' => 'Почему мне интересно:',
-                    'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
-                    'valueColOptions' => ['id' => 'reason_interview-view', 'style' => ['padding' => '10px']],
-                    'type' => kartik\detail\DetailView::INPUT_TEXTAREA,
-                ],
+                'action' => Url::to(['/interview/update', 'id' => $model->id]),
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]);
+            ?>
 
 
-                [
-                    'attribute' => 'count_data_interview',
-                    'columns' => [
-                        [
-                            'attribute' => 'count_respond',
-                            'label' => 'Количество респондентов:',
-                            'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
-                            'valueColOptions' => ['class' => 'text-left', 'id' => 'count_respond-view'],
-                            'type' => kartik\detail\DetailView::INPUT_HTML5 ,
-                            //'contentOptions' => ['style' => 'white-space: normal;'],
-                        ],
+            <div class="row row_header_data">
 
-                        [
-                            'attribute' => 'count_positive',
-                            'label' => 'Количество респондентов, соответствующих сегменту:',
-                            'labelColOptions' => ['class' => 'text-left', 'style' => ['padding' => '10px', 'width' => '40%']],
-                            'valueColOptions' => ['class' => 'text-left', 'id' => 'count_positive-view'],
-                            'type' => kartik\detail\DetailView::INPUT_HTML5 ,
-                            //'contentOptions' => ['style' => 'white-space: normal;'],
-                        ],
-                    ],
-                ],
-            ]
-        ]);
+                <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
 
-        ?>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+
+                </div>
+
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6">
+
+                    <?= Html::button('Просмотр', [
+                        'id' => 'show_form_view_data',
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'background' => '#E0E0E0',
+                            'padding' => '0 7px',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ]
+                    ])?>
+
+                    <?= Html::submitButton('Сохранить', [
+                        'class' => 'btn btn-success',
+                        'style' => [
+                            'color' => '#FFFFFF',
+                            'background' => '#52BE7F',
+                            'padding' => '0 7px',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ]
+                    ]) ?>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="container-fluid">
+
+
+                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
+
+                    <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
+
+                    <?= $form->field($formUpdateConfirmSegment, 'greeting_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+
+                    <?= $form->field($formUpdateConfirmSegment, 'view_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
+
+                    <?= $form->field($formUpdateConfirmSegment, 'reason_interview', [
+                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                    ])->textarea([
+                        'rows' => 1,
+                        'placeholder' => $placeholder,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]);
+                    ?>
+
+                </div>
+
+                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'count_respond', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div>Планируемое количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                        ->textInput([
+                            'type' => 'number',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_respond',
+                        ]);
+                    ?>
+
+                </div>
+
+                <div class="row">
+
+                    <?= $form->field($formUpdateConfirmSegment, 'count_positive', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('Необходимое количество респондентов, соответствующих сегменту')
+                        ->textInput([
+                            'type' => 'number',
+                            'required' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_count_positive',
+                        ]);
+                    ?>
+
+                </div>
+
+
+                <script>
+
+                    $( function() {
+
+                        //Если задано, что count_respond < count_positive, то count_respond = count_positive
+                        $("input#confirm_count_respond").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value2) < parseInt(value1)){
+                                value2 = value1;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) > parseInt(valueMax)){
+                                value2 = valueMax;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+
+                            if (parseInt(value2) < parseInt(valueMin)){
+                                value2 = valueMin;
+                                $("input#confirm_count_respond").val(value2);
+                            }
+                        });
+
+                        //Если задано, что count_positive > count_respond, то count_positive = count_respond
+                        $("input#confirm_count_positive").change(function () {
+                            var value1 = $("input#confirm_count_positive").val();
+                            var value2 = $("input#confirm_count_respond").val();
+                            var valueMax = 100;
+                            var valueMin = 1;
+
+                            if (parseInt(value1) > parseInt(value2)){
+                                value1 = value2;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) > parseInt(valueMax)){
+                                value1 = valueMax;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+
+                            if (parseInt(value1) < parseInt(valueMin)){
+                                value1 = valueMin;
+                                $("input#confirm_count_positive").val(value1);
+                            }
+                        });
+
+                    } );
+                </script>
+
+
+            </div>
+
+            <?php
+            ActiveForm::end();
+            ?>
+
+        </div>
 
 
         <?php
@@ -205,13 +498,17 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                 'id' => 'error_update_data_interview',
             ],
             'size' => 'modal-md',
-            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Внимание!</h3>',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
         ]);
         ?>
 
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-            Количество респондентов не должно быть меньше количества респондентов, соответствующих сенгменту.
+            - общее количество респондентов не может быть меньше количества респондентов, соответствующих сегменту;
+        </h4>
+
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            - количественные данные респондентов не могут быть меньше 1.
+        </h4>
 
         <?php
         Modal::end();
@@ -225,362 +522,378 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
     <!--ШАГ 2-->
     <div id="step_two" class="tabcontent row">
 
-        <?php
+        <div class="container-fluid container-data">
 
-        $gridColumnsQuestions = [
+            <!--Заголовок для списка вопросов-->
 
-            [
-                'class' => 'kartik\grid\SerialColumn',
-                'header' => '',
-            ],
+            <div class="row row_header_data">
 
-            [
-                'attribute' => 'title',
-                'label' => 'Название вопроса',
-                'header' => '<div class="text-center">Название вопроса</div>',
-                'contentOptions' => ['style' => 'white-space: normal; padding-left: 10px;'],
-            ],
+                <div class="col-md-12 col-lg-6" style="padding: 10px 0 0 0;">
 
-            ['class' => 'kartik\grid\ActionColumn',
-                'header' => '',
-                'template' => '{delete}',
-                'buttons' => [
-                    'delete' => function ($url, $model) {
-                        return Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '17px']]), $url,[
-                            'title' => Yii::t('yii', 'Delete'),
-                            'class' => 'delete-question-interview',
-                            'id' => 'delete_question-'.$model->id,
-                        ]);
-                    },
-                ],
-                'urlCreator' => function ($action, $model, $key, $index) {
+                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
 
-                    if ($action === 'delete') {
-                        $url = Url::to(['/interview/delete-question', 'id' =>$model->id]);
-                    }
-                    return $url;
-                },
-            ],
-        ];
-
-        echo GridView::widget([
-            'dataProvider' => $dataProviderQuestions,
-            'showPageSummary' => false, //whether to display the page summary row for the grid view.
-            'showHeader' => false, // Скрытие header у всех столбцов
-            'id' => 'QuestionsTable',
-            'pjax' => false,
-            'striped' => false,
-            'bordered' => true,
-            'condensed' => true,
-            'summary' => false,
-            'hover' => true,
-            'toolbar' => false,
-            'columns' => $gridColumnsQuestions,
-            'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-            'panel' => [
-                'type' => 'default',
-                'heading' => false,
-                'before' => '<div class="row" style="margin: 0; font-size: 24px; padding: 7px 0;"><div class="col-md-12 col-lg-6">
-                <span style="color: #fff; margin-left: 15px; margin-right: 20px;">Список вопросов для интервью</span>'
-
-                    . Html::a('i', ['#'], [
-                        'style' => ['margin-rigth' => '20px', 'font-size' => '16px', 'font-weight' => '700', 'padding' => '2px 10px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                        'class' => 'table-kartik-link',
+                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'data-toggle' => 'modal',
                         'data-target' => "#information-table-questions",
                         'title' => 'Посмотреть описание',
-                    ]) . '</div>'
+                    ]); ?>
 
-                    .   Html::a( '<div style="display:flex; align-items: center;"><div>' . Html::img('/images/icons/add_plus_elem.png', ['width' => '25px']) . '</div><div style="padding-left: 20px; color: #fff;">Новый вопрос</div></div>', ['#'], [
-                        'class' => 'add_new_question_button col-xs-12 col-sm-4 col-lg-3',
-                        'id' => 'buttonAddQuestion',
-                    ])
+                </div>
 
-                    .   Html::a( '<div style="display:flex; align-items: center;"><div>' . Html::img('/images/icons/add_plus_elem.png', ['width' => '25px']) . '</div><div style="padding-left: 20px; color: #fff;">Выбрать вопрос из списка</div></div>', ['#'], [
-                        'class' => 'add_new_question_button col-xs-12 col-sm-4 col-lg-3',
-                        'id' => 'buttonAddQuestionToGeneralList',
-                    ])
+                <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
+                    ['class' => 'add_new_question_button col-xs-12 col-md-6 col-lg-3', 'id' => 'buttonAddQuestion']
+                );
+                ?>
 
-                    .   '</div><div class="row form-newQuestion-panel kv-hide" style="display: none;"></div>
-                    <div class="row form-QuestionsOfGeneralList-panel kv-hide" style="display: none;"></div>',
+                <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Выбрать вопрос</div></div>', ['#'],
+                    ['class' => 'add_new_question_button col-xs-12 col-md-6 col-lg-3', 'id' => 'buttonAddQuestionToGeneralList']
+                );
+                ?>
 
-                'beforeOptions' => ['class' => 'header-table'],
-                //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
-                //'footer' => '{export}',
-                'footer' => Html::a( 'Далее', ['/interview/view', 'id' => $interview->id],[
+            </div>
+
+
+            <!--Сюда помещаем форму для создания нового вопроса-->
+            <div class="form-newQuestion-panel" style="display: none;"></div>
+            <!--Сюда помещаем форму для добавления вопроса из списка-->
+            <div class="form-QuestionsOfGeneralList-panel" style="display: none;"></div>
+
+
+            <!--Список вопросов-->
+            <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 30px;">
+
+                <?php foreach ($questions as $q => $question) : ?>
+
+                    <div class="col-xs-12 string_question string_question-<?= $question->id; ?>">
+
+                        <div class="row style_form_field_questions">
+                            <div class="col-xs-11">
+                                <div style="display:flex;">
+                                    <div class="number_question" style="padding-right: 15px;"><?= ($q+1) . '. '; ?></div>
+                                    <div class="title_question"><?= $question->title; ?></div>
+                                </div>
+                            </div>
+                            <div class="col-xs-1 delete_question_link">
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
+                                    Url::to(['/interview/delete-question', 'id' => $question->id])],[
+                                    'title' => Yii::t('yii', 'Delete'),
+                                    'class' => 'delete-question-confirm-segment pull-right',
+                                    'id' => 'delete_question-'.$question->id,
+                                ]); ?>
+                            </div>
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+
+            <!--Форма для добаления нового вопроса-->
+            <div style="display: none;">
+                <div class="col-md-12 form-newQuestion" style="margin-top: 20px; padding: 0;">
+
+                    <? $form = ActiveForm::begin([
+                        'id' => 'addNewQuestion',
+                        'action' => Url::to(['/interview/add-question', 'id' => $model->id]),
+                        'options' => ['class' => 'g-py-15'],
+                        'errorCssClass' => 'u-has-error-v1',
+                        'successCssClass' => 'u-has-success-v1-1',
+                    ]);?>
+
+                    <div class="col-xs-12 col-sm-9 col-lg-10">
+
+                        <?= $form->field($newQuestion, 'title', ['template' => '{input}'])
+                            ->textInput([
+                                'maxlength' => true,
+                                'required' => true,
+                                'placeholder' => 'Добавьте новый вопрос для интервью',
+                                'class' => 'style_form_field_respond'])
+                            ->label(false);
+                        ?>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-3 col-lg-2">
+                        <?= Html::submitButton('Сохранить', [
+                            'class' => 'btn btn-lg btn-success',
+                            'style' => [
+                                'margin-bottom' => '15px',
+                                'background' => '#52BE7F',
+                                'width' => '100%',
+                                //'width' => '130px',
+                                'height' => '40px',
+                                'padding-top' => '4px',
+                                'padding-bottom' => '4px',
+                                'border-radius' => '8px',
+                            ]
+                        ]); ?>
+                    </div>
+
+
+                    <? ActiveForm::end(); ?>
+
+                </div>
+            </div>
+
+
+            <!--Строка нового вопроса-->
+            <div style="display:none;">
+                <div class="new-string-table-questions">
+                    <div class="col-xs-12 string_question">
+                        <div class="row style_form_field_questions">
+                            <div class="col-xs-11">
+                                <div style="display:flex;">
+                                    <div class="number_question" style="padding-right: 15px;"></div>
+                                    <div class="title_question"></div>
+                                </div>
+                            </div>
+                            <div class="col-xs-1 delete_question_link">
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
+                                    Url::to(['/interview/delete-question', 'id' => ''])],[
+                                    'title' => Yii::t('yii', 'Delete'),
+                                    'class' => 'delete-question-confirm-segment pull-right',
+                                    'id' => '',
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--Форма для выбора вопроса из общего списка-->
+            <div style="display: none;">
+                <div class="col-md-12 form-QuestionsOfGeneralList" style="margin-top: 20px; padding: 0;">
+
+                    <? $form = ActiveForm::begin([
+                        'id' => 'addNewQuestionOfGeneralList',
+                        'action' => Url::to(['/interview/add-question', 'id' => $model->id]),
+                        'options' => ['class' => 'g-py-15'],
+                        'errorCssClass' => 'u-has-error-v1',
+                        'successCssClass' => 'u-has-success-v1-1',
+                    ]);?>
+
+                    <div class="col-xs-12 col-sm-9 col-lg-10">
+
+                        <?= $form->field($newQuestion, 'title', ['template' => '{input}',])
+                            ->widget(Select2::class, [
+                                'data' => $queryQuestions,
+                                'options' => [
+                                    'id' => 'add_new_question_confirm',
+                                    'placeholder' => 'Выберите вариант из списка готовых вопросов',
+                                ],
+                                'disabled' => false,  //Сделать поле неактивным
+                                'hideSearch' => false, //Скрытие поиска
+                            ]);
+                        ?>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-3 col-lg-2">
+                        <?= Html::submitButton('Сохранить', [
+                            'class' => 'btn btn-lg btn-success',
+                            'style' => [
+                                'margin-bottom' => '15px',
+                                'background' => '#52BE7F',
+                                'width' => '100%',
+                                //'width' => '130px',
+                                'height' => '40px',
+                                'padding-top' => '4px',
+                                'padding-bottom' => '4px',
+                                'border-radius' => '8px',
+                            ]
+                        ]); ?>
+                    </div>
+
+                    <? ActiveForm::end(); ?>
+
+                </div>
+            </div>
+
+
+            <div class="col-xs-12">
+
+                <?= Html::a( 'Далее', ['/interview/view', 'id' => $model->id],[
                     'style' => [
-                        'margin' => '-30px 60px 5px 0',
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
                         'background' => '#52BE7F',
-                        'width' => '130px',
-                        'height' => '35px',
-                        'padding-top' => '4px',
-                        'padding-bottom' => '4px'
+                        'width' => '140px',
+                        'height' => '40px',
+                        'font-size' => '24px',
+                        'border-radius' => '8px',
                     ],
                     'class' => 'btn btn-lg btn-success pull-right',
-                ]),
-                'after' => false,
-                //'footer' => false,
-            ],
-        ]);
+                ]);?>
 
+            </div>
+
+        </div>
+
+
+
+        <?php
+        // Модальное окно - данные проекта
+        Modal::begin([
+            'options' => [
+                'id' => 'data_project_modal',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+        ]);
+        ?>
+
+        <?= DetailView::widget([
+            'model' => $project,
+            //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
+            'attributes' => [
+
+                'project_name',
+                'project_fullname:ntext',
+                'description:ntext',
+                'rid',
+                'core_rid:ntext',
+                'patent_number',
+
+                [
+                    'attribute' => 'patent_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'patent_name:ntext',
+
+                [
+                    'attribute'=>'Команда проекта',
+                    'value' => $project->getAuthorInfo($project),
+                    'format' => 'html',
+                ],
+
+                'technology',
+                'layout_technology:ntext',
+                'register_name',
+
+                [
+                    'attribute' => 'register_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'site',
+                'invest_name',
+
+                [
+                    'attribute' => 'invest_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'invest_amount',
+                    'value' => function($project){
+                        if($project->invest_amount !== null){
+                            return number_format($project->invest_amount, 0, '', ' ');
+                        }
+                    },
+                ],
+
+                [
+                    'attribute' => 'date_of_announcement',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'announcement_event',
+
+                [
+                    'attribute' => 'created_at',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'updated_at',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'pre_files',
+                    'label' => 'Презентационные файлы',
+                    'value' => function($model){
+                        $string = '';
+                        foreach ($model->preFiles as $file){
+                            $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
+                        }
+                        return $string;
+                    },
+                    'format' => 'html',
+                ]
+
+            ],
+        ]) ?>
+
+        <?php
+        Modal::end();
         ?>
 
 
-        <!--Форма для добаления нового вопроса-->
-        <div class="row" style="display: none;">
-            <div class="col-md-12 form-newQuestion" style="margin-top: 5px;">
 
-                <? $form = ActiveForm::begin(['id' => 'addNewQuestion', 'action' => Url::to(['/interview/add-question', 'id' => $interview->id])]);?>
+        <?php
+        // Модальное окно - Данные сегмента
+        Modal::begin([
+            'options' => [
+                'id' => 'data_segment_modal',
+                'class' => 'data_segment_modal',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<h3 class="text-center">Информация о сегменте</h3>',
+        ]);
+        ?>
 
-                <div class="col-xs-12 col-md-10 col-lg-10">
-                    <?= $form->field($newQuestion, 'title', ['template' => '{input}'])->textInput(['maxlength' => true, 'required' => true])->label(false); ?>
-                </div>
-                <div class="col-xs-12 col-md-2 col-lg-2">
-                    <?= Html::submitButton('Сохранить', [
-                        'class' => 'btn btn-lg btn-success col-xs-12',
-                        'style' => [
-                            'margin-bottom' => '15px',
-                            'background' => '#52BE7F',
-                            'width' => '130px',
-                            'height' => '35px',
-                            'padding-top' => '4px',
-                            'padding-bottom' => '4px'
-                        ]
-                    ]); ?>
-                </div>
+        <?= $segment->allInformation; ?>
 
-                <? ActiveForm::end(); ?>
+        <?php
+        Modal::end();
+        ?>
 
-            </div>
-        </div>
 
-        <!--Строка нового вопроса-->
-        <table style="display:none;">
-            <tbody class="new-string-table-questions">
-            <tr class="QuestionsTable" data-key="">
-                <td class="kv-align-center kv-align-middle QuestionsTable" style="width: 50px;" data-col-seq="0"></td>
-                <td class="QuestionsTable" data-col-seq="1"></td>
-                <td class="skip-export kv-align-center kv-align-middle QuestionsTable" style="width: 50px;" data-col-seq="2">
-                    <a id="" class="delete-question-interview" href="" title="Удалить">
-                        <img src="/web/images/icons/icon_delete.png" alt="удалить" width="17px">
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <?php
+        // Модальное окно - Запрет на следующий шаг
+        Modal::begin([
+            'options' => [
+                'id' => 'next_step_error',
+            ],
+            'size' => 'modal-md',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Данный этап не доступен</h3>',
+        ]);
+        ?>
 
-        <!--Форма для выбора вопроса из общксписка для  добавления в интервью-->
-        <div class="row" style="display: none;">
-            <div class="col-md-12 form-QuestionsOfGeneralList" style="margin-top: 5px;">
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            Пройдите последовательно этапы подтверждения гипотезы целевого сегмента. Далее переходите к генерации гипотез проблем сегмента.
+        </h4>
 
-                <? $form = ActiveForm::begin(['id' => 'addNewQuestionOfGeneralList', 'action' => Url::to(['/interview/add-question', 'id' => $interview->id])]);?>
+        <?php
+        Modal::end();
+        ?>
 
-                <div class="col-xs-12 col-md-10 col-lg-10">
+        <?php
+        // Описание выполнения задачи на данной странице
+        Modal::begin([
+            'options' => [
+                'id' => 'information-table-questions',
+            ],
+            'size' => 'modal-md',
+            'header' => '<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">1. Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».</h4>',
+        ]);
+        ?>
 
-                    <?php
-                    $items = ArrayHelper::map($queryQuestions,'title','title');
-                    //$params = ['prompt' => 'Выберите вариант из списка готовых вопросов'];
-                    $params = ['prompt' => [
-                        'text' => 'Выберите вариант из списка готовых вопросов',
-                        'options' => [
-                            'style' => [
-                                'font-weight' => '700',
-                            ],
-                            //'class' => 'prompt-class',
-                            //'value' => '',
-                            //'selected' => true,
-                        ]
-                    ]]
-                    ?>
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            2. Когда список будет готов переходите по ссылке «Далее».
+        </h4>
 
-                    <?= $form->field($newQuestion, 'title', ['template' => '{input}'])->dropDownList($items,$params)->label(false); ?>
-
-                </div>
-
-                <div class="col-xs-12 col-md-2 col-lg-2">
-                    <?= Html::submitButton('Сохранить', [
-                        'class' => 'btn btn-lg btn-success col-xs-12',
-                        'style' => [
-                            'margin-bottom' => '15px',
-                            'background' => '#52BE7F',
-                            'width' => '130px',
-                            'height' => '35px',
-                            'padding-top' => '4px',
-                            'padding-bottom' => '4px'
-                        ]
-                    ]); ?>
-                </div>
-
-                <? ActiveForm::end(); ?>
-
-            </div>
-        </div>
+        <?php
+        Modal::end();
+        ?>
 
     </div>
-
-
-
-
-
-
-
-    <?php
-    // Модальное окно - данные проекта
-    Modal::begin([
-        'options' => [
-            'id' => 'data_project_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
-    ]);
-    ?>
-
-    <?= DetailView::widget([
-        'model' => $project,
-        //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
-        'attributes' => [
-
-            'project_name',
-            'project_fullname:ntext',
-            'description:ntext',
-            'rid',
-            'core_rid:ntext',
-            'patent_number',
-
-            [
-                'attribute' => 'patent_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'patent_name:ntext',
-
-            [
-                'attribute'=>'Команда проекта',
-                'value' => $project->getAuthorInfo($project),
-                'format' => 'html',
-            ],
-
-            'technology',
-            'layout_technology:ntext',
-            'register_name',
-
-            [
-                'attribute' => 'register_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'site',
-            'invest_name',
-
-            [
-                'attribute' => 'invest_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'invest_amount',
-                'value' => function($project){
-                    if($project->invest_amount !== null){
-                        return number_format($project->invest_amount, 0, '', ' ');
-                    }
-                },
-            ],
-
-            [
-                'attribute' => 'date_of_announcement',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'announcement_event',
-
-            [
-                'attribute' => 'created_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'update_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'pre_files',
-                'label' => 'Презентационные файлы',
-                'value' => function($model){
-                    $string = '';
-                    foreach ($model->preFiles as $file){
-                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
-                    }
-                    return $string;
-                },
-                'format' => 'html',
-            ]
-
-        ],
-    ]) ?>
-
-    <?php
-    Modal::end();
-    ?>
-
-
-
-    <?php
-    // Модальное окно - Данные сегмента
-    Modal::begin([
-        'options' => [
-            'id' => 'data_segment_modal',
-            'class' => 'data_segment_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Информация о сегменте</h3>',
-    ]);
-    ?>
-
-    <?= $segment->allInformation; ?>
-
-    <?php
-    Modal::end();
-    ?>
-
-
-    <?php
-    // Модальное окно - Запрет на следующий шаг
-    Modal::begin([
-        'options' => [
-            'id' => 'next_step_error',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Данный этап не доступен</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Пройдите последовательно этапы подтверждения гипотезы целевого сегмента. Далее переходите к генерации гипотез проблем сегмента.
-    </h4>
-
-    <?php
-    Modal::end();
-    ?>
-
-    <?php
-    // Описание выполнения задачи на данной странице
-    Modal::begin([
-        'options' => [
-            'id' => 'information-table-questions',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">1. Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».</h4>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        2. Когда список будет готов переходите по ссылке «Далее».
-    </h4>
-
-    <?php
-    Modal::end();
-    ?>
 
 </div>
 
@@ -647,6 +960,21 @@ $script = "
     });
     
     
+    //При нажатии на кнопку редактировать(Шаг 1)
+    //показываем форму редактирования и скрываем вид просмотра
+    $('#show_form_update_data').on('click', function(){
+        $('.form-view-data-confirm').hide();
+        $('.form-update-data-confirm').show();
+    });
+    
+    //При нажатии на кнопку просмотр(Шаг 1)
+    //скрываем форму редактирования и показываем вид просмотра
+    $('#show_form_view_data').on('click', function(){
+        $('.form-update-data-confirm').hide();
+        $('.form-view-data-confirm').show();
+    });
+    
+    
     
     //Редактирование исходных даннных программы подтверждения сегмента (Шаг 1)
     $('#update_data_interview').on('beforeSubmit', function(e){
@@ -667,29 +995,29 @@ $script = "
                     //Обновление данных в режиме просмотра (Шаг 1)
                     
                     var inputCountRespond = response.model.count_respond;
-                    var viewCountRespond = $('#count_respond-view').find('.kv-attribute');
-                    viewCountRespond.html(inputCountRespond);
+                    var viewCountRespond = $('#count_respond-view');
+                    viewCountRespond.val(inputCountRespond);
                     
                     var inputCountPositive = response.model.count_positive;
-                    var viewCountPositive = $('#count_positive-view').find('.kv-attribute');
-                    viewCountPositive.html(inputCountPositive);
+                    var viewCountPositive = $('#count_positive-view');
+                    viewCountPositive.val(inputCountPositive);
                     
                     var textareaGreetingInterview = response.model.greeting_interview;
-                    var viewGreetingInterview = $('#greeting_interview-view').find('.kv-attribute');
+                    var viewGreetingInterview = $('#greeting_interview-view');
                     viewGreetingInterview.html(textareaGreetingInterview);
                     
                     var textareaViewInterview = response.model.view_interview;
-                    var viewViewInterview = $('#view_interview-view').find('.kv-attribute');
+                    var viewViewInterview = $('#view_interview-view');
                     viewViewInterview.html(textareaViewInterview);
                     
                     var textareaReasonInterview = response.model.reason_interview;
-                    var viewReasonInterview = $('#reason_interview-view').find('.kv-attribute');
+                    var viewReasonInterview = $('#reason_interview-view');
                     viewReasonInterview.html(textareaReasonInterview);
-                    
                     
                     //Вызов события клика на кнопку просмотра 
                     //для перхода в режим просмотра (Шаг 1)
-                    $('.kv-btn-view').trigger('click');
+                    $('.form-update-data-confirm').hide();
+                    $('.form-view-data-confirm').show();
                     
 
                 } else {
@@ -724,32 +1052,35 @@ $script = "
             cache: false,
             success: function(response){
                 
-                //Добавление строки для нового вопроса
-                var container = $('#QuestionsTable-container').find('tbody');
-                $('.new-string-table-questions').find('tr').attr('data-key', response.model.id);
-                $('.new-string-table-questions').find('td[data-col-seq=\"1\"]').html(response.model.title);
-                $('.new-string-table-questions').find('.delete-question-interview').attr('id', 'delete_question-' + response.model.id);
-                $('.new-string-table-questions').find('.delete-question-interview').attr('href', '/interview/delete-question?id=' + response.model.id);
+                //Добавление строки для нового вопроса (Шаг 2)
+                var container = $('#QuestionsTable-container');
+                $('.new-string-table-questions').find('.string_question').addClass('string_question-' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.title_question').html(response.model.title);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/interview/delete-question?id=' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('id', 'delete_question-' + response.model.id);
                 var newString = $('.new-string-table-questions').html();
                 container.append(newString);
                 
-                //Изменение нумерации строк
+                //Изменение нумерации строк (Шаг 2)
                 var questions = response.questions;
                 $.each(questions, function(index, value) {
-                    $('#QuestionsTable-container').find('tr[data-key=\"' + value['id'] + '\"]').find('td:first').html(index+1);
+                    $('#QuestionsTable-container').find('.string_question-' + response.model.id).find('.number_question').html((index+1) + '.');
                 });
                 
-                //Скрываем и очищием форму
+                //Обновляем список вопросов для добавления (Шаг 2)
+                var queryQuestions = response.queryQuestions;
+                $('#addNewQuestionOfGeneralList').find('select').html('');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $.each(queryQuestions, function(index, value) {
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
+                });
+                
+                //Скрываем и очищием форму (Шаг 2)
                 $('.form-newQuestion-panel').hide();
                 $('#addNewQuestion')[0].reset();
                 
-                //Обновляем список вопросов для добавления
-                var queryQuestions = response.queryQuestions;
-                $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
-                $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
-                });
+                //Удаляем добавленный класс из шаблона строки вопроса
+                $('.new-string-table-questions').find('.string_question').removeClass('string_question-' + response.model.id);
             },
             error: function(){
                 alert('Ошибка');
@@ -777,31 +1108,34 @@ $script = "
             cache: false,
             success: function(response){
                 
-                //Добавление строки для нового вопроса
-                var container = $('#QuestionsTable-container').find('tbody');
-                $('.new-string-table-questions').find('tr').attr('data-key', response.model.id);
-                $('.new-string-table-questions').find('td[data-col-seq=\"1\"]').html(response.model.title);
-                $('.new-string-table-questions').find('.delete-question-interview').attr('id', 'delete_question-' + response.model.id);
-                $('.new-string-table-questions').find('.delete-question-interview').attr('href', '/interview/delete-question?id=' + response.model.id);
+                //Добавление строки для нового вопроса (Шаг 2)
+                var container = $('#QuestionsTable-container');
+                $('.new-string-table-questions').find('.string_question').addClass('string_question-' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.title_question').html(response.model.title);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/interview/delete-question?id=' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('id', 'delete_question-' + response.model.id);
                 var newString = $('.new-string-table-questions').html();
                 container.append(newString);
                 
-                //Изменение нумерации строк
+                //Изменение нумерации строк (Шаг 2)
                 var questions = response.questions;
                 $.each(questions, function(index, value) {
-                    $('#QuestionsTable-container').find('tr[data-key=\"' + value['id'] + '\"]').find('td:first').html(index+1);
+                    $('#QuestionsTable-container').find('.string_question-' + response.model.id).find('.number_question').html((index+1) + '.');
                 });
                 
-                //Скрываем форму
+                //Скрываем форму (Шаг 2)
                 $('.form-QuestionsOfGeneralList-panel').hide();
                 
-                //Обновляем список вопросов для добавления
+                //Обновляем список вопросов для добавления (Шаг 2)
                 var queryQuestions = response.queryQuestions;
                 $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
                 $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
                 });
+                
+                //Удаляем добавленный класс из шаблона строки вопроса
+                $('.new-string-table-questions').find('.string_question').removeClass('string_question-' + response.model.id);
                 
                 
             },
@@ -820,7 +1154,7 @@ $script = "
     //Для того чтобы обрабатывались и старые и новые вопросы
     //указываем контейнер в контором необходимо обрабатывать запросы,
     //а после события указываем по какому элементу оно будет срабатывать.
-    $('#QuestionsTable-container').on('click', '.delete-question-interview', function(e){
+    $('#QuestionsTable-container').on('click', '.delete-question-confirm-segment', function(e){
         
         var id = $(this).attr('id');
         id = id.split('-');
@@ -830,7 +1164,7 @@ $script = "
         url += id;
         
         //Сторока, которая будет удалена из таблицы
-        var deleteString = $('#QuestionsTable-container').find('tr[data-key=\"' + id + '\"]');
+         var deleteString = $('#QuestionsTable-container').find('.string_question-' + id);
         
         $.ajax({
         
@@ -845,15 +1179,15 @@ $script = "
                 //Изменение нумерации строк после удаления
                 var questions = response.questions;
                 $.each(questions, function(index, value) {
-                    $('#QuestionsTable-container').find('tr[data-key=\"' + value['id'] + '\"]').find('td:first').html(index+1);
+                    $('#QuestionsTable-container').find('.string_question-' + value['id']).find('.number_question').html((index+1) + '.');
                 });
                 
-                //Обновляем список вопросов для добавления
+                //Обновляем список вопросов для добавления (Шаг 2)
                 var queryQuestions = response.queryQuestions;
                 $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font-weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
                 $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option id=\"' + index + ' - stringQueryQuestion\" value=\"' + value.title + '\">' + value.title + '<\/option>');
+                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
                 });
                 
             },

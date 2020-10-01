@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
 
@@ -143,10 +144,10 @@ class Projects extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'created_at', 'update_at', 'project_name'], 'required'],
-            [['user_id',], 'integer'],
+            [['user_id', 'project_name'], 'required'],
+            [['created_at', 'updated_at','user_id',], 'integer'],
             [['invest_amount'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
-            [['created_at', 'update_at', 'patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
+            [['patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
             ['project_name', 'string', 'min' => 3, 'max' => 32],
             [['project_fullname', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
@@ -165,7 +166,7 @@ class Projects extends ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'created_at' => 'Дата создания проекта',
-            'update_at' => 'Дата обновления проекта',
+            'updated_at' => 'Дата обновления проекта',
             'project_fullname' => 'Полное наименование проекта',
             'project_name' => 'Сокращенное наименование проекта',
             'description' => 'Описание проекта',
@@ -184,6 +185,15 @@ class Projects extends ActiveRecord
             'invest_amount' => 'Сумма инвестиций (руб.)',
             'date_of_announcement' => 'Дата анонсирования проекта',
             'announcement_event' => 'Мероприятие, на котором проект анонсирован впервые',
+        ];
+    }
+
+
+    /* Поведения */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class
         ];
     }
 }

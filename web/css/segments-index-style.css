@@ -1,6 +1,5 @@
 .segment-index {
-    /*font-family: 'RobotoCondensed-Regular', serif;*/
-    /*font-size: 16px;*/
+
 }
 
 tbody > tr .TableSegments {
@@ -8,19 +7,21 @@ tbody > tr .TableSegments {
     height: 80px;
 }
 
+.project_info_data {
+    background: #707F99;
+}
+
 .project_name_link {
-    /*color: #F2F2F2;*/
     color: #ffffff;
-    font-size: 17px;
+    font-size: 24px;
     font-weight: 700;
     padding: 8px 10px;
 }
 
 .segment_header_links {
-    /*color: #F2F2F2;*/
     color: #ffffff;
-    padding: 10px;
-    /*font-size: 16px;*/
+    padding: 14px 10px;
+    font-size: 16px;
     text-decoration: none;
 }
 .segment_header_links:hover {
@@ -36,22 +37,89 @@ tbody > tr .TableSegments {
     text-decoration: none;
 }
 
-.new_segment_link {
-    font-size: 15px;
+.container-data {
+    padding: 10px 15px 30px 15px;
+    background: #FFFFFF;
+    min-height: calc(100vh - 200px);
+}
+
+.row_header_data_generation {
+    font-size: 24px;
+    padding: 5px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.row.row_header_data_generation {
+    margin: 0 15px;
+}
+
+.new_segment_link_block {
+    display:flex;
+    align-items: center;
+    padding: 5px 0;
+}
+
+
+.new_segment_link_plus {
     color: #52BE7F;
-    padding-left: 20px;
+    font-size: 24px;
+}
+.new_segment_link_plus:hover {
+    color: #52BE7F;
     text-decoration: none;
 }
-.new_segment_link:hover {
+.new_segment_link_plus:focus {
     color: #52BE7F;
     text-decoration: none;
 }
-.new_segment_link:visited {
-    color: #52BE7F;
+
+.headers_data_respond_hi {
+    font-weight: 700;
+    color: #4F4F4F;
+}
+.headers_data_respond_low {
+    font-size: 14px;
+    color: #4F4F4F;
+}
+
+.container-one_hypothesis {
+    background: #F2F2F2;
+    color: #4F4F4F;
+    font-size: 16px;
+    padding: 0 5px;
+    min-height: 80px;
+    border-radius: 12px;
+}
+
+.container-one_hypothesis:hover {
+    background: #E0E0E0;
+    transition: .3s;
+}
+
+.container-one_hypothesis:focus {
+    background: #E0E0E0;
+}
+
+@media screen and (min-width: 1140px) {
+
+    .container-one_hypothesis {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.container-name_link {
+    color: #4F4F4F;
+    padding-left: 10px;
+}
+
+.container-name_link:hover {
+    color: #4F4F4F;
     text-decoration: none;
 }
-.new_segment_link:focus {
-    color: #52BE7F;
+
+.container-name_link:focus {
+    color: #4F4F4F;
     text-decoration: none;
 }
 

@@ -17,12 +17,14 @@ use app\models\Interview;
 use app\models\Model;
 use app\models\Mvp;
 use app\models\PreFiles;
+use app\models\ProjectSort;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\Segment;
+use app\models\SortForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -34,6 +36,8 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\data\ArrayDataProvider;
+use yii\widgets\ActiveForm;
+use yii\web\Response;
 
 
 /**
@@ -144,20 +148,27 @@ class ProjectsController extends AppController
     public function actionIndex($id)
     {
         $user = User::findOne($id);
+        $models = Projects::find()->where(['user_id' => $id])->all();
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => Projects::find()->where(['user_id' => $id]),
-            'sort' => false,
-        ]);
+        $new_author = new Authors();
+        $newModel = new Projects();
+        $newModel->user_id = $id;
 
-        $projects = Projects::find()->where(['user_id' => $id])->all();
-        if (count($projects) == 0){
-            return $this->redirect(['create', 'id' => $id]);
+        $workers = [];
+        foreach ($models as $model) {
+            $workers[] = Authors::find()->where(['project_id' => $model->id])->all();
         }
 
+        //Модель сортировки
+        $sortModel = new SortForm();
+
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
             'user' => $user,
+            'models' => $models,
+            'new_author' => $new_author,
+            'workers' => $workers,
+            'newModel' => $newModel,
+            'sortModel' => $sortModel,
         ]);
     }
 
@@ -197,7 +208,7 @@ class ProjectsController extends AppController
         {
             return 'Delete';
         }else{
-            return $this->redirect(['update', 'id' => $project->id]);
+            return $this->redirect(['/projects/index', 'id' => $user->id]);
         }
     }
 
@@ -215,6 +226,27 @@ class ProjectsController extends AppController
             'model' => $model,
         ]);
     }
+
+
+
+    public function actionListTypeSort()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        if (isset($_POST['depdrop_parents'])) {
+
+            $parents = $_POST['depdrop_parents'];
+
+            if ($parents != null && $parents[0] != 0) {
+
+                $cat_id = $parents[0];
+                $out = ProjectSort::getListTypes($cat_id);
+                return ['output' => $out, 'selected' => ''];
+            }
+        }
+        return ['output' => '', 'selected' => ''];
+    }
+
 
 
     public function actionUpshot($id)
@@ -263,9 +295,9 @@ class ProjectsController extends AppController
     public function actionCreate($id)
     {
         $model = new Projects();
+        $model->user_id = $id;
 
-        $modelsAuthors = [new Authors];
-
+        $models = Projects::find()->where(['user_id' => $id])->all();
         $user = User::findOne(['id' => $id]);
 
         if ($user->status === User::STATUS_ACTIVE){
@@ -274,103 +306,100 @@ class ProjectsController extends AppController
             $user->createDirName();
         }
 
-        $models = Projects::find()->where(['user_id' => $id])->all();
-
-        $model->user_id = $id;
-        $model->created_at = date('Y:m:d');
-        $model->update_at = date('Y:m:d');
-
         if ($model->load(Yii::$app->request->post())) {
 
-            /*Преобразование даты в число*/
-            if ($model->patent_date){
-                $model->patent_date = strtotime($model->patent_date);
-            }
-            if ($model->register_date){
-                $model->register_date = strtotime($model->register_date);
-            }
-            if ($model->invest_date){
-                $model->invest_date = strtotime($model->invest_date);
-            }
-            if ($model->date_of_announcement){
-                $model->date_of_announcement = strtotime($model->date_of_announcement);
-            }
-
-            $modelsAuthors = Model::createMultiple(Authors::class);
-            Model::loadMultiple($modelsAuthors, Yii::$app->request->post());
+            if(Yii::$app->request->isAjax) {
 
 
-            $countMod = 0;
-            foreach ($models as $item) {
-                if (mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                    $countMod++;
+                /*Преобразование даты в число*/
+                if ($model->patent_date){
+                    $model->patent_date = strtotime($model->patent_date);
                 }
-            }
+                if ($model->register_date){
+                    $model->register_date = strtotime($model->register_date);
+                }
+                if ($model->invest_date){
+                    $model->invest_date = strtotime($model->invest_date);
+                }
+                if ($model->date_of_announcement){
+                    $model->date_of_announcement = strtotime($model->date_of_announcement);
+                }
 
-            if ($countMod === 0){
 
-                if ($model->save()){
-
-                    $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
-                    $user_dir = mb_strtolower($user_dir, "windows-1251");
-                    if (!file_exists($user_dir)){
-                        mkdir($user_dir, 0777);
+                $countMod = 0;
+                foreach ($models as $item) {
+                    if (mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                        $countMod++;
                     }
+                }
 
-                    $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
-                    $project_dir = mb_strtolower($project_dir, "windows-1251");
-                    if (!file_exists($project_dir)){
-                        mkdir($project_dir, 0777);
-                    }
+                if ($countMod === 0){
 
-                    $present_files_dir = $project_dir . '/present files/';
-                    if (!file_exists($present_files_dir)){
-                        mkdir($present_files_dir, 0777);
-                    }
+                    if ($model->save()){
 
-                    $segments_dir = $project_dir . '/segments/';
-                    if (!file_exists($segments_dir)){
-                        mkdir($segments_dir, 0777);
-                    }
 
-                    // validate all models
-                    $valid = $model->validate();
-                    $valid = Model::validateMultiple($modelsAuthors) && $valid;
+                        //Загрузка участников команды проекта (Authors)
+                        //---Начало---
 
-                    if ($valid) {
-                        $transaction = \Yii::$app->db->beginTransaction();
-                        try {
-                            if ($flag = $model->save(false)) {
-                                foreach ($modelsAuthors as $modelsAuthors) {
-                                    $modelsAuthors->project_id = $model->id;
-                                    if (! ($flag = $modelsAuthors->save(false))) {
-                                        $transaction->rollBack();
-                                        break;
-                                    }
-                                }
-                            }
-                            if ($flag) {
-                                $transaction->commit();
+                        $arr_authors = $_POST['Authors'];
+                        $arr_authors = array_values($arr_authors);
 
-                                $model->present_files = UploadedFile::getInstances($model, 'present_files');
+                        foreach ($arr_authors as $arr_author) {
 
-                                $model->upload($present_files_dir);
-
-                                return $this->redirect(['/segment/index', 'id' => $model->id]);
-                            }
-                        } catch (Exception $e) {
-                            $transaction->rollBack();
+                            $worker = new Authors();
+                            $worker->fio = $arr_author['fio'];
+                            $worker->role = $arr_author['role'];
+                            $worker->experience = $arr_author['experience'];
+                            $worker->project_id = $model->id;
+                            $worker->save();
                         }
+
+                        //Загрузка участников команды проекта (Authors)
+                        //---Конец---
+
+
+                        $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
+                        $user_dir = mb_strtolower($user_dir, "windows-1251");
+                        if (!file_exists($user_dir)){
+                            mkdir($user_dir, 0777);
+                        }
+
+                        $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
+                        $project_dir = mb_strtolower($project_dir, "windows-1251");
+                        if (!file_exists($project_dir)){
+                            mkdir($project_dir, 0777);
+                        }
+
+                        $present_files_dir = $project_dir . '/present files/';
+                        if (!file_exists($present_files_dir)){
+                            mkdir($present_files_dir, 0777);
+                        }
+
+                        $segments_dir = $project_dir . '/segments/';
+                        if (!file_exists($segments_dir)){
+                            mkdir($segments_dir, 0777);
+                        }
+
+                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
+
+                        $model->upload($present_files_dir);
+
+
+                        $response =  ['success' => true, 'model_id' => $model->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
+                }else{
+
+                    //Проект с таким именем уже существует
+                    $response =  ['project_already_exists' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-            }else{
-                Yii::$app->session->setFlash('error', 'Проект с названием "'. $model->project_name .'" уже существует!');
             }
         }
-        return $this->render('create', [
-            'model' => $model,
-            'modelsAuthors' => (empty($modelsAuthors)) ? [new Authors] : $modelsAuthors,
-        ]);
     }
 
     /**
@@ -386,116 +415,136 @@ class ProjectsController extends AppController
         $user = User::find()->where(['id' => $model->user_id])->one();
         $_user = Yii::$app->user->identity;
         $models = Projects::find()->where(['user_id' => $user['id']])->all();
-        $modelsAuthors = Authors::find()->where(['project_id'=>$id])->all();
+        $workers = Authors::find()->where(['project_id'=>$id])->all();
 
-        $model->update_at = date('Y:m:d');
 
         if ($model->load(Yii::$app->request->post())) {
 
-            /*Преобразование даты в число*/
-            if ($model->patent_date){
-                $model->patent_date = strtotime($model->patent_date);
-            }
-            if ($model->register_date){
-                $model->register_date = strtotime($model->register_date);
-            }
-            if ($model->invest_date){
-                $model->invest_date = strtotime($model->invest_date);
-            }
-            if ($model->date_of_announcement){
-                $model->date_of_announcement = strtotime($model->date_of_announcement);
-            }
+            if(Yii::$app->request->isAjax) {
 
 
-            $oldIDs = ArrayHelper::map($modelsAuthors, 'id', 'id');
-            $modelsAuthors = Model::createMultiple(Authors::class, $modelsAuthors);
-            Model::loadMultiple($modelsAuthors, Yii::$app->request->post());
-            $deletedIDs1 = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsAuthors, 'id', 'id')));
-
-
-            $countCon = 0;
-            foreach ($models as $item) {
-                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                    $countCon++;
+                /*Преобразование даты в число*/
+                if ($model->patent_date){
+                    $model->patent_date = strtotime($model->patent_date);
                 }
-            }
+                if ($model->register_date){
+                    $model->register_date = strtotime($model->register_date);
+                }
+                if ($model->invest_date){
+                    $model->invest_date = strtotime($model->invest_date);
+                }
+                if ($model->date_of_announcement){
+                    $model->date_of_announcement = strtotime($model->date_of_announcement);
+                }
 
-            if ($countCon === 0){
-                foreach ($models as $elem){
-                    if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
 
-                        $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                            . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
-
-                        $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                        $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                            . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
-
-                        $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                        rename($old_dir, $new_dir);
+                $countCon = 0;
+                foreach ($models as $item) {
+                    if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                        $countCon++;
                     }
                 }
 
-                if ($model->save()){
+                if ($countCon === 0){
+                    foreach ($models as $elem){
+                        if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
 
-                    $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
+                            $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                                . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
 
-                    if (!file_exists($segments_dir)){
-                        mkdir($segments_dir, 0777);
-                    }
+                            $old_dir = mb_strtolower($old_dir, "windows-1251");
 
-                    // validate all models
-                    $valid = $model->validate();
-                    $valid = Model::validateMultiple($modelsAuthors) && $valid;
+                            $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                                . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
 
-                    if ($valid) {
-                        $transaction = \Yii::$app->db->beginTransaction();
-                        try {
-                            if ($flag = $model->save(false)) {
-                                if (! empty($deletedIDs1)) {
-                                    Authors::deleteAll(['id' => $deletedIDs1]);
-                                }
+                            $new_dir = mb_strtolower($new_dir, "windows-1251");
 
-                                foreach ($modelsAuthors as $modelsAuthors) {
-                                    $modelsAuthors->project_id = $model->id;
-                                    if (! ($flag = $modelsAuthors->save(false))) {
-                                        $transaction->rollBack();
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if ($flag) {
-                                $transaction->commit();
-
-                                $model->present_files = UploadedFile::getInstances($model, 'present_files');
-
-                                $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-                                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
-
-
-                                $model->upload($present_files_dir);
-
-                                Yii::$app->session->setFlash('success', "Проект * {$model->project_name} * обновлен");
-                                return $this->redirect(['view', 'id' => $model->id]);
-                            }
-                        } catch (Exception $e) {
-                            $transaction->rollBack();
+                            rename($old_dir, $new_dir);
                         }
                     }
+
+                    if ($model->save()){
+
+                        //Загрузка участников команды проекта (Authors)
+                        //---Начало---
+
+                        $arr_authors = $_POST['Authors'];
+                        $arr_authors = array_values($arr_authors);
+
+                        if (count($arr_authors) > count($workers)) {
+
+                            foreach ($arr_authors as $i => $arr_author) {
+
+                                if (($i+1) <= count($workers)) {
+                                    $workers[$i]->fio = $arr_authors[$i]['fio'];
+                                    $workers[$i]->role = $arr_authors[$i]['role'];
+                                    $workers[$i]->experience = $arr_authors[$i]['experience'];
+                                    $workers[$i]->save();
+                                } else {
+                                    $worker = new Authors();
+                                    $worker->fio = $arr_authors[$i]['fio'];
+                                    $worker->role = $arr_authors[$i]['role'];
+                                    $worker->experience = $arr_authors[$i]['experience'];
+                                    $worker->project_id = $model->id;
+                                    $worker->save();
+                                }
+                            }
+
+                        } else {
+
+                            foreach ($arr_authors as $i => $arr_author) {
+                                $workers[$i]->fio = $arr_author['fio'];
+                                $workers[$i]->role = $arr_author['role'];
+                                $workers[$i]->experience = $arr_author['experience'];
+                                $workers[$i]->save();
+                            }
+                        }
+
+                        //Загрузка участников команды проекта (Authors)
+                        //---Конец---
+
+
+                        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                            mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
+
+                        if (!file_exists($segments_dir)){
+                            mkdir($segments_dir, 0777);
+                        }
+
+                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
+
+                        $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
+                            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
+
+                        $model->upload($present_files_dir);
+
+                        $response =  ['success' => true, 'model_id' => $model->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                } else{
+
+                    //Проект с таким именем уже существует
+                    $response =  ['project_already_exists' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-            } else{
-                Yii::$app->session->setFlash('error', 'Проект с названием "'. $model->project_name .'" уже существует!');
             }
         }
+    }
 
-        return $this->render('update', [
-            'model' => $model,
-            'modelsAuthors' => (empty($modelsAuthors)) ? [new Authors] : $modelsAuthors,
-        ]);
+
+    public function actionDeleteAuthor($id)
+    {
+        $model = Authors::findOne($id);
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+        if ($model){
+            $project->updated_at = time();
+            $model->delete();
+        }
     }
 
     /**

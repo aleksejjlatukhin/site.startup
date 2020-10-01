@@ -357,7 +357,7 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
 
 
         $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
@@ -427,7 +427,7 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
 
         $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         $user = User::find()->where(['id' => $project->user_id])->one();
@@ -484,7 +484,7 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $user = User::find()->where(['id' => $project->user_id])->one();
 
 
@@ -544,7 +544,7 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
 
         $user = User::find()->where(['id' => $project->user_id])->one();

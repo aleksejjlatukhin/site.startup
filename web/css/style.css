@@ -588,7 +588,7 @@ progress.info-red::-moz-progress-bar{
 
 
 /*
-Стилизация вкладок на странице "Программа генерации ГПС"
+Стилизация вкладок на странице "Подтверждение"
 ---Начало--
 */
 
@@ -597,10 +597,12 @@ progress.info-red::-moz-progress-bar{
     overflow: hidden;
     padding: 0;
     margin-top: 10px;
+    font-family: 'RobotoCondensed-Light', serif;
+    font-size: 16px;
 }
 /* Style the buttons that are used to open the tab content */
 .tab button {
-    width: 20%;
+    /*width: 20%;*/
     text-align: center;
     border-radius: 12px 12px 0 0;
     height: 50px;
@@ -652,44 +654,16 @@ progress.info-red::-moz-progress-bar{
 @media screen and (max-width: 1140px) {
 
     .tab button {
-        width: 50%;
+        /*width: 50%;*/
         border-radius: 0;
-    }
-
-    .tab button:last-child {
-        width: 100%;
-    }
-
-    .step_five_button > .link_create_interview-block_text > .link_create_interview-text_left {
-        width: 42%;
-        text-align: right;
-        padding-right: 20px;
-    }
-
-    .step_five > .link_create_interview-text_left {
-        width: 42%;
-        text-align: right;
-        padding-right: 20px;
     }
 }
 
 @media screen and (max-width: 768px) {
 
-    .tab button {
+    /*.tab button {
         width: 100%;
-    }
-
-    .step_five_button > .link_create_interview-block_text > .link_create_interview-text_left {
-        width: 100px;
-        text-align: left;
-        padding-left: 0;
-    }
-
-    .step_five > .link_create_interview-text_left {
-        width: 100px;
-        text-align: left;
-        padding-left: 0;
-    }
+    }*/
 }
 
 /*
@@ -698,19 +672,18 @@ progress.info-red::-moz-progress-bar{
 */
 
 /*
-Стилизация подобия вкладок на странице "Создание Программы генерации ГПС"
+Стилизация подобия вкладок на странице "Создание подтверждения"
 ---Начало--
 */
 
 .block-link-create-interview {
     padding: 0;
     margin-top: 10px;
-    /*font-family: 'RobotoCondensed-Regular', serif;
+    /*font-family: 'RobotoCondensed-Light', serif;
     font-size: 16px;*/
 }
 
 .link_create_interview {
-    width: 20%;
     text-align: center;
     border-radius: 12px 12px 0 0;
     height: 50px;
@@ -721,10 +694,6 @@ progress.info-red::-moz-progress-bar{
     .link_create_interview {
         width: 50%;
         border-radius: 0;
-    }
-
-    .link_create_interview:last-child {
-        width: 100%;
     }
 }
 
@@ -769,10 +738,12 @@ progress.info-red::-moz-progress-bar{
     width: 100px;
     font-size: 20px;
     text-align: left;
+    font-weight: 700;
 }
 
 .link_create_interview-text_right {
     line-height: 16px;
+    font-size: 16px;
 }
 
 /*
@@ -1045,5 +1016,188 @@ progress.info-red::-moz-progress-bar{
 /*
 Стилизация предупреждений валидации форм добавления и выбора вопроса
 Программа генерации ГПС
+---Конец---
+*/
+
+/*
+Навигация по этапам разработки пользов-го проекта
+---Начало---
+*/
+.navigation_blocks {
+    display: flex;
+}
+
+.navigation_block {
+    height: auto;
+    /*width: 160px;*/
+    width: 11.111%;
+    font-size: 10px;
+    text-align: center;
+    justify-content: space-between;
+    padding: 2px 7px;
+    display: flex;
+    align-items: center;
+}
+
+.passive_navigation_block:hover {
+    text-decoration: none;
+    color: #4F4F4F;
+}
+
+.passive_navigation_block:focus {
+    text-decoration: none;
+    color: #4F4F4F;
+}
+
+.passive_navigation_block {
+    background: url('/../images/elements/passive_navigation_block.png') no-repeat;
+    background-size: 100% 100%;
+    color: #4F4F4F;
+}
+
+.no_transition_navigation_block {
+    background: url('/../images/elements/passive_navigation_block.png') no-repeat;
+    background-size: 100% 100%;
+    color: #BDBDBD;
+}
+
+.active_navigation_block {
+    background: url('/../images/elements/active_navigation_block.png') no-repeat;
+    background-size: 100% 100%;
+    color: #F3F7F7;
+}
+
+.stage_number {
+    font-family: 'RobotoCondensed-Bold', serif;
+    font-size: 32px;
+    color: #707F99;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.active_navigation_block > .stage_number {
+    color: #FFFFFF;
+}
+
+.navigation_blocks > .navigation_block:nth-child(7) > .stage_number,
+.navigation_blocks > .navigation_block:nth-child(9) > .stage_number {
+    padding-right: 15px;
+}
+/*
+Навигация по этапам разработки пользов-го проекта
+---Конец---
+*/
+
+/*Стиль для заголовком модальных окон с формами
+---Начало---
+*/
+.style_header_modal_form {
+    border-bottom: none;
+    font-size: 24px;
+    font-family: 'RobotoCondensed-Bold', serif;
+    color: #333333;
+}
+/*Стиль для заголовком модальных окон с формами
+---Конец---
+*/
+
+/*Стили для полей форм
+---Начало---
+*/
+.style_form_field_respond {
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid #828282;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.form-control{
+    font-size: 16px;
+}
+/*Стили для полей форм
+---Конец---
+*/
+
+/*Стилизация для поля Select2
+---Начало---
+*/
+.select2-container--krajee .select2-selection--single,
+.select2-container--krajee .select2-selection--single {
+    font-size: 16px;
+    height: 40px;
+    padding-left: 15px;
+    padding-top: 8px;
+    padding-bottom: 15px;
+    border: 1px solid #828282;
+}
+
+.select2-container--krajee .select2-selection--single .select2-selection__arrow,
+.select2-container--krajee .select2-selection--single .select2-selection__arrow {
+    height: 39px;
+}
+
+.select2-results__option {
+    padding: 6px 15px;
+}
+
+.input-lg.select2-container--krajee .select2-selection__clear,
+.input-group-lg .select2-container--krajee .select2-selection__clear {
+    top: 0.6rem;
+}
+/*Стилизация для поля Select2
+---Конец---
+*/
+
+/*Стилизация для поля DepDrop::TYPE_SELECT2
+---Начало---
+*/
+.select2-container--krajee .select2-selection--single {
+    font-size: 16px;
+    height: 40px;
+    padding-left: 15px;
+    padding-top: 8px;
+    padding-bottom: 15px;
+}
+
+.select2-container--krajee .select2-selection__clear {
+    top: 0.6rem;
+}
+
+.select2-container--krajee .select2-selection--single .select2-selection__arrow {
+    height: 39px;
+}
+
+.select2-container--krajee .select2-search--dropdown .select2-search__field {
+    padding-left: 10px;
+}
+
+.select2-container--krajee .select2-selection {
+    border-radius: 12px;
+}
+/*Стилизация для поля DepDrop::TYPE_SELECT2
+---Конец---
+*/
+
+/*Стилизация для строки вопроса Шаг 2
+---Начало---
+*/
+.style_form_field_questions {
+    min-height: 40px;
+    border-radius: 12px;
+    border: 1px solid #828282;
+    background: #ffffff;
+    color: #333333;
+    padding: 5px 10px;
+}
+
+div.style_form_field_questions {
+    display:flex;
+    align-items: center;
+    margin: 2px 15px;
+}
+/*Стилизация для строки вопроса Шаг 2
 ---Конец---
 */

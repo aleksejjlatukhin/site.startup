@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/interview-create-style.css');
 ?>
 
-<div class="interview-create table-project-kartik">
+<div class="interview-create">
 
     <?= $this->render('_form', [
         'model' => $model,

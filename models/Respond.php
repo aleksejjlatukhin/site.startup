@@ -41,7 +41,7 @@ class Respond extends \yii\db\ActiveRecord
             [['interview_id', 'name'], 'required'],
             [['name', 'info_respond', 'place_interview', 'email'], 'trim'],
             [['interview_id'], 'integer'],
-            [['date_plan'], 'safe'],
+            [['date_plan'], 'integer'],
             [['name', 'info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
             //['exist_respond', 'boolean'],
@@ -54,13 +54,11 @@ class Respond extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'interview_id' => 'Interview ID',
-            'name' => 'Респондент',
+            'name' => 'Фамилия, имя, отчество',
             'info_respond' => 'Данные респондента',
-            'email' => 'Адрес электронной почты',
-            'date_plan' => 'План',
-            'place_interview' => 'Место проведения',
+            'email' => 'E-mail',
+            'date_plan' => 'Плановая дата интервью',
+            'place_interview' => 'Место проведения интервью',
         ];
     }
 }

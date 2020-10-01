@@ -133,6 +133,8 @@ class DescInterviewController extends AppController
 
         $model->interview_file = null;
         $model->server_file = null;
+        $project->updated_at = time();
+        $project->save();
 
         $model->update();
 
@@ -210,7 +212,7 @@ class DescInterviewController extends AppController
                         }
                     }
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
                     if ($project->save()){
 
                         $response = $model;
@@ -268,7 +270,7 @@ class DescInterviewController extends AppController
                         }
                     }
 
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
                     if ($project->save()){
 
                         $response = $model;
@@ -298,7 +300,7 @@ class DescInterviewController extends AppController
         $user = User::find()->where(['id' => $project->user_id])->one();
 
 
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
 
         if ($model->server_file !== null){
             unlink(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .

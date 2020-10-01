@@ -110,7 +110,7 @@ $this->params['breadcrumbs'][] = $model->project_name;
             ],
 
             [
-                'attribute' => 'update_at',
+                'attribute' => 'updated_at',
                 'format' => ['date', 'dd.MM.yyyy'],
             ],
 

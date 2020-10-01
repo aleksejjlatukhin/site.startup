@@ -90,7 +90,7 @@ class DescInterview extends \yii\db\ActiveRecord
             'id' => 'ID',
             'respond_id' => 'Respond ID',
             'date_fact' => 'Фактическая дата интервью',
-            'description' => 'Материалы интервью',
+            'description' => 'Материалы, полученные в ходе интервью',
             'interview_file' => 'Файл',
             'result' => 'Вывод',
             'status' => 'Данный респондент является представителем сегмента?',

@@ -159,7 +159,7 @@ class RespondsMvpController extends AppController
                 $confirmMvp->count_respond = $confirmMvp->count_respond + 1;
                 $confirmMvp->save();
 
-                $project->update_at = date('Y:m:d');
+                $project->updated_at = time();
                 if ($project->save()){
                     Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
                     return $this->redirect(['index', 'id' => $id]);
@@ -359,7 +359,7 @@ class RespondsMvpController extends AppController
             if ($kol == 0){
 
                 if ($model->save()) {
-                    $project->update_at = date('Y:m:d');
+                    $project->updated_at = time();
                     if ($project->save()){
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
@@ -404,7 +404,7 @@ class RespondsMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->update_at = date('Y:m:d');
+        $project->updated_at = time();
         $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
         $user = User::find()->where(['id' => $project->user_id])->one();
         $_user = Yii::$app->user->identity;
