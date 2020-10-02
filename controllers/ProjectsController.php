@@ -186,6 +186,9 @@ class ProjectsController extends AppController
 
         if (file_exists($file)) {
 
+            $project->updated_at = time();
+            $project->save();
+
             return \Yii::$app->response->sendFile($file, $model->file_name);
         }
     }
@@ -202,13 +205,26 @@ class ProjectsController extends AppController
 
         unlink($path . $model->server_file);
 
-        $model->delete();
+        if($model->delete()) {
 
-        if (Yii::$app->request->isAjax)
-        {
-            return 'Delete';
-        }else{
-            return $this->redirect(['/projects/index', 'id' => $user->id]);
+            $project->updated_at = time();
+            $models = PreFiles::find()->where(['project_id' => $project->id])->all();
+            $project->save();
+
+            if (Yii::$app->request->isAjax)
+            {
+                $response =  [
+                    'success' => true,
+                    'count_files' => count($models),
+                    'project_id' => $project->id,
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }else{
+                return $this->redirect(['/projects/index', 'id' => $user->id]);
+            }
         }
     }
 

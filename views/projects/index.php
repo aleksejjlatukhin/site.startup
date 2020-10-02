@@ -719,36 +719,21 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             <div class="container row">
                 <div class="pull-left">
 
+                    <div class="add_files">
 
-                    <div style="margin-top: -5px; padding-left: 5px;">
-                        <label>Максимальное  количество - до 5 файлов. Используйте множественную загрузку.</label>
-                        <p style="margin-top: -5px; color: #BDBDBD;">Загружаемые файлы должны иметь соответствующие расширения: png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                        <div style="margin-top: -5px; padding-left: 5px;">
+                            <label>Максимальное  количество - до 5 файлов. Используйте множественную загрузку.</label>
+                            <p style="margin-top: -5px; color: #BDBDBD;">Загружаемые файлы должны иметь соответствующие расширения: png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                        </div>
+
+                        <div class="error_files_count text-danger" style="display: none; margin-top: -5px; padding-left: 5px;">
+                            Превышено максимальное количество файлов для загрузки.
+                        </div>
+
+                        <div style="padding-left: 5px;"><?= $form->field($newModel, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></div>
+
                     </div>
 
-                    <p style="padding-left: 5px;"><?= $form->field($newModel, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></p>
-
-                    <p><?php if (!empty($newModel->preFiles)){
-                            foreach ($newModel->preFiles as $file){
-                                echo Html::a($file->file_name, ['download', 'filename' => $file->file_name], ['class' => 'btn btn-default prefiles']) .
-                                    ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'filename' => $file->file_name], [
-                                        'onclick'=>
-                                            "$.ajax({
-                                                 type:'POST',
-                                                 cache: false,
-                                                 url: '".Url::to(['delete-file', 'filename' => $file->file_name])."',
-                                                 success  : function(response) {
-                                                     $('.link-del ' . $file->id).html(response);
-                                                     $('.prefiles').remove();
-                                                 }
-                                              });
-                                         return false;
-                                         $('.prefiles').remove();
-                                         ",
-                                        'class' => "link-del $file->id",
-                                    ]) . '<br>';
-                            }
-                        }?>
-                    </p>
                 </div>
             </div>
 
@@ -759,6 +744,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         <div class="col-md-12">
 
             <?= Html::submitButton('Сохранить', [
+                'id' => 'save_create_form',
                 'class' => 'btn btn-success pull-right',
                 'style' => [
                     'display' => 'flex',
@@ -898,6 +884,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         Modal::begin([
             'options' => [
                 'id' => 'data_project_update_modal-' . $model->id,
+                'class' => 'data_project_update_modal',
             ],
             'size' => 'modal-lg',
             'header' => '<h3 class="text-center">Редактирование исходных данных проекта</h3>',
@@ -1387,46 +1374,85 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 <div class="container row">
                     <div class="pull-left">
 
-                        <?php if (count($model->preFiles) < 4) : ?>
+                        <?php if (count($model->preFiles) < 5) : ?>
 
-                            <div style="margin-top: -5px; padding-left: 5px;">
-                                <label>Максимальное  количество - до 5 файлов. Используйте множественную загрузку.</label>
-                                <p style="margin-top: -5px; color: #BDBDBD;">Загружаемые файлы должны иметь соответствующие расширения: png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                            <div class="add_files">
+
+                                <div style="margin-top: -5px; padding-left: 5px;">
+                                    <label>Максимальное  количество - 5 файлов.</label>
+                                    <p style="margin-top: -5px; color: #BDBDBD;">png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                                </div>
+
+                                <div class="error_files_count text-danger" style="display: none; margin-top: -5px; padding-left: 5px;">
+                                    Превышено максимальное количество файлов для загрузки.
+                                </div>
+
+                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true])->label(false) ?></div>
+
                             </div>
 
-                            <p style="padding-left: 5px;"><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></p>
+                            <div class="add_max_files_text" style="display: none; margin-top: -5px; padding-left: 5px;">
+                                <label>Добавлено максимальное количество файлов.</label>
+                                <p style="margin-top: -5px; color: #BDBDBD;">Чтобы загрузить новые файлы, удалите уже загруженные.</p>
+                            </div>
 
                         <?php else : ?>
 
-                            <div style="margin-top: -5px; padding-left: 5px;">
+                            <div class="add_files" style="display: none;">
+
+                                <div style="margin-top: -5px; padding-left: 5px;">
+                                    <label>Максимальное  количество - 5 файлов.</label>
+                                    <p style="margin-top: -5px; color: #BDBDBD;">png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                                </div>
+
+                                <div class="error_files_count text-danger" style="display: none; margin-top: -5px; padding-left: 5px;">
+                                    Превышено максимальное количество файлов для загрузки.
+                                </div>
+
+                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true])->label(false) ?></div>
+
+                            </div>
+
+                            <div class="add_max_files_text" style="margin-top: -5px; padding-left: 5px;">
                                 <label>Добавлено максимальное количество файлов.</label>
                                 <p style="margin-top: -5px; color: #BDBDBD;">Чтобы загрузить новые файлы, удалите уже загруженные.</p>
                             </div>
 
                         <?php endif; ?>
 
-                        <p><?php if (!empty($model->preFiles)){
+                        <div class="block_all_files" style="padding-left: 5px;">
+                            <?php if (!empty($model->preFiles)){
                                 foreach ($model->preFiles as $file){
-                                    echo Html::a($file->file_name, ['download', 'id' => $file->id], ['class' => 'btn btn-default prefiles']) .
-                                        ' ' . Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete-file', 'id' => $file->id], [
-                                            'onclick'=>
-                                                "$.ajax({
-                                                 type:'POST',
-                                                 cache: false,
-                                                 url: '".Url::to(['delete-file', 'id' => $file->id])."',
-                                                 success  : function(response) {
-                                                     $('.link-del ' . $file->id).html(response);
-                                                     $('.prefiles').remove();
-                                                 }
-                                              });
-                                         return false;
-                                         $('.prefiles').remove();
-                                         ",
-                                            'class' => "link-del $file->id",
-                                        ]) . '<br>';
+                                    $filename = $file->file_name;
+                                    if(mb_strlen($filename) > 35){ $filename = mb_substr($file->file_name, 0, 35) . '...'; }
+                                    echo '<div style="display: flex; margin: 2px 0; align-items: center;" class="one_block_file-'.$file->id.'">' .
+                                        Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>'. Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) .'</div></div>', ['download', 'id' => $file->id], [
+                                            'title' => 'Скачать файл',
+                                            'class' => 'btn btn-default prefiles',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                //'color' => '#FFFFFF',
+                                                'justify-content' => 'center',
+                                                'background' => '#E0E0E0',
+                                                'width' => '320px',
+                                                'height' => '40px',
+                                                'text-align' => 'left',
+                                                'font-size' => '14px',
+                                                'border-radius' => '8px',
+                                                'margin-right' => '5px',
+                                            ]
+                                            ]) . ' ' .
+                                        Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px', 'height' => '29px']]), ['delete-file', 'id' => $file->id], [
+                                            'title' => 'Удалить файл',
+                                            'class' => 'delete_file',
+                                            'id' => 'delete_file-' . $file->id,
+                                            'style' => ['display' => 'flex', 'margin-left' => '15px'],
+                                            ])
+                                        . '</div>';
                                 }
                             }?>
-                        </p>
+                        </div>
                     </div>
                 </div>
 
@@ -1437,6 +1463,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             <div class="col-md-12">
 
             <?= Html::submitButton('Сохранить', [
+                'id' => 'save_update_form',
                 'class' => 'btn btn-success pull-right',
                 'style' => [
                     'display' => 'flex',
@@ -1577,35 +1604,90 @@ $script = "
         //Фон для модального окна информации (проект с таким именем уже существует)
         var project_already_exists_modal = $('#project_already_exists').find('.modal-content');
         project_already_exists_modal.css('background-color', '#707F99');
+
+    });
+    
+    
+    $('#data_project_create_modal').on('change', 'input[type=file]',function(){
+    
+        for (var i = 0; i < this.files.length; i++) {
+            console.log(this.files[i].name);
+        }
         
-        //Возвращение скролла первого модального окна после закрытия второго
-        $('.modal').on('hidden.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
-                $('body').addClass('modal-open');
-            }
-        }).on('show.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
-                $(this).css('z-index', parseInt($('.modal-backdrop.in').first().css('z-index')) + 10);
+        //Количество добавленных файлов
+        var add_count = this.files.length;
+        
+        if(add_count > 5) {
+            //Сделать кнопку отправки формы не активной
+            $('#data_project_create_modal').find('#save_create_form').attr('disabled', true);
+            $('#data_project_create_modal').find('.error_files_count').show();
+        }else {
+            //Сделать кнопку отправки формы активной
+            $('#data_project_create_modal').find('#save_create_form').attr('disabled', false);
+            $('#data_project_create_modal').find('.error_files_count').hide();
+        }
+        
+    });
+    
+    
+    //Возвращение скролла первого модального окна после закрытия 
+    //модального окна информации об ошибке
+    $( '#project_already_exists' ).on( 'hidden.bs.modal' , function() {
+        $( 'body' ).addClass( 'modal-open' );
+    } );
+    
+    
+    //Удаление файла из проекта
+    $('body').on('click', '.delete_file', function(e){
+    
+        var deleteFileId = $(this).attr('id');
+        deleteFileId = deleteFileId.split('-');
+        deleteFileId = deleteFileId[1];
+        var url = $(this).attr('href');
+    
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+
+                if (response['success']) {
+                
+                    //Удаляем блок с файлом
+                    $('#data_project_update_modal-' + response['project_id']).find('.one_block_file-' + deleteFileId).remove();
+                    
+                    if (response['count_files'] == 4){
+                        $('#data_project_update_modal-' + response['project_id']).find('.add_files').show();
+                        $('#data_project_update_modal-' + response['project_id']).find('.add_max_files_text').hide();
+                    }
+                }
+                 
+            }, error: function(){
+                alert('Ошибка');
             }
         });
+    
+        e.preventDefault();
+
+        return false;
     });
     
     
     //Создание проекта
     $('#project_create_form').on('beforeSubmit', function(e){
     
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
+        var form = $(this);
+		var url = form.attr('action');	
+		var formData = new FormData(form[0]);
         
         $.ajax({
         
             url: url,
             method: 'POST',
-            data: data,
+            processData: false,
+	        contentType: false,
+            data:  formData,
             cache: false,
             success: function(response){
                 
@@ -1622,7 +1704,6 @@ $script = "
                 
                     $('#project_already_exists').modal('show');
                 }
-                
             },
             error: function(){
                 alert('Ошибка');
@@ -1635,7 +1716,7 @@ $script = "
     });
     
     
-    //Удаление формы автора проекта в редактировании
+    //Удаление формы автора проекта при создании
     $('body').on('click', '.remove_author_for_create', function(){
     
         var clickId = $(this).attr('id');
@@ -1781,34 +1862,65 @@ foreach ($models as $model) :
 
 $script2 = "
 
+   
+
+    $('#data_project_update_modal-" . $model->id. "').on('change', 'input[type=file]',function(){
+    
+        for (var i = 0; i < this.files.length; i++) {
+            console.log(this.files[i].name);
+        }
+        
+        //Количество добавленных файлов
+        var add_count = this.files.length;
+        //Количество файлов уже загруженных
+        var count_exist_files = $('#data_project_update_modal-" . $model->id. "').find('.block_all_files').children('div').length;
+        //Общее количество файлов
+        var countAllFiles = this.files.length + count_exist_files;
+        
+        if(countAllFiles > 5) {
+            //Сделать кнопку отправки формы не активной
+            $('#project_update_form-" . $model->id . "').find('#save_update_form').attr('disabled', true);
+            $('#data_project_update_modal-" . $model->id. "').find('.error_files_count').show();
+        }else {
+            //Сделать кнопку отправки формы активной
+            $('#project_update_form-" . $model->id . "').find('#save_update_form').attr('disabled', false);
+            $('#data_project_update_modal-" . $model->id. "').find('.error_files_count').hide();
+        }
+        
+    });
+    
+
     //Редактирование проекта
     $('#project_update_form-" . $model->id . "').on('beforeSubmit', function(e){
     
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
-        
+        var form = $(this);
+        var url = form.attr('action');	
+        var formData = new FormData(form[0]);
+            
         $.ajax({
-        
+            
             url: url,
             method: 'POST',
-            data: data,
+            processData: false,
+            contentType: false,
+            data:  formData,
             cache: false,
             success: function(response){
-                
+                    
                 //Если данные загружены и проверены
                 if(response['success']){
-                
+                    
                     //Закрываем модальное окно и делаем перезагрузку 
                     $('#data_project_update_modal-' + response['model_id']).modal('hide');
                     location.reload();
                 }
-                
+                    
                 //Если сегмент с таким именем уже существует 
                 if(response['project_already_exists']){
                 
                     $('#project_already_exists').modal('show');
                 }
-                
+                    
             },
             error: function(){
                 alert('Ошибка');
