@@ -1759,7 +1759,7 @@ $script = "
         $('#form_authors').find('.form_authors_inputs').find('.row-author').toggleClass('row-author-').toggleClass('row-author-form-create-' + id);
         var str = $('#form_authors').find('.form_authors_inputs').html();
         $(str).find('.row-author').toggleClass('row-author-').toggleClass('row-author-form-create-' + id);
-        $('.item-authors').append(str);
+        $('#data_project_create_modal').find('.item-authors').append(str);
         
         $('#form_authors').find('.form_authors_inputs').find('.row-author').toggleClass('row-author-form-create-' + id).toggleClass('row-author-');
         $('#form_authors').find('#author_fio_create-' + id).attr('name', 'Authors[0][fio]');
