@@ -730,7 +730,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                             Превышено максимальное количество файлов для загрузки.
                         </div>
 
-                        <div style="padding-left: 5px;"><?= $form->field($newModel, 'present_files[]')->fileInput(['multiple' => true,])->label(false) ?></div>
+                        <div style="padding-left: 5px;"><?= $form->field($newModel, 'present_files[]', ['template' => "{label}\n{input}"])->fileInput(['multiple' => true,])->label(false) ?></div>
 
                     </div>
 
@@ -1387,7 +1387,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                                     Превышено максимальное количество файлов для загрузки.
                                 </div>
 
-                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true])->label(false) ?></div>
+                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]', ['template' => "{label}\n{input}"])->fileInput(['multiple' => true])->label(false) ?></div>
 
                             </div>
 
@@ -1409,7 +1409,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                                     Превышено максимальное количество файлов для загрузки.
                                 </div>
 
-                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]')->fileInput(['multiple' => true])->label(false) ?></div>
+                                <div style="padding-left: 5px;"><?= $form->field($model, 'present_files[]', ['template' => "{label}\n{input}"])->fileInput(['multiple' => true])->label(false) ?></div>
 
                             </div>
 
