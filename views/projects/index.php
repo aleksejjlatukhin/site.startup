@@ -722,8 +722,8 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     <div class="add_files">
 
                         <div style="margin-top: -5px; padding-left: 5px;">
-                            <label>Максимальное  количество - до 5 файлов. Используйте множественную загрузку.</label>
-                            <p style="margin-top: -5px; color: #BDBDBD;">Загружаемые файлы должны иметь соответствующие расширения: png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
+                            <label>Максимальное  количество - 5 файлов.</label>
+                            <p style="margin-top: -5px; color: #BDBDBD;">png, jpg, jpeg, pdf, txt, doc, docx, xls</p>
                         </div>
 
                         <div class="error_files_count text-danger" style="display: none; margin-top: -5px; padding-left: 5px;">
