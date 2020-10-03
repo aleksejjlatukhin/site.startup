@@ -2264,7 +2264,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 <div class="" style="padding: 0;">
                     <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-                    Не соответствуют сегменту: <?= ($model->count_respond - $model->dataMembersOfSegment);?>
+                    Не соответствуют сегменту: <?= ($model->dataDescInterviewsOfModel - $model->dataMembersOfSegment);?>
                 </div>
 
                 <div class="" style="padding: 0;">
