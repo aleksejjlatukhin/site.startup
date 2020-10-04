@@ -170,12 +170,12 @@ class UsersController extends AppAdminController
 
                 foreach ($user->projects as $project) {
 
-                    $project_update_at[] = strtotime($project->update_at);
+                    $project_updated_at[] = $project->updated_at;
                 }
 
-                if (max($project_update_at) > $user->updated_at){
+                if (max($project_updated_at) > $user->updated_at){
 
-                    $user->updated_at = max($project_update_at);
+                    $user->updated_at = max($project_updated_at);
                     $user->save();
                 }
 
@@ -235,7 +235,7 @@ class UsersController extends AppAdminController
                 }
 
                 //Отправка письма на почту пользователю при изменении его статуса
-                //$model->sendEmailUserStatus();
+                $model->sendEmailUserStatus();
 
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $model;
