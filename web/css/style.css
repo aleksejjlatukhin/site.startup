@@ -1201,3 +1201,255 @@ div.style_form_field_questions {
 /*Стилизация для строки вопроса Шаг 2
 ---Конец---
 */
+
+/*Стили для главной страницы
+---Начало---
+*/
+.background_for_main_page {
+    background-image: url("../images/backgrounds/background_for_login_page.png");
+    min-height: 100%;
+    min-width: 300px;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.top_line_text_main_page {
+    margin: 60px 0 0 0;
+    padding: 0;
+}
+.top_line_text_main_page > div {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    text-transform: uppercase;
+    min-height: 60px;
+    height: 100%;
+    background: #E0E0E0;
+}
+
+.content_main_page {
+    position:fixed;
+    top: 20%;
+    display:flex;
+    width: 100%;
+}
+
+.style_form_login {
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_form_singup {
+    display: none;
+    background: #707F99;
+    /*width: 900px;*/
+    min-width: 280px;
+    color: #ffffff;
+    height: 100%;
+    border-radius: 16px;
+    padding: 20px 5px 20px 5px;
+    margin-left: 60px;
+    margin-right: 60px;
+    margin-top: 10px;
+}
+
+.style_error_not_user {
+    display: none;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_go_password_recovery_for_email {
+    display: none;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_password_recovery_for_email {
+    position: relative;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_answer_for_password_recovery {
+    display: none;
+    position: relative;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_form_reset_password {
+    position: relative;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.style_error_not_confirm_singup {
+    display: none;
+    position: relative;
+    background: #707F99;
+    width: 340px;
+    min-width: 280px;
+    color: #ffffff;
+    height: 440px;
+    border-radius: 16px;
+    padding: 0;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+
+.content_main_page_block_text {
+    width: 100%;
+    font-family: 'RobotoCondensed-Bold', serif;
+    color: #4F4F4F;
+    text-transform: uppercase;
+}
+
+.content_main_page_block_text > div {
+    display:flex;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.top_title_main_page {
+    font-size: 52px;
+    line-height: 61px;
+    width: 530px;
+    text-align: center;
+    margin-top: 0;
+}
+
+.bottom_title_main_page {
+    font-size: 36px;
+    width: 453px;
+    line-height: 42px;
+    text-align: center;
+}
+
+.bottom_title_main_page > span {
+    color:#707F99;
+}
+
+.link_singup {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+}
+.link_singup:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+.link_singup:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+/*Стили для главной страницы
+---Конец---
+*/
+
+/*Стилизация Чекбоксов
+---Начало---
+*/
+input[type="checkbox"] { display: none; }
+
+input[type="checkbox"] + label {
+    margin-left: 15px;
+    display: block;
+    position: relative;
+    padding-left: 55px;
+    margin-bottom: 20px;
+    font-weight: 400;
+    font-size: 17px;
+    color: #ffffff;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+input[type="checkbox"] + label:last-child { margin-bottom: 0; }
+
+input[type="checkbox"] + label:before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #ffffff;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    opacity: .6;
+    -webkit-transition: all .12s, border-color .08s;
+    transition: all .12s, border-color .08s;
+}
+
+input[type="checkbox"]:checked + label:before {
+    width: 10px;
+    top: -3px;
+    left: 5px;
+    border-radius: 0;
+    opacity: 1;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+/*Стилизация Чекбоксов
+---Конец---
+*/
+
+

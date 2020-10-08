@@ -15,14 +15,17 @@ class AccountActivation extends Model
 {
     /* @var $user \app\models\User */
     private $_user;
+    public $exist = true;
 
     public function __construct($key, $config = [])
     {
         if(empty($key) || !is_string($key))
-            throw new InvalidArgumentException('Ключ не может быть пустым!');
+            //throw new InvalidArgumentException('Ключ не может быть пустым!');
+            $this->exist = false;
         $this->_user = User::findBySecretKey($key);
         if(!$this->_user)
-            throw new InvalidArgumentException('Не верный ключ! Возможно истекло время его действия...');
+            //throw new InvalidArgumentException('Не верный ключ! Возможно истекло время его действия...');
+            $this->exist = false;
         parent::__construct($config);
     }
 

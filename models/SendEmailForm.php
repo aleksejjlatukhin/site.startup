@@ -15,15 +15,15 @@ class SendEmailForm extends Model
     {
         return [
             ['email', 'filter', 'filter' => 'trim'],
-            ['email', 'required'],
-            ['email', 'email'],
-            ['email', 'exist',
-                'targetClass' => User::class,
-                'filter' => [
-                    'status' => User::STATUS_ACTIVE
-                ],
-                'message' => 'Данный адрес эл.почты не зарегистрирован.'
-            ],
+            //['email', 'required'],
+            //['email', 'email'],
+            //['email', 'exist',
+                //'targetClass' => User::class,
+                //'filter' => [
+                    //'status' => User::STATUS_ACTIVE
+                //],
+                //'message' => 'Данный адрес эл.почты не зарегистрирован.'
+            //],
         ];
     }
 

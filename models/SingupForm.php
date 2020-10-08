@@ -15,6 +15,8 @@ class SingupForm extends Model
     public $telephone;
     public $email;
     public $username;
+    public $uniq_username = true;
+    public $uniq_email = true;
     public $password;
     public $status;
     public $confirm;
@@ -24,7 +26,7 @@ class SingupForm extends Model
     public function rules()
     {
         return [
-            ['exist_agree','boolean'],
+            [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password'], 'required'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password'], 'trim'],
@@ -39,10 +41,12 @@ class SingupForm extends Model
                 'targetClass' => User::class,
                 'message' => 'Этот логин уже занят.'],
 
-            [['email'], 'email'],
-            ['email', 'unique',
-                'targetClass' => User::class,
-                'message' => 'Эта почта уже зарегистрирована.'],
+            //[['email'], 'email'],
+            //['email', 'unique',
+                //'targetClass' => User::class,
+                //'message' => 'Эта почта уже зарегистрирована.'
+            //],
+            ['email', 'uniqEmail'],
 
             ['confirm', 'default', 'value' => User::NOT_CONFIRM, 'on' => 'emailActivation'],
             ['confirm', 'in', 'range' =>[
@@ -82,7 +86,7 @@ class SingupForm extends Model
         ];
     }
 
-    /*Согласие на обработку данных*/
+    //Согласие на обработку данных
     public function existAgree($attr)
     {
         if ($this->exist_agree != 1){
@@ -90,15 +94,31 @@ class SingupForm extends Model
         }
     }
 
-    /*Собственное правило для поля username*/
-    /*Переводим все логины в нижний регистр и сравниваем их с тем, что в форме*/
+    //Собственное правило для поля username
+    //Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
     public function uniqUsername($attr)
     {
         $users = User::find()->all();
 
         foreach ($users as $user){
             if (mb_strtolower($this->username) === mb_strtolower($user->username)){
+                $this->uniq_username = false;
                 $this->addError($attr, 'Этот логин уже занят.');
+            }
+        }
+    }
+
+
+    //Собственное правило для поля username
+    //Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
+    public function uniqEmail($attr)
+    {
+        $users = User::find()->all();
+
+        foreach ($users as $user){
+            if ($this->email === $user->email){
+                $this->uniq_email = false;
+                $this->addError($attr, 'Эта почта уже зарегистрирована.');
             }
         }
     }
