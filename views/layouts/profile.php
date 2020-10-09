@@ -54,7 +54,7 @@ AppAsset::register($this);
             'items' => [
                 ['label' => 'Главная', 'url' => ['/']],
                 ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
-                ['label' => 'О сервисе', 'url' => ['/site/#'], 'options' => ['onclick' => 'return false']],
+                ['label' => 'О сервисе', 'url' => ['/about']],
 
                 !Yii::$app->user->isGuest ? ([
                     'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),

@@ -45,9 +45,7 @@ class BehaviorsController extends Controller
                     [
                         'allow' => true,
                         'controllers' => ['site'],
-                        'actions' => ['singup', 'error', 'login', 'index', 'target-segment', 'segment-problems', 'problem-confirmation',
-                            'value-proposition', 'offer-confirmation', 'development-mvp', 'mvp-confirmation', 'business-model','send-email',
-                            'reset-password', 'activate-account'],
+                        'actions' => ['singup', 'error', 'login', 'index', 'about', 'send-email', 'reset-password', 'activate-account'],
                         'verbs' => ['GET', 'POST'],
                         'roles' => ['?']
                     ],
@@ -55,9 +53,8 @@ class BehaviorsController extends Controller
                     [
                         'allow' => true,
                         'controllers' => ['site', 'profile'],
-                        'actions' => ['singup', 'login', 'index', 'target-segment', 'segment-problems', 'problem-confirmation',
-                            'value-proposition', 'offer-confirmation', 'development-mvp', 'mvp-confirmation', 'business-model','send-email',
-                            'reset-password', 'update-profile', 'change-password', 'logout', 'project', 'roadmap', 'prefiles', 'not-found'],
+                        'actions' => ['singup', 'login', 'index', 'about', 'send-email', 'reset-password', 'update-profile', 'change-password',
+                            'logout', 'project', 'roadmap', 'prefiles', 'not-found'],
                         'verbs' => ['GET', 'POST'],
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {

@@ -70,117 +70,6 @@ class SiteController extends AppController
     }
 
 
-    public function actionTargetSegment()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('target-segment', compact('user'));
-    }
-
-
-    public function actionSegmentProblems()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('segment-problems', compact('user'));
-    }
-
-
-    public function actionProblemConfirmation()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('problem-confirmation', compact('user'));
-    }
-
-
-    public function actionValueProposition()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('value-proposition', compact('user'));
-    }
-
-
-    public function actionOfferConfirmation()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('offer-confirmation', compact('user'));
-    }
-
-
-    public function actionDevelopmentMvp()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('development-mvp', compact('user'));
-    }
-
-
-    public function actionMvpConfirmation()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('mvp-confirmation', compact('user'));
-    }
-
-    public function actionBusinessModel()
-    {
-        $user = Yii::$app->user->identity;
-
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
-        return $this->render('business-model', compact('user'));
-    }
-
-
     /**
      * @return array
      * @throws \yii\base\Exception
@@ -540,31 +429,22 @@ class SiteController extends AppController
     }
 
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    /*public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }*/
 
     /**
      * Displays about page.
      *
      * @return string
      */
-    /*public function actionAbout()
+    public function actionAbout()
     {
-        return $this->render('about');
-    }*/
+        $user = Yii::$app->user->identity;
+
+        /*Подключение шаблона администратора в пользовательской части*/
+        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+            || User::isUserDev(Yii::$app->user->identity['username'])){
+            $this->layout = '@app/modules/admin/views/layouts/base';
+        }
+
+        return $this->render('about', compact('user'));
+    }
 }
