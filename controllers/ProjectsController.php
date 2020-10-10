@@ -173,6 +173,22 @@ class ProjectsController extends AppController
     }
 
 
+    public function actionSortingModels($current_id, $type_sort_id)
+    {
+        $sort = new ProjectSort();
+
+        $content = $sort->showModels($current_id, $type_sort_id);
+
+        if (Yii::$app->request->isAjax) {
+
+            $response =  ['content' => $content];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     public function actionDownload($id)
     {
         $model = PreFiles::findOne($id);

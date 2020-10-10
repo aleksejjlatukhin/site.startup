@@ -103,7 +103,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         </div>
 
 
-        <!--Заголовки для списка сегментов-->
+        <!--Заголовки для списка проектов-->
         <div class="row" style="margin: 0 0 10px 0; padding: 10px;">
 
             <div class="col-md-3 headers_data_respond_hi">
@@ -129,123 +129,127 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         </div>
 
 
-        <!--Данные для списка сегментов-->
-        <?php foreach ($models as $model) : ?>
+        <div class="block_all_projects_user">
+
+            <!--Данные для списка проектов-->
+            <?php foreach ($models as $model) : ?>
 
 
-            <div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
+                <div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
 
-                <div class="col-md-3">
+                    <div class="col-md-3">
 
-                    <div>
-                        <?= Html::a(Html::encode($model->project_name), Url::to(['/segment/index', 'id' => $model->id]),[
-                            'class' => 'project_name_table_link'
-                        ]);?>
+                        <div>
+                            <?= Html::a(Html::encode($model->project_name), Url::to(['/segment/index', 'id' => $model->id]),[
+                                'class' => 'project_name_table_link'
+                            ]);?>
+                        </div>
+                        <div class="project_description_text">
+                            <?php
+
+                            $description = $model->description;
+                            if (mb_strlen($description) > 50) {
+                                $description = mb_substr($description, 0, 50) . '...';
+                            }
+
+                            echo '<div title="'.$model->description.'">' . $description . '</div>';
+
+                            ?>
+                        </div>
+
                     </div>
-                    <div class="project_description_text">
+
+
+                    <div class="col-md-3">
+
                         <?php
 
-                        $description = $model->description;
-                        if (mb_strlen($description) > 50) {
-                            $description = mb_substr($description, 0, 50) . '...';
+                        $rid = $model->rid;
+
+                        if (mb_strlen($rid) > 80) {
+                            $rid = mb_substr($rid, 0, 80)  . ' ...';
                         }
 
-                        echo '<div title="'.$model->description.'">' . $description . '</div>';
+                        echo '<div class="text_14_table_project" title="' . $model->rid . '">' . $rid . '</div>';
 
                         ?>
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <?php
-
-                    $rid = $model->rid;
-
-                    if (mb_strlen($rid) > 80) {
-                        $rid = mb_substr($rid, 0, 80)  . ' ...';
-                    }
-
-                    echo '<div class="text_14_table_project" title="' . $model->rid . '">' . $rid . '</div>';
-
-                    ?>
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <?php
-
-                    $technology = $model->technology;
-
-                    if (mb_strlen($technology) > 50) {
-                        $technology = mb_substr($technology, 0, 50) . ' ...';
-                    }
-
-                    echo '<div class="text_14_table_project" title="' . $model->technology . '">' . $technology . '</div>';
-
-                    ?>
-
-                </div>
-
-                <div class="col-md-1">
-
-                    <?= date('d.m.Y', $model->created_at); ?>
-
-                </div>
-
-                <div class="col-md-1">
-
-                    <?= date('d.m.Y', $model->updated_at); ?>
-
-                </div>
-
-                <div class="col-md-2" style="padding-left: 20px; padding-right: 20px;">
-
-                    <div class="row" style="display:flex; align-items: center;">
-
-
-                        <div class="col-md-4">
-
-                            <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
-                                'class' => '',
-                                'title' => 'Смотреть',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#data_project_modal-$model->id",
-                            ]); ?>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <?= Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
-                                'class' => '',
-                                'title' => 'Редактировать',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#data_project_update_modal-$model->id",
-                            ]); ?>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                'class' => '',
-                                'title' => 'Удалить',
-                                'onclick' => 'return false',
-                            ]); ?>
-
-                        </div>
 
                     </div>
+
+                    <div class="col-md-2">
+
+                        <?php
+
+                        $technology = $model->technology;
+
+                        if (mb_strlen($technology) > 50) {
+                            $technology = mb_substr($technology, 0, 50) . ' ...';
+                        }
+
+                        echo '<div class="text_14_table_project" title="' . $model->technology . '">' . $technology . '</div>';
+
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-1">
+
+                        <?= date('d.m.Y', $model->created_at); ?>
+
+                    </div>
+
+                    <div class="col-md-1">
+
+                        <?= date('d.m.Y', $model->updated_at); ?>
+
+                    </div>
+
+                    <div class="col-md-2" style="padding-left: 20px; padding-right: 20px;">
+
+                        <div class="row" style="display:flex; align-items: center;">
+
+
+                            <div class="col-md-4">
+
+                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Смотреть',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#data_project_modal-$model->id",
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <?= Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Редактировать',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#data_project_update_modal-$model->id",
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Удалить',
+                                    'onclick' => 'return false',
+                                ]); ?>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
                 </div>
 
+            <?php endforeach;?>
 
-            </div>
-
-        <?php endforeach;?>
+        </div>
 
     </div>
 
@@ -1787,12 +1791,12 @@ $script = "
             var worker_id = arrId[3];
             var url = '/projects/delete-author?id=' + worker_id;
             
-        $.ajax({
-            url: url,
-            method: 'POST',
-            cache: false,
-            success: function(response){},
-            error: function(){alert('Ошибка');}
+            $.ajax({
+                url: url,
+                method: 'POST',
+                cache: false,
+                success: function(response){},
+                error: function(){alert('Ошибка');}
             });
         }
         
@@ -1846,6 +1850,39 @@ $script = "
         $('#form_authors').find('#author_experience-' + id).attr('id', 'author_experience-');
         $('#form_authors').find('#remove-author-' + numberId + '_' + id).attr('id', 'remove-author-');
         $('.item-authors-' + numberId).find('.row-author').toggleClass('row-author-' + numberId + '_' + id).toggleClass('row-author-');
+    });
+    
+    
+    
+    //Сортировка проектов
+    $('#listType').change(function(){
+    
+        var current_url = window.location.href;
+        current_url = current_url.split('=');
+        var current_id = current_url[1];
+    
+        var select_value = $('#listType').val();
+        
+        if (select_value !== null) {
+        
+            var url = '/projects/sorting-models?current_id=' + current_id + '&type_sort_id=' + select_value;
+            
+            $.ajax({
+                url: url,
+                method: 'POST',
+                cache: false,
+                success: function(response){
+                
+                    $('.block_all_projects_user').html('');
+                    $('.block_all_projects_user').html(response.content);
+                    
+                },
+                error: function(){
+                    alert('Ошибка')
+                ;}
+            });
+        }
+        
     });
     
 
@@ -1931,7 +1968,6 @@ $script2 = "
 
         return false;
     });
-
     
 ";
 $position = \yii\web\View::POS_READY;

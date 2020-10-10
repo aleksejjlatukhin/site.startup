@@ -224,189 +224,193 @@ $this->registerCssFile('@web/css/segments-index-style.css');
         </div>
 
 
-        <!--Данные для списка сегментов-->
-        <?php foreach ($models as $model) : ?>
+        <div class="block_all_segments_project">
+
+            <!--Данные для списка сегментов-->
+            <?php foreach ($models as $model) : ?>
 
 
-            <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 0;">
+                <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 0;">
 
-                <div class="col-md-3">
+                    <div class="col-md-3">
 
-                    <div class="row" style="display:flex; align-items: center;">
+                        <div class="row" style="display:flex; align-items: center;">
 
-                        <div class="col-md-1" style="padding-bottom: 3px;">
+                            <div class="col-md-1" style="padding-bottom: 3px;">
 
-                            <?php
-                            if ($model->exist_confirm === 1) {
+                                <?php
+                                if ($model->exist_confirm === 1) {
 
-                                echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+                                    echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                            }elseif ($model->exist_confirm === null && empty($model->interview)) {
+                                }elseif ($model->exist_confirm === null && empty($model->interview)) {
 
-                                echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+                                    echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                            }elseif ($model->exist_confirm === null && !empty($model->interview)) {
+                                }elseif ($model->exist_confirm === null && !empty($model->interview)) {
 
-                                echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+                                    echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                            }elseif ($model->exist_confirm === 0) {
+                                }elseif ($model->exist_confirm === 0) {
 
-                                echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+                                    echo '<div class="text-center" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                            }
-                            ?>
+                                }
+                                ?>
 
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
+                            <div class="col-md-8">
 
-                            <?php
+                                <?php
 
-                            if ($model->interview) {
+                                if ($model->interview) {
 
-                                echo Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
-                                    'title' => 'Переход к программе генерации ГПС', 'class' => 'container-name_link',
-                                ]);
+                                    echo Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
+                                        'title' => 'Переход к программе генерации ГПС', 'class' => 'container-name_link',
+                                    ]);
 
-                            } else {
+                                } else {
 
-                                echo Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
-                                    'title' => 'Создание программы генерации ГПС', 'class' => 'container-name_link',
-                                ]);
-                            }
+                                    echo Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
+                                        'title' => 'Создание программы генерации ГПС', 'class' => 'container-name_link',
+                                    ]);
+                                }
 
-                            ?>
+                                ?>
 
-                        </div>
+                            </div>
 
-                        <div class="col-md-3 text-center">
+                            <div class="col-md-3 text-center">
 
-                            <?php
+                                <?php
 
-                            if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
-                                echo '<div class="">B2C</div>';
-                            }
-                            elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B) {
-                                echo '<div class="">B2B</div>';
-                            }
+                                if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
+                                    echo '<div class="">B2C</div>';
+                                }
+                                elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B) {
+                                    echo '<div class="">B2B</div>';
+                                }
 
-                            ?>
+                                ?>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                </div>
 
+                    <div class="col-md-2">
 
-                <div class="col-md-2">
+                        <?php
 
-                    <?php
+                        $field_of_activity = $model->field_of_activity;
 
-                    $field_of_activity = $model->field_of_activity;
+                        if (mb_strlen($field_of_activity) > 50) {
+                            $field_of_activity = mb_substr($field_of_activity, 0, 50);
+                            $field_of_activity = $field_of_activity . ' ...';
+                        }
 
-                    if (mb_strlen($field_of_activity) > 50) {
-                        $field_of_activity = mb_substr($field_of_activity, 0, 50);
-                        $field_of_activity = $field_of_activity . ' ...';
-                    }
+                        echo '<div title="' . $model->field_of_activity . '">' . $field_of_activity . '</div>';
 
-                    echo '<div title="' . $model->field_of_activity . '">' . $field_of_activity . '</div>';
-
-                    ?>
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <?php
-
-                    $sort_of_activity = $model->sort_of_activity;
-
-                    if (mb_strlen($sort_of_activity) > 50) {
-                        $sort_of_activity = mb_substr($sort_of_activity, 0, 50);
-                        $sort_of_activity = $sort_of_activity . ' ...';
-                    }
-
-                    echo '<div title="' . $model->sort_of_activity . '">' . $sort_of_activity . '</div>';
-
-                    ?>
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <?php
-
-                    $specialization_of_activity = $model->specialization_of_activity;
-
-                    if (mb_strlen($specialization_of_activity) > 50) {
-                        $specialization_of_activity = mb_substr($specialization_of_activity, 0, 50);
-                        $specialization_of_activity = $specialization_of_activity . ' ...';
-                    }
-
-                    echo '<div title="' . $model->specialization_of_activity . '">' . $specialization_of_activity . '</div>';
-
-                    ?>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <div class="row" style="display:flex; align-items: center;">
-
-                        <div class="col-md-4 text-right" style="font-size: 16px;">
-
-                            <?php
-
-                            echo number_format($model->market_volume, 0, '', ' ');
-
-                            ?>
-
-                        </div>
-
-                        <div class="col-md-1"></div>
-
-                        <div class="col-md-2">
-
-                            <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/view', 'id' => $model->id], [
-                                'class' => '',
-                                'title' => 'Смотреть',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#segment_view_modal-$model->id",
-                            ]); ?>
-
-                        </div>
-
-                        <div class="col-md-2">
-
-                            <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/segment/update', 'id' => $model->id], [
-                                'class' => '',
-                                'title' => 'Редактировать',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#update_segment_modal-$model->id",
-                            ]); ?>
-
-                        </div>
-
-                        <div class="col-md-2">
-
-                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                'class' => '',
-                                'title' => 'Удалить',
-                                'onclick' => 'return false',
-                            ]); ?>
-
-                        </div>
-
-                        <div class="col-md-1"></div>
+                        ?>
 
                     </div>
+
+                    <div class="col-md-2">
+
+                        <?php
+
+                        $sort_of_activity = $model->sort_of_activity;
+
+                        if (mb_strlen($sort_of_activity) > 50) {
+                            $sort_of_activity = mb_substr($sort_of_activity, 0, 50);
+                            $sort_of_activity = $sort_of_activity . ' ...';
+                        }
+
+                        echo '<div title="' . $model->sort_of_activity . '">' . $sort_of_activity . '</div>';
+
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <?php
+
+                        $specialization_of_activity = $model->specialization_of_activity;
+
+                        if (mb_strlen($specialization_of_activity) > 50) {
+                            $specialization_of_activity = mb_substr($specialization_of_activity, 0, 50);
+                            $specialization_of_activity = $specialization_of_activity . ' ...';
+                        }
+
+                        echo '<div title="' . $model->specialization_of_activity . '">' . $specialization_of_activity . '</div>';
+
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="row" style="display:flex; align-items: center;">
+
+                            <div class="col-md-4 text-right" style="font-size: 16px;">
+
+                                <?php
+
+                                echo number_format($model->market_volume, 0, '', ' ');
+
+                                ?>
+
+                            </div>
+
+                            <div class="col-md-1"></div>
+
+                            <div class="col-md-2">
+
+                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/view', 'id' => $model->id], [
+                                    'class' => '',
+                                    'title' => 'Смотреть',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#segment_view_modal-$model->id",
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-2">
+
+                                <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/segment/update', 'id' => $model->id], [
+                                    'class' => '',
+                                    'title' => 'Редактировать',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#update_segment_modal-$model->id",
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-2">
+
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Удалить',
+                                    'onclick' => 'return false',
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-1"></div>
+
+                        </div>
+                    </div>
+
+
                 </div>
 
+            <?php endforeach;?>
 
-            </div>
-
-        <?php endforeach;?>
+        </div>
 
     </div>
 
@@ -2408,6 +2412,39 @@ $script = "
         e.preventDefault();
 
         return false;
+    });
+    
+    
+    
+    //Сортировка сегментов
+    $('#listType').change(function(){
+    
+        var current_url = window.location.href;
+        current_url = current_url.split('=');
+        var current_id = current_url[1];
+    
+        var select_value = $('#listType').val();
+        
+        if (select_value !== null) {
+        
+            var url = '/segment/sorting-models?current_id=' + current_id + '&type_sort_id=' + select_value;
+            
+            $.ajax({
+                url: url,
+                method: 'POST',
+                cache: false,
+                success: function(response){
+                
+                    $('.block_all_segments_project').html('');
+                    $('.block_all_segments_project').html(response.content);
+                    
+                },
+                error: function(){
+                    alert('Ошибка')
+                ;}
+            });
+        }
+        
     });
 
 ";
