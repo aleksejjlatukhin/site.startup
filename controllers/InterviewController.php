@@ -15,6 +15,7 @@ use app\models\RespondsConfirm;
 use app\models\Segment;
 use app\models\UpdateRespondForm;
 use app\models\User;
+use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Interview;
 use yii\data\ActiveDataProvider;
@@ -674,6 +675,59 @@ class InterviewController extends AppController
             }
         }
     }
+
+
+
+    public function actionMpdfDataResponds($id)
+    {
+        $model = Interview::findOne($id);
+        $responds = $model->responds;
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/interview/viewpdf', ['model' => $model, 'responds' => $responds]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $filename = 'data-responds-'. $model->id .'.pdf';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_LANDSCAPE,
+            //'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            //'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginFooter' => 5,
+            'defaultFont' => 'RobotoCondensed-Light',
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => ['Респонденты для подтверждения гипотезы сегмента «'.$model->segment->name.'»'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Респонденты для подтверждения гипотезы сегмента «'.$model->segment->name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
+    }
+
 
     /**
      * Deletes an existing Interview model.

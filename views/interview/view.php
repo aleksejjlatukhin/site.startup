@@ -2079,12 +2079,16 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                 </div>
 
                 <div class="col-md-1" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
-                    <?= Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]);?>
+                    <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/interview/mpdf-data-responds', 'id' => $model->id], [
+                        'target'=>'_blank',
+                        //'data-toggle'=>'tooltip',
+                        'title'=> 'Скачать',
+                    ]);?>
                 </div>
 
             </div>
 
-            <?php foreach ($responds as $respond): ;?>
+            <?php foreach ($responds as $respond): ?>
 
             <div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
 
