@@ -47,7 +47,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             ?>
 
 
-            <div class="col-md-3" style="font-size: 32px; font-weight: 700;">ПРОЕКТЫ</div>
+            <div class="col-md-3" style="font-size: 32px; font-weight: 700; padding: 0;">ПРОЕКТЫ</div>
 
 
             <div class="col-md-3">
@@ -92,10 +92,10 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             ActiveForm::end();
             ?>
 
-            <div class="col-md-3">
+            <div class="col-md-3" style="padding: 0;">
 
                 <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проект</div></div>', ['#'],
-                    ['data-toggle' => 'modal', 'data-target' => "#data_project_create_modal", 'class' => 'new_segment_link_plus']
+                    ['data-toggle' => 'modal', 'data-target' => "#data_project_create_modal", 'class' => 'new_segment_link_plus pull-right']
                 );
                 ?>
 

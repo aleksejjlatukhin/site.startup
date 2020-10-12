@@ -213,7 +213,7 @@ class SegmentSort extends Model
                                 
                                 </div>
                                 
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="padding: 0;">
 
                                     <div class="row" style="display:flex; align-items: center;">
                                     

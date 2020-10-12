@@ -2021,12 +2021,16 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 </div>
 
-                <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
-                    ['data-toggle' => 'modal',
-                    'data-target' => '#respondCreate_modal',
-                    'class' => 'link_add_respond_text col-md-3']
-                );
-                ?>
+                <div class="col-md-3" style="padding: 0;">
+
+                    <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
+                        ['data-toggle' => 'modal',
+                        'data-target' => '#respondCreate_modal',
+                        'class' => 'link_add_respond_text pull-right']
+                    );
+                    ?>
+
+                </div>
 
             </div>
 
@@ -2078,7 +2082,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     </div>
                 </div>
 
-                <div class="col-md-1" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
+                <div class="col-md-1" style="text-align: right; padding: 10px 7px 10px 0;">
                     <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/interview/mpdf-data-responds', 'id' => $model->id], [
                         'target'=>'_blank',
                         //'data-toggle'=>'tooltip',
