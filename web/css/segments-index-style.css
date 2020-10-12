@@ -40,7 +40,7 @@ tbody > tr .TableSegments {
 .container-data {
     padding: 10px 15px 30px 15px;
     background: #FFFFFF;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 230px);
 }
 
 .row_header_data_generation {
