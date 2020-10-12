@@ -15,7 +15,7 @@ use yii\helpers\Html;
 
         <tr style="background: #F2F2F2;">
             <td colspan="1" style="width: 50px;"></td>
-            <td colspan="3" style="width: 250px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="3" style="width: 250px; padding: 15px 5px; color: #4F4F4F;">
                 <strong>Фамилия, имя, отчество</strong>
             </td>
             <td colspan="2" style="width: 190px; padding: 15px 5px; color: #4F4F4F;">
