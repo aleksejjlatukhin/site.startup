@@ -1667,3 +1667,135 @@ input[type="checkbox"]:checked + label:before {
 /*Стили для страницы About
 ---Конец---
 */
+
+
+/*Стили для дорожной карты
+---Начало---
+*/
+#showRoadmapProject > .modal-lg {
+    display: flex;
+    justify-content: center;
+}
+#showRoadmapSegment > .modal-lg {
+    display: flex;
+    justify-content: center;
+}
+.roadmap_segment_modal_header_title {
+    display: flex;
+    justify-content: center;
+}
+.roadmap_segment_modal_header_title_h2 {
+    font-size: 36px;
+    color: #4F4F4F;
+    max-width: 900px;
+    text-align: center;
+}
+.content_roadmap {
+    padding: 5px;
+    max-width: 100%;
+    color: #4F4F4F;
+}
+.roadmap_row_header {
+    display: flex;
+    align-items: center;
+    padding: 7px 0;
+}
+.roadmap_block_stage {
+    width: 145px;
+}
+.roadmap_block_stage:nth-child(1) {
+    width: 250px;
+    font-size: 16px;
+    font-weight: 700;
+    padding-left: 10px;
+}
+.roadmap_block_stage:nth-child(2) {
+    width: 100px;
+}
+.roadmap_block_stage > div:nth-child(1) {
+    font-size: 13px;
+    font-weight: 700;
+}
+.roadmap_block_stage:not(:nth-child(2)) > div:nth-child(2) {
+    display: flex;
+    justify-content: space-around;
+    font-size: 12px;
+    padding-top: 5px;
+}
+.roadmap_block_stage:nth-child(2) > div:nth-child(2) {
+    font-size: 12px;
+    padding-top: 5px;
+}
+
+
+
+.roadmap_row_dates {
+    max-width: 1370px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #4F4F4F;
+    border-radius: 12px;
+    padding: 2px 0;
+}
+.roadmap_block_name_segment {
+    width: 250px;
+    padding: 0 10px;
+    font-size: 18px;
+    border-right: 1px solid #E0E0E0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+.roadmap_block_date_segment {
+    width: 100px;
+    border-right: 1px solid #E0E0E0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roadmap_block_date {
+    width: 145px;
+    border-right: 1px solid #E0E0E0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+.roadmap_block_date:last-child {
+    border: none;
+}
+.roadmap_block_date_link_success {
+    color: #4F4F4F;
+    border-bottom: 1px solid #4F4F4F;
+    text-decoration: none;
+}
+.roadmap_block_date_link_success:hover {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+.roadmap_block_date_link_success:focus {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+
+.roadmap_block_date_link_danger {
+    color: #EB5757;
+    border-bottom: 1px solid #EB5757;
+    text-decoration: none;
+}
+.roadmap_block_date_link_danger:hover {
+    color: #EB5757;
+    text-decoration: none;
+}
+.roadmap_block_date_link_danger:focus {
+    color: #EB5757;
+    text-decoration: none;
+}
+
+/*Стили для дорожной карты
+---Конец---
+*/

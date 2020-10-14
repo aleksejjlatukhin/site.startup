@@ -38,9 +38,8 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['responds_confirm_id', 'date_fact'], 'required'],
+            [['responds_confirm_id'], 'required'],
             [['responds_confirm_id', 'created_at', 'updated_at'], 'integer'],
-            [['date_fact'], 'safe'],
             ['exist_desc', 'boolean'],
             ['status', 'boolean'],
         ];
@@ -54,7 +53,6 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'responds_confirm_id' => 'Responds Confirm ID',
-            'date_fact' => 'Дата Анкеты',
             'status' => 'Значимость проблемы'
         ];
     }

@@ -32,14 +32,18 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегментов', ['/segment/roadmap', 'id' => $project->id], [
+        <?= Html::a('Дорожная карта проекта', ['#'], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapProject",
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
     </div>
@@ -200,7 +204,16 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
         <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
             <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
-            <?= $segment->name; ?>
+
+            <?php
+                $segment_name = $segment->name;
+                if (mb_strlen($segment_name) > 25){
+                    $segment_name = mb_substr($segment_name, 0, 25) . '...';
+                }
+            ?>
+
+            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
+
         </div>
 
         <?= Html::a('Данные сегмента', ['#'], [
@@ -209,8 +222,10 @@ $this->registerCssFile('@web/css/problem-index-style.css');
             'data-target' => '#data_segment_modal',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['/segment/one-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Дорожная карта сегмента', ['#'], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapSegment",
         ]) ?>
 
     </div>
@@ -326,9 +341,9 @@ $this->registerCssFile('@web/css/problem-index-style.css');
             'options' => ['colspan' => 1],
             'value' => function ($model, $key, $index, $widget) {
 
-                if ($model->date_confirm) {
+                if ($model->time_confirm) {
 
-                    return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", strtotime($model->date_confirm)) .'</div>';
+                    return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", $model->time_confirm) .'</div>';
                 }else {
                     return '';
                 }
@@ -600,6 +615,57 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     <?php
     Modal::end();
+    ?>
+
+
+
+    <!--Roadmap Project-->
+
+    <?php
+
+    // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapProject',
+            'class' => 'showRoadmapProject',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
+    ]);
+    ?>
+
+    <?= $project->showRoadmapProject();?>
+
+    <?php
+
+    Modal::end();
+
+    ?>
+
+
+    <!--Roadmap Segment-->
+
+    <?php
+
+    // Модальное окно - дорожная карта сегмента
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapSegment',
+            'class' => 'showRoadmapSegment',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<div class="roadmap_segment_modal_header_title">
+                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
+                     </div>',
+    ]);
+    ?>
+
+    <?= $segment->showRoadmapSegment();?>
+
+    <?php
+
+    Modal::end();
+
     ?>
 
 

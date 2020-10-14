@@ -70,13 +70,11 @@ class DescInterview extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['respond_id', 'date_fact', 'description', 'result'], 'required'],
+            [['respond_id', 'description', 'result'], 'required'],
             [['respond_id', 'created_at', 'updated_at'], 'integer'],
-            [['date_fact'], 'safe'],
             [['description'], 'string'],
             [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
-            //['exist_desc', 'boolean'],
             ['status', 'boolean'],
         ];
     }
@@ -89,7 +87,6 @@ class DescInterview extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'respond_id' => 'Respond ID',
-            'date_fact' => 'Фактическая дата интервью',
             'description' => 'Материалы, полученные в ходе интервью',
             'interview_file' => 'Файл',
             'result' => 'Вывод',

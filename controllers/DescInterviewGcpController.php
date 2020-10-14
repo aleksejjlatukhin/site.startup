@@ -138,7 +138,6 @@ class DescInterviewGcpController extends AppController
     {
         $model = new DescInterviewGcp();
         $model->responds_gcp_id = $id;
-        $model->date_fact = date('Y:m:d');
 
         $respond = RespondsGcp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();

@@ -188,7 +188,7 @@ class ConfirmProblemController extends AppController
         }else {
 
             $generationProblem->exist_confirm = 0;
-            $generationProblem->date_confirm = date('Y:m:d');
+            $generationProblem->time_confirm = time();
 
             if ($generationProblem->save()){
 
@@ -210,8 +210,7 @@ class ConfirmProblemController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $generationProblem->exist_confirm = 1;
-        $generationProblem->date_confirm = date('Y:m:d');
-        $generationProblem->date_time_confirm = date('Y-m-d H:i:s');
+        $generationProblem->time_confirm = time();
 
         if ($generationProblem->save()){
 

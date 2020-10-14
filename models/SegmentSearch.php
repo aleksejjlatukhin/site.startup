@@ -19,7 +19,7 @@ class SegmentSearch extends Segment
     {
         return [
             [['id', 'project_id', 'type_of_interaction_between_subjects', 'age_from', 'age_to', 'gender_consumer', 'education_of_consumer', 'income_from', 'income_to', 'quantity_from', 'quantity_to', 'market_volume', 'created_at', 'updated_at'], 'integer'],
-            [['name', 'description', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'company_products', 'company_partner', 'add_info', 'creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
+            [['name', 'description', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'company_products', 'company_partner', 'add_info'], 'safe'],
         ];
     }
 
@@ -73,19 +73,6 @@ class SegmentSearch extends Segment
             'market_volume' => $this->market_volume,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'creat_date' => $this->creat_date,
-            'plan_gps' => $this->plan_gps,
-            'fact_gps' => $this->fact_gps,
-            'plan_ps' => $this->plan_ps,
-            'fact_ps' => $this->fact_ps,
-            'plan_dev_gcp' => $this->plan_dev_gcp,
-            'fact_dev_gcp' => $this->fact_dev_gcp,
-            'plan_gcp' => $this->plan_gcp,
-            'fact_gcp' => $this->fact_gcp,
-            'plan_dev_gmvp' => $this->plan_dev_gmvp,
-            'fact_dev_gmvp' => $this->fact_dev_gmvp,
-            'plan_gmvp' => $this->plan_gmvp,
-            'fact_gmvp' => $this->fact_gmvp,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

@@ -79,11 +79,26 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], [
+                'class' => 'btn btn-sm btn-default',
+                'style' => [
+                        'font-weight' => '700',
+                    'color' => '#373737',
+                    'width' => '170px'
+                ],
+            ]) ?>
         </div>
 
         <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], [
+                'class' => 'btn btn-sm btn-default',
+                'style' => [
+                    'font-weight' => '700',
+                    'color' => '#373737',
+                    'width' => '170px'
+                ],
+                'onclick' => 'return false',
+            ]) ?>
         </div>
 
     </div>
@@ -190,9 +205,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options' => ['colspan' => 1],
                 'value' => function ($model, $key, $index, $widget) {
 
-                    if ($model->date_confirm) {
+                    if ($model->time_confirm) {
 
-                        return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", strtotime($model->date_confirm)) .'</div>';
+                        return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", $model->time_confirm) .'</div>';
                     }else {
                         return '';
                     }

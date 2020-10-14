@@ -135,7 +135,6 @@ class FormCreateSegment extends Model
 
                 $segment->market_volume = $this->market_volume_b2c;
 
-                $segment->createRoadmap();
                 $this->createDirName();
 
                 return $segment->save() ? $segment : null;
@@ -162,7 +161,6 @@ class FormCreateSegment extends Model
 
                 $segment->market_volume = $this->market_volume_b2b;
 
-                $segment->createRoadmap();
                 $this->createDirName();
 
                 return $segment->save() ? $segment : null;

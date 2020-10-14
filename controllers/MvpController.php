@@ -138,9 +138,6 @@ class MvpController extends AppController
             return $this->redirect(['gcp/view', 'id' => $gcp->id]);
         }
 
-        if (count($mvps) == 0){
-            return $this->redirect(['create', 'id' => $id]);
-        }
 
         if (User::isUserSimple(Yii::$app->user->identity['username'])) {
 
@@ -226,8 +223,6 @@ class MvpController extends AppController
     {
         $model = new Mvp();
         $model->confirm_gcp_id = $id;
-        $model->date_create = date('Y:m:d');
-        $model->date_time_create = date('Y-m-d H:i:s');
         $models = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
         $model->title = 'ГMVP ' . (count($models)+1);
 

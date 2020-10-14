@@ -190,7 +190,7 @@ class ConfirmGcpController extends AppController
         } else {
 
             $gcp->exist_confirm = 0;
-            $gcp->date_confirm = date('Y:m:d');
+            $gcp->time_confirm = time();
 
             if ($gcp->save()){
 
@@ -214,8 +214,7 @@ class ConfirmGcpController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $gcp->exist_confirm = 1;
-        $gcp->date_confirm = date('Y:m:d');
-        $gcp->date_time_confirm = date('Y-m-d H:i:s');
+        $gcp->time_confirm = time();
 
         if ($gcp->save()){
 

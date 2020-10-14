@@ -30,14 +30,18 @@ use yii\helpers\Url;
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегментов', ['/segment/roadmap', 'id' => $project->id], [
+        <?= Html::a('Дорожная карта проекта', ['#'], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapProject",
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
     </div>
@@ -96,8 +100,31 @@ use yii\helpers\Url;
     <div class="row segment_info_data">
 
         <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
+
             <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
-            <?= $segment->name; ?>
+
+            <?php
+                $segment_name = $segment->name;
+                if (mb_strlen($segment_name) > 25){
+                    $segment_name = mb_substr($segment_name, 0, 25) . '...';
+                }
+            ?>
+
+            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
+
+
+
+            <span style="padding-left: 30px; padding-right: 10px; font-weight: 400; font-size: 20px;">Проблема:</span>
+
+            <?php
+            $problem = $generationProblem->description;
+            if (mb_strlen($problem) > 25){
+                $problem = mb_substr($problem, 0, 25) . '...';
+            }
+            ?>
+
+            <?= '<span title="'.$generationProblem->description.'">' . $problem . '</span>'; ?>
+
         </div>
 
         <?= Html::a('Данные сегмента', ['#'], [
@@ -106,8 +133,10 @@ use yii\helpers\Url;
             'data-target' => '#data_segment_modal',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['/segment/one-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Дорожная карта сегмента', ['#'], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapSegment",
         ]) ?>
 
     </div>
@@ -164,28 +193,18 @@ use yii\helpers\Url;
 
             <div class="container-fluid">
 
-                <?php $form = ActiveForm::begin([
-                    'options' => ['class' => 'g-py-15'],
-                    'errorCssClass' => 'u-has-error-v1',
-                    'successCssClass' => 'u-has-success-v1-1',
-                ]); ?>
+                <div class="row" style="padding-top: 30px; padding-bottom: 10px; padding-left: 5px;">
 
-                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
+                    <div class="col-md-12" style="font-weight: 700;">
+                        Формулировка проблемы, которую проверяем
+                    </div>
 
-                    <?= $form->field($generationProblem, 'description', [
-                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                    ])->label('Формулировка проблемы, которую проверяем')
-                        ->textarea([
-                            'rows' => 1,
-                            'readonly' => true,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                        ])
-                    ?>
+                    <div class="col-md-12" style="padding-top: 10px;">
+                        <?= $generationProblem->description;?>
+                    </div>
 
                 </div>
 
-                <?php ActiveForm::end(); ?>
 
                 <?php
 
@@ -331,6 +350,54 @@ use yii\helpers\Url;
 
 
 
+    <!--Roadmap Project-->
+
+    <?php
+
+    // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapProject',
+            'class' => 'showRoadmapProject',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
+    ]);
+    ?>
+
+    <?= $project->showRoadmapProject();?>
+
+    <?php
+
+    Modal::end();
+
+    ?>
+
+
+    <!--Roadmap Segment-->
+
+    <?php
+
+    // Модальное окно - дорожная карта сегмента
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapSegment',
+            'class' => 'showRoadmapSegment',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<div class="roadmap_segment_modal_header_title">
+                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
+                     </div>',
+    ]);
+    ?>
+
+    <?= $segment->showRoadmapSegment();?>
+
+    <?php
+
+    Modal::end();
+
+    ?>
 
 
 

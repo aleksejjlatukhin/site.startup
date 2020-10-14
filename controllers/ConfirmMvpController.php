@@ -184,7 +184,7 @@ class ConfirmMvpController extends AppController
         }else {
 
             $mvp->exist_confirm = 0;
-            $mvp->date_confirm = date('Y:m:d');
+            $mvp->time_confirm = time();
 
             if ($mvp->save()){
 
@@ -210,8 +210,7 @@ class ConfirmMvpController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $mvp->exist_confirm = 1;
-        $mvp->date_confirm = date('Y:m:d');
-        $mvp->date_time_confirm = date('Y-m-d H:i:s');
+        $mvp->time_confirm = time();
 
         if ($mvp->save()){
 

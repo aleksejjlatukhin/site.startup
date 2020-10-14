@@ -68,10 +68,9 @@ class Gcp extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'description'], 'trim'],
-            [['confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'created_at', 'updated_at'], 'integer'],
+            [['time_confirm', 'confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
-            [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
         ];
     }
 

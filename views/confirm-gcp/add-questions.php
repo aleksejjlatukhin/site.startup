@@ -77,6 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'border' => 'solid 5px #707F99',
                 'border-radius' => '8px',
             ],
+            'onclick' => 'return false',
         ]) ?>
 
 

@@ -12,6 +12,7 @@ use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\RespondsConfirm;
+use app\models\Roadmap;
 use app\models\Segment;
 use app\models\UpdateRespondForm;
 use app\models\User;
@@ -645,7 +646,7 @@ class InterviewController extends AppController
         }else {
 
             $segment->exist_confirm = 0;
-            $segment->date_time_confirm = date('Y-m-d H:i:s');
+            $segment->time_confirm = time();
 
             if ($segment->save()){
 
@@ -665,7 +666,7 @@ class InterviewController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         $segment->exist_confirm = 1;
-        $segment->date_time_confirm = date('Y-m-d H:i:s');
+        $segment->time_confirm = time();
 
         if ($segment->save()){
 

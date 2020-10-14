@@ -71,8 +71,7 @@ class Mvp extends \yii\db\ActiveRecord
             [['title', 'description'], 'trim'],
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
-            [['confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'created_at', 'updated_at'], 'integer'],
-            [['date_create', 'date_confirm', 'date_time_confirm', 'date_time_create'], 'safe'],
+            [['time_confirm', 'confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'created_at', 'updated_at'], 'integer'],
 
         ];
     }
@@ -87,8 +86,6 @@ class Mvp extends \yii\db\ActiveRecord
             'confirm_gcp_id' => 'Confirm Gcp ID',
             'title' => 'Наименование ГMVP',
             'description' => 'Описание',
-            'date_create' => 'Дата создания',
-            'date_confirm' => 'Дата подтверждения',
         ];
     }
 

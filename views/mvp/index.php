@@ -26,7 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <span style="font-size: 30px;"><?= $this->title; ?></span>
 
-        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-default pull-right', 'style' => ['margin-left' => '5px']]) ?>
+        <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], [
+            'class' => 'btn btn-default pull-right',
+            'style' => ['margin-left' => '5px'],
+            'onclick' => 'return false',
+        ]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-success pull-right']) ?>
 

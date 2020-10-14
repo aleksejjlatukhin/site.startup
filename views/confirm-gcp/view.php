@@ -95,11 +95,26 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], [
+                'class' => 'btn btn-sm btn-default',
+                'style' => [
+                    'font-weight' => '700',
+                    'color' => '#373737',
+                    'width' => '170px'
+                ],
+            ]) ?>
         </div>
 
         <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], ['class' => 'btn btn-sm btn-default', 'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px']]) ?>
+            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], [
+                'class' => 'btn btn-sm btn-default',
+                'style' => [
+                    'font-weight' => '700',
+                    'color' => '#373737',
+                    'width' => '170px'
+                ],
+                'onclick' => 'return false',
+            ]) ?>
         </div>
 
     </div>

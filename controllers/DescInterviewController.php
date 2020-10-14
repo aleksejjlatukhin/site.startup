@@ -176,7 +176,6 @@ class DescInterviewController extends AppController
     {
         $model = new DescInterview();
         $model->respond_id = $id;
-        $model->date_fact = date('Y:m:d');
         $respond = Respond::find()->where(['id' => $id])->one();
 
         //Если у респондента уже есть интервью, то отменить действие

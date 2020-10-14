@@ -36,9 +36,8 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['responds_gcp_id', 'date_fact'], 'required'],
+            [['responds_gcp_id'], 'required'],
             [['responds_gcp_id'], 'integer'],
-            [['date_fact'], 'safe'],
             [['status'], 'string'],
             ['exist_desc', 'boolean'],
         ];
@@ -52,7 +51,6 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'responds_gcp_id' => 'Responds Gcp ID',
-            'date_fact' => 'Дата Анкеты',
             'status' => 'Значимость предложения'
         ];
     }

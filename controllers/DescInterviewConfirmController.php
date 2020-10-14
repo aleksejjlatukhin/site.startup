@@ -126,7 +126,6 @@ class DescInterviewConfirmController extends AppController
     {
         $model = new DescInterviewConfirm();
         $model->responds_confirm_id = $id;
-        $model->date_fact = date('Y:m:d');
 
         $respond = RespondsConfirm::find()->where(['id' => $id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();

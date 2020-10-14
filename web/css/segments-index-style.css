@@ -110,7 +110,7 @@ tbody > tr .TableSegments {
 
 .container-name_link {
     color: #4F4F4F;
-    padding-left: 10px;
+    /*padding-left: 10px;*/
 }
 
 .container-name_link:hover {

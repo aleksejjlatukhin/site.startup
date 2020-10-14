@@ -162,7 +162,6 @@ class DescInterviewMvpController extends AppController
     {
         $model = new DescInterviewMvp();
         $model->responds_mvp_id = $id;
-        $model->date_fact = date('Y:m:d');
 
         $respond = RespondsMvp::findOne($id);
         $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();

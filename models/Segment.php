@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /**
@@ -324,7 +325,7 @@ class Segment extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['created_at', 'update_at', 'date_time_confirm'], 'safe'],
+            [['created_at', 'updated_at', 'time_confirm'], 'integer'],
             [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'description', 'specialization_of_activity'], 'trim'],
             [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm'], 'integer'],
             [['age_from', 'age_to'], 'integer'],
@@ -334,7 +335,6 @@ class Segment extends \yii\db\ActiveRecord
             [['add_info'], 'string'],
             [['name',], 'string', 'min' => 6, 'max' => 65],
             [['field_of_activity', 'sort_of_activity', 'specialization_of_activity', 'description', 'company_products', 'company_partner'], 'string', 'max' => 255],
-            [['creat_date', 'plan_gps', 'fact_gps', 'plan_ps', 'fact_ps', 'plan_dev_gcp', 'fact_dev_gcp', 'plan_gcp', 'fact_gcp', 'plan_dev_gmvp', 'fact_dev_gmvp', 'plan_gmvp', 'fact_gmvp'], 'safe'],
         ];
     }
 
@@ -362,35 +362,7 @@ class Segment extends \yii\db\ActiveRecord
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
             'add_info' => 'Дополнительная информация',
-            'creat_date' => 'Дата создания',
-            'plan_gps' => 'План',
-            'fact_gps' => 'Факт',
-            'plan_ps' => 'План',
-            'fact_ps' => 'Факт',
-            'plan_dev_gcp' => 'План',
-            'fact_dev_gcp' => 'Факт',
-            'plan_gcp' => 'План',
-            'fact_gcp' => 'Факт',
-            'plan_dev_gmvp' => 'План',
-            'fact_dev_gmvp' => 'Факт',
-            'plan_gmvp' => 'План',
-            'fact_gmvp' => 'Факт',
         ];
-    }
-
-
-    public function createRoadmap()
-    {
-        if (empty($this->creat_date)) {
-
-            $this->creat_date = date('Y:m:d');
-            $this->plan_gps = date('Y:m:d', (time() + 3600*24*30));
-            $this->plan_ps = date('Y:m:d', (time() + 3600*24*60));
-            $this->plan_dev_gcp = date('Y:m:d', (time() + 3600*24*90));
-            $this->plan_gcp = date('Y:m:d', (time() + 3600*24*120));
-            $this->plan_dev_gmvp = date('Y:m:d', (time() + 3600*24*150));
-            $this->plan_gmvp = date('Y:m:d', (time() + 3600*24*180));
-        }
     }
 
 
@@ -400,5 +372,290 @@ class Segment extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::class
         ];
+    }
+
+
+    public function showRoadmapSegment()
+    {
+        $roadmap = new Roadmap($this->id);
+
+        $content = '';
+
+        $content .= '<div class="content_roadmap">
+                        
+                        <div class="roadmap_row_header">
+
+                            <div class="roadmap_block_stage" style="display: none;">Сегменты</div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Генерация ГЦС</div>
+                                <div>Дата создания</div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Подтверждение ГЦС</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Генерация ГПС</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Подтверждение ГПС</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Разработка ГЦП</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Подтверждение ГЦП</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Разработка ГMVP</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                            <div class="roadmap_block_stage text-center">
+                                <div>Подтверждение ГMVP</div>
+                                <div>
+                                    <div>План</div>
+                                    <div>Факт</div>
+                                </div>
+                            </div>
+            
+                        </div>';
+
+
+
+        $segment_name = $roadmap->getProperty('segment_name');
+        if (mb_strlen($segment_name) > 25) {
+            $segment_name = mb_substr($segment_name, 0, 25) . '...';
+        }
+
+
+        if ($roadmap->getProperty('fact_segment_confirm') != null) {
+
+            if ($roadmap->getProperty('fact_segment_confirm') <= $roadmap->getProperty('plan_segment_confirm')){
+
+                $fact_segment_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_segment_confirm')), ['/interview/view', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_segment_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_segment_confirm')), ['/interview/view', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_segment_confirm = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gps') != null) {
+
+            if ($roadmap->getProperty('fact_gps') <= $roadmap->getProperty('plan_gps')){
+
+                $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gps = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gps_confirm') != null) {
+
+            if ($roadmap->getProperty('fact_gps_confirm') <= $roadmap->getProperty('plan_gps_confirm')){
+
+                $fact_gps_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps_confirm')), ['/confirm-problem/view', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gps_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps_confirm')), ['/confirm-problem/view', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gps_confirm = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gcp') != null) {
+
+            if ($roadmap->getProperty('fact_gcp') <= $roadmap->getProperty('plan_gcp')){
+
+                $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gcp = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gcp_confirm') != null) {
+
+            if ($roadmap->getProperty('fact_gcp_confirm') <= $roadmap->getProperty('plan_gcp_confirm')){
+
+                $fact_gcp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp_confirm')), ['/confirm-gcp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gcp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp_confirm')), ['/confirm-gcp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gcp_confirm = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gmvp') != null) {
+
+            if ($roadmap->getProperty('fact_gmvp') <= $roadmap->getProperty('plan_gmvp')){
+
+                $fact_gmvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gmvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gmvp = '_ _ _ _ _ _';
+        }
+
+
+        if ($roadmap->getProperty('fact_gmvp_confirm') != null) {
+
+            if ($roadmap->getProperty('fact_gmvp_confirm') <= $roadmap->getProperty('plan_gmvp_confirm')){
+
+                $fact_gmvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
+            }else {
+
+                $fact_gmvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+            }
+        }else {
+            $fact_gmvp_confirm = '_ _ _ _ _ _';
+        }
+
+
+
+        $content .= '<div class="roadmap_row_dates" style="width: 1120px;">
+
+                            <div class="roadmap_block_name_segment" style="display: none;">
+                                '.$segment_name.'
+                            </div>
+                            
+                            <div class="roadmap_block_date_segment">
+                                '.date('d.m.y',$roadmap->getProperty('created_at')).'
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_segment_confirm')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_segment_confirm.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gps')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gps.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gps_confirm')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gps_confirm.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gcp')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gcp.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gcp_confirm')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gcp_confirm.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gmvp')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gmvp.'
+                                </div>
+                            
+                            </div>
+                            
+                            <div class="roadmap_block_date">
+                            
+                                <div>
+                                    '.date('d.m.y',$roadmap->getProperty('plan_gmvp_confirm')).'
+                                </div>
+                                
+                                <div>
+                                    '.$fact_gmvp_confirm.'
+                                </div>
+                            
+                            </div>
+                            
+                        </div>
+                        
+                    </div>';
+
+
+        return $content;
     }
 }

@@ -46,14 +46,18 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегментов', ['/segment/roadmap', 'id' => $project->id], [
+        <?= Html::a('Дорожная карта проекта', ['#'], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapProject",
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
         ]) ?>
 
     </div>
@@ -266,15 +270,15 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                                 if ($model->interview) {
 
-                                    echo Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
+                                    echo '<div style="padding-left: 10px;">' . Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
                                         'title' => 'Переход к программе генерации ГПС', 'class' => 'container-name_link',
-                                    ]);
+                                    ]) . '</div>';
 
                                 } else {
 
-                                    echo Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
+                                    echo '<div style="padding-left: 10px;">' . Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
                                         'title' => 'Создание программы генерации ГПС', 'class' => 'container-name_link',
-                                    ]);
+                                    ]) . '</div>';
                                 }
 
                                 ?>
@@ -2239,6 +2243,29 @@ $this->registerCssFile('@web/css/segments-index-style.css');
     ?>
 
 
+
+    <!--Roadmap Project-->
+
+    <?php
+
+    // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapProject',
+            'class' => 'showRoadmapProject',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
+    ]);
+    ?>
+
+    <?= $project->showRoadmapProject();?>
+
+    <?php
+
+    Modal::end();
+
+    ?>
 
 
     <?php

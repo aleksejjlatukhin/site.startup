@@ -51,8 +51,6 @@ class FormCreateGcp extends Model
         $gcp->problem_id = $problem_id;
         $gcp->confirm_problem_id = $confirm_problem_id;
         $gcp->title = 'ГЦП ' . (count($models)+1);
-        $gcp->date_create = date('Y:m:d');
-        $gcp->date_time_create = date('Y-m-d H:i:s');
 
         $gcp->description = 'Наш продукт ' . mb_strtolower($this->good) . ' ';
         $gcp->description .= 'помогает ' . mb_strtolower($segment->name) . ', ';

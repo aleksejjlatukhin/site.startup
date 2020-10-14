@@ -180,7 +180,6 @@ class GenerationProblemController extends AppController
 
         $model = new GenerationProblem();
         $model->interview_id = $id;
-        $model->date_gps = date('Y:m:d');
         $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
         $model->title = 'ГПС ' . (count($models)+1);
 
