@@ -117,12 +117,12 @@ class ProjectSort extends Model
                                     <div class="text_14_table_project" title="' . $model->technology . '">' . $technology . '</div>
                                 </div>
                                 
-                                <div class="col-md-1">
-                                    '.date('d.m.Y', $model->created_at).'
+                                <div class="col-md-1 text-center">
+                                    '.date('d.m.y', $model->created_at).'
                                 </div>
                                 
-                                <div class="col-md-1">
-                                    '.date('d.m.Y', $model->updated_at).'
+                                <div class="col-md-1 text-center">
+                                    '.date('d.m.y', $model->updated_at).'
                                 </div>
                                 
                                 <div class="col-md-2" style="padding-left: 20px; padding-right: 20px;">

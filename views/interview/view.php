@@ -1618,7 +1618,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                                 <div class="col-md-12" style="margin-top: -10px;">
 
-                                    <?= $form->field($createDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
+                                    <?= $form->field($createDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}<span style="color: #BDBDBD; padding-left: 20px;">не более 255 символов</span></div><div>{input}</div>'])->textarea([
                                         'rows' => 1,
                                         'required' => true,
                                         'class' => 'style_form_field_respond form-control',
@@ -1698,41 +1698,134 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                         <?php if ($respond->descInterview) : ?>
 
-                            <?php $form = ActiveForm::begin([
-                                'action' => "/desc-interview/update?id=".$respond->descInterview->id ,
-                                'id' => "formUpdateDescInterview-".$respond->id ,
-                                'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
-                                'errorCssClass' => 'u-has-error-v1',
-                                'successCssClass' => 'u-has-success-v1-1',
-                            ]); ?>
+                            <!--Если пользователь является проектантом-->
+                            <?php if (!User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                <?php $form = ActiveForm::begin([
+                                    'action' => "/desc-interview/update?id=".$respond->descInterview->id ,
+                                    'id' => "formUpdateDescInterview-".$respond->id ,
+                                    'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
+                                    'errorCssClass' => 'u-has-error-v1',
+                                    'successCssClass' => 'u-has-success-v1-1',
+                                ]); ?>
 
 
-                            <div class="row" style="margin-bottom: 15px;">
+                                <div class="row" style="margin-bottom: 15px;">
 
-                                <div class="col-md-12">
+                                    <div class="col-md-12">
 
-                                    <?//= $form->field($updateDescInterviewForms[$i], 'description')->textarea(['rows' => 2])->label('Материалы, полученные во время интервью') ?>
+                                        <?= $form->field($updateDescInterviewForms[$i], 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
+                                            'rows' => 1,
+                                            'required' => true,
+                                            'class' => 'style_form_field_respond form-control',
+                                            'placeholder' => 'Ответы на вопросы, инсайды, ценная информация',
+                                        ]); ?>
 
-                                    <?= $form->field($updateDescInterviewForms[$i], 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                                        'rows' => 1,
-                                        'required' => true,
-                                        'class' => 'style_form_field_respond form-control',
-                                        'placeholder' => 'Ответы на вопросы, инсайды, ценная информация',
-                                    ]); ?>
+                                    </div>
 
-                                </div>
+                                    <div class="col-md-12">
 
-                                <div class="col-md-12">
-
-                                    <p style="padding-left: 5px;"><b>Приложить файл</b> <span style="color: #BDBDBD; padding-left: 20px;">png, jpg, jpeg, pdf, txt, doc, docx, xls</span></p>
+                                        <p style="padding-left: 5px;"><b>Приложить файл</b> <span style="color: #BDBDBD; padding-left: 20px;">png, jpg, jpeg, pdf, txt, doc, docx, xls</span></p>
 
 
-                                    <?php if (!empty($updateDescInterviewForms[$i]->interview_file)) : ?>
+                                        <?php if (!empty($updateDescInterviewForms[$i]->interview_file)) : ?>
 
 
-                                        <div class="feed-exp">
+                                            <div class="feed-exp">
 
-                                            <div style="display:flex; margin-top: -5px;margin-bottom: -30px;">
+                                                <div style="display:flex; margin-top: -5px;margin-bottom: -30px;">
+
+                                                    <?= $form->field($updateDescInterviewForms[$i], 'loadFile')
+                                                        ->fileInput([
+                                                            'id' => "descInterviewUpdateFile-$respond->id", 'class' => 'sr-only'
+                                                        ])->label('Выберите файл',[
+                                                            'class'=>'btn btn-default',
+                                                            'style' => [
+                                                                'display' => 'flex',
+                                                                'align-items' => 'center',
+                                                                'color' => '#FFFFFF',
+                                                                'justify-content' => 'center',
+                                                                'background' => '#707F99',
+                                                                'width' => '180px',
+                                                                'height' => '40px',
+                                                                'font-size' => '24px',
+                                                                'border-radius' => '8px',
+                                                            ],
+                                                        ]); ?>
+
+                                                    <div class="file_name_update_form-<?= $respond->id;?>" style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
+
+                                                </div>
+
+                                            </div>
+
+
+                                        <div style="margin-top: -5px; margin-bottom: 30px;">
+
+                                            <div style="display: flex; align-items: center;">
+
+
+                                                <?= Html::a('Скачать файл', ['/desc-interview/download', 'id' => $updateDescInterviewForms[$i]->id], [
+                                                    'class' => "btn btn-default interview_file_update-$respond->id",
+                                                    'style' => [
+                                                        'display' => 'flex',
+                                                        'align-items' => 'center',
+                                                        'color' => '#FFFFFF',
+                                                        'justify-content' => 'center',
+                                                        'background' => '#707F99',
+                                                        'width' => '170px',
+                                                        'height' => '40px',
+                                                        'text-align' => 'left',
+                                                        'font-size' => '24px',
+                                                        'border-radius' => '8px',
+                                                        'margin-right' => '5px',
+                                                    ]
+
+                                                ]) . ' ' . Html::a('Удалить файл', ['/desc-interview/delete-file', 'id' => $updateDescInterviewForms[$i]->id], [
+                                                        'onclick'=>
+                                                            "$.ajax({
+                                                                type:'POST',
+                                                                cache: false,
+                                                                url: '".Url::to(['/desc-interview/delete-file', 'id' => $updateDescInterviewForms[$i]->id])."',
+                                                                success  : function(response) {
+                                                                    $('.interview_file_update-".$respond->id."').hide();
+                                                                    $('#formUpdateDescInterview-".$respond->id."').find('.link-delete').hide();
+                                                                    $('#formUpdateDescInterview-".$respond->id."').find('.title_name_update_form').hide();
+                                                                    $('#formUpdateDescInterview-".$respond->id."').find('.feed-exp').show();
+                                                                }
+                                                            });
+                                                        return false;
+                                                        
+                                                        ",
+                                                        'class' => "btn btn-default link-delete",
+                                                        'style' => [
+                                                            'display' => 'flex',
+                                                            'align-items' => 'center',
+                                                            'justify-content' => 'center',
+                                                            'background' => '#E0E0E0',
+                                                            'color' => '#FFFFFF',
+                                                            'width' => '170px',
+                                                            'height' => '40px',
+                                                            'font-size' => '24px',
+                                                            'border-radius' => '8px',
+                                                        ]
+                                                    ]);
+                                                ?>
+
+
+                                            </div>
+
+                                            <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $updateDescInterviewForms[$i]->interview_file;?></div>
+
+                                        </div>
+
+
+                                        <?php endif;?>
+
+
+                                        <?php if (empty($updateDescInterviewForms[$i]->interview_file)) : ?>
+
+                                            <div style="display:flex; margin-top: -5px;">
 
                                                 <?= $form->field($updateDescInterviewForms[$i], 'loadFile')
                                                     ->fileInput([
@@ -1756,154 +1849,132 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                                             </div>
 
-                                        </div>
+                                        <?php endif;?>
 
-
-                                    <div style="margin-top: -5px; margin-bottom: 30px;">
-
-                                        <div style="display: flex; align-items: center;">
-
-
-                                            <?= Html::a('Скачать файл', ['/desc-interview/download', 'id' => $updateDescInterviewForms[$i]->id], [
-                                                'class' => "btn btn-default interview_file_update-$respond->id",
-                                                'style' => [
-                                                    'display' => 'flex',
-                                                    'align-items' => 'center',
-                                                    'color' => '#FFFFFF',
-                                                    'justify-content' => 'center',
-                                                    'background' => '#707F99',
-                                                    'width' => '170px',
-                                                    'height' => '40px',
-                                                    'text-align' => 'left',
-                                                    'font-size' => '24px',
-                                                    'border-radius' => '8px',
-                                                    'margin-right' => '5px',
-                                                ]
-
-                                            ]) . ' ' . Html::a('Удалить файл', ['/desc-interview/delete-file', 'id' => $updateDescInterviewForms[$i]->id], [
-                                                    'onclick'=>
-                                                        "$.ajax({
-                                                            type:'POST',
-                                                            cache: false,
-                                                            url: '".Url::to(['/desc-interview/delete-file', 'id' => $updateDescInterviewForms[$i]->id])."',
-                                                            success  : function(response) {
-                                                                $('.interview_file_update-".$respond->id."').hide();
-                                                                $('#formUpdateDescInterview-".$respond->id."').find('.link-delete').hide();
-                                                                $('#formUpdateDescInterview-".$respond->id."').find('.title_name_update_form').hide();
-                                                                $('#formUpdateDescInterview-".$respond->id."').find('.feed-exp').show();
-                                                            }
-                                                        });
-                                                    return false;
-                                                    
-                                                    ",
-                                                    'class' => "btn btn-default link-delete",
-                                                    'style' => [
-                                                        'display' => 'flex',
-                                                        'align-items' => 'center',
-                                                        'justify-content' => 'center',
-                                                        'background' => '#E0E0E0',
-                                                        'color' => '#FFFFFF',
-                                                        'width' => '170px',
-                                                        'height' => '40px',
-                                                        'font-size' => '24px',
-                                                        'border-radius' => '8px',
-                                                    ]
-                                                ]);
-                                            ?>
-
-
-                                        </div>
-
-                                        <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $updateDescInterviewForms[$i]->interview_file;?></div>
 
                                     </div>
 
+                                    <div class="col-md-12" style="margin-top: -10px;">
 
-                                    <?php endif;?>
+                                        <?= $form->field($updateDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}<span style="color: #BDBDBD; padding-left: 20px;">не более 255 символов</span></div><div>{input}</div>'])->textarea([
+                                            'rows' => 1,
+                                            'required' => true,
+                                            'class' => 'style_form_field_respond form-control',
+                                            'placeholder' => 'Опишите краткий вывод по интервью',
+                                        ]); ?>
 
+                                    </div>
 
-                                    <?php if (empty($updateDescInterviewForms[$i]->interview_file)) : ?>
+                                    <div class="col-xs-12 col-md-6">
 
-                                        <div style="display:flex; margin-top: -5px;">
+                                        <?php
+                                        $selection_list = [ '0' => 'Респондент не является представителем сегмента', '1' => 'Респондент является представителем сегмента', ];
+                                        ?>
 
-                                            <?= $form->field($updateDescInterviewForms[$i], 'loadFile')
-                                                ->fileInput([
-                                                    'id' => "descInterviewUpdateFile-$respond->id", 'class' => 'sr-only'
-                                                ])->label('Выберите файл',[
-                                                    'class'=>'btn btn-default',
-                                                    'style' => [
-                                                        'display' => 'flex',
-                                                        'align-items' => 'center',
-                                                        'color' => '#FFFFFF',
-                                                        'justify-content' => 'center',
-                                                        'background' => '#707F99',
-                                                        'width' => '180px',
-                                                        'height' => '40px',
-                                                        'font-size' => '24px',
-                                                        'border-radius' => '8px',
-                                                    ],
-                                                ]); ?>
+                                        <?= $form->field($updateDescInterviewForms[$i], 'status', [
+                                            'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
+                                        ])->label('Этот респондент является представителем сегмента?')->widget(Select2::class, [
+                                            'data' => $selection_list,
+                                            'options' => [
+                                                'id' => "descInterview_status_update-$respond->id",
+                                            ],
+                                            'disabled' => false,  //Сделать поле неактивным
+                                            'hideSearch' => true, //Скрытие поиска
+                                        ]);
+                                        ?>
 
-                                            <div class="file_name_update_form-<?= $respond->id;?>" style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
+                                    </div>
 
-                                        </div>
-
-                                    <?php endif;?>
-
-
-                                </div>
-
-                                <div class="col-md-12" style="margin-top: -10px;">
-
-                                    <?= $form->field($updateDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                                        'rows' => 1,
-                                        'required' => true,
-                                        'class' => 'style_form_field_respond form-control',
-                                        'placeholder' => 'Опишите краткий вывод по интервью',
-                                    ]); ?>
-
-                                </div>
-
-                                <div class="col-xs-12 col-md-6">
-
-                                    <?php
-                                    $selection_list = [ '0' => 'Респондент не является представителем сегмента', '1' => 'Респондент является представителем сегмента', ];
-                                    ?>
-
-                                    <?= $form->field($updateDescInterviewForms[$i], 'status', [
-                                        'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
-                                    ])->label('Этот респондент является представителем сегмента?')->widget(Select2::class, [
-                                        'data' => $selection_list,
-                                        'options' => [
-                                            'id' => "descInterview_status_update-$respond->id",
-                                        ],
-                                        'disabled' => false,  //Сделать поле неактивным
-                                        'hideSearch' => true, //Скрытие поиска
-                                    ]);
-                                    ?>
+                                    <div class="form-group col-xs-12 col-md-6">
+                                        <?= Html::submitButton('Сохранить', [
+                                            'class' => 'btn btn-success pull-right',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                'justify-content' => 'center',
+                                                'background' => '#52BE7F',
+                                                'width' => '140px',
+                                                'height' => '40px',
+                                                'font-size' => '24px',
+                                                'border-radius' => '8px',
+                                                'margin-top' => '28px'
+                                            ]
+                                        ]) ?>
+                                    </div>
 
                                 </div>
 
-                                <div class="form-group col-xs-12 col-md-6">
-                                    <?= Html::submitButton('Сохранить', [
-                                        'class' => 'btn btn-success pull-right',
-                                        'style' => [
-                                            'display' => 'flex',
-                                            'align-items' => 'center',
-                                            'justify-content' => 'center',
-                                            'background' => '#52BE7F',
-                                            'width' => '140px',
-                                            'height' => '40px',
-                                            'font-size' => '24px',
-                                            'border-radius' => '8px',
-                                            'margin-top' => '28px'
-                                        ]
-                                    ]) ?>
+                                <?php ActiveForm::end(); ?>
+
+                            <!--Если пользователь не является проектантом-->
+                            <?php else : ?>
+
+
+                                <div class="row" style="margin-bottom: 15px; color: #4F4F4F;">
+
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">Респондент</div>
+                                        <div><?= $respond->name; ?></div>
+                                    </div>
+
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">Материалы, полученные в ходе интервью</div>
+                                        <div><?= $updateDescInterviewForms[$i]->description; ?></div>
+                                    </div>
+
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">Варианты проблем</div>
+                                        <div><?= $updateDescInterviewForms[$i]->result; ?></div>
+                                    </div>
+
+                                    <div class="col-md-12">
+
+                                        <p style="padding-left: 5px; font-weight: 700;">Приложенный файл</p>
+
+                                        <?php if (!empty($updateDescInterviewForms[$i]->interview_file)) : ?>
+
+                                            <div style="margin-top: -5px; margin-bottom: 30px;">
+
+                                                <div style="display: flex; align-items: center;">
+
+                                                    <?= Html::a('Скачать файл', ['/desc-interview/download', 'id' => $updateDescInterviewForms[$i]->id], [
+                                                        'class' => "btn btn-default interview_file_update-$respond->id",
+                                                        'style' => [
+                                                            'display' => 'flex',
+                                                            'align-items' => 'center',
+                                                            'color' => '#FFFFFF',
+                                                            'justify-content' => 'center',
+                                                            'background' => '#707F99',
+                                                            'width' => '170px',
+                                                            'height' => '40px',
+                                                            'text-align' => 'left',
+                                                            'font-size' => '24px',
+                                                            'border-radius' => '8px',
+                                                            'margin-right' => '5px',
+                                                        ]
+
+                                                    ]);
+                                                    ?>
+
+                                                </div>
+
+                                                <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $updateDescInterviewForms[$i]->interview_file;?></div>
+
+                                            </div>
+
+                                        <?php endif;?>
+
+                                        <?php if (empty($updateDescInterviewForms[$i]->interview_file)) : ?>
+
+                                            <div class="col-md-12" style="padding-left: 5px; margin-bottom: 20px;">Файл не выбран</div>
+
+                                        <?php endif;?>
+
+                                    </div>
+
                                 </div>
 
-                            </div>
-
-                            <?php ActiveForm::end(); ?>
+                            <?php endif; ?>
 
                         <?php endif; ?>
 
@@ -2200,7 +2271,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                                 'style' => ['padding' => '0 5px']
                             ]) . '</div>';
 
-                    }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan) && empty($respond->descInterview->updated_at)){
+                    }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan) && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                         echo '<div class="text-center">' . Html::a(
                                 Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),

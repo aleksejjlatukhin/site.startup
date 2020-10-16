@@ -94,7 +94,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
             <div class="col-md-3" style="padding: 0;">
 
-                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проект</div></div>', ['#'],
+                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['#'],
                     ['data-toggle' => 'modal', 'data-target' => "#data_project_create_modal", 'class' => 'new_segment_link_plus pull-right']
                 );
                 ?>
@@ -110,7 +110,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 <div class="">Проект</div>
             </div>
 
-            <div class="col-md-3 headers_data_respond_hi text-center" style="padding-left: 0; padding-right: 0;">
+            <div class="col-md-3 headers_data_respond_hi">
                 Результат интеллектуальной деятельности
             </div>
 
@@ -192,15 +192,15 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                     </div>
 
-                    <div class="col-md-1">
+                    <div class="col-md-1 text-center">
 
-                        <?= date('d.m.Y', $model->created_at); ?>
+                        <?= date('d.m.y', $model->created_at); ?>
 
                     </div>
 
-                    <div class="col-md-1">
+                    <div class="col-md-1 text-center">
 
-                        <?= date('d.m.Y', $model->updated_at); ?>
+                        <?= date('d.m.y', $model->updated_at); ?>
 
                     </div>
 

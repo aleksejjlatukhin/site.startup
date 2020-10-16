@@ -38,9 +38,10 @@ tbody > tr .TableSegments {
 }
 
 .container-data {
-    padding: 10px 15px 30px 15px;
+    padding: 10px 15px 0 15px;
+    margin-bottom: 110px;
     background: #FFFFFF;
-    min-height: calc(100vh - 230px);
+    height: 100%;
 }
 
 .row_header_data_generation {
@@ -159,4 +160,21 @@ tbody > tr .TableSegments {
     .new_segment_link_block {
         padding-left: 20px;
     }
+}
+
+.information_status_confirm {
+    position: absolute;
+    bottom: 90px;
+    width: 100%;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.information_status_confirm > div {
+    display:flex;
+    justify-content: space-around;
+    background: #F2F2F2;
+    color: #4F4F4F;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 2px solid #707F99;
 }

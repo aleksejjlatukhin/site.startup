@@ -5,6 +5,8 @@ use kartik\grid\GridView;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use app\models\User;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -231,6 +233,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
     </div>
 
 
+
     <?php
     // Модальное окно - Данные сегмента
     Modal::begin([
@@ -245,189 +248,231 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     <?= $segment->allInformation; ?>
 
-    <?php
-    Modal::end();
-    ?>
+    <?php Modal::end(); ?>
 
 
 
-    <?php
+    <div class="container-fluid container-data row">
 
-    $gridColumns = [
+    <div class="container-fluid row">
 
-        [
-            'attribute' => 'title',
-            'label' => 'Наименование',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Наименование</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1,],
-            'value' => function ($model, $key, $index, $widget) {
+        <div class="col-md-12" style="padding: 15px 0;">
 
-                if ($model){
+            <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая гипотеза проблемы сегмента</div></div>',
+                ['/interview/data-availability-for-next-step', 'id' => $interview->id],
+                ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
+            );
+            ?>
 
-                    return '<div class="text-center" style="padding: 0 5px;">' . $model->title . '</div>';
-                }
-            },
-            'format' => 'raw',
-            'hiddenFromExport' => true, // Убрать столбец при скачивании
-        ],
-
-
-        [
-            'attribute' => 'description',
-            'label' => 'Описание гипотезы',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Описание гипотезы</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1],
-            'value' => function ($model, $key, $index, $widget) {
-
-                return '<div style="padding: 0 5px;">' . $model->description . '</div>';
-            },
-            'format' => 'raw',
-        ],
-
-
-        [
-            'attribute' => 'date_create',
-            'label' => 'Дата создания',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата создания</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1],
-            'value' => function ($model, $key, $index, $widget) {
-
-                return '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $model->created_at) . '</div>';
-            },
-            'format' => 'raw',
-        ],
-
-
-        [
-            'attribute' => 'status',
-            'label' => 'Подтверждение',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Подтверждение</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1],
-            'value' => function ($model, $key, $index, $widget) {
-
-                if ($model->exist_confirm === 1) {
-
-                    return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]), Url::to(['/confirm-problem/view', 'id' => $model->confirm->id])) . '</div>';
-
-                }elseif ($model->exist_confirm === null) {
-
-                    return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]), Url::to(['/confirm-problem/create', 'id' => $model->id])) . '</div>';
-
-                }elseif ($model->exist_confirm === 0) {
-
-                    return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]), Url::to(['/confirm-problem/view', 'id' => $model->confirm->id])) . '</div>';
-
-                }else {
-                    return '';
-                }
-            },
-            'format' => 'raw',
-        ],
-
-        [
-            'attribute' => 'date_confirm',
-            'label' => 'Дата подтверждения',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата подтверждения</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1],
-            'value' => function ($model, $key, $index, $widget) {
-
-                if ($model->time_confirm) {
-
-                    return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", $model->time_confirm) .'</div>';
-                }else {
-                    return '';
-                }
-            },
-            'format' => 'raw',
-        ],
-
-    ]
-
-    ?>
-
-    <div class="row" style="margin-top: 10px;">
-
-    <?php
-
-    echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'showPageSummary' => false, //whether to display the page summary row for the grid view.
-        'pjax' => false,
-        'hashExportConfig' => false,
-        'striped' => false,
-        'bordered' => true,
-        'panel' => [
-            'type' => 'default',
-            'heading' => false,
-            //'before' => false,
-            'before' => '<div><span style="margin-left: 30px;margin-right: 20px;">Генерация гипотез проблем сегмента</span>'
-
-                . Html::a('i', ['#'], [
-                    'style' => ['margin-rigth' => '20px', 'font-size' => '16px', 'font-weight' => '700', 'padding' => '2px 10px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information_table_problems",
-                    'title' => 'Посмотреть описание',
-                ]) . '</div>',
-            'beforeOptions' => ['class' => 'header-table'],
-
-            'after' => false,
-        ],
-        'toolbar' => false,
-        'condensed' => true,
-        'summary' => false,
-        'hover' => true,
-        'columns' => $gridColumns,
-        'beforeHeader' => [
-            [
-                'columns' => [
-                    ['content' =>  Html::a(Html::img('@web/images/icons/add_plus_elem.png', ['style' => ['width' => '25px', 'margin-right' => '10px']]), Url::to(['/interview/data-availability-for-next-step', 'id' => $interview->id]), ['id' => 'checking_the_possibility']) . 'Гипотеза проблемы сегмента', 'options' => ['colspan' => 3, 'class' => 'font-segment-header-table text-center', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px']]],
-                    ['content' => 'Проблема сегмента', 'options' => ['colspan' => 2, 'class' => 'font-header-table', 'style' => ['padding-top' => '15px', 'padding-bottom' => '15px', 'text-align' => 'center']]],
-                ],
-                'options' => [
-                    'class' => 'style-header-table-kartik',
-                ]
-            ]
-        ],
-    ]);
-
-    ?>
+        </div>
 
     </div>
 
 
-    <?php
+    <!--Заголовки для списка проблем-->
+    <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
 
-    // Модальное окно - информация о завершении подтверждения
-    Modal::begin([
-        'options' => [
-            'id' => 'information_table_problems',
-            'class' => 'information_table_problems',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-    ]);
-    ?>
+        <div class="col-md-1 ">
+            <div class="row">
+                <div class="col-md-4" style="padding: 0;"></div>
+                <div class="col-md-8" style="padding: 0;">Номер</div>
+            </div>
 
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Сгенерируйте необходимые гипотезы. <br>Далее переходите к их подтверждению.
-    </h4>
+        </div>
 
-    <?php
+        <div class="col-md-7">Описание гипотезы</div>
 
-    Modal::end();
+        <div class="col-md-1 text-center"><div>Дата создания</div></div>
 
-    ?>
+        <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
+
+        <div class="col-md-2"></div>
+
+    </div>
+
+
+    <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
+
+        <!--Данные для списка проблем-->
+        <?php foreach ($models as $model) : ?>
+
+            <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
+
+                <div class="col-md-1">
+                    <div class="row">
+
+                        <div class="col-md-4" style="padding: 0;">
+
+                            <?php
+                            if ($model->exist_confirm === 1) {
+
+                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                            }elseif ($model->exist_confirm === null && empty($model->confirm)) {
+
+                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                            }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
+
+                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                            }elseif ($model->exist_confirm === 0) {
+
+                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                            }
+                            ?>
+
+                        </div>
+
+                        <div class="col-md-8" style="padding: 0;">
+
+                            <?= $model->title; ?>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7" id="column_problem_description-<?=$model->id;?>">
+
+                    <?php
+                        $problem_desc = $model->description;
+                        if (mb_strlen($problem_desc) > 180) {
+                            $problem_desc = mb_substr($model->description, 0, 180) . '...';
+                        }
+                    ?>
+
+                    <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
+
+                </div>
+
+                <div class="col-md-1 text-center">
+
+                    <?= date("d.m.y", $model->created_at); ?>
+
+                </div>
+
+                <div class="col-md-1 text-center">
+
+                    <?php if ($model->time_confirm) : ?>
+                        <?= date("d.m.y", $model->time_confirm); ?>
+                    <?php endif; ?>
+
+                </div>
+
+
+                <div class="col-md-2">
+
+                    <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
+
+                        <div style="margin-right: 25px;">
+
+                            <?php if ($model->confirm) : ?>
+
+                                <?= Html::a('Далее', ['/confirm-problem/view', 'id' => $model->confirm->id], [
+                                    'class' => 'btn btn-default',
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'color' => '#FFFFFF',
+                                        'background' => '#52BE7F',
+                                        'width' => '120px',
+                                        'height' => '40px',
+                                        'font-size' => '18px',
+                                        'border-radius' => '8px',
+                                    ]
+                                ]);
+                                ?>
+
+                            <?php else : ?>
+
+                                <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
+                                    'class' => 'btn btn-default',
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'color' => '#FFFFFF',
+                                        'background' => '#707F99',
+                                        'width' => '120px',
+                                        'height' => '40px',
+                                        'font-size' => '18px',
+                                        'border-radius' => '8px',
+                                    ]
+                                ]);
+                                ?>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                        <div>
+
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Редактировать',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#problem_update_modal-' . $model->id,
+                                ]); ?>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                        <div >
+
+                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                'class' => '',
+                                'title' => 'Удалить',
+                                'onclick' => 'return false',
+                            ]); ?>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        <?php endforeach; ?>
+
+    </div>
+
+    </div>
+
+
+    <?php if (count($models) > 0) : ?>
+
+        <div class="row information_status_confirm">
+
+            <div>
+
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Проблема подтверждена</div>
+                </div>
+
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Проблема не подтверждена</div>
+                </div>
+
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Проблема ожидает подтверждения</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
 
 
     <?php
@@ -438,133 +483,95 @@ $this->registerCssFile('@web/css/problem-index-style.css');
             'class' => 'problem_create_modal',
         ],
         'size' => 'modal-lg',
-        //'header' => '<div class="text-center"><span style="font-size: 24px;">Создание гипотезы проблемы сегмента</span></div>',
+        'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Создание гипотезы проблемы сегмента</span>' . Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
+                'data-toggle' => 'modal',
+                'data-target' => "#information-table-create-problem",
+                'title' => 'Посмотреть описание',
+            ]) . '</div>',
     ]);
     ?>
 
+    <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
 
-    <?php
+        <div class="col-md-12">
+            Варианты проблем, полученные от респондентов (представителей сегмента)
+        </div>
 
-    $gridColumns = [
+    </div>
 
-        [
-            'class' => 'kartik\grid\SerialColumn',
-            'header' => '',
-        ],
+    <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
+
+        <div class="col-md-4 roboto_condensed_bold">
+            Респонденты
+        </div>
+
+        <div class="col-md-8 roboto_condensed_bold">
+            Варианты проблем
+        </div>
+
+    </div>
 
 
-        [
-            'attribute' => 'name',
-            'label' => 'Респондент',
-            'header' => '<div class="font-segment-header-table">Респондент</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1,],
-            'value' => function ($model, $key, $index, $widget) {
+    <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
+    <div class="all_responds_problems row container-fluid" style="margin: 0;">
 
-                return '<div class="fio" style="padding: 0 5px;">' . Html::a($model->name, ['#'], [
-                        'id' => "fio-$model->id",
-                        'class' => 'table-kartik-link',
+        <?php foreach ($responds as $respond) : ?>
+
+            <div class="block_respond_problem row">
+
+                <div class="col-md-4 block_respond_problem_column">
+
+                    <?php
+                        $respond_name = $respond->name;
+                        if (mb_strlen($respond_name) > 30) {
+                            $respond_name = mb_substr($respond_name, 0, 30) . '...';
+                        }
+                    ?>
+                    <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
+                        'class' => '',
                         'data-toggle' => 'modal',
-                        'data-target' => "#respond_positive_view_modal-$model->id",
-                    ]) . '</div>';
+                        'data-target' => "#respond_positive_view_modal-$respond->id",
+                    ]); ?>
 
-            },
-            'format' => 'raw',
-            'hiddenFromExport' => true, // Убрать столбец при скачивании
-        ],
+                </div>
 
+                <div class="col-md-8 block_respond_problem_column">
 
-        [
-            'attribute' => 'name_export',
-            'label' => 'Респондент',
-            'header' => '<div class="font-segment-header-table">Респондент</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1,],
-            'value' => function ($model, $key, $index, $widget) {
+                    <?php
+                        $descInterview_result = $respond->descInterview->result;
+                        if (mb_strlen($descInterview_result) > 70) {
+                            $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
+                        }
+                    ?>
+                    <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
 
-                return '<div class="fio" style="padding: 0 5px;">' . $model->name . '</div>';
+                </div>
 
-            },
-            'format' => 'raw',
-            'hidden' => true,
-        ],
+            </div>
+
+        <?php endforeach; ?>
+
+    </div>
 
 
+    <div class="row" style="color: #4F4F4F; margin-top: 20px;">
 
-        [
-            'attribute' => 'result',
-            'label' => 'Варианты проблем',
-            'header' => '<div class="font-segment-header-table">Варианты проблем</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'options' => ['colspan' => 1],
-            'value' => function ($model, $key, $index, $widget) {
+        <div class="col-md-12">
+            Описание гипотезы проблемы сегмента
+        </div>
 
-                return '<div style="padding: 0 5px;">' . $model->descInterview->result . '</div>';
-
-            },
-            'format' => 'html',
-        ],
-
-    ];
-
-    ?>
+    </div>
 
 
-    <?php
+    <div class="generation-problem-form" style="margin-top: 5px;">
 
-    echo GridView::widget([
-        'dataProvider' => $dataProviderRespondsPositive,
-        'showPageSummary' => false, //whether to display the page summary row for the grid view.
-        'pjax' => true,
-        'hashExportConfig' => false,
-        'pjaxSettings' => [
-            //'neverTimeout' => false,
-            //'beforeGrid' => '',
-            'options' => [
-                'id' => 'problemsCreatePjax',
-                //'enablePushState' => false,
-            ],
-            'loadingCssClass' => false,
-        ],
-        'striped' => false,
-        'bordered' => true,
-        'condensed' => true,
-        'summary' => false,
-        'hover' => true,
-
-        'panel' => [
-            'type' => 'default',
-            'heading' => false,
-            //'headingOptions' => ['class' => 'style-head-table-kartik-top'],
-            'before' => '<div style="font-size: 28px; font-weight: 700; color: #F2F2F2;"><span style="margin-left: 30px;margin-right: 20px;">Создание гипотезы проблемы сегмента</span>'
-
-                . Html::a('i', ['#'], [
-                    'style' => ['margin-rigth' => '20px', 'font-size' => '13px', 'font-weight' => '700', 'padding' => '2px 8px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information-table-create-problem",
-                    'title' => 'Посмотреть описание',
-                ]) . '
-</div>',
-            'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
-            'after' => false,
-            //'footer' => false,
-        ],
-
-        'toolbar' => false,
-        'columns' => $gridColumns,
-        'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-    ]);
-
-    ?>
-
-
-    <div class="generation-problem-form" style="margin-top: 20px;">
-
-        <?php $form = ActiveForm::begin(['id' => 'gpsCreateForm', 'action' => Url::to(['/generation-problem/create', 'id' => $interview->id])]); ?>
+        <?php $form = ActiveForm::begin([
+            'id' => 'gpsCreateForm',
+            'action' => Url::to(['/generation-problem/create', 'id' => $interview->id]),
+            'options' => ['class' => 'g-py-15'],
+            'errorCssClass' => 'u-has-error-v1',
+            'successCssClass' => 'u-has-success-v1-1',
+            ]); ?>
 
         <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
@@ -573,15 +580,28 @@ $this->registerCssFile('@web/css/problem-index-style.css');
         <div class="row">
             <div class="col-md-12">
 
-                <?= $form->field($newProblem, 'description')->label(false)->textarea(['rows' => 4, 'placeholder' => $placeholder]) ?>
+                <?= $form->field($newProblem, 'description')->label(false)->textarea([
+                    'rows' => 3,
+                    'required' => true,
+                    'placeholder' => $placeholder,
+                    'class' => 'style_form_field_respond form-control',
+                    ]) ?>
 
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group row container-fluid">
             <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-block btn-success',
-                'style' => ['font-weight' => '700'],
+                'class' => 'btn btn-success pull-right',
+                'style' => [
+                    'color' => '#FFFFFF',
+                    'background' => '#52BE7F',
+                    'padding' => '0 7px',
+                    'width' => '140px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '8px',
+                ]
             ]) ?>
         </div>
 
@@ -589,10 +609,148 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     </div>
 
+    <?php Modal::end(); ?>
+
+
+
+    <?php foreach ($models as $model) : ?>
+
 
     <?php
-    Modal::end();
+    // Модальное окно - редактирование ГПС
+    Modal::begin([
+        'options' => [
+            'id' => 'problem_update_modal-' . $model->id,
+            'class' => 'problem_update_modal',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Редактирование гипотезы проблемы сегмента - ' . $model->title . '</span></div>',
+    ]);
     ?>
+
+    <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
+
+        <div class="col-md-12">
+            Варианты проблем, полученные от респондентов (представителей сегмента)
+        </div>
+
+    </div>
+
+    <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
+
+        <div class="col-md-4 roboto_condensed_bold">
+            Респонденты
+        </div>
+
+        <div class="col-md-8 roboto_condensed_bold">
+            Варианты проблем
+        </div>
+
+    </div>
+
+
+    <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
+    <div class="all_responds_problems row container-fluid" style="margin: 0;">
+
+        <?php foreach ($responds as $respond) : ?>
+
+            <div class="block_respond_problem row">
+
+                <div class="col-md-4 block_respond_problem_column">
+
+                    <?php
+                    $respond_name = $respond->name;
+                    if (mb_strlen($respond_name) > 30) {
+                        $respond_name = mb_substr($respond_name, 0, 30) . '...';
+                    }
+                    ?>
+                    <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
+                        'class' => '',
+                        'data-toggle' => 'modal',
+                        'data-target' => "#respond_positive_view_modal-$respond->id",
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-8 block_respond_problem_column">
+
+                    <?php
+                    $descInterview_result = $respond->descInterview->result;
+                    if (mb_strlen($descInterview_result) > 70) {
+                        $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
+                    }
+                    ?>
+                    <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
+
+                </div>
+
+            </div>
+
+        <?php endforeach; ?>
+
+    </div>
+
+
+    <div class="row" style="color: #4F4F4F; margin-top: 20px;">
+
+        <div class="col-md-12">
+            Описание гипотезы проблемы сегмента
+        </div>
+
+    </div>
+
+
+    <div class="generation-problem-form" style="margin-top: 5px;">
+
+        <?php $form = ActiveForm::begin([
+            'id' => 'gpsUpdateForm-' . $model->id,
+            'action' => Url::to(['/generation-problem/update', 'id' => $model->id]),
+            'options' => ['class' => 'g-py-15 gpsUpdateForm'],
+            'errorCssClass' => 'u-has-error-v1',
+            'successCssClass' => 'u-has-success-v1-1',
+        ]); ?>
+
+        <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+- отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
+- отсутствие необходимой информации по патентованию...' ?>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <?= $form->field($model, 'description')->label(false)->textarea([
+                    'rows' => 3,
+                    'required' => true,
+                    'placeholder' => $placeholder,
+                    'class' => 'style_form_field_respond form-control',
+                ]) ?>
+
+            </div>
+        </div>
+
+        <div class="form-group row container-fluid">
+            <?= Html::submitButton('Сохранить', [
+                'class' => 'btn btn-success pull-right',
+                'style' => [
+                    'color' => '#FFFFFF',
+                    'background' => '#52BE7F',
+                    'padding' => '0 7px',
+                    'width' => '140px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '8px',
+                ]
+            ]) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
+    </div>
+
+    <?php Modal::end(); ?>
+
+
+    <?php endforeach; ?>
+
 
 
 
@@ -613,9 +771,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
     </h4>
 
 
-    <?php
-    Modal::end();
-    ?>
+    <?php Modal::end(); ?>
 
 
 
@@ -636,11 +792,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     <?= $project->showRoadmapProject();?>
 
-    <?php
-
-    Modal::end();
-
-    ?>
+    <?php Modal::end(); ?>
 
 
     <!--Roadmap Segment-->
@@ -662,11 +814,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     <?= $segment->showRoadmapSegment();?>
 
-    <?php
-
-    Modal::end();
-
-    ?>
+    <?php Modal::end(); ?>
 
 
 
@@ -686,121 +834,93 @@ $this->registerCssFile('@web/css/problem-index-style.css');
         Вернитесь к подтверждению сегмента.
     </h4>
 
-    <?php
-    Modal::end();
-    ?>
+    <?php Modal::end(); ?>
 
 
-    <?php
-    foreach ($interview->responds as $respond) :
-        if ($respond->descInterview->status == 1) :
-            // Модальное окно - Информамация о представителях сегмента
-            Modal::begin([
-                'options' => [
-                    'id' => "respond_positive_view_modal-$respond->id",
-                    'class' => 'respond_positive_view_modal',
-                ],
-                'size' => 'modal-lg',
-                'header' => '<div class="text-center"><span style="font-size: 24px;">Информация о респонденте и интервью</span></div>',
-            ]);
-            ?>
 
+    <?php foreach ($responds as $respond) : ?>
 
-            <?= yii\widgets\DetailView::widget([
-            'model' => $respond,
-            'attributes' => [
+        <?php $descInterview = $respond->descInterview; ?>
 
-                [
-                    'attribute' => 'name',
-                    'label' => 'Ф.И.О. респондента',
-                    'value' => function($model){
-                        return '<div id="respond_name_'.$model->id.'">'.$model->name.'</div>';
-                    },
-                    'format' => 'raw',
-                ],
-
-                'info_respond',
-                'email',
-                'place_interview',
-
-                [
-                    'attribute' => 'date_plan',
-                    'label' => 'Запланированная дата интервью',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'created_descInterview',
-                    'label' => 'Дата создания интервью',
-                    'value' => function($model){
-                        return $model->descInterview->created_at;
-                    },
-                    'contentOptions' => ['id' => "created_at_interview_$model->id"],
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'updated_descInterview',
-                    'label' => 'Последнее изменение интервью',
-                    'value' => function($model){
-                        return $model->descInterview->updated_at;
-                    },
-                    'contentOptions' => ['id' => "updated_at_interview_$model->id"],
-                    'format' => ['date', 'dd.MM.yyyy'],
-
-                ],
-
-                [
-                    'attribute' => 'description',
-                    'label' => 'Материалы интервью',
-                    'value' => function($model){
-                        return $model->descInterview->description;
-                    },
-                ],
-
-                [
-                    'attribute' => 'interview_file',
-                    'label' => 'Файл',
-                    'value' => function($model){
-                        $string = '';
-                        $string .= Html::a($model->descInterview->interview_file, ['/desc-interview/download', 'id' => $model->descInterview->id], ['class' => '']);
-                        return $string;
-                    },
-                    'format' => 'html',
-                ],
-
-                [
-                    'attribute' => 'result',
-                    'label' => 'Вывод из интервью',
-                    'value' => function($model){
-                        return $model->descInterview->result;
-                    },
-                ],
-
-                [
-                    'attribute' => 'respond_status',
-                    'label' => 'Является ли респондент представителем сегмента?',
-                    'value' => function($model){
-                        if ($model->descInterview){
-                            return !$model->descInterview->status ? '<span style="color:red">Нет</span>' : '<span style="color:green">Да</span>';
-                        }else{
-                            return '';
-                        }
-
-                    },
-                    'format' => 'html',
-                ],
-
+        <?php
+        // Модальное окно - Информамация о представителях сегмента
+        Modal::begin([
+            'options' => [
+                'id' => "respond_positive_view_modal-$respond->id",
+                'class' => 'respond_positive_view_modal',
             ],
-        ]) ?>
+            'size' => 'modal-lg',
+            'header' => '<div class="text-center"><span style="font-size: 24px; font-weight: 700;">Информация о интервью</span></div>',
+        ]);
+        ?>
 
+            <div class="row" style="margin-bottom: 15px; margin-top: 15px; color: #4F4F4F;">
 
-            <?php
-            Modal::end();
-        endif;
-    endforeach;
-    ?>
+                <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                    <div style="font-weight: 700;">Респондент</div>
+                    <div><?= $respond->name; ?></div>
+                </div>
 
+                <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                    <div style="font-weight: 700;">Материалы, полученные в ходе интервью</div>
+                    <div><?= $descInterview->description; ?></div>
+                </div>
+
+                <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                    <div style="font-weight: 700;">Варианты проблем</div>
+                    <div><?= $descInterview->result; ?></div>
+                </div>
+
+                <div class="col-md-12">
+
+                    <p style="padding-left: 5px; font-weight: 700;">Приложенный файл</p>
+
+                    <?php if (!empty($descInterview->interview_file)) : ?>
+
+                        <div style="margin-top: -5px; margin-bottom: 30px;">
+
+                            <div style="display: flex; align-items: center;">
+
+                                <?= Html::a('Скачать файл', ['/desc-interview/download', 'id' => $descInterview->id], [
+                                    'class' => "btn btn-default interview_file_view-$descInterview->id",
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'color' => '#FFFFFF',
+                                        'justify-content' => 'center',
+                                        'background' => '#707F99',
+                                        'width' => '170px',
+                                        'height' => '40px',
+                                        'text-align' => 'left',
+                                        'font-size' => '24px',
+                                        'border-radius' => '8px',
+                                        'margin-right' => '5px',
+                                    ]
+
+                                ]);
+                                ?>
+
+                            </div>
+
+                            <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $descInterview->interview_file;?></div>
+
+                        </div>
+
+                    <?php endif;?>
+
+                    <?php if (empty($descInterview->interview_file)) : ?>
+
+                        <div class="col-md-12" style="padding-left: 5px; margin-bottom: 20px;">Файл не выбран</div>
+
+                    <?php endif;?>
+
+                </div>
+
+            </div>
+
+        <?php Modal::end(); ?>
+
+    <?php endforeach; ?>
 
 </div>
 
@@ -810,18 +930,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 $script = "
 
     $(document).ready(function() {
-    
-        //Добавляем одинаковую высоту для элементов меню 
-        //таблицы - Программа генерации ГПС 
-        //равную высоте родителя
-        $('.tab', this).each(function(){
 
-          var height = $(this).height();
-        
-           $('.tablinks').css('height', height);
-        
-        });
-        
         //Фон для модального окна информации при отказе в добавлении ГПС
         var info_problem_create_modal_error = $('#problem_create_modal_error').find('.modal-content');
         info_problem_create_modal_error.css('background-color', '#707F99');
@@ -830,12 +939,21 @@ $script = "
         var information_modal = $('#information-table-create-problem').find('.modal-content');
         information_modal.css('background-color', '#707F99');
         
-        ////Фон для модального окна информации в шапке таблицы 
-        var information_table_problems_modal = $('#information_table_problems').find('.modal-content');
-        information_table_problems_modal.css('background-color', '#707F99');
         
-        
-        
+        //Возвращение скролла первого модального окна после закрытия второго
+        $('.modal').on('hidden.bs.modal', function (e) {
+            if($('.modal:visible').length)
+            {
+                $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
+                $('body').addClass('modal-open');
+            }
+        }).on('show.bs.modal', function (e) {
+            if($('.modal:visible').length)
+            {
+                $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
+                $(this).css('z-index', parseInt($('.modal-backdrop.in').first().css('z-index')) + 10);
+            }
+        });
     
     });
     
@@ -866,6 +984,44 @@ $script = "
         });
         
         //e.preventDefault();
+        return false;
+    });
+    
+    
+    //Редактирование гипотезы проблемы сегмента
+    $('.gpsUpdateForm').on('beforeSubmit', function(e){
+    
+        var id = $(this).attr('id');
+        id = id.split('-');
+        id = id[1];
+        
+        var url = '/generation-problem/update?id=' + id;
+        var data = $(this).serialize();
+        
+        $.ajax({
+        
+            url: url,
+            data: data,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                
+                var description = response.description;
+                
+                if (description.length > 180) {
+                    description = description.substring(0, 180) + '...';
+                }
+                
+                $('#problem_update_modal-' + id).modal('hide');
+                
+                var column = $('#column_problem_description-' + id).html('<\div title=\"' + response.description + '\">' + description + '<\/div>');
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+    
+        e.preventDefault();
         return false;
     });
     

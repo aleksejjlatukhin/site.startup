@@ -106,39 +106,19 @@ class GenerationProblemController extends AppController
         $interview = Interview::find()->with('questions')->where(['id' => $id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => GenerationProblem::find()->where(['interview_id' => $id]),
-            'pagination' => false,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
+        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
 
         //Выбор респондентов, которые являются представителями сегмента
-        $dataProviderRespondsPositive = new ActiveDataProvider([
-            'query' => Respond::find()->with('descInterview')
-                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-                ->where(['interview_id' => $id, 'desc_interview.status' => '1']),
-            'pagination' => false,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
-
+        $responds = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all();
 
         $newProblem = new GenerationProblem();
         $newProblem->interview_id = $id;
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
-            'dataProviderRespondsPositive' => $dataProviderRespondsPositive,
+            'models' => $models,
+            'responds' => $responds,
             'newProblem' => $newProblem,
             'interview' => $interview,
             'segment' => $segment,
@@ -231,34 +211,25 @@ class GenerationProblemController extends AppController
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->request->isAjax) {
+
+                if ($model->save()) {
+
+                    $project->updated_at = time();
+                    if ($project->save()) {
+
+                        $response = $model;
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                }
             }
         }
-
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
-            $project->updated_at = time();
-            if ($project->save()) {
-                Yii::$app->session->setFlash('success', "Данные по " . $model->title . " обновлены!");
-                return $this->redirect(['generation-problem/view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
     }
 
     /**

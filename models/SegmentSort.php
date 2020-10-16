@@ -120,20 +120,6 @@ class SegmentSort extends Model
 
             }
 
-            /*наименование сегмента*/
-            if ($model->interview) {
-
-                $segment_name = Html::a(Html::encode($model->name), Url::to(['/interview/view', 'id' => $model->interview->id]), [
-                    'title' => 'Переход к программе генерации ГПС', 'class' => 'container-name_link',
-                ]);
-
-            } else {
-
-                $segment_name = Html::a(Html::encode($model->name), Url::to(['/interview/create', 'id' => $model->id]), [
-                    'title' => 'Создание программы генерации ГПС', 'class' => 'container-name_link',
-                ]);
-            }
-
             /*тип сегмента*/
             if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
                 $type_segment = '<div class="">B2C</div>';
@@ -166,10 +152,65 @@ class SegmentSort extends Model
                 $specialization_of_activity = $specialization_of_activity . ' ...';
             }
 
+            /*Button next step*/
+            if ($model->interview) {
 
-            $showModels .= '<div class="row container-one_hypothesis" style="margin: 3px 0; padding: 0;">
+                $button_next_step = Html::a('Далее', ['/interview/view', 'id' => $model->interview->id], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'color' => '#FFFFFF',
+                        'background' => '#52BE7F',
+                        'width' => '120px',
+                        'height' => '40px',
+                        'font-size' => '18px',
+                        'border-radius' => '8px',
+                    ]
+                ]);
+            } else {
 
-                                <div class="col-md-3">
+                $button_next_step = Html::a('Подтвердить', ['/interview/create', 'id' => $model->id], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'color' => '#FFFFFF',
+                        'background' => '#707F99',
+                        'width' => '120px',
+                        'height' => '40px',
+                        'font-size' => '18px',
+                        'border-radius' => '8px',
+                    ]
+                ]);
+            }
+
+            /*Button update or view*/
+            if (User::isUserSimple(\Yii::$app->user->identity['username'])) {
+
+                $button_update_or_view = Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/segment/update', 'id' => $model->id], [
+                    'class' => '',
+                    'title' => 'Редактировать',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#update_segment_modal-$model->id",
+                ]);
+            } else {
+                $button_update_or_view = Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/view', 'id' => $model->id], [
+                    'class' => '',
+                    'title' => 'Смотреть',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#segment_view_modal-$model->id",
+                ]);
+            }
+
+
+
+
+            $showModels .= '<div class="row container-one_hypothesis" style="margin: 3px 0;">
+
+                                <div class="col-md-3" style="padding-left: 5px; padding-right: 5px;">
                                 
                                     <div class="row" style="display:flex; align-items: center;">
                                     
@@ -180,9 +221,11 @@ class SegmentSort extends Model
                                         </div>
                                         
                                         <div class="col-md-8">
+                                            <div style="padding-left: 15px;">
                                         
-                                            '.$segment_name.'
-                                        
+                                                '.$model->name.'
+                                                
+                                            </div>
                                         </div>
                                         
                                         <div class="col-md-3 text-center">
@@ -213,41 +256,31 @@ class SegmentSort extends Model
                                 
                                 </div>
                                 
-                                <div class="col-md-3" style="padding: 0;">
-
-                                    <div class="row" style="display:flex; align-items: center;">
+                                <div class="col-md-1">
+                                    <div class="text-right">
                                     
-                                        <div class="col-md-4 text-right" style="font-size: 16px;">
-                                        
-                                            '.number_format($model->market_volume, 0, '', ' ').'
-                                        
-                                        </div>
-                                        
-                                        <div class="col-md-1"></div>
+                                        '.number_format($model->market_volume, 0, '', ' ').'
+                                    
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
 
-                                        <div class="col-md-2">
+                                    <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
+                                    
+                                        <div style="margin-right: 25px;">
                                         
-                                            '.Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/view', 'id' => $model->id], [
-                                                'class' => '',
-                                                'title' => 'Смотреть',
-                                                'data-toggle' => 'modal',
-                                                'data-target' => "#segment_view_modal-$model->id",
-                                            ]).'
+                                            '.$button_next_step.'
                                         
                                         </div>
                                         
-                                        <div class="col-md-2">
+                                        <div>
                                         
-                                            '.Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/segment/update', 'id' => $model->id], [
-                                                'class' => '',
-                                                'title' => 'Редактировать',
-                                                'data-toggle' => 'modal',
-                                                'data-target' => "#update_segment_modal-$model->id",
-                                            ]).'
+                                            '.$button_update_or_view.'
                                         
                                         </div>
-                                        
-                                        <div class="col-md-2">
+
+                                        <div>
                                         
                                             '.Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
                                                 'class' => '',
@@ -256,9 +289,7 @@ class SegmentSort extends Model
                                             ]).'
                                         
                                         </div>
-                                        
-                                        <div class="col-md-1"></div>
-                                    
+
                                     </div>
                                     
                                 </div>

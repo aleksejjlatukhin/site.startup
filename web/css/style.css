@@ -1799,3 +1799,13 @@ input[type="checkbox"]:checked + label:before {
 /*Стили для дорожной карты
 ---Конец---
 */
+
+/*Жирный шрифт
+---Начало---
+*/
+.roboto_condensed_bold {
+    font-family: 'RobotoCondensed-Bold', 'serif';
+}
+/*Жирный шрифт
+---Конец---
+*/

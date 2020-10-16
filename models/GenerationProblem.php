@@ -64,7 +64,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['interview_id', 'description', 'title'], 'required'],
+            [['interview_id', 'title'], 'required'],
             ['title', 'string', 'max' => 255],
             [['title', 'description'], 'trim'],
             [['time_confirm', 'interview_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
