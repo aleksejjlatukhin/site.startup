@@ -658,9 +658,9 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-md-12 col-lg-6" style="padding: 10px 0 0 0;">
+                <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для анкеты</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'data-toggle' => 'modal',
@@ -670,24 +670,20 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 </div>
 
-                <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
-                    ['class' => 'add_new_question_button col-xs-12 col-md-6 col-lg-3', 'id' => 'buttonAddQuestion']
-                );
-                ?>
+                <div class="col-xs-12 col-md-6" style="padding: 0;">
 
-                <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Выбрать вопрос</div></div>', ['#'],
-                    ['class' => 'add_new_question_button col-xs-12 col-md-6 col-lg-3', 'id' => 'buttonAddQuestionToGeneralList']
-                );
-                ?>
+                    <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
+                        ['class' => 'add_new_question_button pull-right', 'id' => 'buttonAddQuestion']
+                    );
+                    ?>
+
+                </div>
 
             </div>
 
 
             <!--Сюда помещаем форму для создания нового вопроса-->
             <div class="form-newQuestion-panel" style="display: none;"></div>
-            <!--Сюда помещаем форму для добавления вопроса из списка-->
-            <div class="form-QuestionsOfGeneralList-panel" style="display: none;"></div>
-
 
             <!--Список вопросов-->
             <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 30px;">
@@ -730,18 +726,44 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                         'options' => ['class' => 'g-py-15'],
                         'errorCssClass' => 'u-has-error-v1',
                         'successCssClass' => 'u-has-success-v1-1',
-                        ]);
+                    ]);
                     ?>
 
                     <div class="col-xs-12 col-sm-9 col-lg-10">
 
-                        <?= $form->field($newQuestion, 'title', ['template' => '{input}'])
+                        <?= $form->field($newQuestion, 'title', ['template' => '{input}', 'options' => ['style' => ['position' => 'absolute', 'top' => '0', 'z-index' => '20', 'left' => '15px', 'right' => '15px']]])
                             ->textInput([
                                 'maxlength' => true,
                                 'required' => true,
-                                'placeholder' => 'Добавьте новый вопрос для анкеты',
-                                'class' => 'style_form_field_respond'])
+                                'placeholder' => 'Введите свой вопрос или выберите готовый из выпадающего списка',
+                                'id' => 'add_text_question_confirm',
+                                'class' => 'style_form_field_respond',
+                                'autocomplete' => 'off'])
                             ->label(false);
+                        ?>
+
+                        <?= Html::a('<span class="triangle-bottom"></span>', ['#'], [
+                            'id' => 'button_add_text_question_confirm',
+                            'class' => 'btn'
+                        ]); ?>
+
+                        <?= $form->field($newQuestion, 'list_questions', ['template' => '{input}', 'options' => ['style' => ['position' => 'absolute', 'top' => '0', 'z-index' => '10', 'left' => '15px', 'right' => '15px']]])
+                            ->widget(Select2::class, [
+                                'data' => $queryQuestions,
+                                'options' => [
+                                    'id' => 'add_new_question_confirm',
+                                    'placeholder' => 'Выберите вариант из списка готовых вопросов',
+                                ],
+                                'pluginEvents' => [
+                                    "select2:open" => 'function() { 
+                                        $(".select2-container--krajee .select2-dropdown").css("border-color","#828282");
+                                        $(".select2-container--krajee.select2-container--open .select2-selection, .select2-container--krajee .select2-selection:focus").css("border-color","#828282");
+                                        $(".select2-container--krajee.select2-container--open .select2-selection, .select2-container--krajee .select2-selection:focus").css("box-shadow","none"); 
+                                    }',
+                                ],
+                                'disabled' => false,  //Сделать поле неактивным
+                                'hideSearch' => false, //Скрытие поиска
+                            ]);
                         ?>
 
                     </div>
@@ -749,6 +771,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                     <div class="col-xs-12 col-sm-3 col-lg-2">
                         <?= Html::submitButton('Сохранить', [
                             'class' => 'btn btn-lg btn-success',
+                            'id' => 'submit_addNewQuestion',
                             'style' => [
                                 'margin-bottom' => '15px',
                                 'background' => '#52BE7F',
@@ -788,55 +811,6 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-
-            <!--Форма для выбора вопроса из общего списка-->
-            <div style="display: none;">
-                <div class="col-md-12 form-QuestionsOfGeneralList" style="margin-top: 20px; padding: 0;">
-
-                    <? $form = ActiveForm::begin([
-                        'id' => 'addNewQuestionOfGeneralList',
-                        'action' => Url::to(['/confirm-problem/add-question', 'id' => $model->id]),
-                        'options' => ['class' => 'g-py-15'],
-                        'errorCssClass' => 'u-has-error-v1',
-                        'successCssClass' => 'u-has-success-v1-1',
-                    ]);?>
-
-                    <div class="col-xs-12 col-sm-9 col-lg-10">
-
-                        <?= $form->field($newQuestion, 'title', ['template' => '{input}',])
-                            ->widget(Select2::class, [
-                                'data' => $queryQuestions,
-                                'options' => [
-                                    'id' => 'add_new_question_confirm',
-                                    'placeholder' => 'Выберите вариант из списка готовых вопросов',
-                                ],
-                                'disabled' => false,  //Сделать поле неактивным
-                                'hideSearch' => false, //Скрытие поиска
-                            ]);
-                        ?>
-
-                    </div>
-
-                    <div class="col-xs-12 col-sm-3 col-lg-2">
-                        <?= Html::submitButton('Сохранить', [
-                            'class' => 'btn btn-lg btn-success',
-                            'style' => [
-                                'margin-bottom' => '15px',
-                                'background' => '#52BE7F',
-                                'width' => '100%',
-                                'height' => '40px',
-                                'padding-top' => '4px',
-                                'padding-bottom' => '4px',
-                                'border-radius' => '8px',
-                            ]
-                        ]); ?>
-                    </div>
-
-                    <? ActiveForm::end(); ?>
-
                 </div>
             </div>
 
@@ -1640,10 +1614,6 @@ $script = "
         });
         
         
-        //Отмена перехода по ссылке кнопки добавить вопрос
-        $('a.add_new_question_button').on('click', false);
-        
-        
         //Плавное изменение цвета ссылки этапа подтверждения
         $('.tab button').hover(function() {
             $(this).stop().animate({ backgroundColor: '#707f99'}, 300);
@@ -1652,27 +1622,16 @@ $script = "
         });
         
     
-        //Убираем отступ снизу таблицы (Шаг 1)
-        $('#table-data-interview-container').find('.panel').css('margin-bottom', '0');
-        
-        //Вырезаем и вставляем форму добавления вопроса в панель таблицы (Шаг 2) 
+        //Вырезаем и вставляем форму добавления вопроса (Шаг 2)
         $('.form-newQuestion-panel').append($('.form-newQuestion').first());
-        
+            
         //Показываем и скрываем форму добавления вопроса 
         //при нажатии на кнопку добавить вопрос (Шаг 2)
-        $('#buttonAddQuestion').on('click', function(){
-            $('.form-QuestionsOfGeneralList-panel').hide();
+        $('#buttonAddQuestion').on('click', function(e){
+            
             $('.form-newQuestion-panel').toggle();
-        });
-        
-        //Вырезаем и вставляем форму для выбора вопроса в панель таблицы (Шаг 2)
-        $('.form-QuestionsOfGeneralList-panel').append($('.form-QuestionsOfGeneralList').first());
-        
-        //Показываем и скрываем форму для выбора вопроса 
-        //при нажатии на кнопку выбрать из списка (Шаг 2)
-        $('#buttonAddQuestionToGeneralList').on('click', function(){
-            $('.form-newQuestion-panel').hide();
-            $('.form-QuestionsOfGeneralList-panel').toggle();
+            e.preventDefault();
+            return false;
         });
         
         
@@ -2171,6 +2130,9 @@ $script = "
     });
 
     
+    
+    
+    
     //Создание нового вопроса (Шаг 2)
     $('#addNewQuestion').on('beforeSubmit', function(e){
         
@@ -2202,11 +2164,11 @@ $script = "
                 
                 //Обновляем список вопросов для добавления (Шаг 2)
                 var queryQuestions = response.queryQuestions;
-                $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $('#addNewQuestion').find('select').html('');
+                $('#addNewQuestion').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
                 $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
-                });
+                    $('#addNewQuestion').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
+                });    
                 
                 //Скрываем и очищием форму (Шаг 2)
                 $('.form-newQuestion-panel').hide();
@@ -2225,61 +2187,96 @@ $script = "
         return false;
     });
     
-    
-    //Добавление нового вопроса из списка предложенных (Шаг 2)
-    $('#addNewQuestionOfGeneralList').on('beforeSubmit', function(e){
-        
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
 
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
+    
+    
+    
+    //события для select2 https://select2.org/programmatic-control/events
+    //Открытие и закрытие списка вопросов для добавления в анкету
+    $('body').on('click', '#button_add_text_question_confirm', function(e){
+
+        if(!$('#button_add_text_question_confirm').hasClass('openDropDownList')){
+            
+            $('#add_new_question_confirm').select2('open');
+            $(this).addClass('openDropDownList');
+            $(this).css('border-width', '0');
+            $(this).find('.triangle-bottom').css('transform', 'rotate(180deg)');
+            
+            var position_button = $('#button_add_text_question_confirm').offset().top;
+            var position_select = $('.select2-container--krajee .select2-dropdown').offset().top;
+            
+            if (position_button < position_select) {
                 
-                //Добавление строки для нового вопроса (Шаг 2)
-                var container = $('#QuestionsTable-container');
-                $('.new-string-table-questions').find('.string_question').addClass('string_question-' + response.model.id);
-                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.title_question').html(response.model.title);
-                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/confirm-problem/delete-question?id=' + response.model.id);
-                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('id', 'delete_question-' + response.model.id);
-                var newString = $('.new-string-table-questions').html();
-                container.append(newString);
-                
-                //Изменение нумерации строк (Шаг 2)
-                var questions = response.questions;
-                $.each(questions, function(index, value) {
-                    $('#QuestionsTable-container').find('.string_question-' + response.model.id).find('.number_question').html((index+1) + '.');
-                });
-                
-                //Скрываем форму (Шаг 2)
-                $('.form-QuestionsOfGeneralList-panel').hide();
-                
-                //Обновляем список вопросов для добавления (Шаг 2)
-                var queryQuestions = response.queryQuestions;
-                $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
-                $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
-                });
-                
-                //Удаляем добавленный класс из шаблона строки вопроса
-                $('.new-string-table-questions').find('.string_question').removeClass('string_question-' + response.model.id);
-                
-                
-            },
-            error: function(){
-                alert('Ошибка');
+                $('#add_text_question_confirm').css('border-bottom-width', '0');
+                $('#add_text_question_confirm').css('border-radius', '12px 12px 0 0');
+            } else {
+            
+                $('#add_text_question_confirm').css('border-top-width', '0');
+                $('#add_text_question_confirm').css('border-radius', '0 0 12px 12px');
             }
-        });
-        
+
+        }else {
+            
+            $('#add_new_question_confirm').select2('close');
+            $(this).removeClass('openDropDownList');
+            $(this).css('border-width', '0 0 0 1px');
+            $(this).find('.triangle-bottom').css('transform', 'rotate(0deg)');
+            $('#add_text_question_confirm').css('border-width', '1px');
+			$('#add_text_question_confirm').css('border-radius', '12px');
+        }
+
         e.preventDefault();
 
         return false;
     });
+    
+    //Проверяем позицию кнопки и select при скролле страницы и задаем стили для поля ввода
+    $(window).on('scroll', function() {
+    
+        var position_button = $('#button_add_text_question_confirm').offset().top;
+        var position_select = $('.select2-container--krajee .select2-dropdown').offset().top;
+            
+        if (position_button < position_select) {
+            
+            $('#add_text_question_confirm').css('border-top-width', '1px');    
+            $('#add_text_question_confirm').css('border-bottom-width', '0');
+            $('#add_text_question_confirm').css('border-radius', '12px 12px 0 0');
+        } else {
+            
+            $('#add_text_question_confirm').css('border-bottom-width', '1px');
+            $('#add_text_question_confirm').css('border-top-width', '0');
+            $('#add_text_question_confirm').css('border-radius', '0 0 12px 12px');
+        }
+    });
+    
+    // Отслеживаем клик вне поля Select
+    $(document).mouseup(function (e){ // событие клика по веб-документу
+    
+		var search = $('.select2-container--krajee .select2-search--dropdown .select2-search__field'); // поле поиска в select
+		var button = $('#button_add_text_question_confirm'); // кнопка открытия и закрытия списка select
+		
+		if (!search.is(e.target) && !button.is(e.target) // если клик был не полю поиска и не по кнопке
+		    && search.has(e.target).length === 0 && button.has(e.target).length === 0) { // и не их по его дочерним элементам
+			
+			$('#add_new_question_confirm').select2('close'); // скрываем список select
+			$('#button_add_text_question_confirm').removeClass('openDropDownList'); // убираем класс открытового списка у кнопки открытия и закрытия списка select
+			
+			$('#button_add_text_question_confirm').css('border-width', '0 0 0 1px'); // возвращаем стили кнопке
+			$(this).find('.triangle-bottom').css('transform', 'rotate(0deg)'); // возвращаем стили кнопке
+			
+			$('#add_text_question_confirm').css('border-width', '1px'); // возвращаем стили для поля ввода
+			$('#add_text_question_confirm').css('border-radius', '12px'); // возвращаем стили для поля ввода
+		}
+	});
+    
+    //Передаем выбранное значение из select в поле ввода
+    $('#add_new_question_confirm').on('select2:select', function(){
+        $('#add_text_question_confirm').val($(this).val());
+        $(this).val('');
+    });
+    
+      
+    
     
     
     //Удаление вопроса для интервью в модальном окне.
@@ -2317,10 +2314,10 @@ $script = "
                 
                 //Обновляем список вопросов для добавления (Шаг 2)
                 var queryQuestions = response.queryQuestions;
-                $('#addNewQuestionOfGeneralList').find('select').html('');
-                $('#addNewQuestionOfGeneralList').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+                $('#addNewQuestion').find('select').html('');
+                $('#addNewQuestion').find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
                 $.each(queryQuestions, function(index, value) {
-                    $('#addNewQuestionOfGeneralList').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
+                    $('#addNewQuestion').find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
                 });
                 
             },
@@ -2333,6 +2330,8 @@ $script = "
 
         return false;
     });
+    
+    
     
     
     //При попытке добавить ГПС проверяем существуют ли необходимые данные

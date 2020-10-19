@@ -14,6 +14,9 @@ use Yii;
  */
 class Questions extends \yii\db\ActiveRecord
 {
+
+    public $list_questions;
+
     /**
      * {@inheritdoc}
      */
@@ -37,7 +40,7 @@ class Questions extends \yii\db\ActiveRecord
             [['interview_id'], 'integer'],
             [['status'], 'boolean'],
             [['status'], 'default', 'value' => '1'],
-            [['title'], 'string', 'max' => 255],
+            [['title', 'list_questions'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
     }

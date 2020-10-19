@@ -7,6 +7,9 @@ use yii\db\ActiveRecord;
 
 class QuestionsConfirmProblem extends ActiveRecord
 {
+
+    public $list_questions;
+
     /**
      * {@inheritdoc}
      */
@@ -35,7 +38,7 @@ class QuestionsConfirmProblem extends ActiveRecord
             [['confirm_problem_id'], 'integer'],
             [['status'], 'boolean'],
             [['status'], 'default', 'value' => '1'],
-            [['title'], 'string', 'max' => 255],
+            [['title', 'list_questions'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
     }

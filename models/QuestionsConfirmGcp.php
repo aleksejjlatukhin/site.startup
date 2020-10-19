@@ -8,6 +8,8 @@ use yii\db\ActiveRecord;
 class QuestionsConfirmGcp extends ActiveRecord
 {
 
+    public $list_questions;
+
     /**
      * {@inheritdoc}
      */
@@ -36,7 +38,7 @@ class QuestionsConfirmGcp extends ActiveRecord
             [['confirm_gcp_id'], 'integer'],
             [['status'], 'boolean'],
             [['status'], 'default', 'value' => '1'],
-            [['title'], 'string', 'max' => 255],
+            [['title', 'list_questions'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
     }

@@ -132,3 +132,50 @@
     }
 
 }
+
+/*Стили для формы добавления вопроса
+---Начало---
+*/
+form#addNewQuestion {
+    position: relative;
+}
+
+input#add_text_question_confirm {
+    outline: none; /* Убираем свечение в Chrome и Safari */
+    -webkit-appearance: none; /* Убираем рамку в Chrome и Safari */
+    box-shadow: none; /* Убираем тень в Firefox */
+    padding-right: 40px;
+}
+
+a#button_add_text_question_confirm {
+    position: absolute;
+    right: 17px;
+    top: 2px;
+    background-color: #fff;
+    border-radius: 0 12px 12px 0;
+    border-width: 0 0 0 1px;
+    border-color: rgb(136, 136, 136);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    z-index: 30;
+}
+a#button_add_text_question_confirm:focus {
+    box-shadow: none;
+}
+.triangle-bottom {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid rgb(136, 136, 136);
+}
+@media screen and (max-width: 768px) {
+
+    #submit_addNewQuestion {
+        margin-top: 55px;
+    }
+}
+/*Стили для формы добавления вопроса
+---Конец---
+*/
