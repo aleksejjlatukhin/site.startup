@@ -1672,7 +1672,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                         <?php if ($respond->descInterview) : ?>
 
                             <!--Если пользователь является проектантом-->
-                            <?php if (!User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
                                 <?php $form = ActiveForm::begin([
                                     'action' => "/desc-interview/update?id=".$respond->descInterview->id ,
@@ -2181,6 +2181,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     <?=  Html::a($respond->name, ['#'], [
                             'id' => "fio-$respond->id",
                             'class' => 'container-respond_name_link',
+                            'title' => 'Редактировать данные респондента',
                             'data-toggle' => 'modal',
                             'data-target' => "#respond_update_modal-$respond->id",
                         ]);
@@ -2237,20 +2238,15 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     if (!empty($respond->descInterview->updated_at)){
 
                         $date_fact = date("d.m.y", $respond->descInterview->updated_at);
-                        echo '<div class="text-center">' . Html::a(Html::encode($date_fact), Url::to(['#']), [
-                                'class' => 'container-respond_data_link',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#interview_update_modal-$respond->id",
-                                'style' => ['padding' => '0 5px']
-                            ]) . '</div>';
+                        echo '<div class="text-center">' . Html::encode($date_fact) . '</div>';
 
                     }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan) && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                         echo '<div class="text-center">' . Html::a(
                                 Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
                                 ['/respond/data-availability', 'id' => Yii::$app->request->get('id')],
-                                ['onclick'=>
-                                    "$.ajax({
+                                ['title' => 'Добавить интервью',
+                                    'onclick'=> "$.ajax({
         
                                         url: '".Url::to(['/respond/data-availability', 'id' => Yii::$app->request->get('id')])."',
                                         method: 'POST',
@@ -2299,9 +2295,19 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                 <div class="col-md-1" style="text-align: right;">
                     <?php
 
+                        if ($respond->descInterview) {
+
+                            echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
+                                    'class' => '',
+                                    'title' => 'Редактировать результаты интервью',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#interview_update_modal-$respond->id",
+                                ]);
+                        }
+
                         echo Html::a(Html::img('/images/icons/icon_delete.png',
                             ['style' => ['width' => '24px']]), ['#'], [
-                            'title' => Yii::t('yii', 'Delete'),
+                            'title' => 'Удалить респондента',
                             'data-toggle' => 'modal',
                             'data-target' => "#delete-respond-modal-$respond->id",
                             ]);
