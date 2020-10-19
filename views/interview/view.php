@@ -352,6 +352,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                         'rows' => 1,
                         'readonly' => true,
                         'required' => true,
+                        'id' => 'greeting_interview-view',
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
                         ]);
@@ -367,6 +368,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                         'rows' => 1,
                         'readonly' => true,
                         'required' => true,
+                        'id' => 'view_interview-view',
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
                     ]);
@@ -382,6 +384,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                         'rows' => 1,
                         'readonly' => true,
                         'required' => true,
+                        'id' => 'reason_interview-view',
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
                     ]);
@@ -398,6 +401,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                             'type' => 'number',
                             'readonly' => true,
                             'required' => true,
+                            'id' => 'count_respond-view',
                             'class' => 'style_form_field_respond form-control'
                         ]);?>
 
@@ -412,6 +416,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                             'type' => 'number',
                             'readonly' => true,
                             'required' => true,
+                            'id' => 'count_positive-view',
                             'class' => 'style_form_field_respond form-control'
                         ]);?>
 
@@ -2704,8 +2709,35 @@ $script = "
 
                 if (!response['error']) {
                 
-                    //Перезагружаем страницу после сохранения данных
-                    location.reload();
+                    //Назначаем перезагрузку страницы при переходе на Шаг 3
+                    $('.tab').find('#defaultOpen').attr('onclick', 'location.reload()');
+                    
+                    //Обновление данных в режиме просмотра (Шаг 1)
+                    
+                    var inputCountRespond = response.model.count_respond;
+                    var viewCountRespond = $('#count_respond-view');
+                    viewCountRespond.val(inputCountRespond);
+                    
+                    var inputCountPositive = response.model.count_positive;
+                    var viewCountPositive = $('#count_positive-view');
+                    viewCountPositive.val(inputCountPositive);
+                    
+                    var textareaGreetingInterview = response.model.greeting_interview;
+                    var viewGreetingInterview = $('#greeting_interview-view');
+                    viewGreetingInterview.html(textareaGreetingInterview);
+                    
+                    var textareaViewInterview = response.model.view_interview;
+                    var viewViewInterview = $('#view_interview-view');
+                    viewViewInterview.html(textareaViewInterview);
+                    
+                    var textareaReasonInterview = response.model.reason_interview;
+                    var viewReasonInterview = $('#reason_interview-view');
+                    viewReasonInterview.html(textareaReasonInterview);
+                    
+                    //Вызов события клика на кнопку просмотра 
+                    //для перхода в режим просмотра (Шаг 1)
+                    $('.form-update-data-confirm').hide();
+                    $('.form-view-data-confirm').show();
 
                 } else {
                     // Вызов модального окна, если было некорректное 
