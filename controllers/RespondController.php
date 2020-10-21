@@ -496,6 +496,7 @@ class RespondController extends AppController
                     if ($updateRespondForm->updateRespond($model)){
 
                         $project->updated_at = time();
+
                         if ($project->save()){
 
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -516,7 +517,7 @@ class RespondController extends AppController
 
 
 
-    public function actionDeleteRespond ($id) {
+    public function actionDelete ($id) {
 
         $model = Respond::findOne($id);
         $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
@@ -575,64 +576,6 @@ class RespondController extends AppController
 
         }
         return false;
-    }
-
-
-    /**
-     * Deletes an existing Respond model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-
-
-        $project->updated_at = time();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-
-
-        if (count($responds) == 1){
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($interview->count_respond == $interview->count_positive){
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества представителей сегмента!");
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($project->save()){
-            Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
-
-            if ($descInterview){
-                $descInterview->delete();
-            }
-
-            $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-
-            if (file_exists($del_dir)){
-                $this->delTree($del_dir);
-            }
-
-            if ($model->delete()){
-                $interview->count_respond = $interview->count_respond -1;
-                $interview->save();
-
-            }
-
-            return $this->redirect(['interview/view', 'id' => $interview->id]);
-        }
     }
 
     /**

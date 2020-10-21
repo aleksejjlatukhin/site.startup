@@ -126,18 +126,19 @@ class DescInterviewConfirmController extends AppController
     {
         $model = new DescInterviewConfirm();
         $model->responds_confirm_id = $id;
-
         $respond = RespondsConfirm::find()->where(['id' => $id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
 
+        //Если у респондента уже есть интервью, то отменить действие
+        if ($respond->descInterview){
+            return false;
+        }
+
+        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
         $answers = $respond->answers;
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
 
         if(Yii::$app->request->isAjax) {
@@ -152,9 +153,11 @@ class DescInterviewConfirmController extends AppController
 
                     if ($model->save()) {
 
+                        $project->updated_at = time();
+
                         if ($project->save()){
 
-                            $response =  ['success' => true];
+                            $response = $model;
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
@@ -195,9 +198,6 @@ class DescInterviewConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
 
         if(Yii::$app->request->isAjax) {
@@ -212,9 +212,11 @@ class DescInterviewConfirmController extends AppController
 
                     if ($model->save()) {
 
+                        $project->updated_at = time();
+
                         if ($project->save()){
 
-                            $response =  ['success' => true];
+                            $response =  $model;
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;

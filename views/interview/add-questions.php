@@ -187,7 +187,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
                     <?= Html::button('Редактировать', [
                         'id' => 'show_form_update_data',
@@ -327,7 +327,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
 
                     <?= Html::button('Просмотр', [
                         'id' => 'show_form_view_data',

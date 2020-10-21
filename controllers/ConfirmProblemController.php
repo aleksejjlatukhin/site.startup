@@ -13,7 +13,9 @@ use app\models\QuestionsConfirmProblem;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
+use app\models\UpdateRespondConfirmForm;
 use app\models\User;
+use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmProblem;
 use yii\data\ActiveDataProvider;
@@ -102,44 +104,17 @@ class ConfirmProblemController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
 
-        $data_responds = 0;
-        $data_desc = 0;
-        foreach ($responds as $respond){
-            if (!empty($respond->name) && !empty($respond->info_respond)){
-                $respond->exist_respond = 1;
-                $data_responds++;
-                if (!empty($respond->descInterview)){
-                    $data_desc++;
-                }
-            }else{
-                $respond->exist_respond = 0;
-            }
-        }
-
-
-
-        $dataProviderResponds = new ActiveDataProvider([
-            'query' => RespondsConfirm::find()->where(['confirm_problem_id' => $id]),
+        $queryResponds = RespondsConfirm::find()->where(['confirm_problem_id' => $id]);
+        $dataProviderQueryResponds = new ActiveDataProvider([
+            'query' => $queryResponds,
             'pagination' => false,
+            //'pagination' => ['pageSize' => 10],
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_ASC,
                     //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
-
-
-        $dataProviderQuestions = new ActiveDataProvider([
-            'query' => QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id]),
-            'pagination' => false,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'title' => SORT_ASC,
                 ]
             ],
         ]);
@@ -153,6 +128,21 @@ class ConfirmProblemController extends AppController
         $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
 
+        $newRespond = new RespondsConfirm();
+        $newRespond->confirm_problem_id = $model->id;
+
+        $updateRespondForms = [];
+        $createDescInterviewForms = [];
+        $updateDescInterviewForms = [];
+
+        foreach ($responds as $i => $respond) {
+
+            $updateRespondForms[] = new UpdateRespondConfirmForm($respond->id);
+
+            $createDescInterviewForms[] = new DescInterviewConfirm();
+
+            $updateDescInterviewForms[] = $respond->descInterview;
+        }
 
 
         return $this->render('view', [
@@ -163,15 +153,109 @@ class ConfirmProblemController extends AppController
             'segment' => $segment,
             'project' => $project,
             'responds' => $responds,
-            'data_responds' => $data_responds,
-            'data_desc' => $data_desc,
-            'dataProviderResponds' => $dataProviderResponds,
-            'dataProviderQuestions' => $dataProviderQuestions,
+            'dataProviderQueryResponds' => $dataProviderQueryResponds,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
+            'newRespond' => $newRespond,
             'queryQuestions' => $queryQuestions,
+            'updateRespondForms' => $updateRespondForms,
+            'createDescInterviewForms' => $createDescInterviewForms,
+            'updateDescInterviewForms' => $updateDescInterviewForms,
         ]);
     }
+
+
+
+
+    /*Проверка данных подтверждения на этапе генерации ГПС*/
+    public function actionDataAvailabilityForNextStep($id)
+    {
+        $model = ConfirmProblem::findOne($id);
+
+        $count_descInterview = 0;
+        $count_positive = 0;
+
+        foreach ($model->responds as $respond) {
+
+            if ($respond->descInterview){
+                $count_descInterview++;
+
+                if ($respond->descInterview->status == 1){
+                    $count_positive++;
+                }
+            }
+        }
+
+        if(Yii::$app->request->isAjax) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps)  && $model->count_positive <= $count_positive)) {
+
+                $response =  ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }else{
+
+                $response = ['error' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+    }
+
+
+
+
+    /*Завершение подтверждения сегмента и переход на следующий этап*/
+    public function actionMovingNextStage($id)
+    {
+        $model = ConfirmProblem::findOne($id);
+        $problem = $model->problem;
+
+        $count_descInterview = 0;
+        $count_positive = 0;
+
+        foreach ($model->responds as $respond) {
+
+            if ($respond->descInterview){
+                $count_descInterview++;
+
+                if ($respond->descInterview->status == 1){
+                    $count_positive++;
+                }
+            }
+        }
+
+        if(Yii::$app->request->isAjax) {
+
+            if (count($model->responds) > $count_descInterview && empty($model->gcps)) {
+
+                $response = ['not_completed_descInterviews' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps))) {
+
+                $response =  [
+                    'success' => true,
+                    'exist_confirm' => $problem->exist_confirm,
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }else{
+
+                $response = ['error' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+    }
+
 
 
     public function actionNotExistConfirm($id)
@@ -236,23 +320,10 @@ class ConfirmProblemController extends AppController
         $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
-            }
-        }
-
 
         if (!empty($generationProblem->confirm)){
             return $this->redirect(['view', 'id' => $generationProblem->confirm->id]);
         }
-
 
         $respondsPre = []; // представители сегмента
         foreach ($responds as $respond){
@@ -349,8 +420,26 @@ class ConfirmProblemController extends AppController
                         $model->createRespondConfirm($responds);
 
                         //Вопросы, которые будут добавлены по-умолчанию
-                        $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
-                        $model->addQuestionDefault('Как принимается решение о покупке?');
+                        $model->addQuestionDefault('Какими функциями должен обладать продукт вашей мечты?');
+                        $model->addQuestionDefault('Расскажите поподробнее, каков алгоритм вашей работы?');
+                        $model->addQuestionDefault('Почему вас это беспокоит?');
+                        $model->addQuestionDefault('Каковы последствия этой ситуации?');
+                        $model->addQuestionDefault('Расскажите поподробнее, что произошло в последний раз?');
+                        $model->addQuestionDefault('Что еще пытались сделать?');
+                        $model->addQuestionDefault('Кто будет финансировать покупку?');
+                        $model->addQuestionDefault('С кем еще мне следует переговорить?');
+                        $model->addQuestionDefault('Есть ли еще вопросы, которые мне следовало задать?');
+                        $model->addQuestionDefault('Пытались ли найти решение?');
+                        $model->addQuestionDefault('Эти решения оказались недостаточно эффективными?');
+                        $model->addQuestionDefault('Как справляются с задачей сейчас и сколько денег тратят?');
+                        $model->addQuestionDefault('Сколько времени это занимает?');
+                        $model->addQuestionDefault('Продемонстрировать как они выполняют работу или другую деятельность?');
+                        $model->addQuestionDefault('Что в этом нравится и что нет?');
+                        $model->addQuestionDefault('Какие еще инструменты и процессы пробовали пока не остановились на этом?');
+                        $model->addQuestionDefault('Ищут ли активно сейчас чем это можно заменить?');
+                        $model->addQuestionDefault('Если да, то в чем проблема?');
+                        $model->addQuestionDefault('Если не ищут, то почему?');
+                        $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
 
                         $project->updated_at = time();
 
@@ -504,27 +593,13 @@ class ConfirmProblemController extends AppController
     }
 
 
-    public function actionUpdateDataInterview ($id)
+    public function actionUpdate ($id)
     {
-        //$model = ConfirmProblem::find()->where(['id' => $id])->one();
         $model = new FormUpdateConfirmProblem($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -532,40 +607,7 @@ class ConfirmProblemController extends AppController
 
                 if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
 
-                    //if ($model->save()){
                     if ($confirm_problem = $model->update()){
-
-                        /*if ((count($responds)+1) <= $model->count_respond){
-                            for ($count = count($responds) + 1; $count <= $model->count_respond; $count++ )
-                            {
-                                $newRespond[$count] = new RespondsConfirm();
-                                $newRespond[$count]->confirm_problem_id = $id;
-                                $newRespond[$count]->name = 'Респондент ' . $count;
-                                $newRespond[$count]->save();
-                            }
-                        }else{
-                            $minus = count($responds) - $model->count_respond;
-                            $respond = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->orderBy(['id' => SORT_DESC])->limit($minus)->all();
-                            foreach ($respond as $item)
-                            {
-                                $descInterview = DescInterviewConfirm::find()->where(['responds_confirm_id' => $item->id])->one();
-
-                                if ($descInterview) {
-                                    $descInterview->delete();
-                                }
-
-                                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                                    mb_convert_encoding($this->translit($item->name), "windows-1251") . '/';
-
-                                if (file_exists($del_dir)) {
-                                    $this->delTree($del_dir);
-                                }
-
-                                $item->delete();
-                            }
-                        }*/
 
                         $project->updated_at = time();
 
@@ -601,60 +643,64 @@ class ConfirmProblemController extends AppController
         }
     }
 
-    /**
-     * Updates an existing ConfirmProblem model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+
+
+    public function actionMpdfDataResponds($id)
     {
-        $model = ConfirmProblem::find()->where(['id' => $id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
+        $model = ConfirmProblem::findOne($id);
+        $responds = $model->responds;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/confirm-problem/viewpdf', ['model' => $model, 'responds' => $responds]);
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $problem_desc = $model->problem->description;
+        if (mb_strlen($problem_desc) > 25) {
+            $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
 
+        $filename = 'Подтверждение проблемы «'.$problem_desc.'». Таблица респондентов.pdf';
 
-        if ($model->load(Yii::$app->request->post())) {
-
-            if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
-
-                if ($model->save()){
-
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        Yii::$app->session->setFlash('success', "Данные для подтверждения обновлены!");
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    }
-                }
-            }else{
-                Yii::$app->session->setFlash('error', "Количество позитивных ответов не может быть больше количества респондентов");
-            }
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_LANDSCAPE,
+            //'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            //'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginFooter' => 5,
+            'defaultFont' => 'RobotoCondensed-Light',
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => ['Респонденты для подтверждения гипотезы проблемы «'.$problem_desc.'»'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Респонденты для подтверждения гипотезы проблемы «'.$problem_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
         ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
     }
+
+
 
     /**
      * Deletes an existing ConfirmProblem model.

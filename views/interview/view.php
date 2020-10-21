@@ -312,7 +312,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
                     <?= Html::button('Редактировать', [
                         'id' => 'show_form_update_data',
@@ -451,7 +451,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
 
                     <?= Html::button('Просмотр', [
                         'id' => 'show_form_view_data',
@@ -854,388 +854,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
     <div id="step_three" class="tabcontent row">
 
 
-        <div class="">
-
-            <?php
-/*
-            $gridColumns = [
-                [
-                    'class' => 'kartik\grid\SerialColumn',
-                    'header' => '',
-                ],
-
-
-                [
-                    'attribute' => 'name',
-                    'label' => 'Фамилия Имя Отчество',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Фамилия Имя Отчество</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1,],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if ($model){
-
-                            return '<div class="fio" style="padding: 0 5px;">' . Html::a($model->name, ['#'], [
-                                    'id' => "fio-$model->id",
-                                    'class' => 'table-kartik-link',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => "#respond_view_modal-$model->id",
-                                ]) . '</div>';
-                        }
-                    },
-                    'format' => 'raw',
-                    'hiddenFromExport' => true, // Убрать столбец при скачивании
-                ],
-
-
-                [
-                    'attribute' => 'name_export',
-                    'label' => 'Фамилия Имя Отчество',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Фамилия Имя Отчество</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1,],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if ($model){
-
-                            return '<div class="fio" style="padding: 0 5px;">' . $model->name . '</div>';
-                        }
-                    },
-                    'format' => 'raw',
-                    'hidden' => true,
-                ],
-
-
-                [
-                    'attribute' => 'info_respond',
-                    'label' => 'Данные респондента',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Общая характеристика</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->info_respond)) {
-
-                            return '<div style="padding: 0 5px;">' . $model->info_respond . '</div>';
-                        }
-
-                    },
-                    'format' => 'html',
-                ],
-
-
-                [
-                    'attribute' => 'plan',
-                    'label' => 'План',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">План</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'width' => '70px',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->date_plan)){
-
-                            return '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $model->date_plan) . '</div>';
-                        }
-                    },
-                    'format' => 'html',
-                ],
-
-
-                [
-                    'attribute' => 'fact',
-                    'label' => 'Факт',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Факт</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'width' => '70px',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->descInterview->updated_at)){
-
-                            $date_fact = date("d.m.y", $model->descInterview->updated_at);
-                            return '<div class="text-center">' . Html::a(Html::encode($date_fact), Url::to(['#']), [
-                                    'class' => 'table-kartik-link',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => "#view_descInterview_modal-$model->id",
-                                    'style' => ['padding' => '0 5px']
-                                ]) . '</div>';
-
-                        }elseif (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan) && empty($model->descInterview->updated_at)){
-
-                            return '<div class="text-center">' . Html::a(
-                                    Html::img(['@web/images/icons/next-step.png'], ['style' => ['width' => '20px']]),
-                                    ['/respond/data-availability', 'id' => Yii::$app->request->get('id')],
-                                    ['onclick'=>
-                                        "$.ajax({
-        
-                                        url: '".Url::to(['/respond/data-availability', 'id' => Yii::$app->request->get('id')])."',
-                                        method: 'POST',
-                                        cache: false,
-                                        success: function(response){
-                                            if (!response['error']) {
-                                            
-                                                //alert('Здесь вывести окно с формой создания интервью');
-                                                $('#create_descInterview_modal-".$model->id."').modal('show');
-                                                //$.pjax({container: '#respPjax'});
-                                                //$.pjax({container: '#Pjax_modal_responds'});
-                                                
-                                                //Закрываем окно создания нового респондента
-                                                //$('#respondCreate_modal').modal('hide');
-                                                
-                                                //Очищаем форму создания нового респондента
-                                                //$('#new_respond_form')[0].reset();
-                                                
-                                            } else {
-                                                
-                                                $('#descInterviewCreate_modal_error').modal('show');
-                                            }
-                                        },
-                                        error: function(){
-                                            alert('Ошибка');
-                                        }
-                                    });
-                            
-                                    return false;
-                                    
-                                ",
-                                    ]) . '</div>';
-                        }
-                    },
-                    'format' => 'raw',
-                    'hiddenFromExport' => true, // Убрать столбец при скачивании
-                ],
-
-
-                [
-                    'attribute' => 'fact_export',
-                    'label' => 'Факт',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Факт</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->descInterview->updated_at)){
-                            $date_fact = date("d.m.y", $model->descInterview->updated_at);
-                            return '<div class="text-center">' . Html::encode($date_fact). '</div>';
-                        }
-                    },
-                    'format' => 'raw',
-                    'hidden' => true,
-                ],
-
-
-                [
-                    'attribute' => 'place_interview',
-                    'label' => 'Место проведения',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Адрес, организация</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->place_interview)){
-
-                            return '<div style="padding: 0 5px;">' . $model->place_interview . '</div>';
-                        }
-                    },
-                    'format' => 'html',
-                ],
-
-
-                [
-                    'attribute' => 'result',
-                    'label' => 'Варианты проблем',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Заключение по интервью</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->descInterview)){
-
-                            return '<div style="padding: 0 5px;">' . $model->descInterview->result . '</div>';
-                        }
-                    },
-                    'format' => 'html',
-                ],
-
-
-                ['class' => 'kartik\grid\ActionColumn',
-                    'header' => '',
-                    'template' => '{delete}',
-                    'buttons' => [
-                        'delete' => function ($url, $model) {
-                            return Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '17px']]), ['#'],[
-                                'title' => Yii::t('yii', 'Delete'),
-                                'data-toggle' => 'modal',
-                                'data-target' => "#delete-respond-modal-$model->id",
-                            ]);
-                        },
-                    ],
-                ],
-
-
-                [
-                    'attribute' => 'delete_export',
-                    'header' => '<div></div>',
-                    'value' => function($model){
-                        return Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '17px']]);
-                    },
-                    'format' => 'raw',
-                    'hidden' => true,
-                ]
-            ]
-
-            */?><!--
-
-
-            --><?php
-/*
-            echo GridView::widget([
-                'dataProvider' => $dataProviderQueryResponds,
-                'showPageSummary' => false, //whether to display the page summary row for the grid view.
-                'pjax' => true,
-                'hashExportConfig' => false,
-                'pjaxSettings' => [
-                    //'neverTimeout' => false,
-                    //'beforeGrid' => '',
-                    'options' => [
-                        'id' => 'respPjax',
-                        //'enablePushState' => false,
-                    ],
-                    'loadingCssClass' => false,
-                ],
-                'striped' => false,
-                'bordered' => true,
-                'condensed' => true,
-                'summary' => false,
-                'hover' => true,
-
-                'panel' => [
-                    'type' => 'default',
-                    'heading' => false,
-                    //'headingOptions' => ['class' => 'style-head-table-kartik-top'],
-
-                    //'before' => false,
-                    'before' => '<div style="font-size: 24px; color: #ffffff;background: #707F99; padding: 7px 0;">' .
-
-                        '<span style="margin-left: 30px;margin-right: 20px;">Информация о респондентах и интервью</span>'
-
-                        . Html::a('i', ['#'], [
-                            'style' => ['margin-rigth' => '20px', 'font-size' => '16px', 'font-weight' => '700', 'padding' => '2px 10px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                            'class' => 'table-kartik-link',
-                            'data-toggle' => 'modal',
-                            'data-target' => "#information-table-responds",
-                            'title' => 'Посмотреть описание',
-                        ]) . '</div>',
-                    'beforeOptions' => ['class' => 'header-table'],
-
-
-                    //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
-                    //'footer' => '{export}',
-                    'after' => false,
-                    //'footer' => false,
-                ],
-
-                'toolbar' => [
-                    //'{toggleData}',
-                    '{export}',
-                ],
-
-                'exportContainer' => ['class' => 'btn btn-group-sm', 'style' => ['padding' => '5px 5px', 'margin' => '3px']],
-                //'toggleDataContainer' => ['class' => 'btn btn-group-sm mr-2', 'style' => ['padding' => '5px 5px']],
-
-//                'toggleDataOptions' => [
-//                    'all' => [
-//                        //'icon' => 'resize-full',
-//                        'label' => '<span class="font-header-table" style="font-weight: 700;">Все страницы</span>',
-//                        'class' => 'btn btn-default',
-//                        'title' => 'Show all data'
-//                    ],
-//                    'page' => [
-//                        //'icon' => 'resize-small',
-//                        'label' => '<span class="font-header-table" style="font-weight: 700;">Одна страница</span>',
-//                        'class' => 'btn btn-default',
-//                        'title' => 'Show first page data'
-//                    ],
-//                ],
-
-                'export' => [
-                    'showConfirmAlert' => false,
-                    'target' => GridView::TARGET_BLANK,
-                    'label' => '<span class="font-header-table" style="font-weight: 700;">Экспорт таблицы</span>',
-                    'options' => ['title' => false],
-                ],
-
-                'columns' => $gridColumns,
-
-                'exportConfig' => [
-                    GridView::PDF => [
-
-                        'filename' => 'Таблица_«Информация_о_респондентах»(Подтверждение_ГЦС&&'.$segment_name.'&&'.$project_filename.')' ,
-
-                        'config' => [
-
-                            'marginRight' => 10,
-                            'marginLeft' => 10,
-                            //'cssInline' => '.positive-business-model-export{margin-right: 20px;}' .
-                            //'.presentation-business-model-export{margin-left: 20px;}',
-
-                            'methods' => [
-                                'SetHeader' => ['<div style="color: #3c3c3c;">Таблица «Информация о респондентах и интервью»(Подтверждение ГЦС / '.$segment->name.' / '.$project->project_name.')</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
-                                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
-                            ],
-
-                            'options' => [
-                                //'title' => 'Сводная таблица проекта «'.$project->project_name.'»',
-                                //'subject' => Yii::t('kvgrid', 'PDF export generated by kartik-v/yii2-grid extension'),
-                                //'keywords' => Yii::t('kvgrid', 'krajee, grid, export, yii2-grid, pdf')
-                            ],
-
-                            //'contentBefore' => '',
-                            //'contentAfter' => '',
-                        ],
-
-                    ],
-                    GridView::EXCEL => [
-                        'filename' => 'Таблица_«Информация_о_респондентах»(Подтверждение_ГЦС&&'.$segment_name.'&&'.$project_filename.')' ,
-                    ],
-                    GridView::HTML => [
-                        'filename' => 'Таблица_«Информация_о_респондентах»(Подтверждение_ГЦС&&'.$segment_name.'&&'.$project_filename.')' ,
-                    ],
-                ],
-
-                //'floatHeader'=>true,
-                //'floatHeaderOptions'=>['top'=>'50'],
-                'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-
-                'beforeHeader' => [
-                    [
-                        'columns' => [
-                            ['content' => '', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' =>  Html::a(Html::img('@web/images/icons/add_plus_elem.png', ['style' => ['width' => '25px', 'margin-right' => '10px']]), ['#'], ['data-toggle' => 'modal', 'data-target' => '#respondCreate_modal',]) . 'Респондент', 'options' => ['colspan' => 1, 'class' => 'font-segment-header-table text-center']],
-                            ['content' => 'Данные респондента', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' => 'Дата интервью', 'options' => ['colspan' => 2, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' => 'Место проведения', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' => 'Варианты проблем', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' => '', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                        ],
-
-                        'options' => [
-                            'class' => 'style-header-table-kartik',
-                        ]
-                    ]
-                ],
-            ]);
-
-            */?>
+        <div class="modal-windows">
 
 
             <?php
@@ -1519,11 +1138,11 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                     </div>
 
-                    <?php
+                    <?php Modal::end(); ?>
 
-                    Modal::end();
 
-                    if (empty($respond->descInterview)) :
+
+                    <?php if (empty($respond->descInterview)) :
 
                         // Форма создания интервью для респондента
                         Modal::begin([
@@ -1950,6 +1569,19 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                                     </div>
 
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">Этот респондент является представителем сегмента?</div>
+                                        <div>
+                                            <?php
+                                            if ($updateDescInterviewForms[$i]->status == 1) {
+                                                echo 'Респондент является представителем сегмента';
+                                            } else {
+                                                echo 'Респондент не является представителем сегмента';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                             <?php endif; ?>
@@ -1959,13 +1591,11 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     </div>
 
 
+                    <?php Modal::end(); ?>
+
+
+
                     <?php
-
-                    Modal::end();
-
-
-
-
                     // Подтверждение удаления респондента
                     Modal::begin([
                         'options' => [
@@ -1982,7 +1612,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                                 'id' => "cancel-delete-respond-$respond->id",
                             ]).
 
-                            Html::a('Ок', ['/respond/delete-respond', 'id' =>$respond->id],[
+                            Html::a('Ок', ['/respond/delete', 'id' => $respond->id],[
                                 'class' => 'btn btn-default',
                                 'style' => ['width' => '120px'],
                                 'id' => "confirm-delete-respond-$respond->id",
@@ -1996,13 +1626,10 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                     <h4 class="text-center">Вы уверены, что хотите удалить все данные<br>о респонденте «<?= $respond->name ?>»?</h4>
 
-                    <?php
+                    <?php Modal::end(); ?>
 
-                    Modal::end();
 
-                endforeach;
-
-                ?>
+                <?php endforeach; ?>
 
             </div>
 
@@ -2488,11 +2115,27 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
         <h4 class="text-center">Вы не набрали достаточное количество представителей сегмента. Следующий этап будет не доступен. Завершить данное подтверждение?</h4>
 
+        <?php Modal::end(); ?>
+
+
         <?php
 
-        Modal::end();
-
+        // Модальное окно - проведены не все интервью
+        Modal::begin([
+            'options' => [
+                'id' => 'not_completed_descInterviews',
+                'class' => 'not_completed_descInterviews',
+            ],
+            'size' => 'modal-md',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+        ]);
         ?>
+
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            Для продолжения Вам необходимо провести интервью со всеми заданными респондентами.
+        </h4>
+
+        <?php Modal::end(); ?>
 
 
         <?php
@@ -2513,11 +2156,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
             Общее количество респондентов не должно быть меньше необходимого количества респондентов соответствующих сегменту.
         </h4>
 
-        <?php
-
-        Modal::end();
-
-        ?>
+        <?php Modal::end(); ?>
 
 
         <?php
@@ -2538,11 +2177,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
             Удаление последнего респондента запрещено.
         </h4>
 
-        <?php
-
-        Modal::end();
-
-        ?>
+        <?php Modal::end(); ?>
 
 
         <?php
@@ -2562,11 +2197,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
             Действует ограничение. Вы не можете добавить больше существующего количества респондентов.
         </h4>
 
-        <?php
-
-        Modal::end();
-
-        ?>
+        <?php Modal::end(); ?>
 
 
     </div>
@@ -2632,6 +2263,10 @@ $script = "
         //Фон для модального окна - чтобы добавить интервью, необходимо заполнить инф-ю о всех респондентах
         var descInterviewCreate_modal_error_modal = $('#descInterviewCreate_modal_error').find('.modal-content');
         descInterviewCreate_modal_error_modal.css('background-color', '#707F99');
+        
+        //Фон для модального окна - для завершения подтверждения необходимо опросить всех заданных респондентов
+        var not_completed_descInterviews_modal = $('#not_completed_descInterviews').find('.modal-content');
+        not_completed_descInterviews_modal.css('background-color', '#707F99');
         
         //Фон для модального окна информации о вопросах
         var information_modal = $('#information-table-questions').find('.modal-content');
@@ -3032,21 +2667,29 @@ $script = "
             data: data,
             cache: false,
             success: function(response){
+            
                 if (!response['error']) {
+                
+                    if (!response['not_completed_descInterviews']) { 
                     
-                    if (response['exist_confirm'] === 1) {
-                        window.location.href = '/generation-problem/index?id=".$model->id."';
+                        if (response['exist_confirm'] === 1) {
+                            window.location.href = '/generation-problem/index?id=".$model->id."';
+                        }
+                        
+                        if (response['exist_confirm'] === null) {
+                            window.location.href = '/interview/exist-confirm?id=".$model->id."';
+                        }
+                        
+                        if (response['exist_confirm'] === 0) {
+                            window.location.href = '/interview/exist-confirm?id=".$model->id."';
+                        }
+                    
+                    } else {
+                        
+                        //Показываем окно (проведены не все интервью)
+                        $('#not_completed_descInterviews').modal('show');
                     }
-                    
-                    if (response['exist_confirm'] === null) {
-                        window.location.href = '/interview/exist-confirm?id=".$model->id."';
-                    }
-                    
-                    if (response['exist_confirm'] === 0) {
-                        window.location.href = '/interview/exist-confirm?id=".$model->id."';
-                    }
-                    
-                    
+
                 } else {
                 
                     //Показываем окно выбора

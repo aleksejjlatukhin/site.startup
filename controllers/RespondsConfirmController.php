@@ -115,80 +115,6 @@ class RespondsConfirmController extends AppController
 
     }
 
-    /**
-     * Lists all RespondsConfirm models.
-     * @return mixed
-     */
-    /*public function actionIndex($id)
-    {
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-
-        $not_exist_data = 0;
-        $exist_data = 0;
-        foreach ($models as $model){
-            if (empty($model->info_respond) || empty($model->descInterview)){
-                $not_exist_data++;
-            }
-            if (!empty($model->info_respond) && !empty($model->descInterview)){
-                $exist_data++;
-            }
-        }
-
-        if (User::isUserSimple(Yii::$app->user->identity['username'])){
-
-            if ($not_exist_data != 0){
-                Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
-            }
-
-            if ($exist_data == count($models)){
-                Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
-            }
-        }
-
-
-        $newRespond = new RespondsConfirm();
-        $newRespond->confirm_problem_id = $id;
-        if ($newRespond->load(Yii::$app->request->post()))
-        {
-            $kol = 0;
-            foreach ($models as $elem){
-                if ($newRespond->id !== $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
-                    $kol++;
-                }
-            }
-
-            if ($kol == 0){
-
-                $newRespond->save();
-                $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
-                $confirmProblem->save();
-
-                $project->update_at = date('Y:m:d');
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
-                    return $this->redirect(['index', 'id' => $id]);
-                }
-            }else{
-                Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');
-            }
-        }
-
-        return $this->render('index', [
-            'models' => $models,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'newRespond' => $newRespond,
-        ]);
-    }*/
 
 
     public function actionIndex($id)
@@ -318,25 +244,6 @@ class RespondsConfirmController extends AppController
         ]);
     }
 
-    /*public function actionByDateInterview($id)
-    {
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('by-date-interview', [
-            'models' => $models,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }*/
-
 
     public function actionByStatusInterview($id)
     {
@@ -409,15 +316,14 @@ class RespondsConfirmController extends AppController
      */
     public function actionCreate($id)
     {
+        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
+        $limit_count_respond = 100;
 
-
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
         $newRespond = new RespondsConfirm();
         $newRespond->confirm_problem_id = $id;
 
@@ -432,30 +338,42 @@ class RespondsConfirmController extends AppController
             }
 
             if(Yii::$app->request->isAjax) {
-                if ($kol == 0) {
-                    if ($newRespond->save()) {
 
-                        $newRespond->addAnswersForNewRespond();
+                if (count($models) < $limit_count_respond) {
 
-                        $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
-                        $confirmProblem->save();
+                    if ($kol == 0) {
 
-                        if ($project->save()) {
+                        if ($newRespond->save()) {
 
-                            $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
+                            $newRespond->addAnswersForNewRespond();
 
-                            $response =  [
-                                'newRespond' => $newRespond,
-                                'responds' => $responds,
-                            ];
+                            $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
+                            $confirmProblem->save();
 
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
+                            $project->updated_at = time();
+
+                            if ($project->save()) {
+
+                                $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
+
+                                $response = [
+                                    'newRespond' => $newRespond,
+                                    'responds' => $responds,
+                                ];
+
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
                         }
+                    } else {
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
-                } else {
-                    $response = ['error' => true];
+                }  else {
+                    $response = ['limit_count_respond' => true];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
                     return $response;
@@ -482,18 +400,14 @@ class RespondsConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
 
         if ($updateRespondForm->load(Yii::$app->request->post())) {
 
             $kol = 0;
             foreach ($models as $item){
-                if ($updateRespondForm->id !== $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
                     $kol++;
                 }
             }
@@ -503,6 +417,8 @@ class RespondsConfirmController extends AppController
                 if ($kol == 0){
 
                     if ($updateRespondForm->updateRespond($model)){
+
+                        $project->updated_at = time();
 
                         if ($project->save()){
 
@@ -524,7 +440,7 @@ class RespondsConfirmController extends AppController
 
 
 
-    public function actionDeleteRespond ($id) {
+    public function actionDelete ($id) {
 
         $model = RespondsConfirm::findOne($id);
         $descInterview = DescInterviewConfirm::find()->where(['responds_confirm_id' => $model->id])->one();
@@ -537,23 +453,31 @@ class RespondsConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
 
 
-        if ($confirmProblem->count_respond == $confirmProblem->count_positive){
-
-            Yii::$app->session->setFlash('error', "Общее количество респондентов не должно быть меньше количества респондентов подтверждающих проблему!");
-            return $this->redirect(['/responds-confirm/index', 'id' => $confirmProblem->id]);
-        }
-
-        if (count($responds) == 1){
-
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['/responds-confirm/index', 'id' => $confirmProblem->id]);
-        }
 
         if (Yii::$app->request->isAjax){
+
+
+            if (count($responds) == 1){
+
+                $response = ['zero_value_responds' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+
+            if ($confirmProblem->count_respond == $confirmProblem->count_positive){
+
+                $response = ['number_less_than_allowed' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+
+            $project->updated_at = time();
 
             if ($project->save()) {
 
@@ -571,70 +495,14 @@ class RespondsConfirmController extends AppController
                     $confirmProblem->save();
                 }
 
-                return $this->renderList($id = $confirmProblem->id);
+                $response = ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
             }
 
         }
         return false;
-    }
-
-
-    /**
-     * Deletes an existing RespondsConfirm model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $descInterview = DescInterviewConfirm::find()->where(['responds_confirm_id' => $model->id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-
-        if (count($responds) == 1){
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($confirmProblem->count_respond == $confirmProblem->count_positive){
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества позитивных интервью!");
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($project->save()){
-            Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
-
-            if ($descInterview){
-                $descInterview->delete();
-            }
-
-            if ($model->delete()){
-                $confirmProblem->count_respond = $confirmProblem->count_respond -1;
-                $confirmProblem->save();
-            }
-            return $this->redirect(['confirm-problem/view', 'id' => $confirmProblem->id]);
-        }
-
-
     }
 
     /**

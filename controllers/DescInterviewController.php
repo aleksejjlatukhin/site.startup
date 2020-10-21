@@ -212,6 +212,7 @@ class DescInterviewController extends AppController
                     }
 
                     $project->updated_at = time();
+
                     if ($project->save()){
 
                         $response = $model;
@@ -270,6 +271,7 @@ class DescInterviewController extends AppController
                     }
 
                     $project->updated_at = time();
+
                     if ($project->save()){
 
                         $response = $model;

@@ -173,13 +173,10 @@ class InterviewController extends AppController
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
-        $segment_name = str_replace(' ', '_', $segment->name);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project_filename = str_replace(' ', '_', $project->project_name);
         $responds = Respond::find()->where(['interview_id' => $id])->all();
 
         $queryResponds = Respond::find()->where(['interview_id' => $id]);
-
         $dataProviderQueryResponds = new ActiveDataProvider([
             'query' => $queryResponds,
             'pagination' => false,
@@ -214,7 +211,6 @@ class InterviewController extends AppController
             $createDescInterviewForms[] = new DescInterview();
 
             $updateDescInterviewForms[] = $respond->descInterview;
-
         }
 
 
@@ -232,8 +228,6 @@ class InterviewController extends AppController
             'updateRespondForms' => $updateRespondForms,
             'createDescInterviewForms' => $createDescInterviewForms,
             'updateDescInterviewForms' => $updateDescInterviewForms,
-            'project_filename' => $project_filename,
-            'segment_name' => $segment_name,
         ]);
     }
 
@@ -258,6 +252,7 @@ class InterviewController extends AppController
         }
 
         if(Yii::$app->request->isAjax) {
+
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems)  && $model->count_positive <= $count_positive)) {
 
                 $response =  ['success' => true];
@@ -299,7 +294,14 @@ class InterviewController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems))) {
+            if (count($model->responds) > $count_descInterview && empty($model->problems)) {
+
+                $response = ['not_completed_descInterviews' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            } elseif ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems))) {
 
                 $response =  [
                     'success' => true,
@@ -330,31 +332,17 @@ class InterviewController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $model = new Interview();
         $model->segment_id = $id;
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['segment/view', 'id' => $segment->id]);
-            }
-        }
 
         if (empty($segment)){
-
             //Отсутствуют данные сегмента
             return $this->redirect(['/segment/index', 'id' => $project->id]);
         }
 
         $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
         if (!empty($modelInterview)){
-
             //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['/interview/view', 'id' => $modelInterview->id]);
         }
-
 
 
         return $this->render('create', [
@@ -508,15 +496,6 @@ class InterviewController extends AppController
         $confirm_segment = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $confirm_segment->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){ return $this->redirect(['view', 'id' => $id]); }
-        }
-
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -690,7 +669,12 @@ class InterviewController extends AppController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $filename = 'data-responds-'. $model->id .'.pdf';
+        $segment_name = $model->segment->name;
+        if (mb_strlen($segment_name) > 25) {
+            $segment_name = mb_substr($segment_name, 0, 25) . '...';
+        }
+
+        $filename = 'Подтверждение сегмента «'.$segment_name.'». Таблица респондентов.pdf';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -716,7 +700,7 @@ class InterviewController extends AppController
             // call mPDF methods on the fly
             'methods' => [
                 'SetTitle' => ['Респонденты для подтверждения гипотезы сегмента «'.$model->segment->name.'»'],
-                'SetHeader' => ['<div style="color: #3c3c3c;">Респонденты для подтверждения гипотезы сегмента «'.$model->segment->name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Респонденты для подтверждения гипотезы сегмента «'.$segment_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',

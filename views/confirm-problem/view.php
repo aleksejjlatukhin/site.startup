@@ -336,7 +336,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
                     <?= Html::button('Редактировать', [
                         'id' => 'show_form_update_data',
@@ -388,6 +388,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                             'rows' => 1,
                             'readonly' => true,
                             'required' => true,
+                            'id' => 'need_consumer-view',
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
                             ]);
@@ -404,6 +405,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                             'type' => 'number',
                             'readonly' => true,
                             'required' => true,
+                            'id' => 'count_respond-view',
                             'class' => 'style_form_field_respond form-control'
                         ]);
                     ?>
@@ -419,6 +421,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                             'type' => 'number',
                             'readonly' => true,
                             'required' => true,
+                            'id' => 'count_positive-view',
                             'class' => 'style_form_field_respond form-control'
                         ]);
                     ?>
@@ -438,7 +441,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             <?php
                 $form = ActiveForm::begin([
                     'id' => 'update_data_interview',
-                    'action' => Url::to(['/confirm-problem/update-data-interview', 'id' => $formUpdateConfirmProblem->id]),
+                    'action' => Url::to(['/confirm-problem/update', 'id' => $formUpdateConfirmProblem->id]),
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
@@ -460,7 +463,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
 
                     <?= Html::button('Просмотр', [
                         'id' => 'show_form_view_data',
@@ -843,665 +846,874 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
 
     <!--ПРОГРАММА ПОДТВЕРЖДЕНИЯ ГПС (ШАГ 3)-->
-    <div id="step_three" class="tabcontent style-header-table-kartik">
-
-        <?php
-
-        //echo $model->pointerOnThirdStep();
-
-        ?>
-
-    <!--</div>-->
+    <div id="step_three" class="tabcontent row">
 
 
-
-
-    <!--ПРОГРАММА ПОДТВЕРЖДЕНИЯ ГПС (ШАГ 4)-->
-   <!-- <div id="step_four" class="tabcontent">-->
-
-        <div class="row step_four">
-
-            <div class="col-sm-6 col-md-3">
-                <?= $model->redirectRespondTable; ?>
-            </div>
-
-            <div class="col-sm-6 col-md-9" style="font-weight: 700; height: 70px; padding: 25px 15px;">
-                <?= $model->messageAboutTheNextStep; ?>
-            </div>
-
-            <div class="col-md-3" style="margin-bottom: 10px; font-weight: 700;">
-                Данные респондентов
-            </div>
-
-            <div class="col-md-9">
-                <?= Html::a($model->dataRespondsOfModel, ['#'],[
-                    'data-toggle' => 'modal',
-                    'data-target' => '#responds_exist',
-                ]); ?>
-            </div>
-
-            <div class="col-md-3" style="margin-bottom: 10px; font-weight: 700;">
-                Проведение опроса
-            </div>
-
-            <div class="col-md-9">
-                <?= Html::a($model->dataDescInterviewsOfModel, ['#'], [
-                    'data-toggle' => 'modal',
-                    'data-target' => '#by_date_interview',
-                ]); ?>
-            </div>
-
-            <div class="col-md-3" style="margin-bottom: 10px; font-weight: 700;">
-                Подтверждение гипотезы
-            </div>
-
-            <div class="col-md-9">
-                <?= Html::a($model->dataMembersOfSegment, ['#'], [
-                    'data-toggle' => 'modal',
-                    'data-target' => '#by_status_responds',
-                ]); ?>
-            </div>
-
+        <div class="modal-windows">
 
 
             <?php
-            // Модальное окно с проверкой заполнения данных о респондентах
+
+            // Форма добавления нового респондента
             Modal::begin([
-                'options' => [
-                    'id' => 'responds_exist',
-                    'class' => 'responds_exist',
-                ],
-                'size' => 'modal-lg',
-                //'header' => '<h3 class="text-center">Проверка заполнения данных о респондентах</h3>',
-            ]);
-            ?>
-
-            <?php
-
-            $gridColumnsResponds_1 = [
-
-                [
-                    'class' => 'kartik\grid\SerialColumn',
-                    'header' => '',
-                ],
-
-                [
-                    'attribute' => 'name',
-                    'label' => 'Фамилия Имя Отчество',
-                    'header' => '<div style="padding: 5px; color: #4F4F4F;">Фамилия Имя Отчество</div>',
-                    'value' => function ($model) {
-                        if ($model->info_respond){
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link go_view_respond_for_exist',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#view_respond-' . $model->id,
-                            ]);
-
-                        }else {
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#not_view_respond_modal',
-                            ]);
-                        }
-
-                    },
-                    'format' => 'raw',
-                ],
-
-                [
-                    'attribute' => 'data',
-                    'label' => 'Данные респондента',
-                    'header' => '<div style="padding: 5px; color: #4F4F4F;">Данные респондента</div>',
-                    'value' => function($model){
-                        if (!empty($model->name) && !empty($model->info_respond)){
-                            return '<div style="padding: 0 5px;">Данные заполнены</div>';
-                        }else{
-                            return '<div style="padding: 0 5px;">Данные отсутствуют</div>';
-                        }
-
-                    },
-                    'format' => 'raw',
-                ],
-
-
-            ];
-
-            echo GridView::widget([
-                'dataProvider' => $dataProviderResponds,
-                'showPageSummary' => false, //whether to display the page summary row for the grid view.
-                //'showHeader' => false, // Скрытие header у всех столбцов
-                'id' => 'TableRespondsExist',
-                'pjax' => false,
-                'striped' => false,
-                'bordered' => true,
-                'condensed' => true,
-                'summary' => false,
-                'hover' => true,
-                'toolbar' => false,
-                'columns' => $gridColumnsResponds_1,
-                'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-                'panel' => [
-                    'type' => 'default',
-                    'heading' => false,
-                    'before' => '<div class="col-md-12" style="font-size: 24px; font-weight: 700; color: #F2F2F2;"><span>Проверка заполнения данных о респондентах</span></div>',
-
-                    'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
-                    //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
-                    //'footer' => '{export}',
-                    'after' => false,
-                    //'footer' => false,
-                ],
+                'options' => ['id' => 'respondCreate_modal'],
+                'size' => 'modal-md',
+                'header' => '<h3 class="text-center">Добавить респондента</h3>',
+                'headerOptions' => ['class' => 'style_header_modal_form'],
             ]);
 
-            ?>
+            $form = ActiveForm::begin([
+                'id' => 'new_respond_form',
+                'action' => "/responds-confirm/create?id=$model->id",
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]); ?>
 
-            <?php
-            Modal::end();
-            ?>
+            <div class="row">
 
+                <div class="col-md-12">
 
-            <?php
-            // Модальное окно - Проверка стадии проведения интервью
-            Modal::begin([
-                'options' => [
-                    'id' => 'by_date_interview',
-                    'class' => 'by_date_interview',
-                ],
-                'size' => 'modal-lg',
-                //'header' => '<h3 class="text-center">Проверка заполнения данных о респондентах</h3>',
-            ]);
-            ?>
+                    <?= $form->field($newRespond, 'name', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                        'maxlength' => true,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                        'placeholder' => 'Иванов Иван Иванович',
+                    ]) ?>
 
-            <?php
+                </div>
 
-            $gridColumnsResponds_2 = [
+                <div class="form-group col-md-12">
 
-                [
-                    'class' => 'kartik\grid\SerialColumn',
-                    'header' => '',
-                ],
-
-                [
-                    'attribute' => 'name',
-                    'label' => 'Фамилия Имя Отчество',
-                    'header' => '<div style="font-size: 12px; font-weight: 500; color: #4F4F4F; padding: 0 5px;">Фамилия Имя Отчество</div>',
-                    'value' => function ($model) {
-                        if ($model->info_respond){
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link go_view_respond_by_date_interview',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#view_respond_by_date-' . $model->id,
-                            ]);
-
-                        } else {
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#not_view_respond_modal',
-                            ]);
-                        }
-
-                    },
-                    'format' => 'raw',
-                ],
-
-                [
-                    'attribute' => 'fact',
-                    'label' => 'Дата изменения',
-                    'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата изменения</div>',
-                    'groupOddCssClass' => 'kv',
-                    'groupEvenCssClass' => 'kv',
-                    'options' => ['colspan' => 1],
-                    'value' => function ($model, $key, $index, $widget) {
-
-                        if (!empty($model->descInterview->updated_at)){
-
-                            return '<div class="text-center" style="padding: 0 25px;">' . date("d.m.yy", $model->descInterview->updated_at) . '</div>';
-
-                        }else{
-                            return '';
-                        }
-                    },
-                    'format' => 'raw',
-                ],
-
-            ];
-
-            echo GridView::widget([
-                'dataProvider' => $dataProviderResponds,
-                'showPageSummary' => false, //whether to display the page summary row for the grid view.
-                //'showHeader' => false, // Скрытие header у всех столбцов
-                'id' => 'TableByDateInterview',
-                'pjax' => false,
-                'striped' => false,
-                'bordered' => true,
-                'condensed' => true,
-                'summary' => false,
-                'hover' => true,
-                'toolbar' => false,
-                'columns' => $gridColumnsResponds_2,
-                'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-                'panel' => [
-                    'type' => 'default',
-                    'heading' => false,
-                    'before' => '<div class="col-md-12" style="font-size: 24px; font-weight: 700; color: #F2F2F2;"><span>Проверка проведения опроса респондентов</span></div>',
-
-                    'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
-                    //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
-                    //'footer' => '{export}',
-                    'after' => false,
-                    //'footer' => false,
-                ],
-                'beforeHeader' => [
-                    [
-                        'columns' => [
-                            ['content' => '', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                            ['content' => 'Респондент', 'options' => ['colspan' => 1, 'class' => 'font-segment-header-table', 'style' => ['padding' => '10px 10px']]],
-                            ['content' => 'Дата опроса', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px', 'text-align' => 'center']]],
-                        ],
-
-                        'options' => [
-                            'class' => 'style-header-table-kartik',
+                    <?= Html::submitButton('Сохранить', [
+                        'class' => 'btn btn-success pull-right',
+                        'id' => 'save_respond',
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#52BE7F',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
                         ]
-                    ]
-                ],
-            ]);
 
-            ?>
+                    ]) ?>
 
-            <?php
+                </div>
+
+            </div>
+
+            <?php ActiveForm::end();
+
             Modal::end();
-            ?>
 
-
-            <?php
-            // Модальное окно - поиск представителей сегмента
+            // Сообщение о том, что респондент с таким именем уже есть
             Modal::begin([
                 'options' => [
-                    'id' => 'by_status_responds',
-                    'class' => 'by_status_responds',
-                ],
-                'size' => 'modal-lg',
-                //'header' => '<h3 class="text-center">Проверка заполнения данных о респондентах</h3>',
-            ]);
-            ?>
-
-            <?php
-
-            $gridColumnsResponds_3 = [
-
-                [
-                    'class' => 'kartik\grid\SerialColumn',
-                    'header' => '',
-                ],
-
-                [
-                    'attribute' => 'name',
-                    'label' => 'Фамилия Имя Отчество',
-                    'header' => '<div style="padding: 5px; color: #4F4F4F;">Фамилия Имя Отчество</div>',
-                    'value' => function ($model) {
-                        if ($model->info_respond){
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link go_view_respond_for_by_status',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#view_respond_by_status-' . $model->id,
-                            ]);
-
-                        }else {
-
-                            return Html::a(Html::encode($model->name), ['#'],[
-                                'class' => 'table-kartik-link',
-                                'style' => ['padding' => '0 5px'],
-                                'data-toggle' => 'modal',
-                                'data-target' => '#not_view_respond_modal',
-                            ]);
-                        }
-                    },
-                    'format' => 'raw',
-                ],
-
-                [
-                    'attribute' => 'status',
-                    'headerOptions' => ['class' => 'text-center'],
-                    'label' => 'Вывод о текущей проблеме',
-                    'header' => '<div style="padding: 5px; color: #4F4F4F;">Вывод о текущей проблеме</div>',
-                    'value' => function($model){
-
-                        if ($model->descInterview->status == 1){
-                            return '<div class="text-center" style="color:green">Значимая проблема</div>';
-
-                        } elseif($model->descInterview->status == null){
-                            return '';
-
-                        } elseif($model->descInterview->status == 0){
-                            return '<div class="text-center" style="color:red">Проблемы не существует или она малозначимая</div>';
-                        }
-                    },
-                    'format' => 'raw',
-                ],
-
-
-            ];
-
-            echo GridView::widget([
-                'dataProvider' => $dataProviderResponds,
-                'showPageSummary' => false, //whether to display the page summary row for the grid view.
-                //'showHeader' => false, // Скрытие header у всех столбцов
-                'id' => 'TableByStatusResponds',
-                'pjax' => false,
-                'striped' => false,
-                'bordered' => true,
-                'condensed' => true,
-                'summary' => false,
-                'hover' => true,
-                'toolbar' => false,
-                'columns' => $gridColumnsResponds_3,
-                'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
-                'panel' => [
-                    'type' => 'default',
-                    'heading' => false,
-                    'before' => '<div class="col-md-12" style="font-size: 24px; font-weight: 700; color: #F2F2F2;"><span>Подтверждение проблемы</span></div>',
-
-                    'beforeOptions' => ['class' => 'style-head-table-kartik-top'],
-                    //'after' => Html::a('<i class="fas fa-redo"></i> Reset Grid', ['index'], ['class' => 'btn btn-info']) . '{export}',
-                    //'footer' => '{export}',
-                    'after' => false,
-                    //'footer' => false,
-                ],
-            ]);
-
-            ?>
-
-            <?php
-            Modal::end();
-            ?>
-
-
-            <?php
-
-            foreach ($model->responds as $respond) :
-
-                if ($respond->info_respond) :
-
-                    // Модальное окно с информацией о респонденте для проверки данных о респонденте
-                    Modal::begin([
-                        'options' => [
-                            'id' => 'view_respond-' . $respond->id,
-                            'class' => 'view_respond',
-                        ],
-                        'size' => 'modal-lg',
-                        'header' => '<div class="text-center">'. Html::button('Назад', ['class' => 'btn btn-default pull-left go_view_back_exist_responds']) .'<span style="font-size: 24px;">Информация о респонденте и анкете</span></div>',
-                    ]);
-                    ?>
-
-                    <?= yii\widgets\DetailView::widget([
-                    'model' => $respond,
-                    'attributes' => [
-
-                        [
-                            'attribute' => 'name',
-                            'label' => 'Ф.И.О. респондента',
-                            'value' => function($model){
-                                return '<div id="respond_name_'.$model->id.'">'.$model->name.'</div>';
-                            },
-                            'format' => 'raw',
-                        ],
-
-                        'info_respond',
-                        'email',
-
-                        [
-                            'attribute' => 'created_descInterview',
-                            'label' => 'Дата создания анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->created_at;
-                            },
-                            'contentOptions' => ['id' => "created_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-                        ],
-
-                        [
-                            'attribute' => 'updated_descInterview',
-                            'label' => 'Дата изменения индикатора анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->updated_at;
-                            },
-                            'contentOptions' => ['id' => "updated_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-
-                        ],
-
-
-                        [
-                            'attribute' => 'respond_status',
-                            'label' => 'Вывод о текущей проблеме',
-                            'value' => function($model){
-                                if ($model->descInterview){
-                                    return !$model->descInterview->status ? '<span style="color:red">Проблемы не существует или она малозначимая</span>' : '<span style="color:green">Значимая проблема</span>';
-                                }else{
-                                    return '';
-                                }
-
-                            },
-                            'format' => 'html',
-                        ],
-
-                    ],
-                ]) ?>
-
-                    <?php
-                    Modal::end();
-
-
-                    // Модальное окно с информацией о респонденте для проверки данных по интервью
-                    Modal::begin([
-                        'options' => [
-                            'id' => 'view_respond_by_date-' . $respond->id,
-                            'class' => 'view_respond_by_date',
-                        ],
-                        'size' => 'modal-lg',
-                        'header' => '<div class="text-center">'. Html::button('Назад', ['class' => 'btn btn-default pull-left go_view_back_by_date']) .'<span style="font-size: 24px;">Информация о респонденте и анкете</span></div>',
-                    ]);
-                    ?>
-
-                    <?= yii\widgets\DetailView::widget([
-                    'model' => $respond,
-                    'attributes' => [
-
-                        [
-                            'attribute' => 'name',
-                            'label' => 'Ф.И.О. респондента',
-                            'value' => function($model){
-                                return '<div id="respond_name_'.$model->id.'">'.$model->name.'</div>';
-                            },
-                            'format' => 'raw',
-                        ],
-
-                        'info_respond',
-                        'email',
-
-                        [
-                            'attribute' => 'created_descInterview',
-                            'label' => 'Дата создания анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->created_at;
-                            },
-                            'contentOptions' => ['id' => "created_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-                        ],
-
-                        [
-                            'attribute' => 'updated_descInterview',
-                            'label' => 'Дата изменения индикатора анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->updated_at;
-                            },
-                            'contentOptions' => ['id' => "updated_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-
-                        ],
-
-                        [
-                            'attribute' => 'questions',
-                            'label' => 'Результаты анкеты (вопрос-ответ)',
-                            'value' => function($model){
-                                return $model->listQuestions();
-                            },
-                            'format' => 'html',
-                        ],
-
-                        [
-                            'attribute' => 'respond_status',
-                            'label' => 'Вывод о текущей проблеме',
-                            'value' => function($model){
-                                if ($model->descInterview){
-                                    return !$model->descInterview->status ? '<span style="color:red">Проблемы не существует или она малозначимая</span>' : '<span style="color:green">Значимая проблема</span>';
-                                }else{
-                                    return '';
-                                }
-
-                            },
-                            'format' => 'html',
-                        ],
-
-                    ],
-                ]) ?>
-
-                    <?php
-                    Modal::end();
-
-
-
-
-                    // Модальное окно с информацией о респонденте для поиска представителей сегмента
-                    Modal::begin([
-                        'options' => [
-                            'id' => 'view_respond_by_status-' . $respond->id,
-                            'class' => 'view_respond_by_status',
-                        ],
-                        'size' => 'modal-lg',
-                        'header' => '<div class="text-center">'. Html::button('Назад', ['class' => 'btn btn-default pull-left go_view_back_by_status']) .'<span style="font-size: 24px;">Информация о респонденте и анкете</span></div>',
-                    ]);
-                    ?>
-
-                    <?= yii\widgets\DetailView::widget([
-                    'model' => $respond,
-                    'attributes' => [
-
-                        [
-                            'attribute' => 'name',
-                            'label' => 'Ф.И.О. респондента',
-                            'value' => function($model){
-                                return '<div id="respond_name_'.$model->id.'">'.$model->name.'</div>';
-                            },
-                            'format' => 'raw',
-                        ],
-
-                        'info_respond',
-                        'email',
-
-                        [
-                            'attribute' => 'created_descInterview',
-                            'label' => 'Дата создания анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->created_at;
-                            },
-                            'contentOptions' => ['id' => "created_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-                        ],
-
-                        [
-                            'attribute' => 'updated_descInterview',
-                            'label' => 'Дата изменения индикатора анкеты',
-                            'value' => function($model){
-                                return $model->descInterview->updated_at;
-                            },
-                            'contentOptions' => ['id' => "updated_at_interview_$model->id"],
-                            'format' => ['date', 'dd.MM.yyyy'],
-
-                        ],
-
-                        [
-                            'attribute' => 'questions',
-                            'label' => 'Результаты анкеты (вопрос-ответ)',
-                            'value' => function($model){
-                                return $model->listQuestions();
-                            },
-                            'format' => 'html',
-                        ],
-
-                        [
-                            'attribute' => 'respond_status',
-                            'label' => 'Вывод о текущей проблеме',
-                            'value' => function($model){
-                                if ($model->descInterview){
-                                    return !$model->descInterview->status ? '<span style="color:red">Проблемы не существует или она малозначимая</span>' : '<span style="color:green">Значимая проблема</span>';
-                                }else{
-                                    return '';
-                                }
-
-                            },
-                            'format' => 'html',
-                        ],
-
-                    ],
-                ]) ?>
-
-                    <?php
-                    Modal::end();
-
-                endif;
-
-            endforeach;
-
-            ?>
-
-            <?php
-
-            // Модальное окно - сообщение о том что у выбранного респондента данные отсутствуют
-            Modal::begin([
-                'options' => [
-                    'id' => 'not_view_respond_modal',
-                    'class' => 'not_view_respond_modal',
+                    'id' => 'respondCreate_modal_error',
                 ],
                 'size' => 'modal-md',
-                'header' => '<h3 class="text-center">Внимание!</h3>',
+                'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Внимание!</h3>',
             ]);
             ?>
 
-            <h4 class="text-center text-danger">
-                У выбранного респондента пока отсутствуют<br>заполненные данные для показа.
+            <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+                Респондент с таким именем уже есть!<br>Имя респондента должно быть уникальным!
             </h4>
 
             <?php
-
             Modal::end();
-
             ?>
+
+
+            <div class="modal-windows-respond">
+
+
+                <?php
+
+                foreach ($responds as $i => $respond) :
+
+
+                    // Форма редактирование информации о респонденте
+                    Modal::begin([
+                        'options' => [
+                            'id' => "respond_update_modal-$respond->id",
+                            'class' => 'respond_update_modal',
+                        ],
+                        'size' => 'modal-lg',
+                        'header' => '<h3 class="text-center">Сведения о респонденте</h3>',
+                        'headerOptions' => ['class' => 'style_header_modal_form'],
+                    ]);
+
+                    // Контент страницы редактирования информации о респонденте
+                    ?>
+
+                    <div class="respond-form">
+
+
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) :?>
+
+
+                            <?php $form = ActiveForm::begin([
+                                'action' => "/responds-confirm/update?id=$respond->id",
+                                'id' => "formUpdateRespond-$respond->id",
+                                'options' => ['class' => 'g-py-15'],
+                                'errorCssClass' => 'u-has-error-v1',
+                                'successCssClass' => 'u-has-success-v1-1',
+                            ]); ?>
+
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <?= $form->field($updateRespondForms[$i], 'name', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                                        'maxlength' => true,
+                                        'required' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'Иванов Иван Иванович',
+                                    ]) ?>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <?= $form->field($updateRespondForms[$i], 'email', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                                        'type' => 'email',
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'ivanov@gmail.com',
+                                    ]); ?>
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <?= $form->field($updateRespondForms[$i], 'info_respond', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
+                                        'rows' => 2,
+                                        'required' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'Кто? Откуда? Чем занимается?',
+                                    ]); ?>
+
+                                </div>
+
+
+                                <div class="form-group col-md-12">
+                                    <?= Html::submitButton('Сохранить', [
+                                        'class' => 'btn btn-success pull-right',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'background' => '#52BE7F',
+                                            'width' => '140px',
+                                            'height' => '40px',
+                                            'font-size' => '24px',
+                                            'border-radius' => '8px',
+                                        ]
+
+                                    ]) ?>
+                                </div>
+
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
+
+
+                        <?php else : ?>
+
+
+                            <?php $form = ActiveForm::begin([
+                                'action' => "/responds-confirm/update?id=$respond->id",
+                                'id' => "formUpdateRespond-$respond->id",
+                                'options' => ['class' => 'g-py-15'],
+                                'errorCssClass' => 'u-has-error-v1',
+                                'successCssClass' => 'u-has-success-v1-1',
+                            ]); ?>
+
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <?= $form->field($updateRespondForms[$i], 'name', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                                        'maxlength' => true,
+                                        'required' => true,
+                                        'readOnly' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'Иванов Иван Иванович',
+                                    ]) ?>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <?= $form->field($updateRespondForms[$i], 'email', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                                        'type' => 'email',
+                                        'readOnly' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'ivanov@gmail.com',
+                                    ]); ?>
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <?= $form->field($updateRespondForms[$i], 'info_respond', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
+                                        'rows' => 2,
+                                        'required' => true,
+                                        'readOnly' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                        'placeholder' => 'Кто? Откуда? Чем занимается?',
+                                    ]); ?>
+
+                                </div>
+
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
+
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <?php Modal::end(); ?>
+
+
+
+                    <?php if (empty($respond->descInterview)) : ?>
+
+                        <?php
+                        // Форма создания интервью для респондента
+                        Modal::begin([
+                            'options' => [
+                                'id' => "create_descInterview_modal-$respond->id",
+                                'class' => 'create_descInterview_modal',
+                            ],
+                            'size' => 'modal-lg',
+                            'header' => '<h3 class="text-center">Внесите данные опроса</h3>',
+                            'headerOptions' => ['class' => 'style_header_modal_form'],
+                        ]);
+                        // Контент страницы создания интервью для респондента
+                        ?>
+
+
+                        <div class="desc-interview-create-form">
+
+
+                            <?php $form = ActiveForm::begin([
+                                'action' => "/desc-interview-confirm/create?id=$respond->id",
+                                'id' => "formCreateDescInterview-$respond->id",
+                                'options' => ['class' => 'g-py-15'],
+                                'errorCssClass' => 'u-has-error-v1',
+                                'successCssClass' => 'u-has-success-v1-1',
+                            ]); ?>
+
+
+                            <?php
+                            foreach ($respond->answers as $index => $answer) :
+                                ?>
+
+                                <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+                                ->textarea([
+                                    'row' => 2,
+                                    'required' => true,
+                                    'class' => 'style_form_field_respond form-control',
+                                    ]);
+                                ?>
+
+                            <?php
+                            endforeach;
+                            ?>
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <?php
+                                    $selection_list = [ '0' => 'Проблемы не существует или она малозначимая', '1' => 'Проблема значимая', ];
+                                    ?>
+
+                                    <?= $form->field($createDescInterviewForms[$i], 'status', [
+                                        'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
+                                    ])->label('По результатам опроса сделайте вывод о текущей проблеме')->widget(Select2::class, [
+                                        'data' => $selection_list,
+                                        'options' => [
+                                            'id' => "descInterview_status-$respond->id",
+                                        ],
+                                        'disabled' => false,  //Сделать поле неактивным
+                                        'hideSearch' => true, //Скрытие поиска
+                                    ]);
+                                    ?>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <?= Html::submitButton('Сохранить', [
+                                        'class' => 'btn btn-success pull-right',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'background' => '#52BE7F',
+                                            'width' => '140px',
+                                            'height' => '40px',
+                                            'font-size' => '24px',
+                                            'border-radius' => '8px',
+                                        ]
+                                    ]) ?>
+                                </div>
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
+
+                        </div>
+
+                        <?php Modal::end(); ?>
+
+                    <?php endif; ?>
+
+
+                    <?php
+
+                    // Форма редактирование информации о интервью
+                    Modal::begin([
+                        'options' => [
+                            'id' => "interview_update_modal-$respond->id",
+                            'class' => 'interview_update_modal',
+                        ],
+                        'size' => 'modal-lg',
+                        'header' => '<h3 class="text-center">Внесите данные опроса</h3>',
+                        'headerOptions' => ['class' => 'style_header_modal_form'],
+                    ]);
+
+                    // Контент страницы редактирования информации о интервью
+                    ?>
+
+
+                    <div class="desc-interview-update-form">
+
+                        <?php if ($respond->descInterview) : ?>
+
+                            <!--Если пользователь является проектантом-->
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                <?php $form = ActiveForm::begin([
+                                    'action' => "/desc-interview-confirm/update?id=".$respond->descInterview->id ,
+                                    'id' => "formUpdateDescInterview-".$respond->id ,
+                                    'options' => ['class' => 'g-py-15'],
+                                    'errorCssClass' => 'u-has-error-v1',
+                                    'successCssClass' => 'u-has-success-v1-1',
+                                ]); ?>
+
+
+                                <?php
+                                foreach ($respond->answers as $index => $answer) :
+                                    ?>
+
+                                    <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+                                    ->textarea([
+                                        'row' => 2,
+                                        'required' => true,
+                                        'class' => 'style_form_field_respond form-control',
+                                    ]);
+                                    ?>
+
+                                <?php
+                                endforeach;
+                                ?>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <?php
+                                        $selection_list = [ '0' => 'Проблемы не существует или она малозначимая', '1' => 'Проблема значимая', ];
+                                        ?>
+
+                                        <?= $form->field($updateDescInterviewForms[$i], 'status', [
+                                            'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
+                                        ])->label('По результатам опроса сделайте вывод о текущей проблеме')->widget(Select2::class, [
+                                            'data' => $selection_list,
+                                            'options' => [
+                                                'id' => "descInterview_status-$respond->id",
+                                            ],
+                                            'disabled' => false,  //Сделать поле неактивным
+                                            'hideSearch' => true, //Скрытие поиска
+                                        ]);
+                                        ?>
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <?= Html::submitButton('Сохранить', [
+                                            'class' => 'btn btn-success pull-right',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                'justify-content' => 'center',
+                                                'background' => '#52BE7F',
+                                                'width' => '140px',
+                                                'height' => '40px',
+                                                'font-size' => '24px',
+                                                'border-radius' => '8px',
+                                            ]
+                                        ]) ?>
+                                    </div>
+                                </div>
+
+
+                                <?php ActiveForm::end(); ?>
+
+                            <!--Если пользователь не является проектантом-->
+                            <?php else : ?>
+
+                                <div class="row" style="margin-bottom: 15px; color: #4F4F4F;">
+
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">Респондент</div>
+                                        <div><?= $respond->name; ?></div>
+                                    </div>
+
+                                    <?php foreach ($respond->answers as $answer) : ?>
+
+                                        <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                            <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+                                            <div><?= $answer->answer; ?></div>
+                                        </div>
+
+                                    <?php endforeach; ?>
+
+                                    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+                                        <div style="font-weight: 700;">По результатам опроса сделайте вывод о текущей проблеме</div>
+                                        <div>
+                                            <?php
+                                                if ($updateDescInterviewForms[$i]->status == 1) {
+                                                    echo 'Проблема значимая';
+                                                } else {
+                                                    echo 'Проблемы не существует или она малозначимая';
+                                                }
+                                            ?>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <?php Modal::end(); ?>
+
+
+
+                    <?php
+                    // Подтверждение удаления респондента
+                    Modal::begin([
+                        'options' => [
+                            'id' => "delete-respond-modal-$respond->id",
+                            'class' => 'delete_respond_modal',
+                        ],
+                        'size' => 'modal-md',
+                        'header' => '<h3 class="text-center header-update-modal">Выберите действие</h3>',
+                        'footer' => '<div class="text-center">'.
+
+                            Html::a('Отмена', ['#'],[
+                                'class' => 'btn btn-default',
+                                'style' => ['width' => '120px'],
+                                'id' => "cancel-delete-respond-$respond->id",
+                            ]).
+
+                            Html::a('Ок', ['/responds-confirm/delete', 'id' => $respond->id],[
+                                'class' => 'btn btn-default',
+                                'style' => ['width' => '120px'],
+                                'id' => "confirm-delete-respond-$respond->id",
+                            ]).
+
+                            '</div>'
+                    ]);
+
+                    // Контент страницы - подтверждение удаления респондента
+                    ?>
+
+                    <h4 class="text-center">Вы уверены, что хотите удалить все данные<br>о респонденте «<?= $respond->name ?>»?</h4>
+
+                    <?php Modal::end(); ?>
+
+
+
+                <?php endforeach; ?>
+
+            </div>
+
+
+            <?php
+            // Сообщение о том, что респондент с таким именем уже есть
+            Modal::begin([
+                'options' => [
+                    'id' => 'respondUpdate_modal_error',
+                ],
+                'size' => 'modal-md',
+                'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Внимание!</h3>',
+            ]);
+            ?>
+
+            <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+                Респондент с таким именем уже есть!<br>Имя респондента должно быть уникальным!
+            </h4>
+
+            <?php
+            Modal::end();
+            ?>
+
+
+            <?php
+            // Сообщение о том, что данные по заданным респондентам отсутствуют
+            Modal::begin([
+                'options' => [
+                    'id' => 'descInterviewCreate_modal_error',
+                ],
+                'size' => 'modal-md',
+                'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Внимание!</h3>',
+            ]);
+            ?>
+
+            <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+                Для перехода к созданию анкеты,<br> необходимо заполнить вводные данные<br>по всем заданным респондентам.
+            </h4>
+
+            <?php
+            Modal::end();
+            ?>
+
+
+            <?php
+            // Описание выполнения задачи на данной странице
+            Modal::begin([
+                'options' => [
+                    'id' => 'information-table-responds',
+                ],
+                'size' => 'modal-md',
+                'header' => '<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">1. Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.</h4>',
+            ]);
+            ?>
+
+            <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+                2. Затем переходите к заполнению данных опроса, при необходимости добавляйте новых респондентов.
+            </h4>
+
+            <?php
+            Modal::end();
+            ?>
+
 
         </div>
 
+
+
+        <!--Список респондентов-->
+        <div class="container-fluid container-data">
+
+            <div class="row row_header_data">
+
+                <div class="col-md-9" style="padding: 10px 0 0 0;">
+
+                    <span style="color: #4F4F4F;padding-right: 10px;">Информация о респондентах и данные опроса</span>
+
+                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
+                        'data-toggle' => 'modal',
+                        'data-target' => "#information-table-responds",
+                        'title' => 'Посмотреть описание',
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-3" style="padding: 0;">
+
+                    <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
+                        ['data-toggle' => 'modal',
+                            'data-target' => '#respondCreate_modal',
+                            'class' => 'link_add_respond_text pull-right']
+                    );
+                    ?>
+
+                </div>
+
+            </div>
+
+            <!--Заголовки для списка респондентов-->
+            <div class="row" style="margin: 0; padding: 10px;">
+
+                <div class="col-md-3 headers_data_respond_hi">
+                    Фамилия, имя, отчество
+                </div>
+
+                <div class="col-md-3" style="padding: 0;">
+                    <div class="headers_data_respond_hi">
+                        Данные респондента
+                    </div>
+                    <div class="headers_data_respond_low">
+                        Кто? Откуда? Чем занят?
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="padding: 0;">
+                    <div class="headers_data_respond_hi">
+                        E-mail
+                    </div>
+                    <div class="headers_data_respond_low">
+                        Адрес электронной почты
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="padding: 0;">
+                    <div class="headers_data_respond_hi">
+                        Дата опроса
+                    </div>
+                    <div class="headers_data_respond_low">
+                        Заполнение анкетных данных
+                    </div>
+                </div>
+
+                <div class="col-md-1" style="text-align: right; padding: 10px 7px 10px 0;">
+                    <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/confirm-problem/mpdf-data-responds', 'id' => $model->id], [
+                        'target'=>'_blank',
+                        //'data-toggle'=>'tooltip',
+                        'title'=> 'Скачать',
+                    ]);?>
+                </div>
+
+            </div>
+
+            <?php foreach ($responds as $respond): ?>
+
+                <div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
+
+                    <div class="col-md-3" style="display:flex; align-items: center;">
+
+                        <div style="padding-right: 10px; padding-bottom: 3px;">
+
+                            <?php
+                            if ($respond->descInterview->status == 1) {
+                                echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
+                            }
+                            elseif ($respond->descInterview->status === null) {
+                                echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);
+                            }
+                            elseif ($respond->descInterview->status == 0) {
+                                echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
+                            }
+                            else {
+                                echo '';
+                            }
+                            ?>
+
+                        </div>
+
+                        <div class="">
+
+                            <?=  Html::a($respond->name, ['#'], [
+                                'id' => "fio-$respond->id",
+                                'class' => 'container-respond_name_link',
+                                'title' => 'Редактировать данные респондента',
+                                'data-toggle' => 'modal',
+                                'data-target' => "#respond_update_modal-$respond->id",
+                            ]);
+                            ?>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3" style="font-size: 14px; padding: 0 10px 0 0;">
+
+                        <?php
+                        if (!empty($respond->info_respond)){
+
+                            if(mb_strlen($respond->info_respond) > 80) {
+                                echo '<div title="'.$respond->info_respond.'">' . mb_substr($respond->info_respond, 0, 80) . '...</div>';
+                            }else {
+                                echo $respond->info_respond;
+                            }
+                        }
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-3" style="padding: 0 10px 0 0;">
+
+                        <?php
+                        if (!empty($respond->email)){
+
+                            if(mb_strlen($respond->email) > 40) {
+                                echo '<div title="'.$respond->email.'">' . mb_substr($respond->email, 0, 40) . '...</div>';
+                            }else {
+                                echo $respond->email;
+                            }
+                        }
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-2" style="padding: 0;">
+
+                        <?php
+                        if (!empty($respond->descInterview->updated_at)){
+
+                            $date_fact = date("d.m.y", $respond->descInterview->updated_at);
+                            echo '<div>' . Html::encode($date_fact) . '</div>';
+
+                        }elseif (!empty($respond->info_respond) && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
+
+                            echo '<div>' . Html::a(
+                                    Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
+                                    ['/responds-confirm/data-availability', 'id' => Yii::$app->request->get('id')],
+                                    ['title' => 'Заполнить анкетные данные',
+                                        'onclick'=> "$.ajax({
+        
+                                        url: '".Url::to(['/responds-confirm/data-availability', 'id' => Yii::$app->request->get('id')])."',
+                                        method: 'POST',
+                                        cache: false,
+                                        success: function(response){
+                                            if (!response['error']) {
+                                            
+                                                //Показываем окно создания интервью
+                                                $('#create_descInterview_modal-".$respond->id."').modal('show');
+                                                
+                                            } else {
+                                                
+                                                //Показываем окно о невозможности создания интервью
+                                                $('#descInterviewCreate_modal_error').modal('show');
+                                            }
+                                        },
+                                        error: function(){
+                                            alert('Ошибка');
+                                        }
+                                    });
+                            
+                                    return false;
+                                    
+                                ",
+                                    ]) . '</div>';
+                        }
+                        ?>
+
+                    </div>
+
+                    <div class="col-md-1" style="text-align: right;">
+                        <?php
+
+                        if ($respond->descInterview) {
+
+                            echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
+                                'class' => '',
+                                'title' => 'Редактировать результаты опроса',
+                                'data-toggle' => 'modal',
+                                'data-target' => "#interview_update_modal-$respond->id",
+                            ]);
+                        }
+
+                        echo Html::a(Html::img('/images/icons/icon_delete.png',
+                            ['style' => ['width' => '24px']]), ['#'], [
+                            'title' => 'Удалить респондента',
+                            'data-toggle' => 'modal',
+                            'data-target' => "#delete-respond-modal-$respond->id",
+                        ]);
+
+                        ?>
+                    </div>
+
+                </div>
+
+            <?php  endforeach;?>
+
+
+            <div class="col-md-12" style="color: #4F4F4F; font-size: 16px; display: flex; justify-content: space-between; padding: 10px 20px; border-radius: 12px; border: 2px solid #707F99; align-items: center; margin-top: 30px;">
+
+                <div class="" style="padding: 0;">
+                    Необходимо респондентов: <?= $model->count_positive;?>
+                </div>
+
+                <div class="" style="padding: 0;">
+                    Внесено респондентов: <?= $model->dataRespondsOfModel;?>
+                </div>
+
+                <div class="" style="padding: 0;">
+                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
+                    Подтверждают проблему: <?= $model->dataMembersOfProblem;?>
+                </div>
+
+                <div class="" style="padding: 0;">
+                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
+                    Не подтверждают проблему: <?= ($model->dataDescInterviewsOfModel - $model->dataMembersOfProblem);?>
+                </div>
+
+                <div class="" style="padding: 0;">
+                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);?>
+                    Не опрошены: <?= ($model->count_respond - $model->dataDescInterviewsOfModel);?>
+                </div>
+
+                <div class="" style="padding: 0;">
+
+                    <?php
+                    if ($model->buttonMovingNextStage === true) :
+                        ?>
+
+                        <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#52BE7F',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-lg btn-success',
+                        'id' => 'button_MovingNextStage',
+                    ]);?>
+
+                    <?php
+                    else :
+                        ?>
+
+                        <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#E0E0E0',
+                            'color' => '#FFFFFF',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-lg btn-default',
+                        'id' => 'button_MovingNextStage',
+                    ]);?>
+
+                    <?php
+                    endif;
+                    ?>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
     </div>
-
-
-
-
-
-
-    <div id="feedbacks" class="tabcontent"></div>
-
-
 
 
 
@@ -1578,6 +1790,130 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
 
 
+    <?php
+
+    // Сообщение о том, что в подтверждении недостаточно представителей сегмента
+    //и необходимо выбрать (вернуться или продолжить)
+    Modal::begin([
+        'options' => [
+            'id' => "not_exist-confirm-modal",
+            'class' => 'not_exist_confirm_modal',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center">Выберите действие</h3>',
+        'footer' => '<div class="text-center">'.
+
+            Html::a('Отмена', ['#'],[
+                'class' => 'btn btn-default',
+                'style' => ['width' => '120px'],
+                'id' => "cancel-not_exist-confirm",
+            ]).
+
+            Html::a('Ок', ['/confirm-problem/not-exist-confirm', 'id' => $model->id],[
+                'class' => 'btn btn-default',
+                'style' => ['width' => '120px'],
+                'id' => "not_exist-confirm",
+            ]).
+
+            '</div>'
+    ]);
+
+    ?>
+
+    <h4 class="text-center">Вы не набрали достаточное количество респондентов, которые подтвердили проблему. Следующий этап будет не доступен. Завершить данное подтверждение?</h4>
+
+    <?php Modal::end(); ?>
+
+
+    <?php
+
+    // Модальное окно - проведены не все интервью
+    Modal::begin([
+        'options' => [
+            'id' => 'not_completed_descInterviews',
+            'class' => 'not_completed_descInterviews',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Для продолжения Вам необходимо опросить всех заданных респондентов.
+    </h4>
+
+    <?php Modal::end(); ?>
+
+
+    <?php
+
+    // Модальное окно - нельльзя удалить респондента,
+    // т.к. общее кол-во респондентов не может быть меньше необходимого кол-ва респондентов соответствующих сегменту
+    Modal::begin([
+        'options' => [
+            'id' => 'not_delete_respond_invalid_value',
+            'class' => 'not_delete_respond_invalid_value',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Удаление респондента отклонено.</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Общее количество респондентов не должно быть меньше необходимого количества респондентов подтверждающих проблему.
+    </h4>
+
+    <?php Modal::end(); ?>
+
+
+    <?php
+
+    // Модальное окно - нельльзя удалить респондента,
+    // Запрет на удаление последнего респондента
+    Modal::begin([
+        'options' => [
+            'id' => 'not_delete_respond_last_child',
+            'class' => 'not_delete_respond_last_child',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Удаление респондента отклонено.</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Удаление последнего респондента запрещено.
+    </h4>
+
+    <?php Modal::end(); ?>
+
+
+    <?php
+
+    // Модальное окно - лимит на создание новых респондентов
+    Modal::begin([
+        'options' => [
+            'id' => 'limit_count_respond_modal',
+            'class' => 'limit_count_respond_modal',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Создание нового респондента заблокировано.</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Действует ограничение. Вы не можете добавить больше существующего количества респондентов.
+    </h4>
+
+    <?php Modal::end(); ?>
+
+
+
+
+    <!--ПРОГРАММА ПОДТВЕРЖДЕНИЯ ГПС (ОТЗЫВЫ ЭКСПЕРТОВ)-->
+    <div id="feedbacks" class="tabcontent">
+
+    </div>
+
 
 </div>
 
@@ -1588,18 +1924,64 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 $script = "
 
     $(document).ready(function() {
+    
+        //Установка шрифта для модальных окон
+        $('.modal').css('font-family', 'RobotoCondensed-Light');
+    
+        //Модальное окно выбора завершения подтверждения
+        var not_exist_confirm_modal_header = $('#not_exist-confirm-modal').find('.modal-header');
+        not_exist_confirm_modal_header.css('background-color', '#707F99');
+        not_exist_confirm_modal_header.css('color', '#ffffff');
+        not_exist_confirm_modal_header.css('border-radius', '5px 5px 0 0');
+        var not_exist_confirm_modal_body = $('#not_exist-confirm-modal').find('.modal-body');
+        not_exist_confirm_modal_body.css('background-color', '#F2F2F2');
+        not_exist_confirm_modal_body.css('color', '#4F4F4F');
+        var not_exist_confirm_modal_footer = $('#not_exist-confirm-modal').find('.modal-footer');
+        not_exist_confirm_modal_footer.css('background-color', '#707F99');
+        not_exist_confirm_modal_footer.css('border-radius', '0 0 5px 5px');
+        
         
         //Фон для модального окна информации о месте добавления новых респондентов
         var information_add_new_responds = $('#information-add-new-responds').find('.modal-content');
         information_add_new_responds.css('background-color', '#707F99');
         
-        //Фон для модального окна информации о некорректном внесении данных в форму (Шаг 1)
+        //Фон для модального окна информации при заголовке таблицы
+        var information_modal_problem_view = $('#information-table-problem-view').find('.modal-content');
+        information_modal_problem_view.css('background-color', '#707F99');
+        
+        // Модальное окно - нельльзя удалить респондента,
+        // т.к. общее кол-во респондентов не может быть меньше необходимого кол-ва респондентов соответствующих сегменту
+        var not_delete_respond_invalid_value_modal = $('#not_delete_respond_invalid_value').find('.modal-content');
+        not_delete_respond_invalid_value_modal.css('background-color', '#707F99');
+        
+        // Модальное окно - лимит на создание новых респондентов
+        var limit_count_respond_modal = $('#limit_count_respond_modal').find('.modal-content');
+        limit_count_respond_modal.css('background-color', '#707F99');
+        
+        // Модальное окно - нельльзя удалить респондента,
+        // Запрет на удаление последнего респондента
+        var not_delete_respond_last_child_modal = $('#not_delete_respond_last_child').find('.modal-content');
+        not_delete_respond_last_child_modal.css('background-color', '#707F99');
+        
+        //Фон для модального окна - некорректное внесение исходных данных в форму редактирования
         var error_update_data_interview_modal = $('#error_update_data_interview').find('.modal-content');
         error_update_data_interview_modal.css('background-color', '#707F99');
         
+        //Фон для модального окна - респондент с таким именем уже существует 
+        var respondUpdate_modal_error_modal = $('#respondUpdate_modal_error').find('.modal-content');
+        respondUpdate_modal_error_modal.css('background-color', '#707F99');
+        
+        //Фон для модального окна - чтобы добавить интервью, необходимо заполнить инф-ю о всех респондентах
+        var descInterviewCreate_modal_error_modal = $('#descInterviewCreate_modal_error').find('.modal-content');
+        descInterviewCreate_modal_error_modal.css('background-color', '#707F99');
+        
+        //Фон для модального окна - для завершения подтверждения необходимо опросить всех заданных респондентов
+        var not_completed_descInterviews_modal = $('#not_completed_descInterviews').find('.modal-content');
+        not_completed_descInterviews_modal.css('background-color', '#707F99');
+        
         //Фон для модального окна информации о вопросах
         var information_modal = $('#information-table-questions').find('.modal-content');
-        information_modal.css('background-color', '#707F99')
+        information_modal.css('background-color', '#707F99');
         
     
         //Добавляем одинаковую высоту для элементов меню 
@@ -1635,52 +2017,6 @@ $script = "
         });
         
         
-        
-        //---Переходы по модальным окнам (ШАГ 4)---Начало---
-        
-        //При переходе из таблицы responds_exist 
-        //в модальное окно просмотра инф-и о респонденте
-        //закарываем другие модальные окна (Шаг 2)
-        $('.interview-view').on('click', '.go_view_respond_for_exist', function(){
-            $('.responds_exist').modal('hide');
-        });
-        
-        //При переходе из таблицы by_date_interview 
-        //в модальное окно просмотра инф-и о респонденте
-        //закарываем другие модальные окна (Шаг 2)
-        $('.interview-view').on('click', '.go_view_respond_by_date_interview', function(){
-            $('.by_date_interview').modal('hide');
-        });
-        
-        //При переходе из таблицы by_status_responds
-        //в модальное окно просмотра инф-и о респонденте
-        //закарываем другие модальные окна (Шаг 2)
-        $('.interview-view').on('click', '.go_view_respond_for_by_status', function(){
-            $('.by_status_responds').modal('hide');
-        });
-        
-        //При клике из окна просмотра инф-и о респонденте на кнопку НАЗАД
-        //закрываем окно и показываем таблицу responds_exist (Шаг 2)
-        $('.go_view_back_exist_responds').on('click', function(){
-            $('.view_respond').modal('hide');
-            $('.responds_exist').modal('show');
-        });
-        
-        //При клике из окна просмотра инф-и о респонденте на кнопку НАЗАД
-        //закрываем окно и показываем таблицу by_date_interview (Шаг 2)
-        $('.go_view_back_by_date').on('click', function(){
-            $('.view_respond_by_date').modal('hide');
-            $('.by_date_interview').modal('show');
-        });
-        
-        //При клике из окна просмотра инф-и о респонденте на кнопку НАЗАД
-        //закрываем окно и показываем таблицу by_status_responds (Шаг 2)
-        $('.go_view_back_by_status').on('click', function(){
-            $('.view_respond_by_status').modal('hide');
-            $('.by_status_responds').modal('show');
-        });
-        
-        //---Переходы по модальным окнам (ШАГ 4)---Конец---
     });
     
     
@@ -1715,404 +2051,24 @@ $script = "
 
                 if (!response['error']) {
                 
-                    location.reload();
+                    //Назначаем перезагрузку страницы при переходе на Шаг 3
+                    $('.tab').find('#defaultOpen').attr('onclick', 'location.reload()');
                 
-//                    //Обновление данных в режиме просмотра (Шаг 1)
-//                    
-//                    var inputCountRespond = response.model.count_respond;
-//                    var viewCountRespond = $('#count_respond-view').find('.kv-attribute');
-//                    viewCountRespond.html(inputCountRespond);
-//                    
-//                    var inputCountPositive = response.model.count_positive;
-//                    var viewCountPositive = $('#count_positive-view').find('.kv-attribute');
-//                    viewCountPositive.html(inputCountPositive);
-//                    
-//                    var textareaNeedConsumer = response.model.need_consumer;
-//                    var viewNeedConsumer = $('#need_consumer-view').find('.kv-attribute');
-//                    viewNeedConsumer.html(textareaNeedConsumer);
-//                    
-//                    
-//                    //Вызов события клика на кнопку просмотра 
-//                    //для перхода в режим просмотра (Шаг 1)
-//                    $('.kv-btn-view').trigger('click');
-//                    
-//                    
-//                    //---Изменяем данные в Шаге 2---
-//                    //Индикатор с данными респондентов
-//                    
-//                    var responds = response.responds;
-//                    var sumDataExistRespond = 0; //Кол-во респондентов, у кот-х заполнены данные
-//                    var sumResponds = 0; //Общее кол-во респондентов
-//                    
-//                    $.each(responds, function(index, value) {
-//                        sumResponds++;
-//                        if(value.name && value.info_respond){
-//                            sumDataExistRespond++;
-//                        }
-//                    });
-//                    
-//                    if (sumDataExistRespond !== 0) {
-//                    
-//                        var valueInfoRespond = (sumDataExistRespond / inputCountRespond) * 100;
-//                        
-//                        valueInfoRespond_withoutResidue = valueInfoRespond.toFixed();
-//                        valueInfoRespond_withTenPart = valueInfoRespond.toFixed(1);
-//                        valueInfoRespond_withHundredPart = valueInfoRespond.toFixed(2);
-//                        
-//                        arr_valueInfoRespond = valueInfoRespond_withHundredPart.split('.');
-//                        var hundredPart_valueInfoRespond = arr_valueInfoRespond[1];
-//                        hundredPart_valueInfoRespond = hundredPart_valueInfoRespond.split('');
-//                        
-//                        if(hundredPart_valueInfoRespond[1] == 0){
-//                            
-//                            valueInfoRespond = valueInfoRespond_withTenPart;
-//                            
-//                            if(hundredPart_valueInfoRespond[0] == 0){
-//                            
-//                                valueInfoRespond = valueInfoRespond_withoutResidue;
-//                            }
-//                            
-//                        }else {
-//                            
-//                            valueInfoRespond = valueInfoRespond_withHundredPart;
-//                        }
-//                        
-//                    } else {
-//                        var valueInfoRespond = 0;
-//                    }
-//                    
-//                    $('#info-respond').attr('value', valueInfoRespond);
-//                    $('#info-respond-text-indicator').html(valueInfoRespond + ' %');
-//                    
-//                    
-//                    //Индикатор проведения интервью
-//                    
-//                    var descInterviews = response.descInterviews;
-//                    var sumDataExistDescInterview = 0; //Кол-во проведенных интервью
-//                    
-//                    $.each(descInterviews, function(index, value) {
-//                         if(value.updated_at){
-//                            sumDataExistDescInterview++;
-//                         }
-//                    });
-//                    
-//                    if(sumDataExistDescInterview !== 0){
-//                    
-//                        var valueInfoDescInterview = (sumDataExistDescInterview / inputCountRespond) * 100;
-//                        
-//                        valueInfoDescInterview_withoutResidue = valueInfoDescInterview.toFixed();
-//                        valueInfoDescInterview_withTenPart = valueInfoDescInterview.toFixed(1);
-//                        valueInfoDescInterview_withHundredPart = valueInfoDescInterview.toFixed(2);
-//                        
-//                        arr_valueInfoDescInterview = valueInfoDescInterview_withHundredPart.split('.');
-//                        var hundredPart_valueInfoDescInterview = arr_valueInfoDescInterview[1];
-//                        hundredPart_valueInfoDescInterview = hundredPart_valueInfoDescInterview.split('');
-//                        
-//                        if(hundredPart_valueInfoDescInterview[1] == 0){
-//                            
-//                            valueInfoDescInterview = valueInfoDescInterview_withTenPart;
-//                            
-//                            if(hundredPart_valueInfoDescInterview[0] == 0){
-//                            
-//                                valueInfoDescInterview = valueInfoDescInterview_withoutResidue;
-//                            }
-//                            
-//                        }else {
-//                            
-//                            valueInfoDescInterview = valueInfoDescInterview_withHundredPart;
-//                        }
-//                        
-//                    } else {
-//                        var valueInfoDescInterview = 0;
-//                    }
-//                    
-//                    $('#info-interview').attr('value', valueInfoDescInterview);
-//                    $('#info-interview-text-indicator').html(valueInfoDescInterview + ' %');
-//                    
-//                    
-//                    //Индикатор представителей сегмента, 
-//                    
-//                    var sumDataMembersOfSegment = 0; //Кол-во предствителей сегмента
-//                    
-//                    $.each(descInterviews, function(index, value) {
-//                         if(value.status == 1){
-//                            sumDataMembersOfSegment++;
-//                         }
-//                    });
-//                    
-//                    if(sumDataMembersOfSegment !== 0){
-//                    
-//                        var valueStatusInterview = (sumDataMembersOfSegment / inputCountRespond) * 100;
-//                        
-//                        valueStatusInterview_withoutResidue = valueStatusInterview.toFixed();
-//                        valueStatusInterview_withTenPart = valueStatusInterview.toFixed(1);
-//                        valueStatusInterview_withHundredPart = valueStatusInterview.toFixed(2);
-//                        
-//                        arr_valueStatusInterview = valueStatusInterview_withHundredPart.split('.');
-//                        var hundredPart_valueStatusInterview = arr_valueStatusInterview[1];
-//                        hundredPart_valueStatusInterview = hundredPart_valueStatusInterview.split('');
-//                        
-//                        if(hundredPart_valueStatusInterview[1] == 0){
-//                            
-//                            valueStatusInterview = valueStatusInterview_withTenPart;
-//                            
-//                            if(hundredPart_valueStatusInterview[0] == 0){
-//                            
-//                                valueStatusInterview = valueStatusInterview_withoutResidue;
-//                            }
-//                            
-//                        }else {
-//                            
-//                            valueStatusInterview = valueStatusInterview_withHundredPart;
-//                        }
-//                        
-//                    } else {
-//                        var valueStatusInterview = 0;
-//                    }
-//                    
-//                    $('#info-status').attr('value', valueStatusInterview);
-//                    $('#info-status-text-indicator').html(valueStatusInterview + ' %');
-//                    
-//                    if (inputCountPositive <= sumDataMembersOfSegment){
-//                        if ($('#info-status').hasClass('info-red') == true){
-//                            $('#info-status').removeClass('info-red').addClass('info-green');
-//                        }
-//                        
-//                    }else {
-//                        if ($('#info-status').hasClass('info-green') == true) {
-//                            $('#info-status').removeClass('info-green').addClass('info-red');
-//                        }
-//                    }
-//                    
-//                    
-//                    
-//                    //кнопка перехода в таблицу Информация о респондентах и строка сообщения 
-//                    
-//                    var problems = response.gcps;
-//                    var sumProblems = 0; //Кол-во ГЦП
-//                    
-//                    $.each(problems, function(index, value) {
-//                         if(value.id){
-//                            sumProblems++;
-//                         }
-//                    });
-//                    
-//                    
-//                    if (sumDataExistRespond == 0) {
-//                    
-//                        $('#redirect_info_responds_table').html('Начать');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-danger')) {
-//                            $('#redirect_info_responds_table').removeClass('btn-danger').addClass('btn-default');
-//                        }
-//                        
-//                        $('#messageAboutTheNextStep').html('Начните заполнять данные о респондентах и интервью');
-//                        if ($('#messageAboutTheNextStep').hasClass('text-warning')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-warning').addClass('text-success');
-//                        }
-//                        if ($('#messageAboutTheNextStep').hasClass('text-danger')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-danger').addClass('text-success');
-//                        }
-//                    
-//                    } 
-//                    
-//                    if (sumDataExistRespond == sumResponds && sumDataExistDescInterview == sumResponds && inputCountPositive <= sumDataMembersOfSegment && sumProblems == 0) {
-//                        
-//                        $('#redirect_info_responds_table').html('Редактировать');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-danger') == true) {
-//                            $('#redirect_info_responds_table').removeClass('btn-danger').addClass('btn-default');
-//                        }
-//                        
-//                        //Скрыть кнопку завершить
-//                        $('.finish_program').hide(); 
-//                        
-//                        $('#messageAboutTheNextStep').html('Переходите к генерации ГЦП');
-//                        if ($('#messageAboutTheNextStep').hasClass('text-warning')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-warning').addClass('text-success');
-//                        }
-//                        if ($('#messageAboutTheNextStep').hasClass('text-danger')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-danger').addClass('text-success');
-//                        }
-//                        
-//                        //Обновление данных Шаг 3.
-//                        $('.not_next_step').hide();
-//                        $('.finish_program_success').show();
-//                        
-//                        
-//                    } 
-//                    
-//                    if (sumProblems != 0) {
-//                    
-//                        $('#redirect_info_responds_table').html('Редактировать');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-danger')) {
-//                            $('#redirect_info_responds_table').removeClass('btn-danger').addClass('btn-default');
-//                        }
-//                        
-//                        $('#messageAboutTheNextStep').html('');
-//                    } 
-//                    
-//                    if (sumDataExistRespond == sumResponds && sumDataExistDescInterview == sumResponds && inputCountPositive > sumDataMembersOfSegment) {
-//                        $('#redirect_info_responds_table').html('Добавить');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-default')) {
-//                            $('#redirect_info_responds_table').removeClass('btn-default').addClass('btn-danger');
-//                        }
-//                        
-//                        $('#messageAboutTheNextStep').html('Недостаточное количество представителей сегмента');
-//                        if ($('#messageAboutTheNextStep').hasClass('text-warning')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-warning').addClass('text-danger');
-//                        }
-//                        if ($('#messageAboutTheNextStep').hasClass('text-success')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-success').addClass('text-danger');
-//                        }
-//                        
-//                        //Обновление данных Шаг 3.
-//                        $('.not_next_step').show();
-//                        $('.finish_program_success').hide();
-//                        
-//                    } 
-//                    
-//                    if (sumDataExistRespond == sumResponds && sumDataExistDescInterview == sumResponds && inputCountPositive > sumDataMembersOfSegment && response.problem.exist_confirm === null) {
-//                        $('#redirect_info_responds_table').html('Добавить');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-default')) {
-//                            $('#redirect_info_responds_table').removeClass('btn-default').addClass('btn-danger');
-//                        }
-//                        
-//                        //Показать кнопку завершить
-//                        $('.finish_program').show();
-//                        
-//                        $('#messageAboutTheNextStep').html('Недостаточное количество представителей сегмента');
-//                        if ($('#messageAboutTheNextStep').hasClass('text-warning')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-warning').addClass('text-danger');
-//                        }
-//                        if ($('#messageAboutTheNextStep').hasClass('text-success')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-success').addClass('text-danger');
-//                        }
-//                        
-//                        //Обновление данных Шаг 3.
-//                        $('.not_next_step').show();
-//                        $('.finish_program_success').hide();
-//                        
-//                    } 
-//                    
-//                    if (sumProblems == 0 && sumDataExistRespond != 0 &&(sumDataExistRespond != sumResponds || sumDataExistDescInterview != sumResponds)) {
-//                        $('#redirect_info_responds_table').html('Продолжить');
-//                        if ($('#redirect_info_responds_table').hasClass('btn-danger')) {
-//                            $('#redirect_info_responds_table').removeClass('btn-danger').addClass('btn-default');
-//                        }
-//                        
-//                        $('#messageAboutTheNextStep').html('Продолжите заполнение данных о респондентах и интервью');
-//                        if ($('#messageAboutTheNextStep').hasClass('text-danger')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-danger').addClass('text-warning');
-//                        }
-//                        if ($('#messageAboutTheNextStep').hasClass('text-success')) {
-//                            $('#messageAboutTheNextStep').removeClass('text-success').addClass('text-warning');
-//                        }
-//                        
-//                    }
-//                    
-//                    
-//                    
-//                    //Изменение данных в модальных окнах с индикаторами данных
-//                    
-//                    
-//                    //Обновление модального окна - проверка данных респондентов
-//                    
-//                    var stringTemplateTableRespondsExist = $('#TableRespondsExist').find('tbody').find('tr:first').html(); //Берем в качестве шаблона первую строку таблицы  
-//                    $('#TableRespondsExist').find('tbody').html(''); //Очищаем таблицу  
-//                    $.each(responds, function(index, value) { //Добавляем данные в таблицу
-//                        
-//                        $('#TableRespondsExist').find('tbody').append('<tr class=\"TableRespondsExist\" id=\"stringTableDataRespond-' + (index + 1) + '\">' + stringTemplateTableRespondsExist + '</tr>');
-//                        $('#stringTableDataRespond-' + (index + 1)).attr('data-key', value.id);
-//                        $('#stringTableDataRespond-' + (index + 1)).find('td:nth-child(1)').html(index+1);
-//                        
-//                        if(value.info_respond && value.date_plan && value.place_interview) {
-//                            
-//                            $('#stringTableDataRespond-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#view_respond-' + value.id).html(value.name);
-//                            $('#stringTableDataRespond-' + (index + 1)).find('td:nth-child(3)').find('div').html('Данные заполнены');
-//                            
-//                        }else {
-//                            
-//                            $('#stringTableDataRespond-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#not_view_respond_modal').removeClass('go_view_respond_for_exist').html(value.name);
-//                            $('#stringTableDataRespond-' + (index + 1)).find('td:nth-child(3)').find('div').html('Данные отсутствуют');
-//                        }
-//                        
-//                    });
-//                    
-//                    
-//                    //Обновление модального окна - проверка данных по интервью
-//                    
-//                    var stringTemplateTableByDateInterview = $('#TableByDateInterview').find('tbody').find('tr:first').html(); //Берем в качестве шаблона первую строку таблицы  
-//                    $('#TableByDateInterview').find('tbody').html(''); //Очищаем таблицу
-//                    $.each(responds, function(index, value) { //Добавляем данные в таблицу
-//                        
-//                        $('#TableByDateInterview').find('tbody').append('<tr class=\"TableByDateInterview\" id=\"stringTableDataInterview-' + (index + 1) + '\">' + stringTemplateTableByDateInterview + '</tr>');
-//                        $('#stringTableDataInterview-' + (index + 1)).attr('data-key', value.id);
-//                        $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(1)').html(index+1);
-//                        
-//                        
-//                        if(value.info_respond && value.date_plan && value.place_interview) {
-//                            
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#view_respond_by_date-' + value.id).html(value.name);
-//                            var date_plan_respond = new Date(value.date_plan*1000).toLocaleDateString();
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(3)').find('div').html(date_plan_respond);
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(4)').find('div').html('');
-//                            
-//                            for (var j = 0; j < descInterviews.length; j++) {
-//                                if(value.id == descInterviews[j].respond_id){
-//                                    
-//                                    var updated_at_descInterview = new Date(descInterviews[j].updated_at*1000).toLocaleDateString();
-//                                    $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(4)').find('div').html(updated_at_descInterview);
-//                                }
-//                            }
-//                        }else {
-//                            
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#not_view_respond_modal').removeClass('go_view_respond_by_date_interview').html(value.name);
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(3)').find('div').html('');
-//                            $('#stringTableDataInterview-' + (index + 1)).find('td:nth-child(4)').find('div').html('');
-//                        }
-//                    });
-//                    
-//                    
-//                    //Обновление модального окна - таблица представителей сегмента
-//                    
-//                    var stringTemplateTableByStatusResponds = $('#TableByStatusResponds').find('tbody').find('tr:first').html(); //Берем в качестве шаблона первую строку таблицы  
-//                    $('#TableByStatusResponds').find('tbody').html(''); //Очищаем таблицу
-//                    $.each(responds, function(index, value) { //Добавляем данные в таблицу
-//                        
-//                        $('#TableByStatusResponds').find('tbody').append('<tr class=\"TableByStatusResponds\" id=\"stringTableStatusRespond-' + (index + 1) + '\">' + stringTemplateTableByStatusResponds + '</tr>');
-//                        $('#stringTableStatusRespond-' + (index + 1)).attr('data-key', value.id);
-//                        $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(1)').html(index+1);
-//                        
-//                        if(value.info_respond && value.date_plan && value.place_interview) {
-//                            
-//                            $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#view_respond_by_status-' + value.id).html(value.name);
-//                            $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(3)').find('div').html('');
-//                            
-//                            for (var j = 0; j < descInterviews.length; j++) {
-//                                if(value.id == descInterviews[j].respond_id){
-//                                    
-//                                    var statusRespond = '';
-//                                    if(descInterviews[j].status == 0){
-//                                        statusRespond = 'Нет';
-//                                        $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(3)').find('div').attr('style', 'color:red');
-//                                    } 
-//                                    if(descInterviews[j].status == 1){
-//                                        statusRespond = 'Да';
-//                                        $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(3)').find('div').attr('style', 'color:green');
-//                                    }
-//                                    
-//                                    $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(3)').find('div').html(statusRespond);
-//                                }
-//                            }
-//                        }else {
-//                            
-//                            $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(2)').find('a').attr('data-target', '#not_view_respond_modal').removeClass('go_view_respond_for_by_status').html(value.name);
-//                            $('#stringTableStatusRespond-' + (index + 1)).find('td:nth-child(3)').find('div').html('');
-//                        }
-//                        
-//                    });
-                    
-                    
+                    //Обновление данных в режиме просмотра (Шаг 1)
 
+                    var inputCountRespond = response.model.count_respond;
+                    $('#count_respond-view').attr('value', inputCountRespond);
+                    
+                    var inputCountPositive = response.model.count_positive;
+                    $('#count_positive-view').attr('value', inputCountPositive);
+                    
+                    var textareaNeedConsumer = response.model.need_consumer;
+                    $('#need_consumer-view').html(textareaNeedConsumer);
+                    
+                    //скрываем форму редактирования и показываем вид просмотра
+                    $('.form-update-data-confirm').hide();
+                    $('.form-view-data-confirm').show();    
+                    
                 } else {
                     // Вызов модального окна, если было некорректное 
                     //внесение данных в форму редактирования 
@@ -2146,6 +2102,9 @@ $script = "
             data: data,
             cache: false,
             success: function(response){
+            
+                //Назначаем перезагрузку страницы при переходе на Шаг 3
+                $('.tab').find('#defaultOpen').attr('onclick', 'location.reload()');
                 
                 //Добавление строки для нового вопроса (Шаг 2)
                 var container = $('#QuestionsTable-container');
@@ -2302,6 +2261,9 @@ $script = "
             method: 'POST',
             cache: false,
             success: function(response){
+            
+                //Назначаем перезагрузку страницы при переходе на Шаг 3
+                $('.tab').find('#defaultOpen').attr('onclick', 'location.reload()');
 
                 //Скрываем удаленный вопрос
                 deleteString.hide();
@@ -2332,25 +2294,110 @@ $script = "
     });
     
     
+    //ШАГ 3 - Заполнение данных респондентов и интервью
+    
+    $(document).ready(function() {
+    
+        //Фон для модального окна информации
+        var information_modal = $('#information-table-responds').find('.modal-content');
+        information_modal.css('background-color', '#707F99');
+        
+        //Фон для модального окна - респондент с таким именем уже существует
+        var respondCreate_modal_error_modal = $('#respondCreate_modal_error').find('.modal-content');
+        respondCreate_modal_error_modal.css('background-color', '#707F99');
+        
+    }); 
     
     
-    //При попытке добавить ГПС проверяем существуют ли необходимые данные
-    //Если данных достаточно - показываем окно с формой
-    //Если данных недостаточно - показываем окно с сообщением error
-    $('#checking_the_possibility').on('click', function(){
+    //При сохранении нового респондента отправляем данные через ajax 
+    $('#new_respond_form').on('beforeSubmit', function(e){
+        
+        var data = $(this).serialize();
+        var url = $(this).attr('action');
+
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            cache: false,
+            success: function(response){
+            
+                if (!response['limit_count_respond']) {
+                
+                    if (!response['error']) {
+                    
+                    //Закрываем окно создания нового респондента
+                    $('#respondCreate_modal').modal('hide');
+                    
+                    //Перезагружаем страницу
+                    location.reload();
+                    
+                    } else {
+                        $('#respondCreate_modal_error').modal('show');
+                    }
+                
+                }else {
+                    
+                    //Закрываем окно создания нового респондента
+                    $('#respondCreate_modal').modal('hide');
+                    
+                    //Показываем окно с информацией
+                    $('#limit_count_respond_modal').modal('show');
+                }
+                
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
     
+    
+    //Переход к генерации ГЦП по кнопке Далее
+    $('#button_MovingNextStage').on('click', function(e){
+        
+        var data = $(this).serialize();
         var url = $(this).attr('href');
         
         $.ajax({
         
             url: url,
             method: 'POST',
+            data: data,
             cache: false,
             success: function(response){
-                if(response['success']){
-                    $('#problem_create_modal').modal('show');
-                }else{
-                    $('#problem_create_modal_error').modal('show');
+            
+                if (!response['error']) {
+                
+                    if (!response['not_completed_descInterviews']) {
+                        
+                        if (response['exist_confirm'] === 1) {
+                            window.location.href = '/gcp/index?id=".$model->id."';
+                        }
+                        
+                        if (response['exist_confirm'] === null) {
+                            window.location.href = '/confirm-problem/exist-confirm?id=".$model->id."';
+                        }
+                        
+                        if (response['exist_confirm'] === 0) {
+                            window.location.href = '/confirm-problem/exist-confirm?id=".$model->id."';
+                        }
+                    
+                    } else {
+                        
+                        //Показываем окно (проведены не все интервью)
+                        $('#not_completed_descInterviews').modal('show');
+                    }
+
+                } else {
+                
+                    //Показываем окно выбора
+                    $('#not_exist-confirm-modal').modal('show');
                 }
             },
             error: function(){
@@ -2358,11 +2405,227 @@ $script = "
             }
         });
         
-        //e.preventDefault();
+        e.preventDefault();
+        
         return false;
     });
+    
+    
+    // Отмена завершения неудачного подтверждения проблемы
+    $('#cancel-not_exist-confirm').on('click',function(e) {
+        
+         //Закрываем окно
+         $('#not_exist-confirm-modal').modal('hide');
+         
+         e.preventDefault();
+         return false;
+    });
+    
+    
 ";
 $position = \yii\web\View::POS_READY;
 $this->registerJs($script, $position);
 
+?>
+
+
+<?php
+
+foreach ($responds as $i => $respond) :
+
+    $script2 = "
+
+    $(document).ready(function() {
+
+        //Стилизация модального окна для удаления респондента
+        
+        $('#delete-respond-modal-".$respond->id."').css('font-family', 'RobotoCondensed-Light');
+        
+        var modal_header_delete_respond = $('#delete-respond-modal-".$respond->id."').find('.modal-header');
+        modal_header_delete_respond.css('background-color', '#707F99');
+        modal_header_delete_respond.css('color', '#ffffff');
+        modal_header_delete_respond.css('border-radius', '5px 5px 0 0');
+        
+        var modal_body_delete_respond = $('#delete-respond-modal-".$respond->id."').find('.modal-body');
+        modal_body_delete_respond.css('background-color', '#F2F2F2');
+        modal_body_delete_respond.css('color', '#4F4F4F');
+        
+        var modal_footer_delete_respond = $('#delete-respond-modal-".$respond->id."').find('.modal-footer');
+        modal_footer_delete_respond.css('background-color', '#707F99');
+        modal_footer_delete_respond.css('border-radius', '0 0 5px 5px');
+        
+    });
+
+    // CONFIRM RESPOND DELETE
+    $('#confirm-delete-respond-".$respond->id."').on('click',function(e) {
+        
+         var url = $(this).attr('href');
+         $.ajax({
+              url: url,
+              method: 'POST',
+              cache: false,
+              success: function(response) {
+              
+                   if (!response['success']) {
+                   
+                       if (response['zero_value_responds']) {
+                       
+                           //Закрываем окно подтверждения
+                           $('#delete-respond-modal-".$respond->id."').modal('hide');
+                       
+                           //Показываем окно с ошибкой 
+                           $('#not_delete_respond_last_child').modal('show'); 
+                       } 
+                       
+                       if (response['number_less_than_allowed']) {
+                       
+                           //Закрываем окно подтверждения
+                           $('#delete-respond-modal-".$respond->id."').modal('hide');
+                           //Показываем окно с ошибкой 
+                           $('#not_delete_respond_invalid_value').modal('show');
+                       } 
+                   } 
+                   
+                   if (response['success']) {
+                   
+                       //Закрываем окно подтверждения
+                       $('#delete-respond-modal-".$respond->id."').modal('hide');
+                                    
+                       //Перезагружаем страницу
+                       location.reload();
+                   
+                   }    
+              }, 
+              error: function(){
+                   alert('Ошибка');
+              }
+         });
+         e.preventDefault();
+         return false;
+    });
+
+
+
+    // CANCEL RESPOND DELETE
+    $('#cancel-delete-respond-".$respond->id."').on('click',function(e) {
+        
+         //Закрываем окно подтверждения
+         $('#delete-respond-modal-".$respond->id."').modal('hide');
+         
+         e.preventDefault();
+         return false;
+    });
+    
+    
+    //Сохранении данных из формы редактирование дынных респондента
+    $('#formUpdateRespond-".$respond->id."').on('beforeSubmit', function(e){
+
+        var data = $(this).serialize();
+        var url = $(this).attr('action');
+
+        
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            cache: false, 
+            success: function(response){
+
+                if (!response['error']) {
+
+                    //Закрываем окно редактирования
+                    $('.respond_update_modal').modal('hide');
+                    
+                    //Перезагружаем страницу
+                    location.reload();
+                      
+                } else {
+
+                    $('#respondUpdate_modal_error').modal('show');
+                }
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
+
+    
+    //Создание интервью при сохранении данных из формы 
+    $('#formCreateDescInterview-".$respond->id."').on('beforeSubmit', function(e){
+    
+        var data = new FormData(this);
+        var url = $(this).attr('action');
+        
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function(response){
+
+                //Закрываем модальное окно с формой
+                $('.create_descInterview_modal').modal('hide');
+                
+                //Перезагружаем страницу
+                location.reload();
+                
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
+    
+    //Редактирование интервью при сохранении данных из формы 
+    $('#formUpdateDescInterview-".$respond->id."').on('beforeSubmit', function(e){
+    
+        var data = new FormData(this);
+        var url = $(this).attr('action');
+        
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function(response){
+                
+                //Закрываем модальное окно с формой
+                $('.interview_update_modal').modal('hide');
+                
+                //Перезагружаем страницу
+                location.reload();
+
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        e.preventDefault();
+
+        return false;
+    });
+    
+    
+";
+    $position = \yii\web\View::POS_READY;
+    $this->registerJs($script2, $position);
+
+endforeach;
 ?>

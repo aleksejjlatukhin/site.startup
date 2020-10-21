@@ -208,7 +208,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
                     <?= Html::button('Редактировать', [
                         'id' => 'show_form_update_data',
@@ -306,7 +306,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
             <?php
             $form = ActiveForm::begin([
                 'id' => 'update_data_interview',
-                'action' => Url::to(['/confirm-problem/update-data-interview', 'id' => $formUpdateConfirmProblem->id]),
+                'action' => Url::to(['/confirm-problem/update', 'id' => $formUpdateConfirmProblem->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -327,7 +327,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
                 </div>
 
-                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6">
+                <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
 
                     <?= Html::button('Просмотр', [
                         'id' => 'show_form_view_data',

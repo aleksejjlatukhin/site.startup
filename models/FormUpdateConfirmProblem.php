@@ -14,7 +14,6 @@ class FormUpdateConfirmProblem extends Model
     public $count_respond;
     public $count_positive;
     public $need_consumer;
-    public $problem_description;
 
 
     /**
@@ -23,10 +22,10 @@ class FormUpdateConfirmProblem extends Model
     public function rules()
     {
         return [
-            //[['problem_description', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
+            //[['count_respond', 'count_positive', 'need_consumer'], 'required'],
             [['gps_id'], 'integer'],
             ['need_consumer', 'trim'],
-            [['problem_description', 'need_consumer'], 'string', 'max' => 255],
+            [['need_consumer'], 'string', 'max' => 255],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
         ];
     }
@@ -42,7 +41,6 @@ class FormUpdateConfirmProblem extends Model
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Необходимое количество позитивных ответов',
             'need_consumer' => 'Потребность потребителя',
-            'problem_description' => 'Формулировка проблемы, которую проверяем',
         ];
     }
 
@@ -55,7 +53,6 @@ class FormUpdateConfirmProblem extends Model
         $this->count_respond = $confirm_problem->count_respond;
         $this->count_positive = $confirm_problem->count_positive;
         $this->need_consumer = $confirm_problem->need_consumer;
-        $this->problem_description = $confirm_problem->problem->description;
 
         parent::__construct($config);
     }
