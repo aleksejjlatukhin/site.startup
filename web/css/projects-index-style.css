@@ -67,20 +67,11 @@
     }
 }
 
-.project_name_table_link {
+.project_name_table {
     font-size: 18px;
     font-weight: 700;
     padding: 0 5px;
     color: #FFFFFF;
-    text-decoration: none;
-}
-.project_name_table_link:hover {
-    color: #FFFFFF;
-    text-decoration: none;
-}
-.project_name_table_link:focus {
-    color: #FFFFFF;
-    text-decoration: none;
 }
 
 .project_description_text {

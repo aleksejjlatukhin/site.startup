@@ -76,10 +76,12 @@ class ProjectSort extends Model
 
         foreach ($models as $model) {
 
+
             $description = $model->description;
             if (mb_strlen($description) > 50) {
                 $description = mb_substr($description, 0, 50) . '...';
             }
+
 
             $rid = $model->rid;
 
@@ -87,20 +89,41 @@ class ProjectSort extends Model
                 $rid = mb_substr($rid, 0, 80)  . ' ...';
             }
 
+
             $technology = $model->technology;
 
             if (mb_strlen($technology) > 50) {
                 $technology = mb_substr($technology, 0, 50) . ' ...';
             }
 
+
+            if (User::isUserSimple(\Yii::$app->user->identity['username'])) {
+
+                $button_update_or_view = Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                    'class' => '',
+                    'style' => ['margin-left' => '30px'],
+                    'title' => 'Редактировать',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#data_project_update_modal-$model->id",
+                ]);
+
+            } else {
+
+                $button_update_or_view = Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
+                    'class' => '',
+                    'style' => ['margin-left' => '30px'],
+                    'title' => 'Смотреть',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#data_project_modal-$model->id",
+                ]);
+            }
+
             $showModels .= '<div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
                                 
                                 <div class="col-md-3">
                                 
-                                    <div>
-                                        '.Html::a(Html::encode($model->project_name), Url::to(['/segment/index', 'id' => $model->id]),[
-                                            'class' => 'project_name_table_link'
-                                        ]).'
+                                    <div class="project_name_table">
+                                        '. $model->project_name .'
                                     </div>
                                     
                                     <div class="project_description_text">
@@ -127,33 +150,31 @@ class ProjectSort extends Model
                                 
                                 <div class="col-md-2" style="padding-left: 20px; padding-right: 20px;">
 
-                                    <div class="row" style="display:flex; align-items: center;">
+                                    <div class="row" style="display:flex; align-items: center; justify-content: space-between; padding-right: 15px;">
                                     
-                                        <div class="col-md-4">
-                                            '.Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
-                                                'class' => '',
-                                                'title' => 'Смотреть',
-                                                'data-toggle' => 'modal',
-                                                'data-target' => "#data_project_modal-$model->id",
-                                            ]).'
-                                        </div>
                                         
-                                        <div class="col-md-4">
-                                            '.Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
-                                                'class' => '',
-                                                'title' => 'Редактировать',
-                                                'data-toggle' => 'modal',
-                                                'data-target' => "#data_project_update_modal-$model->id",
-                                            ]).'
-                                        </div>
-                                        
-                                        <div class="col-md-4">
-                                            '.Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                                'class' => '',
-                                                'title' => 'Удалить',
-                                                'onclick' => 'return false',
-                                            ]).'
-                                        </div>
+                                        '.Html::a('Далее', Url::to(['/segment/index', 'id' => $model->id]), [
+                                            'class' => 'btn btn-default',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                'justify-content' => 'center',
+                                                'color' => '#FFFFFF',
+                                                'background' => '#52BE7F',
+                                                'width' => '120px',
+                                                'height' => '40px',
+                                                'font-size' => '18px',
+                                                'border-radius' => '8px',
+                                            ]
+                                        ])
+
+                                        . $button_update_or_view .
+
+                                        Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                            'class' => '',
+                                            'title' => 'Удалить',
+                                            'onclick' => 'return false',
+                                        ]).'
                                     
                                     </div>
                                     

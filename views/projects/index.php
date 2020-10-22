@@ -139,11 +139,10 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                     <div class="col-md-3">
 
-                        <div>
-                            <?= Html::a(Html::encode($model->project_name), Url::to(['/segment/index', 'id' => $model->id]),[
-                                'class' => 'project_name_table_link'
-                            ]);?>
+                        <div class="project_name_table">
+                            <?= $model->project_name; ?>
                         </div>
+
                         <div class="project_description_text">
                             <?php
 
@@ -206,40 +205,51 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                     <div class="col-md-2" style="padding-left: 20px; padding-right: 20px;">
 
-                        <div class="row" style="display:flex; align-items: center;">
+                        <div class="row" style="display:flex; align-items: center; justify-content: space-between; padding-right: 15px;">
 
+                             <?= Html::a('Далее', Url::to(['/segment/index', 'id' => $model->id]), [
+                                 'class' => 'btn btn-default',
+                                 'style' => [
+                                     'display' => 'flex',
+                                     'align-items' => 'center',
+                                     'justify-content' => 'center',
+                                     'color' => '#FFFFFF',
+                                     'background' => '#52BE7F',
+                                     'width' => '120px',
+                                     'height' => '40px',
+                                     'font-size' => '18px',
+                                     'border-radius' => '8px',
+                                 ]
+                             ]);
+                             ?>
 
-                            <div class="col-md-4">
-
-                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
-                                    'class' => '',
-                                    'title' => 'Смотреть',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => "#data_project_modal-$model->id",
-                                ]); ?>
-
-                            </div>
-
-                            <div class="col-md-4">
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
                                 <?= Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
                                     'class' => '',
+                                    'style' => ['margin-left' => '30px'],
                                     'title' => 'Редактировать',
                                     'data-toggle' => 'modal',
                                     'data-target' => "#data_project_update_modal-$model->id",
                                 ]); ?>
 
-                            </div>
+                            <?php else : ?>
 
-                            <div class="col-md-4">
-
-                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
                                     'class' => '',
-                                    'title' => 'Удалить',
-                                    'onclick' => 'return false',
+                                    'style' => ['margin-left' => '30px'],
+                                    'title' => 'Смотреть',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => "#data_project_modal-$model->id",
                                 ]); ?>
 
-                            </div>
+                            <?php endif; ?>
+
+                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                'class' => '',
+                                'title' => 'Удалить',
+                                'onclick' => 'return false',
+                            ]); ?>
 
                         </div>
                     </div>
