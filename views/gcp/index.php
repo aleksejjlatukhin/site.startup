@@ -11,252 +11,481 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Программа генерации ГЦП';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
-$this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
-$this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $generationProblem->title, 'url' => ['generation-problem/view', 'id' => $generationProblem->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Программа подтверждения ' . $generationProblem->title, 'url' => ['confirm-problem/view', 'id' => $confirmProblem->id]];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Разработка гипотез ценностных предложений';
+
+$this->registerCssFile('@web/css/gcp-index-style.css');
+
 ?>
-<div class="gcp-index table-project-kartik">
+<div class="gcp-index">
+
+
+    <div class="row project_info_data">
+
+
+        <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
+            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
+            <?= $project->project_name; ?>
+        </div>
+
+        <?= Html::a('Данные проекта', ['#'], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links',
+            'data-toggle' => 'modal',
+            'data-target' => "#data_project_modal",
+        ]) ?>
+
+        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
+        ]) ?>
+
+        <?= Html::a('Дорожная карта проекта', ['#'], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapProject",
+        ]) ?>
+
+        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'onclick' => 'return false',
+        ]) ?>
+
+    </div>
 
 
     <?php
-    // Описание выполнения задачи на данной странице
+    // Модальное окно - данные проекта
     Modal::begin([
         'options' => [
-            'id' => 'information-table-problem-view',
+            'id' => 'data_project_modal',
         ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
     ]);
     ?>
 
-    <div style="color: #F2F2F2; padding: 0 30px; font-size: 18px;">
+    <?= \yii\widgets\DetailView::widget([
+        'model' => $project,
+        //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
+        'attributes' => [
 
-        <p>Совершите необходимые действия на данной странице:</p>
+            'project_name',
+            'project_fullname:ntext',
+            'description:ntext',
+            'rid',
+            'core_rid:ntext',
+            'patent_number',
 
-        <p>- сгенерируйте гипотезу ценностного предложения;</p>
+            [
+                'attribute' => 'patent_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
 
-        <p>- отредактируйте описание гипотезы по грамматическому смыслу (переход к редактированию через ссылку «наименование» ГЦП);</p>
+            'patent_name:ntext',
 
-        <p>- далее переходите к подтверждению гипотезы ценностного предложения</p>
+            [
+                'attribute'=>'Команда проекта',
+                'value' => $project->getAuthorInfo($project),
+                'format' => 'html',
+            ],
 
-    </div>
+            'technology',
+            'layout_technology:ntext',
+            'register_name',
+
+            [
+                'attribute' => 'register_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'site',
+            'invest_name',
+
+            [
+                'attribute' => 'invest_date',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'invest_amount',
+                'value' => function($project){
+                    if($project->invest_amount !== null){
+                        return number_format($project->invest_amount, 0, '', ' ');
+                    }
+                },
+            ],
+
+            [
+                'attribute' => 'date_of_announcement',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            'announcement_event',
+
+            [
+                'attribute' => 'created_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'updated_at',
+                'format' => ['date', 'dd.MM.yyyy'],
+            ],
+
+            [
+                'attribute' => 'pre_files',
+                'label' => 'Презентационные файлы',
+                'value' => function($model){
+                    $string = '';
+                    foreach ($model->preFiles as $file){
+                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
+                    }
+                    return $string;
+                },
+                'format' => 'html',
+            ]
+
+        ],
+    ]) ?>
 
     <?php
     Modal::end();
     ?>
 
 
-    <div class="row d-inline p-2" style="background: #707F99; font-size: 26px; font-weight: 700; color: #F2F2F2; border-radius: 5px 5px 0 0; padding: 0; margin: 0; padding-top: 20px; padding-bottom: 10px;/*height: 80px;*//*padding-top: 12px;padding-left: 20px;margin-top: 10px;*/">
 
-        <div class="col-md-12 col-lg-6" style="padding: 0 20px; text-align: center;">
+    <div class="row navigation_blocks">
+
+        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+            ['/segment/index', 'id' => $project->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
+            ['/interview/view', 'id' => $interview->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
+            ['/generation-problem/index', 'id' => $interview->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">4</div><div>Подтверждение гипотез проблем сегментов</div>',
+            ['/confirm-problem/view', 'id' => $confirmProblem->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <div class="active_navigation_block navigation_block">
+            <div class="stage_number">5</div>
+            <div>Разработка гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">6</div>
+            <div>Подтверждение гипотез ценностных предложений</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">7</div>
+            <div>Разработка гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">8</div>
+            <div>Подтверждение гипотез MVP</div>
+        </div>
+
+        <div class="no_transition_navigation_block navigation_block">
+            <div class="stage_number">9</div>
+            <div>Генерация бизнес-модели</div>
+        </div>
+
+    </div>
+
+
+
+    <div class="row segment_info_data">
+
+        <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
+
+            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
 
             <?php
-            echo 'Программа генерации ГЦП' .
-
-                Html::a('i', ['#'], [
-                    'style' => ['margin-left' => '20px', 'font-size' => '13px', 'font-weight' => '700', 'padding' => '2px 8px', 'background-color' => '#F2F2F2', 'border-radius' => '50%', 'text-decoration' => 'none'],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information-table-problem-view",
-                    'title' => 'Посмотреть описание',
-                ])
+            $segment_name = $segment->name;
+            if (mb_strlen($segment_name) > 25){
+                $segment_name = mb_substr($segment_name, 0, 25) . '...';
+            }
             ?>
+
+            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
+
+
+
+            <span style="padding-left: 30px; padding-right: 10px; font-weight: 400; font-size: 20px;">Проблема:</span>
+
+            <?php
+            $problem = $generationProblem->description;
+            if (mb_strlen($problem) > 25){
+                $problem = mb_substr($problem, 0, 25) . '...';
+            }
+            ?>
+
+            <?= '<span title="'.$generationProblem->description.'">' . $problem . '</span>'; ?>
+
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Данные сегмента', ['#'], [
-                'class' => 'btn btn-sm btn-default',
-                'style' => ['font-weight' => '700', 'color' => '#373737', 'width' => '170px'],
-                'data-toggle' => 'modal',
-                'data-target' => '#data_segment_modal',
-            ]); ?>
+        <?= Html::a('Данные сегмента', ['#'], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links',
+            'data-toggle' => 'modal',
+            'data-target' => '#data_segment_modal',
+        ]) ?>
+
+        <?= Html::a('Дорожная карта сегмента', ['#'], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+            'data-toggle' => 'modal',
+            'data-target' => "#showRoadmapSegment",
+        ]) ?>
+
+    </div>
+
+
+    <?php
+    // Модальное окно - Данные сегмента
+    Modal::begin([
+        'options' => [
+            'id' => 'data_segment_modal',
+            'class' => 'data_segment_modal',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Информация о сегменте</h3>',
+    ]);
+    ?>
+
+    <?= $segment->allInformation; ?>
+
+    <?php
+    Modal::end();
+    ?>
+
+
+    <div class="container-fluid container-data row">
+
+        <div class="container-fluid row">
+
+            <div class="col-md-12" style="padding: 15px 0;">
+
+                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новое ценностное предложение</div></div>',
+                    ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->id],
+                    ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
+                );
+                ?>
+
+            </div>
+
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Дорожная карта сегмента', ['segment/one-roadmap', 'id' => $segment->id], [
-                'class' => 'btn btn-sm btn-default',
-                'style' => [
-                        'font-weight' => '700',
-                    'color' => '#373737',
-                    'width' => '170px'
-                ],
-            ]) ?>
+
+        <!--Заголовки для списка проблем-->
+        <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
+
+            <div class="col-md-1 ">
+                <div class="row">
+                    <div class="col-md-4" style="padding: 0;"></div>
+                    <div class="col-md-8" style="padding: 0;">Номер</div>
+                </div>
+
+            </div>
+
+            <div class="col-md-7">Описание гипотезы ценностного предложения</div>
+
+            <div class="col-md-1 text-center"><div>Дата создания</div></div>
+
+            <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
+
+            <div class="col-md-2"></div>
+
         </div>
 
-        <div class="col-md-12 col-lg-2" style="padding: 0 10px 10px 10px; text-align: center;">
-            <?= Html::a('Сводная таблица проекта', ['projects/result', 'id' => $project->id], [
-                'class' => 'btn btn-sm btn-default',
-                'style' => [
-                    'font-weight' => '700',
-                    'color' => '#373737',
-                    'width' => '170px'
-                ],
-                'onclick' => 'return false',
-            ]) ?>
+
+        <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
+
+            <!--Данные для списка ценностных предложений-->
+            <?php foreach ($models as $model) : ?>
+
+                <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
+
+                    <div class="col-md-1">
+                        <div class="row">
+
+                            <div class="col-md-4" style="padding: 0;">
+
+                                <?php
+                                if ($model->exist_confirm === 1) {
+
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                                }elseif ($model->exist_confirm === null && empty($model->confirm)) {
+
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                                }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
+
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                                }elseif ($model->exist_confirm === 0) {
+
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                                }
+                                ?>
+
+                            </div>
+
+                            <div class="col-md-8" style="padding: 0 0 0 5px;">
+
+                                <?= $model->title; ?>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7" id="column_gcp_description-<?=$model->id;?>">
+
+                        <?php
+                        $gcp_desc = $model->description;
+                        if (mb_strlen($gcp_desc) > 180) {
+                            $gcp_desc = mb_substr($gcp_desc, 0, 180) . '...';
+                        }
+                        ?>
+
+                        <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $gcp_desc . '</div>'?>
+
+                    </div>
+
+                    <div class="col-md-1 text-center">
+
+                        <?= date("d.m.y", $model->created_at); ?>
+
+                    </div>
+
+                    <div class="col-md-1 text-center">
+
+                        <?php if ($model->time_confirm) : ?>
+                            <?= date("d.m.y", $model->time_confirm); ?>
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
+
+                            <div style="margin-right: 25px;">
+
+                                <?php if ($model->confirm) : ?>
+
+                                    <?= Html::a('Далее', ['/confirm-gcp/view', 'id' => $model->confirm->id], [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'color' => '#FFFFFF',
+                                            'background' => '#52BE7F',
+                                            'width' => '120px',
+                                            'height' => '40px',
+                                            'font-size' => '18px',
+                                            'border-radius' => '8px',
+                                        ]
+                                    ]);
+                                    ?>
+
+                                <?php else : ?>
+
+                                    <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $model->id], [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'color' => '#FFFFFF',
+                                            'background' => '#707F99',
+                                            'width' => '120px',
+                                            'height' => '40px',
+                                            'font-size' => '18px',
+                                            'border-radius' => '8px',
+                                        ]
+                                    ]);
+                                    ?>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <div>
+
+                                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                        'class' => '',
+                                        'title' => 'Редактировать',
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#update_description_modal-' . $model->id,
+                                    ]); ?>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <div >
+
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
+                                    'class' => '',
+                                    'title' => 'Удалить',
+                                    'onclick' => 'return false',
+                                ]); ?>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <?php endforeach; ?>
+
         </div>
 
     </div>
 
 
+    <?php if (count($models) > 0) : ?>
 
-    <div class="style-header-table-kartik">
+        <div class="row information_status_confirm">
 
+            <div>
 
-        <?php
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Ценностное предложение подтверждено</div>
+                </div>
 
-        $gridColumns = [
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Ценностное предложение не подтверждено</div>
+                </div>
 
-            [
-                'attribute' => 'title',
-                'label' => 'Наименование',
-                'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Наименование</div>',
-                'groupOddCssClass' => 'kv',
-                'groupEvenCssClass' => 'kv',
-                'options' => ['colspan' => 1,],
-                'value' => function ($model, $key, $index, $widget) {
+                <div style="display:flex; align-items: center;">
+                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <div>Ценностное предложение ожидает подтверждения</div>
+                </div>
 
-                    if ($model){
+            </div>
 
-                        return '<div class="text-center">' .
-                            Html::a($model->title, ['#'],[
-                                'class' => 'btn btn-primary',
-                                'data-toggle' => 'modal',
-                                'data-target' => "#update_description_modal-$model->id",
-                                'title' => 'Редактировать описание',
-                                ])
-                            . '</div>';
-                    }
-                },
-                'format' => 'raw',
-                'hiddenFromExport' => true, // Убрать столбец при скачивании
-            ],
+        </div>
 
-
-            [
-                'attribute' => 'description',
-                'label' => 'Описание гипотезы',
-                'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Описание гипотезы</div>',
-                'groupOddCssClass' => 'kv',
-                'groupEvenCssClass' => 'kv',
-                'options' => ['colspan' => 1],
-                'value' => function ($model, $key, $index, $widget) {
-
-                    return '<div style="padding: 0 5px;">' . $model->description . '</div>';
-                },
-                'format' => 'raw',
-            ],
-
-
-            [
-                'attribute' => 'date_create',
-                'label' => 'Дата создания',
-                'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата создания</div>',
-                'groupOddCssClass' => 'kv',
-                'groupEvenCssClass' => 'kv',
-                'options' => ['colspan' => 1],
-                'value' => function ($model, $key, $index, $widget) {
-
-                    return '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $model->created_at) . '</div>';
-                },
-                'format' => 'raw',
-            ],
-
-
-            [
-                'attribute' => 'status',
-                'label' => 'Подтверждение',
-                'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Подтверждение</div>',
-                'groupOddCssClass' => 'kv',
-                'groupEvenCssClass' => 'kv',
-                'options' => ['colspan' => 1],
-                'value' => function ($model, $key, $index, $widget) {
-
-                    if ($model->exist_confirm === 1) {
-
-                        return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]), Url::to(['/confirm-gcp/view', 'id' => $model->confirm->id])) . '</div>';
-
-                    }elseif ($model->exist_confirm === null) {
-
-                        return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]), Url::to(['/confirm-gcp/create', 'id' => $model->id])) . '</div>';
-
-                    }elseif ($model->exist_confirm === 0) {
-
-                        return '<div class="text-center" style="padding: 0 5px;">' . Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]), Url::to(['/confirm-gcp/view', 'id' => $model->confirm->id])) . '</div>';
-
-                    }else {
-                        return '';
-                    }
-                },
-                'format' => 'raw',
-            ],
-
-            [
-                'attribute' => 'date_confirm',
-                'label' => 'Дата подтверждения',
-                'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Дата подтверждения</div>',
-                'groupOddCssClass' => 'kv',
-                'groupEvenCssClass' => 'kv',
-                'options' => ['colspan' => 1],
-                'value' => function ($model, $key, $index, $widget) {
-
-                    if ($model->time_confirm) {
-
-                        return '<div class="text-center" style="padding: 0 5px;">'. date("d.m.y", $model->time_confirm) .'</div>';
-                    }else {
-                        return '';
-                    }
-                },
-                'format' => 'raw',
-            ],
-
-        ]
-
-        ?>
-
-
-        <?php
-
-        echo GridView::widget([
-            'dataProvider' => $dataProvider,
-            'showPageSummary' => false, //whether to display the page summary row for the grid view.
-            'pjax' => false,
-            'hashExportConfig' => false,
-            'striped' => false,
-            'bordered' => true,
-            'panel' => [
-                'type' => 'default',
-                'heading' => false,
-                'before' => false,
-                'after' => false,
-            ],
-            'toolbar' => false,
-            'condensed' => true,
-            'summary' => false,
-            'hover' => true,
-            'columns' => $gridColumns,
-            'beforeHeader' => [
-                [
-                    'columns' => [
-                        ['content' =>  Html::a(Html::img('@web/images/icons/icon-plus.png', ['style' => ['width' => '30px', 'margin-right' => '10px']]), ['#'], ['data-toggle' => 'modal', 'data-target' => '#problem_create_modal',]) . 'Гипотеза ценностного предложения', 'options' => ['colspan' => 3, 'class' => 'font-segment-header-table text-center', 'style' => ['padding-top' => '10px', 'padding-bottom' => '10px']]],
-                        ['content' => 'Ценностное предложение', 'options' => ['colspan' => 2, 'class' => 'font-header-table', 'style' => ['padding-top' => '15px', 'padding-bottom' => '15px', 'text-align' => 'center']]],
-                    ],
-                    'options' => [
-                        'class' => 'style-header-table-kartik',
-                    ]
-                ]
-            ],
-        ]);
-
-        ?>
-
-
-    </div>
+    <?php endif; ?>
 
 
 
@@ -264,200 +493,262 @@ $this->params['breadcrumbs'][] = $this->title;
     // Модальное окно - создание ГЦП
     Modal::begin([
         'options' => [
-            'id' => 'problem_create_modal',
-            'class' => 'problem_create_modal',
+            'id' => 'gcp_create_modal',
+            'class' => 'gcp_create_modal',
         ],
         'size' => 'modal-lg',
-        'header' => '<div class="text-center"><span style="font-size: 24px;">Генерация гипотезы ценностного предложения</span></div>',
+        'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Создание гипотезы ценностного предложения</span>' . Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
+                'data-toggle' => 'modal',
+                'data-target' => "#information_gcp_create",
+                'title' => 'Посмотреть описание',
+            ]) . '</div>',
     ]);
     ?>
 
-    <div class="style-header-table-kartik"></div>
 
-    <?php $form = ActiveForm::begin(['id' => 'gcp_create', 'action' => "/gcp/create?id=$confirmProblem->id"]); ?>
 
-    <div class="row">
-        <div class="col-md-12">
+    <?php
+        $form = ActiveForm::begin([
+            'id' => 'gcp_create',
+            'action' => "/gcp/create?id=$confirmProblem->id",
+            'options' => ['class' => 'g-py-15'],
+            'errorCssClass' => 'u-has-error-v1',
+            'successCssClass' => 'u-has-success-v1-1',
+        ]);
+    ?>
 
-            <?= $form->field($formCreateGcp, 'good')->label('1. Формулировка перспективного продукта (товара / услуги):')->textInput(['maxlength' => true, 'required' => true]); ?>
+    <div class="row" style="color: #4F4F4F;">
 
-            <p style="font-weight: 700;">2. Для какого сегмента предназначено: <?= Html::a($segment->name, ['#'], ['title' => 'Посмотреть описание', 'data-toggle' => 'modal', 'data-target' => '#data_segment_modal',]) ?></b></p>
 
-            <?= $form->field($confirmProblem, 'need_consumer')->label('3. Для удовлетворения следующей потребности сегмента:')->textarea(['rows' => 1, 'readOnly' => true,]); ?>
+        <div class="col-md-12" style="margin-top: 10px;">
 
-            <p style="font-weight: 700;">4. Какую выгоду дает использование данного продукта потребителю – представителю сегмента:
-
-                <?= Html::a('i', ['#'], [
-                    'style' => [
-                        'margin-left' => '10px',
-                        'font-size' => '13px',
-                        'font-weight' => '700',
-                        'padding' => '2px 8px',
-                        'background-color' => '#707F99',
-                        'border-radius' => '50%',
-                        'text-decoration' => 'none',
-                        'color' => '#F2F2F2',
-                    ],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information_benefit_modal",
-                    'title' => 'Посмотреть описание',
-                ])?>
-
-            </p>
-
-            <?= $form->field($formCreateGcp, 'benefit')->label(false)->textarea(['rows' => 1, 'required' => true]); ?>
-
-            <p style="font-weight: 700;">5. По сравнению с каким продуктом заявлена выгода (с чем сравнивается):
-
-                <?= Html::a('i', ['#'], [
-                    'style' => [
-                        'margin-left' => '10px',
-                        'font-size' => '13px',
-                        'font-weight' => '700',
-                        'padding' => '2px 8px',
-                        'background-color' => '#707F99',
-                        'border-radius' => '50%',
-                        'text-decoration' => 'none',
-                        'color' => '#F2F2F2',
-                    ],
-                    'class' => 'table-kartik-link',
-                    'data-toggle' => 'modal',
-                    'data-target' => "#information_contrast_modal",
-                    'title' => 'Посмотреть описание',
-                ])?>
-
-            </p>
-
-            <?= $form->field($formCreateGcp, 'contrast')->label(false)->textarea(['rows' => 1, 'required' => true]); ?>
+            <?= $form->field($formCreateGcp, 'good', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Формулировка перспективного продукта (товара / услуги):')->textInput([
+                'maxlength' => 255,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => '',
+            ]); ?>
 
         </div>
+
+
+        <div class="col-md-12" style="padding-left: 20px; font-weight: 700;">
+
+            Для какого сегмента предназначено:
+            <span class="gcp_create_segment_link"><?= Html::a($segment->name, ['#'], ['title' => 'Посмотреть описание', 'data-toggle' => 'modal', 'data-target' => '#data_segment_modal',]) ?></span>
+
+        </div>
+
+
+        <div class="col-md-12" style="padding-left: 20px; margin-top: 10px;">
+
+            <div style="font-weight: 700;">
+                Для удовлетворения следующей потребности сегмента:
+            </div>
+
+            <div><?= $confirmProblem->need_consumer;?></div>
+
+        </div>
+
+
+        <div class="col-md-12" style="margin-top: 10px;">
+
+            <?= $form->field($formCreateGcp, 'benefit', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Какую выгоду дает использование данного продукта потребителю (представителю сегмента):')->textarea([
+                'rows' => 2,
+                'maxlength' => 255,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => 'Все выгоды формулируются по трем критериям: временной, экономический и качественный факторы.
+Первые два параметра выгоды должны быть исчисляемыми. Параметр качества(исчисляемый /лаконичный текст).',
+            ]);
+            ?>
+
+        </div>
+
+
+        <div class="col-md-12">
+
+            <?= $form->field($formCreateGcp, 'contrast', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('По сравнению с каким продуктом заявлена выгода (с чем сравнивается):')->textarea([
+                'rows' => 1,
+                'maxlength' => 255,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => 'Укажите параметры аналога, с которыми сравниваются параметры нового продукта',
+            ]); ?>
+
+        </div>
+
+
     </div>
 
-    <div class="form-group">
-        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+    <div class="form-group row container-fluid">
+        <?= Html::submitButton('Сохранить', [
+            'class' => 'btn btn-success pull-right',
+            'style' => [
+                'color' => '#FFFFFF',
+                'background' => '#52BE7F',
+                'padding' => '0 7px',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '24px',
+                'border-radius' => '8px',
+            ]
+        ]) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
 
 
+
+    <?php Modal::end(); ?>
+
+
+    <?php
+    // Описание выполнения задачи при создании ГЦП
+    Modal::begin([
+        'options' => [
+            'id' => 'information_gcp_create',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Сгенерируйте гипотезу ценностного предложения и отредактируйте её по грамматическому смыслу.
+    </h4>
+
     <?php
     Modal::end();
     ?>
 
 
-
     <?php
-        // Модальное окно - Данные сегмента
+    // Модальное окно - сообщение о том что данных недостаточно для создания ГЦП
+    Modal::begin([
+        'options' => [
+            'id' => 'gcp_create_modal_error',
+            'class' => 'gcp_create_modal_error',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания ГЦП.</h3>',
+    ]);
+    ?>
+
+    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+        Вернитесь к подтверждению проблемы сегмента.
+    </h4>
+
+    <?php Modal::end(); ?>
+
+
+
+    <?php foreach ($models as $model) : ?>
+
+        <?php
+        // Модальное окно - редактирование описания ГЦП
         Modal::begin([
             'options' => [
-                'id' => 'data_segment_modal',
-                'class' => 'data_segment_modal',
+                'id' => "update_description_modal-$model->id",
+                'class' => 'update_description_modal',
             ],
             'size' => 'modal-lg',
-            'header' => '<h3 class="text-center">Информация о сегменте</h3>',
+            'header' => '<h3 class="text-center" style="color: #4F4F4F; font-weight: 700;">Редактирование гипотезы ценностного предложения - '. $model->title .'</h3>',
         ]);
         ?>
 
-        <?= $segment->allInformation; ?>
+        <?php
+        $form = ActiveForm::begin([
+            'id' => "form_update_description-$model->id",
+            'action' => "/gcp/update?id=$model->id",
+            'options' => ['class' => 'g-py-15 gcpUpdateForm'],
+            'errorCssClass' => 'u-has-error-v1',
+            'successCssClass' => 'u-has-success-v1-1',
+            ]);
+        ?>
+
+        <div class="row" style="color: #4F4F4F;">
+            <div class="col-md-12">
+
+                <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание гипотезы ценностного предложения')->textarea([
+                    'rows' => 4,
+                    'required' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]);
+                ?>
+
+            </div>
+        </div>
+
+        <div class="form-group row container-fluid">
+            <?= Html::submitButton('Сохранить', [
+                'class' => 'btn btn-success pull-right',
+                'style' => [
+                    'color' => '#FFFFFF',
+                    'background' => '#52BE7F',
+                    'padding' => '0 7px',
+                    'width' => '140px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '8px',
+                ]
+            ]) ?>
+        </div>
 
         <?php
-        Modal::end();
-    ?>
-
-
-    <?php
-    // Модальное окно - информация о заполнении выгоды
-    Modal::begin([
-        'options' => [
-            'id' => 'information_benefit_modal',
-            'class' => 'information_benefit_modal',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-    ]);
-    ?>
-
-    <div style="color: #F2F2F2; padding: 0 30px; font-size: 18px;">
-
-        <p>Все выгоды формулируются по трем критериям:</p>
-
-        <p>- временной фактор,</p>
-
-        <p>- экономический фактор,</p>
-
-        <p>- качественный фактор.</p>
-
-        <p>Первые два параметра выгоды должны быть исчисляемыми.</p>
-
-        <p>Параметр качества(исчисляемый /лаконичный текст).</p>
-
-    </div>
-
-    <?php
-    Modal::end();
-    ?>
-
-
-
-    <?php
-    // Модальное окно - информация о заполнении выгоды
-    Modal::begin([
-        'options' => [
-            'id' => 'information_contrast_modal',
-            'class' => 'information_contrast_modal',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Укажите параметры аналога, с которыми сравниваются параметры нового продукта:</h4>
-
-    <?php
-    Modal::end();
-    ?>
-
-
-    <?php
-
-    foreach ($models as $model) :
-    // Модальное окно - редактирование описания ГЦП
-    Modal::begin([
-        'options' => [
-            'id' => "update_description_modal-$model->id",
-            'class' => 'update_description_modal',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center">Редактирование описания '. $model->title .'</h3>',
-    ]);
-    ?>
-
-    <?php
-        ActiveForm::begin(['id' => "form_update_description-$model->id", 'action' => "/gcp/update?id=$model->id"]);
-    ?>
-
-    <?= $form->field($model, 'description')->label(false)->textarea(['rows' => 6, 'required' => true]); ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-    </div>
-
-    <?php
         ActiveForm::end();
-    ?>
+        ?>
+
+        <?php Modal::end(); ?>
+
+    <?php endforeach; ?>
+
+
+
+
+    <!--Roadmap Project-->
 
     <?php
 
-    Modal::end();
-    endforeach;
-
+    // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapProject',
+            'class' => 'showRoadmapProject',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
+    ]);
     ?>
 
+    <?= $project->showRoadmapProject();?>
+
+    <?php Modal::end(); ?>
+
+
+    <!--Roadmap Segment-->
+
+    <?php
+
+    // Модальное окно - дорожная карта сегмента
+    Modal::begin([
+        'options' => [
+            'id' => 'showRoadmapSegment',
+            'class' => 'showRoadmapSegment',
+        ],
+        'size' => 'modal-lg',
+        'header' => '<div class="roadmap_segment_modal_header_title">
+                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
+                     </div>',
+    ]);
+    ?>
+
+    <?= $segment->showRoadmapSegment();?>
+
+    <?php Modal::end(); ?>
 
 
 
-    <div style="font-style: italic;margin-left: auto;"><span class="bolder">ГЦП*</span> - гипотеза ценностного предложения.</div>
 
 </div>
 
@@ -468,54 +759,75 @@ $script = "
 
     $(document).ready(function() {
     
-        //Фон для модального окна информации при заголовке таблицы
-        var information_modal_problem_view = $('#information-table-problem-view').find('.modal-content');
-        information_modal_problem_view.css('background-color', '#707F99');
+        //Фон для модального окна информации в заголовке при создании ГЦП
+        var information_gcp_create_modal = $('#information_gcp_create').find('.modal-content');
+        information_gcp_create_modal.css('background-color', '#707F99');
         
-        //Фон для модального окна формы создания новой ГЦП
-        var problem_create_modal = $('#problem_create_modal').find('.modal-body');
-        problem_create_modal.css('background-color', '#F2F2F2');
-        
-        //Фон для модального окна формы редактирования описания ГЦП
-        var update_description_modal = $('.update_description_modal').find('.modal-body');
-        update_description_modal.css('background-color', '#F2F2F2');
-        
-        //Фон для модального окна информация о заполнении выгоды в форме создания новой ГЦП
-        var information_benefit_modal = $('#information_benefit_modal').find('.modal-content');
-        information_benefit_modal.css('background-color', '#707F99');
-        
-        //Фон для модального окна информация о заполнении продукта с которым идет сравнение в форме создания новой ГЦП
-        var information_contrast_modal = $('#information_contrast_modal').find('.modal-content');
-        information_contrast_modal.css('background-color', '#707F99');
+        //Фон для модального окна (при создании ГЦП - недостаточно данных)
+        var gcp_create_modal_error = $('#gcp_create_modal_error').find('.modal-content');
+        gcp_create_modal_error.css('background-color', '#707F99');
         
         
-        //Отмена перехода по ссылке
-        $('a.disabled').on('click', false);
+        
+        //Возвращение скролла первого модального окна после закрытия второго
+        $('.modal').on('hidden.bs.modal', function (e) {
+            if($('.modal:visible').length)
+            {
+                $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
+                $('body').addClass('modal-open');
+            }
+        }).on('show.bs.modal', function (e) {
+            if($('.modal:visible').length)
+            {
+                $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
+                $(this).css('z-index', parseInt($('.modal-backdrop.in').first().css('z-index')) + 10);
+            }
+        });
         
     });
     
     
     
-";
-$position = \yii\web\View::POS_READY;
-$this->registerJs($script, $position);
-
-?>
-
-
-<?php
-
-foreach ($models as $model) :
-
-$script2 = "
+    
+    //При попытке добавить ГЦП проверяем существуют ли необходимые данные
+    //Если данных достаточно - показываем окно с формой
+    //Если данных недостаточно - показываем окно с сообщением error
+    $('#checking_the_possibility').on('click', function(){
+    
+        var url = $(this).attr('href');
+        
+        $.ajax({
+        
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                if(response['success']){
+                    $('#gcp_create_modal').modal('show');
+                }else{
+                    $('#gcp_create_modal_error').modal('show');
+                }
+            },
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+        
+        //e.preventDefault();
+        return false;
+    });
+    
+    
     
     //Форма редактирования описания ГЦП
-    $('#form_update_description-$model->id').on('beforeSubmit', function(e){
+    $('.gcpUpdateForm').on('beforeSubmit', function(e){
+    
+        var id = $(this).attr('id');
+        id = id.split('-');
+        id = id[1];
     
         var data = $(this).serialize();
-        var url = $(this).attr('action');
-        
-        var str_description_gcp = $('tr[data-key=\"$model->id\"]').find('td[data-col-seq=\"1\"]').find('div');
+        var url = '/gcp/update?id=' + id;
     
         $.ajax({
             
@@ -527,12 +839,15 @@ $script2 = "
             
                 if(!response['error']){
                 
-                    //Изменить значение строки в таблице ГЦП
-                    str_description_gcp.html(response.description);
-                    
-                    //Закрыть модальное окно с формой редактирования
-                    $('#update_description_modal-". $model->id ."').modal('hide');
+                    $('#update_description_modal-' + id).modal('hide');
+
+                    var description = response.description;
                 
+                    if (description.length > 180) {
+                        description = description.substring(0, 180) + '...';
+                    }
+                    
+                    var column = $('#column_gcp_description-' + id).html('<\div title=\"' + response.description + '\">' + description + '<\/div>');
                 } 
             },
             error: function(){
@@ -544,10 +859,10 @@ $script2 = "
         return false;
     });
     
+    
+    
 ";
 $position = \yii\web\View::POS_READY;
-$this->registerJs($script2, $position);
-
-endforeach;
+$this->registerJs($script, $position);
 
 ?>

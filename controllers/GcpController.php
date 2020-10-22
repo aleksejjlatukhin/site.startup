@@ -113,25 +113,16 @@ class GcpController extends AppController
      */
     public function actionIndex($id)
     {
-        $user = Yii::$app->user->identity;
         $models = Gcp::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => Gcp::find()->where(['confirm_problem_id' => $id]),
-        ]);
-
-
         $formCreateGcp = new FormCreateGcp();
 
         return $this->render('index', [
             'models' => $models,
-            'dataProvider' => $dataProvider,
             'confirmProblem' => $confirmProblem,
             'generationProblem' => $generationProblem,
             'interview' => $interview,

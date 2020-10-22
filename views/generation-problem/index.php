@@ -254,194 +254,194 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
     <div class="container-fluid container-data row">
 
-    <div class="container-fluid row">
+        <div class="container-fluid row">
 
-        <div class="col-md-12" style="padding: 15px 0;">
+            <div class="col-md-12" style="padding: 15px 0;">
 
-            <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая гипотеза проблемы сегмента</div></div>',
-                ['/interview/data-availability-for-next-step', 'id' => $interview->id],
-                ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
-            );
-            ?>
+                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                    ['/interview/data-availability-for-next-step', 'id' => $interview->id],
+                    ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
+                );
+                ?>
 
-        </div>
-
-    </div>
-
-
-    <!--Заголовки для списка проблем-->
-    <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
-
-        <div class="col-md-1 ">
-            <div class="row">
-                <div class="col-md-4" style="padding: 0;"></div>
-                <div class="col-md-8" style="padding: 0;">Номер</div>
             </div>
 
         </div>
 
-        <div class="col-md-7">Описание гипотезы</div>
 
-        <div class="col-md-1 text-center"><div>Дата создания</div></div>
+        <!--Заголовки для списка проблем-->
+        <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
 
-        <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
+            <div class="col-md-1 ">
+                <div class="row">
+                    <div class="col-md-4" style="padding: 0;"></div>
+                    <div class="col-md-8" style="padding: 0;">Номер</div>
+                </div>
 
-        <div class="col-md-2"></div>
+            </div>
 
-    </div>
+            <div class="col-md-7">Описание гипотезы проблемы сегмента</div>
+
+            <div class="col-md-1 text-center"><div>Дата создания</div></div>
+
+            <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
+
+            <div class="col-md-2"></div>
+
+        </div>
 
 
-    <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
+        <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
 
-        <!--Данные для списка проблем-->
-        <?php foreach ($models as $model) : ?>
+            <!--Данные для списка проблем-->
+            <?php foreach ($models as $model) : ?>
 
-            <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
+                <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
 
-                <div class="col-md-1">
-                    <div class="row">
+                    <div class="col-md-1">
+                        <div class="row">
 
-                        <div class="col-md-4" style="padding: 0;">
+                            <div class="col-md-4" style="padding: 0;">
 
-                            <?php
-                            if ($model->exist_confirm === 1) {
+                                <?php
+                                if ($model->exist_confirm === 1) {
 
-                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                            }elseif ($model->exist_confirm === null && empty($model->confirm)) {
+                                }elseif ($model->exist_confirm === null && empty($model->confirm)) {
 
-                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                            }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
+                                }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
 
-                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                            }elseif ($model->exist_confirm === 0) {
+                                }elseif ($model->exist_confirm === 0) {
 
-                                echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                            }
-                            ?>
+                                }
+                                ?>
 
-                        </div>
+                            </div>
 
-                        <div class="col-md-8" style="padding: 0;">
+                            <div class="col-md-8" style="padding: 0 0 0 5px;">
 
-                            <?= $model->title; ?>
+                                <?= $model->title; ?>
 
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-7" id="column_problem_description-<?=$model->id;?>">
+                    <div class="col-md-7" id="column_problem_description-<?=$model->id;?>">
 
-                    <?php
-                        $problem_desc = $model->description;
-                        if (mb_strlen($problem_desc) > 180) {
-                            $problem_desc = mb_substr($model->description, 0, 180) . '...';
-                        }
-                    ?>
+                        <?php
+                            $problem_desc = $model->description;
+                            if (mb_strlen($problem_desc) > 180) {
+                                $problem_desc = mb_substr($model->description, 0, 180) . '...';
+                            }
+                        ?>
 
-                    <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
+                        <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
 
-                </div>
+                    </div>
 
-                <div class="col-md-1 text-center">
+                    <div class="col-md-1 text-center">
 
-                    <?= date("d.m.y", $model->created_at); ?>
+                        <?= date("d.m.y", $model->created_at); ?>
 
-                </div>
+                    </div>
 
-                <div class="col-md-1 text-center">
+                    <div class="col-md-1 text-center">
 
-                    <?php if ($model->time_confirm) : ?>
-                        <?= date("d.m.y", $model->time_confirm); ?>
-                    <?php endif; ?>
+                        <?php if ($model->time_confirm) : ?>
+                            <?= date("d.m.y", $model->time_confirm); ?>
+                        <?php endif; ?>
 
-                </div>
+                    </div>
 
 
-                <div class="col-md-2">
+                    <div class="col-md-2">
 
-                    <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
+                        <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
 
-                        <div style="margin-right: 25px;">
+                            <div style="margin-right: 25px;">
 
-                            <?php if ($model->confirm) : ?>
+                                <?php if ($model->confirm) : ?>
 
-                                <?= Html::a('Далее', ['/confirm-problem/view', 'id' => $model->confirm->id], [
-                                    'class' => 'btn btn-default',
-                                    'style' => [
-                                        'display' => 'flex',
-                                        'align-items' => 'center',
-                                        'justify-content' => 'center',
-                                        'color' => '#FFFFFF',
-                                        'background' => '#52BE7F',
-                                        'width' => '120px',
-                                        'height' => '40px',
-                                        'font-size' => '18px',
-                                        'border-radius' => '8px',
-                                    ]
-                                ]);
-                                ?>
+                                    <?= Html::a('Далее', ['/confirm-problem/view', 'id' => $model->confirm->id], [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'color' => '#FFFFFF',
+                                            'background' => '#52BE7F',
+                                            'width' => '120px',
+                                            'height' => '40px',
+                                            'font-size' => '18px',
+                                            'border-radius' => '8px',
+                                        ]
+                                    ]);
+                                    ?>
 
-                            <?php else : ?>
+                                <?php else : ?>
 
-                                <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
-                                    'class' => 'btn btn-default',
-                                    'style' => [
-                                        'display' => 'flex',
-                                        'align-items' => 'center',
-                                        'justify-content' => 'center',
-                                        'color' => '#FFFFFF',
-                                        'background' => '#707F99',
-                                        'width' => '120px',
-                                        'height' => '40px',
-                                        'font-size' => '18px',
-                                        'border-radius' => '8px',
-                                    ]
-                                ]);
-                                ?>
+                                    <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'display' => 'flex',
+                                            'align-items' => 'center',
+                                            'justify-content' => 'center',
+                                            'color' => '#FFFFFF',
+                                            'background' => '#707F99',
+                                            'width' => '120px',
+                                            'height' => '40px',
+                                            'font-size' => '18px',
+                                            'border-radius' => '8px',
+                                        ]
+                                    ]);
+                                    ?>
 
-                            <?php endif; ?>
+                                <?php endif; ?>
 
-                        </div>
+                            </div>
 
-                        <div>
+                            <div>
 
-                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                                <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                        'class' => '',
+                                        'title' => 'Редактировать',
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#problem_update_modal-' . $model->id,
+                                    ]); ?>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <div >
+
+                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
                                     'class' => '',
-                                    'title' => 'Редактировать',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => '#problem_update_modal-' . $model->id,
+                                    'title' => 'Удалить',
+                                    'onclick' => 'return false',
                                 ]); ?>
 
-                            <?php endif; ?>
-
-                        </div>
-
-                        <div >
-
-                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                'class' => '',
-                                'title' => 'Удалить',
-                                'onclick' => 'return false',
-                            ]); ?>
+                            </div>
 
                         </div>
 
                     </div>
 
+
                 </div>
 
+            <?php endforeach; ?>
 
-            </div>
-
-        <?php endforeach; ?>
-
-    </div>
+        </div>
 
     </div>
 
