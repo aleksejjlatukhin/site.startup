@@ -10,15 +10,16 @@ class Roadmap extends PropertyContainer
     public function __construct($id)
     {
         $segment = Segment::findOne($id);
+        $confirm_segment = Segment::find()->where(['id' => $id, 'exist_confirm' =>  1])->one();
 
         $last_gps = GenerationProblem::find()->where(['interview_id' => $segment->interview->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_gps = GenerationProblem::find()->where(['interview_id' => $segment->interview->id])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        $first_confirm_gps = GenerationProblem::find()->where(['interview_id' => $segment->interview->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
         $last_gcp = Gcp::find()->where(['segment_id' => $segment->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_gcp = Gcp::find()->where(['segment_id' => $segment->id])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        $first_confirm_gcp = Gcp::find()->where(['segment_id' => $segment->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
         $last_gmvp = Mvp::find()->where(['segment_id' => $segment->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_gmvp = Mvp::find()->where(['segment_id' => $segment->id])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        $first_confirm_gmvp = Mvp::find()->where(['segment_id' => $segment->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
         $this->addProperty('created_at', $segment->created_at);
         $this->addProperty('plan_segment_confirm', ($segment->created_at + 3600*24*30));
@@ -29,7 +30,7 @@ class Roadmap extends PropertyContainer
         $this->addProperty('plan_gmvp', ($segment->created_at + 3600*24*180));
         $this->addProperty('plan_gmvp_confirm', ($segment->created_at + 3600*24*210));
 
-        $this->addProperty('fact_segment_confirm', $segment->time_confirm);
+        $this->addProperty('fact_segment_confirm', $confirm_segment->time_confirm);
         $this->addProperty('fact_gps', $last_gps->created_at);
         $this->addProperty('fact_gps_confirm', $first_confirm_gps->time_confirm);
         $this->addProperty('fact_gcp', $last_gcp->created_at);

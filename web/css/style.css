@@ -1040,12 +1040,12 @@ progress.info-red::-moz-progress-bar{
 }
 
 .navigation_block:nth-child(7) > div:nth-child(2) {
-    padding-right: 25px;
-    padding-left: 5px;
+    padding-right: 30px;
+    padding-left: 15px;
 }
 .navigation_block:nth-child(8) > div:nth-child(2) {
-    padding-right: 10px;
-    padding-left: 5px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
 .navigation_block:nth-child(9) > div:nth-child(2) {
     padding-right: 15px;
@@ -1055,13 +1055,13 @@ progress.info-red::-moz-progress-bar{
 @media screen and (min-width: 1400px) {
 
     .navigation_block:nth-child(8) > div:nth-child(2) {
-        padding-right: 25px;
-        padding-left: 5px;
+        padding-right: 20px;
+        padding-left: 20px;
     }
 
     .navigation_block:nth-child(9) > div:nth-child(2) {
-        padding-right: 25px;
-        padding-left: 5px;
+        padding-right: 20px;
+        padding-left: 10px;
     }
 }
 
@@ -1074,12 +1074,12 @@ progress.info-red::-moz-progress-bar{
 
     .navigation_block:nth-child(7) > div:nth-child(2) {
         padding-right: 35px;
-        padding-left: 5px;
+        padding-left: 20px;
     }
 
     .navigation_block:nth-child(9) > div:nth-child(2) {
-        padding-right: 35px;
-        padding-left: 5px;
+        padding-right: 30px;
+        padding-left: 15px;
     }
 
     .navigation_block > .stage_number {
@@ -1109,18 +1109,18 @@ progress.info-red::-moz-progress-bar{
     }
 
     .navigation_block:nth-child(7) > div:nth-child(2) {
-        padding-right: 55px;
-        padding-left: 5px;
+        padding-right: 50px;
+        padding-left: 30px;
     }
 
     .navigation_block:nth-child(8) > div:nth-child(2) {
-        padding-right: 45px;
-        padding-left: 5px;
+        padding-right: 30px;
+        padding-left: 30px;
     }
 
     .navigation_block:nth-child(9) > div:nth-child(2) {
-        padding-right: 55px;
-        padding-left: 5px;
+        padding-right: 40px;
+        padding-left: 30px;
     }
 
     .navigation_block > .stage_number {
@@ -1807,5 +1807,42 @@ input[type="checkbox"]:checked + label:before {
     font-family: 'RobotoCondensed-Bold', 'serif';
 }
 /*Жирный шрифт
+---Конец---
+*/
+
+/*Стили для стрелки у ссылки с хлебными крошками
+---Начало---
+*/
+.arrow_link {
+    width: 15px;
+    height: 12px;
+    display: inline-block;
+    position: relative;
+    margin: 0 1rem;
+}
+.arrow_link > span {
+    top: .5rem;
+    position: absolute;
+    width: 9px;
+    height: 1px;
+    background-color: #efefef;
+    display: inline-block;
+    transition: all .5s ease;
+}
+.arrow_link > span:first-of-type {
+    left: 0;
+    transform: rotate(45deg);
+}
+.arrow_link > span:last-of-type {
+    right: 0;
+    transform: rotate(-45deg);
+}
+.arrow_link.active_arrow_link > span:first-of-type {
+    transform: rotate(-45deg);
+}
+.arrow_link.active_arrow_link > span:last-of-type {
+    transform: rotate(45deg);
+}
+/*Стили для стрелки у ссылки с хлебными крошками
 ---Конец---
 */

@@ -12,13 +12,6 @@ use app\models\Segment;
 use kartik\select2\Select2;
 
 $this->title = 'Подтверждение гипотезы проблемы сегмента';
-$this->params['breadcrumbs'][] = ['label' => 'Мои проекты', 'url' => ['projects/index', 'id' => $project->user_id]];
-$this->params['breadcrumbs'][] = ['label' => $project->project_name, 'url' => ['projects/view', 'id' => $project->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Генерация ГЦС', 'url' => ['segment/index', 'id' => $project->id]];
-$this->params['breadcrumbs'][] = ['label' => $segment->name, 'url' => ['segment/view', 'id' => $segment->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Программа генерации ГПС', 'url' => ['interview/view', 'id' => $interview->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Описание: ' . $problem->title, 'url' => ['generation-problem/view', 'id' => $problem->id]];
-$this->params['breadcrumbs'][] = $this->title;
 
 $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 ?>
@@ -30,30 +23,30 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
     <div class="row project_info_data">
 
 
-        <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
+        <div class="col-xs-12 col-md-12 col-lg-4 project_name">
+            <span>Проект:</span>
             <?= $project->project_name; ?>
         </div>
 
         <?= Html::a('Данные проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header',
             'data-toggle' => 'modal',
             'data-target' => "#data_project_modal",
         ]) ?>
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'onclick' => 'return false',
         ]) ?>
 
         <?= Html::a('Дорожная карта проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'data-toggle' => 'modal',
             'data-target' => "#showRoadmapProject",
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'onclick' => 'return false',
         ]) ?>
 
@@ -94,12 +87,12 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
         <div class="no_transition_navigation_block navigation_block">
             <div class="stage_number">7</div>
-            <div>Разработка гипотез MVP</div>
+            <div>Разработка MVP</div>
         </div>
 
         <div class="no_transition_navigation_block navigation_block">
             <div class="stage_number">8</div>
-            <div>Подтверждение гипотез MVP</div>
+            <div>Подтверждение MVP</div>
         </div>
 
         <div class="no_transition_navigation_block navigation_block">
@@ -112,46 +105,53 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
     <div class="row segment_info_data">
 
-        <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-
-            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
+        <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
 
             <?php
             $segment_name = $segment->name;
-            if (mb_strlen($segment_name) > 25){
-                $segment_name = mb_substr($segment_name, 0, 25) . '...';
+            if (mb_strlen($segment_name) > 15){
+                $segment_name = mb_substr($segment_name, 0, 15) . '...';
+            }
+
+            $problem_description = $problem->description;
+            if (mb_strlen($problem_description) > 50){
+                $problem_description = mb_substr($problem_description, 0, 50) . '...';
             }
             ?>
 
-            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
-
-
-
-            <span style="padding-left: 30px; padding-right: 10px; font-weight: 400; font-size: 20px;">Проблема:</span>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
             <?php
-            $problem_desc = $problem->description;
-            if (mb_strlen($problem_desc) > 25){
-                $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
+            $problem_description = $problem->description;
+            if (mb_strlen($problem_description) > 100){
+                $problem_description = mb_substr($problem_description, 0, 100) . '...';
             }
             ?>
 
-            <?= '<span title="'.$problem->description.'">' . $problem_desc . '</span>'; ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
         </div>
 
         <?= Html::a('Данные сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links',
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header',
             'data-toggle' => 'modal',
             'data-target' => '#data_segment_modal',
         ]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header text-center',
             'data-toggle' => 'modal',
             'data-target' => "#showRoadmapSegment",
         ]) ?>
 
+    </div>
+
+
+    <div class="row block_description_stage">
+        <div>Наименование сегмента:</div>
+        <div><?= $segment->name;?></div>
+        <div>Формулировка проблемы:</div>
+        <div><?= $problem->description;?></div>
     </div>
 
 
@@ -527,7 +527,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
                 <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для анкеты</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'data-toggle' => 'modal',
@@ -892,7 +892,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Пройдите последовательно этапы подтверждения гипотезы проблемы сегмента. Далее переходите к генерации гипотез ценностных предложений.
+        Пройдите последовательно этапы подтверждения гипотезы проблемы сегмента. Далее переходите к разработке гипотез ценностных предложений.
     </h4>
 
     <?php
@@ -963,7 +963,6 @@ $script = "
         information_add_new_responds.css('background-color', '#707F99');
         
         //Добавляем одинаковую высоту для элементов меню 
-        //таблицы - Программа генерации ГПС 
         //равную высоте родителя
         $('.block-link-create-interview', this).each(function(){
             var height = $(this).height();

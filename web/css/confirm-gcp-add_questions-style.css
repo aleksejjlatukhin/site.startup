@@ -1,4 +1,4 @@
-.interview-add-questions {
+.confirm-gcp-add_questions {
 
 }
 
@@ -22,11 +22,23 @@
 .stage_name_row {
     color: #ffffff;
     font-size: 18px;
+}
+
+.block_description_stage {
+    opacity: 0;
+    max-height: 0;
+    border-radius: 0 0 12px 12px;
+    background: #7F9FC5;
+    line-height: 20px;
+    color: #ffffff;
+}
+.block_description_stage > div:first-child {
     font-weight: 700;
 }
-.stage_name_row > span {
-    padding-right: 5px;
-    font-weight: 400;
+.block_description_stage > div:nth-child(3),
+.block_description_stage > div:nth-child(5) {
+    font-weight: 700;
+    padding-top: 10px;
 }
 
 .link_in_the_header {
@@ -45,6 +57,41 @@
 .link_in_the_header:focus {
     color: #ffffff;
     text-decoration: none;
+}
+
+a.view_block_description {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #ffffff;
+}
+a.view_block_description:hover {
+    -moz-transition: .8s ease;
+    -webkit-transition: .8s ease;
+    -o-transition: .8s ease;
+    transition: .8s ease;
+    text-decoration: none;
+    color: #ffffff;
+}
+a.view_block_description:focus {
+    text-decoration: none;
+    color: #ffffff;
+}
+a.view_block_description > div {
+    font-weight: 700;
+    padding-left: 7px;
+    padding-right: 5px;
+}
+
+@media screen and (min-width: 1900px) {
+    #view_desc_stage_width_max_1900 {
+        display: none;
+    }
+}
+@media screen and (max-width: 1899px) {
+    #view_desc_stage_width_min_1900 {
+        display: none;
+    }
 }
 
 .add_new_question_button {
@@ -104,53 +151,6 @@
     border-bottom: 1px solid #ccc;
 }
 
-/*Стили для формы добавления вопроса
----Начало---
-*/
-form#addNewQuestion {
-    position: relative;
-}
-
-input#add_text_question_confirm {
-    outline: none; /* Убираем свечение в Chrome и Safari */
-    -webkit-appearance: none; /* Убираем рамку в Chrome и Safari */
-    box-shadow: none; /* Убираем тень в Firefox */
-    padding-right: 40px;
-}
-
-a#button_add_text_question_confirm {
-    position: absolute;
-    right: 17px;
-    top: 2px;
-    background-color: #fff;
-    border-radius: 0 12px 12px 0;
-    border-width: 0 0 0 1px;
-    border-color: rgb(136, 136, 136);
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    z-index: 30;
-}
-a#button_add_text_question_confirm:focus {
-    box-shadow: none;
-}
-.triangle-bottom {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 5px solid rgb(136, 136, 136);
-}
-@media screen and (max-width: 768px) {
-
-    #submit_addNewQuestion {
-        margin-top: 55px;
-    }
-}
-/*Стили для формы добавления вопроса
----Конец---
-*/
-
 @media screen and (min-width: 1140px) {
 
     .project_info_data {
@@ -205,3 +205,50 @@ a#button_add_text_question_confirm:focus {
         padding-bottom: 15px;
     }
 }
+
+/*Стили для формы добавления вопроса
+---Начало---
+*/
+form#addNewQuestion {
+    position: relative;
+}
+
+input#add_text_question_confirm {
+    outline: none; /* Убираем свечение в Chrome и Safari */
+    -webkit-appearance: none; /* Убираем рамку в Chrome и Safari */
+    box-shadow: none; /* Убираем тень в Firefox */
+    padding-right: 40px;
+}
+
+a#button_add_text_question_confirm {
+    position: absolute;
+    right: 17px;
+    top: 2px;
+    background-color: #fff;
+    border-radius: 0 12px 12px 0;
+    border-width: 0 0 0 1px;
+    border-color: rgb(136, 136, 136);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    z-index: 30;
+}
+a#button_add_text_question_confirm:focus {
+    box-shadow: none;
+}
+.triangle-bottom {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid rgb(136, 136, 136);
+}
+@media screen and (max-width: 768px) {
+
+    #submit_addNewQuestion {
+        margin-top: 55px;
+    }
+}
+/*Стили для формы добавления вопроса
+---Конец---
+*/

@@ -22,7 +22,6 @@ class FormUpdateConfirmProblem extends Model
     public function rules()
     {
         return [
-            //[['count_respond', 'count_positive', 'need_consumer'], 'required'],
             [['gps_id'], 'integer'],
             ['need_consumer', 'trim'],
             [['need_consumer'], 'string', 'max' => 255],

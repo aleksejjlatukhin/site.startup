@@ -18,7 +18,7 @@ class QuestionsConfirmProblem extends ActiveRecord
         return 'questions_confirm_problem';
     }
 
-    public function getConfirmProblem ()
+    public function getConfirm ()
     {
         return $this->hasOne(ConfirmProblem::class, ['id' => 'confirm_problem_id']);
     }

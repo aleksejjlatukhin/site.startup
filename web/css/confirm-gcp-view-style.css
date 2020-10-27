@@ -1,4 +1,4 @@
-.confirm-problem-view {
+.confirm-gcp-view {
 
 }
 
@@ -36,7 +36,8 @@
 .block_description_stage > div:first-child {
     font-weight: 700;
 }
-.block_description_stage > div:nth-child(3) {
+.block_description_stage > div:nth-child(3),
+.block_description_stage > div:nth-child(5){
     font-weight: 700;
     padding-top: 10px;
 }

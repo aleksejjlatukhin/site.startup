@@ -25,7 +25,7 @@ class Questions extends \yii\db\ActiveRecord
         return 'questions';
     }
 
-    public function getInterview()
+    public function getConfirm()
     {
         return $this->hasOne(Interview::class, ['id' => 'interview_id']);
     }

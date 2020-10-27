@@ -105,20 +105,6 @@ class ConfirmProblemController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-
-        $queryResponds = RespondsConfirm::find()->where(['confirm_problem_id' => $id]);
-        $dataProviderQueryResponds = new ActiveDataProvider([
-            'query' => $queryResponds,
-            'pagination' => false,
-            //'pagination' => ['pageSize' => 10],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
-
         $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id])->all();
 
         $newQuestion = new QuestionsConfirmProblem();
@@ -153,7 +139,6 @@ class ConfirmProblemController extends AppController
             'segment' => $segment,
             'project' => $project,
             'responds' => $responds,
-            'dataProviderQueryResponds' => $dataProviderQueryResponds,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'newRespond' => $newRespond,
@@ -167,7 +152,7 @@ class ConfirmProblemController extends AppController
 
 
 
-    /*Проверка данных подтверждения на этапе генерации ГПС*/
+    /*Проверка данных подтверждения на этапе разработки ГЦП*/
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmProblem::findOne($id);
@@ -356,16 +341,6 @@ class ConfirmProblemController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['generation-problem/view', 'id' => $generationProblem->id]);
-            }
-        }
 
 
         if (!empty($generationProblem->confirm)){
@@ -477,18 +452,6 @@ class ConfirmProblemController extends AppController
         $interview = Interview::findOne(['id' => $problem->interview_id]);
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
-
-        $dataProviderQuestions = new ActiveDataProvider([
-            'query' => QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id]),
-            'pagination' => false,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'title' => SORT_ASC,
-                ]
-            ],
-        ]);
-
         $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id])->all();
 
         $newQuestion = new QuestionsConfirmProblem();
@@ -500,7 +463,6 @@ class ConfirmProblemController extends AppController
 
         return $this->render('add-questions', [
             'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
-            'dataProviderQuestions' => $dataProviderQuestions,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
@@ -518,9 +480,7 @@ class ConfirmProblemController extends AppController
     {
         $confirmProblem = ConfirmProblem::findOne($id);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
-
         $model = new QuestionsConfirmProblem();
         $model->confirm_problem_id = $id;
 

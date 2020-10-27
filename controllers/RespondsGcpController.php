@@ -350,6 +350,7 @@ class RespondsGcpController extends AppController
      */
     public function actionCreate($id)
     {
+        $models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -357,10 +358,8 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
+        $limit_count_respond = 100;
 
-
-        $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         $newRespond = new RespondsGcp();
         $newRespond->confirm_gcp_id = $id;
 
@@ -375,30 +374,42 @@ class RespondsGcpController extends AppController
             }
 
             if(Yii::$app->request->isAjax) {
-                if ($kol == 0) {
-                    if ($newRespond->save()) {
 
-                        $newRespond->addAnswersForNewRespond();
+                if (count($models) < $limit_count_respond) {
 
-                        $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
-                        $confirmGcp->save();
+                    if ($kol == 0) {
 
-                        if ($project->save()) {
+                        if ($newRespond->save()) {
 
-                            $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
+                            $newRespond->addAnswersForNewRespond();
 
-                            $response =  [
-                                'newRespond' => $newRespond,
-                                'responds' => $responds,
-                            ];
+                            $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
+                            $confirmGcp->save();
 
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
+                            $project->updated_at = time();
+
+                            if ($project->save()) {
+
+                                $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
+
+                                $response = [
+                                    'newRespond' => $newRespond,
+                                    'responds' => $responds,
+                                ];
+
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
                         }
+                    } else {
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 } else {
-                    $response = ['error' => true];
+                    $response = ['limit_count_respond' => true];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
                     return $response;
@@ -427,18 +438,14 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-
         $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
 
         if ($updateRespondForm->load(Yii::$app->request->post())) {
 
             $kol = 0;
             foreach ($models as $item){
-                if ($updateRespondForm->id !== $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
                     $kol++;
                 }
             }
@@ -448,6 +455,8 @@ class RespondsGcpController extends AppController
                 if ($kol == 0){
 
                     if ($updateRespondForm->updateRespond($model)){
+
+                        $project->updated_at = time();
 
                         if ($project->save()){
 
@@ -469,7 +478,7 @@ class RespondsGcpController extends AppController
 
 
 
-    public function actionDeleteRespond ($id) {
+    public function actionDelete ($id) {
 
         $model = RespondsGcp::findOne($id);
         $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
@@ -484,23 +493,28 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
 
-
-        if ($confirmGcp->count_respond == $confirmGcp->count_positive){
-
-            Yii::$app->session->setFlash('error', "Общее количество респондентов не должно быть меньше количества респондентов подтверждающих ценностное предложение!");
-            return $this->redirect(['/responds-gcp/index', 'id' => $confirmGcp->id]);
-        }
-
-        if (count($responds) == 1){
-
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['/responds-gcp/index', 'id' => $confirmGcp->id]);
-        }
 
         if (Yii::$app->request->isAjax){
+
+            if (count($responds) == 1){
+
+                $response = ['zero_value_responds' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+
+            if ($confirmGcp->count_respond == $confirmGcp->count_positive){
+
+                $response = ['number_less_than_allowed' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
+            $project->updated_at = time();
 
             if ($project->save()) {
 
@@ -518,72 +532,14 @@ class RespondsGcpController extends AppController
                     $confirmGcp->save();
                 }
 
-                return $this->renderList($id = $confirmGcp->id);
+                $response = ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
             }
 
         }
         return false;
-    }
-
-
-    /**
-     * Deletes an existing RespondsGcp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
-
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-
-        if (count($responds) == 1){
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($confirmGcp->count_respond == $confirmGcp->count_positive){
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества позитивных интервью!");
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        if ($project->save()){
-            Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
-
-            if ($descInterview){
-                $descInterview->delete();
-            }
-
-            if ($model->delete()){
-                $confirmGcp->count_respond = $confirmGcp->count_respond -1;
-                $confirmGcp->save();
-            }
-            return $this->redirect(['confirm-gcp/view', 'id' => $confirmGcp->id]);
-        }
-
     }
 
     /**

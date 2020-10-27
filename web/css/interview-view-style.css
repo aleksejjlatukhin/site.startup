@@ -5,33 +5,44 @@
 .project_info_data {
     background: #707F99;
 }
+.project_name {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+}
+.project_name > span {
+    padding-right: 5px;
+    font-weight: 400;
+}
 
 .segment_info_data {
     border-radius: 0 0 12px 12px;
     background: #707F99;
 }
-
-.project_name_link {
+.stage_name_row {
     color: #ffffff;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
-    padding: 8px 10px;
 }
-.segment_header_links {
+.stage_name_row > span {
+    padding-right: 5px;
+    font-weight: 400;
+}
+
+.link_in_the_header {
     color: #ffffff;
-    padding: 14px 10px;
     font-size: 16px;
     text-decoration: none;
 }
-.segment_header_links:hover {
+.link_in_the_header:hover {
     color: #ffffff;
     text-decoration: none;
 }
-.segment_header_links:visited {
+.link_in_the_header:visited {
     color: #ffffff;
     text-decoration: none;
 }
-.segment_header_links:focus {
+.link_in_the_header:focus {
     color: #ffffff;
     text-decoration: none;
 }
@@ -172,45 +183,6 @@
     text-decoration: none;
 }
 
-@media screen and (min-width: 1140px) {
-    .segment_header_links {
-        text-align: right;
-    }
-}
-
-@media screen and (max-width: 1140px) {
-
-    .project_name_link {
-        text-align: center;
-    }
-
-    .segment_header_links {
-        text-align: center;
-        padding: 0 10px 15px 10px;
-    }
-
-    .block-buttons-update-data-confirm {
-        text-align: left;
-    }
-
-}
-
-@media screen and (max-width: 768px) {
-
-    .segment_header_links {
-        text-align: center;
-        padding: 0 10px 5px 10px;
-    }
-
-    .project_info_data > .segment_header_links:last-child {
-        padding-bottom: 15px;
-    }
-
-    .segment_info_data > .segment_header_links:last-child {
-        padding-bottom: 15px;
-    }
-}
-
 
 /*Стили для формы добавления вопроса
 ---Начало---
@@ -258,3 +230,59 @@ a#button_add_text_question_confirm:focus {
 /*Стили для формы добавления вопроса
 ---Конец---
 */
+
+@media screen and (min-width: 1140px) {
+
+    .project_info_data {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+    }
+
+    .segment_info_data {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+    }
+
+    .link_in_the_header {
+        text-align: right;
+    }
+}
+
+@media screen and (max-width: 1140px) {
+
+    .project_name {
+        text-align: center;
+    }
+
+    .stage_name_row {
+        text-align: center;
+    }
+
+    .link_in_the_header {
+        text-align: center;
+        padding: 0 10px 15px 10px;
+    }
+
+    .block-buttons-update-data-confirm {
+        text-align: left;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+
+    .link_in_the_header {
+        text-align: center;
+        padding: 0 10px 5px 10px;
+    }
+
+    .project_info_data > .link_in_the_header:last-child {
+        padding-bottom: 15px;
+    }
+
+    .segment_info_data > .link_in_the_header:last-child {
+        padding-bottom: 15px;
+    }
+}

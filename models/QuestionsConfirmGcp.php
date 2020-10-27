@@ -18,7 +18,7 @@ class QuestionsConfirmGcp extends ActiveRecord
         return 'questions_confirm_gcp';
     }
 
-    public function getConfirmProblem ()
+    public function getConfirm ()
     {
         return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
     }

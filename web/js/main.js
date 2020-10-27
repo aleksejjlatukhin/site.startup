@@ -1,21 +1,35 @@
 
 $(document).ready(function() {
 
-    //Добавить сегмент
+    // Показать описание стадии
     /*--------------------------------------------*/
-    $('.open_fast').click(function () {
-        $('.popap_fast').addClass('active');
-        $('.open_fast').addClass('active');
+    $('.view_desc_stage').hover(function() {
+        $('.arrow_link').find('span').css({
+            'height': '2px',
+            'transition': 'all 0.2s ease',
+        });
+    }).mouseleave(function(){
+        $('.arrow_link').find('span').css({
+            'height': '1px',
+            'transition': 'all 0.2s ease',
+        });
+    }).on('click', function() {
+        $('.arrow_link').toggleClass('active_arrow_link');
+        if ($('.arrow_link').hasClass('active_arrow_link')) {
+            $('.segment_info_data').css('border-radius', '0');
+            $('.block_description_stage').css({
+                'opacity': '1',
+                'max-height': '1000px',
+                'padding': '15px',
+                'transition': 'max-height 0.5s ease',
+            });
+        } else {
+            $('.block_description_stage').css('max-height', '0');
+            setTimeout(function() {$('.segment_info_data').css('border-radius', '0 0 12px 12px');}, 500);
+            setTimeout(function() {$('.block_description_stage').css({'padding': '0', 'opacity': '0',});}, 400);
+        }
     });
-
-    $('.cross-out').click(function () {
-        $('.popap_fast').removeClass('active');
-        $('.open_fast').removeClass('active');
-    });
-
-    $('.link-del').click(function () {
-        $('.feed-exp').addClass('active');
-    });
+    /*--------------------------------------------*/
 
 
     //Показать и скрыть данные

@@ -2,37 +2,33 @@
 
 }
 
-tbody > tr .TableSegments {
-    background: #F2F2F2;
-    height: 80px;
-}
-
 .project_info_data {
     background: #707F99;
 }
-
-.project_name_link {
+.project_name {
     color: #ffffff;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
-    padding: 8px 10px;
+}
+.project_name > span {
+    padding-right: 5px;
+    font-weight: 400;
 }
 
-.segment_header_links {
+.link_in_the_header {
     color: #ffffff;
-    padding: 14px 10px;
     font-size: 16px;
     text-decoration: none;
 }
-.segment_header_links:hover {
+.link_in_the_header:hover {
     color: #ffffff;
     text-decoration: none;
 }
-.segment_header_links:visited {
+.link_in_the_header:visited {
     color: #ffffff;
     text-decoration: none;
 }
-.segment_header_links:focus {
+.link_in_the_header:focus {
     color: #ffffff;
     text-decoration: none;
 }
@@ -59,7 +55,6 @@ tbody > tr .TableSegments {
     align-items: center;
     padding: 5px 10px 5px 0;
 }
-
 
 .new_segment_link_plus {
     color: #52BE7F;
@@ -101,17 +96,8 @@ tbody > tr .TableSegments {
     background: #E0E0E0;
 }
 
-@media screen and (min-width: 1140px) {
-
-    .container-one_hypothesis {
-        display: flex;
-        align-items: center;
-    }
-}
-
 .container-name_link {
     color: #4F4F4F;
-    /*padding-left: 10px;*/
 }
 
 .container-name_link:hover {
@@ -122,44 +108,6 @@ tbody > tr .TableSegments {
 .container-name_link:focus {
     color: #4F4F4F;
     text-decoration: none;
-}
-
-@media screen and (min-width: 1140px) {
-    .segment_header_links {
-        text-align: right;
-    }
-}
-
-@media screen and (max-width: 1140px) {
-
-    .project_name_link {
-        text-align: center;
-    }
-
-    .segment_header_links {
-        text-align: center;
-        padding: 0 10px 15px 10px;
-    }
-
-    .new_segment_link_block {
-        padding-left: 20px;
-    }
-}
-
-@media screen and (max-width: 768px) {
-
-    .segment_header_links {
-        text-align: center;
-        padding: 0 10px 5px 10px;
-    }
-
-    .segment_header_links:last-child {
-        padding-bottom: 15px;
-    }
-
-    .new_segment_link_block {
-        padding-left: 20px;
-    }
 }
 
 .information_status_confirm {
@@ -177,4 +125,54 @@ tbody > tr .TableSegments {
     padding: 10px 20px;
     border-radius: 12px;
     border: 2px solid #707F99;
+}
+
+@media screen and (min-width: 1140px) {
+
+    .project_info_data {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+    }
+
+    .container-one_hypothesis {
+        display: flex;
+        align-items: center;
+    }
+
+    .link_in_the_header {
+        text-align: right;
+    }
+}
+
+@media screen and (max-width: 1140px) {
+
+    .project_name {
+        text-align: center;
+    }
+
+    .link_in_the_header {
+        text-align: center;
+        padding: 0 10px 15px 10px;
+    }
+
+    .link_in_the_header {
+        padding-left: 20px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .link_in_the_header {
+        text-align: center;
+        padding: 0 10px 5px 10px;
+    }
+
+    .link_in_the_header:last-child {
+        padding-bottom: 15px;
+    }
+
+    .new_segment_link_block {
+        padding-left: 20px;
+    }
 }

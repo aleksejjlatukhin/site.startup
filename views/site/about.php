@@ -101,12 +101,12 @@ $this->title = 'О сервисе';
 
         <div class="passive_navigation_block navigation_block tablinks" onclick="openCity(event, 'step_seven')">
             <div class="stage_number">7</div>
-            <div>Разработка гипотез MVP</div>
+            <div>Разработка MVP</div>
         </div>
 
         <div class="passive_navigation_block navigation_block tablinks" onclick="openCity(event, 'step_eight')">
             <div class="stage_number">8</div>
-            <div>Подтверждение гипотез MVP</div>
+            <div>Подтверждение MVP</div>
         </div>
 
         <div class="passive_navigation_block navigation_block tablinks" onclick="openCity(event, 'step_nine')">
@@ -230,7 +230,7 @@ $this->title = 'О сервисе';
 
     <div id="step_eight" class="tabcontent row">
 
-        <p>Этап подтверждения гипотезы «минимально жизнеспособного продукта» является отправной точкой для старта продаж.</p>
+        <p>Этап подтверждения «минимально жизнеспособного продукта» является отправной точкой для старта продаж.</p>
 
         <p>Если выясняется, что существующая проблема целевой аудитории решается с помощью предложенного вами продукта,
             в нашем случае MVP, и потребители готовы его покупать, этап подтверждения считается пройденным.</p>

@@ -15,427 +15,527 @@ $this->title = 'Генерация гипотез проблем сегмент�
 
 $this->registerCssFile('@web/css/problem-index-style.css');
 ?>
-<div class="generation-problem-index">
+    <div class="generation-problem-index">
 
 
-    <div class="row project_info_data">
+        <div class="row project_info_data">
 
+            <div class="col-xs-12 col-md-12 col-lg-4 project_name">
+                <span>Проект:</span>
+                <?= $project->project_name; ?>
+            </div>
 
-        <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
-            <?= $project->project_name; ?>
+            <?= Html::a('Данные проекта', ['#'], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header',
+                'data-toggle' => 'modal',
+                'data-target' => "#data_project_modal",
+            ]) ?>
+
+            <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
+                'onclick' => 'return false',
+            ]) ?>
+
+            <?= Html::a('Дорожная карта проекта', ['#'], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
+                'data-toggle' => 'modal',
+                'data-target' => "#showRoadmapProject",
+            ]) ?>
+
+            <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
+                'onclick' => 'return false',
+            ]) ?>
+
         </div>
 
-        <?= Html::a('Данные проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links',
-            'data-toggle' => 'modal',
-            'data-target' => "#data_project_modal",
+
+
+        <?php
+        // Модальное окно - данные проекта
+        Modal::begin([
+            'options' => [
+                'id' => 'data_project_modal',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+        ]);
+        ?>
+
+        <?= \yii\widgets\DetailView::widget([
+            'model' => $project,
+            //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
+            'attributes' => [
+
+                'project_name',
+                'project_fullname:ntext',
+                'description:ntext',
+                'rid',
+                'core_rid:ntext',
+                'patent_number',
+
+                [
+                    'attribute' => 'patent_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'patent_name:ntext',
+
+                [
+                    'attribute'=>'Команда проекта',
+                    'value' => $project->getAuthorInfo($project),
+                    'format' => 'html',
+                ],
+
+                'technology',
+                'layout_technology:ntext',
+                'register_name',
+
+                [
+                    'attribute' => 'register_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'site',
+                'invest_name',
+
+                [
+                    'attribute' => 'invest_date',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'invest_amount',
+                    'value' => function($project){
+                        if($project->invest_amount !== null){
+                            return number_format($project->invest_amount, 0, '', ' ');
+                        }
+                    },
+                ],
+
+                [
+                    'attribute' => 'date_of_announcement',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                'announcement_event',
+
+                [
+                    'attribute' => 'created_at',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'updated_at',
+                    'format' => ['date', 'dd.MM.yyyy'],
+                ],
+
+                [
+                    'attribute' => 'pre_files',
+                    'label' => 'Презентационные файлы',
+                    'value' => function($model){
+                        $string = '';
+                        foreach ($model->preFiles as $file){
+                            $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
+                        }
+                        return $string;
+                    },
+                    'format' => 'html',
+                ]
+
+            ],
         ]) ?>
 
-        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
-            'onclick' => 'return false',
-        ]) ?>
-
-        <?= Html::a('Дорожная карта проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
-            'data-toggle' => 'modal',
-            'data-target' => "#showRoadmapProject",
-        ]) ?>
-
-        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
-            'onclick' => 'return false',
-        ]) ?>
-
-    </div>
+        <?php
+        Modal::end();
+        ?>
 
 
+        <div class="row navigation_blocks">
 
-    <?php
-    // Модальное окно - данные проекта
-    Modal::begin([
-        'options' => [
-            'id' => 'data_project_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
-    ]);
-    ?>
+            <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
+                ['/segment/index', 'id' => $project->id],
+                ['class' => 'passive_navigation_block navigation_block']
+            ) ;?>
 
-    <?= \yii\widgets\DetailView::widget([
-        'model' => $project,
-        //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
-        'attributes' => [
+            <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
+                ['/interview/view', 'id' => $interview->id],
+                ['class' => 'passive_navigation_block navigation_block']
+            ) ;?>
 
-            'project_name',
-            'project_fullname:ntext',
-            'description:ntext',
-            'rid',
-            'core_rid:ntext',
-            'patent_number',
+            <div class="active_navigation_block navigation_block">
+                <div class="stage_number">3</div>
+                <div>Генерация гипотез проблем сегментов</div>
+            </div>
 
-            [
-                'attribute' => 'patent_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">4</div>
+                <div>Подтверждение гипотез проблем сегментов</div>
+            </div>
 
-            'patent_name:ntext',
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">5</div>
+                <div>Разработка гипотез ценностных предложений</div>
+            </div>
 
-            [
-                'attribute'=>'Команда проекта',
-                'value' => $project->getAuthorInfo($project),
-                'format' => 'html',
-            ],
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">6</div>
+                <div>Подтверждение гипотез ценностных предложений</div>
+            </div>
 
-            'technology',
-            'layout_technology:ntext',
-            'register_name',
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">7</div>
+                <div>Разработка MVP</div>
+            </div>
 
-            [
-                'attribute' => 'register_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">8</div>
+                <div>Подтверждение MVP</div>
+            </div>
 
-            'site',
-            'invest_name',
-
-            [
-                'attribute' => 'invest_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'invest_amount',
-                'value' => function($project){
-                    if($project->invest_amount !== null){
-                        return number_format($project->invest_amount, 0, '', ' ');
-                    }
-                },
-            ],
-
-            [
-                'attribute' => 'date_of_announcement',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'announcement_event',
-
-            [
-                'attribute' => 'created_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'updated_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'pre_files',
-                'label' => 'Презентационные файлы',
-                'value' => function($model){
-                    $string = '';
-                    foreach ($model->preFiles as $file){
-                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
-                    }
-                    return $string;
-                },
-                'format' => 'html',
-            ]
-
-        ],
-    ]) ?>
-
-    <?php
-    Modal::end();
-    ?>
-
-
-    <div class="row navigation_blocks">
-
-        <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segment/index', 'id' => $project->id],
-            ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
-
-        <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/interview/view', 'id' => $interview->id],
-            ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
-
-        <div class="active_navigation_block navigation_block">
-            <div class="stage_number">3</div>
-            <div>Генерация гипотез проблем сегментов</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">4</div>
-            <div>Подтверждение гипотез проблем сегментов</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">5</div>
-            <div>Разработка гипотез ценностных предложений</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">6</div>
-            <div>Подтверждение гипотез ценностных предложений</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">7</div>
-            <div>Разработка гипотез MVP</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">8</div>
-            <div>Подтверждение гипотез MVP</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">9</div>
-            <div>Генерация бизнес-модели</div>
-        </div>
-
-    </div>
-
-
-    <div class="row segment_info_data">
-
-        <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
-
-            <?php
-                $segment_name = $segment->name;
-                if (mb_strlen($segment_name) > 25){
-                    $segment_name = mb_substr($segment_name, 0, 25) . '...';
-                }
-            ?>
-
-            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
-
-        </div>
-
-        <?= Html::a('Данные сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links',
-            'data-toggle' => 'modal',
-            'data-target' => '#data_segment_modal',
-        ]) ?>
-
-        <?= Html::a('Дорожная карта сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
-            'data-toggle' => 'modal',
-            'data-target' => "#showRoadmapSegment",
-        ]) ?>
-
-    </div>
-
-
-
-    <?php
-    // Модальное окно - Данные сегмента
-    Modal::begin([
-        'options' => [
-            'id' => 'data_segment_modal',
-            'class' => 'data_segment_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Информация о сегменте</h3>',
-    ]);
-    ?>
-
-    <?= $segment->allInformation; ?>
-
-    <?php Modal::end(); ?>
-
-
-
-    <div class="container-fluid container-data row">
-
-        <div class="container-fluid row">
-
-            <div class="col-md-12" style="padding: 15px 0;">
-
-                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
-                    ['/interview/data-availability-for-next-step', 'id' => $interview->id],
-                    ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
-                );
-                ?>
-
+            <div class="no_transition_navigation_block navigation_block">
+                <div class="stage_number">9</div>
+                <div>Генерация бизнес-модели</div>
             </div>
 
         </div>
 
 
-        <!--Заголовки для списка проблем-->
-        <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
+        <div class="row segment_info_data">
 
-            <div class="col-md-1 ">
-                <div class="row">
-                    <div class="col-md-4" style="padding: 0;"></div>
-                    <div class="col-md-8" style="padding: 0;">Номер</div>
+            <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
+                <span>Сегмент:</span>
+                <?= $segment->name; ?>
+            </div>
+
+            <?= Html::a('Данные сегмента', ['#'], [
+                'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header',
+                'data-toggle' => 'modal',
+                'data-target' => '#data_segment_modal',
+            ]) ?>
+
+            <?= Html::a('Дорожная карта сегмента', ['#'], [
+                'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header text-center',
+                'data-toggle' => 'modal',
+                'data-target' => "#showRoadmapSegment",
+            ]) ?>
+
+        </div>
+
+
+
+        <?php
+        // Модальное окно - Данные сегмента
+        Modal::begin([
+            'options' => [
+                'id' => 'data_segment_modal',
+                'class' => 'data_segment_modal',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<h3 class="text-center">Информация о сегменте</h3>',
+        ]);
+        ?>
+
+        <?= $segment->allInformation; ?>
+
+        <?php Modal::end(); ?>
+
+
+
+        <div class="container-fluid container-data row">
+
+            <div class="container-fluid row">
+
+                <div class="col-md-12" style="padding: 15px 0;">
+
+                    <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                        ['/interview/data-availability-for-next-step', 'id' => $interview->id],
+                        ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
+                    );
+                    ?>
+
                 </div>
 
             </div>
 
-            <div class="col-md-7">Описание гипотезы проблемы сегмента</div>
 
-            <div class="col-md-1 text-center"><div>Дата создания</div></div>
+            <!--Заголовки для списка проблем-->
+            <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
 
-            <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
-
-            <div class="col-md-2"></div>
-
-        </div>
-
-
-        <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
-
-            <!--Данные для списка проблем-->
-            <?php foreach ($models as $model) : ?>
-
-                <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
-
-                    <div class="col-md-1">
-                        <div class="row">
-
-                            <div class="col-md-4" style="padding: 0;">
-
-                                <?php
-                                if ($model->exist_confirm === 1) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
-
-                                }elseif ($model->exist_confirm === null && empty($model->confirm)) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
-
-                                }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
-
-                                }elseif ($model->exist_confirm === 0) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
-
-                                }
-                                ?>
-
-                            </div>
-
-                            <div class="col-md-8" style="padding: 0 0 0 5px;">
-
-                                <?= $model->title; ?>
-
-                            </div>
-                        </div>
+                <div class="col-md-1 ">
+                    <div class="row">
+                        <div class="col-md-4" style="padding: 0;"></div>
+                        <div class="col-md-8" style="padding: 0;">Номер</div>
                     </div>
 
-                    <div class="col-md-7" id="column_problem_description-<?=$model->id;?>">
+                </div>
 
-                        <?php
+                <div class="col-md-7">Описание гипотезы проблемы сегмента</div>
+
+                <div class="col-md-1 text-center"><div>Дата создания</div></div>
+
+                <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
+
+                <div class="col-md-2"></div>
+
+            </div>
+
+
+            <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
+
+                <!--Данные для списка проблем-->
+                <?php foreach ($models as $model) : ?>
+
+                    <div class="row container-one_hypothesis" style="margin: 3px 0; padding: 10px;">
+
+                        <div class="col-md-1">
+                            <div class="row">
+
+                                <div class="col-md-4" style="padding: 0;">
+
+                                    <?php
+                                    if ($model->exist_confirm === 1) {
+
+                                        echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                                    }elseif ($model->exist_confirm === null && empty($model->confirm)) {
+
+                                        echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                                    }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
+
+                                        echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
+
+                                    }elseif ($model->exist_confirm === 0) {
+
+                                        echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
+
+                                    }
+                                    ?>
+
+                                </div>
+
+                                <div class="col-md-8" style="padding: 0 0 0 5px;">
+
+                                    <?= $model->title; ?>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7" id="column_problem_description-<?=$model->id;?>">
+
+                            <?php
                             $problem_desc = $model->description;
                             if (mb_strlen($problem_desc) > 180) {
                                 $problem_desc = mb_substr($model->description, 0, 180) . '...';
                             }
-                        ?>
+                            ?>
 
-                        <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
+                            <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
 
-                    </div>
+                        </div>
 
-                    <div class="col-md-1 text-center">
+                        <div class="col-md-1 text-center">
 
-                        <?= date("d.m.y", $model->created_at); ?>
+                            <?= date("d.m.y", $model->created_at); ?>
 
-                    </div>
+                        </div>
 
-                    <div class="col-md-1 text-center">
+                        <div class="col-md-1 text-center">
 
-                        <?php if ($model->time_confirm) : ?>
-                            <?= date("d.m.y", $model->time_confirm); ?>
-                        <?php endif; ?>
+                            <?php if ($model->time_confirm) : ?>
+                                <?= date("d.m.y", $model->time_confirm); ?>
+                            <?php endif; ?>
 
-                    </div>
+                        </div>
 
 
-                    <div class="col-md-2">
+                        <div class="col-md-2">
 
-                        <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
+                            <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
 
-                            <div style="margin-right: 25px;">
+                                <div style="margin-right: 25px;">
 
-                                <?php if ($model->confirm) : ?>
+                                    <?php if ($model->confirm) : ?>
 
-                                    <?= Html::a('Далее', ['/confirm-problem/view', 'id' => $model->confirm->id], [
-                                        'class' => 'btn btn-default',
-                                        'style' => [
-                                            'display' => 'flex',
-                                            'align-items' => 'center',
-                                            'justify-content' => 'center',
-                                            'color' => '#FFFFFF',
-                                            'background' => '#52BE7F',
-                                            'width' => '120px',
-                                            'height' => '40px',
-                                            'font-size' => '18px',
-                                            'border-radius' => '8px',
-                                        ]
-                                    ]);
-                                    ?>
+                                        <?= Html::a('Далее', ['/confirm-problem/view', 'id' => $model->confirm->id], [
+                                            'class' => 'btn btn-default',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                'justify-content' => 'center',
+                                                'color' => '#FFFFFF',
+                                                'background' => '#52BE7F',
+                                                'width' => '120px',
+                                                'height' => '40px',
+                                                'font-size' => '18px',
+                                                'border-radius' => '8px',
+                                            ]
+                                        ]);
+                                        ?>
 
-                                <?php else : ?>
+                                    <?php else : ?>
 
-                                    <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
-                                        'class' => 'btn btn-default',
-                                        'style' => [
-                                            'display' => 'flex',
-                                            'align-items' => 'center',
-                                            'justify-content' => 'center',
-                                            'color' => '#FFFFFF',
-                                            'background' => '#707F99',
-                                            'width' => '120px',
-                                            'height' => '40px',
-                                            'font-size' => '18px',
-                                            'border-radius' => '8px',
-                                        ]
-                                    ]);
-                                    ?>
+                                        <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
+                                            'class' => 'btn btn-default',
+                                            'style' => [
+                                                'display' => 'flex',
+                                                'align-items' => 'center',
+                                                'justify-content' => 'center',
+                                                'color' => '#FFFFFF',
+                                                'background' => '#707F99',
+                                                'width' => '120px',
+                                                'height' => '40px',
+                                                'font-size' => '18px',
+                                                'border-radius' => '8px',
+                                            ]
+                                        ]);
+                                        ?>
 
-                                <?php endif; ?>
+                                    <?php endif; ?>
 
-                            </div>
+                                </div>
 
-                            <div>
+                                <div>
 
-                                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                        <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
+                                            'class' => '',
+                                            'title' => 'Редактировать',
+                                            'data-toggle' => 'modal',
+                                            'data-target' => '#problem_update_modal-' . $model->id,
+                                        ]); ?>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                                <div >
+
+                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
                                         'class' => '',
-                                        'title' => 'Редактировать',
-                                        'data-toggle' => 'modal',
-                                        'data-target' => '#problem_update_modal-' . $model->id,
+                                        'title' => 'Удалить',
+                                        'onclick' => 'return false',
                                     ]); ?>
 
-                                <?php endif; ?>
-
-                            </div>
-
-                            <div >
-
-                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                    'class' => '',
-                                    'title' => 'Удалить',
-                                    'onclick' => 'return false',
-                                ]); ?>
+                                </div>
 
                             </div>
 
                         </div>
 
+
                     </div>
 
+                <?php endforeach; ?>
+
+            </div>
+
+        </div>
+
+
+        <?php if (count($models) > 0) : ?>
+
+            <div class="row information_status_confirm">
+
+                <div>
+
+                    <div style="display:flex; align-items: center;">
+                        <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                        <div>Проблема подтверждена</div>
+                    </div>
+
+                    <div style="display:flex; align-items: center;">
+                        <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                        <div>Проблема не подтверждена</div>
+                    </div>
+
+                    <div style="display:flex; align-items: center;">
+                        <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                        <div>Проблема ожидает подтверждения</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        <?php endif; ?>
+
+
+
+        <?php
+        // Модальное окно - создание ГПС
+        Modal::begin([
+            'options' => [
+                'id' => 'problem_create_modal',
+                'class' => 'problem_create_modal',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Создание гипотезы проблемы сегмента</span>' . Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
+                    'data-toggle' => 'modal',
+                    'data-target' => "#information-table-create-problem",
+                    'title' => 'Посмотреть описание',
+                ]) . '</div>',
+        ]);
+        ?>
+
+        <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
+
+            <div class="col-md-12">
+                Варианты проблем, полученные от респондентов (представителей сегмента)
+            </div>
+
+        </div>
+
+        <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
+
+            <div class="col-md-4 roboto_condensed_bold">
+                Респонденты
+            </div>
+
+            <div class="col-md-8 roboto_condensed_bold">
+                Варианты проблем
+            </div>
+
+        </div>
+
+
+        <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
+        <div class="all_responds_problems row container-fluid" style="margin: 0;">
+
+            <?php foreach ($responds as $respond) : ?>
+
+                <div class="block_respond_problem row">
+
+                    <div class="col-md-4 block_respond_problem_column">
+
+                        <?php
+                        $respond_name = $respond->name;
+                        if (mb_strlen($respond_name) > 30) {
+                            $respond_name = mb_substr($respond_name, 0, 30) . '...';
+                        }
+                        ?>
+                        <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
+                            'class' => '',
+                            'data-toggle' => 'modal',
+                            'data-target' => "#respond_positive_view_modal-$respond->id",
+                        ]); ?>
+
+                    </div>
+
+                    <div class="col-md-8 block_respond_problem_column">
+
+                        <?php
+                        $descInterview_result = $respond->descInterview->result;
+                        if (mb_strlen($descInterview_result) > 70) {
+                            $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
+                        }
+                        ?>
+                        <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
+
+                    </div>
 
                 </div>
 
@@ -443,416 +543,306 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
         </div>
 
-    </div>
 
+        <div class="row" style="color: #4F4F4F; margin-top: 20px;">
 
-    <?php if (count($models) > 0) : ?>
-
-        <div class="row information_status_confirm">
-
-            <div>
-
-                <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
-                    <div>Проблема подтверждена</div>
-                </div>
-
-                <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
-                    <div>Проблема не подтверждена</div>
-                </div>
-
-                <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
-                    <div>Проблема ожидает подтверждения</div>
-                </div>
-
+            <div class="col-md-12">
+                Описание гипотезы проблемы сегмента
             </div>
 
         </div>
 
-    <?php endif; ?>
 
+        <div class="generation-problem-form" style="margin-top: 5px;">
 
-
-    <?php
-    // Модальное окно - создание ГПС
-    Modal::begin([
-        'options' => [
-            'id' => 'problem_create_modal',
-            'class' => 'problem_create_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Создание гипотезы проблемы сегмента</span>' . Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                'data-toggle' => 'modal',
-                'data-target' => "#information-table-create-problem",
-                'title' => 'Посмотреть описание',
-            ]) . '</div>',
-    ]);
-    ?>
-
-    <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
-
-        <div class="col-md-12">
-            Варианты проблем, полученные от респондентов (представителей сегмента)
-        </div>
-
-    </div>
-
-    <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
-
-        <div class="col-md-4 roboto_condensed_bold">
-            Респонденты
-        </div>
-
-        <div class="col-md-8 roboto_condensed_bold">
-            Варианты проблем
-        </div>
-
-    </div>
-
-
-    <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
-    <div class="all_responds_problems row container-fluid" style="margin: 0;">
-
-        <?php foreach ($responds as $respond) : ?>
-
-            <div class="block_respond_problem row">
-
-                <div class="col-md-4 block_respond_problem_column">
-
-                    <?php
-                        $respond_name = $respond->name;
-                        if (mb_strlen($respond_name) > 30) {
-                            $respond_name = mb_substr($respond_name, 0, 30) . '...';
-                        }
-                    ?>
-                    <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
-                        'class' => '',
-                        'data-toggle' => 'modal',
-                        'data-target' => "#respond_positive_view_modal-$respond->id",
-                    ]); ?>
-
-                </div>
-
-                <div class="col-md-8 block_respond_problem_column">
-
-                    <?php
-                        $descInterview_result = $respond->descInterview->result;
-                        if (mb_strlen($descInterview_result) > 70) {
-                            $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
-                        }
-                    ?>
-                    <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
-
-                </div>
-
-            </div>
-
-        <?php endforeach; ?>
-
-    </div>
-
-
-    <div class="row" style="color: #4F4F4F; margin-top: 20px;">
-
-        <div class="col-md-12">
-            Описание гипотезы проблемы сегмента
-        </div>
-
-    </div>
-
-
-    <div class="generation-problem-form" style="margin-top: 5px;">
-
-        <?php $form = ActiveForm::begin([
-            'id' => 'gpsCreateForm',
-            'action' => Url::to(['/generation-problem/create', 'id' => $interview->id]),
-            'options' => ['class' => 'g-py-15'],
-            'errorCssClass' => 'u-has-error-v1',
-            'successCssClass' => 'u-has-success-v1-1',
+            <?php $form = ActiveForm::begin([
+                'id' => 'gpsCreateForm',
+                'action' => Url::to(['/generation-problem/create', 'id' => $interview->id]),
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
 
-        <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+            <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
-        <div class="row">
-            <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
 
-                <?= $form->field($newProblem, 'description')->label(false)->textarea([
-                    'rows' => 3,
-                    'required' => true,
-                    'placeholder' => $placeholder,
-                    'class' => 'style_form_field_respond form-control',
+                    <?= $form->field($newProblem, 'description')->label(false)->textarea([
+                        'rows' => 3,
+                        'required' => true,
+                        'placeholder' => $placeholder,
+                        'class' => 'style_form_field_respond form-control',
                     ]) ?>
 
-            </div>
-        </div>
-
-        <div class="form-group row container-fluid">
-            <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
-                'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
-                    'padding' => '0 7px',
-                    'width' => '140px',
-                    'height' => '40px',
-                    'font-size' => '24px',
-                    'border-radius' => '8px',
-                ]
-            ]) ?>
-        </div>
-
-        <?php ActiveForm::end(); ?>
-
-    </div>
-
-    <?php Modal::end(); ?>
-
-
-
-    <?php foreach ($models as $model) : ?>
-
-
-    <?php
-    // Модальное окно - редактирование ГПС
-    Modal::begin([
-        'options' => [
-            'id' => 'problem_update_modal-' . $model->id,
-            'class' => 'problem_update_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Редактирование гипотезы проблемы сегмента - ' . $model->title . '</span></div>',
-    ]);
-    ?>
-
-    <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
-
-        <div class="col-md-12">
-            Варианты проблем, полученные от респондентов (представителей сегмента)
-        </div>
-
-    </div>
-
-    <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
-
-        <div class="col-md-4 roboto_condensed_bold">
-            Респонденты
-        </div>
-
-        <div class="col-md-8 roboto_condensed_bold">
-            Варианты проблем
-        </div>
-
-    </div>
-
-
-    <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
-    <div class="all_responds_problems row container-fluid" style="margin: 0;">
-
-        <?php foreach ($responds as $respond) : ?>
-
-            <div class="block_respond_problem row">
-
-                <div class="col-md-4 block_respond_problem_column">
-
-                    <?php
-                    $respond_name = $respond->name;
-                    if (mb_strlen($respond_name) > 30) {
-                        $respond_name = mb_substr($respond_name, 0, 30) . '...';
-                    }
-                    ?>
-                    <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
-                        'class' => '',
-                        'data-toggle' => 'modal',
-                        'data-target' => "#respond_positive_view_modal-$respond->id",
-                    ]); ?>
-
                 </div>
+            </div>
 
-                <div class="col-md-8 block_respond_problem_column">
+            <div class="form-group row container-fluid">
+                <?= Html::submitButton('Сохранить', [
+                    'class' => 'btn btn-success pull-right',
+                    'style' => [
+                        'color' => '#FFFFFF',
+                        'background' => '#52BE7F',
+                        'padding' => '0 7px',
+                        'width' => '140px',
+                        'height' => '40px',
+                        'font-size' => '24px',
+                        'border-radius' => '8px',
+                    ]
+                ]) ?>
+            </div>
 
-                    <?php
-                    $descInterview_result = $respond->descInterview->result;
-                    if (mb_strlen($descInterview_result) > 70) {
-                        $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
-                    }
-                    ?>
-                    <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
+            <?php ActiveForm::end(); ?>
 
+        </div>
+
+        <?php Modal::end(); ?>
+
+
+
+        <?php foreach ($models as $model) : ?>
+
+
+            <?php
+            // Модальное окно - редактирование ГПС
+            Modal::begin([
+                'options' => [
+                    'id' => 'problem_update_modal-' . $model->id,
+                    'class' => 'problem_update_modal',
+                ],
+                'size' => 'modal-lg',
+                'header' => '<div style="display:flex; align-items: center; justify-content: center; font-weight: 700;"><span style="font-size: 24px; color: #4F4F4F; padding-right: 10px;">Редактирование гипотезы проблемы сегмента - ' . $model->title . '</span></div>',
+            ]);
+            ?>
+
+            <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
+
+                <div class="col-md-12">
+                    Варианты проблем, полученные от респондентов (представителей сегмента)
                 </div>
 
             </div>
+
+            <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
+
+                <div class="col-md-4 roboto_condensed_bold">
+                    Респонденты
+                </div>
+
+                <div class="col-md-8 roboto_condensed_bold">
+                    Варианты проблем
+                </div>
+
+            </div>
+
+
+            <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
+            <div class="all_responds_problems row container-fluid" style="margin: 0;">
+
+                <?php foreach ($responds as $respond) : ?>
+
+                    <div class="block_respond_problem row">
+
+                        <div class="col-md-4 block_respond_problem_column">
+
+                            <?php
+                            $respond_name = $respond->name;
+                            if (mb_strlen($respond_name) > 30) {
+                                $respond_name = mb_substr($respond_name, 0, 30) . '...';
+                            }
+                            ?>
+                            <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['#'], [
+                                'class' => '',
+                                'data-toggle' => 'modal',
+                                'data-target' => "#respond_positive_view_modal-$respond->id",
+                            ]); ?>
+
+                        </div>
+
+                        <div class="col-md-8 block_respond_problem_column">
+
+                            <?php
+                            $descInterview_result = $respond->descInterview->result;
+                            if (mb_strlen($descInterview_result) > 70) {
+                                $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
+                            }
+                            ?>
+                            <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
+
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+
+            <div class="row" style="color: #4F4F4F; margin-top: 20px;">
+
+                <div class="col-md-12">
+                    Описание гипотезы проблемы сегмента
+                </div>
+
+            </div>
+
+
+            <div class="generation-problem-form" style="margin-top: 5px;">
+
+                <?php $form = ActiveForm::begin([
+                    'id' => 'gpsUpdateForm-' . $model->id,
+                    'action' => Url::to(['/generation-problem/update', 'id' => $model->id]),
+                    'options' => ['class' => 'g-py-15 gpsUpdateForm'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]); ?>
+
+                <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+- отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
+- отсутствие необходимой информации по патентованию...' ?>
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <?= $form->field($model, 'description')->label(false)->textarea([
+                            'rows' => 3,
+                            'required' => true,
+                            'placeholder' => $placeholder,
+                            'class' => 'style_form_field_respond form-control',
+                        ]) ?>
+
+                    </div>
+                </div>
+
+                <div class="form-group row container-fluid">
+                    <?= Html::submitButton('Сохранить', [
+                        'class' => 'btn btn-success pull-right',
+                        'style' => [
+                            'color' => '#FFFFFF',
+                            'background' => '#52BE7F',
+                            'padding' => '0 7px',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ]
+                    ]) ?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
+
+            </div>
+
+            <?php Modal::end(); ?>
+
 
         <?php endforeach; ?>
 
-    </div>
 
 
-    <div class="row" style="color: #4F4F4F; margin-top: 20px;">
-
-        <div class="col-md-12">
-            Описание гипотезы проблемы сегмента
-        </div>
-
-    </div>
-
-
-    <div class="generation-problem-form" style="margin-top: 5px;">
-
-        <?php $form = ActiveForm::begin([
-            'id' => 'gpsUpdateForm-' . $model->id,
-            'action' => Url::to(['/generation-problem/update', 'id' => $model->id]),
-            'options' => ['class' => 'g-py-15 gpsUpdateForm'],
-            'errorCssClass' => 'u-has-error-v1',
-            'successCssClass' => 'u-has-success-v1-1',
-        ]); ?>
-
-        <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
-- отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
-- отсутствие необходимой информации по патентованию...' ?>
-
-        <div class="row">
-            <div class="col-md-12">
-
-                <?= $form->field($model, 'description')->label(false)->textarea([
-                    'rows' => 3,
-                    'required' => true,
-                    'placeholder' => $placeholder,
-                    'class' => 'style_form_field_respond form-control',
-                ]) ?>
-
-            </div>
-        </div>
-
-        <div class="form-group row container-fluid">
-            <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
-                'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
-                    'padding' => '0 7px',
-                    'width' => '140px',
-                    'height' => '40px',
-                    'font-size' => '24px',
-                    'border-radius' => '8px',
-                ]
-            ]) ?>
-        </div>
-
-        <?php ActiveForm::end(); ?>
-
-    </div>
-
-    <?php Modal::end(); ?>
-
-
-    <?php endforeach; ?>
-
-
-
-
-    <?php
-    // Модальное окно - Информационное окно в создании ГПС
-    Modal::begin([
-        'options' => [
-            'id' => 'information-table-create-problem',
-            'class' => 'information-table-create-problem',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2;">Информация</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Необходимо просмотреть и проанализировать все материалы интервью представителей сегмента и выявить проблемы, которые характерны для нескольких респондентов
-    </h4>
-
-
-    <?php Modal::end(); ?>
-
-
-
-    <!--Roadmap Project-->
-
-    <?php
-
-    // Модальное окно - дорожная карта проекта
-    Modal::begin([
-        'options' => [
-            'id' => 'showRoadmapProject',
-            'class' => 'showRoadmapProject',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
-    ]);
-    ?>
-
-    <?= $project->showRoadmapProject();?>
-
-    <?php Modal::end(); ?>
-
-
-    <!--Roadmap Segment-->
-
-    <?php
-
-    // Модальное окно - дорожная карта сегмента
-    Modal::begin([
-        'options' => [
-            'id' => 'showRoadmapSegment',
-            'class' => 'showRoadmapSegment',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<div class="roadmap_segment_modal_header_title">
-                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
-                     </div>',
-    ]);
-    ?>
-
-    <?= $segment->showRoadmapSegment();?>
-
-    <?php Modal::end(); ?>
-
-
-
-    <?php
-    // Модальное окно - сообщение о том что данных недостаточно для создания ГПС
-    Modal::begin([
-        'options' => [
-            'id' => 'problem_create_modal_error',
-            'class' => 'problem_create_modal_error',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания ГПС.</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Вернитесь к подтверждению сегмента.
-    </h4>
-
-    <?php Modal::end(); ?>
-
-
-
-    <?php foreach ($responds as $respond) : ?>
-
-        <?php $descInterview = $respond->descInterview; ?>
 
         <?php
-        // Модальное окно - Информамация о представителях сегмента
+        // Модальное окно - Информационное окно в создании ГПС
         Modal::begin([
             'options' => [
-                'id' => "respond_positive_view_modal-$respond->id",
-                'class' => 'respond_positive_view_modal',
+                'id' => 'information-table-create-problem',
+                'class' => 'information-table-create-problem',
             ],
-            'size' => 'modal-lg',
-            'header' => '<div class="text-center"><span style="font-size: 24px; font-weight: 700;">Информация о интервью</span></div>',
+            'size' => 'modal-md',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2;">Информация</h3>',
         ]);
         ?>
+
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            Необходимо просмотреть и проанализировать все материалы интервью представителей сегмента и выявить проблемы, которые характерны для нескольких респондентов
+        </h4>
+
+
+        <?php Modal::end(); ?>
+
+
+
+        <!--Roadmap Project-->
+
+        <?php
+
+        // Модальное окно - дорожная карта проекта
+        Modal::begin([
+            'options' => [
+                'id' => 'showRoadmapProject',
+                'class' => 'showRoadmapProject',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
+        ]);
+        ?>
+
+        <?= $project->showRoadmapProject();?>
+
+        <?php Modal::end(); ?>
+
+
+        <!--Roadmap Segment-->
+
+        <?php
+
+        // Модальное окно - дорожная карта сегмента
+        Modal::begin([
+            'options' => [
+                'id' => 'showRoadmapSegment',
+                'class' => 'showRoadmapSegment',
+            ],
+            'size' => 'modal-lg',
+            'header' => '<div class="roadmap_segment_modal_header_title">
+                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
+                     </div>',
+        ]);
+        ?>
+
+        <?= $segment->showRoadmapSegment();?>
+
+        <?php Modal::end(); ?>
+
+
+
+        <?php
+        // Модальное окно - сообщение о том что данных недостаточно для создания ГПС
+        Modal::begin([
+            'options' => [
+                'id' => 'problem_create_modal_error',
+                'class' => 'problem_create_modal_error',
+            ],
+            'size' => 'modal-md',
+            'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания ГПС.</h3>',
+        ]);
+        ?>
+
+        <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
+            Вернитесь к подтверждению сегмента.
+        </h4>
+
+        <?php Modal::end(); ?>
+
+
+
+        <?php foreach ($responds as $respond) : ?>
+
+            <?php $descInterview = $respond->descInterview; ?>
+
+            <?php
+            // Модальное окно - Информамация о представителях сегмента
+            Modal::begin([
+                'options' => [
+                    'id' => "respond_positive_view_modal-$respond->id",
+                    'class' => 'respond_positive_view_modal',
+                ],
+                'size' => 'modal-lg',
+                'header' => '<div class="text-center"><span style="font-size: 24px; font-weight: 700;">Информация о интервью</span></div>',
+            ]);
+            ?>
 
             <div class="row" style="margin-bottom: 15px; margin-top: 15px; color: #4F4F4F;">
 
@@ -918,11 +908,11 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
             </div>
 
-        <?php Modal::end(); ?>
+            <?php Modal::end(); ?>
 
-    <?php endforeach; ?>
+        <?php endforeach; ?>
 
-</div>
+    </div>
 
 
 <?php

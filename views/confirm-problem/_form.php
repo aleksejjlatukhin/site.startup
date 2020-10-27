@@ -16,31 +16,30 @@ use yii\helpers\Url;
 
     <div class="row project_info_data">
 
-
-        <div class="col-xs-12 col-md-12 col-lg-4 project_name_link">
-            <span style="padding-right: 20px; font-weight: 400; font-size: 20px;">Проект:</span>
+        <div class="col-xs-12 col-md-12 col-lg-4 project_name">
+            <span>Проект:</span>
             <?= $project->project_name; ?>
         </div>
 
         <?= Html::a('Данные проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header',
             'data-toggle' => 'modal',
             'data-target' => "#data_project_modal",
         ]) ?>
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'onclick' => 'return false',
         ]) ?>
 
         <?= Html::a('Дорожная карта проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'data-toggle' => 'modal',
             'data-target' => "#showRoadmapProject",
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
             'onclick' => 'return false',
         ]) ?>
 
@@ -81,12 +80,12 @@ use yii\helpers\Url;
 
         <div class="no_transition_navigation_block navigation_block">
             <div class="stage_number">7</div>
-            <div>Разработка гипотез MVP</div>
+            <div>Разработка MVP</div>
         </div>
 
         <div class="no_transition_navigation_block navigation_block">
             <div class="stage_number">8</div>
-            <div>Подтверждение гипотез MVP</div>
+            <div>Подтверждение MVP</div>
         </div>
 
         <div class="no_transition_navigation_block navigation_block">
@@ -99,46 +98,53 @@ use yii\helpers\Url;
 
     <div class="row segment_info_data">
 
-        <div class="col-xs-12 col-md-12 col-lg-8 project_name_link">
-
-            <span style="padding-right: 10px; font-weight: 400; font-size: 20px;">Сегмент:</span>
+        <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
 
             <?php
-                $segment_name = $segment->name;
-                if (mb_strlen($segment_name) > 25){
-                    $segment_name = mb_substr($segment_name, 0, 25) . '...';
-                }
-            ?>
+            $segment_name = $segment->name;
+            if (mb_strlen($segment_name) > 15){
+                $segment_name = mb_substr($segment_name, 0, 15) . '...';
+            }
 
-            <?= '<span title="'.$segment->name.'">' . $segment_name . '</span>'; ?>
-
-
-
-            <span style="padding-left: 30px; padding-right: 10px; font-weight: 400; font-size: 20px;">Проблема:</span>
-
-            <?php
-            $problem = $generationProblem->description;
-            if (mb_strlen($problem) > 25){
-                $problem = mb_substr($problem, 0, 25) . '...';
+            $problem_description = $generationProblem->description;
+            if (mb_strlen($problem_description) > 50){
+                $problem_description = mb_substr($problem_description, 0, 50) . '...';
             }
             ?>
 
-            <?= '<span title="'.$generationProblem->description.'">' . $problem . '</span>'; ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+
+            <?php
+            $problem_description = $generationProblem->description;
+            if (mb_strlen($problem_description) > 100){
+                $problem_description = mb_substr($problem_description, 0, 100) . '...';
+            }
+            ?>
+
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
         </div>
 
         <?= Html::a('Данные сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links',
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header',
             'data-toggle' => 'modal',
             'data-target' => '#data_segment_modal',
         ]) ?>
 
         <?= Html::a('Дорожная карта сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 segment_header_links text-center',
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header text-center',
             'data-toggle' => 'modal',
             'data-target' => "#showRoadmapSegment",
         ]) ?>
 
+    </div>
+
+
+    <div class="row block_description_stage">
+        <div>Наименование сегмента:</div>
+        <div><?= $segment->name;?></div>
+        <div>Формулировка проблемы:</div>
+        <div><?= $generationProblem->description;?></div>
     </div>
 
 
@@ -533,7 +539,7 @@ use yii\helpers\Url;
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Пройдите последовательно этапы подтверждения гипотезы проблемы сегмента. Далее переходите к генерации гипотез ценностных предложений.
+        Пройдите последовательно этапы подтверждения гипотезы проблемы сегмента. Далее переходите к разработке гипотез ценностных предложений.
     </h4>
 
     <?php
@@ -655,7 +661,7 @@ $script = "
         e.preventDefault();
 
         return false;
-    });
+     });
     
 ";
 $position = \yii\web\View::POS_READY;

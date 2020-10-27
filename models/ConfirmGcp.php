@@ -109,8 +109,18 @@ class ConfirmGcp extends \yii\db\ActiveRecord
 
     public function addQuestionToGeneralList($title)
     {
+        $segment = $this->gcp->segment;
+        $user = $this->gcp->project->user;
+
         //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmGcp::find()->select('title')->all();
+        $baseQuestions = AllQuestionsConfirmGcp::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity,
+                /*'user_id' => $user->id*/
+            ])->select('title')->all();
 
         $existQuestions = 0;
 
@@ -122,9 +132,14 @@ class ConfirmGcp extends \yii\db\ActiveRecord
 
         if ($existQuestions == 0){
 
-            $allQuestions = new AllQuestionsConfirmGcp();
-            $allQuestions->title = $title;
-            $allQuestions->save();
+            $general_question = new AllQuestionsConfirmGcp();
+            $general_question->title = $title;
+            $general_question->user_id = $user->id;
+            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
+            $general_question->field_of_activity = $segment->field_of_activity;
+            $general_question->sort_of_activity = $segment->sort_of_activity;
+            $general_question->specialization_of_activity = $segment->specialization_of_activity;
+            $general_question->save();
         }
     }
 
@@ -155,13 +170,26 @@ class ConfirmGcp extends \yii\db\ActiveRecord
 
     public function queryQuestionsGeneralList()
     {
+        $segment = $this->gcp->segment;
+
         //Добавляем в массив $questions вопросы уже привязанные к данной программе
         $questions = [];
         foreach ($this->questions as $question) {
             $questions[] = $question['title'];
         }
 
-        $allQuestions = AllQuestionsConfirmGcp::find()->orderBy(['id' => SORT_DESC])->all();
+        $allQuestions = AllQuestionsConfirmGcp::find()
+            ->where([
+                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
+                'field_of_activity' => $segment->field_of_activity,
+                'sort_of_activity' => $segment->sort_of_activity,
+                'specialization_of_activity' => $segment->specialization_of_activity
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->select('title')
+            ->asArray()
+            ->all();
+
         $queryQuestions = $allQuestions;
 
         //Убираем из списка для добавления вопросов,
@@ -176,198 +204,7 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
-    public function getShowListQuestions()
-    {
-        $showListQuestions = '';
-
-        if ($this->questions){
-
-            $i = 0;
-            foreach ($this->questions as $question){
-                $i++;
-                $showListQuestions .= '<p style="font-weight: 400;">'. $i . '. '.$question->title.'</p>';
-            }
-        }
-
-        return $showListQuestions;
-    }
-
-
-    public function getRedirectRespondTable()
-    {
-        $data_responds = 0;
-        $data_interview = 0;
-        $data_interview_status = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->name) && !empty($respond->info_respond)){
-                $data_responds++;
-
-                if (!empty($respond->descInterview)){
-                    $data_interview++;
-
-                    if ($respond->descInterview->status == 1){
-                        $data_interview_status++;
-                    }
-                }
-            }
-        }
-
-        if ($data_interview == 0){
-
-            return Html::a('Начать', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
-
-        }elseif ($data_responds == count($this->responds) && $data_interview != 0 && $data_interview == count($this->responds) && $data_interview_status >= $this->count_positive){
-
-            return Html::a('Редактировать <span class="glyphicon glyphicon-pencil"></span>', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 20px 0 0']]) .
-                Html::a('Завершить', ['/confirm-gcp/not-exist-confirm', 'id' => $this->id], [
-                    'class' => 'btn btn-default finish_program',
-                    'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0', 'display' => 'none'],
-                    'data' => [
-                        'confirm' => 'Ценностное предложение не подтверждено!<br>Вы действительно хотите завершить программу подтверждения ' . $this->gcp->title . ' ?',
-                        'method' => 'post',
-                    ],
-                ]);
-
-        }elseif (count($this->mvps) != 0){
-
-            return Html::a('Редактировать <span class="glyphicon glyphicon-pencil"></span>', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn  btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
-
-        }elseif ($data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status < $this->count_positive && $this->gcp->exist_confirm === null){
-
-            return Html::a('Добавить', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-danger', 'style' => ['font-weight' => '700', 'margin' => '20px 10px 0 0']]) .
-                Html::a('Завершить', ['/confirm-gcp/not-exist-confirm', 'id' => $this->id], [
-                    'class' => 'btn btn-default finish_program',
-                    'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0'],
-                    'data' => [
-                        'confirm' => 'Ценностное предложение не подтверждено!<br>Вы действительно хотите завершить программу подтверждения ' . $this->gcp->title . ' ?',
-                        'method' => 'post',
-                    ],
-                ]);
-
-        }elseif ($data_responds == count($this->responds) && $data_interview == count($this->responds) && $data_interview_status < $this->count_positive && $this->gcp->exist_confirm === 0){
-
-            return Html::a('Добавить', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-danger', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
-
-        }elseif ((count($this->mvps) == 0) && ($data_responds != count($this->responds) || $data_interview != count($this->responds))){
-
-            return Html::a('Продолжить', ['/responds-gcp/index', 'id' => $this->id], ['id' => 'redirect_info_responds_table', 'class' => 'btn btn-default', 'style' => ['font-weight' => '700', 'margin' => '20px 0 0 0']]);
-
-        }else{
-
-            return '';
-        }
-    }
-
-
-    public function getMessageAboutTheNextStep()
-    {
-        $sumPositive = 0; // Кол-во представителей сегмента
-        $data_respond = 0; //Кол-во респондентов, которые имеют описание
-        $data_desc = 0; // Кол-во проведенных интервью
-        foreach ($this->responds as $respond){
-
-            if (!empty($respond->info_respond)){
-                $data_respond++;
-            }
-
-            if ($respond->descInterview){
-                $data_desc++;
-
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-
-        if ($data_desc == 0){
-            return '<span id="messageAboutTheNextStep" class="text-success">Начните заполнять анкетные данные респондентов</span>';
-        }
-
-        if ($data_respond != 0 && count($this->responds) != $data_desc && empty($this->mvps) && $data_desc != 0){
-            return '<span id="messageAboutTheNextStep" class="text-warning">Продолжите заполнение анкетных данных респондентов</span>';
-        }
-
-        if ($sumPositive < $this->count_positive && count($this->responds) == $data_desc){
-            return '<span id="messageAboutTheNextStep" class="text-danger">Недостаточное количество респондентов, подтвердивших ценностное предложение</span>';
-        }
-
-        if ($this->count_positive <= $sumPositive && empty($this->mvps) && $data_desc == count($this->responds)){
-            return '<span id="messageAboutTheNextStep" class="text-success">Переходите к генерации Minimum Viable Product</span>';
-        }
-    }
-
-
-    public function getDataRespondsOfModel()
-    {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->info_respond)){
-                $sum++;
-            }
-        }
-
-        if ($sum !== 0){
-            $value = round(($sum / count($this->responds) * 100) * 100) / 100;
-        }else{
-            $value = 0;
-        }
-
-
-        return "<progress max='100' value='$value' id='info-respond'></progress><p id='info-respond-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$value  %</p>";
-    }
-
-
-    public function getDataDescInterviewsOfModel()
-    {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if ($respond->descInterview){
-                $sum++;
-            }
-        }
-
-        if ($sum !== 0){
-            $value = round(($sum / count($this->responds) * 100) *100) / 100;
-        }else{
-            $value = 0;
-        }
-
-
-        return "<progress max='100' value='$value' id='info-interview'></progress><p id='info-interview-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$value  %</p>";
-    }
-
-
-    public function getDataMembersOfSegment()
-    {
-        $sumPositive = 0; //Кол-во респондентов подтверживших ценностное предложение
-        foreach ($this->responds as $respond){
-
-            if ($respond->descInterview){
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-        if($sumPositive !== 0){
-            $valPositive = round(($sumPositive / count($this->responds) * 100) *100) / 100;
-        }else {
-            $valPositive = 0;
-        }
-
-
-        if ($this->count_positive <= $sumPositive){
-            return "<progress max='100' value='$valPositive' id='info-status' class='info-green'></progress><p id='info-status-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>";
-        }
-
-        if ($sumPositive < $this->count_positive){
-            return "<progress max='100' value='$valPositive' id='info-status' class='info-red'></progress><p id='info-status-text-indicator' class='text-center' style='font-weight: 700;font-size: 13px;'>$valPositive  %</p>";
-        }
-    }
-
-
-    public function getNextStep()
+    public function getButtonMovingNextStage()
     {
         $count_descInterview = 0;
         $count_positive = 0;
@@ -383,90 +220,53 @@ class ConfirmGcp extends \yii\db\ActiveRecord
             }
         }
 
-        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->mvps) && $this->count_positive <= $count_positive)){
+        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->mvps))) {
             return true;
-        }else{
+        }else {
             return false;
         }
     }
 
 
-    public function pointerOnThirdStep()
+    public function getDataRespondsOfModel()
     {
+        $sum = 0;
+        foreach ($this->responds as $respond){
+            if (!empty($respond->info_respond)){
+                $sum++;
+            }
+        }
 
-        $sumPositive = 0; // Кол-во представителей сегмента
-        $data_respond = 0; //Кол-во респондентов, которые имеют описание
-        $data_desc = 0; // Кол-во проведенных интервью
+        return $sum;
+    }
 
+
+    public function getDataDescInterviewsOfModel()
+    {
+        $sum = 0;
+        foreach ($this->responds as $respond){
+            if ($respond->descInterview){
+                $sum++;
+            }
+        }
+
+        return $sum;
+    }
+
+
+    public function getDataMembersOfGcp()
+    {
+        $sumPositive = 0; // Кол-во подтвердивших ЦП
         foreach ($this->responds as $respond){
 
-            if (!empty($respond->info_respond)){
-                $data_respond++;
-            }
-
             if ($respond->descInterview){
-                $data_desc++;
-
                 if ($respond->descInterview->status == 1){
                     $sumPositive++;
                 }
             }
         }
 
-
-        if ($data_desc == 0 && empty($this->mvps)){
-
-            return '<div class="text-center text-danger" style="padding: 50px 0; font-weight: 700; font-size: 16px;">Данный этап пока не доступен, вернитесь на Шаг 2.</div>';
-        }
-
-        if ($data_respond != 0 && count($this->responds) != $data_desc && $data_desc != 0 && empty($this->mvps)){
-
-            return '<div class="text-center text-danger" style="padding: 50px 0; font-weight: 700; font-size: 16px;">Данный этап пока не доступен, вернитесь на Шаг 2.</div>';
-        }
-
-        if ($sumPositive < $this->count_positive && count($this->responds) == $data_desc && empty($this->mvps)){
-
-            return '<div class="text-center text-danger not_next_step" style="padding: 50px 0; font-weight: 700; font-size: 16px;">Данный этап пока не доступен, вернитесь на Шаг 2.</div>' .
-
-                '<div class="text-center finish_program_success" style="padding: 50px 0; display: none;">' . Html::a('Завершить программу подтверждения ' . $this->gcp->title . ' и<br>перейти к генерации Minimum Viable Product', ['/confirm-gcp/exist-confirm', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>';
-        }
-
-
-        if ($this->count_positive <= $sumPositive && $data_desc == count($this->responds) && $this->gcp->exist_confirm != 1 && empty($this->mvps)){
-
-            if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                return '<div class="text-center finish_program_success" style="padding: 50px 0;">' . Html::a('Завершить программу подтверждения ' . $this->gcp->title . ' и<br>перейти к генерации Minimum Viable Product', ['/confirm-gcp/exist-confirm', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>' .
-
-                    '<div class="text-center text-danger not_next_step" style="padding: 50px 0; font-weight: 700; font-size: 16px; display: none;">Данный этап пока не доступен, вернитесь на Шаг 2.</div>';
-
-            }else {
-
-                return '<div class="text-center text-warning finish_program_success" style="padding: 50px 0;">Пользователь пока не завершил программу подтверждения ' . $this->gcp->title . '.</div>' .
-
-                    '<div class="text-center text-danger not_next_step" style="padding: 50px 0; font-weight: 700; font-size: 16px; display: none">Данный этап пока не доступен, вернитесь на Шаг 2.</div>';
-            }
-        }
-
-
-        if ($this->count_positive <= $sumPositive && empty($this->mvps) && $data_desc == count($this->responds) && $this->gcp->exist_confirm == 1){
-
-            if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                return '<div class="text-center" style="padding: 50px 0;">' . Html::a('Переходите к генерации Minimum Viable Product', ['/mvp/index', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>';
-
-            }else {
-
-                return '<div class="text-center text-warning" style="padding: 50px 0;">Пользователь пока не сгенерировал ни одной гипотезы Minimum Viable Product</div>';
-            }
-        }
-
-
-        if (!empty($this->mvps)){
-
-            return '<div class="text-center" style="padding: 50px 0;">' . Html::a('Переход на страницу гипотез Minimum Viable Product', ['/mvp/index', 'id' => $this->id], ['class' => 'btn btn-success', 'style' => ['font-weight' => '700', 'font-size' => '16px']]) . '</div>';
-        }
-
-
+        return $sumPositive;
     }
+
 }
