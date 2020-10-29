@@ -23,27 +23,15 @@ use yii\filters\VerbFilter;
 class GenerationProblemController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
-
-            $model = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update'])){
 
             $model = GenerationProblem::findOne(Yii::$app->request->get());
             $interview = Interview::find()->where(['id' => $model->interview_id])->one();
@@ -96,9 +84,10 @@ class GenerationProblemController extends AppController
 
     }
 
+
     /**
-     * Lists all GenerationProblem models.
-     * @return mixed
+     * @param $id
+     * @return string
      */
     public function actionIndex($id)
     {
@@ -126,35 +115,11 @@ class GenerationProblemController extends AppController
         ]);
     }
 
-    /**
-     * Displays a single GenerationProblem model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $model = GenerationProblem::findOne($id);
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('view', [
-            'model' => $model,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
 
     /**
-     * Creates a new GenerationProblem model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return \yii\web\Response
      */
-
-
-
     public function actionCreate($id)
     {
 
@@ -169,18 +134,6 @@ class GenerationProblemController extends AppController
 
         $model->segment_id = $segment->id;
         $model->project_id = $project->id;
-
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['interview/view', 'id' => $interview->id]);
-            }
-        }
 
         if ($model->load(Yii::$app->request->post())) {
             $model->description = $_POST['GenerationProblem']['description'];
@@ -199,11 +152,9 @@ class GenerationProblemController extends AppController
 
 
     /**
-     * Updates an existing GenerationProblem model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return GenerationProblem
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {

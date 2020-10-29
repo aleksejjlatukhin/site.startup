@@ -304,10 +304,10 @@ class Projects extends ActiveRecord
 
                 if ($roadmap->getProperty('fact_gps') <= $roadmap->getProperty('plan_gps')){
 
-                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_success']);
+                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_success']);
                 }else {
 
-                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_danger']);
+                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_danger']);
                 }
             }else {
                 $fact_gps = '_ _ _ _ _ _';
@@ -332,10 +332,10 @@ class Projects extends ActiveRecord
 
                 if ($roadmap->getProperty('fact_gcp') <= $roadmap->getProperty('plan_gcp')){
 
-                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_success']);
+                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_success']);
                 }else {
 
-                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_danger']);
+                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_danger']);
                 }
             }else {
                 $fact_gcp = '_ _ _ _ _ _';
@@ -356,31 +356,31 @@ class Projects extends ActiveRecord
             }
 
 
-            if ($roadmap->getProperty('fact_gmvp') != null) {
+            if ($roadmap->getProperty('fact_mvp') != null) {
 
-                if ($roadmap->getProperty('fact_gmvp') <= $roadmap->getProperty('plan_gmvp')){
+                if ($roadmap->getProperty('fact_mvp') <= $roadmap->getProperty('plan_mvp')){
 
-                    $fact_gmvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
+                    $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_success']);
                 }else {
 
-                    $fact_gmvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+                    $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_danger']);
                 }
             }else {
-                $fact_gmvp = '_ _ _ _ _ _';
+                $fact_mvp = '_ _ _ _ _ _';
             }
 
 
-            if ($roadmap->getProperty('fact_gmvp_confirm') != null) {
+            if ($roadmap->getProperty('fact_mvp_confirm') != null) {
 
-                if ($roadmap->getProperty('fact_gmvp_confirm') <= $roadmap->getProperty('plan_gmvp_confirm')){
+                if ($roadmap->getProperty('fact_mvp_confirm') <= $roadmap->getProperty('plan_mvp_confirm')){
 
-                    $fact_gmvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
+                    $fact_mvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_mvp')], ['class' => 'roadmap_block_date_link_success']);
                 }else {
 
-                    $fact_gmvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gmvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+                    $fact_mvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_mvp')], ['class' => 'roadmap_block_date_link_danger']);
                 }
             }else {
-                $fact_gmvp_confirm = '_ _ _ _ _ _';
+                $fact_mvp_confirm = '_ _ _ _ _ _';
             }
 
 
@@ -458,11 +458,11 @@ class Projects extends ActiveRecord
                             <div class="roadmap_block_date">
                             
                                 <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gmvp')).'
+                                    '.date('d.m.y',$roadmap->getProperty('plan_mvp')).'
                                 </div>
                                 
                                 <div>
-                                    '.$fact_gmvp.'
+                                    '.$fact_mvp.'
                                 </div>
                             
                             </div>
@@ -470,11 +470,11 @@ class Projects extends ActiveRecord
                             <div class="roadmap_block_date">
                             
                                 <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gmvp_confirm')).'
+                                    '.date('d.m.y',$roadmap->getProperty('plan_mvp_confirm')).'
                                 </div>
                                 
                                 <div>
-                                    '.$fact_gmvp_confirm.'
+                                    '.$fact_mvp_confirm.'
                                 </div>
                             
                             </div>
