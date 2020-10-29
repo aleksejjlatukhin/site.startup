@@ -534,7 +534,7 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
 
         <div class="col-md-12" style="margin-top: 10px;">
 
-            <?= $form->field($newMvp, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта:')->textarea([
+            <?= $form->field($newMvp, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта')->textarea([
                 'rows' => 2,
                 'maxlength' => 255,
                 'required' => true,
@@ -621,7 +621,7 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
 
             <div class="col-md-12" style="margin-top: 10px;">
 
-                <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание гипотезы ценностного предложения')->textarea([
+                <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта')->textarea([
                     'rows' => 2,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
