@@ -13,54 +13,31 @@ use app\models\UpdateRespondConfirmForm;
 use app\models\User;
 use Yii;
 use app\models\RespondsConfirm;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * RespondsConfirmController implements the CRUD actions for RespondsConfirm model.
- */
 class RespondsConfirmController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = RespondsConfirm::findOne(Yii::$app->request->get());
             $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
             $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'update') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['view'])){
-
-            $model = RespondsConfirm::findOne(Yii::$app->request->get());
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -72,36 +49,14 @@ class RespondsConfirmController extends AppController
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['by-status-interview']) || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
-
-            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -116,77 +71,10 @@ class RespondsConfirmController extends AppController
     }
 
 
-
-    public function actionIndex($id)
-    {
-        return $this->renderList($id);
-    }
-
-
-    protected function renderList($id)
-    {
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $problem_title = str_replace(' ', '_', $generationProblem->title);
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $segment_name = str_replace(' ', '_', $segment->name);
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project_filename = str_replace(' ', '_', $project->project_name);
-
-        $newRespond = new RespondsConfirm();
-        $newRespond->confirm_problem_id = $confirmProblem->id;
-
-        $updateRespondForms = [];
-        $createDescInterviewForms = [];
-        $updateDescInterviewForms = [];
-        foreach ($models as $i => $model) {
-
-            $updateRespondForms[] = new UpdateRespondConfirmForm($model->id);
-
-            $createDescInterviewForms[] = new DescInterviewConfirm();
-
-            $updateDescInterviewForms[] = $model->descInterview;
-
-        }
-
-
-        $query = RespondsConfirm::find()->where(['confirm_problem_id' => $id]);
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
-
-
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-            'models' => $models,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'newRespond' => $newRespond,
-            'updateRespondForms' => $updateRespondForms,
-            'createDescInterviewForms' => $createDescInterviewForms,
-            'updateDescInterviewForms' => $updateDescInterviewForms,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'project_filename' => $project_filename,
-            'segment_name' => $segment_name,
-            'problem_title' => $problem_title,
-        ]);
-    }
-
-
+    /**
+     * @param $id
+     * @return array
+     */
     public function actionDataAvailability($id)
     {
 
@@ -223,96 +111,9 @@ class RespondsConfirmController extends AppController
     }
 
 
-    public function actionExist($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => RespondsConfirm::find()->where(['confirm_problem_id' => $id]),
-        ]);
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('exist', [
-            'dataProvider' => $dataProvider,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-
-    public function actionByStatusInterview($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => RespondsConfirm::find()->where(['confirm_problem_id' => $id]),
-        ]);
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('by-status-interview', [
-            'dataProvider' => $dataProvider,
-            'responds' => $responds,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
     /**
-     * Displays a single RespondsConfirm model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $model = RespondsConfirm::findOne($id);
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $desc_interview = DescInterviewConfirm::find()->where(['responds_confirm_id' => $model->id])->one();
-
-
-        if (User::isUserSimple(Yii::$app->user->identity['username'])){
-
-            if (empty($model->info_respond)){
-                Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
-            }
-
-            if (!empty($model->info_respond) && empty($model->descInterview)){
-                Yii::$app->session->setFlash('success', 'Для внесения данных в анкету респондента пройдите по ссылке "Добавить анкету".');
-            }
-        }
-
-
-        return $this->render('view', [
-            'model' => $model,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'desc_interview' => $desc_interview,
-        ]);
-    }
-
-    /**
-     * Creates a new RespondsConfirm model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return array
      */
     public function actionCreate($id)
     {
@@ -322,11 +123,10 @@ class RespondsConfirmController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $limit_count_respond = 100;
+        $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
 
         $newRespond = new RespondsConfirm();
         $newRespond->confirm_problem_id = $id;
-
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -383,12 +183,11 @@ class RespondsConfirmController extends AppController
 
     }
 
+
     /**
-     * Updates an existing RespondsConfirm model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return RespondsConfirm|array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -401,7 +200,6 @@ class RespondsConfirmController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-
 
         if ($updateRespondForm->load(Yii::$app->request->post())) {
 
@@ -439,7 +237,12 @@ class RespondsConfirmController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDelete ($id) {
 
         $model = RespondsConfirm::findOne($id);
@@ -454,10 +257,7 @@ class RespondsConfirmController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-
-
         if (Yii::$app->request->isAjax){
-
 
             if (count($responds) == 1){
 
@@ -475,7 +275,6 @@ class RespondsConfirmController extends AppController
                 \Yii::$app->response->data = $response;
                 return $response;
             }
-
 
             $project->updated_at = time();
 

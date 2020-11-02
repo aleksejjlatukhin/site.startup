@@ -2,61 +2,40 @@
 
 namespace app\controllers;
 
-use app\models\FeedbackExpert;
-use app\models\FeedbackExpertConfirm;
 use app\models\FormCreateSegment;
 use app\models\FormUpdateSegment;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
-use app\models\Mvp;
 use app\models\Projects;
-use app\models\Questions;
-use app\models\Respond;
-use app\models\RespondsConfirm;
 use app\models\SegmentSearch;
 use app\models\TypeOfActivityB2B;
 use app\models\TypeOfActivityB2C;
 use app\models\User;
 use Yii;
 use app\models\Segment;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use app\models\SortForm;
 use app\models\SegmentSort;
 
-/**
- * SegmentController implements the CRUD actions for Segment model.
- */
 class SegmentController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
-
-            $model = Segment::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $model->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update'])){
 
             $model = Segment::findOne(Yii::$app->request->get());
             $project = Projects::find()->where(['id' => $model->project_id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -85,10 +64,8 @@ class SegmentController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -102,9 +79,10 @@ class SegmentController extends AppController
 
     }
 
+
     /**
-     * Lists all Segment models.
-     * @return mixed
+     * @param $id
+     * @return string
      */
     public function actionIndex($id)
     {
@@ -118,10 +96,8 @@ class SegmentController extends AppController
         $updateSegments = [];
 
         foreach ($models as $model){
-
             $updateSegments[] = new FormUpdateSegment($model->id);
         }
-
 
         //Проверка и создание необходимых папок на сервере --- начало ---
         $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
@@ -157,7 +133,11 @@ class SegmentController extends AppController
     }
 
 
-
+    /**
+     * @param $current_id
+     * @param $type_sort_id
+     * @return array
+     */
     public function actionSortingModels($current_id, $type_sort_id)
     {
         $sort = new SegmentSort();
@@ -174,58 +154,19 @@ class SegmentController extends AppController
     }
 
 
-
     /**
-     * Displays a single Segment model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-        $project = Projects::find()->where(['id' => $this->findModel($id)->project_id])->one();
-
-        if (empty($model->creat_date)){
-            Yii::$app->session->setFlash('error', "Необходимо заполнить все данные о сегменте!");
-        }
-
-        return $this->render('view', [
-            'model' => $model,
-            'project' => $project,
-        ]);
-    }
-
-    /**
-     * Creates a new Segment model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return array|string|\yii\web\Response
      */
     public function actionCreate($id)
     {
         $model = new FormCreateSegment();
         $model->project_id = $id;
-
         $project = Projects::find()->where(['id' => $model->project_id])->one();
-        $project->updated_at = time();
-
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['/segment/index', 'id' => $project->id]);
-            }
-        }
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
-
 
                 if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
 
@@ -236,6 +177,8 @@ class SegmentController extends AppController
                         if ($model->validate()) {
 
                             if ($model->create()) {
+
+                                $project->updated_at = time();
 
                                 if ($project->save()){
 
@@ -278,6 +221,8 @@ class SegmentController extends AppController
 
                             if ($model->create()) {
 
+                                $project->updated_at = time();
+
                                 if ($project->save()){
 
                                     $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
@@ -313,14 +258,13 @@ class SegmentController extends AppController
                 }
             }
         }
-
-        return $this->render('create', [
-            'model' => $model,
-            'project' => $project,
-        ]);
+        return false;
     }
 
 
+    /**
+     * @return array
+     */
     public function actionListTypeSort()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -340,6 +284,9 @@ class SegmentController extends AppController
     }
 
 
+    /**
+     * @return array
+     */
     public function actionListOfActivitiesForSelectedAreaB2c()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -359,6 +306,9 @@ class SegmentController extends AppController
     }
 
 
+    /**
+     * @return array
+     */
     public function actionListOfSpecializationsForSelectedActivityB2c()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -378,6 +328,9 @@ class SegmentController extends AppController
     }
 
 
+    /**
+     * @return array
+     */
     public function actionListOfActivitiesForSelectedAreaB2b()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -398,7 +351,9 @@ class SegmentController extends AppController
     }
 
 
-
+    /**
+     * @return array
+     */
     public function actionListOfSpecializationsForSelectedActivityB2b()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -427,30 +382,16 @@ class SegmentController extends AppController
         return ['output' => '', 'selected' => ''];
     }
 
+
     /**
-     * Updates an existing Segment model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return array|\yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $segment = $this->findModel($id);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['/segment/index', 'id' => $project->id]);
-            }
-        }
 
         $model = new FormUpdateSegment($id);
 
@@ -468,6 +409,8 @@ class SegmentController extends AppController
                         if ($model->validate()) {
 
                             if ($model->update()) {
+
+                                $project->updated_at = time();
 
                                 if ($project->save()){
 

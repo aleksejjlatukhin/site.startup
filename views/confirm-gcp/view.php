@@ -607,7 +607,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
         ?>
 
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-            - общее количество респондентов не может быть меньше количества респондентов, подтверждающих проблему;
+            - общее количество респондентов не может быть меньше количества респондентов, подтверждающих ценностное предложение;
         </h4>
 
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
@@ -2083,7 +2083,7 @@ $script = "
                 var container = $('#QuestionsTable-container');
                 $('.new-string-table-questions').find('.string_question').addClass('string_question-' + response.model.id);
                 $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.title_question').html(response.model.title);
-                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/confirm-problem/delete-question?id=' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/confirm-gcp/delete-question?id=' + response.model.id);
                 $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('id', 'delete_question-' + response.model.id);
                 var newString = $('.new-string-table-questions').html();
                 container.append(newString);

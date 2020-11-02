@@ -400,7 +400,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                     <?= $form->field($formUpdateConfirmProblem, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                    ])->label('<div>Количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,
@@ -530,7 +530,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                     <?= $form->field($formUpdateConfirmProblem, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                    ])->label('<div>Количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,

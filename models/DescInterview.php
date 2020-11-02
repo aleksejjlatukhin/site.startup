@@ -6,20 +6,11 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\web\NotFoundHttpException;
 
-/**
- * This is the model class for table "desc_interview".
- *
- * @property string $id
- * @property int $respond_id
- * @property string $date_fact
- * @property string $description
- */
+
 class DescInterview extends \yii\db\ActiveRecord
 {
 
     public $loadFile;
-
-    //public $exist_desc;
 
     /**
      * {@inheritdoc}
@@ -71,11 +62,10 @@ class DescInterview extends \yii\db\ActiveRecord
     {
         return [
             [['respond_id', 'description', 'result'], 'required'],
-            [['respond_id', 'created_at', 'updated_at'], 'integer'],
+            [['respond_id', 'status'], 'integer'],
             [['description'], 'string'],
             [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
-            ['status', 'boolean'],
         ];
     }
 

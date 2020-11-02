@@ -16,7 +16,7 @@ use Yii;
 class RespondsMvp extends \yii\db\ActiveRecord
 {
 
-    public $exist_respond;
+    const LIMIT_COUNT = 100;
 
     /**
      * {@inheritdoc}
@@ -36,6 +36,11 @@ class RespondsMvp extends \yii\db\ActiveRecord
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
     }
 
+    public function getAnswers()
+    {
+        return $this->hasMany(AnswersQuestionsConfirmMvp::class, ['respond_id' => 'id']);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -47,7 +52,6 @@ class RespondsMvp extends \yii\db\ActiveRecord
             [['name', 'info_respond', 'email'], 'trim'],
             [['name', 'info_respond', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
-            ['exist_respond', 'boolean'],
         ];
     }
 
@@ -63,5 +67,19 @@ class RespondsMvp extends \yii\db\ActiveRecord
             'info_respond' => 'Данные респондента',
             'email' => 'Адрес электронной почты',
         ];
+    }
+
+
+    public function addAnswersForNewRespond()
+    {
+        $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $this->confirm_mvp_id])->all();
+
+        foreach ($questions as $question){
+
+            $answer = new AnswersQuestionsConfirmMvp();
+            $answer->question_id = $question->id;
+            $answer->respond_id = $this->id;
+            $answer->save();
+        }
     }
 }

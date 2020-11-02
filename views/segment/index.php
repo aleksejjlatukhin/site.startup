@@ -2504,21 +2504,6 @@ $this->registerJs($script, $position);
 foreach ($models as $model) :
 
     $script2 = "
-
-    $(document).ready(function() {
-    
-        // Проверка установленного значения B2C/B2B в форме редактирования
-//        if($('#select2-type-interaction-".$model->id."-container').html() === 'Коммерческие взаимоотношения между организацией и частным потребителем (B2C)'){
-//            $('.form-update-template-b2b-".$model->id."').hide();
-//            $('.form-update-template-b2c-".$model->id."').show();
-//        }
-//        else {  
-//            $('.form-update-template-b2b-".$model->id."').show();
-//            $('.form-update-template-b2c-".$model->id."').hide();
-//        }
-
-    });
-    
     
     $('#formUpdateSegment-".$model->id."').on('beforeSubmit', function(e){
         

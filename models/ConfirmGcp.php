@@ -5,18 +5,9 @@ namespace app\models;
 use Yii;
 use yii\helpers\Html;
 
-/**
- * This is the model class for table "confirm_gcp".
- *
- * @property string $id
- * @property int $gcp_id
- * @property int $count_respond
- * @property int $count_positive
- */
+
 class ConfirmGcp extends \yii\db\ActiveRecord
 {
-
-    public $exist_confirm;
 
     /**
      * {@inheritdoc}
@@ -58,7 +49,7 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     {
         return [
             [['gcp_id', 'count_respond', 'count_positive'], 'required'],
-            [['gcp_id', 'exist_confirm'], 'integer'],
+            [['gcp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
         ];
     }

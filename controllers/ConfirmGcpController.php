@@ -18,17 +18,18 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmGcp;
-use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * ConfirmGcpController implements the CRUD actions for ConfirmGcp model.
- */
+
 class ConfirmGcpController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
@@ -36,11 +37,7 @@ class ConfirmGcpController extends AppController
 
             $model = ConfirmGcp::findOne(Yii::$app->request->get());
             $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -52,18 +49,17 @@ class ConfirmGcpController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = ConfirmGcp::findOne(Yii::$app->request->get());
             $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -74,14 +70,65 @@ class ConfirmGcpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $gcp = Gcp::findOne(Yii::$app->request->get());
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['save-confirm-gcp'])){
+
+            $gcp = Gcp::findOne(Yii::$app->request->get());
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        }elseif (in_array($action->id, ['add-questions'])){
+
+            $model = ConfirmGcp::findOne(Yii::$app->request->get());
+            $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        } elseif (in_array($action->id, ['delete-question'])){
+
+            $question = QuestionsConfirmGcp::findOne(Yii::$app->request->get());
+            $confirm_gcp = ConfirmGcp::find()->where(['id' => $question->confirm_gcp_id])->one();
+            $gcp = Gcp::find()->where(['id' => $confirm_gcp->gcp_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -97,10 +144,9 @@ class ConfirmGcpController extends AppController
 
 
     /**
-     * Displays a single ConfirmGcp model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -160,7 +206,11 @@ class ConfirmGcpController extends AppController
     }
 
 
-    /*Проверка данных подтверждения на этапе разработки ГЦП*/
+    /**
+     * Проверка данных подтверждения на этапе разработки ГЦП
+     * @param $id
+     * @return array
+     */
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmGcp::findOne($id);
@@ -197,9 +247,11 @@ class ConfirmGcpController extends AppController
         }
     }
 
-
-
-    /*Завершение подтверждения сегмента и переход на следующий этап*/
+    /**
+     * Завершение подтверждения ГЦП и переход на следующий этап
+     * @param $id
+     * @return array
+     */
     public function actionMovingNextStage($id)
     {
         $model = ConfirmGcp::findOne($id);
@@ -249,7 +301,10 @@ class ConfirmGcpController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionNotExistConfirm($id)
     {
         $model = ConfirmGcp::find()->where(['id' => $id])->one();
@@ -279,6 +334,10 @@ class ConfirmGcpController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionExistConfirm($id)
     {
         $model = ConfirmGcp::find()->where(['id' => $id])->one();
@@ -301,10 +360,10 @@ class ConfirmGcpController extends AppController
         }
     }
 
+
     /**
-     * Creates a new ConfirmGcp model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return string|\yii\web\Response
      */
     public function actionCreate($id)
     {
@@ -344,7 +403,10 @@ class ConfirmGcpController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return array|\yii\web\Response
+     */
     public function actionSaveConfirmGcp($id)
     {
         $model = new ConfirmGcp();
@@ -439,8 +501,11 @@ class ConfirmGcpController extends AppController
     }
 
 
-
-    //Страница со списком вопросов
+    /**
+     * Страница со списком вопросов
+     * @param $id
+     * @return string
+     */
     public function actionAddQuestions($id)
     {
         $confirmGcp = ConfirmGcp::findOne($id);
@@ -475,9 +540,11 @@ class ConfirmGcpController extends AppController
         ]);
     }
 
-
-
-    //Метод для добавления новых вопросов
+    /**
+     * Метод для добавления новых вопросов
+     * @param $id
+     * @return array
+     */
     public function actionAddQuestion($id)
     {
         $model = new QuestionsConfirmGcp();
@@ -520,6 +587,12 @@ class ConfirmGcpController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteQuestion($id)
     {
         $model = QuestionsConfirmGcp::findOne($id);
@@ -555,7 +628,10 @@ class ConfirmGcpController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return array
+     */
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmGcp($id);
@@ -610,8 +686,15 @@ class ConfirmGcpController extends AppController
     }
 
 
-
-
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionMpdfDataResponds($id)
     {
         $model = ConfirmGcp::findOne($id);

@@ -2,17 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\AllQuestions;
 use app\models\DescInterview;
-use app\models\FeedbackExpert;
-use app\models\FeedbackExpertConfirm;
 use app\models\FormUpdateConfirmSegment;
-use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
-use app\models\RespondsConfirm;
-use app\models\Roadmap;
 use app\models\Segment;
 use app\models\UpdateRespondForm;
 use app\models\User;
@@ -22,11 +16,8 @@ use app\models\Interview;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
-use yii\filters\VerbFilter;
 
-/**
- * InterviewController implements the CRUD actions for Interview model.
- */
+
 class InterviewController extends AppController
 {
 
@@ -49,7 +40,7 @@ class InterviewController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = Interview::findOne(Yii::$app->request->get());
             $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -57,6 +48,9 @@ class InterviewController extends AppController
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -86,10 +80,8 @@ class InterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'save-interview') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -107,6 +99,9 @@ class InterviewController extends AppController
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
                 return parent::beforeAction($action);
 
             }else{
@@ -123,30 +118,8 @@ class InterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'delete-question') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['data-availability-for-next-step'])){
-
-            $interview = Interview::findOne(Yii::$app->request->get());
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                if ($action->id == 'data-availability-for-next-step') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -161,12 +134,9 @@ class InterviewController extends AppController
     }
 
 
-
     /**
-     * Displays a single Interview model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string
      */
     public function actionView($id)
     {
@@ -232,7 +202,11 @@ class InterviewController extends AppController
     }
 
 
-    /*Проверка данных подтверждения на этапе генерации ГПС*/
+    /**
+     * Проверка данных подтверждения на этапе генерации ГПС
+     * @param $id
+     * @return array
+     */
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = Interview::findOne($id);
@@ -272,7 +246,11 @@ class InterviewController extends AppController
 
 
 
-    /*Завершение подтверждения сегмента и переход на следующий этап*/
+    /**
+     * Завершение подтверждения сегмента и переход на следующий этап
+     * @param $id
+     * @return array
+     */
     public function actionMovingNextStage($id)
     {
         $model = Interview::findOne($id);
@@ -321,10 +299,10 @@ class InterviewController extends AppController
         }
     }
 
+
     /**
-     * Creates a new Interview model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return string|\yii\web\Response
      */
     public function actionCreate($id)
     {
@@ -353,6 +331,10 @@ class InterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array|\yii\web\Response
+     */
     public function actionSaveInterview($id)
     {
         $segment = Segment::findOne($id);
@@ -448,7 +430,11 @@ class InterviewController extends AppController
         }
     }
 
-    //Страница со списком вопросов
+    /**
+     * Страница со списком вопросов
+     * @param $id
+     * @return string
+     */
     public function actionAddQuestions($id)
     {
         $model = Interview::find()->with('questions')->where(['id' => $id])->one();
@@ -488,8 +474,10 @@ class InterviewController extends AppController
     }
 
 
-
-
+    /**
+     * @param $id
+     * @return array
+     */
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmSegment($id);
@@ -539,8 +527,11 @@ class InterviewController extends AppController
     }
 
 
-
-    //Метод для добавления новых вопросов
+    /**
+     * Метод для добавления новых вопросов
+     * @param $id
+     * @return array
+     */
     public function actionAddQuestion($id)
     {
         $model = new Questions();
@@ -581,6 +572,12 @@ class InterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteQuestion ($id)
     {
         $model = Questions::findOne($id);
@@ -613,6 +610,10 @@ class InterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionNotExistConfirm($id)
     {
         $model = Interview::findOne($id);
@@ -638,6 +639,10 @@ class InterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionExistConfirm($id)
     {
         $model = Interview::findOne($id);
@@ -657,7 +662,15 @@ class InterviewController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionMpdfDataResponds($id)
     {
         $model = Interview::findOne($id);

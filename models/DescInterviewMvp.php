@@ -5,18 +5,10 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
-/**
- * This is the model class for table "desc_interview_mvp".
- *
- * @property string $id
- * @property int $responds_mvp_id
- * @property string $date_fact
- * @property string $status
- */
+
 class DescInterviewMvp extends \yii\db\ActiveRecord
 {
 
-    public $exist_desc;
     /**
      * {@inheritdoc}
      */
@@ -38,7 +30,6 @@ class DescInterviewMvp extends \yii\db\ActiveRecord
         return [
             [['responds_mvp_id', 'status'], 'required'],
             [['responds_mvp_id', 'status'], 'integer'],
-            ['exist_desc', 'boolean'],
         ];
     }
 

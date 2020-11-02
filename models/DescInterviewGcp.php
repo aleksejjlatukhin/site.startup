@@ -5,18 +5,10 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
-/**
- * This is the model class for table "desc_interview_gcp".
- *
- * @property string $id
- * @property int $responds_gcp_id
- * @property string $date_fact
- * @property string $status
- */
+
 class DescInterviewGcp extends \yii\db\ActiveRecord
 {
 
-    public $exist_desc;
     /**
      * {@inheritdoc}
      */
@@ -36,10 +28,8 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['responds_gcp_id'], 'required'],
-            [['responds_gcp_id'], 'integer'],
-            [['status'], 'string'],
-            ['exist_desc', 'boolean'],
+            [['responds_gcp_id', 'status'], 'required'],
+            [['responds_gcp_id', 'status'], 'integer'],
         ];
     }
 

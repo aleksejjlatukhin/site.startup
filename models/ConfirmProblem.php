@@ -5,29 +5,9 @@ namespace app\models;
 use Yii;
 use yii\helpers\Html;
 
-/**
- * This is the model class for table "confirm_problem".
- *
- * @property string $id
- * @property int $gps_id
- * @property int $count_respond
- * @property int $count_positive
- * @property string $greeting_interview
- * @property string $view_interview
- * @property string $reason_interview
- * @property string $question_1
- * @property string $question_2
- * @property string $question_3
- * @property string $question_4
- * @property string $question_5
- * @property string $question_6
- * @property string $question_7
- * @property string $question_8
- */
+
 class ConfirmProblem extends \yii\db\ActiveRecord
 {
-
-    public $exist_confirm;
 
     /**
      * {@inheritdoc}
@@ -71,7 +51,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     {
         return [
             [['gps_id', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
-            [['gps_id', 'exist_confirm'], 'integer'],
+            [['gps_id'], 'integer'],
             ['need_consumer', 'trim'],
             ['need_consumer', 'string', 'max' => 255],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],

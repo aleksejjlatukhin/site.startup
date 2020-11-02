@@ -17,7 +17,7 @@ use Yii;
  */
 class Respond extends \yii\db\ActiveRecord
 {
-    //public $exist_respond;
+    const LIMIT_COUNT = 100;
 
     /**
      * {@inheritdoc}
@@ -44,7 +44,6 @@ class Respond extends \yii\db\ActiveRecord
             [['date_plan'], 'integer'],
             [['name', 'info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
-            //['exist_respond', 'boolean'],
         ];
     }
 

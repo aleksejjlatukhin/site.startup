@@ -2,24 +2,16 @@
 
 namespace app\controllers;
 
-use app\models\ConfirmProblem;
-use app\models\DescInterview;
-use app\models\FeedbackExpertConfirm;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Respond;
-use app\models\RespondsConfirm;
 use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\GenerationProblem;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * GenerationProblemController implements the CRUD actions for GenerationProblem model.
- */
+
 class GenerationProblemController extends AppController
 {
 
@@ -31,15 +23,16 @@ class GenerationProblemController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $model->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 

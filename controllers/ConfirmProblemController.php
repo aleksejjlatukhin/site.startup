@@ -2,9 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\AllQuestionsConfirmProblem;
 use app\models\DescInterviewConfirm;
-use app\models\FeedbackExpertConfirm;
 use app\models\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -18,17 +16,18 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmProblem;
-use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * ConfirmProblemController implements the CRUD actions for ConfirmProblem model.
- */
+
 class ConfirmProblemController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
@@ -36,9 +35,7 @@ class ConfirmProblemController extends AppController
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -50,16 +47,17 @@ class ConfirmProblemController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -83,6 +81,63 @@ class ConfirmProblemController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
+        }elseif (in_array($action->id, ['save-confirm-problem'])){
+
+            $problem = GenerationProblem::findOne(Yii::$app->request->get());
+            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
+            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
+            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        } elseif (in_array($action->id, ['add-questions'])){
+
+            $model = ConfirmProblem::findOne(Yii::$app->request->get());
+            $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        } elseif (in_array($action->id, ['delete-question'])){
+
+            $question = QuestionsConfirmProblem::findOne(Yii::$app->request->get());
+            $confirm_problem = ConfirmProblem::find()->where(['id' => $question->confirm_problem_id])->one();
+            $problem = GenerationProblem::find()->where(['id' => $confirm_problem->gps_id])->one();
+            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
         }else{
             return parent::beforeAction($action);
         }
@@ -91,10 +146,8 @@ class ConfirmProblemController extends AppController
 
 
     /**
-     * Displays a single ConfirmProblem model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string
      */
     public function actionView($id)
     {
@@ -149,10 +202,11 @@ class ConfirmProblemController extends AppController
         ]);
     }
 
-
-
-
-    /*Проверка данных подтверждения на этапе разработки ГЦП*/
+    /**
+     * Проверка данных подтверждения на этапе разработки ГЦП
+     * @param $id
+     * @return array
+     */
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmProblem::findOne($id);
@@ -189,10 +243,11 @@ class ConfirmProblemController extends AppController
         }
     }
 
-
-
-
-    /*Завершение подтверждения сегмента и переход на следующий этап*/
+    /**
+     * Завершение подтверждения ГПС и переход на следующий этап
+     * @param $id
+     * @return array
+     */
     public function actionMovingNextStage($id)
     {
         $model = ConfirmProblem::findOne($id);
@@ -242,7 +297,10 @@ class ConfirmProblemController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionNotExistConfirm($id)
     {
         $model = ConfirmProblem::findOne($id);
@@ -270,6 +328,10 @@ class ConfirmProblemController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
     public function actionExistConfirm($id)
     {
         $model = ConfirmProblem::findOne($id);
@@ -290,10 +352,10 @@ class ConfirmProblemController extends AppController
         }
     }
 
+
     /**
-     * Creates a new ConfirmProblem model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return string|\yii\web\Response
      */
     public function actionCreate($id)
     {
@@ -319,7 +381,6 @@ class ConfirmProblemController extends AppController
 
         $model->count_respond = count($respondsPre);
 
-
         return $this->render('create', [
             'model' => $model,
             'generationProblem' => $generationProblem,
@@ -330,6 +391,10 @@ class ConfirmProblemController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array|\yii\web\Response
+     */
     public function actionSaveConfirmProblem($id)
     {
         $model = new ConfirmProblem();
@@ -442,8 +507,11 @@ class ConfirmProblemController extends AppController
         }
     }
 
-
-    //Страница со списком вопросов
+    /**
+     * Страница со списком вопросов
+     * @param $id
+     * @return string
+     */
     public function actionAddQuestions($id)
     {
         $confirmProblem = ConfirmProblem::find()->with('questions')->where(['id' => $id])->one();
@@ -474,8 +542,11 @@ class ConfirmProblemController extends AppController
         ]);
     }
 
-
-    //Метод для добавления новых вопросов
+    /**
+     * Метод для добавления новых вопросов
+     * @param $id
+     * @return array
+     */
     public function actionAddQuestion($id)
     {
         $confirmProblem = ConfirmProblem::findOne($id);
@@ -518,6 +589,12 @@ class ConfirmProblemController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteQuestion($id)
     {
         $model = QuestionsConfirmProblem::findOne($id);
@@ -553,6 +630,10 @@ class ConfirmProblemController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array
+     */
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmProblem($id);
@@ -604,7 +685,15 @@ class ConfirmProblemController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionMpdfDataResponds($id)
     {
         $model = ConfirmProblem::findOne($id);

@@ -9,39 +9,17 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\DescInterview;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 
-/**
- * DescInterviewController implements the CRUD actions for DescInterview model.
- */
+
 class DescInterviewController extends AppController
 {
 
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
-
-            $descInterview = DescInterview::findOne(Yii::$app->request->get());
-            $respond = Respond::find()->where(['id' => $descInterview->respond_id])->one();
-            $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $descInterview = DescInterview::findOne(Yii::$app->request->get());
             $respond = Respond::find()->where(['id' => $descInterview->respond_id])->one();
@@ -52,10 +30,8 @@ class DescInterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'update') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -73,10 +49,8 @@ class DescInterviewController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if ($project->user_id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -141,36 +115,13 @@ class DescInterviewController extends AppController
         if (Yii::$app->request->isAjax)
         {
             return '';
-        }else{
-            return $this->redirect(['update', 'id' => $model->id]);
         }
     }
 
     /**
-     * Displays a single DescInterview model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        return $this->render('view', [
-            'model' => $model,
-            'respond' => $respond,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-    /**
-     * Creates a new DescInterview model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return DescInterview|bool
+     * @throws NotFoundHttpException
      */
     public function actionCreate($id)
     {
@@ -225,12 +176,11 @@ class DescInterviewController extends AppController
         }
     }
 
+
     /**
-     * Updates an existing DescInterview model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return DescInterview
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -291,7 +241,7 @@ class DescInterviewController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $model = DescInterview::find()->where(['respond_id' => $id])->one();
         $respond = Respond::findOne($id);
@@ -318,7 +268,7 @@ class DescInterviewController extends AppController
 
             return $this->redirect(['respond/view', 'id' => $respond->id]);
         }
-    }
+    }*/
 
     /**
      * Finds the DescInterview model based on its primary key value.

@@ -12,13 +12,8 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\Mvp;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * MvpController implements the CRUD actions for mvp model.
- */
 class MvpController extends AppController
 {
 
@@ -30,19 +25,16 @@ class MvpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = Mvp::findOne(Yii::$app->request->get());
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $model->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -54,19 +46,10 @@ class MvpController extends AppController
 
             $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
             $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                if ($action->id == 'create') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
 
                 return parent::beforeAction($action);
 
@@ -78,11 +61,7 @@ class MvpController extends AppController
 
             $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
             $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])

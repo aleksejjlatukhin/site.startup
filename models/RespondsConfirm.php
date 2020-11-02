@@ -16,7 +16,7 @@ use Yii;
  */
 class RespondsConfirm extends \yii\db\ActiveRecord
 {
-    public $exist_respond;
+    const LIMIT_COUNT = 100;
 
     /**
      * {@inheritdoc}
@@ -52,7 +52,6 @@ class RespondsConfirm extends \yii\db\ActiveRecord
             [['name', 'info_respond', 'email'], 'trim'],
             [['name', 'info_respond', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
-            ['exist_respond', 'boolean'],
         ];
     }
 
@@ -84,24 +83,4 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         }
     }
 
-
-    public function listQuestions()
-    {
-        $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $this->confirm_problem_id])->all();
-
-        $answers = $this->answers;
-
-        $listQuestions = '';
-
-        foreach ($questions as $i => $question){
-
-            $listQuestions .= '<p>' . ($i+1) . '. ' . $question->title . '</p><p style="padding-left: 15px;">' . $answers[$i]->answer . '</p>';
-
-            if (($i+1) != count($questions)){
-                $listQuestions .= '<hr>';
-            }
-        }
-
-        return $listQuestions;
-    }
 }

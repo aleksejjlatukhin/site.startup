@@ -5,19 +5,9 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
-/**
- * This is the model class for table "desc_interview_confirm".
- *
- * @property string $id
- * @property int $responds_confirm_id
- * @property string $date_fact
- * @property string $description
- * @property string $interview_file
- */
+
 class DescInterviewConfirm extends \yii\db\ActiveRecord
 {
-
-    public $exist_desc;
 
     /**
      * {@inheritdoc}
@@ -38,10 +28,8 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['responds_confirm_id'], 'required'],
-            [['responds_confirm_id', 'created_at', 'updated_at'], 'integer'],
-            ['exist_desc', 'boolean'],
-            ['status', 'boolean'],
+            [['responds_confirm_id', 'status'], 'required'],
+            [['responds_confirm_id', 'status'], 'integer'],
         ];
     }
 

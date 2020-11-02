@@ -3,19 +3,12 @@
 namespace app\controllers;
 
 use Yii;
-use yii\base\Exception;
-use yii\filters\AccessControl;
 use yii\web\Response;
-use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 use app\models\SingupForm;
 use app\models\User;
 use app\models\ResetPasswordForm;
-use yii\base\InvalidArgumentException;
-use yii\web\BadRequestHttpException;
 use app\models\SendEmailForm;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\AccountActivation;
 
@@ -72,7 +65,8 @@ class SiteController extends AppController
 
     /**
      * @return array
-     * @throws \yii\base\Exception
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionSingup()
     {
@@ -91,22 +85,6 @@ class SiteController extends AppController
                         if ($user = $model->singup()) {
 
                             if ($user->confirm == User::NOT_CONFIRM) {
-
-                                /*try {
-
-                                    $model->sendActivationEmail($user);
-                                    Yii::$app->session->setFlash('success', '<div style="text-align: center">Письмо с подтверждением регистрации отправлено на указанный адрес: <strong>' .
-                                        Html::encode($user->email) . '</strong></div>');
-
-                                } catch (\Exception $e) {
-
-                                    $user->delete();
-                                    throw new \yii\web\HttpException('550', 'Ошибка. Не отправляются письма на указанный адрес эл.почты: ' . $model->email . '.');
-                                    //Yii::$app->session->setFlash('error', 'Ошибка. Письмо не отправлено.');
-                                    //Yii::error('Ошибка отправки письма.');
-                                }
-                                return $this->refresh();*/
-
 
                                 if ($model->sendActivationEmail($user)) {
 
@@ -172,15 +150,12 @@ class SiteController extends AppController
     }
 
 
-
+    /**
+     * @param $key
+     * @return string|Response
+     */
     public function actionActivateAccount($key)
     {
-        /*try {
-            $user = new AccountActivation($key);
-        }
-        catch(InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }*/
 
         $user = new AccountActivation($key);
 
@@ -226,22 +201,6 @@ class SiteController extends AppController
             ]);
         }
 
-
-        /*if($user->activateAccount()) {
-
-            //Отправка письма админу после подтверждения регистрации
-            $_user = $user->user;
-            $_user->sendEmailAdmin($_user);
-
-            Yii::$app->session->setFlash('success', '<div style="text-align: center">Подтверждение регистрации прошло успешно.</div>');
-
-        } else {
-
-            Yii::$app->session->setFlash('error', '<div style="text-align: center">Ошибка подтверждения регистрации.</div>');
-            Yii::error('Ошибка при подтверждении регистрации.');
-        }
-
-        return $this->redirect(Url::to(['/']));*/
     }
 
     /**
@@ -347,6 +306,9 @@ class SiteController extends AppController
     }
 
 
+    /**
+     * @return array
+     */
     public function actionSendEmail()
     {
 
@@ -392,14 +354,12 @@ class SiteController extends AppController
     }
 
 
+    /**
+     * @param $key
+     * @return string|Response
+     */
     public function actionResetPassword($key)
     {
-        /*try {
-            $model = new ResetPasswordForm($key);
-        }
-        catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }*/
 
         $model = new ResetPasswordForm($key);
 

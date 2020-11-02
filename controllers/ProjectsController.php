@@ -4,9 +4,7 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
-use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
-use app\models\ConfirmProblem;
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
 use app\models\FeedbackExpertGcp;
@@ -14,7 +12,6 @@ use app\models\FeedbackExpertMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
-use app\models\Model;
 use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\ProjectSort;
@@ -29,27 +26,25 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Projects;
-use yii\data\ActiveDataProvider;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\data\ArrayDataProvider;
-use yii\widgets\ActiveForm;
 use yii\web\Response;
 
 
-/**
- * ProjectsController implements the CRUD actions for Projects model.
- */
 class ProjectsController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot'])){
+        if (in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
@@ -121,7 +116,7 @@ class ProjectsController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $project = Projects::findOne(Yii::$app->request->get());
             $user = User::findOne(['id' => $project->user_id]);
@@ -142,8 +137,8 @@ class ProjectsController extends AppController
 
 
     /**
-     * Lists all Projects models.
-     * @return mixed
+     * @param $id
+     * @return string
      */
     public function actionIndex($id)
     {
@@ -173,6 +168,11 @@ class ProjectsController extends AppController
     }
 
 
+    /**
+     * @param $current_id
+     * @param $type_sort_id
+     * @return array
+     */
     public function actionSortingModels($current_id, $type_sort_id)
     {
         $sort = new ProjectSort();
@@ -189,6 +189,10 @@ class ProjectsController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\console\Response|Response
+     */
     public function actionDownload($id)
     {
         $model = PreFiles::findOne($id);
@@ -210,6 +214,12 @@ class ProjectsController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array|Response
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteFile($id)
     {
         $model = PreFiles::findOne($id);
@@ -244,23 +254,10 @@ class ProjectsController extends AppController
         }
     }
 
+
     /**
-     * Displays a single Projects model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @return array
      */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-
-        return $this->render('view', [
-            'model' => $model,
-        ]);
-    }
-
-
-
     public function actionListTypeSort()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -280,7 +277,10 @@ class ProjectsController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return string
+     */
     public function actionUpshot($id)
     {
         $model = Projects::findOne($id);
@@ -306,7 +306,6 @@ class ProjectsController extends AppController
             }
         }
 
-
         return $this->render('upshot', [
             'model' => $model,
             'segments' => $segments,
@@ -319,10 +318,11 @@ class ProjectsController extends AppController
         ]);
     }
 
+
     /**
-     * Creates a new Projects model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
      */
     public function actionCreate($id)
     {
@@ -434,26 +434,22 @@ class ProjectsController extends AppController
         }
     }
 
+
     /**
-     * Updates an existing Projects model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
         $user = User::find()->where(['id' => $model->user_id])->one();
-        $_user = Yii::$app->user->identity;
         $models = Projects::find()->where(['user_id' => $user['id']])->all();
         $workers = Authors::find()->where(['project_id'=>$id])->all();
-
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
-
 
                 /*Преобразование даты в число*/
                 if ($model->patent_date){
@@ -468,7 +464,6 @@ class ProjectsController extends AppController
                 if ($model->date_of_announcement){
                     $model->date_of_announcement = strtotime($model->date_of_announcement);
                 }
-
 
                 $countCon = 0;
                 foreach ($models as $item) {
@@ -535,7 +530,6 @@ class ProjectsController extends AppController
                         //Загрузка участников команды проекта (Authors)
                         //---Конец---
 
-
                         $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
 
@@ -567,199 +561,10 @@ class ProjectsController extends AppController
         }
     }
 
-
-    public function actionDeleteAuthor($id)
-    {
-        $model = Authors::findOne($id);
-        $project = Projects::find()->where(['id' => $model->project_id])->one();
-
-        if ($model){
-            $project->updated_at = time();
-            $model->delete();
-        }
-    }
-
     /**
-     * Deletes an existing Projects model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string
      */
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $user = User::find()->where(['id' => $model->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        if(!empty($segments)){
-            foreach ($segments as $segment){
-
-                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
-                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-
-                if(!empty($responds)){
-                    foreach ($responds as $respond){
-                        if (!empty($respond->descInterview)){
-                            $respond->descInterview->delete();
-                        }
-                    }
-                }
-
-                $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
-
-                if (!empty($generationProblems)){
-                    foreach ($generationProblems as $generationProblem){
-                        if (!empty($generationProblem->confirm)){
-                            $confirmProblem = $generationProblem->confirm;
-
-                            if (!empty($confirmProblem->feedbacks)){
-                                FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-
-                            if (!empty($confirmProblem->responds)){
-                                $respondsConfirm = $confirmProblem->responds;
-
-                                foreach ($respondsConfirm as $respondConfirm){
-                                    if (!empty($respondConfirm->descInterview)){
-                                        $respondConfirm->descInterview->delete();
-                                    }
-                                }
-
-                                RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-
-                            if (!empty($confirmProblem->gcps)){
-                                $gcps = $confirmProblem->gcps;
-
-                                foreach ($gcps as $gcp){
-                                    if(!empty($gcp->confirm)){
-                                        $confirmGcp = $gcp->confirm;
-
-                                        if (!empty($confirmGcp->feedbacks)){
-                                            FeedbackExpertGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        if (!empty($confirmGcp->responds)){
-                                            $respondsGcp = $confirmGcp->responds;
-
-                                            foreach ($respondsGcp as $respondGcp){
-                                                if (!empty($respondGcp->descInterview)){
-                                                    $respondGcp->descInterview->delete();
-                                                }
-                                            }
-
-                                            RespondsGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        if (!empty($confirmGcp->mvps)){
-                                            $mvps = $confirmGcp->mvps;
-
-                                            foreach ($mvps as $mvp){
-                                                if (!empty($mvp->confirm)){
-                                                    $confirmMvp = $mvp->confirm;
-
-                                                    if (!empty($confirmMvp->feedbacks)){
-                                                        FeedbackExpertMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
-                                                    }
-
-                                                    if (!empty($confirmMvp->responds)){
-                                                        $respondsMvp = $confirmMvp->responds;
-
-                                                        foreach ($respondsMvp as $respondMvp){
-                                                            if (!empty($respondMvp->descInterview)){
-                                                                $respondMvp->descInterview->delete();
-                                                            }
-                                                        }
-
-                                                        RespondsMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
-                                                    }
-
-                                                    if (!empty($confirmMvp->business)){
-                                                        $confirmMvp->business->delete();
-                                                    }
-
-
-                                                    $confirmMvp->delete();
-                                                }
-                                            }
-
-                                            Mvp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        $confirmGcp->delete();
-                                    }
-                                }
-
-                                Gcp::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-                            $confirmProblem->delete();
-                        }
-                    }
-                }
-
-
-
-                Questions::deleteAll(['interview_id' => $interview->id]);
-                FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
-                Respond::deleteAll(['interview_id' => $interview->id]);
-                GenerationProblem::deleteAll(['interview_id' => $interview->id]);
-                Interview::deleteAll(['segment_id' => $segment->id]);
-            }
-        }
-
-        /*Удаление загруженных папок и файлов пользователя*/
-        $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
-        if (file_exists($pathDelete)){
-            $this->delTree($pathDelete);
-        }
-        /*-----------------------------------------------*/
-
-
-        PreFiles::deleteAll(['project_id' => $model->id]);
-        Authors::deleteAll(['project_id' => $model->id]);
-        Segment::deleteAll(['project_id' => $model->id]);
-
-
-        Yii::$app->session->setFlash('error', 'Проект "' . $this->findModel($id)->project_name . '" удален');
-
-        $model->delete();
-
-        return $this->redirect(['index', 'id' => $user->id]);
-    }
-
-    /**
-     * Finds the Projects model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return Projects the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Projects::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-
     public function actionResult($id)
     {
 
@@ -965,6 +770,10 @@ class ProjectsController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return string
+     */
     public function actionReport ($id) {
 
         $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
@@ -1041,7 +850,15 @@ class ProjectsController extends AppController
     }
 
 
-    /*export in pdf*/
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionMpdfBusinessModel($id) {
 
         $model = BusinessModel::findOne($id);
@@ -1088,5 +905,204 @@ class ProjectsController extends AppController
 
         // return the pdf output as per the destination setting
         return $pdf->render();
+    }
+
+
+    /**
+     * @param $id
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionDeleteAuthor($id)
+    {
+        $model = Authors::findOne($id);
+        $project = Projects::find()->where(['id' => $model->project_id])->one();
+
+        if ($model){
+            $project->updated_at = time();
+            $model->delete();
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $segments = Segment::find()->where(['project_id' => $model->id])->all();
+        $user = User::find()->where(['id' => $model->user_id])->one();
+        $_user = Yii::$app->user->identity;
+
+
+        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            //Удаление доступно только проектанту, который создал данную модель
+            if ($user->id != $_user['id']){
+                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        if(!empty($segments)){
+            foreach ($segments as $segment){
+
+                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
+                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
+
+                if(!empty($responds)){
+                    foreach ($responds as $respond){
+                        if (!empty($respond->descInterview)){
+                            $respond->descInterview->delete();
+                        }
+                    }
+                }
+
+                $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
+
+                if (!empty($generationProblems)){
+                    foreach ($generationProblems as $generationProblem){
+                        if (!empty($generationProblem->confirm)){
+                            $confirmProblem = $generationProblem->confirm;
+
+                            if (!empty($confirmProblem->feedbacks)){
+                                FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                            }
+
+
+                            if (!empty($confirmProblem->responds)){
+                                $respondsConfirm = $confirmProblem->responds;
+
+                                foreach ($respondsConfirm as $respondConfirm){
+                                    if (!empty($respondConfirm->descInterview)){
+                                        $respondConfirm->descInterview->delete();
+                                    }
+                                }
+
+                                RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                            }
+
+
+                            if (!empty($confirmProblem->gcps)){
+                                $gcps = $confirmProblem->gcps;
+
+                                foreach ($gcps as $gcp){
+                                    if(!empty($gcp->confirm)){
+                                        $confirmGcp = $gcp->confirm;
+
+                                        if (!empty($confirmGcp->feedbacks)){
+                                            FeedbackExpertGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        if (!empty($confirmGcp->responds)){
+                                            $respondsGcp = $confirmGcp->responds;
+
+                                            foreach ($respondsGcp as $respondGcp){
+                                                if (!empty($respondGcp->descInterview)){
+                                                    $respondGcp->descInterview->delete();
+                                                }
+                                            }
+
+                                            RespondsGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        if (!empty($confirmGcp->mvps)){
+                                            $mvps = $confirmGcp->mvps;
+
+                                            foreach ($mvps as $mvp){
+                                                if (!empty($mvp->confirm)){
+                                                    $confirmMvp = $mvp->confirm;
+
+                                                    if (!empty($confirmMvp->feedbacks)){
+                                                        FeedbackExpertMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
+                                                    }
+
+                                                    if (!empty($confirmMvp->responds)){
+                                                        $respondsMvp = $confirmMvp->responds;
+
+                                                        foreach ($respondsMvp as $respondMvp){
+                                                            if (!empty($respondMvp->descInterview)){
+                                                                $respondMvp->descInterview->delete();
+                                                            }
+                                                        }
+
+                                                        RespondsMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
+                                                    }
+
+                                                    if (!empty($confirmMvp->business)){
+                                                        $confirmMvp->business->delete();
+                                                    }
+
+
+                                                    $confirmMvp->delete();
+                                                }
+                                            }
+
+                                            Mvp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
+                                        }
+
+                                        $confirmGcp->delete();
+                                    }
+                                }
+
+                                Gcp::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
+                            }
+
+                            $confirmProblem->delete();
+                        }
+                    }
+                }
+
+
+
+                Questions::deleteAll(['interview_id' => $interview->id]);
+                FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
+                Respond::deleteAll(['interview_id' => $interview->id]);
+                GenerationProblem::deleteAll(['interview_id' => $interview->id]);
+                Interview::deleteAll(['segment_id' => $segment->id]);
+            }
+        }
+
+        /*Удаление загруженных папок и файлов пользователя*/
+        $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
+        if (file_exists($pathDelete)){
+            $this->delTree($pathDelete);
+        }
+        /*-----------------------------------------------*/
+
+
+        PreFiles::deleteAll(['project_id' => $model->id]);
+        Authors::deleteAll(['project_id' => $model->id]);
+        Segment::deleteAll(['project_id' => $model->id]);
+
+
+        Yii::$app->session->setFlash('error', 'Проект "' . $this->findModel($id)->project_name . '" удален');
+
+        $model->delete();
+
+        return $this->redirect(['index', 'id' => $user->id]);
+    }
+
+
+    /**
+     * Finds the Projects model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Projects the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Projects::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

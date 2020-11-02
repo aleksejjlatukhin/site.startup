@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\AnswersQuestionsConfirmMvp;
 use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
@@ -12,60 +13,36 @@ use app\models\Interview;
 use app\models\Mvp;
 use app\models\Projects;
 use app\models\Segment;
+use app\models\UpdateRespondMvpForm;
 use app\models\User;
 use Yii;
 use app\models\RespondsMvp;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
-/**
- * RespondsMvpController implements the CRUD actions for RespondsMvp model.
- */
+
 class RespondsMvpController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = RespondsMvp::findOne(Yii::$app->request->get());
             $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
             $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['view'])){
-
-            $model = RespondsMvp::findOne(Yii::$app->request->get());
-            $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-            $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -73,21 +50,17 @@ class RespondsMvpController extends AppController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['by-status-interview']) || in_array($action->id, ['exist']) || in_array($action->id, ['index'])){
+        }elseif (in_array($action->id, ['create'])){
 
             $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get());
             $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -101,229 +74,134 @@ class RespondsMvpController extends AppController
 
     }
 
+
+
     /**
-     * Lists all RespondsMvp models.
-     * @return mixed
+     * @param $id
+     * @return array
      */
-    public function actionIndex($id)
+    public function actionDataAvailability($id)
+    {
+
+        $models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
+
+        $exist_data_respond = 0;
+        $exist_data_descInterview = 0;
+        foreach ($models as $model){
+
+            if (!empty($model->info_respond)){
+                $exist_data_respond++;
+            }
+            if (!empty($model->descInterview)){
+                $exist_data_descInterview++;
+            }
+        }
+
+        if(Yii::$app->request->isAjax) {
+            if (($exist_data_respond == count($models)) || ($exist_data_descInterview > 0)) {
+
+                $response =  ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            }else{
+
+                $response = ['error' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function actionCreate($id)
     {
         $models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
         $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-
-        $not_exist_data = 0;
-        $exist_data = 0;
-        foreach ($models as $model){
-            if (empty($model->info_respond) || empty($model->descInterview)){
-                $not_exist_data++;
-            }
-            if (!empty($model->info_respond) && !empty($model->descInterview)){
-                $exist_data++;
-            }
-        }
-
-        if (User::isUserSimple(Yii::$app->user->identity['username'])){
-
-            if ($not_exist_data != 0){
-                Yii::$app->session->setFlash('success', 'Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.');
-            }
-
-            if ($exist_data == count($models)){
-                Yii::$app->session->setFlash('success', 'Все данные о респондентах заполнены! При необходимости добавляйте новых респондентов.');
-            }
-        }
-
+        $limit_count_respond = RespondsMvp::LIMIT_COUNT;
 
         $newRespond = new RespondsMvp();
         $newRespond->confirm_mvp_id = $id;
-        if ($newRespond->load(Yii::$app->request->post()))
-        {
+
+        if ($newRespond->load(Yii::$app->request->post())) {
+
             $kol = 0;
             foreach ($models as $elem){
-                if ($newRespond->id !== $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
+                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
                     $kol++;
                 }
             }
 
-            if ($kol == 0){
+            if(Yii::$app->request->isAjax) {
 
-                $newRespond->save();
-                $confirmMvp->count_respond = $confirmMvp->count_respond + 1;
-                $confirmMvp->save();
+                if (count($models) < $limit_count_respond) {
 
-                $project->updated_at = time();
-                if ($project->save()){
-                    Yii::$app->session->setFlash('success', 'Создан новый респондент: "' . $newRespond->name . '"');
-                    return $this->redirect(['index', 'id' => $id]);
+                    if ($kol == 0) {
+
+                        if ($newRespond->save()) {
+
+                            $newRespond->addAnswersForNewRespond();
+
+                            $confirmMvp->count_respond = $confirmMvp->count_respond + 1;
+                            $confirmMvp->save();
+
+                            $project->updated_at = time();
+
+                            if ($project->save()) {
+
+                                $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
+
+                                $response = [
+                                    'newRespond' => $newRespond,
+                                    'responds' => $responds,
+                                ];
+
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
+                        }
+                    } else {
+                        $response = ['error' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                } else {
+                    $response = ['limit_count_respond' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-            }else{
-                Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');
             }
         }
-
-        return $this->render('index', [
-            'models' => $models,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'newRespond' => $newRespond,
-        ]);
     }
 
-
-    public function actionExist($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => RespondsMvp::find()->where(['confirm_mvp_id' => $id]),
-        ]);
-
-        $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('exist', [
-            'dataProvider' => $dataProvider,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-    public function actionByStatusInterview($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => RespondsMvp::find()->where(['confirm_mvp_id' => $id]),
-        ]);
-
-        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
-        $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        return $this->render('by-status-interview', [
-            'dataProvider' => $dataProvider,
-            'responds' => $responds,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
 
     /**
-     * Displays a single RespondsMvp model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $desc_interview = DescInterviewMvp::find()->where(['responds_mvp_id' => $model->id])->one();
-
-
-        if (User::isUserSimple(Yii::$app->user->identity['username'])){
-
-            if (empty($model->info_respond)){
-                Yii::$app->session->setFlash('success', 'Для внесения новой информации о респонденте или корректировки пройдите по ссылке "Редактировать данные".');
-            }
-
-            if (!empty($model->info_respond) && empty($model->descInterview)){
-                Yii::$app->session->setFlash('success', 'Для внесения данных в анкету респондента пройдите по ссылке "Добавить анкету".');
-            }
-        }
-
-
-        return $this->render('view', [
-            'model' => $model,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'desc_interview' => $desc_interview,
-
-        ]);
-    }
-
-    /**
-     * Creates a new RespondsMvp model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    /*public function actionCreate()
-    {
-        $model = new RespondsMvp();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }*/
-
-    /**
-     * Updates an existing RespondsMvp model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return RespondsMvp|array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $updateRespondForm = new UpdateRespondMvpForm($id);
+
         $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -334,68 +212,60 @@ class RespondsMvpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $models = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
 
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($updateRespondForm->load(Yii::$app->request->post())) {
 
             $kol = 0;
             foreach ($models as $item){
-                if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '',$model->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
                     $kol++;
                 }
             }
 
-            if ($kol == 0){
+            if(Yii::$app->request->isAjax) {
 
-                if ($model->save()) {
-                    $project->updated_at = time();
-                    if ($project->save()){
-                        return $this->redirect(['view', 'id' => $model->id]);
+                if ($kol == 0){
+
+                    if ($updateRespondForm->updateRespond($model)){
+
+                        $project->updated_at = time();
+
+                        if ($project->save()){
+
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $model;
+                            return $model;
+                        }
                     }
+                }else{
+
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-            }else{
-                Yii::$app->session->setFlash('error', 'Респондент с таким именем уже есть! Имя респондента должно быть уникальным!');
             }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-            'models' => $models,
-        ]);
     }
 
+
     /**
-     * Deletes an existing RespondsMvp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
         $descInterview = DescInterviewMvp::find()->where(['responds_mvp_id' => $model->id])->one();
+        $answers = AnswersQuestionsConfirmMvp::find()->where(['respond_id' => $id])->all();
+
         $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
+        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
+
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -404,44 +274,53 @@ class RespondsMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
 
 
-        if (count($responds) == 1){
-            Yii::$app->session->setFlash('error', 'Удаление последнего респондента запрещено!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+        if (Yii::$app->request->isAjax){
 
-        if ($confirmMvp->count_respond == $confirmMvp->count_positive){
-            Yii::$app->session->setFlash('error', "Количество респондентов не должно быть меньше количества позитивных интервью!");
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+            if (count($responds) == 1){
 
-        if ($project->save()){
-            Yii::$app->session->setFlash('error', 'Респондент: "' . $model->name . '" удален!');
-
-            if ($descInterview){
-                $descInterview->delete();
+                $response = ['zero_value_responds' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
             }
 
-            if ($model->delete()){
-                $confirmMvp->count_respond = $confirmMvp->count_respond -1;
-                $confirmMvp->save();
+
+            if ($confirmMvp->count_respond == $confirmMvp->count_positive){
+
+                $response = ['number_less_than_allowed' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
             }
-            return $this->redirect(['confirm-mvp/view', 'id' => $confirmMvp->id]);
+
+            $project->updated_at = time();
+
+            if ($project->save()) {
+
+                if ($descInterview) {
+                    $descInterview->delete();
+                }
+
+                foreach ($answers as $answer){
+                    $answer->delete();
+                }
+
+                if ($model->delete()) {
+
+                    $confirmMvp->count_respond = $confirmMvp->count_respond - 1;
+                    $confirmMvp->save();
+                }
+
+                $response = ['success' => true];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+
         }
+        return false;
 
     }
 

@@ -10,13 +10,13 @@ use yii\helpers\ArrayHelper;
 use app\models\Segment;
 use kartik\select2\Select2;
 
-$this->title = 'Подтверждение гипотез ценностных предложений';
+$this->title = 'Подтверждение MVP';
 
-$this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
+$this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 ?>
 
 
-<div class="confirm-gcp-add_questions">
+<div class="confirm-mvp-add_questions">
 
     <div class="row project_info_data">
 
@@ -78,17 +78,17 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
+        <?= Html::a('<div class="stage_number">6</div><div>Подтверждение гипотез ценностных предложений</div>',
+            ['/confirm-gcp/view', 'id' => $confirmGcp->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
+        <?= Html::a('<div class="stage_number">7</div><div>Разработка MVP</div>',
+            ['/mvp/index', 'id' => $confirmGcp->id],
+            ['class' => 'passive_navigation_block navigation_block']
+        ) ;?>
+
         <div class="active_navigation_block navigation_block">
-            <div class="stage_number">6</div>
-            <div>Подтверждение гипотез ценностных предложений</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
-            <div class="stage_number">7</div>
-            <div>Разработка MVP</div>
-        </div>
-
-        <div class="no_transition_navigation_block navigation_block">
             <div class="stage_number">8</div>
             <div>Подтверждение MVP</div>
         </div>
@@ -107,31 +107,36 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
 
             <?php
             $segment_name = $segment->name;
-            if (mb_strlen($segment_name) > 15){
-                $segment_name = mb_substr($segment_name, 0, 15) . '...';
+            if (mb_strlen($segment_name) > 12){
+                $segment_name = mb_substr($segment_name, 0, 12) . '...';
             }
 
             $problem_description = $problem->description;
-            if (mb_strlen($problem_description) > 15){
-                $problem_description = mb_substr($problem_description, 0, 15) . '...';
+            if (mb_strlen($problem_description) > 12){
+                $problem_description = mb_substr($problem_description, 0, 12) . '...';
             }
 
             $gcp_description = $gcp->description;
-            if (mb_strlen($gcp_description) > 35){
-                $gcp_description = mb_substr($gcp_description, 0, 35) . '...';
+            if (mb_strlen($gcp_description) > 15){
+                $gcp_description = mb_substr($gcp_description, 0, 15) . '...';
+            }
+
+            $mvp_description = $mvp->description;
+            if (mb_strlen($mvp_description) > 15){
+                $mvp_description = mb_substr($mvp_description, 0, 15) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div> / ЦП: <div>' . $gcp_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div> / ЦП: <div>' . $gcp_description . '</div> / MVP: <div>' . $mvp_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
             <?php
-            $gcp_description = $gcp->description;
-            if (mb_strlen($gcp_description) > 80){
-                $gcp_description = mb_substr($gcp_description, 0, 80) . '...';
+            $mvp_description = $mvp->description;
+            if (mb_strlen($mvp_description) > 50){
+                $mvp_description = mb_substr($mvp_description, 0, 50) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div> / ЦП: <div>' . $gcp_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div> / ЦП: <div>' . $gcp_description . '</div> / MVP: <div>' . $mvp_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
         </div>
 
@@ -157,6 +162,8 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
         <div><?= $problem->description;?></div>
         <div>Формулировка ценностного предложения:</div>
         <div><?= $gcp->description;?></div>
+        <div>Формулировка минимально жизнеспособного продукта:</div>
+        <div><?= $mvp->description;?></div>
     </div>
 
 
@@ -245,20 +252,20 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px; padding-left: 5px;">
 
                     <div class="col-md-12" style="font-weight: 700;">
-                        Формулировка ценностного предложения, которое проверяем
+                        Формулировка минимально жизнеспособного продукта, который проверяем
                     </div>
 
                     <div class="col-md-12" style="padding-top: 10px;">
-                        <?= $gcp->description;?>
+                        <?= $mvp->description;?>
                     </div>
 
                 </div>
 
                 <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
 
-                    <?= $form->field($formUpdateConfirmGcp, 'count_respond', [
+                    <?= $form->field($formUpdateConfirmMvp, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов, подтвердивших проблему</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')->textInput([
+                    ])->label('<div>Количество респондентов, подтвердивших ценностное предложение</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')->textInput([
                         'type' => 'number',
                         'readonly' => true,
                         'required' => true,
@@ -270,9 +277,9 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
 
                 <div class="row">
 
-                    <?= $form->field($formUpdateConfirmGcp, 'count_positive', [
+                    <?= $form->field($formUpdateConfirmMvp, 'count_positive', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('Необходимое количество респондентов, подтверждающих ценностное предложение')->textInput([
+                    ])->label('Необходимое количество респондентов, подтверждающих продукт (MVP)')->textInput([
                         'type' => 'number',
                         'readonly' => true,
                         'required' => true,
@@ -295,7 +302,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
             <?php
             $form = ActiveForm::begin([
                 'id' => 'update_data_interview',
-                'action' => Url::to(['/confirm-gcp/update', 'id' => $formUpdateConfirmGcp->id]),
+                'action' => Url::to(['/confirm-mvp/update', 'id' => $formUpdateConfirmMvp->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -353,20 +360,20 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                 <div class="row" style="padding-top: 30px; padding-bottom: 10px; padding-left: 5px;">
 
                     <div class="col-md-12" style="font-weight: 700;">
-                        Формулировка ценностного предложения, которое проверяем
+                        Формулировка минимально жизнеспособного продукта, который проверяем
                     </div>
 
                     <div class="col-md-12" style="padding-top: 10px;">
-                        <?= $gcp->description;?>
+                        <?= $mvp->description;?>
                     </div>
 
                 </div>
 
                 <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
 
-                    <?= $form->field($formUpdateConfirmGcp, 'count_respond', [
+                    <?= $form->field($formUpdateConfirmMvp, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов, подтвердивших проблему</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                    ])->label('<div>Количество респондентов, подтвердивших ценностное предложение</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,
@@ -380,9 +387,9 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
 
                 <div class="row">
 
-                    <?= $form->field($formUpdateConfirmGcp, 'count_positive', [
+                    <?= $form->field($formUpdateConfirmMvp, 'count_positive', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('Необходимое количество респондентов, подтверждающих ценностное предложение')
+                    ])->label('Необходимое количество респондентов, подтверждающих продукт (MVP)')
                         ->textInput([
                             'type' => 'number',
                             'required' => true,
@@ -470,7 +477,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
         ?>
 
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-            - общее количество респондентов не может быть меньше количества респондентов, подтверждающих ценностное предложение;
+            - общее количество респондентов не может быть меньше количества респондентов, подтверждающих продукт (MVP);
         </h4>
 
         <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
@@ -554,9 +561,9 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                             </div>
                             <div class="col-xs-1 delete_question_link">
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
-                                    Url::to(['/confirm-gcp/delete-question', 'id' => $question->id])],[
+                                    Url::to(['/confirm-mvp/delete-question', 'id' => $question->id])],[
                                     'title' => Yii::t('yii', 'Delete'),
-                                    'class' => 'delete-question-confirm-gcp pull-right',
+                                    'class' => 'delete-question-confirm-mvp pull-right',
                                     'id' => 'delete_question-'.$question->id,
                                 ]); ?>
                             </div>
@@ -575,7 +582,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
 
                     <? $form = ActiveForm::begin([
                         'id' => 'addNewQuestion',
-                        'action' => Url::to(['/confirm-gcp/add-question', 'id' => $confirmGcp->id]),
+                        'action' => Url::to(['/confirm-mvp/add-question', 'id' => $confirmMvp->id]),
                         'options' => ['class' => 'g-py-15'],
                         'errorCssClass' => 'u-has-error-v1',
                         'successCssClass' => 'u-has-success-v1-1',
@@ -656,9 +663,9 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                             </div>
                             <div class="col-xs-1 delete_question_link">
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
-                                    Url::to(['/confirm-gcp/delete-question', 'id' => ''])],[
+                                    Url::to(['/confirm-mvp/delete-question', 'id' => ''])],[
                                     'title' => Yii::t('yii', 'Delete'),
-                                    'class' => 'delete-question-confirm-gcp pull-right',
+                                    'class' => 'delete-question-confirm-mvp pull-right',
                                     'id' => '',
                                 ]); ?>
                             </div>
@@ -670,7 +677,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
 
             <div class="col-xs-12">
 
-                <?= Html::a( 'Далее', ['/confirm-gcp/view', 'id' => $confirmGcp->id],[
+                <?= Html::a( 'Далее', ['/confirm-mvp/view', 'id' => $confirmMvp->id],[
                     'style' => [
                         'display' => 'flex',
                         'align-items' => 'center',
@@ -864,7 +871,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
     ?>
 
     <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Пройдите последовательно этапы подтверждения гипотезы ценностного предложения. Далее переходите к разработке «минимально жизнеспособных продуктов» (MVP).
+        Пройдите последовательно этапы подтверждения продукта (MVP). Далее переходите к генерации бизнес-модели.
     </h4>
 
     <?php Modal::end(); ?>
@@ -1042,7 +1049,7 @@ $script = "
                 var container = $('#QuestionsTable-container');
                 $('.new-string-table-questions').find('.string_question').addClass('string_question-' + response.model.id);
                 $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.title_question').html(response.model.title);
-                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/confirm-gcp/delete-question?id=' + response.model.id);
+                $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('href', '/confirm-mvp/delete-question?id=' + response.model.id);
                 $('.new-string-table-questions').find('.string_question-' + response.model.id).find('.delete_question_link > a').attr('id', 'delete_question-' + response.model.id);
                 var newString = $('.new-string-table-questions').html();
                 container.append(newString);
@@ -1175,13 +1182,13 @@ $script = "
     //Для того чтобы обрабатывались и старые и новые вопросы
     //указываем контейнер в контором необходимо обрабатывать запросы,
     //а после события указываем по какому элементу оно будет срабатывать.
-    $('#QuestionsTable-container').on('click', '.delete-question-confirm-gcp', function(e){
+    $('#QuestionsTable-container').on('click', '.delete-question-confirm-mvp', function(e){
         
         var id = $(this).attr('id');
         id = id.split('-');
         id = id[1];
         
-        var url = '/confirm-gcp/delete-question?id=';
+        var url = '/confirm-mvp/delete-question?id=';
         url += id;
         
         //Сторока, которая будет удалена из таблицы
