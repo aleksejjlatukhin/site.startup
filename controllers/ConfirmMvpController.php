@@ -365,7 +365,7 @@ class ConfirmMvpController extends AppController
 
             $project->updated_at = time();
             if ($project->save()){
-                return $this->redirect(['business-model/create', 'id' => $model->id]);
+                return $this->redirect(['business-model/index', 'id' => $model->id]);
             }
         }
     }

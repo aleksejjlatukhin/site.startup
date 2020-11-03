@@ -679,6 +679,7 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
                 <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание гипотезы ценностного предложения')->textarea([
                     'rows' => 4,
+                    'maxlength' => 1000,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                 ]);

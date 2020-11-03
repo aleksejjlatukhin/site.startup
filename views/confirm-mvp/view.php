@@ -2343,7 +2343,7 @@ $script = "
                     if (!response['not_completed_descInterviews']) {
                         
                         if (response['exist_confirm'] === 1) {
-                            window.location.href = '/business-model/create?id=".$model->id."';
+                            window.location.href = '/business-model/index?id=".$model->id."';
                         }
                         
                         if (response['exist_confirm'] === null) {

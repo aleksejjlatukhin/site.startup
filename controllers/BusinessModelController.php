@@ -14,24 +14,26 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\BusinessModel;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use kartik\mpdf\Pdf;
 
-/**
- * BusinessModelController implements the CRUD actions for BusinessModel model.
- */
+
 class BusinessModelController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
+        if (in_array($action->id, ['index'])){
 
-            $model = BusinessModel::findOne(Yii::$app->request->get());
-            $project = $model->project;
+            $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get());
+            $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+            $project = $mvp->project;
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -51,6 +53,9 @@ class BusinessModelController extends AppController
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+
                 return parent::beforeAction($action);
 
             }else{
@@ -64,6 +69,9 @@ class BusinessModelController extends AppController
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
 
                 return parent::beforeAction($action);
 
@@ -91,16 +99,17 @@ class BusinessModelController extends AppController
 
     }
 
+
     /**
-     * Displays a single BusinessModel model.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string
      */
-    public function actionView($id)
+    public function actionIndex ($id)
     {
-        $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
+        $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
+        $confirmMvp = ConfirmMvp::findOne($id);
+        $newModel = new BusinessModel();
+
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -110,9 +119,10 @@ class BusinessModelController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        return $this->render('view', [
+        return $this->render('index', [
             'model' => $model,
             'confirmMvp' => $confirmMvp,
+            'newModel' => $newModel,
             'mvp' => $mvp,
             'confirmGcp' => $confirmGcp,
             'gcp' => $gcp,
@@ -124,15 +134,14 @@ class BusinessModelController extends AppController
         ]);
     }
 
+
     /**
-     * Creates a new BusinessModel model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $id
+     * @return array
      */
     public function actionCreate($id)
     {
         $model = new BusinessModel();
-        $model->confirm_mvp_id = $id;
 
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
@@ -144,60 +153,36 @@ class BusinessModelController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $model->project_id = $project->id;
-        $model->segment_id = $segment->id;
-        $model->problem_id = $generationProblem->id;
-        $model->gcp_id = $gcp->id;
-        $model->mvp_id = $mvp->id;
+        if ($model->load(Yii::$app->request->post())) {
 
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
+            if(Yii::$app->request->isAjax) {
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+                if ($businessModel = $model->create($id, $mvp->id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['confirm-mvp/view', 'id' => $confirmMvp->id]);
+                    $project->updated_at = time();
+
+                    if ($project->save()) {
+
+                        $response = ['model' => $businessModel];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                } else {
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
             }
         }
-
-
-
-        if ($confirmMvp->business){
-            return $this->redirect(['view', 'id' => $confirmMvp->business->id]);
-        }
-
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
-            $project->updated_at = time();
-            if ($project->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-
-        ]);
     }
 
+
     /**
-     * Updates an existing BusinessModel model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -211,82 +196,46 @@ class BusinessModelController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->save()) {
+
+                    $project->updated_at = time();
+
+                    if ($project->save()) {
+
+                        $response = ['model' => $model];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                } else {
+
+                    $response = ['error' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
             }
         }
-
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
-            $project->updated_at = time();
-            if ($project->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-            'confirmMvp' => $confirmMvp,
-            'mvp' => $mvp,
-            'confirmGcp' => $confirmGcp,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
+        return false;
     }
 
+
     /**
-     * Deletes an existing BusinessModel model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * export in pdf
      * @param string $id
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
      */
-    /*public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        if ($model->delete()) {
-            $project->save();
-        }
-
-        return $this->redirect(['index']);
-    }*/
-
-
-    /*export in pdf*/
     public function actionMpdfBusinessModel($id) {
 
         $model = $this->findModel($id);

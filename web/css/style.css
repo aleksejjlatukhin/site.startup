@@ -1,25 +1,3 @@
-.open_fast
-{
-    display: block;
-}
-.open_fast.active
-{
-    display: none;
-}
-.popap_fast
-{
-    display: none;
-}
-.popap_fast.active
-{
-    display: block;
-}
-.cross-out
-{
-    cursor: pointer;
-    font-size: 24px;
-    margin-top: 25px;
-}
 
 .feed-exp
 {
@@ -31,357 +9,47 @@
     margin-top: -20px;
 }
 
-
-#info-interview-red::-webkit-progress-bar{
-    background-color: red;
-    border-radius: 2px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-}
-progress {
-    border:0;
-    /*width: 140px;*/
-    width: 100%;
-    height: 20px;
-    border-radius: 5px;
-    background: #f1f1f1;
-    -webkit-box-shadow: inset 0 3px 3px 0 rgba(0, 0, 0, 0.2), inset 0 -1px 3px 1px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: inset 0 3px 3px 0 rgba(0, 0, 0, 0.2), inset 0 -1px 3px 1px rgba(0, 0, 0, 0.2);
-}
-
-progress::-webkit-progress-bar {
-    border-radius: 5px;
-    background: #f1f1f1;
-    -webkit-box-shadow: inset 0 3px 3px 0 rgba(0, 0, 0, 0.2), inset 0 -1px 3px 1px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: inset 0 3px 3px 0 rgba(0, 0, 0, 0.2), inset 0 -1px 3px 1px rgba(0, 0, 0, 0.2);
-}
-progress::-webkit-progress-value {
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
-    background: rgb(208,228,247); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(208,228,247,1) 0%, rgba(115,177,231,1) 24%, rgba(10,119,213,1) 50%, rgba(83,159,225,1) 79%, rgba(135,188,234,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-
-}
-progress::-moz-progress-bar {
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
-    background: rgb(208,228,247); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(208,228,247,1) 0%, rgba(115,177,231,1) 24%, rgba(10,119,213,1) 50%, rgba(83,159,225,1) 79%, rgba(135,188,234,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-progress.info-green::-webkit-progress-value {
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#b4ddb4+0,83c783+17,52b152+33,008a00+67,005700+83,002400+100;Green+3D+%231 */
-    background: rgb(180,221,180); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(180,221,180,1) 0%, rgba(131,199,131,1) 17%, rgba(82,177,82,1) 33%, rgba(0,138,0,1) 67%, rgba(0,87,0,1) 83%, rgba(0,36,0,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b4ddb4', endColorstr='#002400',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-progress.info-green::-moz-progress-bar {
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#b4ddb4+0,83c783+17,52b152+33,008a00+67,005700+83,002400+100;Green+3D+%231 */
-    background: rgb(180,221,180); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(180,221,180,1) 0%, rgba(131,199,131,1) 17%, rgba(82,177,82,1) 33%, rgba(0,138,0,1) 67%, rgba(0,87,0,1) 83%, rgba(0,36,0,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b4ddb4', endColorstr='#002400',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-progress.info-red::-webkit-progress-value{
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f4aea1+0,ef857a+15,ed1300+42,f02f17+69,e08c86+100 */
-    background: rgb(244,174,161); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(244,174,161,1) 0%, rgba(239,133,122,1) 15%, rgba(237,19,0,1) 42%, rgba(240,47,23,1) 69%, rgba(224,140,134,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4aea1', endColorstr='#e08c86',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-progress.info-red::-moz-progress-bar{
-    border-radius: 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f4aea1+0,ef857a+15,ed1300+42,f02f17+69,e08c86+100 */
-    background: rgb(244,174,161); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(244,174,161,1) 0%, rgba(239,133,122,1) 15%, rgba(237,19,0,1) 42%, rgba(240,47,23,1) 69%, rgba(224,140,134,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4aea1', endColorstr='#e08c86',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
 .border-gray{
     border-bottom: #e7e8e6 solid 1px;
 }
 
-.block-200{
-    width: 223px;
-    margin: 0 5px 5px 0;
-    min-height: 180px;
-    border: solid 1px #9d9d9d;
-    padding: 5px;
-    color: #4c4c4c;
-    border-radius: 5px;
-}
-.block-100{
-    text-align: center;
-    width: 565px;
-    min-height: 100px;
-    margin: 0 5px 5px 0;
-    border: solid 1px #9d9d9d;
-    padding: 0 5px;
-    color: #4c4c4c;
-    border-radius: 5px;
-}
+/*Стили для pdf-бизнес-модели
+---Начало---
+*/
 .block-200-export{
     width: 220px;
     margin: 0 5px 5px 0;
-    min-height: 180px;
+    vertical-align: top;
     border: solid 1px #9d9d9d;
     padding: 5px;
     color: #4c4c4c;
+    font-size: 12px;
     border-radius: 5px;
 }
 .block-100-export{
-    text-align: center;
-    min-height: 100px;
+    width: 550px;
+    vertical-align: top;
     margin: 0 5px 5px 0;
     border: solid 1px #9d9d9d;
     padding: 0 5px;
     color: #4c4c4c;
+    font-size: 12px;
     border-radius: 5px;
 }
+.export_business_model_mini_header {
+    font-weight: 700;
+    color: #828282;
+    margin-top: 7px;
+}
+/*Стили для pdf-бизнес-модели
+---Конец---
+*/
+
 .bolder{
     font-weight: 700;
 }
 
-/*Меню-стрелка на главной странице - начало*/
-.arrow{
-    background-image: url("/web/images/blue_arrow.png");
-    height: 115px;
-    width: 1140px;
-    /*margin-top: -15px;*/
-}
-#arrow-container{
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-}
-.arrowlist{
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    text-align: center;
-    padding-top: 15px;
-    margin-top: 5px;
-    background-color: #d9d6c4;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-}
-.arrowlist:hover{
-    background-color: #9bcc60;
-    text-decoration: none;
-    color: #3a3427;
-    transition: 0.5s;
-}
-.arrowlist a{
-    height: 120px;
-    width: 120px;
-    border-radius: 50%;
-    text-align: center;
-    padding-top: 15px;
-    background-color: #d9d6c4;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-}
-.arrowlist:last-child{
-    height: 100px;
-    width: 140px;
-    border-radius: 15px;
-    text-align: center;
-    margin-left: 40px;
-    padding-top: 15px;
-    background-color: #d9d6c4;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-}
-#arrow-container >a:hover{
-    background-color: #9bcc60;
-    text-decoration: none;
-    color: #3a3427;
-    transition: 0.5s;
-}
-#arrow-container >a:link, #arrow-container >a:visited, #arrow-container >a:active{
-    color: #3a3427;
-    text-decoration: none;
-}
-#arrow-container >a.act{
-    background-color: #9bcc60;
-    color: #3a3427;
-}
-/*Меню-стрелка на главной странице - конец*/
-
-
-/*Меню-стрелка на остальных страницах - начало*/
-.menu-arrow{
-    background-image: url("/web/images/blue_arrow.png");
-    height: 115px;
-    width: 1140px;
-    /*margin-top: -15px;*/
-}
-#menu-arrow-container{
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    position: relative;
-    align-items: center;
-}
-.menu-arrowlist{
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    text-align: center;
-    margin-top: 5px;
-    padding-top: 15px;
-    background-color: #d9d6c4;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-}
-.menu-arrowlist-active{
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    text-align: center;
-    margin-top: 5px;
-    padding-top: 15px;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    background-color: #9bcc60;
-    text-decoration: none;
-    color: #3a3427;
-}
-.menu-arrowlist:hover{
-    cursor: pointer;
-}
-.menu-arrowlist-active{
-    cursor: pointer;
-}
-.crib-gcs{
-    display: block;
-    width: 100px;
-    height: 100px;
-    margin-top: 5px;
-    margin-left: -1px;
-    padding: 17px 5px;
-    border-radius: 50%;
-    border: 1px solid #b9bbbe;
-    background-color: #9bcc60;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    font-weight: 700;
-    transition: 0.4s;
-    font-size: 10px;
-    color: #3a3427;
-}
-.menu-arrowlist:nth-child(1) .crib-gcs, .menu-arrowlist:nth-child(2) .crib-gcs {
-    padding: 25px 5px;
-}
-.menu-arrowlist:nth-child(6) .crib-gcs {
-    padding: 10px 5px;
-}
-.menu-arrowlist:nth-child(7) .crib-gcs {
-    padding: 15px 5px;
-}
-.menu-arrowlist:hover .crib-gcs{
-    opacity: 1;
-}
-.menu-arrowlist-active:hover .crib-gcs{
-    opacity: 1;
-}
-
-.menu-last-arrow{
-    height: 100px;
-    width: 140px;
-    text-align: center;
-    margin-top: 5px;
-    margin-left: 40px;
-    padding-top: 15px;
-    background-color: #d9d6c4;
-    border-radius: 15px;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-}
-.menu-last-arrow-active{
-    height: 100px;
-    width: 140px;
-    text-align: center;
-    margin-top: 5px;
-    padding-top: 15px;
-    background-color: #9bcc60;
-    border-radius: 15px;
-    border: 1px solid #b9bbbe;
-    font-weight: 700;
-    text-decoration: none;
-    color: #3a3427;
-    margin-left: 40px;
-}
-.menu-last-arrow:hover{
-    cursor: pointer;
-}
-.menu-last-arrow-active{
-    cursor: pointer;
-}
-.crib-gcs-last{
-    display: block;
-    width: 140px;
-    height: 100px;
-    margin-top: 5px;
-    margin-left: -1px;
-    padding: 25px 5px;
-    border-radius: 15px;
-    border: 1px solid #b9bbbe;
-    background-color: #9bcc60;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    font-weight: 700;
-    transition: 0.4s;
-    font-size: 12px;
-    color: #3a3427;
-}
-.menu-last-arrow:hover .crib-gcs-last{
-    opacity: 1;
-}
-.menu-last-arrow-active:hover .crib-gcs-last{
-    opacity: 1;
-}
-
-/*Меню-стрелка на остальных страницах - конец
----------------------------------------------*/
-
-
-/* Показать и скрыть данные сегмента - начало
+/* Показать и скрыть данные - начало
 --------------------------------------------*/
 .faq_list{
     position: relative;
@@ -447,61 +115,11 @@ progress.info-red::-moz-progress-bar{
     font-size: 15px;
 }
 
-/* Показать и скрыть данные сегмента - конец
+/* Показать и скрыть данные - конец
 --------------------------------------------*/
 
-
 /*
-Стилизация слайдера с ползунками для сегмента
----Начало---
-*/
-
-/*Стили для ползунков*/
-.ui-slider .ui-slider-handle{
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
-    background: rgb(208,228,247); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(208,228,247,1) 0%, rgba(115,177,231,1) 24%, rgba(10,119,213,1) 50%, rgba(83,159,225,1) 79%, rgba(135,188,234,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-    border-radius: 50%;
-    border: 1px solid #0A77D5;
-    box-shadow: 0 0 0 4px white inset;
-    /*border: 1px solid #0b58a2;*/
-}
-
-/*Область слайдера за гранью выбранного диапазона*/
-.ui-slider.ui-slider-horizontal{
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f5f6f6+0,dbdce2+21,b8bac6+49,dddfe3+80,f5f6f6+100;Grey+Pipe */
-    background: rgb(245,246,246); /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(245,246,246,1) 0%, rgba(219,220,226,1) 21%, rgba(184,186,198,1) 49%, rgba(221,223,227,1) 80%, rgba(245,246,246,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  rgba(245,246,246,1) 0%,rgba(219,220,226,1) 21%,rgba(184,186,198,1) 49%,rgba(221,223,227,1) 80%,rgba(245,246,246,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  rgba(245,246,246,1) 0%,rgba(219,220,226,1) 21%,rgba(184,186,198,1) 49%,rgba(221,223,227,1) 80%,rgba(245,246,246,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f6f6', endColorstr='#f5f6f6',GradientType=0 ); /* IE6-9 */
-
-    border: 1px solid #B8BAC6;
-}
-
-/*Область слайдера в диапазоне ползунков*/
-.ui-slider .ui-slider-range{
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
-    background: rgb(208,228,247); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(208,228,247,1) 0%, rgba(115,177,231,1) 24%, rgba(10,119,213,1) 50%, rgba(83,159,225,1) 79%, rgba(135,188,234,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-/*
-Стилизация слайдера с ползунками для сегмента
----Конец---
-*/
-
-
-/*
-Стилизация подсказок в сводной таблице проекта
+Стилизация подсказок (title)
 ---Начало---
 */
 
@@ -551,7 +169,7 @@ progress.info-red::-moz-progress-bar{
 }
 
 /*
-Стилизация подсказок в сводной таблице проекта
+Стилизация подсказок (title)
 ---Конец---
 */
 
@@ -679,8 +297,6 @@ progress.info-red::-moz-progress-bar{
 .block-link-create-interview {
     padding: 0;
     margin-top: 10px;
-    /*font-family: 'RobotoCondensed-Light', serif;
-    font-size: 16px;*/
 }
 
 .link_create_interview {
@@ -749,64 +365,6 @@ progress.info-red::-moz-progress-bar{
 /*
 Стилизация подобия вкладок на странице "Создание Программы генерации ГПС"
 ---Конец--
-*/
-
-
-/*
-Кватратики результата подтверждения ГMVP (mvp/index)
----Начало---
-*/
-
-.blue-confirm{
-
-    border-radius: 5px;
-    color: #fff;
-    font-weight: 700;
-    padding: 4px 12px;
-    margin: 0 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d0e4f7+0,73b1e7+24,0a77d5+50,539fe1+79,87bcea+100;Blue+Pipe+%231 */
-    background: rgb(208,228,247); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(208,228,247,1) 0%, rgba(115,177,231,1) 24%, rgba(10,119,213,1) 50%, rgba(83,159,225,1) 79%, rgba(135,188,234,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(208,228,247,1) 0%,rgba(115,177,231,1) 24%,rgba(10,119,213,1) 50%,rgba(83,159,225,1) 79%,rgba(135,188,234,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e4f7', endColorstr='#87bcea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-.success-confirm{
-
-    border-radius: 5px;
-    color: #fff;
-    font-weight: 700;
-    padding: 4px 12px;
-    margin: 0 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#b4ddb4+0,83c783+17,52b152+33,008a00+67,005700+83,002400+100;Green+3D+%231 */
-    background: rgb(180,221,180); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(180,221,180,1) 0%, rgba(131,199,131,1) 17%, rgba(82,177,82,1) 33%, rgba(0,138,0,1) 67%, rgba(0,87,0,1) 83%, rgba(0,36,0,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(180,221,180,1) 0%,rgba(131,199,131,1) 17%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 83%,rgba(0,36,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b4ddb4', endColorstr='#002400',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-
-.danger-confirm{
-
-    border-radius: 5px;
-    color: #fff;
-    font-weight: 700;
-    padding: 4px 12px;
-    margin: 0 5px;
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f4aea1+0,ef857a+15,ed1300+42,f02f17+69,e08c86+100 */
-    background: rgb(244,174,161); /* Old browsers */
-    background: -moz-linear-gradient(-45deg,  rgba(244,174,161,1) 0%, rgba(239,133,122,1) 15%, rgba(237,19,0,1) 42%, rgba(240,47,23,1) 69%, rgba(224,140,134,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(135deg,  rgba(244,174,161,1) 0%,rgba(239,133,122,1) 15%,rgba(237,19,0,1) 42%,rgba(240,47,23,1) 69%,rgba(224,140,134,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4aea1', endColorstr='#e08c86',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-
-}
-/*
-Кватратики результата подтверждения ГMVP (mvp/index)
----Конец---
 */
 
 
@@ -992,30 +550,6 @@ progress.info-red::-moz-progress-bar{
 }
 
 /* /projects/upshot - таблица kartik yii2-grid
----Конец---
-*/
-
-
-
-
-/*
-Стилизация предупреждений валидации форм добавления и выбора вопроса
-Программа генерации ГПС
----Начало---
-*/
-
-#addNewQuestion .has-error .form-control {
-    border-color: #ccc;
-    box-shadow: none;
-}
-#addNewQuestionOfGeneralList .has-error .form-control {
-    border-color: #ccc;
-    box-shadow: none;
-}
-
-/*
-Стилизация предупреждений валидации форм добавления и выбора вопроса
-Программа генерации ГПС
 ---Конец---
 */
 
@@ -1810,7 +1344,7 @@ input[type="checkbox"]:checked + label:before {
 ---Конец---
 */
 
-/*Стили для стрелки у ссылки с хлебными крошками
+/*Стили для стрелки(открытие-закрытие контента) у ссылки с хлебными крошками
 ---Начало---
 */
 .arrow_link {

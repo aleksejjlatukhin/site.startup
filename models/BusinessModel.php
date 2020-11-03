@@ -5,20 +5,7 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
-/**
- * This is the model class for table "business_model".
- *
- * @property string $id
- * @property int $confirm_mvp_id
- * @property string $quantity
- * @property string $sort_of_activity
- * @property string $relations
- * @property string $partners
- * @property string $distribution_of_sales
- * @property string $resources
- * @property string $cost
- * @property string $revenue
- */
+
 class BusinessModel extends \yii\db\ActiveRecord
 {
     /**
@@ -49,12 +36,12 @@ class BusinessModel extends \yii\db\ActiveRecord
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
 
-    public function getGmvp ()
+    public function getMvp ()
     {
         return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
     }
 
-    public function getMvp()
+    public function getConfirmMvp()
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
     }
@@ -67,7 +54,9 @@ class BusinessModel extends \yii\db\ActiveRecord
         return [
             [['confirm_mvp_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
             [['confirm_mvp_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id', 'created_at', 'updated_at'], 'integer'],
-            [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'string', 'max' => 255],
+            [['relations', 'distribution_of_sales', 'resources'], 'string', 'max' => 255],
+            [['partners', 'cost', 'revenue'], 'string', 'max' => 1000],
+            [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'trim'],
         ];
     }
 
@@ -95,5 +84,26 @@ class BusinessModel extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::class
         ];
+    }
+
+
+    public function create ($confirm_mvp_id, $mvp_id, $gcp_id, $problem_id, $segment_id, $project_id){
+
+        $model = new BusinessModel();
+
+        $model->confirm_mvp_id = $confirm_mvp_id;
+        $model->mvp_id = $mvp_id;
+        $model->gcp_id = $gcp_id;
+        $model->problem_id = $problem_id;
+        $model->segment_id = $segment_id;
+        $model->project_id = $project_id;
+        $model->relations = $this->relations;
+        $model->partners = $this->partners;
+        $model->distribution_of_sales = $this->distribution_of_sales;
+        $model->resources = $this->resources;
+        $model->cost = $this->cost;
+        $model->revenue = $this->revenue;
+
+        return $model->save() ? $model : null;
     }
 }

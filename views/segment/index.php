@@ -614,6 +614,7 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                 ])->label('Краткое описание сегмента *')->textarea([
                     'rows' => 1,
+                    'maxlength' => true,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
@@ -1448,6 +1449,7 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                         'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                     ])->label('Краткое описание сегмента *')->textarea([
                         'rows' => 1,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
