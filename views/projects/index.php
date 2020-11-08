@@ -135,11 +135,11 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             <?php foreach ($models as $model) : ?>
 
 
-                <div class="row container-one_respond" style="margin: 3px 0; padding: 0;">
+                <div class="row container-one_respond row_hypothesis-<?= $model->id;?>" style="margin: 3px 0; padding: 0;">
 
                     <div class="col-md-3">
 
-                        <div class="project_name_table">
+                        <div class="project_name_table hypothesis_title">
                             <?= $model->project_name; ?>
                         </div>
 
@@ -235,20 +235,17 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                             <?php else : ?>
 
-                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['#'], [
-                                    'class' => '',
+                                <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/projects/show-all-information', 'id' => $model->id], [
+                                    'class' => 'openAllInformationProject',
                                     'style' => ['margin-left' => '30px'],
                                     'title' => 'Смотреть',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => "#data_project_modal-$model->id",
                                 ]); ?>
 
                             <?php endif; ?>
 
-                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                'class' => '',
+                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->id], [
+                                'class' => 'delete_hypothesis',
                                 'title' => 'Удалить',
-                                'onclick' => 'return false',
                             ]); ?>
 
                         </div>
@@ -279,7 +276,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
     <?php $form = ActiveForm::begin([
         'id' => 'project_create_form',
-        'action' => Url::to(['projects/create', 'id' => $newModel->user_id]),
+        'action' => Url::to(['projects/create', 'id' => $user->id]),
         'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -363,7 +360,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
     <div class="row">
         <div class="panel-body col-md-12">
             <div class="panel panel-default"><!-- widgetBody -->
-                <div class="panel-heading" style="font-size: 24px;">Данные о патенте</div>
+                <div class="panel-heading" style="font-size: 24px;">Сведения о патенте</div>
             </div>
 
             <div class="row" style="margin-bottom: 15px;">
@@ -790,7 +787,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
     <?php foreach ($models as $key => $model) : ?>
 
         <?php
-        // Модальное окно - данные проекта
+/*        // Модальное окно - данные проекта
         Modal::begin([
             'options' => [
                 'id' => 'data_project_modal-' . $model->id,
@@ -798,97 +795,13 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             'size' => 'modal-lg',
             'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
         ]);
-        ?>
+        */?><!--
 
+        <?/*= $this->render('/projects/all-information', ['project' => $model]); */?>
 
-        <?= DetailView::widget([
-            'model' => $model,
-            //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
-            'attributes' => [
-
-                'project_name',
-                'project_fullname:ntext',
-                'description:ntext',
-                'rid',
-                'core_rid:ntext',
-                'patent_number',
-
-                [
-                    'attribute' => 'patent_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'patent_name:ntext',
-
-                [
-                    'attribute'=>'Команда проекта',
-                    'value' => $model->getAuthorInfo($model),
-                    'format' => 'html',
-                ],
-
-                'technology',
-                'layout_technology:ntext',
-                'register_name',
-
-                [
-                    'attribute' => 'register_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'site',
-                'invest_name',
-
-                [
-                    'attribute' => 'invest_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'invest_amount',
-                    'value' => function($model){
-                        if($model->invest_amount !== null){
-                            return number_format($model->invest_amount, 0, '', ' ');
-                        }
-                    },
-                ],
-
-                [
-                    'attribute' => 'date_of_announcement',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'announcement_event',
-
-                [
-                    'attribute' => 'created_at',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'updated_at',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'pre_files',
-                    'label' => 'Презентационные файлы',
-                    'value' => function($model){
-                        $string = '';
-                        foreach ($model->preFiles as $file){
-                            $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
-                        }
-                        return $string;
-                    },
-                    'format' => 'html',
-                ]
-
-            ],
-        ]) ?>
-
-
-        <?php
-        Modal::end();
-        ?>
+        --><?php
+/*        Modal::end();
+        */?>
 
 
 
@@ -992,7 +905,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         <div class="row">
             <div class="panel-body col-md-12">
                 <div class="panel panel-default"><!-- widgetBody -->
-                    <div class="panel-heading" style="font-size: 24px;">Данные о патенте</div>
+                    <div class="panel-heading" style="font-size: 24px;">Сведения о патенте</div>
                 </div>
 
                 <div class="row" style="margin-bottom: 15px;">

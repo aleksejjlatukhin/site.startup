@@ -26,9 +26,14 @@ class Gcp extends \yii\db\ActiveRecord
         return 'gcp';
     }
 
-    public function getBusinessModel ()
+    public function getConfirm()
     {
-        return $this->hasOne(BusinessModel::class, ['gcp_id' => 'id']);
+        return $this->hasOne(ConfirmGcp::class, ['gcp_id' => 'id']);
+    }
+
+    public function getBusinessModels ()
+    {
+        return $this->hasMany(BusinessModel::class, ['gcp_id' => 'id']);
     }
 
     public function getMvps ()
@@ -37,16 +42,6 @@ class Gcp extends \yii\db\ActiveRecord
     }
 
     public function getProblem()
-    {
-        return $this->hasOne(ConfirmProblem::class, ['id' => 'confirm_problem_id']);
-    }
-
-    public function getConfirm()
-    {
-        return $this->hasOne(ConfirmGcp::class, ['gcp_id' => 'id']);
-    }
-
-    public function getGps ()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
     }
@@ -96,5 +91,31 @@ class Gcp extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::class
         ];
+    }
+
+
+    public function deleteStage ()
+    {
+        if ($mvps = $this->mvps) {
+            foreach ($mvps as $mvp) {
+                $mvp->deleteStage();
+            }
+        }
+
+        if ($confirm = $this->confirm) {
+
+            $responds = $confirm->responds;
+            foreach ($responds as $respond) {
+
+                DescInterviewGcp::deleteAll(['responds_gcp_id' => $respond->id]);
+                AnswersQuestionsConfirmGcp::deleteAll(['respond_id' => $respond->id]);
+            }
+
+            QuestionsConfirmGcp::deleteAll(['confirm_gcp_id' => $confirm->id]);
+            RespondsGcp::deleteAll(['confirm_gcp_id' => $confirm->id]);
+            $confirm->delete();
+        }
+
+        $this->delete();
     }
 }

@@ -3,12 +3,12 @@
 namespace app\controllers;
 
 use app\models\DescInterview;
-use app\models\FormUpdateConfirmSegment;
+use app\models\forms\FormUpdateConfirmSegment;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\Segment;
-use app\models\UpdateRespondForm;
+use app\models\forms\UpdateRespondForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -342,16 +342,6 @@ class InterviewController extends AppController
         $model = new Interview();
         $model->segment_id = $id;
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['segment/view', 'id' => $segment->id]);
-            }
-        }
 
         $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
         if (!empty($modelInterview)){ return $this->redirect(['/interview/view', 'id' => $modelInterview->id]); }
@@ -371,13 +361,6 @@ class InterviewController extends AppController
                             mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/';
                         if (!file_exists($interviews_dir)) {
                             mkdir($interviews_dir, 0777);
-                        }
-
-                        $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/feedbacks/';
-                        if (!file_exists($feedbacks_dir)) {
-                            mkdir($feedbacks_dir, 0777);
                         }
 
                         $generation_problems_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .

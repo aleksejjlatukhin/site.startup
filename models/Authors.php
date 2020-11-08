@@ -39,6 +39,7 @@ class Authors extends \yii\db\ActiveRecord
             [['project_id'], 'integer'],
             [['experience'], 'string'],
             [['fio', 'role'], 'string', 'max' => 255],
+            [['fio', 'role', 'experience'], 'trim'],
         ];
     }
 

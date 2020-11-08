@@ -39,7 +39,7 @@ class MvpController extends AppController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа к данному действию.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -54,7 +54,7 @@ class MvpController extends AppController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new \yii\web\HttpException(200, 'У Вас нет доступа к данному действию.');
             }
 
         }elseif (in_array($action->id, ['index'])){
@@ -200,35 +200,38 @@ class MvpController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    /*public function actionDelete($id)
+    public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $model->problem_id]);
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $model->project_id]);
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        if(Yii::$app->request->isAjax) {
 
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
+                '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251")) .
+                '/generation problems/' . mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251"), "windows-1251") .
+                '/gcps/' . mb_strtolower(mb_convert_encoding($this->translit($gcp->title) , "windows-1251"), "windows-1251") .
+                '/mvps/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251");
+
+            if (file_exists($pathDelete)){
+                $this->delTree($pathDelete);
+            }
+
+            $project->updated_at = time();
+            $project->save();
+
+            if ($model->deleteStage()) {
+
+                return true;
             }
         }
-
-        if ($model->delete()){
-            $project->save();
-        }
-
-        return $this->redirect(['index']);
-    }*/
+        return false;
+    }
 
     /**
      * Finds the mvp model based on its primary key value.

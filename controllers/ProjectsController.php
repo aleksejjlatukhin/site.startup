@@ -9,6 +9,7 @@ use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
 use app\models\FeedbackExpertGcp;
 use app\models\FeedbackExpertMvp;
+use app\models\forms\FormCreateProject;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -20,6 +21,7 @@ use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
+use app\models\Roadmap;
 use app\models\Segment;
 use app\models\SortForm;
 use app\models\User;
@@ -323,27 +325,21 @@ class ProjectsController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
     public function actionCreate($id)
     {
         $model = new Projects();
         $model->user_id = $id;
 
-        $models = Projects::find()->where(['user_id' => $id])->all();
-        $user = User::findOne(['id' => $id]);
-
-        if ($user->status === User::STATUS_ACTIVE){
-            //В зависимости от статуса пользователя
-            // создаем папку на сервере, если она ещё не создана
-            $user->createDirName();
-        }
+        $models = Projects::findAll(['user_id' => $id]);
+        $user = User::findOne($id);
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-
-                /*Преобразование даты в число*/
+                //Преобразование даты в число
                 if ($model->patent_date){
                     $model->patent_date = strtotime($model->patent_date);
                 }
@@ -357,70 +353,26 @@ class ProjectsController extends AppController
                     $model->date_of_announcement = strtotime($model->date_of_announcement);
                 }
 
-
-                $countMod = 0;
-                foreach ($models as $item) {
-                    if (mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                        $countMod++;
-                    }
-                }
-
-                if ($countMod === 0){
+                //Проверка на совпадение по названию проекта у данного пользователя
+                if ($model->checkingForMatchByName($models) === false) {
 
                     if ($model->save()){
 
-
                         //Загрузка участников команды проекта (Authors)
-                        //---Начало---
+                        $model->saveAuthors();
 
-                        $arr_authors = $_POST['Authors'];
-                        $arr_authors = array_values($arr_authors);
+                        //Создание дирректорий проекта
+                        if ($present_files_dir = $model->createDirectories($user)) {
 
-                        foreach ($arr_authors as $arr_author) {
+                            //Загрузка презентационных файлов
+                            $model->present_files = UploadedFile::getInstances($model, 'present_files');
+                            $model->upload($present_files_dir);
 
-                            $worker = new Authors();
-                            $worker->fio = $arr_author['fio'];
-                            $worker->role = $arr_author['role'];
-                            $worker->experience = $arr_author['experience'];
-                            $worker->project_id = $model->id;
-                            $worker->save();
+                            $response =  ['success' => true, 'model_id' => $model->id];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
-
-                        //Загрузка участников команды проекта (Authors)
-                        //---Конец---
-
-
-                        $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
-                        $user_dir = mb_strtolower($user_dir, "windows-1251");
-                        if (!file_exists($user_dir)){
-                            mkdir($user_dir, 0777);
-                        }
-
-                        $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/';
-                        $project_dir = mb_strtolower($project_dir, "windows-1251");
-                        if (!file_exists($project_dir)){
-                            mkdir($project_dir, 0777);
-                        }
-
-                        $present_files_dir = $project_dir . '/present files/';
-                        if (!file_exists($present_files_dir)){
-                            mkdir($present_files_dir, 0777);
-                        }
-
-                        $segments_dir = $project_dir . '/segments/';
-                        if (!file_exists($segments_dir)){
-                            mkdir($segments_dir, 0777);
-                        }
-
-                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
-
-                        $model->upload($present_files_dir);
-
-
-                        $response =  ['success' => true, 'model_id' => $model->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }else{
 
@@ -439,6 +391,7 @@ class ProjectsController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
     public function actionUpdate($id)
     {
@@ -465,89 +418,25 @@ class ProjectsController extends AppController
                     $model->date_of_announcement = strtotime($model->date_of_announcement);
                 }
 
-                $countCon = 0;
-                foreach ($models as $item) {
-                    if ($model->id !== $item->id && mb_strtolower(str_replace(' ', '', $model->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                        $countCon++;
-                    }
-                }
-
-                if ($countCon === 0){
-                    foreach ($models as $elem){
-                        if ($model->id == $elem->id && mb_strtolower(str_replace(' ', '',$model->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
-
-                            $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
-
-                            $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                            $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                                . '/' . mb_convert_encoding($this->translit($model->project_name), "windows-1251") . '/';
-
-                            $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                            rename($old_dir, $new_dir);
-                        }
-                    }
+                //Проверка на совпадение по названию проекта у данного пользователя
+                if ($model->checkingForMatchByName($models) === false) {
 
                     if ($model->save()){
 
                         //Загрузка участников команды проекта (Authors)
-                        //---Начало---
+                        $model->saveAuthors();
 
-                        $arr_authors = $_POST['Authors'];
-                        $arr_authors = array_values($arr_authors);
+                        //Проверка существования дирректорий проекта
+                        if ($present_files_dir = $model->createDirectories($user)) {
 
-                        if (count($arr_authors) > count($workers)) {
+                            $model->present_files = UploadedFile::getInstances($model, 'present_files');
+                            $model->upload($present_files_dir);
 
-                            foreach ($arr_authors as $i => $arr_author) {
-
-                                if (($i+1) <= count($workers)) {
-                                    $workers[$i]->fio = $arr_authors[$i]['fio'];
-                                    $workers[$i]->role = $arr_authors[$i]['role'];
-                                    $workers[$i]->experience = $arr_authors[$i]['experience'];
-                                    $workers[$i]->save();
-                                } else {
-                                    $worker = new Authors();
-                                    $worker->fio = $arr_authors[$i]['fio'];
-                                    $worker->role = $arr_authors[$i]['role'];
-                                    $worker->experience = $arr_authors[$i]['experience'];
-                                    $worker->project_id = $model->id;
-                                    $worker->save();
-                                }
-                            }
-
-                        } else {
-
-                            foreach ($arr_authors as $i => $arr_author) {
-                                $workers[$i]->fio = $arr_author['fio'];
-                                $workers[$i]->role = $arr_author['role'];
-                                $workers[$i]->experience = $arr_author['experience'];
-                                $workers[$i]->save();
-                            }
+                            $response =  ['success' => true, 'model_id' => $model->id];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
-
-                        //Загрузка участников команды проекта (Authors)
-                        //---Конец---
-
-                        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($model->project_name) , "windows-1251") . '/segments/';
-
-                        if (!file_exists($segments_dir)){
-                            mkdir($segments_dir, 0777);
-                        }
-
-                        $model->present_files = UploadedFile::getInstances($model, 'present_files');
-
-                        $present_files_dir = UPLOAD . mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-                            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251") . '/present files/';
-
-                        $model->upload($present_files_dir);
-
-                        $response =  ['success' => true, 'model_id' => $model->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 } else{
 
@@ -560,6 +449,57 @@ class ProjectsController extends AppController
             }
         }
     }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionShowAllInformation ($id)
+    {
+        $project = Projects::findOne($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('all-information', ['project' => $project]),
+                'project' => $project,
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionShowRoadmap ($id)
+    {
+        $project = Projects::findOne($id);
+        $roadmaps = [];
+
+        foreach ($project->segments as $i => $segment){
+            $roadmaps[$i] = new Roadmap($segment->id);
+        }
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('roadmap', ['roadmaps' => $roadmaps]),
+                'project' => $project,
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
 
     /**
      * @param $id
@@ -927,166 +867,29 @@ class ProjectsController extends AppController
 
     /**
      * @param $id
-     * @return Response
+     * @return bool
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $segments = Segment::find()->where(['project_id' => $model->id])->all();
         $user = User::find()->where(['id' => $model->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
+        if(Yii::$app->request->isAjax) {
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
 
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+            if (file_exists($pathDelete)){
+                $this->delTree($pathDelete);
+            }
+
+            if ($model->deleteStage()) {
+
+                return true;
             }
         }
-
-        if(!empty($segments)){
-            foreach ($segments as $segment){
-
-                $interview = Interview::find()->where(['segment_id' => $segment->id])->one();
-                $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-
-                if(!empty($responds)){
-                    foreach ($responds as $respond){
-                        if (!empty($respond->descInterview)){
-                            $respond->descInterview->delete();
-                        }
-                    }
-                }
-
-                $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
-
-                if (!empty($generationProblems)){
-                    foreach ($generationProblems as $generationProblem){
-                        if (!empty($generationProblem->confirm)){
-                            $confirmProblem = $generationProblem->confirm;
-
-                            if (!empty($confirmProblem->feedbacks)){
-                                FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-
-                            if (!empty($confirmProblem->responds)){
-                                $respondsConfirm = $confirmProblem->responds;
-
-                                foreach ($respondsConfirm as $respondConfirm){
-                                    if (!empty($respondConfirm->descInterview)){
-                                        $respondConfirm->descInterview->delete();
-                                    }
-                                }
-
-                                RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-
-                            if (!empty($confirmProblem->gcps)){
-                                $gcps = $confirmProblem->gcps;
-
-                                foreach ($gcps as $gcp){
-                                    if(!empty($gcp->confirm)){
-                                        $confirmGcp = $gcp->confirm;
-
-                                        if (!empty($confirmGcp->feedbacks)){
-                                            FeedbackExpertGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        if (!empty($confirmGcp->responds)){
-                                            $respondsGcp = $confirmGcp->responds;
-
-                                            foreach ($respondsGcp as $respondGcp){
-                                                if (!empty($respondGcp->descInterview)){
-                                                    $respondGcp->descInterview->delete();
-                                                }
-                                            }
-
-                                            RespondsGcp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        if (!empty($confirmGcp->mvps)){
-                                            $mvps = $confirmGcp->mvps;
-
-                                            foreach ($mvps as $mvp){
-                                                if (!empty($mvp->confirm)){
-                                                    $confirmMvp = $mvp->confirm;
-
-                                                    if (!empty($confirmMvp->feedbacks)){
-                                                        FeedbackExpertMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
-                                                    }
-
-                                                    if (!empty($confirmMvp->responds)){
-                                                        $respondsMvp = $confirmMvp->responds;
-
-                                                        foreach ($respondsMvp as $respondMvp){
-                                                            if (!empty($respondMvp->descInterview)){
-                                                                $respondMvp->descInterview->delete();
-                                                            }
-                                                        }
-
-                                                        RespondsMvp::deleteAll(['confirm_mvp_id' => $confirmMvp->id]);
-                                                    }
-
-                                                    if (!empty($confirmMvp->business)){
-                                                        $confirmMvp->business->delete();
-                                                    }
-
-
-                                                    $confirmMvp->delete();
-                                                }
-                                            }
-
-                                            Mvp::deleteAll(['confirm_gcp_id' => $confirmGcp->id]);
-                                        }
-
-                                        $confirmGcp->delete();
-                                    }
-                                }
-
-                                Gcp::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                            }
-
-                            $confirmProblem->delete();
-                        }
-                    }
-                }
-
-
-
-                Questions::deleteAll(['interview_id' => $interview->id]);
-                FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
-                Respond::deleteAll(['interview_id' => $interview->id]);
-                GenerationProblem::deleteAll(['interview_id' => $interview->id]);
-                Interview::deleteAll(['segment_id' => $segment->id]);
-            }
-        }
-
-        /*Удаление загруженных папок и файлов пользователя*/
-        $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
-        if (file_exists($pathDelete)){
-            $this->delTree($pathDelete);
-        }
-        /*-----------------------------------------------*/
-
-
-        PreFiles::deleteAll(['project_id' => $model->id]);
-        Authors::deleteAll(['project_id' => $model->id]);
-        Segment::deleteAll(['project_id' => $model->id]);
-
-
-        Yii::$app->session->setFlash('error', 'Проект "' . $this->findModel($id)->project_name . '" удален');
-
-        $model->delete();
-
-        return $this->redirect(['index', 'id' => $user->id]);
+        return false;
     }
 
 

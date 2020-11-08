@@ -118,8 +118,9 @@ class GenerationProblemController extends AppController
 
         $model = new GenerationProblem();
         $model->interview_id = $id;
-        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
-        $model->title = 'ГПС ' . (count($models)+1);
+        $last_model = GenerationProblem::find()->where(['interview_id' => $id])->orderBy(['id' => SORT_DESC])->one();
+        $last_model_number = explode(' ',$last_model->title)[1];
+        $model->title = 'ГПС ' . ($last_model_number + 1);
 
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
@@ -183,72 +184,34 @@ class GenerationProblemController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    /*public function actionDelete($id)
+    public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['gps_id' => $model->id])->one();
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-        $project->updated_at = time();
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $model->project_id]);
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        //Удаление доступно только проектанту, который создал данную модель
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        if(Yii::$app->request->isAjax) {
 
-            //Действие доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
+                    '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251")) .
+                '/generation problems/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251");
+
+            if (file_exists($pathDelete)){
+                $this->delTree($pathDelete);
+            }
+
+            $project->updated_at = time();
+            $project->save();
+
+            if ($model->deleteStage()) {
+
+                return true;
             }
         }
-
-
-        if ($project->save()) {
-
-            foreach ($responds as $respond){
-                $descInterview = $respond->descInterview;
-
-                if ($descInterview->interview_file !== null){
-                    unlink('upload/interviews-confirm/' . $descInterview->interview_file);
-                }
-
-                if (!empty($descInterview)){
-                    $descInterview->delete();
-                }
-            }
-
-            if (!empty($confirmProblem->feedbacks)){
-                foreach ($confirmProblem->feedbacks as $feedback) {
-                    if ($feedback->feedback_file !== null){
-                        unlink('upload/feedbacks-confirm/' . $feedback->feedback_file);
-                    }
-                }
-            }
-
-            RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-
-            Yii::$app->session->setFlash('error', '"' . $model->title . '" удалена!');
-
-            $confirmProblem->delete();
-
-            $model->delete();
-
-            $j = 0;
-            foreach ($interview->problems as $item){
-                $j++;
-                $item->title = 'ГПС ' . $j;
-                $item->save();
-            }
-
-            return $this->redirect(['interview/view', 'id' => $interview->id]);
-        }
-
-
-    }*/
+        return false;
+    }
 
     /**
      * Finds the GenerationProblem model based on its primary key value.

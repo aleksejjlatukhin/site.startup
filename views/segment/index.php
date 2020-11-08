@@ -31,10 +31,8 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                 <?= $project->project_name; ?>
             </div>
 
-            <?= Html::a('Данные проекта', ['#'], [
-                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header',
-                'data-toggle' => 'modal',
-                'data-target' => "#data_project_modal",
+            <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->id], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openAllInformationProject link_in_the_header',
             ]) ?>
 
             <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
@@ -42,10 +40,8 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                 'onclick' => 'return false',
             ]) ?>
 
-            <?= Html::a('Дорожная карта проекта', ['#'], [
-                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
-                'data-toggle' => 'modal',
-                'data-target' => "#showRoadmapProject",
+            <?= Html::a('Дорожная карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
             ]) ?>
 
             <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
@@ -230,7 +226,7 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                 <?php foreach ($models as $model) : ?>
 
 
-                    <div class="row container-one_hypothesis" style="margin: 3px 0;">
+                    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>" style="margin: 3px 0;">
 
                         <div class="col-md-3" style="padding-left: 5px; padding-right: 5px;">
 
@@ -262,7 +258,7 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                                 <div class="col-md-8">
 
-                                    <div style="padding-left: 15px;">
+                                    <div class="hypothesis_title" style="padding-left: 15px;">
                                         <?= $model->name;?>
                                     </div>
 
@@ -410,11 +406,8 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                                     <?php else : ?>
 
-                                        <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/view', 'id' => $model->id], [
-                                            'class' => '',
-                                            'title' => 'Смотреть',
-                                            'data-toggle' => 'modal',
-                                            'data-target' => "#segment_view_modal-$model->id",
+                                        <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/segment/show-all-information', 'id' => $model->id], [
+                                            'class' => 'openAllInformationSegment', 'title' => 'Смотреть',
                                         ]); ?>
 
                                     <?php endif; ?>
@@ -423,10 +416,9 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                                 <div >
 
-                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['#'], [
-                                        'class' => '',
+                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/segment/delete', 'id' => $model->id], [
+                                        'class' => 'delete_hypothesis',
                                         'title' => 'Удалить',
-                                        'onclick' => 'return false',
                                     ]); ?>
 
                                 </div>
@@ -470,107 +462,6 @@ $this->registerCssFile('@web/css/segments-index-style.css');
             </div>
 
         <?php endif; ?>
-
-
-
-        <?php
-        // Модальное окно - данные проекта
-        Modal::begin([
-            'options' => [
-                'id' => 'data_project_modal',
-            ],
-            'size' => 'modal-lg',
-            'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
-        ]);
-        ?>
-
-        <?= DetailView::widget([
-            'model' => $project,
-            //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
-            'attributes' => [
-
-                'project_name',
-                'project_fullname:ntext',
-                'description:ntext',
-                'rid',
-                'core_rid:ntext',
-                'patent_number',
-
-                [
-                    'attribute' => 'patent_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'patent_name:ntext',
-
-                [
-                    'attribute'=>'Команда проекта',
-                    'value' => $project->getAuthorInfo($project),
-                    'format' => 'html',
-                ],
-
-                'technology',
-                'layout_technology:ntext',
-                'register_name',
-
-                [
-                    'attribute' => 'register_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'site',
-                'invest_name',
-
-                [
-                    'attribute' => 'invest_date',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'invest_amount',
-                    'value' => function($project){
-                        if($project->invest_amount !== null){
-                            return number_format($project->invest_amount, 0, '', ' ');
-                        }
-                    },
-                ],
-
-                [
-                    'attribute' => 'date_of_announcement',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                'announcement_event',
-
-                [
-                    'attribute' => 'created_at',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'updated_at',
-                    'format' => ['date', 'dd.MM.yyyy'],
-                ],
-
-                [
-                    'attribute' => 'pre_files',
-                    'label' => 'Презентационные файлы',
-                    'value' => function($model){
-                        $string = '';
-                        foreach ($model->preFiles as $file){
-                            $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
-                        }
-                        return $string;
-                    },
-                    'format' => 'html',
-                ]
-
-            ],
-        ]) ?>
-
-        <?php
-        Modal::end();
-        ?>
 
 
         <?php
@@ -2271,56 +2162,9 @@ $this->registerCssFile('@web/css/segments-index-style.css');
             </div>
 
 
-            <?php
+            <?php Modal::end(); ?>
 
-            Modal::end();
-
-
-
-            // Модальное окно - Просмотр данных сегмента
-            Modal::begin([
-                'options' => [
-                    'id' => 'segment_view_modal-' . $model->id,
-                ],
-                'size' => 'modal-lg',
-                'header' => '<h3 class="text-center">Просмотр данных сегмента</h3>',
-            ]);
-            ?>
-
-            <?= $model->allInformation;?>
-
-            <?php
-
-            Modal::end();
-
-        endforeach;
-
-        ?>
-
-
-
-        <!--Roadmap Project-->
-
-        <?php
-
-        // Модальное окно - дорожная карта проекта
-        Modal::begin([
-            'options' => [
-                'id' => 'showRoadmapProject',
-                'class' => 'showRoadmapProject',
-            ],
-            'size' => 'modal-lg',
-            'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
-        ]);
-        ?>
-
-        <?= $project->showRoadmapProject();?>
-
-        <?php
-
-        Modal::end();
-
-        ?>
+        <?php endforeach; ?>
 
 
         <?php

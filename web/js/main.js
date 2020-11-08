@@ -101,7 +101,6 @@ $(document).ready(function() {
     ---это небольшая часть(остальное находится ниже)--
     */
 
-
 });
 
 
@@ -133,5 +132,198 @@ function openCity(evt, cityName) {
 
 /*
 Вкладки на странице "Программа генерации ГПС"
+---Конец---
+*/
+
+
+/*
+Добавляем контент в окно просмотра данных проекта
+---Начало---
+ */
+$(document).on('click', 'body .openAllInformationProject', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#data_project_modal');
+    var container = $(modal).find('.modal-body');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в окно просмотра данных проекта
+---Конец---
+ */
+
+
+/*
+Добавляем контент в окно просмотра данных сегмента
+---Начало---
+ */
+$(document).on('click', 'body .openAllInformationSegment', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#data_segment_modal');
+    var container = $(modal).find('.modal-body');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в окно просмотра данных сегмента
+---Конец---
+ */
+
+
+/*
+Добавляем контент в дорожную карту проекта
+---Начало---
+ */
+$(document).on('click', 'body .openRoadmapProject', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#showRoadmapProject');
+    var container = $(modal).find('.modal-body');
+    var header = $(modal).find('.modal-header').find('h2');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+            $(header).html('Дорожная карта проекта «' + response.project.project_name + '»');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в дорожную карту проекта
+---Конец---
+ */
+
+/*
+Добавляем контент в дорожную карту сегмента
+---Начало---
+*/
+$(document).on('click', 'body .openRoadmapSegment', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#showRoadmapSegment');
+    var container = $(modal).find('.modal-body');
+    var header = $(modal).find('.modal-header').find('.roadmap_segment_modal_header_title_h2');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+            $(header).html('Дорожная карта сегмента «' + response.segment.name + '»');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в дорожную карту сегмента
+---Конец---
+*/
+
+/*
+При вызове окна удаления гипотезы
+---Начало---
+*/
+$(document).on('click', 'body .delete_hypothesis', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#delete_hypothesis_modal');
+    var model_id = url.split('id=')[1];
+    var controller = url.split('/')[1];
+    var hypothesis_title = $('.row_hypothesis-' + model_id).find('.hypothesis_title').html();
+
+    switch (controller) {
+        case 'projects':
+            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить проект «' + hypothesis_title + '» ?');
+            break;
+        case 'segment':
+            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить сегмент «' + hypothesis_title + '» ?');
+            break;
+        default:
+            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить «' + hypothesis_title + '» ?');
+    }
+
+    $(modal).find('#confirm_delete_hypothesis').attr('href', url);
+    $(modal).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+/*
+При вызове окна удаления гипотезы
+---Конец---
+*/
+
+/*
+При подтверждении удаления гипотезы
+---Начало---
+*/
+$(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
+
+    var url = $(this).attr('href');
+    var model_id = url.split('id=')[1];
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(){
+
+            $('.row_hypothesis-' + model_id).hide();
+            $('#delete_hypothesis_modal').modal('hide');
+        },
+        error: function () {
+           alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+При подтверждении удаления гипотезы
 ---Конец---
 */

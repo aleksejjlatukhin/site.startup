@@ -30,7 +30,7 @@ class DescInterviewMvpController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['update'])){
 
             $model = DescInterviewMvp::findOne(Yii::$app->request->get());
             $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
@@ -203,46 +203,6 @@ class DescInterviewMvpController extends AppController
             }
         }
     }
-
-    /**
-     * Deletes an existing DescInterviewMvp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    /*public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        if ($model->delete()) {
-            $project->save();
-        }
-
-        return $this->redirect(['index']);
-    }*/
 
     /**
      * Finds the DescInterviewMvp model based on its primary key value.

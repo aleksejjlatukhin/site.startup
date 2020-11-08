@@ -6,32 +6,8 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
-use yii\helpers\Html;
 
-/**
- * This is the model class for table "projects".
- *
- * @property string $id
- * @property int $user_id
- * @property string $created_at
- * @property string $update_at
- * @property string $project_fullname
- * @property string $project_name
- * @property string $description
- * @property string $rid
- * @property string $patent_number
- * @property string $patent_date
- * @property string $patent_name
- * @property string $core_rid
- * @property string $technology
- * @property string $layout_technology
- * @property string $register_name
- * @property string $register_date
- * @property string $site
- * @property string $invest_name
- * @property string $invest_date
- * @property int $invest_amount
- */
+
 class Projects extends ActiveRecord
 {
 
@@ -74,67 +50,14 @@ class Projects extends ActiveRecord
         return $this->hasMany(Mvp::class, ['project_id' => 'id']);
     }
 
-    public function getBusinessModel ()
+    public function getBusinessModels ()
     {
-        return $this->hasOne(BusinessModel::class, ['project_id' => 'id']);
+        return $this->hasMany(BusinessModel::class, ['project_id' => 'id']);
     }
 
     public function getPreFiles()
     {
         return $this->hasMany(PreFiles::class, ['project_id' => 'id']);
-    }
-
-    public function getAuthorInfo($model)
-    {
-        $string = '';
-        $j = 0;
-        foreach ($model->authors as $author) {
-            if (!empty($author->fio)){
-                $j++;
-                $string .= "<u>Сотрудник №$j</u> <br>";
-                $string .= 'ФИО: ' . $author->fio . "<br>";
-                $string .= 'Роль в проекте: ' . $author->role . "<br>";
-                $string .= 'Опыт работы: ' . $author->experience . "<br><br>";
-            }
-        }
-        return $string;
-    }
-
-
-    public function upload($path){
-
-        if (!is_dir($path)){
-
-            throw new NotFoundHttpException('Дирректория не существует!');
-
-        }else{
-
-            if($this->validate()){
-
-                foreach($this->present_files as $file){
-
-                    $filename = Yii::$app->getSecurity()->generateRandomString(15);
-
-                    try{
-
-                        $file->saveAs($path . $filename . '.' . $file->extension);
-
-                        $preFiles = new PreFiles();
-                        $preFiles->file_name = $file;
-                        $preFiles->server_file = $filename . '.' . $file->extension;
-                        $preFiles->project_id = $this->id;
-                        $preFiles->save(false);
-
-                    }catch (\Exception $e){
-
-                        throw new NotFoundHttpException('Невозможно загрузить файл!');
-                    }
-                }
-                return true;
-            }else{
-                return false;
-            }
-        }
     }
 
 
@@ -198,292 +121,252 @@ class Projects extends ActiveRecord
         ];
     }
 
-
-    public function showRoadmapProject()
+    public function showListAuthors()
     {
-        $roadmaps = [];
+        $string = '';
+        $j = 0;
+        foreach ($this->authors as $author) {
 
-        foreach ($this->segments as $i => $segment){
-            $roadmaps[$i] = new Roadmap($segment->id);
+            $j++;
+            $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: 700;">Сотрудник №'.$j.'</div>';
+            $string .= '<div>ФИО: ' . $author->fio . '</div>';
+            $string .= '<div>Роль в проекте: ' . $author->role . '</div>';
+            $string .= '<div>Опыт работы: ' . $author->experience . '</div></div>';
+
+        }
+        return $string;
+    }
+
+
+    /**
+     * Загрузка презентационных файлов
+     * @param $path
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    public function upload($path){
+
+        if (!is_dir($path)){
+
+            throw new NotFoundHttpException('Дирректория не существует!');
+
+        }else{
+
+            if($this->validate()){
+
+                foreach($this->present_files as $file){
+
+                    $filename = Yii::$app->getSecurity()->generateRandomString(15);
+
+                    try{
+
+                        $file->saveAs($path . $filename . '.' . $file->extension);
+
+                        $preFiles = new PreFiles();
+                        $preFiles->file_name = $file;
+                        $preFiles->server_file = $filename . '.' . $file->extension;
+                        $preFiles->project_id = $this->id;
+                        $preFiles->save(false);
+
+                    }catch (\Exception $e){
+
+                        throw new NotFoundHttpException('Невозможно загрузить файл!');
+                    }
+                }
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
+
+    /**
+     * Проверка на совпадение по названию проекта у данного пользователя
+     * @param $models
+     * @return bool
+     */
+    public function checkingForMatchByName ($models)
+    {
+        $numberOfMatches = 0;
+        if (empty($this->id)) {
+            //При создании проекта
+            foreach ($models as $item) {
+                if (mb_strtolower(str_replace(' ', '', $this->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                    $numberOfMatches++;
+                }
+            }
+        } else {
+            //При редактировании проекта
+            foreach ($models as $item) {
+                if ($this->id !== $item->id && mb_strtolower(str_replace(' ', '', $this->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                    $numberOfMatches++;
+                }
+            }
+
+            //Изменение имени дирректории при редактировании проекта
+            $this->updateProjectDirectory($models);
         }
 
-        $content = '';
+        if ($numberOfMatches == 0) {
+            return false;
+        }else {
+            return true;
+        }
+    }
 
-        $content .= '<div class="content_roadmap">
-                        
-                        <div class="roadmap_row_header">
 
-                            <div class="roadmap_block_stage">Сегменты</div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Генерация ГЦС</div>
-                                <div>Дата создания</div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Подтверждение ГЦС</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Генерация ГПС</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Подтверждение ГПС</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Разработка ГЦП</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Подтверждение ГЦП</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Разработка ГMVP</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                            <div class="roadmap_block_stage text-center">
-                                <div>Подтверждение ГMVP</div>
-                                <div>
-                                    <div>План</div>
-                                    <div>Факт</div>
-                                </div>
-                            </div>
-            
-                        </div>';
+    /**
+     * Изменение имени дирректории при редактировании проекта
+     * @param $models
+     */
+    private function updateProjectDirectory ($models)
+    {
+        $user = User::findOne(['id' => $this->user_id]);
 
-        foreach ($roadmaps as $roadmap) {
+        foreach ($models as $elem){
 
-            $segment_name = $roadmap->getProperty('segment_name');
-            if (mb_strlen($segment_name) > 25) {
-                $segment_name = mb_substr($segment_name, 0, 25) . '...';
+            if ($this->id == $elem->id && mb_strtolower(str_replace(' ', '',$this->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
+
+                $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                    . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
+
+                $old_dir = mb_strtolower($old_dir, "windows-1251");
+
+                $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                    . '/' . mb_convert_encoding($this->translit($this->project_name), "windows-1251") . '/';
+
+                $new_dir = mb_strtolower($new_dir, "windows-1251");
+
+                rename($old_dir, $new_dir);
             }
+        }
+    }
 
 
-            if ($roadmap->getProperty('fact_segment_confirm') != null) {
+    /**
+     * Сохранение команды(авторов)
+     */
+    public function saveAuthors ()
+    {
+        $workers = Authors::find()->where(['project_id' => $this->id])->all();
 
-                if ($roadmap->getProperty('fact_segment_confirm') <= $roadmap->getProperty('plan_segment_confirm')){
+        if (empty($workers)) {
 
-                    $fact_segment_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_segment_confirm')), ['/interview/view', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
+            //При создании проекта
+            $arr_authors = $_POST['Authors'];
+            $arr_authors = array_values($arr_authors);
 
-                    $fact_segment_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_segment_confirm')), ['/interview/view', 'id' => $roadmap->getProperty('id_confirm_segment')], ['class' => 'roadmap_block_date_link_danger']);
+            foreach ($arr_authors as $arr_author) {
+
+                $worker = new Authors();
+                $worker->fio = $arr_author['fio'];
+                $worker->role = $arr_author['role'];
+                $worker->experience = $arr_author['experience'];
+                $worker->project_id = $this->id;
+                $worker->save();
+            }
+        } else {
+
+            //При редактировании проекта
+            $arr_authors = $_POST['Authors'];
+            $arr_authors = array_values($arr_authors);
+
+            if (count($arr_authors) > count($workers)) {
+
+                foreach ($arr_authors as $i => $arr_author) {
+
+                    if (($i+1) <= count($workers)) {
+                        $workers[$i]->fio = $arr_authors[$i]['fio'];
+                        $workers[$i]->role = $arr_authors[$i]['role'];
+                        $workers[$i]->experience = $arr_authors[$i]['experience'];
+                        $workers[$i]->save();
+                    } else {
+                        $worker = new Authors();
+                        $worker->fio = $arr_authors[$i]['fio'];
+                        $worker->role = $arr_authors[$i]['role'];
+                        $worker->experience = $arr_authors[$i]['experience'];
+                        $worker->project_id = $this->id;
+                        $worker->save();
+                    }
                 }
-            }else {
-                $fact_segment_confirm = '_ _ _ _ _ _';
-            }
 
+            } else {
 
-            if ($roadmap->getProperty('fact_gps') != null) {
-
-                if ($roadmap->getProperty('fact_gps') <= $roadmap->getProperty('plan_gps')){
-
-                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_danger']);
+                foreach ($arr_authors as $i => $arr_author) {
+                    $workers[$i]->fio = $arr_author['fio'];
+                    $workers[$i]->role = $arr_author['role'];
+                    $workers[$i]->experience = $arr_author['experience'];
+                    $workers[$i]->save();
                 }
-            }else {
-                $fact_gps = '_ _ _ _ _ _';
             }
-
-
-            if ($roadmap->getProperty('fact_gps_confirm') != null) {
-
-                if ($roadmap->getProperty('fact_gps_confirm') <= $roadmap->getProperty('plan_gps_confirm')){
-
-                    $fact_gps_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps_confirm')), ['/confirm-problem/view', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_gps_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps_confirm')), ['/confirm-problem/view', 'id' => $roadmap->getProperty('id_confirm_problem')], ['class' => 'roadmap_block_date_link_danger']);
-                }
-            }else {
-                $fact_gps_confirm = '_ _ _ _ _ _';
-            }
-
-
-            if ($roadmap->getProperty('fact_gcp') != null) {
-
-                if ($roadmap->getProperty('fact_gcp') <= $roadmap->getProperty('plan_gcp')){
-
-                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_danger']);
-                }
-            }else {
-                $fact_gcp = '_ _ _ _ _ _';
-            }
-
-
-            if ($roadmap->getProperty('fact_gcp_confirm') != null) {
-
-                if ($roadmap->getProperty('fact_gcp_confirm') <= $roadmap->getProperty('plan_gcp_confirm')){
-
-                    $fact_gcp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp_confirm')), ['/confirm-gcp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_gcp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp_confirm')), ['/confirm-gcp/view', 'id' => $roadmap->getProperty('id_confirm_gcp')], ['class' => 'roadmap_block_date_link_danger']);
-                }
-            }else {
-                $fact_gcp_confirm = '_ _ _ _ _ _';
-            }
-
-
-            if ($roadmap->getProperty('fact_mvp') != null) {
-
-                if ($roadmap->getProperty('fact_mvp') <= $roadmap->getProperty('plan_mvp')){
-
-                    $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_danger']);
-                }
-            }else {
-                $fact_mvp = '_ _ _ _ _ _';
-            }
-
-
-            if ($roadmap->getProperty('fact_mvp_confirm') != null) {
-
-                if ($roadmap->getProperty('fact_mvp_confirm') <= $roadmap->getProperty('plan_mvp_confirm')){
-
-                    $fact_mvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_mvp')], ['class' => 'roadmap_block_date_link_success']);
-                }else {
-
-                    $fact_mvp_confirm = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp_confirm')), ['/confirm-mvp/view', 'id' => $roadmap->getProperty('id_confirm_mvp')], ['class' => 'roadmap_block_date_link_danger']);
-                }
-            }else {
-                $fact_mvp_confirm = '_ _ _ _ _ _';
-            }
-
-
-
-            $content .= '<div class="roadmap_row_dates">
-
-                            <div class="roadmap_block_name_segment" title="'.$roadmap->getProperty('segment_name').'">
-                                '.$segment_name.'
-                            </div>
-                            
-                            <div class="roadmap_block_date_segment">
-                                '.date('d.m.y',$roadmap->getProperty('created_at')).'
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_segment_confirm')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_segment_confirm.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gps')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_gps.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gps_confirm')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_gps_confirm.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gcp')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_gcp.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_gcp_confirm')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_gcp_confirm.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_mvp')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_mvp.'
-                                </div>
-                            
-                            </div>
-                            
-                            <div class="roadmap_block_date">
-                            
-                                <div>
-                                    '.date('d.m.y',$roadmap->getProperty('plan_mvp_confirm')).'
-                                </div>
-                                
-                                <div>
-                                    '.$fact_mvp_confirm.'
-                                </div>
-                            
-                            </div>
-                            
-                        </div>';
         }
 
-        $content .= '</div>';
 
-        return $content;
+    }
+
+
+    /**
+     * Создание дирректорий проекта
+     * @param $user
+     */
+    public function createDirectories ($user)
+    {
+        $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
+        $user_dir = mb_strtolower($user_dir, "windows-1251");
+        if (!file_exists($user_dir)){
+            mkdir($user_dir, 0777);
+        }
+
+        $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($this->project_name) , "windows-1251") . '/';
+        $project_dir = mb_strtolower($project_dir, "windows-1251");
+        if (!file_exists($project_dir)){
+            mkdir($project_dir, 0777);
+        }
+
+        $present_files_dir = $project_dir . '/present files/';
+        if (!file_exists($present_files_dir)){
+            mkdir($present_files_dir, 0777);
+        }
+
+        $segments_dir = $project_dir . '/segments/';
+        if (!file_exists($segments_dir)){
+            mkdir($segments_dir, 0777);
+        }
+
+        return $present_files_dir;
+    }
+
+
+    public function translit($s)
+    {
+        $s = (string) $s; // преобразуем в строковое значение
+        $s = strip_tags($s); // убираем HTML-теги
+        $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
+        $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
+        $s = trim($s); // убираем пробелы в начале и конце строки
+        $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
+        $s = strtr($s, array('а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','ш'=>'sh','щ'=>'shch','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>''));
+        $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
+        $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
+        return $s; // возвращаем результат
+
+    }
+
+
+    public function deleteStage ()
+    {
+
+        if ($segments = $this->segments) {
+            foreach ($segments as $segment) {
+                $segment->deleteStage();
+            }
+        }
+
+        Authors::deleteAll(['project_id' => $this->id]);
+        PreFiles::deleteAll(['project_id' => $this->id]);
+
+        $this->delete();
     }
 }

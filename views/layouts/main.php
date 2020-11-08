@@ -8,6 +8,7 @@ use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use app\assets\AppAsset;
+use yii\bootstrap\Modal;
 
 AppAsset::register($this);
 ?>
@@ -71,6 +72,98 @@ AppAsset::register($this);
     <div class="container-fluid">
         <?= $content ?>
     </div>
+
+
+    <!--All-information Project begin-->
+
+    <?php // Модальное окно - данные проекта
+    Modal::begin([
+        'options' => ['id' => 'data_project_modal'],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Project end-->
+
+
+    <!--All-information Segment begin-->
+
+    <?php // Модальное окно - Данные сегмента
+    Modal::begin([
+        'options' => ['id' => 'data_segment_modal', 'class' => 'data_segment_modal',],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные сегмента</h3>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Segment end-->
+
+
+    <!--Roadmap Project begin-->
+
+    <?php // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;"></h2>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Roadmap Project end-->
+
+
+    <!--Roadmap Segment begin-->
+
+    <?php // Модальное окно - дорожная карта сегмента
+    Modal::begin([
+        'options' => ['id' => 'showRoadmapSegment', 'class' => 'showRoadmapSegment'],
+        'size' => 'modal-lg',
+        'header' => '<div class="roadmap_segment_modal_header_title"><h2 class="roadmap_segment_modal_header_title_h2"></h2></div>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Roadmap Segment end-->
+
+
+    <!--Modal Hypothesis delete begin-->
+
+    <?php
+    // Подтверждение удаления гипотезы
+    Modal::begin([
+        'options' => [
+            'id' => "delete_hypothesis_modal",
+            'class' => 'delete_hypothesis_modal',
+        ],
+        'size' => 'modal-md',
+        'header' => '<h3 class="text-center header-update-modal">Выберите действие</h3>',
+        'footer' => '<div class="text-center">'.
+
+            Html::a('Отмена', ['#'],[
+                'class' => 'btn btn-default',
+                'style' => ['width' => '120px'],
+                'onclick' => "$('#delete_hypothesis_modal').modal('hide'); return false;"
+            ]).
+
+            Html::a('Ок', ['#'],[
+                'class' => 'btn btn-default',
+                'style' => ['width' => '120px'],
+                'id' => "confirm_delete_hypothesis",
+            ]).
+
+            '</div>'
+    ]); ?>
+    <h4 class="text-center"></h4>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Modal Hypothesis delete end-->
+
+
 </div>
 
 <footer class="footer">

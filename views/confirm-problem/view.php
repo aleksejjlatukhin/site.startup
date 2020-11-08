@@ -30,10 +30,8 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             <?= $project->project_name; ?>
         </div>
 
-        <?= Html::a('Данные проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header',
-            'data-toggle' => 'modal',
-            'data-target' => "#data_project_modal",
+        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openAllInformationProject link_in_the_header',
         ]) ?>
 
         <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
@@ -41,10 +39,8 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             'onclick' => 'return false',
         ]) ?>
 
-        <?= Html::a('Дорожная карта проекта', ['#'], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
-            'data-toggle' => 'modal',
-            'data-target' => "#showRoadmapProject",
+        <?= Html::a('Дорожная карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
@@ -53,106 +49,6 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
         ]) ?>
 
     </div>
-
-
-    <?php
-    // Модальное окно - данные проекта
-    Modal::begin([
-        'options' => [
-            'id' => 'data_project_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
-    ]);
-    ?>
-
-    <?= \yii\widgets\DetailView::widget([
-        'model' => $project,
-        //'options' => ['class' => 'table table-bordered detail-view'], //Стилизация таблицы
-        'attributes' => [
-
-            'project_name',
-            'project_fullname:ntext',
-            'description:ntext',
-            'rid',
-            'core_rid:ntext',
-            'patent_number',
-
-            [
-                'attribute' => 'patent_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'patent_name:ntext',
-
-            [
-                'attribute'=>'Команда проекта',
-                'value' => $project->getAuthorInfo($project),
-                'format' => 'html',
-            ],
-
-            'technology',
-            'layout_technology:ntext',
-            'register_name',
-
-            [
-                'attribute' => 'register_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'site',
-            'invest_name',
-
-            [
-                'attribute' => 'invest_date',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'invest_amount',
-                'value' => function($project){
-                    if($project->invest_amount !== null){
-                        return number_format($project->invest_amount, 0, '', ' ');
-                    }
-                },
-            ],
-
-            [
-                'attribute' => 'date_of_announcement',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            'announcement_event',
-
-            [
-                'attribute' => 'created_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'updated_at',
-                'format' => ['date', 'dd.MM.yyyy'],
-            ],
-
-            [
-                'attribute' => 'pre_files',
-                'label' => 'Презентационные файлы',
-                'value' => function($model){
-                    $string = '';
-                    foreach ($model->preFiles as $file){
-                        $string .= Html::a($file->file_name, ['/projects/download', 'id' => $file->id], ['class' => '']) . '<br>';
-                    }
-                    return $string;
-                },
-                'format' => 'html',
-            ]
-
-        ],
-    ]) ?>
-
-    <?php
-    Modal::end();
-    ?>
 
 
 
@@ -236,16 +132,12 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
         </div>
 
-        <?= Html::a('Данные сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header',
-            'data-toggle' => 'modal',
-            'data-target' => '#data_segment_modal',
+        <?= Html::a('Данные сегмента', ['/segment/show-all-information', 'id' => $segment->id], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['#'], [
-            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 link_in_the_header text-center',
-            'data-toggle' => 'modal',
-            'data-target' => "#showRoadmapSegment",
+        <?= Html::a('Дорожная карта сегмента', ['/segment/show-roadmap', 'id' => $segment->id], [
+            'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
     </div>
@@ -257,25 +149,6 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
         <div>Формулировка проблемы:</div>
         <div><?= $generationProblem->description;?></div>
     </div>
-
-
-    <?php
-    // Модальное окно - Данные сегмента
-    Modal::begin([
-        'options' => [
-            'id' => 'data_segment_modal',
-            'class' => 'data_segment_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Информация о сегменте</h3>',
-    ]);
-    ?>
-
-    <?= $segment->allInformation; ?>
-
-    <?php
-    Modal::end();
-    ?>
 
 
 
@@ -1734,58 +1607,6 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
     <?php
     Modal::end();
-    ?>
-
-
-
-
-    <!--Roadmap Project-->
-
-    <?php
-
-    // Модальное окно - дорожная карта проекта
-    Modal::begin([
-        'options' => [
-            'id' => 'showRoadmapProject',
-            'class' => 'showRoadmapProject',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;">Дорожная карта проекта «' . $project->project_name . '»</h2>',
-    ]);
-    ?>
-
-    <?= $project->showRoadmapProject();?>
-
-    <?php
-
-    Modal::end();
-
-    ?>
-
-
-    <!--Roadmap Segment-->
-
-    <?php
-
-    // Модальное окно - дорожная карта сегмента
-    Modal::begin([
-        'options' => [
-            'id' => 'showRoadmapSegment',
-            'class' => 'showRoadmapSegment',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<div class="roadmap_segment_modal_header_title">
-                        <h2 class="roadmap_segment_modal_header_title_h2">Дорожная карта сегмента «' . $segment->name . '»</h2>
-                     </div>',
-    ]);
-    ?>
-
-    <?= $segment->showRoadmapSegment();?>
-
-    <?php
-
-    Modal::end();
-
     ?>
 
 

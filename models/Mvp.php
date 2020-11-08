@@ -26,11 +26,6 @@ class Mvp extends \yii\db\ActiveRecord
         return 'mvp';
     }
 
-    public function getGcp()
-    {
-        return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
-    }
-
     public function getConfirm()
     {
         return $this->hasOne(ConfirmMvp::class, ['mvp_id' => 'id']);
@@ -51,7 +46,7 @@ class Mvp extends \yii\db\ActiveRecord
         return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
     }
 
-    public function getValueProposition ()
+    public function getGcp ()
     {
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
@@ -100,7 +95,7 @@ class Mvp extends \yii\db\ActiveRecord
 
     public function create($condirm_gcp_id, $gcp_id, $problem_id, $segment_id, $project_id)
     {
-        $models = Mvp::find()->where(['confirm_gcp_id' => $condirm_gcp_id])->all();
+        $last_model = Mvp::find()->where(['confirm_gcp_id' => $condirm_gcp_id])->orderBy(['id' => SORT_DESC])->one();
         $project = Projects::findOne($project_id);
         $user = User::find()->where(['id' => $project->user_id])->one();
         $segment = Segment::findOne($segment_id);
@@ -113,7 +108,8 @@ class Mvp extends \yii\db\ActiveRecord
         $mvp->problem_id = $generationProblem->id;
         $mvp->gcp_id = $gcp->id;
         $mvp->confirm_gcp_id = $condirm_gcp_id;
-        $mvp->title = 'MVP ' . (count($models)+1);
+        $last_model_number = explode(' ',$last_model->title)[1];
+        $mvp->title = 'MVP ' . ($last_model_number + 1);
         $mvp->description = $this->description;
 
         if ($mvp->save()){
@@ -173,5 +169,29 @@ class Mvp extends \yii\db\ActiveRecord
         $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
         return $s; // возвращаем результат
 
+    }
+
+
+    public function deleteStage ()
+    {
+        if ($businessModel = $this->businessModel) {
+            $businessModel->delete();
+        }
+
+        if ($confirm = $this->confirm) {
+
+            $responds = $confirm->responds;
+            foreach ($responds as $respond) {
+
+                DescInterviewMvp::deleteAll(['responds_mvp_id' => $respond->id]);
+                AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $respond->id]);
+            }
+
+            QuestionsConfirmMvp::deleteAll(['confirm_mvp_id' => $confirm->id]);
+            RespondsMvp::deleteAll(['confirm_mvp_id' => $confirm->id]);
+            $confirm->delete();
+        }
+
+        $this->delete();
     }
 }

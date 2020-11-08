@@ -1380,3 +1380,23 @@ input[type="checkbox"]:checked + label:before {
 /*Стили для стрелки у ссылки с хлебными крошками
 ---Конец---
 */
+
+/* Стилизация модального окна для удаления гипотезы
+---Начало---
+*/
+#delete_hypothesis_modal .modal-header {
+    background-color: #707F99;
+    color: #ffffff;
+    border-radius: 5px 5px 0 0;
+}
+#delete_hypothesis_modal .modal-body {
+    background-color: #F2F2F2;
+    color: #4F4F4F;
+}
+#delete_hypothesis_modal .modal-footer {
+    background-color: #707F99;
+    border-radius: 0 0 5px 5px;
+}
+/* Стилизация модального окна для удаления гипотезы
+---Конец---
+*/

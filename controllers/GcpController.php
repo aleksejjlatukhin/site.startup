@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\models\ConfirmProblem;
-use app\models\FormCreateGcp;
+use app\models\forms\FormCreateGcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -192,45 +192,36 @@ class GcpController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    /*public function actionDelete($id)
+    public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
+        $generationProblem = GenerationProblem::findOne(['id' => $model->problem_id]);
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $model->project_id]);
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
+        if(Yii::$app->request->isAjax) {
 
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
+            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
+                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
+                    '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251")) .
+                '/generation problems/' . mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251"), "windows-1251") .
+                '/gcps/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251");
+
+            if (file_exists($pathDelete)){
+                $this->delTree($pathDelete);
+            }
+
+            $project->updated_at = time();
+            $project->save();
+
+            if ($model->deleteStage()) {
+
+                return true;
             }
         }
-
-        if ($project->save()){
-
-            Yii::$app->session->setFlash('error', '"' . $model->title . '" удалена!');
-
-            if ($model->delete()){
-
-                $models = Gcp::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-                $j = 0;
-                foreach ($models as $item){
-                    $j++;
-                    $item->title = 'ГЦП ' . $j;
-                    $item->save();
-                }
-
-                return $this->redirect(['index', 'id' => $confirmProblem->id]);
-            }
-        }
-    }*/
+        return false;
+    }
 
     /**
      * Finds the Gcp model based on its primary key value.

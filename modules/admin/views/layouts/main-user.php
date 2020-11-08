@@ -11,6 +11,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\User;
+use yii\bootstrap\Modal;
 
 AppAsset::register($this);
 ?>
@@ -234,6 +235,66 @@ AppAsset::register($this);
         <?= $content ?>
 
     </div>
+
+
+
+
+    <!--All-information Project begin-->
+
+    <?php // Модальное окно - данные проекта
+    Modal::begin([
+        'options' => ['id' => 'data_project_modal'],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Project end-->
+
+
+    <!--All-information Segment begin-->
+
+    <?php // Модальное окно - Данные сегмента
+    Modal::begin([
+        'options' => ['id' => 'data_segment_modal', 'class' => 'data_segment_modal',],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные сегмента</h3>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Segment end-->
+
+
+    <!--Roadmap Project begin-->
+
+    <?php // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;"></h2>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Roadmap Project end-->
+
+
+    <!--Roadmap Segment begin-->
+
+    <?php // Модальное окно - дорожная карта сегмента
+    Modal::begin([
+        'options' => ['id' => 'showRoadmapSegment', 'class' => 'showRoadmapSegment'],
+        'size' => 'modal-lg',
+        'header' => '<div class="roadmap_segment_modal_header_title"><h2 class="roadmap_segment_modal_header_title_h2"></h2></div>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Roadmap Segment end-->
+
+
 </div>
 
 <footer class="footer">

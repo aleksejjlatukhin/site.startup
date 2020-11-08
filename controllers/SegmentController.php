@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
-use app\models\FormCreateSegment;
-use app\models\FormUpdateSegment;
+use app\models\forms\FormCreateSegment;
+use app\models\forms\FormUpdateSegment;
 use app\models\Projects;
+use app\models\Roadmap;
 use app\models\SegmentSearch;
 use app\models\TypeOfActivityB2B;
 use app\models\TypeOfActivityB2C;
@@ -168,98 +169,103 @@ class SegmentController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+                if ($model->checkFillingFields() == true) {
 
-                    if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2c) && !empty($model->sort_of_activity_b2c)
-                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->gender_consumer) && !empty($model->education_of_consumer)
-                        && !empty($model->income_from) && !empty($model->income_to) && !empty($model->quantity_from) && !empty($model->quantity_to) && !empty($model->market_volume_b2c)) {
+                    if ($model->validate()) {
 
-                        if ($model->validate()) {
+                        if ($model->create()) {
 
-                            if ($model->create()) {
+                            $project->updated_at = time();
 
-                                $project->updated_at = time();
+                            if ($project->save()){
 
-                                if ($project->save()){
+                                $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
 
-                                    $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
-
-                                    $response =  ['success' => true, 'new_segment_id' => $new_segment->id];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
+                                $response =  [
+                                    'success' => true,
+                                    'new_segment_id' => $new_segment->id,
+                                    'project_id' => $project->id
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
                             }
-
-                        }else {
-
-                            //Сегмент с таким именем уже существует
-                            $response =  ['segment_already_exists' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
                         }
 
-                    } else {
+                    }else {
 
-                        //Данные не загружены
-                        $response =  ['data_not_loaded' => true];
+                        //Сегмент с таким именем уже существует
+                        $response =  ['segment_already_exists' => true];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
                     }
 
+                } else {
 
-
-                }elseif ($model->type_of_interaction_between_subjects == Segment::TYPE_B2B){
-
-                    if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2b) && !empty($model->sort_of_activity_b2b)
-                        && !empty($model->specialization_of_activity_b2b) && !empty($model->company_products) && !empty($model->company_partner) && !empty($model->quantity_from_b2b)
-                        && !empty($model->quantity_to_b2b) && !empty($model->income_company_from) && !empty($model->income_company_to) && !empty($model->market_volume_b2b)) {
-
-                        if ($model->validate()) {
-
-                            if ($model->create()) {
-
-                                $project->updated_at = time();
-
-                                if ($project->save()){
-
-                                    $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
-
-                                    $response =  [
-                                        'success' => true,
-                                        'new_segment_id' => $new_segment->id,
-                                        'project_id' => $project->id
-                                    ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
-                            }
-
-                        }else {
-
-                            //Сегмент с таким именем уже существует
-                            $response =  ['segment_already_exists' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
-
-                    } else {
-
-                        //Данные не загружены
-                        $response =  ['data_not_loaded' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    //Данные не загружены
+                    $response =  ['data_not_loaded' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
         return false;
     }
+
+
+
+    /**
+     * @param $id
+     * @return array|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdate($id)
+    {
+        $segment = $this->findModel($id);
+        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+
+        $model = new FormUpdateSegment($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model->checkFillingFields() == true) {
+
+                    if ($model->validate()) {
+
+                        if ($model->update()) {
+
+                            if ($project->save()){
+
+                                $response =  ['success' => true, 'model_id' => $model->id];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
+                        }
+                    }else {
+
+                        //Сегмент с таким именем уже существует
+                        $response =  ['segment_already_exists' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                } else {
+
+                    //Данные не загружены
+                    $response =  ['data_not_loaded' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
 
 
     /**
@@ -383,98 +389,53 @@ class SegmentController extends AppController
     }
 
 
+
     /**
      * @param $id
-     * @return array|\yii\web\Response
-     * @throws NotFoundHttpException
+     * @return array|bool
      */
-    public function actionUpdate($id)
+    public function actionShowAllInformation ($id)
     {
-        $segment = $this->findModel($id);
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $segment = Segment::findOne($id);
 
-        $model = new FormUpdateSegment($id);
+        if(Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-
-                if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
-
-                    if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2c) && !empty($model->sort_of_activity_b2c)
-                        && !empty($model->specialization_of_activity_b2c) && !empty($model->age_from) && !empty($model->age_to) && !empty($model->gender_consumer) && !empty($model->education_of_consumer)
-                        && !empty($model->income_from) && !empty($model->income_to) && !empty($model->quantity_from) && !empty($model->quantity_to) && !empty($model->market_volume_b2c)) {
-
-                        if ($model->validate()) {
-
-                            if ($model->update()) {
-
-                                $project->updated_at = time();
-
-                                if ($project->save()){
-
-                                    $response =  ['success' => true, 'model_id' => $model->id];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
-                            }
-                        }else {
-
-                            //Сегмент с таким именем уже существует
-                            $response =  ['segment_already_exists' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
-                    } else {
-
-                        //Данные не загружены
-                        $response =  ['data_not_loaded' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
-
-                }elseif ($model->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
-
-                    if (!empty($model->name) && !empty($model->description) && !empty($model->field_of_activity_b2b) && !empty($model->sort_of_activity_b2b)
-                        && !empty($model->specialization_of_activity_b2b) && !empty($model->company_products) && !empty($model->company_partner) && !empty($model->quantity_from_b2b)
-                        && !empty($model->quantity_to_b2b) && !empty($model->income_company_from) && !empty($model->income_company_to) && !empty($model->market_volume_b2b)) {
-
-                        if ($model->validate()) {
-
-                            if ($model->update()) {
-
-                                if ($project->save()){
-
-                                    $response =  ['success' => true, 'model_id' => $model->id];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
-                            }
-                        }else {
-
-                            //Сегмент с таким именем уже существует
-                            $response =  ['segment_already_exists' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
-                    } else {
-
-                        //Данные не загружены
-                        $response =  ['data_not_loaded' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
-                }
-            }
+            $response = [
+                'renderAjax' => $this->renderAjax('all-information', ['segment' => $segment]),
+                'segment' => $segment,
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
         }
+        return false;
     }
+
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionShowRoadmap ($id)
+    {
+        $roadmap = new Roadmap($id);
+        $segment = Segment::findOne($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('roadmap', ['roadmap' => $roadmap]),
+                'segment' => $segment,
+                ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
 
     /**
      * Deletes an existing Segment model.
@@ -483,105 +444,32 @@ class SegmentController extends AppController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    /*public function actionDelete($id)
+    public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $project = Projects::findOne(['id' => $model->project_id]);
         $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
 
-        //Удаление доступно только проектанту, который создал данную модель
-        if ($user->id != $_user['id']){
-            Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        $project->updated_at = time();
-        $interview = Interview::find()->where(['segment_id' => $model->id])->one();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-        $generationProblems = GenerationProblem::find()->where(['interview_id' => $interview->id])->all();
-
-        if ($project->save()) {
-
-            Yii::$app->session->setFlash('error', "Сегмент {$this->findModel($id)->name} удален");
-
-            foreach ($responds as $respond){
-                $descInterview = $respond->descInterview;
-
-                if ($descInterview->interview_file !== null){
-                    unlink('upload/interviews/' . $descInterview->interview_file);
-                }
-
-                if (!empty($descInterview)){
-                    $descInterview->delete();
-                }
-            }
-
-            if (!empty($interview->feedbacks)){
-                foreach ($interview->feedbacks as $feedback) {
-                    if ($feedback->feedback_file !== null){
-                        unlink('upload/feedbacks/' . $feedback->feedback_file);
-                    }
-                }
-            }
-
-
-            if (!empty($generationProblems)){
-                foreach ($generationProblems as $generationProblem){
-                    if (!empty($generationProblem->confirm)){
-                        $confirmProblem = $generationProblem->confirm;
-
-                        if (!empty($confirmProblem->feedbacks)){
-                            $feedbacksConfirm = $confirmProblem->feedbacks;
-                            foreach ($feedbacksConfirm as $feedbackConfirm){
-                                if ($feedbackConfirm->feedback_file !== null){
-                                    unlink('upload/feedbacks-confirm/' . $feedbackConfirm->feedback_file);
-                                }
-                            }
-                            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                        }
-
-
-                        if (!empty($confirmProblem->responds)){
-                            $respondsConfirm = $confirmProblem->responds;
-                            foreach ($respondsConfirm as $respondConfirm){
-                                if (!empty($respondConfirm->descInterview)){
-                                    $descInterviewConfirm = $respondConfirm->descInterview;
-                                    if ($descInterviewConfirm->interview_file !== null){
-                                        unlink('upload/interviews-confirm/' . $descInterviewConfirm->interview_file);
-                                    }
-                                    $descInterviewConfirm->delete();
-                                }
-                            }
-                            RespondsConfirm::deleteAll(['confirm_problem_id' => $confirmProblem->id]);
-                        }
-
-                        $confirmProblem->delete();
-                    }
-                }
-            }
-
-
-            Questions::deleteAll(['interview_id' => $interview->id]);
-            Respond::deleteAll(['interview_id' => $interview->id]);
-            FeedbackExpert::deleteAll(['interview_id' => $interview->id]);
-            GenerationProblem::deleteAll(['interview_id' => $interview->id]);
+        if(Yii::$app->request->isAjax) {
 
             $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
-                '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"), "windows-1251"));
-            $this->delTree($pathDelete);
+                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
+                    '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"), "windows-1251"));
 
-            if ($interview){
-                $interview->delete();
+            if (file_exists($pathDelete)){
+                $this->delTree($pathDelete);
             }
 
-            $model->delete();
+            $project->updated_at = time();
+            $project->save();
 
-            return $this->redirect(['index', 'id' => $project->id]);
+            if ($model->deleteStage()) {
 
+                return true;
+            }
         }
-    }*/
+        return false;
+    }
 
     /**
      * Finds the Segment model based on its primary key value.

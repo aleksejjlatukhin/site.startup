@@ -6,7 +6,7 @@ use app\models\DescInterview;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
-use app\models\UpdateRespondForm;
+use app\models\forms\UpdateRespondForm;
 use app\models\User;
 use Yii;
 use app\models\Respond;
