@@ -34,55 +34,61 @@ AppAsset::register($this);
 
         <?php
         NavBar::begin([
-            'brandLabel' => Yii::$app->name = 'StartPool <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">admin-panel</span>',
+            'id' => 'main_menu_admin',
+            'brandLabel' => Yii::$app->name = 'Spaccel <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">admin-panel</span>',
             'brandUrl' => ['/admin/default/index'],
+            'brandOptions' => ['class' => 'font_nav_menu_brand'],
             'options' => [
                 'class' => 'navbar-inverse navbar-fixed-top',
             ],
+            'renderInnerContainer' => false,
         ]);
 
-
-        if (!Yii::$app->user->isGuest):
-            ?>
-            <div class="navbar-form navbar-right">
-                <button class="btn btn-md btn-default"
-                        data-container="body"
-                        data-toggle="popover"
-                        data-trigger="focus"
-                        data-placement="bottom"
-                        data-title="<?= Yii::$app->user->identity['username'] ?>"
-                        data-content="
-                                <p><a href='<?= Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id]) ?>' data-method='post'>Мой профиль</a></p>
-                                <p><a href='<?= Url::to(['/site/logout']) ?>' data-method='post'>Выход</a></p>
-                            ">
-                    <span class="glyphicon glyphicon-user"></span>
-                </button>
-            </div>
-        <?php
-        endif;
 
         if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) :
 
             echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-right'],
+                'id' => 'main_navbar_right',
+                'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                 'items' => [
                     ['label' => 'Главная', 'url' => ['/']],
-                    ['label' => 'Сообщения', 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
-                    ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
                     ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
+                    ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
+
+                    [
+                        'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                        'items' => [
+                            ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
+                            ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                        ],
+                    ],
+
+                    ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                 ],
+                'encodeLabels' => false,
             ]);
 
         elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) :
 
             echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-right'],
+                'id' => 'main_navbar_right',
+                'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                 'items' => [
                     ['label' => 'Главная', 'url' => ['/']],
-                    ['label' => 'Сообщения', 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
-                    ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
                     ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
+                    ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
+
+                    [
+                        'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                        'items' => [
+                            ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
+                            ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                        ],
+                    ],
+
+                    ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                 ],
+                'encodeLabels' => false,
             ]);
 
         endif;
@@ -96,36 +102,14 @@ AppAsset::register($this);
     </div>
 
 
-    <div class="container">
-
-
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-
-        <?php if( Yii::$app->session->hasFlash('success') ): ?>
-            <div class="alert alert-success alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <?php echo Yii::$app->session->getFlash('success'); ?>
-            </div>
-        <?php endif;?>
-
-        <?php if( Yii::$app->session->hasFlash('error') ): ?>
-            <div class="alert alert-danger alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <?php echo Yii::$app->session->getFlash('error'); ?>
-            </div>
-        <?php endif;?>
-
+    <div class="container-fluid">
         <?= $content ?>
-
     </div>
 </div>
 
 <footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; StartPool <?= date('Y') ?></p>
+    <div class="container-fluid">
+        <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
     </div>
 </footer>
 

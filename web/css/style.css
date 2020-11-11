@@ -1219,7 +1219,7 @@ input[type="checkbox"]:checked + label:before {
     justify-content: center;
 }
 .roadmap_segment_modal_header_title_h2 {
-    font-size: 36px;
+    font-size: 32px;
     color: #4F4F4F;
     max-width: 900px;
     text-align: center;
@@ -1398,5 +1398,196 @@ input[type="checkbox"]:checked + label:before {
     border-radius: 0 0 5px 5px;
 }
 /* Стилизация модального окна для удаления гипотезы
+---Конец---
+*/
+
+/* Стилизация сводной таблицы проекта
+---Начало---
+*/
+#showResultTableProject .modal-lg {
+    display: flex;
+    justify-content: center;
+}
+#showResultTableProject .modal-header {
+    border-bottom: none;
+    padding: 15px 15px 0 15px;
+}
+
+.TableResultProject {
+    font-size: 12px;
+    color: #4F4F4F;
+    margin-bottom: 20px;
+}
+
+
+.containerHeaderTableResultProject {
+    display:flex;
+}
+.headerTableResultProject {
+    margin: 0 auto;
+    min-width: 1270px;
+    width: 1270px;
+    background: #707F99;
+    border-radius: 12px 12px 0 0;
+}
+.headerTableResultProject div{
+    font-size: 32px;
+    color: #F2F2F2;
+    font-weight: 700;
+    padding: 5px 0;
+}
+.headerTableResultProject span {
+    margin-right: 10px;
+}
+
+
+.containerHeaderDataOfTableResultProject {
+    display:flex;
+}
+.headerDataOfTableResultProject {
+    display:flex;
+    margin: 0 auto;
+    border-bottom: 1px solid #B4B4B4;
+    background: #F2F2F2;
+}
+.blocks_for_double_header_level {
+    display:flex;
+}
+.blocks_for_single_header_level {
+    display:flex;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 65px;
+    width: 65px;
+    align-items: center;
+}
+.one_block_for_double_header_level:not(:first-child) {
+    margin-left: 10px;
+}
+.one_block_for_double_header_level .stage {
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+.one_block_for_double_header_level .columns_stage {
+    display: flex;
+}
+.headerDataOfTableResultProject .column_segment_name {
+    min-width: 200px;
+    width: 200px;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+}
+.headerDataOfTableResultProject .regular_column {
+    min-width: 65px;
+    width: 65px;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+}
+.headerDataOfTableResultProject .first_regular_column_of_stage {
+    max-width: 65px;
+    width: 65px;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+
+
+.containerDataOfTableResultProject {
+    display: flex;
+}
+.dataOfTableResultProject {
+    margin: 0 auto;
+}
+.rowSegmentTableResultProject {
+    display:flex;
+}
+.dataOfTableResultProject .container_all_stage{
+    display:flex;
+    width: 100%;
+}
+.dataOfTableResultProject .column_segment_name {
+    min-width: 200px;
+    width: 200px;
+    padding: 5px 10px;
+    border-right: 1px solid #B4B4B4;
+}
+.dataOfTableResultProject .column_segment_name span{
+    margin-right: 5px;
+}
+.dataOfTableResultProject .column_business_model {
+    min-width: 65px;
+    width: 65px;
+    padding: 5px 0;
+}
+.dataOfTableResultProject .regular_column {
+    min-width: 65px;
+    width: 65px;
+    padding: 5px 0;
+    border-right: 1px solid #B4B4B4;
+}
+.dataOfTableResultProject .first_regular_column_of_stage {
+    max-width: 65px;
+    width: 65px;
+    padding: 5px 0;
+    margin-left: 10px;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+.link_in_column_result_table {
+    color: #4F4F4F;
+    transition: color 0.3s ease;
+}
+.link_in_column_result_table:hover {
+    color: #000000;
+    text-decoration: none;
+}
+.link_in_column_result_table:focus {
+    color: #000000;
+    text-decoration: none;
+}
+
+
+
+@media screen and (min-width: 1800px) {
+
+    .TableResultProject {
+        font-size: 14px;
+    }
+
+    .headerTableResultProject {
+        min-width: 1560px;
+        width: 1560px;
+    }
+
+    .blocks_for_single_header_level {
+        font-size: 16px;
+        min-width: 80px;
+        width: 80px;
+    }
+
+    .one_block_for_double_header_level .stage {
+        font-size: 16px;
+    }
+
+    .headerDataOfTableResultProject .column_segment_name,
+    .dataOfTableResultProject .column_segment_name {
+        min-width: 250px;
+        width: 250px;
+    }
+
+    .headerDataOfTableResultProject .regular_column,
+    .headerDataOfTableResultProject .first_regular_column_of_stage,
+    .dataOfTableResultProject .column_business_model,
+    .dataOfTableResultProject .regular_column,
+    .dataOfTableResultProject .first_regular_column_of_stage {
+        min-width: 80px;
+        width: 80px;
+    }
+}
+/* Стилизация сводной таблицы проекта
 ---Конец---
 */

@@ -313,16 +313,16 @@ class UsersController extends AppAdminController
 
             if (!empty($user->projects)){
 
-                $project_update_at = [];
+                $projects_updated_at = [];
 
                 foreach ($user->projects as $project) {
 
-                    $project_update_at[] = strtotime($project->update_at);
+                    $projects_updated_at[] = $project->updated_at;
                 }
 
-                if (max($project_update_at) > $user->updated_at){
+                if (max($projects_updated_at) > $user->updated_at){
 
-                    $user->updated_at = max($project_update_at);
+                    $user->updated_at = max($projects_updated_at);
                     $user->save();
                 }
 

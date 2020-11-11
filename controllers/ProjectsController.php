@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Authors;
 use app\models\BusinessModel;
 use app\models\ConfirmMvp;
+use app\models\DataOfTableResultProject;
 use app\models\FeedbackExpert;
 use app\models\FeedbackExpertConfirm;
 use app\models\FeedbackExpertGcp;
@@ -501,11 +502,30 @@ class ProjectsController extends AppController
 
 
 
+    public function actionResult ($id)
+    {
+        $project = Projects::findOne($id);
+        $segments = Segment::find()->where(['project_id' => $id])->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('result', ['project' => $project, 'segments' => $segments]),
+                'project' => $project,
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
     /**
      * @param $id
      * @return string
      */
-    public function actionResult($id)
+    /*public function actionResultTest($id)
     {
 
         $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
@@ -634,10 +654,10 @@ class ProjectsController extends AppController
                 $arrP = explode('ГЦП ', $businessModels[$k]->gcp->title);
                 $numberGcp = $arrP[1];
 
-                $arrG = explode('ГMVP ', $businessModels[$k]->gmvp->title);
+                $arrG = explode('ГMVP ', $businessModels[$k]->mvp->title);
                 $numberMvp = $arrG[1];
 
-                $businessModels[$k]->gmvp->title = 'ГMVP ' . $numberGcp . '.' . $numberMvp;
+                $businessModels[$k]->mvp->title = 'ГMVP ' . $numberGcp . '.' . $numberMvp;
             }
         }
 
@@ -655,8 +675,8 @@ class ProjectsController extends AppController
                         $i++;
                         if ($i > 1) {
                             $businessModels[$k+1]->gcp->title = '';
-                            $businessModels[$k+1]->gcp->date_create = null;
-                            $businessModels[$k+1]->gcp->date_confirm = null;
+                            $businessModels[$k+1]->gcp->created_at = null;
+                            $businessModels[$k+1]->gcp->time_confirm = null;
                         }
                     }
                 }
@@ -671,8 +691,8 @@ class ProjectsController extends AppController
                         $i++;
                         if ($i > 1) {
                             $businessModels[$k+1]->problem->title = '';
-                            $businessModels[$k+1]->problem->date_gps = null;
-                            $businessModels[$k+1]->problem->date_confirm = null;
+                            $businessModels[$k+1]->problem->created_at = null;
+                            $businessModels[$k+1]->problem->time_confirm = null;
                         }
                     }
                 }
@@ -683,15 +703,15 @@ class ProjectsController extends AppController
 
         //debug($businessModels);
 
-        /*foreach ($mvps as $mvp) {
-            //debug($mvp->valueProposition->exist_confirm);
-        }*/
+//        foreach ($mvps as $mvp) {
+//            //debug($mvp->valueProposition->exist_confirm);
+//        }
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $businessModels,
-            /*'pagination' => [
-                'pageSize' => 100,
-            ],*/
+            //'pagination' => [
+                //'pageSize' => 100,
+            //],
             'pagination' => false,
             'sort' => false,
         ]);
@@ -700,14 +720,14 @@ class ProjectsController extends AppController
         $project = Projects::findOne($id);
         $project_filename = str_replace(' ', '_', $project->project_name);
 
-        return $this->render('result', [
+        return $this->render('result-test', [
             'dataProvider' => $dataProvider,
             'project' => $project,
             'project_filename' => $project_filename,
             ]
         );
 
-    }
+    }*/
 
 
     /**

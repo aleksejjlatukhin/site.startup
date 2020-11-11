@@ -35,8 +35,7 @@ use yii\helpers\Url;
         ]) ?>
 
         <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
-            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
-            'onclick' => 'return false',
+            'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openResultTableProject link_in_the_header text-center',
         ]) ?>
 
     </div>

@@ -327,3 +327,34 @@ $(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
 При подтверждении удаления гипотезы
 ---Конец---
 */
+
+
+/*
+Добавляем контент в сводную таблицу проекта
+---Начало---
+ */
+$(document).on('click', 'body .openResultTableProject', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#showResultTableProject');
+    var container = $(modal).find('.modal-body');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в сводную таблицу проекта
+---Конец---
+ */

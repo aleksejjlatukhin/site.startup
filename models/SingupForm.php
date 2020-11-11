@@ -156,44 +156,11 @@ class SingupForm extends Model
     {
 
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
             ->setTo($this->email)
-            ->setSubject('Регистрация на сайте StartPool')
+            ->setSubject('Регистрация на сайте Spaccel.ru')
             ->send();
 
     }
-
-
-    /*public function sendEmailUser($user)
-    {
-
-        if($user){
-
-            return Yii::$app->mailer->compose('signup-user', ['user' => $user])
-                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
-                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
-                ->setTo($user->email)
-                ->setSubject('Регистрация на сайте StartPool')
-                ->send();
-        }
-
-        return false;
-    }*/
-
-    /*public function sendEmailAdmin($user)
-    {
-
-        if($user) {
-
-            return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
-                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
-                ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
-                ->setTo([Yii::$app->params['adminEmail']])
-                ->setSubject('Регистрация нового пользователя на сайте StartPool')
-                ->send();
-        }
-
-        return false;
-    }*/
 
 }

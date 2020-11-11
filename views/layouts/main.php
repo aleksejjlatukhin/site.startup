@@ -32,7 +32,7 @@ AppAsset::register($this);
 
         <?php
         NavBar::begin([
-            'id' => 'main_menu',
+            'id' => 'main_menu_user',
             'brandLabel' => Yii::$app->name = 'Spaccel',
             'brandUrl' => Yii::$app->homeUrl,
             'brandOptions' => ['class' => 'font_nav_menu_brand'],
@@ -108,7 +108,7 @@ AppAsset::register($this);
     Modal::begin([
         'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
         'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;"></h2>',
+        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
     ]); ?>
     <!--Контент добавляется через Ajax-->
     <?php Modal::end(); ?>
@@ -162,6 +162,19 @@ AppAsset::register($this);
     <?php Modal::end(); ?>
 
     <!--Modal Hypothesis delete end-->
+
+
+    <!--Result Project begin-->
+
+    <?php // Модальное окно - сводная таблица проекта
+    Modal::begin([
+        'options' => ['id' => 'showResultTableProject', 'class' => 'showResultTableProject'],
+        'size' => 'modal-lg',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Result Project end-->
 
 
 </div>

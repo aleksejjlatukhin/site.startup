@@ -273,7 +273,7 @@ AppAsset::register($this);
     Modal::begin([
         'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
         'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 36px; color: #4F4F4F;"></h2>',
+        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
     ]); ?>
     <!--Контент добавляется через Ajax-->
     <?php Modal::end(); ?>
@@ -293,6 +293,19 @@ AppAsset::register($this);
     <?php Modal::end(); ?>
 
     <!--Roadmap Segment end-->
+
+
+    <!--Result Project begin-->
+
+    <?php // Модальное окно - сводная таблица проекта
+    Modal::begin([
+        'options' => ['id' => 'showResultTableProject', 'class' => 'showResultTableProject'],
+        'size' => 'modal-lg',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Result Project end-->
 
 
 </div>

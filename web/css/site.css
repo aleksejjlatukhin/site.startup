@@ -25,7 +25,11 @@ body {
 }
 
 /*Фон главного меню*/
-#main_menu {
+#main_menu_user {
+    background-color: #4F4F4F;
+    border-color: #4F4F4F;
+}
+#main_menu_admin {
     background-color: #4F4F4F;
     border-color: #4F4F4F;
 }

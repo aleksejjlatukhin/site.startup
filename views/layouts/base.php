@@ -31,7 +31,7 @@ AppAsset::register($this);
 
         <?php
         NavBar::begin([
-            'id' => 'main_menu',
+            'id' => 'main_menu_user',
             'brandLabel' => Yii::$app->name = 'Spaccel',
             'brandUrl' => Yii::$app->homeUrl,
             'brandOptions' => ['class' => 'font_nav_menu_brand'],

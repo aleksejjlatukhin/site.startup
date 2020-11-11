@@ -22,13 +22,13 @@ class Roadmap extends PropertyContainer
         $first_confirm_mvp = Mvp::find()->where(['segment_id' => $segment->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
         $this->addProperty('created_at', $segment->created_at);
-        $this->addProperty('plan_segment_confirm', ($segment->created_at + 3600*24*30));
-        $this->addProperty('plan_gps', ($segment->created_at + 3600*24*60));
-        $this->addProperty('plan_gps_confirm', ($segment->created_at + 3600*24*90));
-        $this->addProperty('plan_gcp', ($segment->created_at + 3600*24*120));
-        $this->addProperty('plan_gcp_confirm', ($segment->created_at + 3600*24*150));
-        $this->addProperty('plan_mvp', ($segment->created_at + 3600*24*180));
-        $this->addProperty('plan_mvp_confirm', ($segment->created_at + 3600*24*210));
+        $this->addProperty('plan_segment_confirm', ($segment->created_at + 3600*24*10));
+        $this->addProperty('plan_gps', ($segment->created_at + 3600*24*20));
+        $this->addProperty('plan_gps_confirm', ($segment->created_at + 3600*24*30));
+        $this->addProperty('plan_gcp', ($segment->created_at + 3600*24*40));
+        $this->addProperty('plan_gcp_confirm', ($segment->created_at + 3600*24*50));
+        $this->addProperty('plan_mvp', ($segment->created_at + 3600*24*60));
+        $this->addProperty('plan_mvp_confirm', ($segment->created_at + 3600*24*70));
 
         $this->addProperty('fact_segment_confirm', $confirm_segment->time_confirm);
         $this->addProperty('fact_gps', $last_gps->created_at);

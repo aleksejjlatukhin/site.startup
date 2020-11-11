@@ -52,9 +52,9 @@ class SendEmailForm extends Model
 
                 return Yii::$app->mailer->compose('resetPassword', ['user' => $user])
                     //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
-                    ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
+                    ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                     ->setTo($this->email)
-                    ->setSubject('Изменение пароля на сайте StartPool для пользователя ' . $user->username)
+                    ->setSubject('Изменение пароля на сайте Spaccel.ru для пользователя ' . $user->username)
                     ->send();
             }
         }
