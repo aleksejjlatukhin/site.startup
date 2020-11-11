@@ -174,7 +174,7 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
             <div class="col-md-1 ">
                 <div class="row">
                     <div class="col-md-4" style="padding: 0;"></div>
-                    <div class="col-md-8" style="padding: 0;">Номер</div>
+                    <div class="col-md-8" style="padding: 0;">Обознач.</div>
                 </div>
 
             </div>

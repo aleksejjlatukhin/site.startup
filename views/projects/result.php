@@ -36,7 +36,7 @@ use yii\helpers\Html;
                     <div class="text-center stage">Проблемы сегмента</div>
 
                     <div class="columns_stage">
-                        <div class="text-center first_regular_column_of_stage">Номер</div>
+                        <div class="text-center first_regular_column_of_stage">Обознач.</div>
                         <div class="text-center regular_column">Статус</div>
                         <div class="text-center regular_column">Дата генер.</div>
                         <div class="text-center regular_column">Дата подтв.</div>
@@ -50,7 +50,7 @@ use yii\helpers\Html;
                     <div class="text-center stage">Ценностные предложения</div>
 
                     <div class="columns_stage">
-                        <div class="text-center regular_column first_regular_column_of_stage">Номер</div>
+                        <div class="text-center regular_column first_regular_column_of_stage">Обознач.</div>
                         <div class="text-center regular_column">Статус</div>
                         <div class="text-center regular_column">Дата генер.</div>
                         <div class="text-center regular_column">Дата подтв.</div>
@@ -64,7 +64,7 @@ use yii\helpers\Html;
                     <div class="text-center stage">MVP (продукт)</div>
 
                     <div class="columns_stage">
-                        <div class="text-center first_regular_column_of_stage">Номер</div>
+                        <div class="text-center first_regular_column_of_stage">Обознач.</div>
                         <div class="text-center regular_column">Статус</div>
                         <div class="text-center regular_column">Дата генер.</div>
                         <div class="text-center regular_column">Дата подтв.</div>
