@@ -61,8 +61,7 @@ AppAsset::register($this);
                 ]) : (''),
 
                 !Yii::$app->user->isGuest ? (
-                ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/message/view', 'id' => $conversation->id]]) :
-                    (['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['#'], 'options' => ['onclick' => 'return false']]),
+                ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/message/view', 'id' => $conversation->id]]) : '',
             ],
             'encodeLabels' => false,
         ]);

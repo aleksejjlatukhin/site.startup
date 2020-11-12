@@ -4,17 +4,17 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Изменение пароля';
-//$this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
-<?= $this->render('menu_user', [
-    'user' => $user,
-]) ?>
-
 <div class="profile-change-password">
 
-    <div class="row" style="display: flex">
+    <div class="row">
+
+        <?= $this->render('menu_user', [
+            'user' => $user,
+        ]) ?>
+
         <div class="col-md-7">
 
             <div style="margin-bottom: 20px;">

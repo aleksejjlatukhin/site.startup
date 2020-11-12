@@ -51,7 +51,7 @@ AppAsset::register($this);
                     'id' => 'main_navbar_right',
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
-                        ['label' => 'Главная', 'url' => ['/']],
+                        ['label' => 'Главная', 'url' => ['/admin/']],
                         ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
                         ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
 
@@ -74,7 +74,7 @@ AppAsset::register($this);
                     'id' => 'main_navbar_right',
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
-                        ['label' => 'Главная', 'url' => ['/']],
+                        ['label' => 'Главная', 'url' => ['/admin/']],
                         ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
                         ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
 

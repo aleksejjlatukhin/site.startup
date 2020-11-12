@@ -10,7 +10,7 @@ use yii\helpers\Url;
 
     <ul class="catalog" style = "background: #ccc;padding-top: 1px; min-height: 100vh; list-style: none;padding-left: 20px;">
 
-        <li style="margin: -10px 0 20px 0;">
+        <li style="margin: 20px 0 30px 0;">
             <h3>Профиль пользователя</h3>
         </li>
 
@@ -25,7 +25,7 @@ use yii\helpers\Url;
                     <?php foreach ($user->projects as $project) : ?>
 
                         <li style="margin-bottom: -3px;">
-                            <?= Html::a(' - ' . $project->project_name, Url::to(['/profile/project', 'id' => $project->id]))?>
+                            <?= Html::a(' - ' . $project->project_name, ['/projects/result', 'id' => $project->id], ['class' => 'openResultTableProject'])?>
                         </li>
 
                     <?php endforeach; ?>
@@ -48,7 +48,7 @@ use yii\helpers\Url;
                     <?php foreach ($user->projects as $project) : ?>
 
                         <li style="margin-bottom: -3px;">
-                            <?= Html::a(' - ' . $project->project_name, Url::to(['/profile/roadmap', 'id' => $project->id]))?>
+                            <?= Html::a(' - ' . $project->project_name, ['/projects/show-roadmap', 'id' => $project->id], ['class' => 'openRoadmapProject'])?>
                         </li>
 
                     <?php endforeach; ?>
@@ -72,7 +72,7 @@ use yii\helpers\Url;
                     <?php foreach ($user->projects as $project) : ?>
 
                         <li style="margin-bottom: -3px;">
-                            <?= Html::a(' - ' . $project->project_name, Url::to(['/profile/prefiles', 'id' => $project->id]))?>
+                            <?= Html::a(' - ' . $project->project_name, ['/projects/show-all-information', 'id' => $project->id], ['class' => 'openAllInformationProject'])?>
                         </li>
 
                     <?php endforeach; ?>

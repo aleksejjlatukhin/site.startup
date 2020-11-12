@@ -8,13 +8,14 @@ $this->title = 'Редактирование данных пользовател
 
 ?>
 
-<?= $this->render('menu_user', [
-    'user' => $user,
-]) ?>
-
 <div class="profile-update-profile">
 
-    <div class="row" style="display: flex">
+    <div class="row">
+
+        <?= $this->render('menu_user', [
+            'user' => $user,
+        ]) ?>
+
         <div class="col-md-7">
 
             <div style="margin-bottom: 20px;">

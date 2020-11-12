@@ -11,6 +11,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use yii\bootstrap\Modal;
 
 AppAsset::register($this);
 ?>
@@ -51,7 +52,7 @@ AppAsset::register($this);
                 'id' => 'main_navbar_right',
                 'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                 'items' => [
-                    ['label' => 'Главная', 'url' => ['/']],
+                    ['label' => 'Главная', 'url' => ['/admin/']],
                     ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
                     ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
 
@@ -74,7 +75,7 @@ AppAsset::register($this);
                 'id' => 'main_navbar_right',
                 'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                 'items' => [
-                    ['label' => 'Главная', 'url' => ['/']],
+                    ['label' => 'Главная', 'url' => ['/admin/']],
                     ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
                     ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
 
@@ -105,6 +106,49 @@ AppAsset::register($this);
     <div class="container-fluid">
         <?= $content ?>
     </div>
+
+
+    <!--All-information Project begin-->
+
+    <?php // Модальное окно - данные проекта
+    Modal::begin([
+        'options' => ['id' => 'data_project_modal'],
+        'size' => 'modal-lg',
+        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Project end-->
+
+
+    <!--Roadmap Project begin-->
+
+    <?php // Модальное окно - дорожная карта проекта
+    Modal::begin([
+        'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Roadmap Project end-->
+
+
+    <!--Result Project begin-->
+
+    <?php // Модальное окно - сводная таблица проекта
+    Modal::begin([
+        'options' => ['id' => 'showResultTableProject', 'class' => 'showResultTableProject'],
+        'size' => 'modal-lg',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Result Project end-->
+
+
 </div>
 
 <footer class="footer">
