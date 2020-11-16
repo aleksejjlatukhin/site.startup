@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\DescInterview;
+use app\models\forms\FormCreateProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Respond;
@@ -90,18 +92,9 @@ class GenerationProblemController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
 
-        //Выбор респондентов, которые являются представителями сегмента
-        $responds = Respond::find()->with('descInterview')
-            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all();
-
-        $newProblem = new GenerationProblem();
-        $newProblem->interview_id = $id;
 
         return $this->render('index', [
             'models' => $models,
-            'responds' => $responds,
-            'newProblem' => $newProblem,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
@@ -111,43 +104,44 @@ class GenerationProblemController extends AppController
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return array
      */
     public function actionCreate($id)
     {
 
-        $model = new GenerationProblem();
-        $model->interview_id = $id;
-        $last_model = GenerationProblem::find()->where(['interview_id' => $id])->orderBy(['id' => SORT_DESC])->one();
-        $last_model_number = explode(' ',$last_model->title)[1];
-        $model->title = 'ГПС ' . ($last_model_number + 1);
-
+        $model = new FormCreateProblem();
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        $model->segment_id = $segment->id;
-        $model->project_id = $project->id;
-
         if ($model->load(Yii::$app->request->post())) {
-            $model->description = $_POST['GenerationProblem']['description'];
 
-            if ($model->save()){
+            if (Yii::$app->request->isAjax) {
 
-                $project->updated_at = time();
-                if ($project->save()){
+                if ($model->create($interview->id, $segment->id, $project->id)){
 
-                    return $this->redirect(['/generation-problem/index', 'id' => $id]);
+                    $project->updated_at = time();
+
+                    if ($project->save()){
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => GenerationProblem::find()->where(['interview_id' => $id])->all(),
+                            ]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
-
     }
 
 
     /**
      * @param $id
-     * @return GenerationProblem
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -167,7 +161,11 @@ class GenerationProblemController extends AppController
                     $project->updated_at = time();
                     if ($project->save()) {
 
-                        $response = $model;
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => GenerationProblem::find()->where(['interview_id' => $interview->id])->all(),
+                            ]),
+                        ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
@@ -176,6 +174,63 @@ class GenerationProblemController extends AppController
             }
         }
     }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+
+        //Выбор респондентов, которые являются представителями сегмента
+        $responds = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $model->interview_id, 'desc_interview.status' => '1'])->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', [
+                    'model' => $model,
+                    'responds' => $responds
+                ]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function actionGetInterviewRespond ($id)
+    {
+        $respond = Respond::findOne($id);
+        $descInterview = DescInterview::findOne(['respond_id' => $id]);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'respond' => $respond,
+                'renderAjax' => $this->renderAjax('data_respond', [
+                    'respond' => $respond,
+                    'descInterview' => $descInterview
+                ]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
 
     /**
      * Deletes an existing GenerationProblem model.

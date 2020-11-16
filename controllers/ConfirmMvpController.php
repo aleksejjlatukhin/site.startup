@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
 use app\models\DescInterviewMvp;
+use app\models\forms\FormCreateBusinessModel;
 use app\models\FormUpdateConfirmMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
@@ -237,7 +238,13 @@ class ConfirmMvpController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->business)  && $model->count_positive <= $count_positive)) {
 
-                $response =  ['success' => true];
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/business-model/create', [
+                        'confirmMvp' => $model,
+                        'model' => new FormCreateBusinessModel(),
+                    ]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;

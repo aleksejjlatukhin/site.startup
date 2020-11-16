@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
+use app\models\forms\FormCreateBusinessModel;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -108,7 +109,6 @@ class BusinessModelController extends AppController
     {
         $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
         $confirmMvp = ConfirmMvp::findOne($id);
-        $newModel = new BusinessModel();
 
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -122,7 +122,6 @@ class BusinessModelController extends AppController
         return $this->render('index', [
             'model' => $model,
             'confirmMvp' => $confirmMvp,
-            'newModel' => $newModel,
             'mvp' => $mvp,
             'confirmGcp' => $confirmGcp,
             'gcp' => $gcp,
@@ -141,8 +140,7 @@ class BusinessModelController extends AppController
      */
     public function actionCreate($id)
     {
-        $model = new BusinessModel();
-
+        $model = new FormCreateBusinessModel();
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -163,16 +161,17 @@ class BusinessModelController extends AppController
 
                     if ($project->save()) {
 
-                        $response = ['model' => $businessModel];
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'model' => BusinessModel::findOne(['confirm_mvp_id' => $id]),
+                                'segment' => $segment,
+                                'gcp' => $gcp,
+                            ]),
+                        ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
                     }
-                } else {
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
@@ -181,7 +180,7 @@ class BusinessModelController extends AppController
 
     /**
      * @param $id
-     * @return array|bool
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -207,21 +206,42 @@ class BusinessModelController extends AppController
 
                     if ($project->save()) {
 
-                        $response = ['model' => $model];
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'model' => BusinessModel::findOne(['confirm_mvp_id' => $confirmMvp->id]),
+                                'segment' => $segment,
+                                'gcp' => $gcp,
+                            ]),
+                        ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
                     }
-                } else {
-
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
-        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
     }
 
 

@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\models\DescInterview;
+use app\models\forms\FormCreateProblem;
 use app\models\forms\FormUpdateConfirmSegment;
+use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
@@ -229,7 +231,16 @@ class InterviewController extends AppController
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems)  && $model->count_positive <= $count_positive)) {
 
-                $response =  ['success' => true];
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/generation-problem/create', [
+                        'interview' => $model,
+                        'model' => new FormCreateProblem(),
+                        'responds' => Respond::find()->with('descInterview')
+                            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
+                    ]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;

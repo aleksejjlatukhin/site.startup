@@ -92,20 +92,20 @@ a.view_block_description > div {
     background: #FFFFFF;
     height: 100%;
 }
-.new_segment_link_block {
+.new_hypothesis_link_block {
     display:flex;
     align-items: center;
     padding: 5px 10px 5px 0;
 }
-.new_segment_link_plus {
+.new_hypothesis_link_plus {
     color: #52BE7F;
     font-size: 24px;
 }
-.new_segment_link_plus:hover {
+.new_hypothesis_link_plus:hover {
     color: #52BE7F;
     text-decoration: none;
 }
-.new_segment_link_plus:focus {
+.new_hypothesis_link_plus:focus {
     color: #52BE7F;
     text-decoration: none;
 }

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
+use app\models\forms\FormCreateMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -94,7 +95,6 @@ class MvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $newMvp = new Mvp();
 
         return $this->render('index', [
             'models' => $models,
@@ -105,18 +105,17 @@ class MvpController extends AppController
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'newMvp' => $newMvp,
         ]);
     }
 
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return array
      */
     public function actionCreate($id)
     {
-        $model = new Mvp();
+        $model = new FormCreateMvp();
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -127,13 +126,23 @@ class MvpController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->create($id, $gcp->id, $generationProblem->id, $segment->id, $project->id)){
+            if (Yii::$app->request->isAjax) {
 
-                $project->updated_at = time();
+                if ($model->create($id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
-                if ($project->save()) {
+                    $project->updated_at = time();
 
-                    return $this->redirect(['/mvp/index', 'id' => $id]);
+                    if ($project->save()) {
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Mvp::find()->where(['confirm_gcp_id' => $id])->all(),
+                            ]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
@@ -167,31 +176,43 @@ class MvpController extends AppController
 
                     if ($project->save()){
 
-                        $response = $model;
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Mvp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all(),
+                            ]),
+                        ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
 
-                    }else{
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
-
-                }else{
-
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
-
-        return false;
     }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
 
     /**
      * Deletes an existing mvp model.

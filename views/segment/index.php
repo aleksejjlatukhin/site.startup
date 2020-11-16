@@ -170,10 +170,10 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                 <div class="col-md-3" style="padding: 0;">
 
-                    <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый сегмент</div></div>', ['#'],
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый сегмент</div></div>', ['#'],
                         ['data-toggle' => 'modal',
                             'data-target' => "#create_segment_modal",
-                            'class' => 'new_segment_link_plus pull-right']
+                            'class' => 'new_hypothesis_link_plus pull-right']
                     );
                     ?>
 

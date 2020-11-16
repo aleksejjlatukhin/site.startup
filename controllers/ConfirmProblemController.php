@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\DescInterviewConfirm;
+use app\models\forms\FormCreateGcp;
 use app\models\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -228,7 +229,14 @@ class ConfirmProblemController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps)  && $model->count_positive <= $count_positive)) {
 
-                $response =  ['success' => true];
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/gcp/create', [
+                        'confirmProblem' => $model,
+                        'model' => new FormCreateGcp(),
+                        'segment' => $model->problem->segment,
+                    ]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;
@@ -431,30 +439,16 @@ class ConfirmProblemController extends AppController
 
                     if ($model->save()){
 
-
-                        $gps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                        $gcps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251");
+                            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
 
-                        $gps_dir = mb_strtolower($gps_dir, "windows-1251");
+                        $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
 
-                        if (!file_exists($gps_dir)){
-                            mkdir($gps_dir, 0777);
+                        if (!file_exists($gcps_dir)){
+                            mkdir($gcps_dir, 0777);
                         }
-
-
-                        $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/feedbacks-confirm/';
-
-                        $feedbacks_dir = mb_strtolower($feedbacks_dir, "windows-1251");
-
-                        if (!file_exists($feedbacks_dir)){
-                            mkdir($feedbacks_dir, 0777);
-                        }
-
 
                         //Создание респондентов для программы подтверждения ГПС из представителей сегмента
                         $model->createRespondConfirm($responds);

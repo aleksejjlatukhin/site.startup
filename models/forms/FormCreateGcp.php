@@ -78,18 +78,8 @@ class FormCreateGcp extends Model
 
 
 
-    public function addDir($user, $project, $segment, $generationProblem, $gcp)
+    private function addDir($user, $project, $segment, $generationProblem, $gcp)
     {
-        $gcps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
-
-        $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
-
-        if (!file_exists($gcps_dir)){
-            mkdir($gcps_dir, 0777);
-        }
 
         $gcp_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.

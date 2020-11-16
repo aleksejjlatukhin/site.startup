@@ -102,40 +102,40 @@ a.view_block_description > div {
     color: #ffffff;
     font-size: 24px;
 }
-.headers_data_problem {
+.headers_data_hypothesis {
     font-weight: 700;
     color: #4F4F4F;
 }
 @media screen and (min-width: 1000px) {
 
-    .headers_data_problem {
+    .headers_data_hypothesis {
         display: flex;
         align-items: center;
     }
-    .headers_data_problem > .header_date_confirm {
+    .headers_data_hypothesis > .header_date_confirm {
         display:flex;
         justify-content: center;
     }
-    .headers_data_problem > .header_date_confirm > div {
+    .headers_data_hypothesis > .header_date_confirm > div {
         width: 80%;
     }
 }
 
 
-.new_segment_link_block {
+.new_hypothesis_link_block {
     display:flex;
     align-items: center;
     padding: 5px 10px 5px 0;
 }
-.new_segment_link_plus {
+.new_hypothesis_link_plus {
     color: #52BE7F;
     font-size: 24px;
 }
-.new_segment_link_plus:hover {
+.new_hypothesis_link_plus:hover {
     color: #52BE7F;
     text-decoration: none;
 }
-.new_segment_link_plus:focus {
+.new_hypothesis_link_plus:focus {
     color: #52BE7F;
     text-decoration: none;
 }

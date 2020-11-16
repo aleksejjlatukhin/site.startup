@@ -158,15 +158,19 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
         <?php if (empty($model)) : ?>
 
-            <div class="container-fluid row">
+            <div class="container-business_model">
 
-                <div class="col-md-12" style="padding: 15px 0;">
+                <div class="container-fluid row">
 
-                    <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Бизнес-модель</div></div>',
-                        ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->id],
-                        ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
-                    );
-                    ?>
+                    <div class="col-md-12" style="padding: 15px 0;">
+
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Бизнес-модель</div></div>',
+                            ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->id],
+                            ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
+                        );
+                        ?>
+
+                    </div>
 
                 </div>
 
@@ -174,145 +178,145 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
         <?php else : ?>
 
-            <div class="row" style="margin: 0;">
+            <div class="container-business_model">
 
-                <div class="col-md-9 text_update_page">
+                <div class="row" style="margin: 0;">
 
-                    <?php echo Html::a( 'Бизнес-модель' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]), ['/business-model/mpdf-business-model', 'id' => $model->id], [
-                        'class' => 'export_link',
-                        'target' => '_blank',
-                        //'data-toggle'=>'tooltip',
-                        'title' => 'Скачать в pdf',
-                    ]);?>
+                    <div class="col-md-9 text_update_page">
+
+                        <?php echo Html::a( 'Бизнес-модель' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]), ['/business-model/mpdf-business-model', 'id' => $model->id], [
+                            'class' => 'export_link',
+                            'target' => '_blank',
+                            'title' => 'Скачать в pdf',
+                        ]);?>
+                    </div>
+
+                    <div class="button-update col-md-3">
+
+                        <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
+                            'class' => 'btn btn-default update-hypothesis',
+                            'style' => [
+                                'color' => '#FFFFFF',
+                                'background' => '#52BE7F',
+                                'padding' => '0 7px',
+                                'width' => '190px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                        ])?>
+                    </div>
                 </div>
 
-                <div class="button-update col-md-3">
+                <div class="blocks_business_model">
 
-                    <?= Html::button('Редактировать', [
-                        'id' => 'update_business_model',
-                        'class' => 'btn btn-default',
-                        'style' => [
-                            'color' => '#FFFFFF',
-                            'background' => '#52BE7F',
-                            'padding' => '0 7px',
-                            'width' => '190px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                        ],
-                        'data-toggle' => 'modal',
-                        'data-target' => '#business_model_update_modal',
-                    ])?>
-                </div>
-            </div>
+                    <div class="block_20_business_model">
 
-            <div class="blocks_business_model">
+                        <div class="desc_block_20">
+                            <h5>Ключевые партнеры</h5>
+                            <div><?= $model->partners; ?></div>
+                        </div>
 
-                <div class="block_20_business_model">
+                    </div>
 
-                    <div class="desc_block_20">
-                        <h5>Ключевые партнеры</h5>
-                        <div id="view_partners"><?= $model->partners; ?></div>
+                    <div class="block_20_business_model">
+
+                        <div class="desc_block_20">
+
+                            <h5>Ключевые направления</h5>
+
+                            <div class="mini_header_desc_block">Тип взаимодейстивия с рынком:</div>
+                            <?php
+                            if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+                                echo 'В2С (бизнес-клиент)';
+                            } else {
+                                echo 'B2B (бизнес-бизнес)';
+                            }
+                            ?>
+
+                            <div class="mini_header_desc_block">Сфера деятельности:</div>
+                            <?= $segment->field_of_activity; ?>
+
+                            <div class="mini_header_desc_block">Вид деятельности:</div>
+                            <?= $segment->sort_of_activity; ?>
+
+                            <div class="mini_header_desc_block">Специализация вида деятельности:</div>
+                            <?= $segment->specialization_of_activity; ?>
+
+                        </div>
+
+                        <div class="desc_block_20">
+                            <h5>Ключевые ресурсы</h5>
+                            <div><?= $model->resources; ?></div>
+                        </div>
+
+                    </div>
+
+                    <div class="block_20_business_model">
+
+                        <div class="desc_block_20">
+                            <h5>Ценностное предложение</h5>
+                            <?= $gcp->description; ?>
+                        </div>
+
+                    </div>
+
+                    <div class="block_20_business_model">
+
+                        <div class="desc_block_20">
+                            <h5>Взаимоотношения с клиентами</h5>
+                            <div><?= $model->relations; ?></div>
+                        </div>
+
+                        <div class="desc_block_20">
+                            <h5>Каналы коммуникации и сбыта</h5>
+                            <div><?= $model->distribution_of_sales; ?></div>
+                        </div>
+
+                    </div>
+
+                    <div class="block_20_business_model">
+
+                        <div class="desc_block_20">
+
+                            <h5>Потребительский сегмент</h5>
+
+                            <div class="mini_header_desc_block">Наименование:</div>
+                            <?= $segment->name; ?>
+
+                            <div class="mini_header_desc_block">Краткое описание:</div>
+                            <?= $segment->description; ?>
+
+                            <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
+                            <?= ' от ' . number_format($segment->quantity_from * 1000, 0, '', ' ') .
+                            ' до ' . number_format($segment->quantity_to * 1000, 0, '', ' ') . ' человек'; ?>
+
+                            <div class="mini_header_desc_block">Объем рынка:</div>
+                            <?= number_format($segment->market_volume * 1000000, 0, '', ' ') . ' рублей'; ?>
+
+                        </div>
                     </div>
 
                 </div>
 
-                <div class="block_20_business_model">
+                <div class="blocks_business_model">
 
-                    <div class="desc_block_20">
+                    <div class="block_50_business_model">
 
-                        <h5>Ключевые направления</h5>
-
-                        <div class="mini_header_desc_block">Тип взаимодейстивия с рынком:</div>
-                        <?php
-                        if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
-                            echo 'В2С (бизнес-клиент)';
-                        } else {
-                            echo 'B2B (бизнес-бизнес)';
-                        }
-                        ?>
-
-                        <div class="mini_header_desc_block">Сфера деятельности:</div>
-                        <?= $segment->field_of_activity; ?>
-
-                        <div class="mini_header_desc_block">Вид деятельности:</div>
-                        <?= $segment->sort_of_activity; ?>
-
-                        <div class="mini_header_desc_block">Специализация вида деятельности:</div>
-                        <?= $segment->specialization_of_activity; ?>
+                        <div class="desc_block_50">
+                            <h5>Структура издержек</h5>
+                            <div><?= $model->cost; ?></div>
+                        </div>
 
                     </div>
 
-                    <div class="desc_block_20">
-                        <h5>Ключевые ресурсы</h5>
-                        <div id="view_resources"><?= $model->resources; ?></div>
-                    </div>
+                    <div class="block_50_business_model">
 
-                </div>
+                        <div class="desc_block_50">
+                            <h5>Потоки поступления доходов</h5>
+                            <div><?= $model->revenue; ?></div>
+                        </div>
 
-                <div class="block_20_business_model">
-
-                    <div class="desc_block_20">
-                        <h5>Ценностное предложение</h5>
-                        <?= $gcp->description; ?>
-                    </div>
-
-                </div>
-
-                <div class="block_20_business_model">
-
-                    <div class="desc_block_20">
-                        <h5>Взаимоотношения с клиентами</h5>
-                        <div id="view_relations"><?= $model->relations; ?></div>
-                    </div>
-
-                    <div class="desc_block_20">
-                        <h5>Каналы коммуникации и сбыта</h5>
-                        <div id="view_distribution_of_sales"><?= $model->distribution_of_sales; ?></div>
-                    </div>
-
-                </div>
-
-                <div class="block_20_business_model">
-
-                    <div class="desc_block_20">
-
-                        <h5>Потребительский сегмент</h5>
-
-                        <div class="mini_header_desc_block">Наименование:</div>
-                        <?= $segment->name; ?>
-
-                        <div class="mini_header_desc_block">Краткое описание:</div>
-                        <?= $segment->description; ?>
-
-                        <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
-                        <?= ' от ' . number_format($segment->quantity_from * 1000, 0, '', ' ') .
-                        ' до ' . number_format($segment->quantity_to * 1000, 0, '', ' ') . ' человек'; ?>
-
-                        <div class="mini_header_desc_block">Объем рынка:</div>
-                        <?= number_format($segment->market_volume * 1000000, 0, '', ' ') . ' рублей'; ?>
-
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="blocks_business_model">
-
-                <div class="block_50_business_model">
-
-                    <div class="desc_block_50">
-                        <h5>Структура издержек</h5>
-                        <div id="view_cost"><?= $model->cost; ?></div>
-                    </div>
-
-                </div>
-
-                <div class="block_50_business_model">
-
-                    <div class="desc_block_50">
-                        <h5>Потоки поступления доходов</h5>
-                        <div id="view_revenue"><?= $model->revenue; ?></div>
                     </div>
 
                 </div>
@@ -324,422 +328,11 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
     </div>
 
 
-    <?php
-    // Модальное окно для создания Бизнес-модели
-    Modal::begin([
-        'options' => [
-            'id' => 'business_model_create_modal',
-            'class' => 'business_model_create_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Внесите данные для создания бизнес-модели</h3>',
-    ]);
-    ?>
-
-    <?php
-    $form = ActiveForm::begin([
-        'id' => 'business_model_create',
-        'action' => "/business-model/create?id=$confirmMvp->id",
-        'options' => ['class' => 'g-py-15'],
-        'errorCssClass' => 'u-has-error-v1',
-        'successCssClass' => 'u-has-success-v1-1',
-    ]);
-    ?>
-
-    <div class="row">
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'partners', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'resources', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'relations', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'distribution_of_sales', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'cost', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newModel, 'revenue', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]);
-            ?>
-
-        </div>
-
-    </div>
-
-
-    <div class="form-group row container-fluid">
-        <?= Html::submitButton('Сохранить', [
-            'class' => 'btn btn-success pull-right',
-            'style' => [
-                'color' => '#FFFFFF',
-                'background' => '#52BE7F',
-                'padding' => '0 7px',
-                'width' => '140px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px',
-            ]
-        ]) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
-
-
-    <?php Modal::end(); ?>
-
-
-
-    <!--Если существует Бизнес-модель-->
-    <?php if (!empty($model)) : ?>
-
-        <?php
-        // Модальное окно редактирования Бизнес-модели
-        Modal::begin([
-            'options' => [
-                'id' => 'business_model_update_modal',
-                'class' => 'business_model_update_modal',
-            ],
-            'size' => 'modal-lg',
-            'header' => '<h3 class="text-center">Редактирование бизнес-модели</h3>',
-        ]);
-        ?>
-
-        <?php
-        $form = ActiveForm::begin([
-            'id' => 'business_model_update',
-            'action' => "/business-model/update?id=$model->id",
-            'options' => ['class' => 'g-py-15'],
-            'errorCssClass' => 'u-has-error-v1',
-            'successCssClass' => 'u-has-success-v1-1',
-        ]);
-        ?>
-
-        <div class="row">
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'partners', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'resources', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'relations', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'distribution_of_sales', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'cost', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'revenue', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => '',
-                ]);
-                ?>
-
-            </div>
-
-        </div>
-
-
-        <div class="form-group row container-fluid">
-            <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
-                'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
-                    'padding' => '0 7px',
-                    'width' => '140px',
-                    'height' => '40px',
-                    'font-size' => '24px',
-                    'border-radius' => '8px',
-                ]
-            ]) ?>
-        </div>
-
-        <?php ActiveForm::end(); ?>
-
-
-        <?php Modal::end(); ?>
-
-    <?php endif; ?>
-
-
-
-
-    <?php
-    // Модальное окно - сообщение о том что данных недостаточно для создания Бизнес-модели
-    Modal::begin([
-        'options' => [
-            'id' => 'business_model_create_modal_error',
-            'class' => 'business_model_create_modal_error',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 25px;">Недостаточно данных для создания бизнес-модели.</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Вернитесь к подтверждению продукта (MVP).
-    </h4>
-
-    <?php Modal::end(); ?>
-
+    <!--Модальные окна-->
+    <?= $this->render('modal'); ?>
 
 </div>
 
 
-
-<?php
-
-$script = "
-
-    $(document).ready(function() {
-        
-        //Фон для модального окна (при создании Бизнес-модели - недостаточно данных)
-        var business_model_create_modal_error = $('#business_model_create_modal_error').find('.modal-content');
-        business_model_create_modal_error.css('background-color', '#707F99');
-        
-        
-        
-        //Возвращение скролла первого модального окна после закрытия второго
-        $('.modal').on('hidden.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
-                $('body').addClass('modal-open');
-            }
-        }).on('show.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
-                $(this).css('z-index', parseInt($('.modal-backdrop.in').first().css('z-index')) + 10);
-            }
-        });
-        
-    });
-    
-    
-    
-    
-    //При попытке добавить Бизнес-модель проверяем существуют ли необходимые данные
-    //Если данных достаточно - показываем окно с формой
-    //Если данных недостаточно - показываем окно с сообщением error
-    $('#checking_the_possibility').on('click', function(){
-    
-        var url = $(this).attr('href');
-        
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            cache: false,
-            success: function(response){
-                if(response['success']){
-                    $('#business_model_create_modal').modal('show');
-                }else{
-                    $('#business_model_create_modal_error').modal('show');
-                }
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-        
-        //e.preventDefault();
-        return false;
-    });
-    
-    
-    //При сохранинии данных из формы создания бизнес-модели
-    $('#business_model_create').on('beforeSubmit', function(e){
-    
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
-        
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
-            
-                if (!response['error']) {
-                    
-                    //Закрываем окно создания бизнес-модели
-                    $('#business_model_create_modal').modal('hide');
-                    
-                    //Назначаем перезагрузку
-                    location.reload();
-                }
-            
-            }, error: function(){
-                alert('Ошибка');
-            }
-        });
-    
-        e.preventDefault();
-        return false;
-    });
-    
-    //Форма редактирования Бизнес-модели
-    $('#business_model_update').on('beforeSubmit', function(e){
-    
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
-    
-        $.ajax({
-            
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
-            
-                if(!response['error']){
-                
-                    //Закрываем окно редактирования
-                    $('#business_model_update_modal').modal('hide');
-                    
-                    //Обновляем данные на странице
-                    $('#view_partners').html(response.model.partners);
-                    $('#view_resources').html(response.model.resources);
-                    $('#view_relations').html(response.model.relations);
-                    $('#view_distribution_of_sales').html(response.model.distribution_of_sales);
-                    $('#view_cost').html(response.model.cost);
-                    $('#view_revenue').html(response.model.revenue);
-                } 
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-        
-        e.preventDefault();
-        return false;
-    });
-
-    
-";
-$position = \yii\web\View::POS_READY;
-$this->registerJs($script, $position);
-
-?>
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/business_model_index.js'); ?>

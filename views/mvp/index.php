@@ -157,9 +157,9 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
 
             <div class="col-md-12" style="padding: 15px 0;">
 
-                <?=  Html::a( '<div class="new_segment_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый продукт (MVP)</div></div>',
+                <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый продукт (MVP)</div></div>',
                     ['/confirm-gcp/data-availability-for-next-step', 'id' => $confirmGcp->id],
-                    ['id' => 'checking_the_possibility', 'class' => 'new_segment_link_plus pull-right']
+                    ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
                 );
                 ?>
 
@@ -168,8 +168,8 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
         </div>
 
 
-        <!--Заголовки для списка проблем-->
-        <div class="row headers_data_problem" style="margin: 0; padding: 10px; padding-top: 0;">
+        <!--Заголовки для списка MVP-->
+        <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px; padding-top: 0;">
 
             <div class="col-md-1 ">
                 <div class="row">
@@ -190,7 +190,7 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
         </div>
 
 
-        <div class="block_all_problems_segment row" style="padding-left: 10px; padding-right: 10px;">
+        <div class="block_all_hypothesis row" style="padding-left: 10px; padding-right: 10px;">
 
             <!--Данные для списка MVP -->
             <?php foreach ($models as $model) : ?>
@@ -232,7 +232,7 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
                         </div>
                     </div>
 
-                    <div class="col-md-7" id="column_mvp_description-<?=$model->id;?>">
+                    <div class="col-md-7">
 
                         <?php
                         $mvp_desc = $model->description;
@@ -309,11 +309,9 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
 
                                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['#'], [
-                                        'class' => '',
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/mvp/get-hypothesis-to-update', 'id' => $model->id], [
+                                        'class' => 'update-hypothesis',
                                         'title' => 'Редактировать',
-                                        'data-toggle' => 'modal',
-                                        'data-target' => '#update_description_modal-' . $model->id,
                                     ]); ?>
 
                                 <?php endif; ?>
@@ -370,271 +368,10 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
     <?php endif; ?>
 
 
-
-    <?php
-    // Модальное окно - создание MVP
-    Modal::begin([
-        'options' => [
-            'id' => 'mvp_create_modal',
-            'class' => 'mvp_create_modal',
-        ],
-        'size' => 'modal-lg',
-        'header' => '<div class="text-center" style="font-size: 24px; color: #4F4F4F; font-weight: 700;">Сформулируйте описание продукта (MVP)</div>',
-    ]);
-    ?>
-
-
-
-    <?php
-    $form = ActiveForm::begin([
-        'id' => 'mvp_create',
-        'action' => "/mvp/create?id=$confirmGcp->id",
-        'options' => ['class' => 'g-py-15'],
-        'errorCssClass' => 'u-has-error-v1',
-        'successCssClass' => 'u-has-success-v1-1',
-    ]);
-    ?>
-
-    <div class="row" style="color: #4F4F4F;">
-
-        <div class="col-md-12" style="margin-top: 10px; padding-left: 20px; padding-right: 20px;">
-            Minimum Viable Product(MVP) — минимально жизнеспособный продукт, концепция минимализма программной комплектации выводимого на рынок устройства.
-            Минимально жизнеспособный продукт - продукт, обладающий минимальными, но достаточными для удовлетворения первых потребителей функциями.
-            Основная задача — получение обратной связи для формирования гипотез дальнейшего развития продукта.
-        </div>
-
-        <div class="col-md-12" style="margin-top: 10px;">
-
-            <?= $form->field($newMvp, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта')->textarea([
-                'rows' => 2,
-                'maxlength' => 255,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => 'Примеры: презентация, макет, программное обеспечение, опытный образец, видео и т.д.',
-            ]);
-            ?>
-
-        </div>
-
-    </div>
-
-    <div class="form-group row container-fluid">
-        <?= Html::submitButton('Сохранить', [
-            'class' => 'btn btn-success pull-right',
-            'style' => [
-                'color' => '#FFFFFF',
-                'background' => '#52BE7F',
-                'padding' => '0 7px',
-                'width' => '140px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px',
-            ]
-        ]) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
-
-    <?php Modal::end(); ?>
-
-
-    <?php
-    // Модальное окно - сообщение о том что данных недостаточно для создания MVP
-    Modal::begin([
-        'options' => [
-            'id' => 'mvp_create_modal_error',
-            'class' => 'mvp_create_modal_error',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания нового продукта (MVP).</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Вернитесь к подтверждению ценностного предложения.
-    </h4>
-
-    <?php Modal::end(); ?>
-
-
-
-    <?php foreach ($models as $model) : ?>
-
-        <?php
-        // Модальное окно - редактирование описания MVP
-        Modal::begin([
-            'options' => [
-                'id' => "update_description_modal-$model->id",
-                'class' => 'update_description_modal',
-            ],
-            'size' => 'modal-lg',
-            'header' => '<h3 class="text-center" style="color: #4F4F4F; font-weight: 700;">Редактирование описания продукта (MVP) - '. $model->title .'</h3>',
-        ]);
-        ?>
-
-        <?php
-        $form = ActiveForm::begin([
-            'id' => "form_update_description-$model->id",
-            'action' => "/mvp/update?id=$model->id",
-            'options' => ['class' => 'g-py-15 mvpUpdateForm'],
-            'errorCssClass' => 'u-has-error-v1',
-            'successCssClass' => 'u-has-success-v1-1',
-        ]);
-        ?>
-
-        <div class="row" style="color: #4F4F4F;">
-
-            <div class="col-md-12" style="margin-top: 10px; padding-left: 20px; padding-right: 20px;">
-                Minimum Viable Product(MVP) — минимально жизнеспособный продукт, концепция минимализма программной комплектации выводимого на рынок устройства.
-                Минимально жизнеспособный продукт - продукт, обладающий минимальными, но достаточными для удовлетворения первых потребителей функциями.
-                Основная задача — получение обратной связи для формирования гипотез дальнейшего развития продукта.
-            </div>
-
-            <div class="col-md-12" style="margin-top: 10px;">
-
-                <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта')->textarea([
-                    'rows' => 2,
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                    'placeholder' => 'Примеры: презентация, макет, программное обеспечение, опытный образец, видео и т.д.',
-                ]);
-                ?>
-
-            </div>
-        </div>
-
-        <div class="form-group row container-fluid">
-            <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
-                'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
-                    'padding' => '0 7px',
-                    'width' => '140px',
-                    'height' => '40px',
-                    'font-size' => '24px',
-                    'border-radius' => '8px',
-                ]
-            ]) ?>
-        </div>
-
-        <?php
-        ActiveForm::end();
-        ?>
-
-        <?php Modal::end(); ?>
-
-    <?php endforeach; ?>
-
+    <!--Модальные окна-->
+    <?= $this->render('modal'); ?>
 
 </div>
 
-
-<?php
-
-$script = "
-
-    $(document).ready(function() {
-        
-        //Фон для модального окна (при создании MVP - недостаточно данных)
-        var mvp_create_modal_error = $('#mvp_create_modal_error').find('.modal-content');
-        mvp_create_modal_error.css('background-color', '#707F99');
-        
-        
-        
-        //Возвращение скролла первого модального окна после закрытия второго
-        $('.modal').on('hidden.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
-                $('body').addClass('modal-open');
-            }
-        }).on('show.bs.modal', function (e) {
-            if($('.modal:visible').length)
-            {
-                $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
-                $(this).css('z-index', parseInt($('.modal-backdrop.in').first().css('z-index')) + 10);
-            }
-        });
-        
-    });
-    
-    
-    
-    
-    //При попытке добавить MVP проверяем существуют ли необходимые данные
-    //Если данных достаточно - показываем окно с формой
-    //Если данных недостаточно - показываем окно с сообщением error
-    $('#checking_the_possibility').on('click', function(){
-    
-        var url = $(this).attr('href');
-        
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            cache: false,
-            success: function(response){
-                if(response['success']){
-                    $('#mvp_create_modal').modal('show');
-                }else{
-                    $('#mvp_create_modal_error').modal('show');
-                }
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-        
-        //e.preventDefault();
-        return false;
-    });
-    
-    
-    
-    //Форма редактирования описания MVP
-    $('.mvpUpdateForm').on('beforeSubmit', function(e){
-    
-        var id = $(this).attr('id');
-        id = id.split('-');
-        id = id[1];
-    
-        var data = $(this).serialize();
-        var url = '/mvp/update?id=' + id;
-    
-        $.ajax({
-            
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
-            
-                if(!response['error']){
-                
-                    $('#update_description_modal-' + id).modal('hide');
-
-                    var description = response.description;
-                
-                    if (description.length > 180) {
-                        description = description.substring(0, 180) + '...';
-                    }
-                    
-                    var column = $('#column_mvp_description-' + id).html('<\div title=\"' + response.description + '\">' + description + '<\/div>');
-                } 
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-        
-        e.preventDefault();
-        return false;
-    });
-    
-    
-";
-$position = \yii\web\View::POS_READY;
-$this->registerJs($script, $position);
-
-?>
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/hypothesis_mvp_index.js'); ?>

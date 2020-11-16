@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\ConfirmProblem;
 use app\models\DescInterviewGcp;
+use app\models\forms\FormCreateMvp;
 use app\models\FormUpdateConfirmGcp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
@@ -232,7 +233,13 @@ class ConfirmGcpController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->mvps)  && $model->count_positive <= $count_positive)) {
 
-                $response =  ['success' => true];
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/mvp/create', [
+                        'confirmGcp' => $model,
+                        'model' => new FormCreateMvp(),
+                    ]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;
@@ -443,16 +450,16 @@ class ConfirmGcpController extends AppController
 
                     if ($model->save()) {
 
-                        $feedbacks_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/generation problems/'
-                            . mb_convert_encoding($this->translit($generationProblem->title), "windows-1251") . '/gcps/'
-                            . mb_convert_encoding($this->translit($gcp->title), "windows-1251") . '/feedbacks-confirm/';
+                        $mvps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/'
+                            . mb_convert_encoding($this->translit($gcp->title) , "windows-1251") . '/mvps/';
 
-                        $feedbacks_dir = mb_strtolower($feedbacks_dir, "windows-1251");
+                        $mvps_dir = mb_strtolower($mvps_dir, "windows-1251");
 
-                        if (!file_exists($feedbacks_dir)) {
-                            mkdir($feedbacks_dir, 0777);
+                        if (!file_exists($mvps_dir)){
+                            mkdir($mvps_dir, 0777);
                         }
 
 

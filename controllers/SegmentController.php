@@ -89,10 +89,8 @@ class SegmentController extends AppController
     {
 
         $project = Projects::findOne($id);
-        $user = User::find()->where(['id' => $project->user_id])->one();
         $models = Segment::findAll(['project_id' => $project->id]);
-        $searchModel = new SegmentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $sortModel = new SortForm();
         $newSegment = new FormCreateSegment();
         $updateSegments = [];
 
@@ -100,31 +98,7 @@ class SegmentController extends AppController
             $updateSegments[] = new FormUpdateSegment($model->id);
         }
 
-        //Проверка и создание необходимых папок на сервере --- начало ---
-        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
-
-        if (!file_exists($segments_dir)){
-            mkdir($segments_dir, 0777);
-        }
-
-        foreach ($models as $model){
-            $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-            $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-            if (!file_exists($segment_dir)){
-                mkdir($segment_dir, 0777);
-            }
-        }
-        //Проверка и создание необходимых папок на сервере --- конец ---
-
-        //Модель сортировки
-        $sortModel = new SortForm();
-
-
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel,
             'project' => $project,
             'newSegment' => $newSegment,
             'updateSegments' => $updateSegments,

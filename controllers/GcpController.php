@@ -92,7 +92,6 @@ class GcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $formCreateGcp = new FormCreateGcp();
 
         return $this->render('index', [
             'models' => $models,
@@ -101,33 +100,42 @@ class GcpController extends AppController
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'formCreateGcp' => $formCreateGcp,
         ]);
     }
 
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return array
      */
     public function actionCreate($id)
     {
-        $formCreateGcp = new FormCreateGcp();
+        $model = new FormCreateGcp();
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if ($formCreateGcp->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            if ($formCreateGcp->create($id, $generationProblem->id, $segment->id, $project->id)){
+            if (Yii::$app->request->isAjax) {
 
-                $project->updated_at = time();
+                if ($model->create($id, $generationProblem->id, $segment->id, $project->id)) {
 
-                if ($project->save()){
+                    $project->updated_at = time();
 
-                    return $this->redirect(['/gcp/index', 'id' => $id]);
+                    if ($project->save()) {
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Gcp::find()->where(['confirm_problem_id' => $id])->all(),
+                            ]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
@@ -136,7 +144,7 @@ class GcpController extends AppController
 
     /**
      * @param $id
-     * @return Gcp|array|bool
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -159,31 +167,43 @@ class GcpController extends AppController
 
                     if ($project->save()){
 
-                        $response = $model;
+                        $response = [
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Gcp::find()->where(['confirm_problem_id' => $confirmProblem->id])->all(),
+                            ]),
+                        ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
 
-                    }else{
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
-
-                }else{
-
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
-
-        return false;
     }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
 
     /**
      * Deletes an existing Gcp model.
