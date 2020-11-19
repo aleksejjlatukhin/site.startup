@@ -176,6 +176,19 @@ AppAsset::register($this);
 
     <!--Result Project end-->
 
+    <!--Report Project begin-->
+
+    <?php // Модальное окно - протокол проекта
+    Modal::begin([
+        'options' => ['id' => 'showReportProject', 'class' => 'showReportProject'],
+        'size' => 'modal-lg',
+        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Report Project end-->
+
 
 </div>
 

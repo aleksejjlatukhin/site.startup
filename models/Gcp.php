@@ -18,6 +18,9 @@ use yii\behaviors\TimestampBehavior;
  */
 class Gcp extends \yii\db\ActiveRecord
 {
+
+    public $propertyContainer;
+
     /**
      * {@inheritdoc}
      */
@@ -25,6 +28,19 @@ class Gcp extends \yii\db\ActiveRecord
     {
         return 'gcp';
     }
+
+
+    /**
+     * Gcp constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->propertyContainer = new PropertyContainer();
+
+        parent::__construct($config);
+    }
+
 
     public function getConfirm()
     {

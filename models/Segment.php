@@ -36,6 +36,8 @@ class Segment extends \yii\db\ActiveRecord
     const HIGHER_INCOMPLETE_EDUCATION = 200;
     const HIGHER_EDUCATION = 300;
 
+    public $propertyContainer;
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +45,20 @@ class Segment extends \yii\db\ActiveRecord
     {
         return 'segments';
     }
+
+
+    /**
+     * Segment constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->propertyContainer = new PropertyContainer();
+
+        parent::__construct($config);
+    }
+
+
 
     public function getProject()
     {

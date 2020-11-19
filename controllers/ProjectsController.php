@@ -15,7 +15,9 @@ use app\models\Interview;
 use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\ProjectSort;
+use app\models\PropertyContainer;
 use app\models\Questions;
+use app\models\ReportProject;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
@@ -499,7 +501,10 @@ class ProjectsController extends AppController
     }
 
 
-
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionResult ($id)
     {
         $project = Projects::findOne($id);
@@ -509,6 +514,49 @@ class ProjectsController extends AppController
 
             $response = [
                 'renderAjax' => $this->renderAjax('result', ['project' => $project, 'segments' => $segments]),
+                'project' => $project,
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionReport ($id)
+    {
+        $project = Projects::findOne($id);
+        $segments = Segment::findAll(['project_id' => $id]);
+
+        foreach ($segments as $s => $segment) {
+
+            $segment->propertyContainer->addProperty('title', 'Сегмент ' . ($s+1));
+
+            foreach ($segment->problems as $p => $problem) {
+
+                $problem->propertyContainer->addProperty('title', 'ГПС ' . ($s+1) . '.' . ($p+1));
+
+                foreach ($problem->gcps as $g => $gcp) {
+
+                    $gcp->propertyContainer->addProperty('title', 'ГЦП ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1));
+
+                    foreach ($gcp->mvps as $m => $mvp) {
+
+                        $mvp->propertyContainer->addProperty('title', 'MVP ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . '.' . ($m+1));
+                    }
+                }
+            }
+        }
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('report', ['segments' => $segments]),
                 'project' => $project,
             ];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -732,7 +780,7 @@ class ProjectsController extends AppController
      * @param $id
      * @return string
      */
-    public function actionReport ($id) {
+    /*public function actionReportTest ($id) {
 
         $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
 
@@ -789,9 +837,9 @@ class ProjectsController extends AppController
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $statModels,
-            /*'pagination' => [
-                'pageSize' => 100,
-            ],*/
+            //'pagination' => [
+                //'pageSize' => 100,
+            //],
             'pagination' => false,
             'sort' => false,
         ]);
@@ -799,13 +847,13 @@ class ProjectsController extends AppController
         $project = Projects::findOne($id);
         $project_filename = str_replace(' ', '_', $project->project_name);
 
-        return $this->render('report', [
+        return $this->render('report-test', [
                 'dataProvider' => $dataProvider,
                 'project' => $project,
                 'project_filename' => $project_filename,
             ]
         );
-    }
+    }*/
 
 
     /**

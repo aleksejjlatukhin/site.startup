@@ -36,8 +36,7 @@ $this->registerCssFile('@web/css/segments-index-style.css');
             ]) ?>
 
             <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
-                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 link_in_the_header text-center',
-                'onclick' => 'return false',
+                'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openReportProject link_in_the_header text-center',
             ]) ?>
 
             <?= Html::a('Дорожная карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [

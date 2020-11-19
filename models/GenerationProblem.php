@@ -15,6 +15,9 @@ use yii\behaviors\TimestampBehavior;
  */
 class GenerationProblem extends \yii\db\ActiveRecord
 {
+
+    public $propertyContainer;
+
     /**
      * {@inheritdoc}
      */
@@ -22,6 +25,19 @@ class GenerationProblem extends \yii\db\ActiveRecord
     {
         return 'generation_problem';
     }
+
+
+    /**
+     * GenerationProblem constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->propertyContainer = new PropertyContainer();
+
+        parent::__construct($config);
+    }
+
 
     public function getGcps()
     {

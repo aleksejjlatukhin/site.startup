@@ -1,670 +1,593 @@
 <?php
 
-use kartik\grid\GridView;
-use yii\widgets\Pjax;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\helpers\ArrayHelper;
-use app\models\Segment;
-use app\models\GenerationProblem;
-use app\models\Gcp;
-use app\models\Mvp;
-use app\models\BusinessModel;
 
 ?>
 
-<?php
+<div class="report-project">
 
-$this->title = 'Протокол проекта "' . mb_strtolower($project->project_name) . '"';
+    <!--Шапка таблицы-->
+    <div class="report-project-header">
 
-?>
+        <div class="left_part_header">Наименование этапа</div>
 
-<div class="table-project-kartik">
+        <div class="right_part_header">
+            
+            <div class="right_part_header_top">Результаты проведенных тестов</div>
 
-    <?
+            <div class="right_part_header_bottom">
 
-    $gridColumns = [
+                <div>Запланировано</div>
+                <div>Необходимо</div>
+                <div>Положительные</div>
+                <div>Отрицательные</div>
+                <div>Не опрошены</div>
+                <div>Статус</div>
+                <div>Бизнес-модель</div>
 
+            </div>
+        </div>
+    </div>
 
-        [
-            'attribute' => 'stages',
-            'label' => 'Описание этапа проекта',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Описание этапов проекта относительно их взаимосвязи</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            //'hAlign' => GridView::ALIGN_RIGHT,
-            //'options' => ['class' => ''],
-            'value' => function ($model) {
+    <!--Строки сегментов-->
+    <?php foreach ($segments as $segment) : ?>
 
-                if (($model instanceof GenerationProblem) === true) {
-                    if ($model->description) {
+        <!--Если у сегмента существует подтверждение-->
+        <?php if($segment->interview) : ?>
 
-                        return '<div class="table-kartik-link">' . $model->description . '</div>';
-                    }
-                }
+        <div class="stage_data_string">
 
-                if (($model instanceof Gcp) === true) {
-                    if ($model->description) {
+            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title'); ?></div>
 
-                        return '<div class="table-kartik-link">' . $model->description . '</div>';
-                    }
-                }
+            <?php if (mb_strlen($segment->name) > 50) : ?>
 
-                if (($model instanceof Mvp) === true) {
-                    if ($model->description) {
+                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->name; ?>">
+                    <?= Html::a(mb_substr($segment->name, 0, 50) . '...', ['/segment/index', 'id' => $segment->project_id],
+                        ['class' => 'link_for_description_stage']); ?>
+                </div>
 
-                        return '<div class="table-kartik-link">' . $model->description . '</div>';
-                    }
-                }
+            <?php else : ?>
 
-            },
-            'format' => 'html',
-            //'hiddenFromExport' => true,
-            //'groupedRow' => true, // Группировка по строке
-            //'group' => true,  // enable grouping
-            //'subGroupOf' => 0 // supplier column index is the parent group
-        ],
+                <div class="column_description_of_segment column_block_text_max_1800">
+                    <?= Html::a($segment->name, ['/segment/index', 'id' => $segment->project_id],
+                        ['class' => 'link_for_description_stage']); ?>
+                </div>
 
-        [
-            'attribute' => 'positive-exist-respond',
-            'label' => 'Положит., шт.',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Положит.,</div><div class="font-header-table" style="font-size: 12px;font-weight: 500;">шт.</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'value' => function ($model) {
+            <?php endif; ?>
 
-                if (($model instanceof GenerationProblem) === true) {
 
-                    if (!empty($model->confirm)) {
+            <div class="column_description_of_segment column_block_text_min_1800">
+                <?= Html::a($segment->name, ['/segment/index', 'id' => $segment->project_id],
+                    ['class' => 'link_for_description_stage']); ?>
+            </div>
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status == 1) {
-                                    $exist++;
-                                }
-                            }
-                        }
+            <div class="column_stage_confirm"><?= $segment->interview->count_respond; ?></div>
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+            <div class="column_stage_confirm"><?= $segment->interview->count_positive; ?></div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+            <div class="column_stage_confirm"><?= $segment->interview->dataMembersOfSegment; ?></div>
 
+            <div class="column_stage_confirm"><?= ($segment->interview->dataDescInterviewsOfModel - $segment->interview->dataMembersOfSegment); ?></div>
 
-                if (($model instanceof Gcp) === true) {
+            <div class="column_stage_confirm"><?= ($segment->interview->count_respond - $segment->interview->dataDescInterviewsOfModel); ?></div>
 
-                    if (!empty($model->confirm)) {
+            <div class="column_stage_confirm">
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
+                <?php if ($segment->exist_confirm === 1) : ?>
 
-                                if ($respond->descInterview->status == 1) {
-                                    $exist++;
-                                }
-                            }
-                        }
+                    <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
+                        ['/interview/view', 'id' => $segment->interview->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+                <?php elseif ($segment->exist_confirm === null) : ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                    <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                        ['/interview/view', 'id' => $segment->interview->id], ['title' => 'Продолжить подтверждение']); ?>
 
+                <?php elseif ($segment->exist_confirm === 0) : ?>
 
-                if (($model instanceof Mvp) === true) {
+                    <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
+                        ['/interview/view', 'id' => $segment->interview->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-                    if (!empty($model->confirm)) {
+                <?php endif; ?>
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
+            </div>
 
-                                if ($respond->descInterview->status === 1) {
-                                    $exist++;
-                                }
-                                if ($respond->descInterview->status === 2) {
-                                    $exist++;
-                                }
-                            }
-                        }
+            <div class="column_stage_confirm"></div>
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+        </div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+        <!--Если у сегмента не существует подтверждения-->
+        <?php else : ?>
 
-            },
-            'format' => 'html',
-        ],
+        <div class="stage_data_string">
 
+            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title'); ?></div>
 
-        [
-            'attribute' => 'negative-exist-respond',
-            'label' => 'Отриц., шт.',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Отриц.,</div><div class="font-header-table" style="font-size: 12px;font-weight: 500;">шт.</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+            <?php if (mb_strlen($segment->name) > 50) : ?>
 
-                    if (!empty($model->confirm)) {
+                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->name; ?>">
+                    <?= Html::a(mb_substr($segment->name, 0, 50) . '...', ['/segment/index', 'id' => $segment->project_id],
+                        ['class' => 'link_for_description_stage']); ?>
+                </div>
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
+            <?php else : ?>
 
-                                if ($respond->descInterview->status == '0') {
-                                    $exist++;
-                                }
-                            }
-                        }
+                <div class="column_description_of_segment column_block_text_max_1800">
+                    <?= Html::a($segment->name, ['/segment/index', 'id' => $segment->project_id],
+                        ['class' => 'link_for_description_stage']); ?>
+                </div>
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+            <?php endif; ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
 
+            <div class="column_description_of_segment column_block_text_min_1800">
+                <?= Html::a($segment->name, ['/segment/index', 'id' => $segment->project_id],
+                    ['class' => 'link_for_description_stage']); ?>
+            </div>
 
-                if (($model instanceof Gcp) === true) {
 
-                    if (!empty($model->confirm)) {
+            <div class="column_stage_confirm">-</div>
+            <div class="column_stage_confirm">-</div>
+            <div class="column_stage_confirm">-</div>
+            <div class="column_stage_confirm">-</div>
+            <div class="column_stage_confirm">-</div>
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
+            <div class="column_stage_confirm">
+                <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                    ['/interview/create', 'id' => $segment->id], ['title' => 'Создать подтверждение']); ?>
+            </div>
 
-                                if ($respond->descInterview->status == '0') {
-                                    $exist++;
-                                }
-                            }
-                        }
+            <div class="column_stage_confirm"></div>
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+        </div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+        <?php endif; ?>
 
+        <!--Строки проблем сегментов-->
+        <?php foreach ($segment->problems as $problem) : ?>
 
-                if (($model instanceof Mvp) === true) {
+            <!--Если у проблемы существует подтверждение-->
+            <?php if($problem->confirm) : ?>
 
-                    if (!empty($model->confirm)) {
+            <div class="stage_data_string">
 
-                        $responds = $model->confirm->responds;
-                        if ($responds) {
-                            $exist = 0;
-                            foreach ($responds as $respond) {
+                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title'); ?></div>
 
-                                if ($respond->descInterview->status === 0) {
-                                    $exist++;
-                                }
-                            }
-                        }
 
-                        return '<div class="table-kartik-link text-center">' . $exist . '</div>';
+                <?php if (mb_strlen($problem->description) > 100) : ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->description; ?>">
+                        <?= Html::a(mb_substr($problem->description, 0, 100) . '...', ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-            },
-            'format' => 'html',
-        ],
+                <?php else : ?>
 
+                    <div class="column_description_of_stage column_block_text_max_1800">
+                        <?= Html::a($problem->description, ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
+                <?php endif; ?>
 
-        [
-            'attribute' => 'share-positive',
-            'label' => 'Результат, %',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Результат,</div><div class="font-header-table" style="font-size: 12px;font-weight: 500;">%</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                <?php if (mb_strlen($problem->description) > 130) : ?>
 
-                    if (!empty($model->confirm)) {
+                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->description; ?>">
+                        <?= Html::a(mb_substr($problem->description, 0, 130) . '...', ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-                        $responds = $model->confirm->responds;
+                <?php else : ?>
 
-                        $sumPositive = 0;
-                        foreach ($responds as $respond){
-                            if ($respond->descInterview->status == 1){
-                                $sumPositive++;
-                            }
-                        }
+                    <div class="column_description_of_stage column_block_text_min_1800">
+                        <?= Html::a($problem->description, ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-                        if($sumPositive !== 0){
+                <?php endif; ?>
 
-                            $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
 
-                        }else {
+                <div class="column_stage_confirm"><?= $problem->confirm->count_respond; ?></div>
 
-                            $valPositive = 0;
-                        }
+                <div class="column_stage_confirm"><?= $problem->confirm->count_positive; ?></div>
 
-                        return '<div class="table-kartik-link text-center">' . $valPositive . '%</div>';
+                <div class="column_stage_confirm"><?= $problem->confirm->dataMembersOfProblem; ?></div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                <div class="column_stage_confirm"><?= ($problem->confirm->dataDescInterviewsOfModel - $problem->confirm->dataMembersOfProblem); ?></div>
 
+                <div class="column_stage_confirm"><?= ($problem->confirm->count_respond - $problem->confirm->dataDescInterviewsOfModel); ?></div>
 
-                if (($model instanceof Gcp) === true) {
+                <div class="column_stage_confirm">
 
-                    if (!empty($model->confirm)) {
+                    <?php if ($problem->exist_confirm === 1) : ?>
 
-                        $responds = $model->confirm->responds;
+                        <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
+                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-                        $sumPositive = 0;
-                        foreach ($responds as $respond){
-                            if ($respond->descInterview->status == 1){
-                                $sumPositive++;
-                            }
-                        }
+                    <?php elseif ($problem->exist_confirm === null) : ?>
 
-                        if($sumPositive !== 0){
+                        <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
 
-                            $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+                    <?php elseif ($problem->exist_confirm === 0) : ?>
 
-                        }else {
+                        <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
+                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-                            $valPositive = 0;
-                        }
+                    <?php endif; ?>
 
-                        return '<div class="table-kartik-link text-center">' . $valPositive . '%</div>';
+                </div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                <div class="column_stage_confirm"></div>
 
+            </div>
 
-                if (($model instanceof Mvp) === true) {
+            <!--Если у проблемы не существует подтверждения-->
+            <?php else : ?>
 
-                    if (!empty($model->confirm)) {
+            <div class="stage_data_string">
 
-                        $responds = $model->confirm->responds;
+                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title'); ?></div>
 
-                        $sumPositive = 0;
-                        foreach ($responds as $respond){
-                            if ($respond->descInterview->status > 0){
-                                $sumPositive++;
-                            }
-                        }
 
-                        if($sumPositive !== 0){
+                <?php if (mb_strlen($problem->description) > 100) : ?>
 
-                            $valPositive = round(($sumPositive / count($responds) * 100) *100) / 100;
+                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->description; ?>">
+                        <?= Html::a(mb_substr($problem->description, 0, 100) . '...', ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-                        }else {
+                <?php else : ?>
 
-                            $valPositive = 0;
-                        }
+                    <div class="column_description_of_stage column_block_text_max_1800">
+                        <?= Html::a($problem->description, ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-                        return '<div class="table-kartik-link text-center">' . $valPositive . '%</div>';
+                <?php endif; ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
 
-            },
-            'format' => 'html',
-        ],
+                <?php if (mb_strlen($problem->description) > 130) : ?>
 
+                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->description; ?>">
+                        <?= Html::a(mb_substr($problem->description, 0, 130) . '...', ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-        [
-            'attribute' => 'minimum-positive',
-            'label' => 'Порог полож., %',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Порог</div><div class="font-header-table" style="font-size: 12px;font-weight: 500;">полож.,%</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'value' => function ($model) {
+                <?php else : ?>
 
-                if (($model instanceof GenerationProblem) === true) {
+                    <div class="column_description_of_stage column_block_text_min_1800">
+                        <?= Html::a($problem->description, ['/generation-problem/index/', 'id' => $problem->interview_id],
+                            ['class' => 'link_for_description_stage']); ?>
+                    </div>
 
-                    if (!empty($model->confirm)) {
+                <?php endif; ?>
 
-                        $minPositive = round(($model->confirm->count_positive / $model->confirm->count_respond * 100) *100) / 100;
 
-                        return '<div class="table-kartik-link text-center">' . $minPositive . '%</div>';
+                <div class="column_stage_confirm">-</div>
+                <div class="column_stage_confirm">-</div>
+                <div class="column_stage_confirm">-</div>
+                <div class="column_stage_confirm">-</div>
+                <div class="column_stage_confirm">-</div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                <div class="column_stage_confirm">
+                    <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                        ['/confirm-problem/create', 'id' => $problem->id], ['title' => 'Создать подтверждение']); ?>
+                </div>
 
+                <div class="column_stage_confirm"></div>
 
-                if (($model instanceof Gcp) === true) {
+            </div>
 
-                    if (!empty($model->confirm)) {
+            <?php endif; ?>
 
-                        $minPositive = round(($model->confirm->count_positive / $model->confirm->count_respond * 100) *100) / 100;
+            <!--Строки ценностных предложений-->
+            <?php foreach ($problem->gcps as $gcp) : ?>
 
-                        return '<div class="table-kartik-link text-center">' . $minPositive . '%</div>';
+                <!--Если у ценностного предложения существует подтверждение-->
+                <?php if($gcp->confirm) : ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                    <div class="stage_data_string">
 
+                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title'); ?></div>
 
-                if (($model instanceof Mvp) === true) {
 
-                    if (!empty($model->confirm)) {
+                        <?php if (mb_strlen($gcp->description) > 100) : ?>
 
-                        $minPositive = round(($model->confirm->count_positive / $model->confirm->count_respond * 100) *100) / 100;
+                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->description; ?>">
+                                <?= Html::a(mb_substr($gcp->description, 0, 100) . '...', ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                        return '<div class="table-kartik-link text-center">' . $minPositive . '%</div>';
+                        <?php else : ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                            <div class="column_description_of_stage column_block_text_max_1800">
+                                <?= Html::a($gcp->description, ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-            },
-            'format' => 'html',
-        ],
+                        <?php endif; ?>
 
 
-        [
-            'attribute' => 'result',
-            'label' => 'Вывод',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Вывод</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'hAlign' => GridView::ALIGN_CENTER,
-            'value' => function ($model) {
+                        <?php if (mb_strlen($gcp->description) > 130) : ?>
 
-                if (($model instanceof GenerationProblem) === true) {
+                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->description; ?>">
+                                <?= Html::a(mb_substr($gcp->description, 0, 130) . '...', ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                    if (!empty($model->confirm)) {
+                        <?php else : ?>
 
-                        if ($model->exist_confirm !== null) {
+                            <div class="column_description_of_stage column_block_text_min_1800">
+                                <?= Html::a($gcp->description, ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                            if ($model->exist_confirm == 1) {
-                                return Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]);
-                            }else {
-                                return Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]);
-                            }
-                        }else {
-                            return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]);
-                        }
+                        <?php endif; ?>
 
-                    }else {
-                        return '<div class="text-center"> - </div>';
-                    }
-                }
 
+                        <div class="column_stage_confirm"><?= $gcp->confirm->count_respond; ?></div>
 
-                if (($model instanceof Gcp) === true) {
+                        <div class="column_stage_confirm"><?= $gcp->confirm->count_positive; ?></div>
 
-                    if (!empty($model->confirm)) {
+                        <div class="column_stage_confirm"><?= $gcp->confirm->dataMembersOfGcp; ?></div>
 
-                        if ($model->exist_confirm !== null) {
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->dataDescInterviewsOfModel - $gcp->confirm->dataMembersOfGcp); ?></div>
 
-                            if ($model->exist_confirm == 1) {
-                                return Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]);
-                            }else {
-                                return Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]);
-                            }
-                        }else {
-                            return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]);
-                        }
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->count_respond - $gcp->confirm->dataDescInterviewsOfModel); ?></div>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                        <div class="column_stage_confirm">
 
+                            <?php if ($gcp->exist_confirm === 1) : ?>
 
-                if (($model instanceof Mvp) === true) {
+                                <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-                    if (!empty($model->confirm)) {
+                            <?php elseif ($gcp->exist_confirm === null) : ?>
 
-                        if ($model->exist_confirm !== null) {
+                                <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
 
-                            if ($model->exist_confirm == 1) {
-                                return Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]);
-                            }else {
-                                return Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]);
-                            }
-                        }else {
-                            return Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]);
-                        }
+                            <?php elseif ($gcp->exist_confirm === 0) : ?>
 
-                    }else {
-                        return '<div class="table-kartik-link text-center"> - </div>';
-                    }
-                }
+                                <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
 
-            },
-            'format' => 'html',
-        ],
+                            <?php endif; ?>
 
+                        </div>
 
-        [
-            'attribute' => 'business',
-            'label' => 'Бизнес-модель',
-            'header' => '<div class="font-header-table" style="font-size: 12px;font-weight: 500;">Бизнес-</div><div class="font-header-table" style="font-size: 12px;font-weight: 500;">модель</div>',
-            'groupOddCssClass' => 'kv',
-            'groupEvenCssClass' => 'kv',
-            'vAlign' => GridView::ALIGN_MIDDLE,
-            'width' => '90px',
-            //'options' => ['colspan' => 1],
-            'hAlign' => GridView::ALIGN_CENTER,
-            'value' => function ($model) {
+                        <div class="column_stage_confirm"></div>
 
-                if (($model instanceof Mvp) === true) {
+                    </div>
 
-                    if ($model->businessModel) {
-                        return Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]);
-                    }
-                }
+                    <!--Если у ценностного предложения не существует подтверждения-->
+                <?php else : ?>
 
-            },
-            'format' => 'html',
-        ],
+                    <div class="stage_data_string">
 
+                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title'); ?></div>
 
-        [
-            'attribute' => 'segment-line',
-            'label' => 'Сегмент',
-            'header' => '<div class="font-header-table" style="font-size: 12px; font-weight: 500;">Сегмент</div>',
-            'groupOddCssClass' => 'kv-grouped-row',
-            'groupEvenCssClass' => 'kv-grouped-row',
-            //'options' => ['colspan' => 1],
-            'value' => function ($model) {
+                        <?php if (mb_strlen($gcp->description) > 100) : ?>
 
-                if (($model instanceof GenerationProblem) === true) {
+                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->description; ?>">
+                                <?= Html::a(mb_substr($gcp->description, 0, 100) . '...', ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                    if (empty($model->id)) {
+                        <?php else : ?>
 
-                        foreach ($model->project->segments as $s => $segment) {
-                            if ($model->segment_id == $segment->id){
-                                return '<div class="table-kartik-link">Сегмент ' . ($s+1) . ': ' . $model->segment->name . '</div>';
-                            }
-                        }
-                    }else {
+                            <div class="column_description_of_stage column_block_text_max_1800">
+                                <?= Html::a($gcp->description, ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                        $arrS = explode('.', $model->description);
-                        $arrNumberSegment = explode('ГПС ',$arrS[0]);
-                        $numberSegment = $arrNumberSegment[1];
+                        <?php endif; ?>
 
-                        return '<div class="table-kartik-link">Сегмент ' . $numberSegment . ': ' . $model->segment->name . '</div>';
-                    }
-                }
 
-                if (($model instanceof Gcp) === true) {
+                        <?php if (mb_strlen($gcp->description) > 130) : ?>
 
-                    $arrS = explode('.', $model->description);
-                    $arrNumberSegment = explode('ГЦП ',$arrS[0]);
-                    $numberSegment = $arrNumberSegment[1];
+                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->description; ?>">
+                                <?= Html::a(mb_substr($gcp->description, 0, 130) . '...', ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                    return '<div class="table-kartik-link">Сегмент ' . $numberSegment . ': ' . $model->segment->name . '</div>';
-                }
+                        <?php else : ?>
 
-                if (($model instanceof Mvp) === true) {
+                            <div class="column_description_of_stage column_block_text_min_1800">
+                                <?= Html::a($gcp->description, ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                    ['class' => 'link_for_description_stage']); ?>
+                            </div>
 
-                    $arrS = explode('.', $model->description);
-                    $arrNumberSegment = explode('ГMVP ',$arrS[0]);
-                    $numberSegment = $arrNumberSegment[1];
+                        <?php endif; ?>
 
-                    return '<div class="table-kartik-link">Сегмент ' . $numberSegment . ': ' . $model->segment->name . '</div>';
-                }
 
+                        <div class="column_stage_confirm">-</div>
+                        <div class="column_stage_confirm">-</div>
+                        <div class="column_stage_confirm">-</div>
+                        <div class="column_stage_confirm">-</div>
+                        <div class="column_stage_confirm">-</div>
 
-            },
-            'format' => 'html',
-            //'hiddenFromExport' => true, // Убрать столбец при скачивании
-            'group' => true,  // enable grouping
-            'groupedRow' => true, // Группировка по строке
-            /*'groupFooter' => function ($model, $key, $index, $widget) {
-                return [
-                    //'mergeColumns' => [[1,3]], // columns to merge in summary
-                    'content' => [             // content to show in each summary cell
-                        1 => '<div class="table-kartik-link" style="padding: 0 5px;">Summary' . $model->segment->name . '</div>',
-                        //4 => 'привет',
-                    ],
-                    'options' => ['class' => 'info table-info','style' => 'font-weight:bold;']
-                ];
-            }*/
-        ],
+                        <div class="column_stage_confirm">
+                            <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                                ['/confirm-gcp/create', 'id' => $gcp->id], ['title' => 'Создать подтверждение']); ?>
+                        </div>
 
+                        <div class="column_stage_confirm"></div>
 
+                    </div>
 
+                <?php endif; ?>
 
-    ];
+                <!--Строки MVP(продуктов)-->
+                <?php foreach ($gcp->mvps as $mvp) : ?>
 
+                    <!--Если у MVP существует подтверждение-->
+                    <?php if($mvp->confirm) : ?>
 
+                        <div class="stage_data_string">
 
+                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title'); ?></div>
 
-    echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'showPageSummary' => true,
-        'pjax' => true,
-        'id' => 'reportTable',
-        'striped' => false,
-        'bordered' => true,
-        'condensed' => true,
-        'summary' => false,
-        'hover' => true,
 
-        'panel' => [
-            'type' => 'default',
-            'heading' => false,
-            //'headingOptions' => ['class' => 'style-head-table-kartik-top'],
-            'before' => '<div style="font-size: 30px; font-weight: 700; color: #F2F2F2;">Проект: «'. $project->project_name . '» ' . Html::a('Посмотреть описание', ['/projects/view', 'id' => $project->id], ['style' => ['font-size' => '12px', 'color' => '#F2F2F2', 'font-weight' => '300']]) .'</div>',
-            'beforeOptions' => ['class' => 'style-head-table-kartik-top']
-        ],
+                            <?php if (mb_strlen($mvp->description) > 100) : ?>
 
-        'toolbar' => [
-            '{export}',
-        ],
+                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->description; ?>">
+                                    <?= Html::a(mb_substr($mvp->description, 0, 100) . '...', ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
 
-        'exportContainer' => ['class' => 'btn-group-sm', 'style' => ['padding' => '5px 5px']],
-        //'toggleDataContainer' => ['class' => 'btn-group mr-2'],
+                            <?php else : ?>
 
-        'export'=>[
-            'showConfirmAlert'=>false,
-            'target'=>GridView::TARGET_BLANK,
-            'label' => '<span class="font-header-table" style="font-weight: 700;">Экпорт таблицы</span>',
-            'options' => ['title' => false],
-        ],
+                                <div class="column_description_of_stage column_block_text_max_1800">
+                                    <?= Html::a($mvp->description, ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
 
-        'columns' => $gridColumns,
+                            <?php endif; ?>
 
-        'exportConfig' => [
-            GridView::PDF => [
 
-                'filename' => 'Протокол_проекта_«'. $project_filename . '»',
+                            <?php if (mb_strlen($mvp->description) > 130) : ?>
 
-                'config' => [
+                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->description; ?>">
+                                    <?= Html::a(mb_substr($mvp->description, 0, 130) . '...', ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
 
-                    //'marginRight' => 10,
-                    //'marginLeft' => 10,
-                    //'cssInline' => '.positive-business-model-export{margin-right: 20px;}' .
-                    //'.presentation-business-model-export{margin-left: 20px;}',
+                            <?php else : ?>
 
-                    'methods' => [
-                        'SetHeader' => ['<div style="color: #3c3c3c;">Протокол проекта «'.$project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
-                        'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
-                    ],
+                                <div class="column_description_of_stage column_block_text_min_1800">
+                                    <?= Html::a($mvp->description, ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
 
-                    'options' => [
-                        //'title' => 'Сводная таблица проекта «'.$project->project_name.'»',
-                        //'subject' => Yii::t('kvgrid', 'PDF export generated by kartik-v/yii2-grid extension'),
-                        //'keywords' => Yii::t('kvgrid', 'krajee, grid, export, yii2-grid, pdf')
-                    ],
+                            <?php endif; ?>
 
-                    //'contentBefore' => '',
-                    //'contentAfter' => '',
-                ],
-            ],
-            /*GridView::EXCEL => [
 
-            ],
-            GridView::HTML => [
+                            <div class="column_stage_confirm"><?= $mvp->confirm->count_respond; ?></div>
 
-            ],*/
-        ],
+                            <div class="column_stage_confirm"><?= $mvp->confirm->count_positive; ?></div>
 
-        //'floatHeader'=>true,
-        //'floatHeaderOptions'=>['top'=>'50'],
-        'headerRowOptions' => ['class' => 'style-head-table-kartik-bottom'],
+                            <div class="column_stage_confirm"><?= $mvp->confirm->dataMembersOfMvp; ?></div>
 
-        'beforeHeader' => [
-            [
-                'columns' => [
-                    ['content' =>  'Наименование этапа', 'options' => ['colspan' => 1, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
-                    ['content' => 'Результаты теста', 'options' => ['colspan' => 5, 'class' => 'font-header-table', 'style' => ['padding' => '10px 0']]],
-                    ['content' => '', 'options' => ['colspan' => 1, 'class' => 'font-header-table']],
-                ],
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->dataDescInterviewsOfModel - $mvp->confirm->dataMembersOfMvp); ?></div>
 
-                'options' => [
-                    'class' => 'style-header-table-kartik',
-                ]
-            ]
-        ],
-    ]);
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->count_respond - $mvp->confirm->dataDescInterviewsOfModel); ?></div>
 
-    ?>
+                            <div class="column_stage_confirm">
+
+                                <?php if ($mvp->exist_confirm === 1) : ?>
+
+                                    <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+
+                                <?php elseif ($mvp->exist_confirm === null) : ?>
+
+                                    <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
+
+                                <?php elseif ($mvp->exist_confirm === 0) : ?>
+
+                                    <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <!--Бизнес модели-->
+                            <?php if ($mvp->businessModel) : ?>
+
+                                <div class="column_stage_confirm">
+                                    <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
+                                        ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть бизнес-модель']);?>
+                                </div>
+
+                            <?php elseif (empty($mvp->businessModel) && $mvp->exist_confirm === 1) : ?>
+
+                                <div class="column_stage_confirm">
+                                    <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                                        ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Создать бизнес-модель']);
+                                    ?>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div class="column_stage_confirm"></div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                        <!--Если у MVP не существует подтверждения-->
+                    <?php else : ?>
+
+                        <div class="stage_data_string">
+
+                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title'); ?></div>
+
+
+                            <?php if (mb_strlen($mvp->description) > 100) : ?>
+
+                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->description; ?>">
+                                    <?= Html::a(mb_substr($mvp->description, 0, 100) . '...', ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div class="column_description_of_stage column_block_text_max_1800">
+                                    <?= Html::a($mvp->description, ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <?php if (mb_strlen($mvp->description) > 130) : ?>
+
+                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->description; ?>">
+                                    <?= Html::a(mb_substr($mvp->description, 0, 130) . '...', ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div class="column_description_of_stage column_block_text_min_1800">
+                                    <?= Html::a($mvp->description, ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                        ['class' => 'link_for_description_stage']); ?>
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <div class="column_stage_confirm">-</div>
+                            <div class="column_stage_confirm">-</div>
+                            <div class="column_stage_confirm">-</div>
+                            <div class="column_stage_confirm">-</div>
+                            <div class="column_stage_confirm">-</div>
+
+                            <div class="column_stage_confirm">
+                                <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
+                                    ['/confirm-mvp/create', 'id' => $mvp->id], ['title' => 'Создать подтверждение']); ?>
+                            </div>
+
+                            <div class="column_stage_confirm"></div>
+
+                        </div>
+
+                    <?php endif; ?>
+
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+    <?php endforeach;?>
 
 </div>
+
+
+
 

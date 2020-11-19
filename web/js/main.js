@@ -358,3 +358,36 @@ $(document).on('click', 'body .openResultTableProject', function(e) {
 Добавляем контент в сводную таблицу проекта
 ---Конец---
  */
+
+
+/*
+Добавляем контент в протокол проекта
+---Начало---
+ */
+$(document).on('click', 'body .openReportProject', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#showReportProject');
+    var container = $(modal).find('.modal-body');
+    var header = $(modal).find('.modal-header').find('h2');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+            $(header).html('Протокол проекта «' + response.project.project_name + '»');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+/*
+Добавляем контент в протокол проекта
+---Конец---
+ */

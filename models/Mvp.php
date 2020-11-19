@@ -18,6 +18,9 @@ use yii\behaviors\TimestampBehavior;
  */
 class Mvp extends \yii\db\ActiveRecord
 {
+
+    public $propertyContainer;
+
     /**
      * {@inheritdoc}
      */
@@ -25,6 +28,19 @@ class Mvp extends \yii\db\ActiveRecord
     {
         return 'mvp';
     }
+
+
+    /**
+     * Mvp constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->propertyContainer = new PropertyContainer();
+
+        parent::__construct($config);
+    }
+
 
     public function getConfirm()
     {

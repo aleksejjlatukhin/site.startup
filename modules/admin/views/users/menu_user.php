@@ -67,6 +67,30 @@ use yii\helpers\Url;
 
         <?php if (!empty($user->projects)) : ?>
 
+            <li style="padding-bottom: 3px;"><a href="#">Протоколы</a>
+                <ul style="list-style: none;padding: 0 5px;">
+                    <?php foreach ($user->projects as $project) : ?>
+
+                        <li style="margin-bottom: -3px;">
+                            <?= Html::a(' - ' . $project->project_name, ['/projects/report', 'id' => $project->id], ['class' => 'openReportProject'])?>
+                        </li>
+
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+
+        <?php else : ?>
+
+            <li style="margin-bottom: 3px;">
+                <?= Html::a('Протоколы', Url::to(['/admin/users/profile', 'id' => $user['id']]))?>
+            </li>
+
+        <?php endif; ?>
+
+
+
+        <?php if (!empty($user->projects)) : ?>
+
             <li style="padding-bottom: 3px;"><a href="#">Презентации</a>
                 <ul style="list-style: none;padding: 0 5px;">
                     <?php foreach ($user->projects as $project) : ?>
