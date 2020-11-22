@@ -27,7 +27,7 @@ class SegmentController extends AppController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['update'])){
+        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = Segment::findOne(Yii::$app->request->get());
             $project = Projects::find()->where(['id' => $model->project_id])->one();
@@ -87,21 +87,12 @@ class SegmentController extends AppController
      */
     public function actionIndex($id)
     {
-
         $project = Projects::findOne($id);
         $models = Segment::findAll(['project_id' => $project->id]);
         $sortModel = new SortForm();
-        $newSegment = new FormCreateSegment();
-        $updateSegments = [];
-
-        foreach ($models as $model){
-            $updateSegments[] = new FormUpdateSegment($model->id);
-        }
 
         return $this->render('index', [
             'project' => $project,
-            'newSegment' => $newSegment,
-            'updateSegments' => $updateSegments,
             'models' => $models,
             'sortModel' => $sortModel,
         ]);
@@ -117,11 +108,12 @@ class SegmentController extends AppController
     {
         $sort = new SegmentSort();
 
-        $content = $sort->showModels($current_id, $type_sort_id);
-
         if (Yii::$app->request->isAjax) {
 
-            $response =  ['content' => $content];
+            $response =  ['renderAjax' => $this->renderAjax('_index_ajax', [
+                'models' => $sort->fetchModels($current_id, $type_sort_id)
+                ])
+            ];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;
@@ -131,7 +123,7 @@ class SegmentController extends AppController
 
     /**
      * @param $id
-     * @return array|string|\yii\web\Response
+     * @return array|bool
      */
     public function actionCreate($id)
     {
@@ -153,16 +145,34 @@ class SegmentController extends AppController
 
                             if ($project->save()){
 
-                                $new_segment = Segment::find()->where(['project_id' => $project->id])->orderBy(['id' => SORT_DESC])->one();
+                                $type_sort_id = $_POST['type_sort_id'];
 
-                                $response =  [
-                                    'success' => true,
-                                    'new_segment_id' => $new_segment->id,
-                                    'project_id' => $project->id
-                                ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
+                                if ($type_sort_id != '') {
+
+                                    $sort = new SegmentSort();
+
+                                    $response =  [
+                                        'success' => true,
+                                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                                            'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                        ]),
+                                    ];
+                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                    \Yii::$app->response->data = $response;
+                                    return $response;
+
+                                } else {
+
+                                    $response =  [
+                                        'success' => true,
+                                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                                            'models' => Segment::find()->where(['project_id' => $project->id])->all(),
+                                        ]),
+                                    ];
+                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                    \Yii::$app->response->data = $response;
+                                    return $response;
+                                }
                             }
                         }
 
@@ -214,10 +224,34 @@ class SegmentController extends AppController
 
                             if ($project->save()){
 
-                                $response =  ['success' => true, 'model_id' => $model->id];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
+                                $type_sort_id = $_POST['type_sort_id'];
+
+                                if ($type_sort_id != '') {
+
+                                    $sort = new SegmentSort();
+
+                                    $response =  [
+                                        'success' => true,
+                                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                                            'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                        ]),
+                                    ];
+                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                    \Yii::$app->response->data = $response;
+                                    return $response;
+
+                                } else {
+
+                                    $response =  [
+                                        'success' => true,
+                                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                                            'models' => Segment::find()->where(['project_id' => $project->id])->all(),
+                                        ]),
+                                    ];
+                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                    \Yii::$app->response->data = $response;
+                                    return $response;
+                                }
                             }
                         }
                     }else {
@@ -407,6 +441,45 @@ class SegmentController extends AppController
             return $response;
         }
         return false;
+    }
+
+
+
+    public function actionGetHypothesisToCreate ($id)
+    {
+        $project = Projects::findOne($id);
+        $model = new FormCreateSegment();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('create', [
+                    'model' => $model,
+                    'project' => $project
+                ]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = new FormUpdateSegment($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
     }
 
 

@@ -110,7 +110,7 @@ use app\models\Segment;
     <?php endif; ?>
 
 
-    <div style="font-weight: 700;">Объем рынка</div>
+    <div style="font-weight: 700;">Платежеспособность целевого сегмента</div>
     <div style="margin-bottom: 10px;"><?= number_format($segment->market_volume, 0, '', ' ') . ' млн. руб./год'; ?></div>
 
 

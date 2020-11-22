@@ -69,11 +69,12 @@
     text-decoration: none;
 }
 
-.headers_data_respond_hi {
+
+.headers_data_hypothesis_hi {
     font-weight: 700;
     color: #4F4F4F;
 }
-.headers_data_respond_low {
+.headers_data_hypothesis_low {
     font-size: 14px;
     color: #4F4F4F;
 }
@@ -142,6 +143,13 @@
 
     .link_in_the_header {
         text-align: right;
+    }
+
+    .row .all_headers_data_hypothesis {
+        margin: 0;
+        padding: 10px;
+        display:flex;
+        align-items: center;
     }
 }
 
