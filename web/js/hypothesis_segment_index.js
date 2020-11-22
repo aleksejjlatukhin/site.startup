@@ -94,7 +94,6 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
             //Если данные загружены и проверены
             if(response.success){
 
-                //Закрываем модальное окно и делаем перезагрузку
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
             }
@@ -215,8 +214,8 @@ $(body).change('#listType', function(){
                 $('.block_all_hypothesis').html(response.renderAjax);
             },
             error: function(){
-                alert('Ошибка')
-                ;}
+                alert('Ошибка');
+            }
         });
     }
 

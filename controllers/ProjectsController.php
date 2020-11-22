@@ -5,23 +5,11 @@ namespace app\controllers;
 use app\models\Authors;
 use app\models\BusinessModel;
 use app\models\ConfirmMvp;
-use app\models\FeedbackExpert;
-use app\models\FeedbackExpertConfirm;
-use app\models\FeedbackExpertGcp;
-use app\models\FeedbackExpertMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
-use app\models\Interview;
 use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\ProjectSort;
-use app\models\PropertyContainer;
-use app\models\Questions;
-use app\models\ReportProject;
-use app\models\Respond;
-use app\models\RespondsConfirm;
-use app\models\RespondsGcp;
-use app\models\RespondsMvp;
 use app\models\Roadmap;
 use app\models\Segment;
 use app\models\SortForm;
@@ -32,7 +20,6 @@ use app\models\Projects;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
-use yii\data\ArrayDataProvider;
 use yii\web\Response;
 
 
@@ -146,28 +133,58 @@ class ProjectsController extends AppController
     public function actionIndex($id)
     {
         $user = User::findOne($id);
-        $models = Projects::find()->where(['user_id' => $id])->all();
-
+        $models = Projects::findAll(['user_id' => $id]);
         $new_author = new Authors();
-        $newModel = new Projects();
-        $newModel->user_id = $id;
-
-        $workers = [];
-        foreach ($models as $model) {
-            $workers[] = Authors::find()->where(['project_id' => $model->id])->all();
-        }
-
-        //Модель сортировки
         $sortModel = new SortForm();
 
         return $this->render('index', [
             'user' => $user,
             'models' => $models,
             'new_author' => $new_author,
-            'workers' => $workers,
-            'newModel' => $newModel,
             'sortModel' => $sortModel,
         ]);
+    }
+
+
+    public function actionGetHypothesisToCreate ($id)
+    {
+        $user = User::findOne($id);
+        $model = new Projects();
+        $author = new Authors();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('create', [
+                    'user' => $user,
+                    'model' => $model,
+                    'author' => $author
+                ]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = Projects::findOne($id);
+        $workers = Authors::findAll(['project_id' => $id]);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('update', [
+                    'model' => $model,
+                    'workers' => $workers
+                ]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
     }
 
 
@@ -180,11 +197,12 @@ class ProjectsController extends AppController
     {
         $sort = new ProjectSort();
 
-        $content = $sort->showModels($current_id, $type_sort_id);
-
         if (Yii::$app->request->isAjax) {
 
-            $response =  ['content' => $content];
+            $response =  ['renderAjax' => $this->renderAjax('_index_ajax', [
+                'models' => $sort->fetchModels($current_id, $type_sort_id)
+                ])
+            ];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;
@@ -282,48 +300,6 @@ class ProjectsController extends AppController
 
     /**
      * @param $id
-     * @return string
-     */
-    public function actionUpshot($id)
-    {
-        $model = Projects::findOne($id);
-        $segments = Segment::find()->where(['project_id' => $model->id])->all();
-        $problems = [];
-        $offers = [];
-        $mvProducts = [];
-        $confirmMvps = [];
-        foreach ($segments as $segment){
-            $generationProblems = GenerationProblem::find()->where(['interview_id' => $segment->interview->id])->all();
-            foreach ($generationProblems as $k => $generationProblem){
-                $problems[] = $generationProblem;
-                $gcps = Gcp::find()->where(['confirm_problem_id' => $generationProblem->confirm->id])->all();
-                foreach ($gcps as $gcp){
-                    $offers[] = $gcp;
-                    $mvps = Mvp::find()->where(['confirm_gcp_id' => $gcp->confirm->id])->all();
-                    foreach ($mvps as $mvp){
-                        $mvProducts[] = $mvp;
-                        $confMvp = ConfirmMvp::find()->where(['mvp_id' => $mvp->id])->one();
-                        $confirmMvps[] = $confMvp;
-                    }
-                }
-            }
-        }
-
-        return $this->render('upshot', [
-            'model' => $model,
-            'segments' => $segments,
-            'generationProblems' => $generationProblems,
-            'problems' => $problems,
-            'offers' => $offers,
-            'mvProducts' => $mvProducts,
-            'confirmMvps' => $confirmMvps,
-
-        ]);
-    }
-
-
-    /**
-     * @param $id
      * @return array
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
@@ -369,10 +345,35 @@ class ProjectsController extends AppController
                             $model->present_files = UploadedFile::getInstances($model, 'present_files');
                             $model->upload($present_files_dir);
 
-                            $response =  ['success' => true, 'model_id' => $model->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
+                            //Проверка наличия сортировки
+                            $type_sort_id = $_POST['type_sort_id'];
+
+                            if ($type_sort_id != '') {
+
+                                $sort = new ProjectSort();
+
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => $sort->fetchModels($user->id, $type_sort_id),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+
+                            } else {
+
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => Projects::findAll(['user_id' => $user->id]),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
                         }
                     }
                 }else{
@@ -433,10 +434,35 @@ class ProjectsController extends AppController
                             $model->present_files = UploadedFile::getInstances($model, 'present_files');
                             $model->upload($present_files_dir);
 
-                            $response =  ['success' => true, 'model_id' => $model->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
+                            //Проверка наличия сортировки
+                            $type_sort_id = $_POST['type_sort_id'];
+
+                            if ($type_sort_id != '') {
+
+                                $sort = new ProjectSort();
+
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => $sort->fetchModels($user->id, $type_sort_id),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+
+                            } else {
+
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => Projects::findAll(['user_id' => $user->id]),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
+                            }
                         }
                     }
                 } else{
