@@ -390,6 +390,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                         ->textarea([
                             'rows' => 1,
                             'placeholder' => '',
+                            'maxlength' => true,
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             ]);
@@ -851,6 +852,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                                     <?= $form->field($updateRespondForms[$i], 'email', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
                                         'type' => 'email',
+                                        'maxlength' => true,
                                         'class' => 'style_form_field_respond form-control',
                                         'placeholder' => 'ivanov@gmail.com',
                                     ]); ?>
@@ -861,6 +863,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                                     <?= $form->field($updateRespondForms[$i], 'info_respond', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
                                         'rows' => 2,
+                                        'maxlength' => true,
                                         'required' => true,
                                         'class' => 'style_form_field_respond form-control',
                                         'placeholder' => 'Кто? Откуда? Чем занимается?',
@@ -987,6 +990,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                                 <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
                                 ->textarea([
                                     'row' => 2,
+                                    'maxlength' => true,
                                     'required' => true,
                                     'class' => 'style_form_field_respond form-control',
                                     ]);
@@ -1086,6 +1090,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                                     <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
                                     ->textarea([
                                         'row' => 2,
+                                        'maxlength' => true,
                                         'required' => true,
                                         'class' => 'style_form_field_respond form-control',
                                     ]);

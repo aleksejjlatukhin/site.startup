@@ -1377,6 +1377,10 @@ input[type="checkbox"]:checked + label:before {
 .arrow_link.active_arrow_link > span:last-of-type {
     transform: rotate(45deg);
 }
+/*---блок, который открывается с описанием стадий проекта---*/
+.block_description_stage {
+    display: none;
+}
 /*Стили для стрелки у ссылки с хлебными крошками
 ---Конец---
 */
@@ -1598,6 +1602,350 @@ a.link_in_column_result_table:focus {
 /* Стилизация сводной таблицы проекта
 ---Конец---
 */
+
+
+
+/*Стилизация страницы админка/проекты (порфель проектов)
+---Начало---
+*/
+.admin-projects-result .select_count_projects {
+    display:flex;
+    align-items: center;
+}
+@media screen and (min-width: 1600px) {
+    .admin-projects-result .select_count_projects {
+        width: 95%;
+    }
+}
+@media screen and (min-width: 1800px) {
+    .admin-projects-result .select_count_projects {
+        width: 85%;
+    }
+}
+
+
+.admin-projects-result .containerHeaderDataOfTableResultProject {
+    display:flex;
+    font-size: 12px;
+}
+.admin-projects-result .headerDataOfTableResultProject {
+    display:flex;
+    margin: 0 auto;
+    border-bottom: 1px solid #B4B4B4;
+    background: #F2F2F2;
+    width: 100%;
+}
+.admin-projects-result .blocks_for_double_header_level {
+    display:flex;
+    min-width: 94%;
+    width: 94%;
+}
+.admin-projects-result .blocks_for_single_header_level {
+    display:flex;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 6%;
+    width: 6%;
+    align-items: center;
+    padding-right: 10px;
+}
+.admin-projects-result .one_block_for_double_header_level {
+    min-width: 32.5%;
+    width: 32.5%;
+}
+.admin-projects-result .one_block_for_double_header_level:not(:first-child) {
+    margin-left: 10px;
+    min-width: 21.5%;
+    width: 21.5%;
+}
+.admin-projects-result .one_block_for_double_header_level .stage {
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+.admin-projects-result .one_block_for_double_header_level .columns_stage {
+    display: flex;
+}
+.admin-projects-result .one_block_for_double_header_level .columns_stage .column_segment_name {
+    min-width: 52%;
+    width: 52%;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .one_block_for_double_header_level:first-child .columns_stage .regular_column {
+    min-width: 16%;
+    width: 16%;
+}
+
+.admin-projects-result .one_block_for_double_header_level .columns_stage .regular_column {
+    min-width: 25%;
+    width: 25%;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .one_block_for_double_header_level .columns_stage .first_regular_column_of_stage {
+    max-width: 25%;
+    width: 25%;
+    padding: 0 0 10px 0;
+    color: #000000;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+
+
+
+.admin-projects-result .block_for_projectname_and_username {
+    display:flex;
+    height: 40px;
+    align-items: center;
+    background: #7F9FC5;
+    border-top: 1px solid #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+    font-size: 22px;
+    font-weight: 700;
+}
+.admin-projects-result .block_for_projectname_and_username a {
+    color: #F2F2F2;
+    text-decoration: none;
+    transition: color .3s;
+}
+.admin-projects-result .block_for_projectname_and_username a:hover,
+.admin-projects-result .block_for_projectname_and_username a:focus{
+    color: #ffffff;
+}
+.admin-projects-result .block_for_projectname_and_username a span {
+    margin-right: 5px;
+}
+
+
+.admin-projects-result .ratingOfProject {
+    display: flex;
+}
+.admin-projects-result .ratingOfProject .base_line {
+    width: 94%;
+    display:flex;
+}
+.admin-projects-result .ratingOfProject .business_models_line {
+    width: 6%;
+    z-index: 98;
+}
+.admin-projects-result .ratingOfProject .segments_line_success {
+    height: 10px;
+    background: #52BE7F;
+    width: 32.5%;
+}
+.admin-projects-result .ratingOfProject .segments_line_default {
+    height: 10px;
+    background: #C4C4C4;
+    width: 32.5%;
+}
+.admin-projects-result .ratingOfProject .rating_line_success {
+    height: 10px;
+    background: #52BE7F;
+    width: calc(21.5% + 10px);
+    z-index: 99;
+}
+.admin-projects-result .ratingOfProject .rating_line_default {
+    height: 10px;
+    background: #C4C4C4;
+    width: calc(21.5% + 10px);
+    z-index: 99;
+}
+.admin-projects-result .ratingOfProject .business_models_line_success {
+    height: 10px;
+    background: #52BE7F;
+    width: 150%;
+    margin-left: -50%;
+}
+.admin-projects-result .ratingOfProject .business_models_line_default {
+    height: 10px;
+    background: #C4C4C4;
+    width: 150%;
+    margin-left: -50%;
+}
+
+
+
+.admin-projects-result .containerDataOfTableResultProject {
+    display: flex;
+    font-size: 12px;
+}
+.admin-projects-result .dataOfTableResultProject {
+    margin: 0 auto;
+    width: 100%;
+}
+.admin-projects-result .dataOfTableResultProject .rowSegmentTableResultProject {
+    display:flex;
+}
+.admin-projects-result .dataOfTableResultProject .container_all_stage{
+    display:flex;
+    width: 100%;
+}
+.admin-projects-result .dataOfTableResultProject .column_segment_name {
+    min-width: 52%;
+    width: 52%;
+    padding: 5px 10px;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .column_segment_name span{
+    margin-right: 5px;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_segment {
+    min-width: 16%;
+    width: 16%;
+    padding: 5px 0;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_problem {
+    max-width: 7.275%;
+    width: 7.275%;
+    padding: 5px 0;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_gcp {
+    max-width: 10.44%;
+    width: 10.44%;
+    padding: 5px 0;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_mvp {
+    max-width: 18.55%;
+    width: 18.55%;
+    padding: 5px 0;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .column_business_model_for_mvp {
+    max-width: 22%;
+    width: 22%;
+    padding: 5px 0 5px 15px;
+}
+.admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_problem {
+    max-width: 7.275%;
+    width: 7.275%;
+    padding: 5px 0;
+    margin-left: 10px;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_gcp {
+    max-width: 10.43%;
+    width: 10.43%;
+    padding: 5px 0;
+    margin-left: 10px;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_mvp {
+    max-width: 18.55%;
+    width: 18.55%;
+    padding: 5px 0;
+    margin-left: 10px;
+    border-right: 1px solid #B4B4B4;
+    border-left: 1px solid #B4B4B4;
+}
+
+.admin-projects-result a.link_in_column_result_table {
+    color: #4F4F4F;
+    padding-bottom: 2px;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: all .3s ease;
+}
+.admin-projects-result a.link_in_column_result_table:hover {
+    color: #000000;
+    background-size: 100% 1px;
+}
+.admin-projects-result a.link_in_column_result_table:focus {
+    color: #000000;
+    background-size: 100% 1px;
+}
+
+
+@media screen and (min-width: 1600px) {
+
+    .admin-projects-result .containerHeaderDataOfTableResultProject {
+        font-size: 14px;
+    }
+    .admin-projects-result .blocks_for_single_header_level {
+        font-size: 16px;
+    }
+    .admin-projects-result .blocks_for_double_header_level .one_block_for_double_header_level .stage {
+        font-size: 16px;
+    }
+    .admin-projects-result .containerDataOfTableResultProject {
+        font-size: 14px;
+    }
+    .admin-projects-result .dataOfTableResultProject .column_business_model_for_mvp {
+        padding-left: 30px;
+    }
+}
+
+/*Стилизация страницы админка/проекты (порфель проектов)
+---Конец---
+*/
+
+
+
+/*Стилизация пагинации для страницы админка/проекты (порфель проектов)
+---Начало---
+*/
+.pagination-admin-projects-result {
+    margin: 15px 0;
+}
+ul.admin-projects-result-pagin-list {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+ul.admin-projects-result-pagin-list li {
+    display: inline;
+}
+ul.admin-projects-result-pagin-list li  {
+    display: flex;
+    float: left;
+    width: 45px;
+    height: 37px;
+    justify-content: center;
+    align-items: center;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+}
+ul.admin-projects-result-pagin-list li a {
+    color: #333333;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+ul.admin-projects-result-pagin-list li.pagination_active_page {
+    background-color: #7F9FC5;
+    border: 1px solid #7F9FC5;
+}
+ul.admin-projects-result-pagin-list li.pagination_active_page a{
+    color: white;
+}
+ul.admin-projects-result-pagin-list li:hover:not(.pagination_active_page) {
+    background-color: #ddd;
+}
+.admin-projects-result-pagin-list li:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.admin-projects-result-pagin-list li:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+/*Стилизация пагинации для страницы админка/проекты (порфель проектов)
+---Конец---
+*/
+
 
 
 /*Стили для таблицы - Протокол проекта

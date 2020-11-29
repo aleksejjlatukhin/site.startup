@@ -30,7 +30,7 @@ class FormUpdateConfirmSegment extends Model
         return [
             [['segment_id'], 'integer'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'trim'],
-            [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => 255],
+            [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => '2000'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
         ];
     }

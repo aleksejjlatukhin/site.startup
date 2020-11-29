@@ -31,6 +31,7 @@ use yii\helpers\Url;
 
             <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание минимально жизнеспособного продукта')->textarea([
                 'rows' => 2,
+                'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Примеры: презентация, макет, программное обеспечение, опытный образец, видео и т.д.',

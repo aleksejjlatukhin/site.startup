@@ -370,6 +370,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
                     ])->label('Какую потребность потребителя сегмента проверяем')
                         ->textarea([
                             'rows' => 1,
+                            'maxlength' => true,
                             'placeholder' => '',
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',

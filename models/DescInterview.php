@@ -64,7 +64,8 @@ class DescInterview extends \yii\db\ActiveRecord
             [['respond_id', 'description', 'result'], 'required'],
             [['respond_id', 'status'], 'integer'],
             [['description'], 'string'],
-            [['interview_file', 'server_file', 'result'], 'string', 'max' => 255],
+            [['interview_file', 'server_file'], 'string', 'max' => 255],
+            [['result'], 'string', 'max' => 2000],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
         ];
     }

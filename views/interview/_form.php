@@ -169,8 +169,9 @@ use app\models\Segment;
                             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                         ])->textarea([
                             'rows' => 1,
-                            'placeholder' => $placeholder,
+                            'maxlength' => true,
                             'required' => true,
+                            'placeholder' => $placeholder,
                             'class' => 'style_form_field_respond form-control',
                         ]);
                         ?>
@@ -185,8 +186,9 @@ use app\models\Segment;
                             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                         ])->textarea([
                             'rows' => 1,
-                            'placeholder' => $placeholder,
+                            'maxlength' => true,
                             'required' => true,
+                            'placeholder' => $placeholder,
                             'class' => 'style_form_field_respond form-control',
                         ]);
                         ?>
@@ -201,8 +203,9 @@ use app\models\Segment;
                             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                         ])->textarea([
                             'rows' => 1,
-                            'placeholder' => $placeholder,
+                            'maxlength' => true,
                             'required' => true,
+                            'placeholder' => $placeholder,
                             'class' => 'style_form_field_respond form-control',
                         ]);
                         ?>

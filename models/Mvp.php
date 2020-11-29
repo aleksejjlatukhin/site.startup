@@ -80,8 +80,7 @@ class Mvp extends \yii\db\ActiveRecord
         return [
             [['confirm_gcp_id', 'title', 'description'], 'required'],
             [['title', 'description'], 'trim'],
-            [['description'], 'string'],
-            [['title'], 'string', 'max' => 255],
+            [['title', 'description'], 'string', 'max' => 255],
             [['time_confirm', 'confirm_gcp_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'created_at', 'updated_at'], 'integer'],
 
         ];

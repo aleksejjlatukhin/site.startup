@@ -72,9 +72,9 @@ class Projects extends ActiveRecord
             [['created_at', 'updated_at','user_id',], 'integer'],
             [['invest_amount'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
-            [['description', 'patent_name', 'core_rid', 'layout_technology'], 'string'],
+            [['description', 'core_rid', 'layout_technology'], 'string'],
             ['project_name', 'string', 'min' => 3, 'max' => 32],
-            [['project_fullname', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
+            [['project_fullname', 'rid', 'patent_name', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology'], 'trim'],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls', 'maxFiles' => 10],
         ];

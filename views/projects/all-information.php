@@ -102,7 +102,7 @@ $string .= '<div class="panel panel-default"><div class="panel-heading" style="f
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Анонс проекта</div></div>
                     <div style="font-weight: 700;">Мероприятие, на котором проект анонсирован впервые</div><div style="margin-bottom: 10px;">'.$announcement_event.'</div>
-                    <div style="font-weight: 700;">Дата получения инвестиций</div><div style="margin-bottom: 20px;">'.$date_of_announcement.'</div>
+                    <div style="font-weight: 700;">Дата анонсирования проекта</div><div style="margin-bottom: 20px;">'.$date_of_announcement.'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Презентационные файлы</div></div>';
 

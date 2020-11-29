@@ -24,7 +24,7 @@ use yii\helpers\Url;
         <div class="col-md-12" style="margin-top: 10px;">
 
             <?= $form->field($model, 'good', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Формулировка перспективного продукта (товара / услуги):')->textInput([
-                'maxlength' => 255,
+                'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
@@ -61,7 +61,7 @@ use yii\helpers\Url;
 
             <?= $form->field($model, 'benefit', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Какую выгоду дает использование данного продукта потребителю (представителю сегмента):')->textarea([
                 'rows' => 2,
-                'maxlength' => 255,
+                'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Все выгоды формулируются по трем критериям: временной, экономический и качественный факторы.
@@ -76,7 +76,7 @@ use yii\helpers\Url;
 
             <?= $form->field($model, 'contrast', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('По сравнению с каким продуктом заявлена выгода (с чем сравнивается):')->textarea([
                 'rows' => 1,
-                'maxlength' => 255,
+                'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Укажите параметры аналога, с которыми сравниваются параметры нового продукта',

@@ -80,7 +80,7 @@ class Gcp extends \yii\db\ActiveRecord
         return [
             [['title', 'description'], 'trim'],
             [['time_confirm', 'confirm_problem_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'created_at', 'updated_at'], 'integer'],
-            [['description'], 'string'],
+            [['description'], 'string', 'max' => 1500],
             [['title'], 'string', 'max' => 255],
         ];
     }

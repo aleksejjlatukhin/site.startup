@@ -20,7 +20,7 @@ class FormCreateProblem extends Model
     {
         return [
             [['description'], 'trim'],
-            [['description'], 'string'],
+            [['description'], 'string', 'max' => 255],
         ];
     }
 

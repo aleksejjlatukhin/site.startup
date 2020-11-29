@@ -23,7 +23,7 @@ class FormCreateMvp extends Model
     {
         return [
             [['description'], 'trim'],
-            [['description'], 'string'],
+            [['description'], 'string', 'max' => 255],
         ];
     }
 

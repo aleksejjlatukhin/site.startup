@@ -16,17 +16,27 @@ $(document).ready(function() {
     }).on('click', function() {
         $('.arrow_link').toggleClass('active_arrow_link');
         if ($('.arrow_link').hasClass('active_arrow_link')) {
-            $('.segment_info_data').css('border-radius', '0');
+
             $('.block_description_stage').css({
-                'opacity': '1',
-                'max-height': '1000px',
-                'padding': '15px',
-                'transition': 'max-height 0.5s ease',
+                'display':'block',
             });
+
+            setTimeout(function() {
+                $('.segment_info_data').css('border-radius', '0');
+                $('.block_description_stage').css({
+                    'display':'block',
+                    'opacity': '1',
+                    'max-height': '1000px',
+                    'padding': '15px',
+                    'transition': 'max-height 0.5s ease',
+                });
+            }, 100);
+
         } else {
             $('.block_description_stage').css('max-height', '0');
             setTimeout(function() {$('.segment_info_data').css('border-radius', '0 0 12px 12px');}, 500);
-            setTimeout(function() {$('.block_description_stage').css({'padding': '0', 'opacity': '0',});}, 400);
+            setTimeout(function() {$('.block_description_stage').css({'padding': '0', 'opacity': '0'});}, 400);
+            setTimeout(function() {$('.block_description_stage').css({'display':'none'});}, 1000);
         }
     });
     /*--------------------------------------------*/
@@ -87,7 +97,6 @@ $(document).ready(function() {
     });
 
 
-
     /*
     Вкладки на странице "Программа генерации ГПС"
     ---это небольшая часть(остальное находится ниже)--
@@ -102,6 +111,7 @@ $(document).ready(function() {
     */
 
 });
+
 
 
 /*

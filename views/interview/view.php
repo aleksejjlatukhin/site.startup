@@ -354,6 +354,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);
@@ -370,6 +371,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);
@@ -386,6 +388,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);
@@ -843,6 +846,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                                     <?= $form->field($updateRespondForms[$i], 'email', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
                                         'type' => 'email',
+                                        'maxlength' => true,
                                         'class' => 'style_form_field_respond form-control',
                                         'placeholder' => 'ivanov@gmail.com',
                                     ]); ?>
@@ -854,6 +858,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                                     <?= $form->field($updateRespondForms[$i], 'info_respond', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
                                         'rows' => 1,
                                         'required' => true,
+                                        'maxlength' => true,
                                         'class' => 'style_form_field_respond form-control',
                                         'placeholder' => 'Кто? Откуда? Чем занимается?',
                                     ]); ?>
@@ -1073,8 +1078,9 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                             <div class="col-md-12" style="margin-top: -10px;">
 
-                                <?= $form->field($createDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}<span style="color: #BDBDBD; padding-left: 20px;">не более 255 символов</span></div><div>{input}</div>'])->textarea([
+                                <?= $form->field($createDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
                                     'rows' => 1,
+                                    'maxlength' => true,
                                     'required' => true,
                                     'class' => 'style_form_field_respond form-control',
                                     'placeholder' => 'Опишите краткий вывод по интервью',
@@ -1311,8 +1317,9 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                                     <div class="col-md-12" style="margin-top: -10px;">
 
-                                        <?= $form->field($updateDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}<span style="color: #BDBDBD; padding-left: 20px;">не более 255 символов</span></div><div>{input}</div>'])->textarea([
+                                        <?= $form->field($updateDescInterviewForms[$i], 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
                                             'rows' => 1,
+                                            'maxlength' => true,
                                             'required' => true,
                                             'class' => 'style_form_field_respond form-control',
                                             'placeholder' => 'Опишите краткий вывод по интервью',

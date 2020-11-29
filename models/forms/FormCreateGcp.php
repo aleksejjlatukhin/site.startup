@@ -24,7 +24,8 @@ class FormCreateGcp extends Model
     {
         return [
             [['good', 'benefit', 'contrast'], 'trim'],
-            [['good', 'benefit', 'contrast'], 'string', 'max' => 255],
+            [['good', 'contrast'], 'string', 'max' => 255],
+            [['benefit'], 'string', 'max' => 500],
         ];
     }
 

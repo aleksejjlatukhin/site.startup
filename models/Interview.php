@@ -31,7 +31,7 @@ class Interview extends \yii\db\ActiveRecord
             [['segment_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
-            [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => 255],
+            [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => '2000'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'trim'],
         ];
     }

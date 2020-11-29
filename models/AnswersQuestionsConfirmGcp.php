@@ -28,7 +28,7 @@ class AnswersQuestionsConfirmGcp extends ActiveRecord
     {
         return [
             [['question_id', 'respond_id'], 'required'],
-            [['answer'], 'string', 'max' => 255],
+            [['answer'], 'string', 'max' => 1000],
             [['answer'], 'trim'],
         ];
     }

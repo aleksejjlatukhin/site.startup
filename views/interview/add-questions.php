@@ -348,6 +348,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);
@@ -364,6 +365,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);
@@ -380,6 +382,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                     ])->textarea([
                         'rows' => 1,
                         'placeholder' => $placeholder,
+                        'maxlength' => true,
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                     ]);

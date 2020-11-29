@@ -98,6 +98,7 @@ use yii\helpers\Url;
 
                     <?= $form->field($model, 'description')->label(false)->textarea([
                         'rows' => 3,
+                        'maxlength' => true,
                         'required' => true,
                         'placeholder' => $placeholder,
                         'class' => 'style_form_field_respond form-control',

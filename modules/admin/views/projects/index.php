@@ -1,739 +1,135 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\Url;
-
+use app\models\ProjectSort;
+use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 ?>
 
 <?php
 
-$this->title = 'Админка | Проекты';
+$this->title = 'Портфель проектов';
 
 ?>
 
-<h2><?= $this->title; ?></h2>
-
-<br>
-
-
-<table class="table table-bordered table" style="width: 1140px;">
-    <thead>
-    <tr>
-        <th scope="col" rowspan="2" style="width: 200px; height: 60px; text-align: center;padding-bottom: 20px;">Наименование проета</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 20px;">Автор проекта</th>
-        <th scope="col" rowspan="2" style="width: 800px; height: 60px; text-align: center;padding-bottom: 30px;">Сегмент</th>
-        <th scope="col" rowspan="2" style="width: 150px; height: 60px; text-align: center;padding-bottom: 30px;">ГПС</th>
-        <th scope="col" colspan="2" style="width: 170px; height: 30px; text-align: center;padding-bottom: 2px;">Проблема сегмента</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 30px;">ГЦП</th>
-        <th scope="col" colspan="2" style="width: 160px; height: 30px; text-align: center;padding-bottom: 2px;">Ценностное предложение</th>
-        <th scope="col" rowspan="2" style="width: 130px; height: 60px; text-align: center;padding-bottom: 30px;">ГMVP</th>
-        <th scope="col" colspan="2" style="width: 160px; height: 30px; text-align: center;padding-bottom: 11px;">MVP (продукт)</th>
-        <th scope="col" rowspan="2" style="width: 140px; height: 60px; text-align: center;padding-bottom: 20px;">Бизнес-модель</th>
-    </tr>
-    <tr>
-        <td style="width: 70px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 110px;text-align: center;font-weight: 700;">Дата</td>
-        <td style="width: 60px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 100px;text-align: center;font-weight: 700;">Дата</td>
-        <td style="width: 50px;text-align: center;font-weight: 700;">Статус</td>
-        <td style="width: 100px;text-align: center;font-weight: 700;">Дата</td>
-    </tr>
-    </thead>
-    <tbody>
+<div class="admin-projects-result">
 
     <?php
-
-    foreach ($models as $k => $model){
-
-        echo '<tr style="text-align: center; font-size: 13px;">';
-
-        echo '<td style="font-weight: 700; height: ' . $minHeight *  $projectsRows[$k] . 'px;">' . Html::a(Html::encode($model->project_name), Url::to(['/projects/view', 'id' => $model->id])). '</td>';
-
-        echo '<td style="font-weight: 700; height: ' . $minHeight *  $projectsRows[$k] . 'px;">' . Html::a(Html::encode($model->user->second_name . ' ' . $model->user->first_name . ' ' . $model->user->middle_name), Url::to(['/projects/view', 'id' => $model->id])) . '</td>';
-
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment){
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта (здесь по умолчанию зеленый, т.к. в проекте должен быть как минимум один сегмент)
-                echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-            }
-
-
-            if ($segment->project->id == $model->id){
-
-                //Выводим названия сегментов
-                echo '<div class="border-gray" style="font-weight: 700; padding-top: 5px; height: ' . $minHeight *  $segmentsRows[$s] . 'px;">' . Html::a(Html::encode($segment->name), Url::to(['/segment/view', 'id' => $segment->id])). '</div>';
-
-            }
-        }
-
-        echo '</td>';
-
-        //Выводим ГПС
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countProblems[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                //Если у сегмента нет ГПС выводим следующее
-                if(empty($segment->interview->problems)){
-                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                }
-
-                //Если у сегмента есть ГПС выводим их названия
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-                        echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">
-                
-                                    <span data-toggle="tooltip" title="'.$problem->description.'">' . Html::a(Html::encode($problem->title), Url::to(['/generation-problem/view', 'id' => $problem->id])) . '</span>
-                
-                                </div>';
-                    }
-                }
-
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим подтверждение ГПС
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmProblems[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-                        //Если есть подтверждение то выводим его результат
-                        if ($problem->exist_confirm === 1) {
-                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">' . Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) . '</div>';
-                        }
-                        if ($problem->exist_confirm === 0) {
-                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">' . Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) . '</div>';
-                        }
-
-                        //Если у существующей ГПС нет подтверждения то выводим следующее
-                        if ($problem->exist_confirm === null && !empty($problem)) {
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">' . Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) . '</div>';
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим дату подтверждения ГПС
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmProblems[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-                        //Если есть подтверждение то выводим его результат
-                        if ($problem->exist_confirm === 1) {
-                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">'. date('d.m.y', strtotime($problem->date_confirm)) .'</div>';
-                        }
-                        if ($problem->exist_confirm === 0) {
-                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;">'. date('d.m.y', strtotime($problem->date_confirm)) .'</div>';
-                        }
-
-                        //Если у существующей ГПС нет подтверждения то выводим следующее
-                        if ($problem->exist_confirm === null && !empty($problem)) {
-                            echo '<div class="border-gray" style="line-height: ' . $minHeight * $problemsRows[$i] . 'px; height: ' . $minHeight * $problemsRows[$i] . 'px;"></div>';
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим ГЦП
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countOffers[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-                        //Если не существует ГЦП
-                        if (empty($problem->confirm->gcps)){
-
-                            if ($problem->exist_confirm === 0){
-
-                                //Если подтверждение ГПС отрицательное выводим следующее
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-
-                            }elseif ($problem->exist_confirm === 1){
-
-                                //Если подтверждение ГПС положительное выводим следующее
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-
-                            }elseif ($problem->exist_confirm === null){
-
-                                //Если подтверждение ГПС отсутствует или не закончено выводим следующее
-                                echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                            }
-                        }
-
-                        //Если существует ГЦП выводим названия
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">
-                            
-                                            <span data-toggle="tooltip" title="'.$offer->description.'">' . Html::a(Html::encode($offer->title), Url::to(['/gcp/view', 'id' => $offer->id])) . '</span>
-                            
-                                        </div>';
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-
-        //Выводим подтверждение ГЦП
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmOffers[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если не  существует ГЦП выводим следующее
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-
-                        //Если ГЦП существует
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                if ($offer->exist_confirm === 1) {
-
-                                    //Если подтверждение ГЦП положительное выводим следующее
-                                    echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                                if ($offer->exist_confirm === 0) {
-
-                                    //Если подтверждение ГЦП отрицательное выводим следующее
-                                    echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                                if ($offer->exist_confirm === null) {
-
-                                    //Если подтверждение ГЦП отсутствует или не закончено выводим следующее
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим дату подтверждения ГЦП
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmOffers[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если не  существует ГЦП выводим следующее
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-
-                        //Если ГЦП существует
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                if ($offer->exist_confirm === 1) {
-
-                                    //Если подтверждение ГЦП положительное выводим следующее
-                                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">'. date('d.m.y', strtotime($offer->date_confirm)) .'</div>';
-                                }
-                                if ($offer->exist_confirm === 0) {
-
-                                    //Если подтверждение ГЦП отрицательное выводим следующее
-                                    echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;">'. date('d.m.y', strtotime($offer->date_confirm)) .'</div>';
-                                }
-                                if ($offer->exist_confirm === null) {
-
-                                    //Если подтверждение ГЦП отсутствует или не закончено выводим следующее
-                                    echo '<div class="border-gray" style="line-height: ' . $minHeight * $offersRows[$j] . 'px; height: ' . $minHeight * $offersRows[$j] . 'px;"></div>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим ГMVP
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countMvp[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если отсутствует ГЦП выводим следующее
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        //Если ГЦП существует
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                //Если ГMVP не существует
-                                if (empty($offer->confirm->mvps)){
-
-                                    if ($offer->exist_confirm === 0){
-
-                                        //Если подтверждение ГЦП отрицательное выводим следующее
-                                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-
-                                    }elseif ($offer->exist_confirm === 1){
-
-                                        //Если подтверждение ГЦП положительное выводим следующее
-                                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-
-                                    }elseif ($offer->exist_confirm === null){
-
-                                        //Если подтверждение ГЦП отсутствует или не закончено выводим следующее
-                                        echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                    }
-                                }
-
-                                //Если ГMVP существует
-                                foreach ($mvProducts as $mvProduct) {
-
-                                    if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                        //Выводим название соответствующего ГMVP
-                                        echo '<div class="border-gray" style="font-weight: 700; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">
-                                
-                                                    <span data-toggle="tooltip" title="'.$mvProduct->description.'">' . Html::a(Html::encode($mvProduct->title), Url::to(['/mvp/view', 'id' => $mvProduct->id])) . '</span>
-                                
-                                                </div>';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-
-        //Выводим подтверждение ГMVP
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmMvp[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если отсутствует ГЦП
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                if (empty($offer->confirm->mvps)){
-
-                                    //Если отсутствует ГMVP
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                }
-
-                                foreach ($mvProducts as $mvProduct) {
-                                    if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                        if ($mvProduct->exist_confirm === 1) {
-
-                                            //Если подтверждение ГMVP положительное выводим следующее
-                                            echo '<div class="border-gray" style="color: green; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]]) .'</div>';
-                                        }
-                                        if ($mvProduct->exist_confirm === 0) {
-
-                                            //Если подтверждение ГMVP отрицательное выводим следующее
-                                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]]) .'</div>';
-                                        }
-                                        if ($mvProduct->exist_confirm === null) {
-
-                                            //Если подтверждение ГMVP отсутствует или не закончено выводим следующее
-                                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]]) .'</div>';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим дату подтверждения ГMVP
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countConfirmMvp[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если отсутствует ГЦП
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                if (empty($offer->confirm->mvps)){
-
-                                    //Если отсутствует ГMVP
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                }
-
-                                foreach ($mvProducts as $mvProduct) {
-                                    if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                        if ($mvProduct->exist_confirm === 1) {
-
-                                            //Если подтверждение ГMVP положительное выводим следующее
-                                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m.y', strtotime($mvProduct->date_confirm)) .'</div>';
-                                        }
-                                        if ($mvProduct->exist_confirm === 0) {
-
-                                            //Если подтверждение ГMVP отрицательное выводим следующее
-                                            echo '<div class="border-gray" style="font-weight: 700; font-size: 13px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">'. date('d.m.y', strtotime($mvProduct->date_confirm)) .'</div>';
-                                        }
-                                        if ($mvProduct->exist_confirm === null) {
-
-                                            //Если подтверждение ГMVP отсутствует или не закончено выводим следующее
-                                            echo '<div class="border-gray" style="line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;"> </div>';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-
-        //Выводим бизнес-модель
-        echo '<td style="padding: 0;">';
-
-        foreach ($segmentsM as $s => $segment) {
-
-            if ($s == 0){
-
-                //Выводим индикатор проекта
-                if ($countBusinessModel[$k] == 0 ){
-
-                    echo '<div class="border-gray bgc-warning" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-
-                }else {
-
-                    echo '<div class="border-gray bgc-success" style="height: ' . $minHeight *  1.5 . 'px;"></div>';
-                }
-            }
-
-            if ($segment->project->id == $model->id) {
-
-                foreach ($problems as $i => $problem) {
-
-                    if ($problem->interview_id == $segment->interview->id) {
-
-
-                        if (empty($problem->confirm->gcps)){
-
-                            //Если не существует ГЦП выводим следующее
-                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                        }
-
-                        //Если существует ГЦП
-                        foreach ($offers as $j => $offer) {
-
-                            if ($offer->confirm_problem_id == $problem->confirm->id) {
-
-                                if (empty($offer->confirm->mvps)){
-
-                                    //Если не существует ГMVP выводим следующее
-                                    echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                }
-
-
-                                //Если существует ГMVP
-                                foreach ($mvProducts as $k => $mvProduct) {
-
-                                    if ($mvProduct->confirm_gcp_id == $offer->confirm->id) {
-
-                                        //Если подтверждение ГMVP положительное
-                                        if ($mvProduct->exist_confirm === 1) {
-
-                                            foreach ($confirmMvps as $confirmMvp){
-
-                                                if ($confirmMvp->id == $mvProduct->confirm->id){
-
-                                                    if (empty($confirmMvp->business)){
-
-                                                        echo '<div class="border-gray" style="display: flex; justify-content: center; align-items: center; height: ' . $minHeight . 'px;">'. Html::a('Создать', ['/business-model/create', 'id' => $mvProducts[$k]->confirm->id], ['class' => 'btn btn-success btn-sm', 'style' => ['font-weight' => '700', 'width' => '90px']]) .'</div>';
-                                                    }else{
-                                                        echo '<div class="border-gray" style="display: flex; justify-content: center; align-items: center; height: ' . $minHeight . 'px;">'. Html::a('Посмотреть', ['/business-model/view', 'id' => $confirmMvp->business->id], ['class' => 'btn btn-success btn-sm', 'style' => ['font-weight' => '700', 'width' => '90px']]) .'</div>';
-
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if ($mvProduct->exist_confirm === 0) {
-
-                                            //Если подтверждение ГMVP отрицательное
-                                            echo '<div class="border-gray" style="color: red; font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                        }
-                                        if ($mvProduct->exist_confirm === null) {
-
-                                            //Если подтверждение ГMVP отсутствует или не закончено
-                                            echo '<div class="border-gray" style="font-size: 20px; line-height: ' . $minHeight . 'px; height: ' . $minHeight . 'px;">  </div>';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        echo '</td>';
-
-        echo '</tr>';
-    }
-
+    $form = ActiveForm::begin([
+        'options' => ['class' => 'g-py-15'],
+        'errorCssClass' => 'u-has-error-v1',
+        'successCssClass' => 'u-has-success-v1-1',
+    ]);
 
     ?>
 
-    </tbody>
-</table>
+    <div class="row" style="display:flex; align-items: center;">
+        <div class="col-md-10" style="font-size: 32px; text-transform: uppercase;"><?= $this->title; ?></div>
+        <div class="col-md-2">
+            <div class="row pull-right select_count_projects">
+
+                <div class="col-md-4" style="padding: 0;">
+                    <div class="pull-right" style="padding-top: 5px; font-size: 18px;">Показывать:</div>
+                </div>
+
+                <div class="col-md-8" style="">
+                    <?= $form->field($sortModel, 'field',
+                        ['template' => '<div style="padding-top: 15px;">{input}</div>'])
+                        ->widget(Select2::class, [
+                            'data' => $show_count_projects,
+                            'options' => ['id' => 'field_count_projects',],
+                            'hideSearch' => true, //Скрытие поиска
+                        ]);
+                    ?>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <?php
+    ActiveForm::end();
+    ?>
 
 
-<div style="font-size: 13px;">
+    <div class="containerHeaderDataOfTableResultProject">
+        <div class="headerDataOfTableResultProject">
+            <div class="blocks_for_double_header_level">
 
-    <p><span class="bolder">Сегмент</span> - целевой сегмент, по которому проводится исследование.</p>
-    <p><span class="bolder">Проблема сегмента</span> - подтвержденная гипотеза проблемы целевого сегмента.</p>
-    <p><span class="bolder">Ценностное предложение</span> - подтвержденная гипотеза ценностного предложения.</p>
-    <p><span class="bolder">MVP (продукт)</span> - подтвержденный минимально жизнеспособный продукт.</p>
-    <p><span class="bolder">Бизнес-модель</span> - построение бизнес-модели по Остервальдеру.</p>
+                <div class="one_block_for_double_header_level">
 
-    <p><span class="bolder">ГПС</span> - гипотеза проблемы целевого сегмента.</p>
-    <p><span class="bolder">ГЦП</span> - гипотеза ценностного предложения.</p>
-    <p><span class="bolder">ГMVP</span> - гипотеза минимально жизнеспособного продукта.</p>
+                    <div class="text-center stage">Сегмент</div>
 
-    <p style="padding-right: 80px;"><?= Html::img('@web/images/icons/green tick.png', ['style' => ['width' => '20px', 'padding-bottom' => '3px',]])?> - этап подтвержден.</p>
-    <p style="padding-right: 80px;"><?= Html::img('@web/images/icons/cross delete.png', ['style' => ['width' => '22px', 'padding-bottom' => '3px',]])?> - этап не подтвержден.</p>
-    <p><?= Html::img('@web/images/icons/fast forward.png', ['style' => ['width' => '18px', 'padding-bottom' => '3px',]])?> - этап, который требует дальнейшей реализации.</p>
+                    <div class="columns_stage">
+                        <div class="text-center column_segment_name">Наименование</div>
+                        <div class="text-center regular_column">Статус</div>
+                        <div class="text-center regular_column">Дата генер.</div>
+                        <div class="text-center regular_column">Дата подтв.</div>
+                    </div>
+
+                </div>
+
+
+                <div class="one_block_for_double_header_level">
+
+                    <div class="text-center stage">Проблемы сегмента</div>
+
+                    <div class="columns_stage">
+                        <div class="text-center first_regular_column_of_stage">Обознач.</div>
+                        <div class="text-center regular_column">Статус</div>
+                        <div class="text-center regular_column">Дата генер.</div>
+                        <div class="text-center regular_column">Дата подтв.</div>
+                    </div>
+
+                </div>
+
+
+                <div class="one_block_for_double_header_level">
+
+                    <div class="text-center stage">Ценностные предложения</div>
+
+                    <div class="columns_stage">
+                        <div class="text-center regular_column first_regular_column_of_stage">Обознач.</div>
+                        <div class="text-center regular_column">Статус</div>
+                        <div class="text-center regular_column">Дата генер.</div>
+                        <div class="text-center regular_column">Дата подтв.</div>
+                    </div>
+
+                </div>
+
+
+                <div class="one_block_for_double_header_level">
+
+                    <div class="text-center stage">MVP (продукт)</div>
+
+                    <div class="columns_stage">
+                        <div class="text-center first_regular_column_of_stage">Обознач.</div>
+                        <div class="text-center regular_column">Статус</div>
+                        <div class="text-center regular_column">Дата генер.</div>
+                        <div class="text-center regular_column">Дата подтв.</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="blocks_for_single_header_level text-center">
+                <div class="">Бизнес-модель</div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="allContainersDataOfTableResultProject">
+
+    </div>
 
 </div>
+
+
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/admin_project_portfolio_index.js'); ?>
+
+
