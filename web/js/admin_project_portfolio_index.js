@@ -60,6 +60,7 @@ $(body).on('click', '.pagination-admin-projects-result .admin-projects-result-pa
         success: function(response){
 
             $('.allContainersDataOfTableResultProject').html(response.renderAjax);
+            $('html, body').animate({scrollTop: 0});
         },
         error: function(){
             alert('Ошибка');
