@@ -236,22 +236,13 @@
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#707f99+0,707f99+100 */
-    background: #707f99; /* Old browsers */
-    background: -moz-linear-gradient(top,  #707f99 0%, #707f99 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  #707f99 0%,#707f99 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  #707f99 0%,#707f99 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707f99', endColorstr='#707f99',GradientType=0 ); /* IE6-9 */
+    background: #707f99;
     color: #ffffff;
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
-    background: #707f99; /* Old browsers */
-    background: -moz-linear-gradient(top,  #707f99 0%, #707f99 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  #707f99 0%,#707f99 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  #707f99 0%,#707f99 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707f99', endColorstr='#707f99',GradientType=0 ); /* IE6-9 */
+    background: #707f99;
     color: #ffffff;
     overflow: hidden;
     float: left;
@@ -342,7 +333,10 @@
     border: 1px solid #F2F2F2;
     outline: none;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+}
+.link_passive_create_interview:hover {
+    background: #707f99;
 }
 
 .link_create_interview-block_text {
@@ -1799,30 +1793,30 @@ a.link_in_column_result_table:focus {
     border-right: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .regular_column_for_problem {
-    max-width: 7.275%;
+    min-width: 7.275%;
     width: 7.275%;
     padding: 5px 0;
     border-right: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .regular_column_for_gcp {
-    max-width: 10.44%;
+    min-width: 10.44%;
     width: 10.44%;
     padding: 5px 0;
     border-right: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .regular_column_for_mvp {
-    max-width: 18.55%;
+    min-width: 18.55%;
     width: 18.55%;
     padding: 5px 0;
     border-right: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .column_business_model_for_mvp {
-    max-width: 22%;
+    min-width: 22%;
     width: 22%;
     padding: 5px 0 5px 15px;
 }
 .admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_problem {
-    max-width: 7.275%;
+    min-width: 7.275%;
     width: 7.275%;
     padding: 5px 0;
     margin-left: 10px;
@@ -1830,7 +1824,7 @@ a.link_in_column_result_table:focus {
     border-left: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_gcp {
-    max-width: 10.43%;
+    min-width: 10.43%;
     width: 10.43%;
     padding: 5px 0;
     margin-left: 10px;
@@ -1838,13 +1832,44 @@ a.link_in_column_result_table:focus {
     border-left: 1px solid #B4B4B4;
 }
 .admin-projects-result .dataOfTableResultProject .first_regular_column_of_stage_for_mvp {
-    max-width: 18.55%;
+    min-width: 18.55%;
     width: 18.55%;
     padding: 5px 0;
     margin-left: 10px;
     border-right: 1px solid #B4B4B4;
     border-left: 1px solid #B4B4B4;
 }
+
+
+.admin-projects-result .dataOfTableResultProject .regular_column_for_segment_empty {
+    min-width: 16%;
+    width: 16%;
+    padding: 5px 0;
+    min-height: 30px;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_problem_empty {
+    min-width: 7.275%;
+    width: 7.275%;
+    padding: 5px 0;
+    min-height: 30px;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_gcp_empty {
+    min-width: 10.44%;
+    width: 10.44%;
+    padding: 5px 0;
+    min-height: 30px;
+    border-right: 1px solid #B4B4B4;
+}
+.admin-projects-result .dataOfTableResultProject .regular_column_for_mvp_empty {
+    min-width: 18.55%;
+    width: 18.55%;
+    padding: 5px 0;
+    min-height: 30px;
+    border-right: 1px solid #B4B4B4;
+}
+
 
 .admin-projects-result a.link_in_column_result_table {
     color: #4F4F4F;
@@ -1882,6 +1907,13 @@ a.link_in_column_result_table:focus {
     }
     .admin-projects-result .dataOfTableResultProject .column_business_model_for_mvp {
         padding-left: 30px;
+    }
+
+    .admin-projects-result .dataOfTableResultProject .regular_column_for_segment_empty,
+    .admin-projects-result .dataOfTableResultProject .regular_column_for_problem_empty,
+    .admin-projects-result .dataOfTableResultProject .regular_column_for_gcp_empty,
+    .admin-projects-result .dataOfTableResultProject .regular_column_for_mvp_empty {
+        min-height: 31px;
     }
 }
 
@@ -1943,6 +1975,63 @@ ul.admin-projects-result-pagin-list li:hover:not(.pagination_active_page) {
     border-bottom-right-radius: 5px;
 }
 /*Стилизация пагинации для страницы админка/проекты (порфель проектов)
+---Конец---
+*/
+
+
+
+/*Стилизация пагинации респондентов для страниц подтверждений
+---Начало---
+*/
+.pagination-responds-confirm {
+    margin: 15px 0;
+}
+ul.responds-confirm-pagin-list {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+ul.responds-confirm-pagin-list li {
+    display: inline;
+}
+ul.responds-confirm-pagin-list li  {
+    display: flex;
+    float: left;
+    width: 45px;
+    height: 37px;
+    justify-content: center;
+    align-items: center;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+}
+ul.responds-confirm-pagin-list li a {
+    color: #333333;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+ul.responds-confirm-pagin-list li.pagination_active_page {
+    background-color: #707F99;
+    border: 1px solid #707F99;
+}
+ul.responds-confirm-pagin-list li.pagination_active_page a{
+    color: white;
+}
+ul.responds-confirm-pagin-list li:hover:not(.pagination_active_page) {
+    background-color: #ddd;
+}
+.responds-confirm-pagin-list li:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.responds-confirm-pagin-list li:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+/*Стилизация пагинации респондентов для страниц подтверждений
 ---Конец---
 */
 
@@ -2100,5 +2189,40 @@ a.link_for_description_stage:focus {
 }
 
 /*Стили для таблицы - Протокол проекта
+---Конец---
+*/
+
+
+/*Стили для всплывающих модальных окон
+---Начало---
+*/
+
+body .next_step_error .modal-content { /*невозможность перехода на следующий этап*/
+    background-color: #707F99;
+}
+
+body .information-table-questions .modal-content { /*информации о вопросах для подтверждения*/
+    background-color: #707F99;
+}
+
+body .error_respond_modal_style .modal-content { /*Модальные окна с ошибками при работе с респондентами*/
+    background-color: #707F99;
+}
+
+body .not_exist_confirm_modal .modal-header { /*Модальные окно выбора завершения подтверждения - header*/
+    background-color: #707F99;
+    color: #ffffff;
+    border-radius: 5px 5px 0 0;
+}
+body .not_exist_confirm_modal .modal-body { /*Модальные окно выбора завершения подтверждения - body*/
+    background-color: #F2F2F2;
+    color: #4F4F4F;
+}
+body .not_exist_confirm_modal .modal-footer { /*Модальные окно выбора завершения подтверждения - footer*/
+    background-color: #707F99;
+    border-radius: 0 0 5px 5px;
+}
+
+/*Стили для всплывающих модальных окон
 ---Конец---
 */

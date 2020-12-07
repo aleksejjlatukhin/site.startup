@@ -15,7 +15,7 @@ use app\models\User;
 use Yii;
 use app\models\RespondsGcp;
 use yii\web\NotFoundHttpException;
-use app\models\UpdateRespondGcpForm;
+use app\models\forms\UpdateRespondGcpForm;
 
 
 class RespondsGcpController extends AppController

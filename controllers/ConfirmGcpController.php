@@ -14,7 +14,7 @@ use app\models\QuestionsConfirmGcp;
 use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
 use app\models\Segment;
-use app\models\UpdateRespondGcpForm;
+use app\models\forms\UpdateRespondGcpForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;

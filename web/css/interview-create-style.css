@@ -56,7 +56,8 @@
 .container-data {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 330px);
+    margin-bottom: -10px;
 }
 
 .row_header_data {

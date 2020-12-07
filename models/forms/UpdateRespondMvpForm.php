@@ -1,14 +1,16 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
+use app\models\RespondsMvp;
 
-class UpdateRespondConfirmForm extends Model
+class UpdateRespondMvpForm extends Model
 {
+
     public $id;
-    public $confirm_problem_id;
+    public $confirm_mvp_id;
     public $name;
     public $info_respond;
     public $email;
@@ -41,9 +43,9 @@ class UpdateRespondConfirmForm extends Model
 
     public function __construct($id, $config = [])
     {
-        $respond = RespondsConfirm::findOne($id);
+        $respond = RespondsMvp::findOne($id);
         $this->id = $id;
-        $this->confirm_problem_id = $respond->confirm_problem_id;
+        $this->confirm_mvp_id = $respond->confirm_mvp_id;
         $this->name = $respond->name;
         $this->info_respond = $respond->info_respond;
         $this->email = $respond->email;

@@ -118,9 +118,25 @@ class DescInterviewController extends AppController
         }
     }
 
+
+    public function actionGetDataCreateForm($id)
+    {
+        $respond = Respond::findOne($id);
+        $model = new DescInterview();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
-     * @return DescInterview|bool
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionCreate($id)
@@ -128,12 +144,6 @@ class DescInterviewController extends AppController
         $model = new DescInterview();
         $model->respond_id = $id;
         $respond = Respond::find()->where(['id' => $id])->one();
-
-        //Если у респондента уже есть интервью, то отменить действие
-        if ($respond->descInterview){
-            return false;
-        }
-
         $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
@@ -166,7 +176,7 @@ class DescInterviewController extends AppController
 
                     if ($project->save()){
 
-                        $response = $model;
+                        $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;
@@ -177,9 +187,24 @@ class DescInterviewController extends AppController
     }
 
 
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = DescInterview::findOne($id);
+        $respond = $model->respond;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
-     * @return DescInterview
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -224,7 +249,7 @@ class DescInterviewController extends AppController
 
                     if ($project->save()){
 
-                        $response = $model;
+                        $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;
                         return $response;

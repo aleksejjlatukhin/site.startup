@@ -42,7 +42,8 @@ class Respond extends \yii\db\ActiveRecord
             [['name', 'info_respond', 'place_interview', 'email'], 'trim'],
             [['interview_id'], 'integer'],
             [['date_plan'], 'integer'],
-            [['name', 'info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 100],
+            [['info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }

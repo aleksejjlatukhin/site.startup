@@ -9,7 +9,7 @@ use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
-use app\models\UpdateRespondConfirmForm;
+use app\models\forms\UpdateRespondConfirmForm;
 use app\models\User;
 use Yii;
 use app\models\RespondsConfirm;

@@ -2,15 +2,13 @@
 
 namespace app\controllers;
 
-use app\models\DescInterview;
+use app\models\forms\FormCreateConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\forms\FormUpdateConfirmSegment;
-use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
 use app\models\Segment;
-use app\models\forms\UpdateRespondForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -146,44 +144,12 @@ class InterviewController extends AppController
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $responds = Respond::find()->where(['interview_id' => $id])->all();
-
-        $queryResponds = Respond::find()->where(['interview_id' => $id]);
-        $dataProviderQueryResponds = new ActiveDataProvider([
-            'query' => $queryResponds,
-            'pagination' => false,
-            //'pagination' => ['pageSize' => 10],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'name' => SORT_ASC,
-                ]
-            ],
-        ]);
-
-        $questions = Questions::find()->where(['interview_id' => $id])->all();
-
+        $questions = Questions::findAll(['interview_id' => $id]);
         $newQuestion = new Questions();
-        $newQuestion->interview_id = $id;
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
-
-        $newRespond = new Respond();
-        $newRespond->interview_id = $model->id;
-
-        $updateRespondForms = [];
-        $createDescInterviewForms = [];
-        $updateDescInterviewForms = [];
-        foreach ($responds as $i => $respond) {
-
-            $updateRespondForms[] = new UpdateRespondForm($respond->id);
-
-            $createDescInterviewForms[] = new DescInterview();
-
-            $updateDescInterviewForms[] = $respond->descInterview;
-        }
 
 
         return $this->render('view', [
@@ -191,15 +157,9 @@ class InterviewController extends AppController
             'formUpdateConfirmSegment' => $formUpdateConfirmSegment,
             'segment' => $segment,
             'project' => $project,
-            'responds' => $responds,
-            'dataProviderQueryResponds' => $dataProviderQueryResponds,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
-            'newRespond' => $newRespond,
             'queryQuestions' => $queryQuestions,
-            'updateRespondForms' => $updateRespondForms,
-            'createDescInterviewForms' => $createDescInterviewForms,
-            'updateDescInterviewForms' => $updateDescInterviewForms,
         ]);
     }
 
@@ -319,8 +279,7 @@ class InterviewController extends AppController
     {
         $segment = Segment::findOne($id);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $model = new Interview();
-        $model->segment_id = $id;
+        $model = new FormCreateConfirmSegment();
 
         if (empty($segment)){
             //Отсутствуют данные сегмента
@@ -350,75 +309,44 @@ class InterviewController extends AppController
     {
         $segment = Segment::findOne($id);
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $model = new Interview();
+        $model = new FormCreateConfirmSegment();
         $model->segment_id = $id;
-        $user = User::find()->where(['id' => $project->user_id])->one();
 
         $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
         if (!empty($modelInterview)){ return $this->redirect(['/interview/view', 'id' => $modelInterview->id]); }
         if (empty($segment)){ return $this->redirect(['/segment/index', 'id' => $project->id]); }
 
-
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive  && $model->count_respond > 0 && $model->count_positive > 0){
+                if ($model = $model->create()){
 
-                    if ($model->save()){
+                    //Создание респондентов по заданному значению count_respond
+                    $model->createRespond();
 
-                        $interviews_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/';
-                        if (!file_exists($interviews_dir)) {
-                            mkdir($interviews_dir, 0777);
-                        }
+                    //Вопросы, которые будут добавлены по-умолчанию
+                    $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
+                    $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
+                    $model->addQuestionDefault('Вас беспокоит данная ситуация?');
+                    $model->addQuestionDefault('Что вы пытались с этим сделать?');
+                    $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
+                    $model->addQuestionDefault('Если ничего не делали, то почему?');
+                    $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
+                    $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
+                    $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
+                    $model->addQuestionDefault('Как принимается решение о покупке?');
 
-                        $generation_problems_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                            mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/generation problems/';
-                        if (!file_exists($generation_problems_dir)) {
-                            mkdir($generation_problems_dir, 0777);
-                        }
+                    $project->updated_at = time();
 
-                        //Создание респондентов по заданному значению count_respond
-                        $model->createRespond();
+                    if ($project->save()) {
 
-                        //Вопросы, которые будут добавлены по-умолчанию
-                        $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
-                        $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
-                        $model->addQuestionDefault('Вас беспокоит данная ситуация?');
-                        $model->addQuestionDefault('Что вы пытались с этим сделать?');
-                        $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
-                        $model->addQuestionDefault('Если ничего не делали, то почему?');
-                        $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
-                        $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
-                        $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
-                        $model->addQuestionDefault('Как принимается решение о покупке?');
+                        $response =  ['success' => true, 'id' => $model->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
 
-                        $project->updated_at = time();
-
-                        if ($project->save()) {
-
-                            $response =  [
-                                'success' => true,
-                                'id' => $model->id,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-
-                        }
                     }
-                }else{
-
-                    $response =  [
-                        'error' => true,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-
                 }
             }
         }
@@ -435,18 +363,6 @@ class InterviewController extends AppController
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segment::find()->where(['id' => $model->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        $dataProviderQuestions = new ActiveDataProvider([
-            'query' => Questions::find()->where(['interview_id' => $id]),
-            'pagination' => false,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_ASC,
-                    //'title' => SORT_ASC,
-                ]
-            ],
-        ]);
-
         $questions = Questions::find()->where(['interview_id' => $id])->all();
         $newQuestion = new Questions();
         $newQuestion->interview_id = $id;
@@ -456,7 +372,6 @@ class InterviewController extends AppController
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
 
         return $this->render('add-questions', [
-            'dataProviderQuestions' => $dataProviderQuestions,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
@@ -483,38 +398,27 @@ class InterviewController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive && $model->count_respond > 0 && $model->count_positive > 0){
+                if ($update_confirm_segment = $model->update()){
 
-                    if ($update_confirm_segment = $model->update()){
+                    $project->updated_at = time();
 
-                        $project->updated_at = time();
+                    if ($project->save()){
 
-                        if ($project->save()){
-
-                            $descInterviews = [];
-                            foreach ($update_confirm_segment->responds as $respond) {
-                                if($respond->descInterview) {
-                                    $descInterviews[] = $respond->descInterview;
-                                }
+                        $descInterviews = [];
+                        foreach ($update_confirm_segment->responds as $respond) {
+                            if($respond->descInterview) {
+                                $descInterviews[] = $respond->descInterview;
                             }
-
-                            $response = [
-                                'model' => $update_confirm_segment,
-                                'responds' => $update_confirm_segment->responds,
-                                'descInterviews' => $descInterviews,
-                                'problems' => $update_confirm_segment->problems,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
                         }
-                    }
-                }else{
 
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                        $response = [
+                            'success' => true,
+                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $update_confirm_segment, 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id)]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
@@ -556,6 +460,7 @@ class InterviewController extends AppController
                         'model' => $model,
                         'questions' => $questions,
                         'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
@@ -595,6 +500,7 @@ class InterviewController extends AppController
                 $response = [
                     'questions' => $questions,
                     'queryQuestions' => $queryQuestions,
+                    'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;

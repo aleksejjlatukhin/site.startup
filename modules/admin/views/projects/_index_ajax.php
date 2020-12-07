@@ -100,13 +100,17 @@ use yii\helpers\Html;
                                     ?>
                                 </div>
 
-                            <?php elseif ($segment->exist_confirm === null) : ?>
+                            <?php elseif ($segment->interview && $segment->exist_confirm === null) : ?>
 
                                 <div class="text-center regular_column_for_segment">
                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                        ['/interview/create', 'id' => $segment->id], ['title'=> 'Подтвердить сегмент']);
+                                        ['/interview/view', 'id' => $segment->interview->id], ['title'=> 'Посмотреть подтверждение сегмента']);
                                     ?>
                                 </div>
+
+                            <?php elseif (empty($segment->interview) && $segment->exist_confirm === null) : ?>
+
+                                <div class="text-center regular_column_for_segment_empty">- - -</div>
 
                             <?php endif; ?>
 
@@ -130,20 +134,7 @@ use yii\helpers\Html;
 
                                 <div class="" style="display:flex; height: 100%;">
 
-                                    <?php if ($segment->exist_confirm === 1) : ?>
-
-                                        <div class="text-center first_regular_column_of_stage_for_problem">
-                                            <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                ['/generation-problem/index', 'id' => $segment->interview->id], ['title'=> 'Создать ГПС']);
-                                            ?>
-                                        </div>
-
-                                    <?php else : ?>
-
-                                        <div class="text-center first_regular_column_of_stage_for_problem"></div>
-
-                                    <?php endif; ?>
-
+                                    <div class="text-center first_regular_column_of_stage_for_problem"></div>
                                     <div class="text-center regular_column_for_problem"></div>
                                     <div class="text-center regular_column_for_problem"></div>
                                     <div class="text-center regular_column_for_problem"></div>
@@ -193,13 +184,17 @@ use yii\helpers\Html;
                                                 ?>
                                             </div>
 
-                                        <?php elseif ($problem->exist_confirm === null) : ?>
+                                        <?php elseif ($problem->confirm && $problem->exist_confirm === null) : ?>
 
                                             <div class="text-center regular_column_for_problem">
                                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                    ['/confirm-problem/create', 'id' => $problem->id], ['title'=> 'Подтвердить ГПС']);
+                                                    ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title'=> 'Посмотреть подтверждение ГПС']);
                                                 ?>
                                             </div>
+
+                                        <?php elseif (empty($problem->confirm) && $problem->exist_confirm === null) : ?>
+
+                                            <div class="text-center regular_column_for_problem_empty">- - -</div>
 
                                         <?php endif; ?>
 
@@ -219,20 +214,7 @@ use yii\helpers\Html;
                                                 <!--Если у проблемы отсутствуют гипотезы ценностных предложений-->
                                                 <?php if (empty($problem->gcps)) : ?>
 
-                                                    <?php if ($problem->exist_confirm === 1) : ?>
-
-                                                        <div class="text-center first_regular_column_of_stage_for_gcp">
-                                                            <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                ['/gcp/index', 'id' => $problem->confirm->id], ['title'=> 'Создать ГЦП']);
-                                                            ?>
-                                                        </div>
-
-                                                    <?php else : ?>
-
-                                                        <div class="text-center first_regular_column_of_stage_for_gcp"></div>
-
-                                                    <?php endif; ?>
-
+                                                    <div class="text-center first_regular_column_of_stage_for_gcp"></div>
                                                     <div class="text-center regular_column_for_gcp"></div>
                                                     <div class="text-center regular_column_for_gcp"></div>
                                                     <div class="text-center regular_column_for_gcp"></div>
@@ -274,13 +256,17 @@ use yii\helpers\Html;
                                                             ?>
                                                         </div>
 
-                                                    <?php elseif ($gcp->exist_confirm === null) : ?>
+                                                    <?php elseif ($gcp->confirm && $gcp->exist_confirm === null) : ?>
 
                                                         <div class="text-center regular_column_for_gcp">
                                                             <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                ['/confirm-gcp/create', 'id' => $gcp->id], ['title'=> 'Подтвердить ГЦП']);
+                                                                ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title'=> 'Посмотреть подтверждение ГЦП']);
                                                             ?>
                                                         </div>
+
+                                                    <?php elseif (empty($gcp->confirm) && $gcp->exist_confirm === null) : ?>
+
+                                                        <div class="text-center regular_column_for_gcp_empty">- - -</div>
 
                                                     <?php endif; ?>
 
@@ -299,20 +285,7 @@ use yii\helpers\Html;
 
                                                             <div class="" style="display:flex; height: 100%;">
 
-                                                                <?php if ($gcp->exist_confirm === 1) : ?>
-
-                                                                    <div class="text-center first_regular_column_of_stage_for_mvp">
-                                                                        <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                            ['/mvp/index', 'id' => $gcp->confirm->id], ['title'=> 'Создать MVP']);
-                                                                        ?>
-                                                                    </div>
-
-                                                                <?php else : ?>
-
-                                                                    <div class="text-center first_regular_column_of_stage_for_mvp"></div>
-
-                                                                <?php endif; ?>
-
+                                                                <div class="text-center first_regular_column_of_stage_for_mvp"></div>
                                                                 <div class="text-center regular_column_for_mvp"></div>
                                                                 <div class="text-center regular_column_for_mvp"></div>
                                                                 <div class="text-center regular_column_for_mvp"></div>
@@ -352,13 +325,17 @@ use yii\helpers\Html;
                                                                         ?>
                                                                     </div>
 
-                                                                <?php elseif ($mvp->exist_confirm === null) : ?>
+                                                                <?php elseif ($mvp->confirm && $mvp->exist_confirm === null) : ?>
 
                                                                     <div class="text-center regular_column_for_mvp">
                                                                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                            ['/confirm-mvp/create', 'id' => $mvp->id], ['title'=> 'Подтвердить MVP']);
+                                                                            ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть подтверждение MVP']);
                                                                         ?>
                                                                     </div>
+
+                                                                <?php elseif (empty($mvp->confirm) && $mvp->exist_confirm === null) : ?>
+
+                                                                    <div class="text-center regular_column_for_mvp_empty">- - -</div>
 
                                                                 <?php endif; ?>
 
@@ -375,14 +352,6 @@ use yii\helpers\Html;
                                                                     <div class="text-center column_business_model_for_mvp">
                                                                         <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
                                                                             ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть бизнес-модель']);?>
-                                                                    </div>
-
-                                                                <?php elseif (empty($mvp->businessModel) && $mvp->exist_confirm === 1) : ?>
-
-                                                                    <div class="text-center column_business_model_for_mvp">
-                                                                        <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                            ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Создать бизнес-модель']);
-                                                                        ?>
                                                                     </div>
 
                                                                 <?php else : ?>

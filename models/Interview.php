@@ -2,14 +2,7 @@
 
 namespace app\models;
 
-use Yii;
-use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 
-/**
- * This is the model class for table "interview".
- */
 class Interview extends \yii\db\ActiveRecord
 {
 
@@ -37,11 +30,27 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'segment_id' => 'Segment ID',
+            'count_respond' => 'Количество респондентов',
+            'count_positive' => 'Количество респондентов, соответствующих сегменту',
+            'greeting_interview' => 'Приветствие в начале встречи',
+            'view_interview' => 'Представление интервьюера',
+            'reason_interview' => 'Почему мне интересно',
+        ];
+    }
+
+
     public function getSegment()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
-
 
     public function getQuestions()
     {
@@ -223,22 +232,5 @@ class Interview extends \yii\db\ActiveRecord
         }
 
         return $sumPositive;
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'segment_id' => 'Segment ID',
-            'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Количество респондентов, соответствующих сегменту',
-            'greeting_interview' => 'Приветствие в начале встречи',
-            'view_interview' => 'Представление интервьюера',
-            'reason_interview' => 'Почему мне интересно',
-        ];
     }
 }

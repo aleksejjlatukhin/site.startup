@@ -1,6 +1,16 @@
 
 $(document).ready(function() {
 
+    //Динамическое изменение высоты и ширины textarea
+    /*---------------------------------------*/
+    $('body').on('input', 'textarea', function() {
+
+        this.style.height = '60px';
+        this.style.width = '100%';
+        this.style.height = (this.scrollHeight + 6) + 'px';
+    });
+    /*-----------------------------------------*/
+
     // Показать описание стадии
     /*--------------------------------------------*/
     $('.view_desc_stage').hover(function() {

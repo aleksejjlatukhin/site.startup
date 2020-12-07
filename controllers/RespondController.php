@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\DescInterview;
+use app\models\forms\CreateRespondForm;
+use app\models\forms\FormUpdateConfirmSegment;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
@@ -10,6 +12,7 @@ use app\models\forms\UpdateRespondForm;
 use app\models\User;
 use Yii;
 use app\models\Respond;
+use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
 class RespondController extends AppController
@@ -102,6 +105,22 @@ class RespondController extends AppController
         }
     }
 
+
+    public function actionGetDataCreateForm($id)
+    {
+        $interview = Interview::findOne($id);
+        $model = new CreateRespondForm();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['interview' => $interview, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -113,24 +132,19 @@ class RespondController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $limit_count_respond = Respond::LIMIT_COUNT;
-
-        $newRespond = new Respond();
+        $newRespond = new CreateRespondForm();
         $newRespond->interview_id = $id;
+
         if ($newRespond->load(Yii::$app->request->post()))
         {
-            $kol = 0;
-            foreach ($models as $elem){
-                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
-                    $kol++;
-                }
-            }
-
             if(Yii::$app->request->isAjax) {
 
                 if (count($models) < $limit_count_respond) {
 
-                    if ($kol == 0) {
-                        if ($newRespond->save()) {
+                    if ($newRespond->validate(['name'])) {
+
+                        if ($newRespond->create()) {
+
                             $interview->count_respond = $interview->count_respond + 1;
                             $interview->save();
 
@@ -138,10 +152,14 @@ class RespondController extends AppController
                             if ($project->save()) {
 
                                 $responds = Respond::find()->where(['interview_id' => $id])->all();
+                                $page = floor((count($responds) - 1) / 10) + 1;
 
                                 $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
+                                    'page' => $page,
+                                    'interview_id' => $id,
+                                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id)]),
                                 ];
 
                                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -165,6 +183,21 @@ class RespondController extends AppController
         }
     }
 
+
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = new UpdateRespondForm($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return Respond|array
@@ -174,63 +207,26 @@ class RespondController extends AppController
     {
         $model = $this->findModel($id);
         $updateRespondForm = new UpdateRespondForm($id);
-
         $interview = Interview::find()->where(['id' => $model->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $models = Respond::find()->where(['interview_id' => $interview->id])->all();
-        $user = User::find()->where(['id' => $project->user_id])->one();
 
         if ($updateRespondForm->load(Yii::$app->request->post())) {
 
-            $kol = 0;
-            foreach ($models as $item){
-                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
-                    $kol++;
-                }
-            }
-
             if(Yii::$app->request->isAjax) {
 
-                if ($kol == 0){
+                if ($updateRespondForm->validate(['name'])){
 
-                    foreach ($models as $elem){
-
-                        if ($updateRespondForm->id == $elem->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) != mb_strtolower(str_replace(' ', '',$elem->name))){
-
-                            $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                                mb_convert_encoding($this->translit($elem->name) , "windows-1251") . '/';
-
-                            $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                                mb_convert_encoding($this->translit($updateRespondForm->name) , "windows-1251") . '/';
-
-                            if (file_exists($old_dir)){
-                                rename($old_dir, $new_dir);
-                            }
-                        }
-                    }
-
-                    $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                        mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                        mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                        mb_convert_encoding($this->translit($updateRespondForm->name) , "windows-1251") . '/';
-                    if (!file_exists($respond_dir)){
-                        mkdir($respond_dir, 0777);
-                    }
-
-                    if ($updateRespondForm->updateRespond($model)){
+                    if ($updateRespondForm->updateRespond()){
 
                         $project->updated_at = time();
 
                         if ($project->save()){
 
+                            $response = ['interview_id' => $interview->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $model;
-                            return $model;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
 
@@ -244,6 +240,43 @@ class RespondController extends AppController
         }
     }
 
+
+    /**
+     * @param $id
+     * @return Respond
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataModel($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = $model;
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    public function actionGetQueryResponds($id, $page)
+    {
+        $model = Interview::findOne($id);
+        $queryResponds = Respond::find()->where(['interview_id' => $id]);
+        $pagesResponds = new Pagination(['totalCount' => $queryResponds->count(), 'page' => ($page - 1), 'pageSize' => 10]);
+        $pagesResponds->pageSizeParam = false; //убираем параметр $per-page
+        $responds = $queryResponds->offset($pagesResponds->offset)->limit(10)->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['ajax_data_responds' => $this->renderAjax('view_ajax', ['model' => $model, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
 
 
     public function actionDelete ($id) {
@@ -297,7 +330,11 @@ class RespondController extends AppController
                     $interview->save();
                 }
 
-                $response = ['success' => true];
+                $response = [
+                    'success' => true,
+                    'interview_id' => $interview->id,
+                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne([$interview->id]), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment([$interview->id])]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;
