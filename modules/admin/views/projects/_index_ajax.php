@@ -23,33 +23,78 @@ use yii\helpers\Html;
         <div class="row ratingOfProject">
 
             <div class="base_line">
-                <!--Наличие сегментов-->
+                <!--Наличие положительного подтверждения у сегментов-->
                 <?php if ($project->segments) : ?>
-                    <div class="segments_line_success"></div>
+
+                    <?php $count_exist_confirm_segment = 0; ?>
+                    <?php foreach ($project->segments as $segment) : ?>
+                        <?php if ($segment->exist_confirm === 1) $count_exist_confirm_segment++; ?>
+                    <?php endforeach; ?>
+
+                    <?php if ($count_exist_confirm_segment > 0) : ?>
+                        <div class="segments_line_success"></div>
+                    <?php else : ?>
+                        <div class="segments_line_default"></div>
+                    <?php endif; ?>
+
                 <?php else : ?>
                     <div class="segments_line_default"></div>
                 <?php endif; ?>
 
-                <!--Наличие проблем сегментов-->
+                <!--Наличие положительного подтверждения у проблем сегментов-->
                 <?php if ($project->problems) : ?>
-                    <div class="rating_line_success"></div>
+
+                    <?php $count_exist_confirm_problem = 0; ?>
+                    <?php foreach ($project->problems as $problem) : ?>
+                        <?php if ($problem->exist_confirm === 1) $count_exist_confirm_problem++; ?>
+                    <?php endforeach; ?>
+
+                    <?php if ($count_exist_confirm_problem > 0) : ?>
+                        <div class="rating_line_success"></div>
+                    <?php else : ?>
+                        <div class="rating_line_default"></div>
+                    <?php endif; ?>
+
                 <?php else : ?>
                     <div class="rating_line_default"></div>
                 <?php endif; ?>
 
-                <!--Наличие ценностных предложений-->
+                <!--Наличие положительного подтверждения у ценностных предложений-->
                 <?php if ($project->gcps) : ?>
-                    <div class="rating_line_success"></div>
+
+                    <?php $count_exist_confirm_gcp = 0; ?>
+                    <?php foreach ($project->gcps as $gcp) : ?>
+                        <?php if ($gcp->exist_confirm === 1) $count_exist_confirm_gcp++; ?>
+                    <?php endforeach; ?>
+
+                    <?php if ($count_exist_confirm_gcp > 0) : ?>
+                        <div class="rating_line_success"></div>
+                    <?php else : ?>
+                        <div class="rating_line_default"></div>
+                    <?php endif; ?>
+
                 <?php else : ?>
                     <div class="rating_line_default"></div>
                 <?php endif; ?>
 
-                <!--Наличие mvps-->
+                <!--Наличие положительного подтверждения у mvps-->
                 <?php if ($project->mvps) : ?>
-                    <div class="rating_line_success"></div>
+
+                    <?php $count_exist_confirm_mvp = 0; ?>
+                    <?php foreach ($project->mvps as $mvp) : ?>
+                        <?php if ($mvp->exist_confirm === 1) $count_exist_confirm_mvp++; ?>
+                    <?php endforeach; ?>
+
+                    <?php if ($count_exist_confirm_mvp > 0) : ?>
+                        <div class="rating_line_success"></div>
+                    <?php else : ?>
+                        <div class="rating_line_default"></div>
+                    <?php endif; ?>
+
                 <?php else : ?>
                     <div class="rating_line_default"></div>
                 <?php endif; ?>
+
             </div>
 
             <div class="business_models_line">
