@@ -1,6 +1,6 @@
 
-//Форма создания модели подтверждения сегмента
-$('#new_confirm_segment').on('beforeSubmit', function(e){
+//Форма создания модели подтверждения
+$('#new_confirm_problem').on('beforeSubmit', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
@@ -15,7 +15,7 @@ $('#new_confirm_segment').on('beforeSubmit', function(e){
 
             if (response.success) {
 
-                window.location.href = '/interview/add-questions?id=' + response.id;
+                window.location.href = '/confirm-problem/add-questions?id=' + response.id;
             }
         },
         error: function(){

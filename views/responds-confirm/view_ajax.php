@@ -5,7 +5,7 @@ use app\models\User;
 
 ?>
 
-<!--Список респондентов-->
+
 <div class="block_all_responds">
 
     <?php foreach ($responds as $respond): ?>
@@ -45,55 +45,35 @@ use app\models\User;
 
             </div>
 
-            <div class="col-md-2" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->info_respond; ?>">
+            <div class="col-md-5" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->info_respond; ?>">
                 <?= $respond->info_respond; ?>
             </div>
 
-            <div class="col-md-2" style="font-size: 14px; padding: 0 5px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->place_interview; ?>">
-                <?= $respond->place_interview; ?>
+            <div class="col-md-2" style="padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->email; ?>">
+                <?= $respond->email; ?>
             </div>
 
-            <div class="col-md-1">
-
-                <?php
-                if (!empty($respond->date_plan)){
-
-                    echo '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $respond->date_plan) . '</div>';
-                }
-                ?>
-
-            </div>
-
-            <div class="col-md-1">
+            <div class="col-md-1 text-center" style="padding: 0; margin-left: -7px;">
 
                 <?php
                 if (!empty($respond->descInterview)){
 
                     $date_fact = date("d.m.y", $respond->descInterview->updated_at);
-                    echo '<div class="text-center">' . Html::encode($date_fact) . '</div>';
+                    echo '<div class="">' . Html::encode($date_fact) . '</div>';
 
-                }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan)
-                    && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
+                }elseif (!empty($respond->info_respond) && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
-                    echo '<div class="text-center">' . Html::a(
+                    echo '<div class="">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
-                            ['/respond/data-availability', 'id' => $model->id], [
+                            ['/responds-confirm/data-availability', 'id' => $model->id], [
                             'id' => 'respond_descInterview_form-' . $respond->id,
                             'class' => 'showDescInterviewCreateForm',
-                            'title' => 'Добавить интервью'
+                            'title' => 'Добавить анкету'
                         ]) .
                         '</div>';
                 } ?>
 
             </div>
-
-            <?php if ($respond->descInterview) : ?>
-                <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->descInterview->result; ?>">
-                    <?= $respond->descInterview->result; ?>
-                </div>
-            <?php else : ?>
-                <div class="col-md-2"></div>
-            <?php endif; ?>
 
             <div class="col-md-1" style="text-align: right;">
 
@@ -105,7 +85,7 @@ use app\models\User;
                         echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
                             'id' => 'descInterview_form-' . $respond->descInterview->id,
                             'class' => 'showDescInterviewUpdateForm',
-                            'title' => 'Редактировать результаты интервью',
+                            'title' => 'Редактировать результаты опроса',
                         ]);
                     }
 
@@ -125,7 +105,7 @@ use app\models\User;
                         echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
                             'id' => 'descInterview_form-' . $respond->descInterview->id,
                             'class' => 'showDescInterviewUpdateForm',
-                            'title' => 'Редактировать результаты интервью',
+                            'title' => 'Редактировать результаты опроса',
                         ]);
                     }
                     ?>
@@ -164,12 +144,12 @@ use app\models\User;
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
-            Соответствуют сегменту: <?= $model->dataMembersOfSegment;?>
+            Подтверждают проблему: <?= $model->dataMembersOfProblem;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-            Не соответствуют сегменту: <?= ($model->dataDescInterviewsOfModel - $model->dataMembersOfSegment);?>
+            Не подтверждают проблему: <?= ($model->dataDescInterviewsOfModel - $model->dataMembersOfProblem);?>
         </div>
 
         <div class="" style="padding: 0;">
@@ -183,46 +163,46 @@ use app\models\User;
 
                 <?php if ($model->buttonMovingNextStage === true) : ?>
 
-                    <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $model->id],[
-                    'style' => [
-                        'display' => 'flex',
-                        'align-items' => 'center',
-                        'justify-content' => 'center',
-                        'background' => '#52BE7F',
-                        'width' => '140px',
-                        'height' => '40px',
-                        'font-size' => '24px',
-                        'border-radius' => '8px',
-                    ],
-                    'class' => 'btn btn-lg btn-success',
-                    'id' => 'button_MovingNextStage',
+                    <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#52BE7F',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-lg btn-success',
+                        'id' => 'button_MovingNextStage',
                     ]);?>
 
                 <?php else : ?>
 
-                    <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $model->id],[
-                    'style' => [
-                        'display' => 'flex',
-                        'align-items' => 'center',
-                        'justify-content' => 'center',
-                        'background' => '#E0E0E0',
-                        'color' => '#FFFFFF',
-                        'width' => '140px',
-                        'height' => '40px',
-                        'font-size' => '24px',
-                        'border-radius' => '8px',
-                    ],
-                    'class' => 'btn btn-lg btn-default',
-                    'id' => 'button_MovingNextStage',
+                    <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#E0E0E0',
+                            'color' => '#FFFFFF',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ],
+                        'class' => 'btn btn-lg btn-default',
+                        'id' => 'button_MovingNextStage',
                     ]);?>
 
                 <?php endif; ?>
 
             <?php else : ?>
 
-                <?php if ($model->segment->exist_confirm == 1) : ?>
+                <?php if ($model->problem->exist_confirm == 1) : ?>
 
-                    <?= Html::a( 'Далее', ['/generation-problem/index', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/gcp/index', 'id' => $model->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',

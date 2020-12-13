@@ -22,7 +22,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
     }
 
-
     public function getFeedbacks()
     {
         return $this->hasMany(FeedbackExpertConfirm::class, ['confirm_problem_id' => 'id']);
@@ -77,15 +76,13 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     public function createRespondConfirm ($responds)
     {
         foreach ($responds as $respond) {
-            if ($respond->descInterview->status == 1){
 
-                $respondConfirm = new RespondsConfirm();
-                $respondConfirm->confirm_problem_id = $this->id;
-                $respondConfirm->name = $respond->name;
-                $respondConfirm->info_respond = $respond->info_respond;
-                $respondConfirm->email = $respond->email;
-                $respondConfirm->save();
-            }
+            $respondConfirm = new RespondsConfirm();
+            $respondConfirm->confirm_problem_id = $this->id;
+            $respondConfirm->name = $respond->name;
+            $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->email = $respond->email;
+            $respondConfirm->save();
         }
     }
 
@@ -153,6 +150,11 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @param $question_id
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function deleteAnswerConfirmProblem ($question_id)
     {
         //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
@@ -201,19 +203,14 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = 0;
-        $count_positive = 0;
 
-        foreach ($this->responds as $respond) {
+        $count_descInterview = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
 
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $this->id, 'desc_interview_confirm.status' => '1'])->count();
 
         if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->gcps))) {
             return true;
@@ -225,43 +222,33 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
     public function getDataRespondsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->info_respond)){
-                $sum++;
-            }
-        }
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count = RespondsConfirm::find()->where(['confirm_problem_id' => $this->id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-        return $sum;
+        return $count;
     }
 
 
     public function getDataDescInterviewsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if ($respond->descInterview){
-                $sum++;
-            }
-        }
+        // Кол-во респондентов, у кот-х существует анкета
+        $count = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
 
-        return $sum;
+        return $count;
     }
 
 
     public function getDataMembersOfProblem()
     {
-        $sumPositive = 0; // Кол-во подтвердивших проблему
-        foreach ($this->responds as $respond){
+        //Кол-во респондентов, кот-е подтвердили проблему
+        $count = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $this->id, 'desc_interview_confirm.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-        return $sumPositive;
+        return $count;
     }
 
 }

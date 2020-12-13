@@ -187,9 +187,14 @@ class DescInterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionGetDataUpdateForm($id)
     {
-        $model = DescInterview::findOne($id);
+        $model = $this->findModel($id);
         $respond = $model->respond;
 
         if(Yii::$app->request->isAjax) {

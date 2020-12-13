@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\DescInterviewConfirm;
+use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
 use app\models\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
@@ -12,7 +12,6 @@ use app\models\QuestionsConfirmProblem;
 use app\models\Respond;
 use app\models\RespondsConfirm;
 use app\models\Segment;
-use app\models\forms\UpdateRespondConfirmForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -154,52 +153,28 @@ class ConfirmProblemController extends AppController
     {
         $model = ConfirmProblem::findOne($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
         $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id])->all();
-
         $newQuestion = new QuestionsConfirmProblem();
-        $newQuestion->confirm_problem_id = $id;
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
 
-        $newRespond = new RespondsConfirm();
-        $newRespond->confirm_problem_id = $model->id;
-
-        $updateRespondForms = [];
-        $createDescInterviewForms = [];
-        $updateDescInterviewForms = [];
-
-        foreach ($responds as $i => $respond) {
-
-            $updateRespondForms[] = new UpdateRespondConfirmForm($respond->id);
-
-            $createDescInterviewForms[] = new DescInterviewConfirm();
-
-            $updateDescInterviewForms[] = $respond->descInterview;
-        }
-
 
         return $this->render('view', [
             'model' => $model,
             'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
-            'generationProblem' => $generationProblem,
+            'problem' => $problem,
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'responds' => $responds,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
-            'newRespond' => $newRespond,
             'queryQuestions' => $queryQuestions,
-            'updateRespondForms' => $updateRespondForms,
-            'createDescInterviewForms' => $createDescInterviewForms,
-            'updateDescInterviewForms' => $updateDescInterviewForms,
         ]);
     }
 
@@ -212,19 +187,14 @@ class ConfirmProblemController extends AppController
     {
         $model = ConfirmProblem::findOne($id);
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
+        $count_positive = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $id, 'desc_interview_confirm.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
 
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps)  && $model->count_positive <= $count_positive)) {
@@ -261,19 +231,13 @@ class ConfirmProblemController extends AppController
         $model = ConfirmProblem::findOne($id);
         $problem = $model->problem;
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $id, 'desc_interview_confirm.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -367,27 +331,24 @@ class ConfirmProblemController extends AppController
      */
     public function actionCreate($id)
     {
-        $model = new ConfirmProblem();
-        $model->gps_id = $id;
-
+        $model = new FormCreateConfirmProblem();
         $generationProblem = GenerationProblem::findOne($id);
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
-        if (!empty($generationProblem->confirm)){
+        //кол-во представителей сегмента
+        $count_represent_segment = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->count();
+
+        $model->count_respond = $count_represent_segment;
+
+        if ($generationProblem->confirm){
+            //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $generationProblem->confirm->id]);
         }
 
-        $respondsPre = []; // представители сегмента
-        foreach ($responds as $respond){
-            if ($respond->descInterview->status == 1){
-                $respondsPre[] = $respond;
-            }
-        }
-
-        $model->count_respond = count($respondsPre);
 
         return $this->render('create', [
             'model' => $model,
@@ -405,97 +366,57 @@ class ConfirmProblemController extends AppController
      */
     public function actionSaveConfirmProblem($id)
     {
-        $model = new ConfirmProblem();
+        $model = new FormCreateConfirmProblem();
         $model->gps_id = $id;
 
         $generationProblem = GenerationProblem::findOne($id);
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-
-
-        if (!empty($generationProblem->confirm)){
-            return $this->redirect(['view', 'id' => $generationProblem->confirm->id]);
-        }
-
-
-        $respondsPre = []; // представители сегмента
-        foreach ($responds as $respond){
-            if ($respond->descInterview->status == 1){
-                $respondsPre[] = $respond;
-            }
-        }
-
-        $model->count_respond = count($respondsPre);
-
+        $responds = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
+                if ($model = $model->create()){
 
-                    if ($model->save()){
+                    //Создание респондентов для программы подтверждения ГПС из представителей сегмента
+                    $model->createRespondConfirm($responds);
 
-                        $gcps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
+                    //Вопросы, которые будут добавлены по-умолчанию
+                    $model->addQuestionDefault('Какими функциями должен обладать продукт вашей мечты?');
+                    $model->addQuestionDefault('Расскажите поподробнее, каков алгоритм вашей работы?');
+                    $model->addQuestionDefault('Почему вас это беспокоит?');
+                    $model->addQuestionDefault('Каковы последствия этой ситуации?');
+                    $model->addQuestionDefault('Расскажите поподробнее, что произошло в последний раз?');
+                    $model->addQuestionDefault('Что еще пытались сделать?');
+                    $model->addQuestionDefault('Кто будет финансировать покупку?');
+                    $model->addQuestionDefault('С кем еще мне следует переговорить?');
+                    $model->addQuestionDefault('Есть ли еще вопросы, которые мне следовало задать?');
+                    $model->addQuestionDefault('Пытались ли найти решение?');
+                    $model->addQuestionDefault('Эти решения оказались недостаточно эффективными?');
+                    $model->addQuestionDefault('Как справляются с задачей сейчас и сколько денег тратят?');
+                    $model->addQuestionDefault('Сколько времени это занимает?');
+                    $model->addQuestionDefault('Продемонстрировать как они выполняют работу или другую деятельность?');
+                    $model->addQuestionDefault('Что в этом нравится и что нет?');
+                    $model->addQuestionDefault('Какие еще инструменты и процессы пробовали пока не остановились на этом?');
+                    $model->addQuestionDefault('Ищут ли активно сейчас чем это можно заменить?');
+                    $model->addQuestionDefault('Если да, то в чем проблема?');
+                    $model->addQuestionDefault('Если не ищут, то почему?');
+                    $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
 
-                        $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
+                    $project->updated_at = time();
 
-                        if (!file_exists($gcps_dir)){
-                            mkdir($gcps_dir, 0777);
-                        }
+                    if ($project->save()){
 
-                        //Создание респондентов для программы подтверждения ГПС из представителей сегмента
-                        $model->createRespondConfirm($responds);
-
-                        //Вопросы, которые будут добавлены по-умолчанию
-                        $model->addQuestionDefault('Какими функциями должен обладать продукт вашей мечты?');
-                        $model->addQuestionDefault('Расскажите поподробнее, каков алгоритм вашей работы?');
-                        $model->addQuestionDefault('Почему вас это беспокоит?');
-                        $model->addQuestionDefault('Каковы последствия этой ситуации?');
-                        $model->addQuestionDefault('Расскажите поподробнее, что произошло в последний раз?');
-                        $model->addQuestionDefault('Что еще пытались сделать?');
-                        $model->addQuestionDefault('Кто будет финансировать покупку?');
-                        $model->addQuestionDefault('С кем еще мне следует переговорить?');
-                        $model->addQuestionDefault('Есть ли еще вопросы, которые мне следовало задать?');
-                        $model->addQuestionDefault('Пытались ли найти решение?');
-                        $model->addQuestionDefault('Эти решения оказались недостаточно эффективными?');
-                        $model->addQuestionDefault('Как справляются с задачей сейчас и сколько денег тратят?');
-                        $model->addQuestionDefault('Сколько времени это занимает?');
-                        $model->addQuestionDefault('Продемонстрировать как они выполняют работу или другую деятельность?');
-                        $model->addQuestionDefault('Что в этом нравится и что нет?');
-                        $model->addQuestionDefault('Какие еще инструменты и процессы пробовали пока не остановились на этом?');
-                        $model->addQuestionDefault('Ищут ли активно сейчас чем это можно заменить?');
-                        $model->addQuestionDefault('Если да, то в чем проблема?');
-                        $model->addQuestionDefault('Если не ищут, то почему?');
-                        $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
-
-                        $project->updated_at = time();
-
-                        if ($project->save()){
-
-                            $response =  [
-                                'success' => true,
-                                'id' => $model->id,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response =  ['success' => true, 'id' => $model->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
-                } else{
-
-                    $response =  [
-                        'error' => true,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
@@ -508,19 +429,17 @@ class ConfirmProblemController extends AppController
      */
     public function actionAddQuestions($id)
     {
-        $confirmProblem = ConfirmProblem::find()->with('questions')->where(['id' => $id])->one();
+        $model = ConfirmProblem::findOne($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
         $interview = Interview::findOne(['id' => $problem->interview_id]);
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
-        $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id])->all();
-
+        $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
         $newQuestion = new QuestionsConfirmProblem();
-        $newQuestion->confirm_problem_id = $id;
 
         //Список вопросов для добавления к списку программы
-        $queryQuestions = $confirmProblem->queryQuestionsGeneralList();
+        $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
 
         return $this->render('add-questions', [
@@ -528,7 +447,7 @@ class ConfirmProblemController extends AppController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
-            'confirmProblem' => $confirmProblem,
+            'model' => $model,
             'problem' => $problem,
             'interview' => $interview,
             'segment' => $segment,
@@ -543,18 +462,21 @@ class ConfirmProblemController extends AppController
      */
     public function actionAddQuestion($id)
     {
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
         $model = new QuestionsConfirmProblem();
         $model->confirm_problem_id = $id;
 
+        $confirmProblem = ConfirmProblem::findOne($id);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
 
         if ($model->load(Yii::$app->request->post())){
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model->save()){
+
+                    $project->updated_at = time();
+                    $project->save();
 
                     $confirmProblemNew = ConfirmProblem::findOne($id);
                     $questions = $confirmProblemNew->questions;
@@ -566,13 +488,11 @@ class ConfirmProblemController extends AppController
                     //Передаем обновленный список вопросов для добавления в программу
                     $queryQuestions = $confirmProblemNew->queryQuestionsGeneralList();
 
-                    $project->updated_at = time();
-                    $project->save();
-
                     $response = [
                         'model' => $model,
                         'questions' => $questions,
                         'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
@@ -613,8 +533,10 @@ class ConfirmProblemController extends AppController
                 $queryQuestions = $confirmProblemNew->queryQuestionsGeneralList();
 
                 $response = [
+                    'model' => $model,
                     'questions' => $questions,
                     'queryQuestions' => $queryQuestions,
+                    'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
@@ -640,39 +562,20 @@ class ConfirmProblemController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
+                if ($confirm_problem = $model->update()){
 
-                    if ($confirm_problem = $model->update()){
+                    $project->updated_at = time();
 
-                        $project->updated_at = time();
+                    if ($project->save()){
 
-                        if ($project->save()){
-
-                            $descInterviews = [];
-                            foreach ($confirm_problem->responds as $respond) {
-                                if($respond->descInterview) {
-                                    $descInterviews[] = $respond->descInterview;
-                                }
-                            }
-
-                            $response = [
-                                'model' => $confirm_problem,
-                                'responds' => $confirm_problem->responds,
-                                'descInterviews' => $descInterviews,
-                                'gcps' => $confirm_problem->gcps,
-                                'problem' => $generationProblem,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = [
+                            'success' => true,
+                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $confirm_problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $generationProblem]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
-                }else{
-
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }

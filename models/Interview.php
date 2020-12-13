@@ -171,19 +171,14 @@ class Interview extends \yii\db\ActiveRecord
 
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = 0;
-        $count_positive = 0;
 
-        foreach ($this->responds as $respond) {
+        $count_descInterview = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $this->id])->andWhere(['not', ['desc_interview.id' => null]])->count();
 
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $this->id, 'desc_interview.status' => '1'])->count();
 
         if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->problems))) {
             return true;
@@ -195,42 +190,32 @@ class Interview extends \yii\db\ActiveRecord
 
     public function getDataRespondsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->info_respond) && !empty($respond->date_plan) && !empty($respond->place_interview)){
-                $sum++;
-            }
-        }
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count = Respond::find()->where(['interview_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-        return $sum;
+        return $count;
     }
 
 
     public function getDataDescInterviewsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if ($respond->descInterview){
-                $sum++;
-            }
-        }
+        // Кол-во респондентов, у кот-х существует интервью
+        $count = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $this->id])->andWhere(['not', ['desc_interview.id' => null]])->count();
 
-        return $sum;
+        return $count;
     }
 
 
     public function getDataMembersOfSegment()
     {
-        $sumPositive = 0; // Кол-во представителей сегмента
-        foreach ($this->responds as $respond){
+        // Кол-во представителей сегмента
+        $count = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $this->id, 'desc_interview.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-        return $sumPositive;
+        return $count;
     }
 }

@@ -91,8 +91,8 @@ use yii\helpers\Html;
                     <?php
                     if (!empty($respond->info_respond)){
 
-                        if(mb_strlen($respond->info_respond) > 45) {
-                            echo '<div title="'.$respond->info_respond.'">' . mb_substr($respond->info_respond, 0, 42) . '...</div>';
+                        if(mb_strlen($respond->info_respond) > 65) {
+                            echo '<div title="'.$respond->info_respond.'">' . mb_substr($respond->info_respond, 0, 62) . '...</div>';
                         }else {
                             echo $respond->info_respond;
                         }
@@ -106,8 +106,8 @@ use yii\helpers\Html;
                     <?php
                     if (!empty($respond->place_interview)){
 
-                        if(mb_strlen($respond->place_interview) > 45) {
-                            echo '<div title="'.$respond->place_interview.'">' . mb_substr($respond->place_interview, 0, 42) . '...</div>';
+                        if(mb_strlen($respond->place_interview) > 65) {
+                            echo '<div title="'.$respond->place_interview.'">' . mb_substr($respond->place_interview, 0, 62) . '...</div>';
                         }else {
                             echo $respond->place_interview;
                         }
@@ -148,8 +148,8 @@ use yii\helpers\Html;
                     <?php
                     if (!empty($respond->descInterview)){
 
-                        if(mb_strlen($respond->descInterview->result) > 60) {
-                            echo '<div title="'.$respond->descInterview->result.'">' . mb_substr($respond->descInterview->result, 0, 57) . '...</div>';
+                        if(mb_strlen($respond->descInterview->result) > 90) {
+                            echo '<div title="'.$respond->descInterview->result.'">' . mb_substr($respond->descInterview->result, 0, 87) . '...</div>';
                         }else {
                             echo $respond->descInterview->result;
                         }

@@ -18,13 +18,13 @@ use yii\helpers\Html;
             <td colspan="3" style="width: 300px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
                 <strong>Фамилия, имя, отчество</strong>
             </td>
-            <td colspan="4" style="width: 300px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="4" style="width: 400px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
                 <strong>Данные респондента</strong>
             </td>
             <td colspan="2" style="width: 200px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
                 <strong>E-mail</strong>
             </td>
-            <td colspan="2" style="width: 200px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="1" style="width: 100px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
                 <strong>Дата опроса</strong>
             </td>
         </tr>
@@ -35,14 +35,14 @@ use yii\helpers\Html;
             <td colspan="3" style="width: 300px; padding: 10px 5px; color: #4F4F4F; text-align: center;">
 
             </td>
-            <td colspan="4" style="width: 300px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
+            <td colspan="4" style="width: 400px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
                 Кто? Откуда? Чем занят?
             </td>
             <td colspan="2" style="width: 200px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
                 Адрес электронной почты
             </td>
-            <td colspan="2" style="width: 200px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
-                Заполнение анкетных данных
+            <td colspan="1" style="width: 100px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
+                Факт
             </td>
         </tr>
 
@@ -77,13 +77,13 @@ use yii\helpers\Html;
                 </td>
 
 
-                <td colspan="4" style="width: 300px; padding: 10px 5px; color: #FFFFFF; font-size: 12px; height: 60px;">
+                <td colspan="4" style="width: 400px; padding: 10px 5px; color: #FFFFFF; font-size: 12px; height: 60px;">
 
                     <?php
                     if (!empty($respond->info_respond)){
 
-                        if(mb_strlen($respond->info_respond) > 65) {
-                            echo '<div title="'.$respond->info_respond.'">' . mb_substr($respond->info_respond, 0, 62) . '...</div>';
+                        if(mb_strlen($respond->info_respond) > 150) {
+                            echo '<div title="'.$respond->info_respond.'">' . mb_substr($respond->info_respond, 0, 147) . '...</div>';
                         }else {
                             echo $respond->info_respond;
                         }
@@ -107,7 +107,7 @@ use yii\helpers\Html;
 
                 </td>
 
-                <td colspan="2" style="width: 200px; text-align: center; color: #FFFFFF; height: 60px; font-size: 15px;">
+                <td colspan="1" style="width: 100px; text-align: center; color: #FFFFFF; height: 60px; font-size: 15px;">
 
                     <?php
                     if (!empty($respond->descInterview->updated_at)){

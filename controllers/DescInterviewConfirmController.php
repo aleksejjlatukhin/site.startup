@@ -71,6 +71,21 @@ class DescInterviewConfirmController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $respond = RespondsConfirm::findOne($id);
+        $model = new DescInterviewConfirm();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return DescInterviewConfirm|array|bool
@@ -79,20 +94,13 @@ class DescInterviewConfirmController extends AppController
     {
         $model = new DescInterviewConfirm();
         $model->responds_confirm_id = $id;
-        $respond = RespondsConfirm::find()->where(['id' => $id])->one();
-
-        //Если у респондента уже есть интервью, то отменить действие
-        if ($respond->descInterview){
-            return false;
-        }
-
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
+        $respond = RespondsConfirm::findOne($id);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $respond->confirm_problem_id]);
         $answers = $respond->answers;
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if(Yii::$app->request->isAjax) {
 
@@ -110,26 +118,34 @@ class DescInterviewConfirmController extends AppController
 
                         if ($project->save()){
 
-                            $response = $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_problem_id' => $confirmProblem->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = $this->findModel($id);
+        $respond = $model->respond;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
         }
     }
 
@@ -142,14 +158,13 @@ class DescInterviewConfirmController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $respond = RespondsConfirm::find()->where(['id' => $model->responds_confirm_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $respond->confirm_problem_id])->one();
-
+        $respond = RespondsConfirm::findOne(['id' => $model->responds_confirm_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $respond->confirm_problem_id]);
         $answers = $respond->answers;
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
 
         if(Yii::$app->request->isAjax) {
@@ -168,23 +183,11 @@ class DescInterviewConfirmController extends AppController
 
                         if ($project->save()){
 
-                            $response =  $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_problem_id' => $confirmProblem->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }

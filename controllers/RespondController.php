@@ -151,7 +151,7 @@ class RespondController extends AppController
                             $project->updated_at = time();
                             if ($project->save()) {
 
-                                $responds = Respond::find()->where(['interview_id' => $id])->all();
+                                $responds = Respond::findAll(['interview_id' => $id]);
                                 $page = floor((count($responds) - 1) / 10) + 1;
 
                                 $response =  [
@@ -282,12 +282,12 @@ class RespondController extends AppController
     public function actionDelete ($id) {
 
         $model = Respond::findOne($id);
-        $descInterview = DescInterview::find()->where(['respond_id' => $model->id])->one();
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $responds = Respond::find()->where(['interview_id' => $interview->id])->all();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $descInterview = DescInterview::findOne(['respond_id' => $model->id]);
+        $interview = Interview::findOne(['id' => $model->interview_id]);
+        $responds = Respond::findAll(['interview_id' => $interview->id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         if (Yii::$app->request->isAjax){
 
@@ -332,8 +332,8 @@ class RespondController extends AppController
 
                 $response = [
                     'success' => true,
-                    'interview_id' => $interview->id,
-                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne([$interview->id]), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment([$interview->id])]),
+                    'interview_id' => $model->interview_id,
+                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($model->interview_id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->interview_id)]),
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;

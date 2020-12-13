@@ -5,6 +5,8 @@ namespace app\controllers;
 use app\models\AnswersQuestionsConfirmProblem;
 use app\models\ConfirmProblem;
 use app\models\DescInterviewConfirm;
+use app\models\forms\CreateRespondConfirmForm;
+use app\models\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -13,6 +15,7 @@ use app\models\forms\UpdateRespondConfirmForm;
 use app\models\User;
 use Yii;
 use app\models\RespondsConfirm;
+use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
 class RespondsConfirmController extends AppController
@@ -111,6 +114,21 @@ class RespondsConfirmController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $confirm_problem = ConfirmProblem::findOne($id);
+        $model = new CreateRespondConfirmForm();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['confirm_problem' => $confirm_problem, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -119,31 +137,24 @@ class RespondsConfirmController extends AppController
     {
         $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
+        $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
 
-        $newRespond = new RespondsConfirm();
+        $newRespond = new CreateRespondConfirmForm();
         $newRespond->confirm_problem_id = $id;
 
         if ($newRespond->load(Yii::$app->request->post())) {
-
-            $kol = 0;
-            foreach ($models as $elem){
-                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
-                    $kol++;
-                }
-            }
 
             if(Yii::$app->request->isAjax) {
 
                 if (count($models) < $limit_count_respond) {
 
-                    if ($kol == 0) {
+                    if ($newRespond->validate(['name'])) {
 
-                        if ($newRespond->save()) {
+                        if ($newRespond = $newRespond->create()) {
 
                             $newRespond->addAnswersForNewRespond();
 
@@ -154,11 +165,15 @@ class RespondsConfirmController extends AppController
 
                             if ($project->save()) {
 
-                                $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
+                                $responds = RespondsConfirm::findAll(['confirm_problem_id' => $id]);
+                                $page = floor((count($responds) - 1) / 10) + 1;
 
-                                $response = [
+                                $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
+                                    'page' => $page,
+                                    'confirm_problem_id' => $id,
+                                    'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id)]),
                                 ];
 
                                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -184,6 +199,20 @@ class RespondsConfirmController extends AppController
     }
 
 
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = new UpdateRespondConfirmForm($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return RespondsConfirm|array
@@ -191,38 +220,29 @@ class RespondsConfirmController extends AppController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $updateRespondForm = new UpdateRespondConfirmForm($id);
+        $model = new UpdateRespondConfirmForm($id);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-
-        if ($updateRespondForm->load(Yii::$app->request->post())) {
-
-            $kol = 0;
-            foreach ($models as $item){
-                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
-                    $kol++;
-                }
-            }
+        if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($kol == 0){
+                if ($model->validate(['name'])){
 
-                    if ($updateRespondForm->updateRespond($model)){
+                    if ($model->updateRespond()){
 
                         $project->updated_at = time();
 
                         if ($project->save()){
 
+                            $response = ['confirm_problem_id' => $confirmProblem->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $model;
-                            return $model;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
                 }else{
@@ -239,6 +259,44 @@ class RespondsConfirmController extends AppController
 
     /**
      * @param $id
+     * @return RespondsConfirm
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataModel($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = $model;
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    public function actionGetQueryResponds($id, $page)
+    {
+        $model = ConfirmProblem::findOne($id);
+        $queryResponds = RespondsConfirm::find()->where(['confirm_problem_id' => $id]);
+        $pagesResponds = new Pagination(['totalCount' => $queryResponds->count(), 'page' => ($page - 1), 'pageSize' => 10]);
+        $pagesResponds->pageSizeParam = false; //убираем параметр $per-page
+        $responds = $queryResponds->offset($pagesResponds->offset)->limit(10)->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['ajax_data_responds' => $this->renderAjax('view_ajax', ['model' => $model, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
      * @return array|bool
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
@@ -246,16 +304,14 @@ class RespondsConfirmController extends AppController
     public function actionDelete ($id) {
 
         $model = RespondsConfirm::findOne($id);
-        $descInterview = DescInterviewConfirm::find()->where(['responds_confirm_id' => $model->id])->one();
-        $answers = AnswersQuestionsConfirmProblem::find()->where(['respond_id' => $id])->all();
-
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->all();
-
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $model->id]);
+        $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
+        $responds = RespondsConfirm::findAll(['confirm_problem_id' => $confirmProblem->id]);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $problem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if (Yii::$app->request->isAjax){
 
@@ -294,7 +350,11 @@ class RespondsConfirmController extends AppController
                     $confirmProblem->save();
                 }
 
-                $response = ['success' => true];
+                $response = [
+                    'success' => true,
+                    'confirm_problem_id' => $model->confirm_problem_id,
+                    'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($model->confirm_problem_id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->confirm_problem_id)]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;

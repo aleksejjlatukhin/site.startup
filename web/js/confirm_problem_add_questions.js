@@ -15,8 +15,9 @@ $(body).on('click', '#show_form_view_data', function(){
     $('.form-view-data-confirm').show();
 });
 
-//Редактирование исходных даннных программы подтверждения сегмента (Шаг 1)
-$(body).on('beforeSubmit', '#update_data_interview', function(e){
+
+//Редактирование исходных даннных подтверждения (Шаг 1)
+$(body).on('beforeSubmit', '#update_data_confirm', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
@@ -32,12 +33,13 @@ $(body).on('beforeSubmit', '#update_data_interview', function(e){
             if (response.success) {
 
                 //Обновление данных в режиме просмотра (Шаг 1)
-                $('#step_one').html(response.ajax_data_confirm);
+                $('#step_one').html(response.ajax_data_confirm);// Закончил здесь - делать файл вида и метод контроллера
 
                 //Вызов события клика на кнопку просмотра
                 //для перехода в режим просмотра (Шаг 1)
                 $('.form-update-data-confirm').hide();
                 $('.form-view-data-confirm').show();
+
             }
         }, error: function(){
             alert('Ошибка');
@@ -87,7 +89,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
             //Обновляем список вопросов на странице
             $('#QuestionsTable-container').html(response.ajax_questions_confirm);
 
-            //Обновляем список вопросов для добавления
+            //Обновляем список вопросов для добавления (Шаг 2)
             var queryQuestions = response.queryQuestions;
             var addNewQuestionForm = $('#addNewQuestion');
             $(addNewQuestionForm).find('select').html('');
@@ -98,7 +100,6 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
 
             //Очищием форму добавления вопроса
             $(addNewQuestionForm)[0].reset();
-
         },
         error: function(){
             alert('Ошибка');
@@ -110,8 +111,8 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
 });
 
 
-//Удаление вопроса для интервью (Шаг 2)
-$(body).on('click', '.delete-question-confirm-segment', function(e){
+//Удаление вопроса для анкеты (Шаг 2)
+$(body).on('click', '.delete-question-confirm-problem', function(e){
 
     var url = $(this).attr('href');
 
@@ -125,7 +126,7 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
             //Обновляем список вопросов на странице
             $('#QuestionsTable-container').html(response.ajax_questions_confirm);
 
-            //Обновляем список вопросов для добавления
+            //Обновляем список вопросов для добавления (Шаг 2)
             var queryQuestions = response.queryQuestions;
             var addNewQuestionForm = $('#addNewQuestion');
             $(addNewQuestionForm).find('select').html('');
@@ -133,6 +134,7 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
             $.each(queryQuestions, function(index, value) {
                 $(addNewQuestionForm).find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
             });
+
         },
         error: function(){
             alert('Ошибка');
@@ -142,7 +144,6 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
     e.preventDefault();
     return false;
 });
-
 
 
 //события для select2 https://select2.org/programmatic-control/events

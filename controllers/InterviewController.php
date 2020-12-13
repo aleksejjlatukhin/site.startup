@@ -13,7 +13,6 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Interview;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 
@@ -173,19 +172,13 @@ class InterviewController extends AppController
     {
         $model = Interview::findOne($id);
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id])->andWhere(['not', ['desc_interview.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -227,19 +220,14 @@ class InterviewController extends AppController
         $model = Interview::findOne($id);
         $segment = $model->segment;
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id])->andWhere(['not', ['desc_interview.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
+        $count_positive = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
 
         if(Yii::$app->request->isAjax) {
 
@@ -278,20 +266,13 @@ class InterviewController extends AppController
     public function actionCreate($id)
     {
         $segment = Segment::findOne($id);
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $project = Projects::findOne(['id' => $segment->project_id]);
         $model = new FormCreateConfirmSegment();
 
-        if (empty($segment)){
-            //Отсутствуют данные сегмента
-            return $this->redirect(['/segment/index', 'id' => $project->id]);
-        }
-
-        $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
-        if (!empty($modelInterview)){
+        if ($segment->interview){
             //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['/interview/view', 'id' => $modelInterview->id]);
+            return $this->redirect(['/interview/view', 'id' => $segment->interview->id]);
         }
-
 
         return $this->render('create', [
             'model' => $model,
@@ -311,10 +292,6 @@ class InterviewController extends AppController
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $model = new FormCreateConfirmSegment();
         $model->segment_id = $id;
-
-        $modelInterview = Interview::find()->where(['segment_id' => $id])->one();
-        if (!empty($modelInterview)){ return $this->redirect(['/interview/view', 'id' => $modelInterview->id]); }
-        if (empty($segment)){ return $this->redirect(['/segment/index', 'id' => $project->id]); }
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -403,13 +380,6 @@ class InterviewController extends AppController
                     $project->updated_at = time();
 
                     if ($project->save()){
-
-                        $descInterviews = [];
-                        foreach ($update_confirm_segment->responds as $respond) {
-                            if($respond->descInterview) {
-                                $descInterviews[] = $respond->descInterview;
-                            }
-                        }
 
                         $response = [
                             'success' => true,

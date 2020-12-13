@@ -21,8 +21,10 @@ class UpdateRespondConfirmForm extends Model
     {
         return [
             [['name', 'info_respond'], 'required'],
+            [['name'], 'uniqueName'],
             [['name', 'info_respond', 'email'], 'trim'],
-            [['name', 'info_respond', 'email'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 100],
+            [['info_respond', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }
@@ -52,11 +54,29 @@ class UpdateRespondConfirmForm extends Model
     }
 
 
-    public function updateRespond($respond)
+    public function updateRespond()
     {
+        $respond = RespondsConfirm::findOne($this->id);
         $respond->name = $this->name;
         $respond->info_respond = $this->info_respond;
         $respond->email = $this->email;
         return $respond->save() ? $respond : null;
+    }
+
+
+    /**
+     * @param $attr
+     */
+    public function uniqueName($attr)
+    {
+        $models = RespondsConfirm::findAll(['confirm_problem_id' => $this->confirm_problem_id]);
+
+        foreach ($models as $item){
+
+            if ($this->id != $item->id && mb_strtolower(str_replace(' ', '', $this->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+
+                $this->addError($attr, 'Респондент с таким именем «'. $this->name .'» уже существует!');
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
     var id = (window.location.search).split('?id=')[1];
-    var url = '/respond/get-query-responds?id=' + id + '&page=1';
+    var url = '/responds-confirm/get-query-responds?id=' + id + '&page=1';
 
     //Загружаем данные респондентов (Шаг 3)
     $.ajax({
@@ -20,6 +20,7 @@ $(document).ready(function() {
     });
 
 });
+
 
 var body = $('body');
 
@@ -63,9 +64,8 @@ $(body).on('click', '#show_form_view_data', function(){
 });
 
 
-
 //Редактирование исходных даннных подтверждения (Шаг 1)
-$(body).on('beforeSubmit', '#update_data_interview', function(e){
+$(body).on('beforeSubmit', '#update_data_confirm', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
@@ -92,7 +92,7 @@ $(body).on('beforeSubmit', '#update_data_interview', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/respond/get-query-responds?id=' + id + '&page=1',
+                    url: '/responds-confirm/get-query-responds?id=' + id + '&page=1',
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -152,7 +152,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
             //Обновляем список вопросов на странице
             $('#QuestionsTable-container').html(response.ajax_questions_confirm);
 
-            //Обновляем список вопросов для добавления
+            //Обновляем список вопросов для добавления (Шаг 2)
             var queryQuestions = response.queryQuestions;
             var addNewQuestionForm = $('#addNewQuestion');
             $(addNewQuestionForm).find('select').html('');
@@ -161,7 +161,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
                 $(addNewQuestionForm).find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
             });
 
-            //Скрываем и очищием форму добавления вопроса
+            //Очищием форму добавления вопроса
             $(addNewQuestionForm)[0].reset();
         },
         error: function(){
@@ -170,13 +170,12 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
     });
 
     e.preventDefault();
-
     return false;
 });
 
 
-//Удаление вопроса для интервью (Шаг 2)
-$(body).on('click', '.delete-question-confirm-segment', function(e){
+//Удаление вопроса для анкеты (Шаг 2)
+$(body).on('click', '.delete-question-confirm-problem', function(e){
 
     var url = $(this).attr('href');
 
@@ -190,7 +189,7 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
             //Обновляем список вопросов на странице
             $('#QuestionsTable-container').html(response.ajax_questions_confirm);
 
-            //Обновляем список вопросов для добавления
+            //Обновляем список вопросов для добавления (Шаг 2)
             var queryQuestions = response.queryQuestions;
             var addNewQuestionForm = $('#addNewQuestion');
             $(addNewQuestionForm).find('select').html('');
@@ -198,6 +197,7 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
             $.each(queryQuestions, function(index, value) {
                 $(addNewQuestionForm).find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
             });
+
         },
         error: function(){
             alert('Ошибка');
@@ -207,7 +207,6 @@ $(body).on('click', '.delete-question-confirm-segment', function(e){
     e.preventDefault();
     return false;
 });
-
 
 
 //события для select2 https://select2.org/programmatic-control/events
@@ -342,7 +341,7 @@ $(body).on('change', 'input#confirm_count_positive', function () {
 $(body).on('click', '#showRespondCreateForm', function(e){
 
     var id = location.href.split('=')[1];
-    var url = '/respond/get-data-create-form?id=' + id;
+    var url = '/responds-confirm/get-data-create-form?id=' + id;
 
     $.ajax({
 
@@ -386,7 +385,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
                     //Загружаем данные респондентов (Шаг 3)
                     $.ajax({
 
-                        url: '/respond/get-query-responds?id=' + response.interview_id + '&page=' + response.page,
+                        url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + response.page,
                         method: 'POST',
                         cache: false,
                         success: function(response){
@@ -437,7 +436,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 $(body).on('click', '.showRespondUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/respond/get-data-update-form?id=' + id;
+    var url = '/responds-confirm/get-data-update-form?id=' + id;
 
     $.ajax({
 
@@ -481,7 +480,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/respond/get-query-responds?id=' + response.interview_id + '&page=' + page,
+                    url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -514,12 +513,12 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 });
 
 
-//Получение формы создания интервью для респондента
+//Получение формы создания анкеты для респондента
 $(body).on('click', '.showDescInterviewCreateForm', function(e){
 
     var url_1 = $(this).attr('href');
     var id = $(this).attr('id').split('-')[1];
-    var url_2 = '/desc-interview/get-data-create-form?id=' + id;
+    var url_2 = '/desc-interview-confirm/get-data-create-form?id=' + id;
     var error_respond_modal = $('#error_respond_modal');
 
     $.ajax({
@@ -563,15 +562,7 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
 });
 
 
-//После выбора файла в форме создания интервью выводим его имя на экран
-$(body).on('change', '#formCreateDescInterview input[type=file]',function(){
-
-    var filename = $(this).val().split('\\').pop();
-    $('.title_file').html(filename);
-});
-
-
-//Сохранении данных из формы при создании интервью
+//Сохранении данных из формы при создании анкеты
 $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 
     var data = new FormData(this);
@@ -592,7 +583,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/respond/get-query-responds?id=' + response.interview_id + '&page=' + page,
+                url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -617,11 +608,11 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 });
 
 
-//Получение формы редактирования интервью респондента
+//Получение формы редактирования анкеты респондента
 $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/desc-interview/get-data-update-form?id=' + id;
+    var url = '/desc-interview-confirm/get-data-update-form?id=' + id;
 
     $.ajax({
 
@@ -643,15 +634,7 @@ $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 });
 
 
-//После выбора файла в форме редактирования интервью выводим его имя на экран
-$(body).on('change', '#formUpdateDescInterview input[type=file]',function(){
-
-    var filename = $(this).val().split('\\').pop();
-    $('.file_name_update_form').html(filename);
-});
-
-
-//Редактирование интервью при сохранении данных из формы
+//Редактирование анкеты при сохранении данных из формы
 $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 
     var data = new FormData(this);
@@ -672,7 +655,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/respond/get-query-responds?id=' + response.interview_id + '&page=' + page,
+                url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -697,38 +680,11 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 });
 
 
-//Удаление файла из формы редактирования интервью
-$(body).on('click', '#link_delete_file', function(e){
-
-    var url = $(this).attr('href');
-
-    $.ajax({
-
-        type:'POST',
-        cache: false,
-        url: url,
-        success: function() {
-
-            $('.interview_file_update').hide();
-            $('.link-delete').hide();
-            $('.title_name_update_form').hide();
-            $('.feed-exp').show();
-        },
-        error: function() {
-            alert('Ошибка');
-        }
-    });
-
-    e.preventDefault();
-    return false;
-});
-
-
 //Вызов модального окна удаления респондента
 $(body).on('click', '.showDeleteRespondModal', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/respond/get-data-model?id=' + id;
+    var url = '/responds-confirm/get-data-model?id=' + id;
 
     $.ajax({
 
@@ -739,7 +695,7 @@ $(body).on('click', '.showDeleteRespondModal', function(e){
 
             var delete_respond_modal = $('#delete-respond-modal');
             $(delete_respond_modal).find('.modal-body h4').html('Вы уверены, что хотите удалить все данные<br>о респонденте «' + response.name + '»?');
-            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/respond/delete?id=' + response.id);
+            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/responds-confirm/delete?id=' + response.id);
             $(delete_respond_modal).modal('show');
         },
         error: function(){
@@ -789,7 +745,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                     $('#delete-respond-modal').modal('hide');
                     //Показываем окно с ошибкой
                     $(error_respond_modal).find('.modal-header h3').html('Удаление респондента отклонено');
-                    $(error_respond_modal).find('.modal-body h4').html('Общее количество респондентов не должно быть меньше необходимого количества респондентов соответствующих сегменту.');
+                    $(error_respond_modal).find('.modal-body h4').html('Общее количество респондентов не должно быть меньше необходимого количества респондентов, которые должны подтвердить проблему.');
                     $(error_respond_modal).modal('show');
                 }
             }
@@ -798,7 +754,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/respond/get-query-responds?id=' + response.interview_id + '&page=' + page,
+                    url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -837,7 +793,7 @@ $(body).on('click', '#cancel-delete-respond', function(e) {
 });
 
 
-//Переход к генерации ГПС по кнопке Далее
+//Переход к генерации ГЦП по кнопке Далее
 $(body).on('click', '#button_MovingNextStage', function(e){
 
     var data = $(this).serialize();
@@ -858,20 +814,20 @@ $(body).on('click', '#button_MovingNextStage', function(e){
                 if (!response.not_completed_descInterviews) {
 
                     if (response.exist_confirm === 1) {
-                        window.location.href = '/generation-problem/index?id=' + id;
+                        window.location.href = '/gcp/index?id=' + id;
                     }
                     else if (response.exist_confirm === null) {
-                        window.location.href = '/interview/exist-confirm?id=' + id;
+                        window.location.href = '/confirm-problem/exist-confirm?id=' + id;
                     }
                     else if (response.exist_confirm === 0) {
-                        window.location.href = '/interview/exist-confirm?id=' + id;
+                        window.location.href = '/confirm-problem/exist-confirm?id=' + id;
                     }
 
                 } else {
 
                     //Показываем окно с информацией
                     $(error_respond_modal).find('.modal-header h3').html('Информация');
-                    $(error_respond_modal).find('.modal-body h4').html('Для продолжения Вам необходимо провести интервью со всеми заданными респондентами.');
+                    $(error_respond_modal).find('.modal-body h4').html('Для продолжения Вам необходимо опросить всех заданных респондентов.');
                     $(error_respond_modal).modal('show');
                 }
 
@@ -891,7 +847,7 @@ $(body).on('click', '#button_MovingNextStage', function(e){
 });
 
 
-// Отмена завершения неудачного подтверждения сегмента
+// Отмена завершения неудачного подтверждения ГПС
 $(body).on('click', '#cancel-not_exist-confirm', function(e) {
 
     //Закрываем окно
