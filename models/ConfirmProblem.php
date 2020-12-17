@@ -220,7 +220,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataRespondsOfModel()
+    public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
         $count = RespondsConfirm::find()->where(['confirm_problem_id' => $this->id])
@@ -230,7 +230,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataDescInterviewsOfModel()
+    public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
         $count = RespondsConfirm::find()->with('descInterview')
@@ -241,7 +241,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataMembersOfProblem()
+    public function getCountConfirmMembers()
     {
         //Кол-во респондентов, кот-е подтвердили проблему
         $count = RespondsConfirm::find()->with('descInterview')

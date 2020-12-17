@@ -73,22 +73,19 @@ class RespondController extends AppController
     public function actionDataAvailability($id)
     {
 
-        $models = Respond::find()->where(['interview_id' => $id])->all();
+        $count_models = Respond::find()->where(['interview_id' => $id])->count();
 
-        $exist_data_respond = 0;
-        $exist_data_descInterview = 0;
-        foreach ($models as $model){
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count_exist_data_respond = Respond::find()->where(['interview_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-            if (!empty($model->info_respond) && !empty($model->place_interview) && !empty($model->date_plan)){
-                $exist_data_respond++;
-            }
-            if (!empty($model->descInterview)){
-                $exist_data_descInterview++;
-            }
-        }
+        //Кол-во респондентов, у кот-х существует интервью
+        $count_exist_data_descInterview = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $id])->andWhere(['not', ['desc_interview.id' => null]])->count();
 
         if(Yii::$app->request->isAjax) {
-            if (($exist_data_respond == count($models)) || ($exist_data_descInterview > 0)) {
+            if (($count_exist_data_respond == $count_models) || ($count_exist_data_descInterview > 0)) {
 
                 $response =  ['success' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -159,7 +156,7 @@ class RespondController extends AppController
                                     'responds' => $responds,
                                     'page' => $page,
                                     'interview_id' => $id,
-                                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id)]),
+                                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id), 'project' => $project]),
                                 ];
 
                                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -333,7 +330,7 @@ class RespondController extends AppController
                 $response = [
                     'success' => true,
                     'interview_id' => $model->interview_id,
-                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($model->interview_id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->interview_id)]),
+                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($model->interview_id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->interview_id), 'project' => $project]),
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;

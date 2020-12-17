@@ -1,9 +1,10 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
+use app\models\ConfirmMvp;
 
 class FormUpdateConfirmMvp extends Model
 {

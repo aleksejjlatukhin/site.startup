@@ -11,7 +11,7 @@ use app\models\User;
 <?php foreach ($models as $model) : ?>
 
 
-    <div class="row container-one_respond row_hypothesis-<?= $model->id;?>" style="margin: 3px 0; padding: 0;">
+    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
 
         <div class="col-md-3">
 
@@ -19,17 +19,8 @@ use app\models\User;
                 <?= $model->project_name; ?>
             </div>
 
-            <div class="project_description_text">
-                <?php
-
-                $description = $model->description;
-                if (mb_strlen($description) > 50) {
-                    $description = mb_substr($description, 0, 50) . '...';
-                }
-
-                echo '<div title="'.$model->description.'">' . $description . '</div>';
-
-                ?>
+            <div class="project_description_text" title="<?= $model->description; ?>">
+                <?= $model->description; ?>
             </div>
 
         </div>
@@ -37,33 +28,17 @@ use app\models\User;
 
         <div class="col-md-3">
 
-            <?php
-
-            $rid = $model->rid;
-
-            if (mb_strlen($rid) > 80) {
-                $rid = mb_substr($rid, 0, 80)  . ' ...';
-            }
-
-            echo '<div class="text_14_table_project" title="' . $model->rid . '">' . $rid . '</div>';
-
-            ?>
+            <div class="text_14_table_project" title="<?= $model->rid; ?>">
+                <?= $model->rid; ?>
+            </div>
 
         </div>
 
         <div class="col-md-2">
 
-            <?php
-
-            $technology = $model->technology;
-
-            if (mb_strlen($technology) > 50) {
-                $technology = mb_substr($technology, 0, 50) . ' ...';
-            }
-
-            echo '<div class="text_14_table_project" title="' . $model->technology . '">' . $technology . '</div>';
-
-            ?>
+            <div class="text_14_table_project" title="<?= $model->technology; ?>">
+                <?= $model->technology; ?>
+            </div>
 
         </div>
 
@@ -107,6 +82,11 @@ use app\models\User;
                         'title' => 'Редактировать',
                     ]); ?>
 
+                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->id], [
+                        'class' => 'delete_hypothesis',
+                        'title' => 'Удалить',
+                    ]); ?>
+
                 <?php else : ?>
 
                     <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '20px']]),['/projects/show-all-information', 'id' => $model->id], [
@@ -116,11 +96,6 @@ use app\models\User;
                     ]); ?>
 
                 <?php endif; ?>
-
-                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->id], [
-                    'class' => 'delete_hypothesis',
-                    'title' => 'Удалить',
-                ]); ?>
 
             </div>
         </div>

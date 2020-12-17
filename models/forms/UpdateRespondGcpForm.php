@@ -22,8 +22,10 @@ class UpdateRespondGcpForm extends Model
     {
         return [
             [['name', 'info_respond'], 'required'],
+            [['name'], 'uniqueName'],
             [['name', 'info_respond', 'email'], 'trim'],
-            [['name', 'info_respond', 'email'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 100],
+            [['info_respond', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }
@@ -53,11 +55,29 @@ class UpdateRespondGcpForm extends Model
     }
 
 
-    public function updateRespond($respond)
+    public function updateRespond()
     {
+        $respond = RespondsGcp::findOne($this->id);
         $respond->name = $this->name;
         $respond->info_respond = $this->info_respond;
         $respond->email = $this->email;
         return $respond->save() ? $respond : null;
+    }
+
+
+    /**
+     * @param $attr
+     */
+    public function uniqueName($attr)
+    {
+        $models = RespondsGcp::findAll(['confirm_gcp_id' => $this->confirm_gcp_id]);
+
+        foreach ($models as $item){
+
+            if ($this->id != $item->id && mb_strtolower(str_replace(' ', '', $this->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+
+                $this->addError($attr, 'Респондент с таким именем «'. $this->name .'» уже существует!');
+            }
+        }
     }
 }

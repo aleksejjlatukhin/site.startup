@@ -330,7 +330,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <?= $form->field($formUpdateConfirmProblem, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'

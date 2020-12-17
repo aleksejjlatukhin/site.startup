@@ -3,17 +3,17 @@
 
 namespace app\models\forms;
 
-use app\models\ConfirmProblem;
-use app\models\GenerationProblem;
+use app\models\ConfirmGcp;
+use app\models\Gcp;
 use app\models\User;
 use yii\base\Model;
 
-class FormCreateConfirmProblem extends Model
+class FormCreateConfirmGcp extends Model
 {
-    public $gps_id;
+
+    public $gcp_id;
     public $count_respond;
     public $count_positive;
-    public $need_consumer;
 
 
     /**
@@ -22,10 +22,8 @@ class FormCreateConfirmProblem extends Model
     public function rules()
     {
         return [
-            [['gps_id', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
-            [['gps_id'], 'integer'],
-            [['need_consumer'], 'trim'],
-            [['need_consumer'], 'string', 'max' => 255],
+            [['gcp_id', 'count_respond', 'count_positive'], 'required'],
+            [['gcp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
@@ -37,18 +35,16 @@ class FormCreateConfirmProblem extends Model
     public function attributeLabels()
     {
         return [
-            'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Необходимое количество позитивных ответов',
-            'need_consumer' => 'Потребность потребителя',
+            'count_respond' => 'Количество респондентов, подтвердивших проблему',
+            'count_positive' => 'Необходимое количество респондентов, подтверждающих ценностное предложение',
         ];
     }
 
 
     public function create()
     {
-        $model = new ConfirmProblem();
-        $model->gps_id = $this->gps_id;
-        $model->need_consumer = $this->need_consumer;
+        $model = new ConfirmGcp();
+        $model->gcp_id = $this->gcp_id;
         $model->count_respond = $this->count_respond;
         $model->count_positive = $this->count_positive;
         $this->addDir();
@@ -59,20 +55,22 @@ class FormCreateConfirmProblem extends Model
 
     private function addDir()
     {
-        $generationProblem = GenerationProblem::findOne(['id' => $this->gps_id]);
-        $segment = $generationProblem->segment;
-        $project = $generationProblem->project;
+        $gcp = Gcp::findOne(['id' => $this->gcp_id]);
+        $problem = $gcp->problem;
+        $segment = $gcp->segment;
+        $project = $gcp->project;
         $user = User::findOne($project->user_id);
 
-        $gcps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+        $mvps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
             mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251") . '/gcps/';
+            . mb_convert_encoding($this->translit($problem->title) , "windows-1251") . '/gcps/'
+            . mb_convert_encoding($this->translit($gcp->title) , "windows-1251") . '/mvps/';
 
-        $gcps_dir = mb_strtolower($gcps_dir, "windows-1251");
+        $mvps_dir = mb_strtolower($mvps_dir, "windows-1251");
 
-        if (!file_exists($gcps_dir)){
-            mkdir($gcps_dir, 0777);
+        if (!file_exists($mvps_dir)){
+            mkdir($mvps_dir, 0777);
         }
     }
 

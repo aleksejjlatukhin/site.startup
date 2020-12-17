@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
-use app\models\FormUpdateConfirmProblem;
+use app\models\forms\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -148,10 +148,11 @@ class ConfirmProblemController extends AppController
     /**
      * @param $id
      * @return string
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
-        $model = ConfirmProblem::findOne($id);
+        $model = $this->findModel($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
         $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
         $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
@@ -163,7 +164,6 @@ class ConfirmProblemController extends AppController
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
-
 
         return $this->render('view', [
             'model' => $model,
@@ -333,9 +333,9 @@ class ConfirmProblemController extends AppController
     {
         $model = new FormCreateConfirmProblem();
         $generationProblem = GenerationProblem::findOne($id);
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         //кол-во представителей сегмента
         $count_represent_segment = Respond::find()->with('descInterview')
@@ -370,9 +370,9 @@ class ConfirmProblemController extends AppController
         $model->gps_id = $id;
 
         $generationProblem = GenerationProblem::findOne($id);
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
         $responds = Respond::find()->with('descInterview')
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
             ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
@@ -553,16 +553,16 @@ class ConfirmProblemController extends AppController
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmProblem($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $interview = Interview::findOne(['id' => $problem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($confirm_problem = $model->update()){
+                if ($model = $model->update()){
 
                     $project->updated_at = time();
 
@@ -570,7 +570,7 @@ class ConfirmProblemController extends AppController
 
                         $response = [
                             'success' => true,
-                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $confirm_problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $generationProblem]),
+                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
                         ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;

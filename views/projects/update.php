@@ -51,8 +51,21 @@ use yii\helpers\Html;
                 ])->textarea([
                     'rows' => 2,
                     'required' => true,
+                    'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                ]) ?>
+            </div>
+
+            <div class="row" style="margin-bottom: 15px;">
+                <?= $form->field($model, 'purpose_project', [
+                    'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                ])->textarea([
+                    'rows' => 2,
+                    'required' => true,
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => 'Примеры: разработать продукт, найти целевой сегмент, найти рекламный слоган, разработать упаковку и т.д.',
                 ]) ?>
             </div>
 
@@ -83,6 +96,7 @@ use yii\helpers\Html;
                 ])->textarea([
                     'rows' => 2,
                     'required' => true,
+                    'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                 ]) ?>
@@ -270,6 +284,7 @@ use yii\helpers\Html;
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
                 ])->textarea([
                     'rows' => 2,
+                    'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                 ]) ?>

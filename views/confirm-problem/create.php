@@ -185,13 +185,13 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
             <div class="container-fluid">
 
-                <div class="row" style="padding-top: 30px; padding-bottom: 10px; padding-left: 5px;">
+                <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
 
                     <div class="col-md-12" style="font-weight: 700;">
                         Формулировка проблемы, которую проверяем
                     </div>
 
-                    <div class="col-md-12" style="padding-top: 10px;">
+                    <div class="col-md-12">
                         <?= $generationProblem->description;?>
                     </div>
 
@@ -210,7 +210,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 ?>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <?= $form->field($model, 'need_consumer', [
                         'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
@@ -226,7 +226,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <?= $form->field($model, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'

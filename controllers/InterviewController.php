@@ -383,7 +383,7 @@ class InterviewController extends AppController
 
                         $response = [
                             'success' => true,
-                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $update_confirm_segment, 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id)]),
+                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $update_confirm_segment, 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id), 'project' => $project]),
                         ];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                         \Yii::$app->response->data = $response;

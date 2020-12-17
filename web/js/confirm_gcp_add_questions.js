@@ -112,7 +112,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
 
 
 //Удаление вопроса для анкеты (Шаг 2)
-$(body).on('click', '.delete-question-confirm-problem', function(e){
+$(body).on('click', '.delete-question-confirm-gcp', function(e){
 
     var url = $(this).attr('href');
 

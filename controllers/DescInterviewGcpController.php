@@ -74,6 +74,21 @@ class DescInterviewGcpController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $respond = RespondsGcp::findOne($id);
+        $model = new DescInterviewGcp();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return DescInterviewGcp|array|bool
@@ -83,12 +98,6 @@ class DescInterviewGcpController extends AppController
         $model = new DescInterviewGcp();
         $model->responds_gcp_id = $id;
         $respond = RespondsGcp::findOne($id);
-
-        //Если у респондента уже есть интервью, то отменить действие
-        if ($respond->descInterview){
-            return false;
-        }
-
         $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
         $answers = $respond->answers;
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -97,7 +106,6 @@ class DescInterviewGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
 
         if(Yii::$app->request->isAjax) {
 
@@ -115,26 +123,34 @@ class DescInterviewGcpController extends AppController
 
                         if ($project->save()){
 
-                            $response = $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_gcp_id' => $confirmGcp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = $this->findModel($id);
+        $respond = $model->respond;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
         }
     }
 
@@ -149,7 +165,6 @@ class DescInterviewGcpController extends AppController
         $model = $this->findModel($id);
         $respond = RespondsGcp::find()->where(['id' => $model->responds_gcp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
-
         $answers = $respond->answers;
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -157,7 +172,6 @@ class DescInterviewGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
 
         if(Yii::$app->request->isAjax) {
 
@@ -175,23 +189,11 @@ class DescInterviewGcpController extends AppController
 
                         if ($project->save()){
 
-                            $response =  $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_gcp_id' => $confirmGcp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }

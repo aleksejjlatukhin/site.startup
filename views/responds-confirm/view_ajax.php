@@ -139,22 +139,22 @@ use app\models\User;
         </div>
 
         <div class="" style="padding: 0;">
-            Внесено респондентов: <?= $model->dataRespondsOfModel;?>
+            Внесено респондентов: <?= $model->countRespondsOfModel;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
-            Подтверждают проблему: <?= $model->dataMembersOfProblem;?>
+            Подтверждают проблему: <?= $model->countConfirmMembers;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-            Не подтверждают проблему: <?= ($model->dataDescInterviewsOfModel - $model->dataMembersOfProblem);?>
+            Не подтверждают проблему: <?= ($model->countDescInterviewsOfModel - $model->countConfirmMembers);?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);?>
-            Не опрошены: <?= ($model->count_respond - $model->dataDescInterviewsOfModel);?>
+            Не опрошены: <?= ($model->count_respond - $model->countDescInterviewsOfModel);?>
         </div>
 
         <div class="" style="padding: 0;">

@@ -95,7 +95,6 @@ a.view_block_description > div {
     }
 }
 
-
 .header-table {
     background: #707F99;
     border-radius: 3px 3px 0 0;
@@ -105,7 +104,8 @@ a.view_block_description > div {
 .container-data {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 330px);
+    margin-bottom: -10px;
 }
 
 .row_header_data {

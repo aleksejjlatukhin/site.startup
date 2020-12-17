@@ -97,6 +97,17 @@
     background: #E0E0E0;
 }
 
+@media screen and (min-width: 1250px) {
+
+    .container-one_hypothesis {
+        max-height: 80px;
+    }
+}
+
+.row .container-one_hypothesis {
+    margin: 3px 0;
+}
+
 .container-name_link {
     color: #4F4F4F;
 }
@@ -126,6 +137,13 @@
     padding: 10px 20px;
     border-radius: 12px;
     border: 2px solid #707F99;
+}
+
+.text_description_segment {
+    overflow: hidden;
+    max-height: inherit;
+    line-height: 19px;
+    padding-top: 2px;
 }
 
 @media screen and (min-width: 1140px) {

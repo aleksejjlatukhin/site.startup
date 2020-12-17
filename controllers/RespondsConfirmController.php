@@ -6,7 +6,7 @@ use app\models\AnswersQuestionsConfirmProblem;
 use app\models\ConfirmProblem;
 use app\models\DescInterviewConfirm;
 use app\models\forms\CreateRespondConfirmForm;
-use app\models\FormUpdateConfirmProblem;
+use app\models\forms\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -81,22 +81,20 @@ class RespondsConfirmController extends AppController
     public function actionDataAvailability($id)
     {
 
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
+        $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
 
-        $exist_data_respond = 0;
-        $exist_data_descInterview = 0;
-        foreach ($models as $model){
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count_exist_data_respond = RespondsConfirm::find()->where(['confirm_problem_id' => $id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-            if (!empty($model->info_respond)){
-                $exist_data_respond++;
-            }
-            if (!empty($model->descInterview)){
-                $exist_data_descInterview++;
-            }
-        }
+        //Кол-во респондентов, у кот-х существует анкета
+        $count_exist_data_descInterview = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
 
         if(Yii::$app->request->isAjax) {
-            if (($exist_data_respond == count($models)) || ($exist_data_descInterview > 0)) {
+
+            if (($count_exist_data_respond == $count_models) || ($count_exist_data_descInterview > 0)) {
 
                 $response =  ['success' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

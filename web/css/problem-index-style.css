@@ -97,6 +97,12 @@
     background: #FFFFFF;
     height: 100%;
 }
+
+.row .container-one_hypothesis {
+    margin: 3px 0;
+    padding: 10px;
+}
+
 .container-one_hypothesis {
     background: #F2F2F2;
     color: #4F4F4F;
@@ -115,12 +121,21 @@
     background: #E0E0E0;
 }
 
-@media screen and (min-width: 1140px) {
+@media screen and (min-width: 1250px) {
 
     .container-one_hypothesis {
         display: flex;
         align-items: center;
+        overflow: hidden;
+        max-height: 60px;
     }
+}
+
+.text_description_problem {
+    overflow: hidden;
+    max-height: inherit;
+    line-height: 19px;
+    padding-top: 2px;
 }
 
 .block_respond_problem {

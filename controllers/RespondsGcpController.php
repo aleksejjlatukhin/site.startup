@@ -6,6 +6,8 @@ use app\models\AnswersQuestionsConfirmGcp;
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
 use app\models\DescInterviewGcp;
+use app\models\forms\CreateRespondGcpForm;
+use app\models\forms\FormUpdateConfirmGcp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -14,6 +16,7 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\RespondsGcp;
+use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 use app\models\forms\UpdateRespondGcpForm;
 
@@ -81,22 +84,21 @@ class RespondsGcpController extends AppController
     public function actionDataAvailability($id)
     {
 
-        $models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
+        $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
 
-        $exist_data_respond = 0;
-        $exist_data_descInterview = 0;
-        foreach ($models as $model){
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count_exist_data_respond = RespondsGcp::find()->where(['confirm_gcp_id' => $id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-            if (!empty($model->info_respond)){
-                $exist_data_respond++;
-            }
-            if (!empty($model->descInterview)){
-                $exist_data_descInterview++;
-            }
-        }
+        //Кол-во респондентов, у кот-х существует анкета
+        $count_exist_data_descInterview = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+
 
         if(Yii::$app->request->isAjax) {
-            if (($exist_data_respond == count($models)) || ($exist_data_descInterview > 0)) {
+
+            if (($count_exist_data_respond == $count_models) || ($count_exist_data_descInterview > 0)) {
 
                 $response =  ['success' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -114,6 +116,21 @@ class RespondsGcpController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $confirm_gcp = ConfirmGcp::findOne($id);
+        $model = new CreateRespondGcpForm();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['confirm_gcp' => $confirm_gcp, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -122,34 +139,26 @@ class RespondsGcpController extends AppController
     {
         $models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
         $confirmGcp = ConfirmGcp::findOne($id);
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
 
-        $newRespond = new RespondsGcp();
+        $newRespond = new CreateRespondGcpForm();
         $newRespond->confirm_gcp_id = $id;
 
-
         if ($newRespond->load(Yii::$app->request->post())) {
-
-            $kol = 0;
-            foreach ($models as $elem){
-                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
-                    $kol++;
-                }
-            }
 
             if(Yii::$app->request->isAjax) {
 
                 if (count($models) < $limit_count_respond) {
 
-                    if ($kol == 0) {
+                    if ($newRespond->validate(['name'])) {
 
-                        if ($newRespond->save()) {
+                        if ($newRespond = $newRespond->create()) {
 
                             $newRespond->addAnswersForNewRespond();
 
@@ -160,11 +169,15 @@ class RespondsGcpController extends AppController
 
                             if ($project->save()) {
 
-                                $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
+                                $responds = RespondsGcp::findAll(['confirm_gcp_id' => $id]);
+                                $page = floor((count($responds) - 1) / 10) + 1;
 
-                                $response = [
+                                $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
+                                    'page' => $page,
+                                    'confirm_gcp_id' => $id,
+                                    'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id)]),
                                 ];
 
                                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -190,6 +203,20 @@ class RespondsGcpController extends AppController
     }
 
 
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = new UpdateRespondGcpForm($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return RespondsGcp|array
@@ -197,9 +224,7 @@ class RespondsGcpController extends AppController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $updateRespondForm = new UpdateRespondGcpForm($id);
-
+        $model = new UpdateRespondGcpForm($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -207,31 +232,23 @@ class RespondsGcpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $models = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
 
-
-        if ($updateRespondForm->load(Yii::$app->request->post())) {
-
-            $kol = 0;
-            foreach ($models as $item){
-                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
-                    $kol++;
-                }
-            }
+        if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($kol == 0){
+                if ($model->validate(['name'])){
 
-                    if ($updateRespondForm->updateRespond($model)){
+                    if ($model->updateRespond()){
 
                         $project->updated_at = time();
 
                         if ($project->save()){
 
+                            $response = ['confirm_gcp_id' => $confirmGcp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $model;
-                            return $model;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
                 }else{
@@ -248,6 +265,45 @@ class RespondsGcpController extends AppController
 
     /**
      * @param $id
+     * @return RespondsGcp
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataModel($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = $model;
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    public function actionGetQueryResponds($id, $page)
+    {
+        $model = ConfirmGcp::findOne($id);
+        $queryResponds = RespondsGcp::find()->where(['confirm_gcp_id' => $id]);
+        $pagesResponds = new Pagination(['totalCount' => $queryResponds->count(), 'page' => ($page - 1), 'pageSize' => 10]);
+        $pagesResponds->pageSizeParam = false; //убираем параметр $per-page
+        $responds = $queryResponds->offset($pagesResponds->offset)->limit(10)->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['ajax_data_responds' => $this->renderAjax('view_ajax', ['model' => $model, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+
+    /**
+     * @param $id
      * @return array|bool
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
@@ -257,10 +313,8 @@ class RespondsGcpController extends AppController
         $model = RespondsGcp::findOne($id);
         $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $id])->all();
-
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
-
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
@@ -306,7 +360,11 @@ class RespondsGcpController extends AppController
                     $confirmGcp->save();
                 }
 
-                $response = ['success' => true];
+                $response = [
+                    'success' => true,
+                    'confirm_gcp_id' => $model->confirm_gcp_id,
+                    'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($model->confirm_gcp_id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->confirm_gcp_id)]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;

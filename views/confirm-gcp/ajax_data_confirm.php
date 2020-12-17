@@ -1,9 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-use app\models\User;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use app\models\User;
 
 ?>
 
@@ -48,27 +48,21 @@ use yii\helpers\Url;
 
     </div>
 
-
     <div class="container-fluid content-view-data-confirm">
 
         <div class="row">
-            <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-            <div class="col-md-12"><?= $problem->description;?></div>
+            <div class="col-md-12">Формулировка ценностного предложения, которое проверяем</div>
+            <div class="col-md-12"><?= $gcp->description;?></div>
         </div>
 
         <div class="row">
-            <div class="col-md-12">Потребность потребителя сегмента, которую проверяем</div>
-            <div class="col-md-12"><?= $model->need_consumer;?></div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">Количество респондентов (представителей сегмента):
+            <div class="col-md-12">Количество респондентов, подтвердивших проблему:
                 <span><?= $model->count_respond; ?></span>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-12">Необходимое количество респондентов, подтверждающих проблему:
+            <div class="col-md-12">Необходимое количество респондентов, подтверждающих ценностное предложение:
                 <span><?= $model->count_positive; ?></span>
             </div>
         </div>
@@ -82,7 +76,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'update_data_confirm',
-        'action' => Url::to(['/confirm-problem/update', 'id' => $model->id]),
+        'action' => Url::to(['/confirm-gcp/update', 'id' => $formUpdateConfirmGcp->id]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -140,36 +134,20 @@ use yii\helpers\Url;
         <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
 
             <div class="col-md-12" style="font-weight: 700;">
-                Формулировка проблемы, которую проверяем
+                Формулировка ценностного предложения, которое проверяем
             </div>
 
             <div class="col-md-12">
-                <?= $problem->description;?>
+                <?= $gcp->description;?>
             </div>
 
         </div>
 
         <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
-            <?= $form->field($formUpdateConfirmProblem, 'need_consumer', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Какую потребность потребителя сегмента проверяем')
-                ->textarea([
-                    'rows' => 1,
-                    'maxlength' => true,
-                    'placeholder' => '',
-                    'required' => true,
-                    'class' => 'style_form_field_respond form-control',
-                ]);
-            ?>
-
-        </div>
-
-        <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
-
-            <?= $form->field($formUpdateConfirmProblem, 'count_respond', [
+            <?= $form->field($formUpdateConfirmGcp, 'count_respond', [
                 'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-            ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+            ])->label('<div>Количество респондентов, подтвердивших проблему</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                 ->textInput([
                     'type' => 'number',
                     'readonly' => true,
@@ -183,9 +161,9 @@ use yii\helpers\Url;
 
         <div class="row">
 
-            <?= $form->field($formUpdateConfirmProblem, 'count_positive', [
+            <?= $form->field($formUpdateConfirmGcp, 'count_positive', [
                 'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-            ])->label('Необходимое количество респондентов, подтверждающих проблему')
+            ])->label('Необходимое количество респондентов, подтверждающих ценностное предложение')
                 ->textInput([
                     'type' => 'number',
                     'required' => true,

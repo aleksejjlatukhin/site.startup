@@ -70,7 +70,8 @@ $string .= '<div class="row container-fluid" style="color: #4F4F4F;">';
 $string .= '<div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Описание проекта</div></div>
                     <div style="font-weight: 700;">Сокращенное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->project_name.'</div>
                     <div style="font-weight: 700;">Полное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->project_fullname.'</div>
-                    <div style="font-weight: 700;">Описание проекта</div><div style="margin-bottom: 20px;">'.$project->description.'</div>
+                    <div style="font-weight: 700;">Описание проекта</div><div style="margin-bottom: 10px;">'.$project->description.'</div>
+                    <div style="font-weight: 700;">Цель проекта</div><div style="margin-bottom: 20px;">'.$project->purpose_project.'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Результат интеллектуальной деятельности</div></div>
                     <div style="font-weight: 700;">Результат интеллектуальной деятельности</div><div style="margin-bottom: 10px;">'.$project->rid.'</div>

@@ -148,6 +148,18 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
             <div class="container-fluid">
 
+                <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
+
+                    <div class="col-md-12" style="font-weight: 700;">
+                        Цель акселерации проблемного интервью
+                    </div>
+
+                    <div class="col-md-12">
+                        <?= $project->purpose_project;?>
+                    </div>
+
+                </div>
+
                 <?php
 
                 $form = ActiveForm::begin([
@@ -161,7 +173,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
                 ?>
 
 
-                <div class="row" style="padding-top: 30px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
 
@@ -178,7 +190,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
 
@@ -195,7 +207,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
 
@@ -212,7 +224,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 15px; padding-bottom: 5px;">
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
                     <?= $form->field($model, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'

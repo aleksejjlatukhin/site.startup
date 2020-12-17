@@ -113,11 +113,15 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                 <div class="col-md-12" style="padding: 15px 0;">
 
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
-                        ['/interview/data-availability-for-next-step', 'id' => $interview->id],
-                        ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
-                    );
-                    ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                            ['/interview/data-availability-for-next-step', 'id' => $interview->id],
+                            ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
+                        );
+                        ?>
+
+                    <?php endif; ?>
 
                 </div>
 
@@ -135,7 +139,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                 </div>
 
-                <div class="col-md-7">Описание гипотезы проблемы сегмента</div>
+                <div class="col-md-7" style="padding-left: 10px;">Описание гипотезы проблемы сегмента</div>
 
                 <div class="col-md-1 text-center"><div>Дата создания</div></div>
 
@@ -151,7 +155,7 @@ $this->registerCssFile('@web/css/problem-index-style.css');
                 <!--Данные для списка проблем-->
                 <?php foreach ($models as $model) : ?>
 
-                    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>" style="margin: 3px 0; padding: 10px;">
+                    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
 
                         <div class="col-md-1">
                             <div class="row">
@@ -188,16 +192,9 @@ $this->registerCssFile('@web/css/problem-index-style.css');
                             </div>
                         </div>
 
-                        <div class="col-md-7">
+                        <div class="col-md-7 text_description_problem" title="<?= $model->description; ?>">
 
-                            <?php
-                            $problem_desc = $model->description;
-                            if (mb_strlen($problem_desc) > 180) {
-                                $problem_desc = mb_substr($model->description, 0, 180) . '...';
-                            }
-                            ?>
-
-                            <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $problem_desc . '</div>'?>
+                            <?= $model->description; ?>
 
                         </div>
 
@@ -242,21 +239,42 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                                     <?php else : ?>
 
-                                        <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
-                                            'class' => 'btn btn-default',
-                                            'style' => [
-                                                'display' => 'flex',
-                                                'align-items' => 'center',
-                                                'justify-content' => 'center',
-                                                'color' => '#FFFFFF',
-                                                'background' => '#707F99',
-                                                'width' => '120px',
-                                                'height' => '40px',
-                                                'font-size' => '18px',
-                                                'border-radius' => '8px',
-                                            ]
-                                        ]);
-                                        ?>
+                                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                            <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $model->id], [
+                                                'class' => 'btn btn-default',
+                                                'style' => [
+                                                    'display' => 'flex',
+                                                    'align-items' => 'center',
+                                                    'justify-content' => 'center',
+                                                    'color' => '#FFFFFF',
+                                                    'background' => '#707F99',
+                                                    'width' => '120px',
+                                                    'height' => '40px',
+                                                    'font-size' => '18px',
+                                                    'border-radius' => '8px',
+                                                ]
+                                            ]); ?>
+
+                                        <?php else: ?>
+
+                                            <?= Html::a('Подтвердить', ['#'], [
+                                                'onclick' => 'return false',
+                                                'class' => 'btn btn-default',
+                                                'style' => [
+                                                    'display' => 'flex',
+                                                    'align-items' => 'center',
+                                                    'justify-content' => 'center',
+                                                    'color' => '#FFFFFF',
+                                                    'background' => '#707F99',
+                                                    'width' => '120px',
+                                                    'height' => '40px',
+                                                    'font-size' => '18px',
+                                                    'border-radius' => '8px',
+                                                ]
+                                            ]); ?>
+
+                                        <?php endif; ?>
 
                                     <?php endif; ?>
 
@@ -277,10 +295,14 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                                 <div >
 
-                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/generation-problem/delete', 'id' => $model->id], [
-                                        'class' => 'delete_hypothesis',
-                                        'title' => 'Удалить',
-                                    ]); ?>
+                                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                                        <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/generation-problem/delete', 'id' => $model->id], [
+                                            'class' => 'delete_hypothesis',
+                                            'title' => 'Удалить',
+                                        ]); ?>
+
+                                    <?php endif; ?>
 
                                 </div>
 

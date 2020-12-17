@@ -51,6 +51,7 @@ class ConfirmGcp extends \yii\db\ActiveRecord
             [['gcp_id', 'count_respond', 'count_positive'], 'required'],
             [['gcp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
 
@@ -72,15 +73,13 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     public function createRespondConfirm ($responds)
     {
         foreach ($responds as $respond) {
-            if ($respond->descInterview->status == 1){
 
-                $respondConfirm = new RespondsGcp();
-                $respondConfirm->confirm_gcp_id = $this->id;
-                $respondConfirm->name = $respond->name;
-                $respondConfirm->info_respond = $respond->info_respond;
-                $respondConfirm->email = $respond->email;
-                $respondConfirm->save();
-            }
+            $respondConfirm = new RespondsGcp();
+            $respondConfirm->confirm_gcp_id = $this->id;
+            $respondConfirm->name = $respond->name;
+            $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->email = $respond->email;
+            $respondConfirm->save();
         }
     }
 
@@ -197,19 +196,13 @@ class ConfirmGcp extends \yii\db\ActiveRecord
 
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
 
-        foreach ($this->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $this->id, 'desc_interview_gcp.status' => '1'])->count();
 
         if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->mvps))) {
             return true;
@@ -219,45 +212,35 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataRespondsOfModel()
+    public function getCountRespondsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->info_respond)){
-                $sum++;
-            }
-        }
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count = RespondsGcp::find()->where(['confirm_gcp_id' => $this->id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-        return $sum;
+        return $count;
     }
 
 
-    public function getDataDescInterviewsOfModel()
+    public function getCountDescInterviewsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if ($respond->descInterview){
-                $sum++;
-            }
-        }
+        // Кол-во респондентов, у кот-х существует анкета
+        $count = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
 
-        return $sum;
+        return $count;
     }
 
 
-    public function getDataMembersOfGcp()
+    public function getCountConfirmMembers()
     {
-        $sumPositive = 0; // Кол-во подтвердивших ЦП
-        foreach ($this->responds as $respond){
+        // Кол-во подтвердивших ЦП
+        $count = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $this->id, 'desc_interview_gcp.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-        return $sumPositive;
+        return $count;
     }
 
 }

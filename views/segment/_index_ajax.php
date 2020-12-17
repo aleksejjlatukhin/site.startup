@@ -11,7 +11,7 @@ use app\models\Segment;
 <?php foreach ($models as $model) : ?>
 
 
-    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>" style="margin: 3px 0;">
+    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
 
         <div class="col-md-3" style="padding-left: 5px; padding-right: 5px;">
 
@@ -69,65 +69,28 @@ use app\models\Segment;
         </div>
 
 
-        <div class="col-md-2">
+        <div class="col-md-2 text_description_segment" title="<?= $model->field_of_activity; ?>">
 
-            <?php
-
-            $field_of_activity = $model->field_of_activity;
-
-            if (mb_strlen($field_of_activity) > 50) {
-                $field_of_activity = mb_substr($field_of_activity, 0, 50);
-                $field_of_activity = $field_of_activity . ' ...';
-            }
-
-            echo '<div title="' . $model->field_of_activity . '">' . $field_of_activity . '</div>';
-
-            ?>
+            <?= $model->field_of_activity; ?>
 
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-2 text_description_segment" title="<?= $model->sort_of_activity; ?>">
 
-            <?php
-
-            $sort_of_activity = $model->sort_of_activity;
-
-            if (mb_strlen($sort_of_activity) > 50) {
-                $sort_of_activity = mb_substr($sort_of_activity, 0, 50);
-                $sort_of_activity = $sort_of_activity . ' ...';
-            }
-
-            echo '<div title="' . $model->sort_of_activity . '">' . $sort_of_activity . '</div>';
-
-            ?>
+            <?= $model->sort_of_activity; ?>
 
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-2 text_description_segment" title="<?= $model->specialization_of_activity; ?>">
 
-            <?php
-
-            $specialization_of_activity = $model->specialization_of_activity;
-
-            if (mb_strlen($specialization_of_activity) > 50) {
-                $specialization_of_activity = mb_substr($specialization_of_activity, 0, 50);
-                $specialization_of_activity = $specialization_of_activity . ' ...';
-            }
-
-            echo '<div title="' . $model->specialization_of_activity . '">' . $specialization_of_activity . '</div>';
-
-            ?>
+            <?= $model->specialization_of_activity; ?>
 
         </div>
 
 
-        <div class="col-md-1">
+        <div class="col-md-1 text-right">
 
-            <?php
-
-            echo '<div class="text-right">' . number_format($model->market_volume, 0, '', ' ') . '</div>';
-
-            ?>
+            <?= number_format($model->market_volume, 0, '', ' '); ?>
 
         </div>
 
@@ -158,21 +121,42 @@ use app\models\Segment;
 
                     <?php else : ?>
 
-                        <?= Html::a('Подтвердить', ['/interview/create', 'id' => $model->id], [
-                            'class' => 'btn btn-default',
-                            'style' => [
-                                'display' => 'flex',
-                                'align-items' => 'center',
-                                'justify-content' => 'center',
-                                'color' => '#FFFFFF',
-                                'background' => '#707F99',
-                                'width' => '120px',
-                                'height' => '40px',
-                                'font-size' => '18px',
-                                'border-radius' => '8px',
-                            ]
-                        ]);
-                        ?>
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?= Html::a('Подтвердить', ['/interview/create', 'id' => $model->id], [
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'width' => '120px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]); ?>
+
+                        <?php else: ?>
+
+                            <?= Html::a('Подтвердить', ['#'], [
+                                'onclick' => 'return false',
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'width' => '120px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]); ?>
+
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
@@ -199,10 +183,14 @@ use app\models\Segment;
 
                 <div >
 
-                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/segment/delete', 'id' => $model->id], [
-                        'class' => 'delete_hypothesis',
-                        'title' => 'Удалить',
-                    ]); ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                        <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/segment/delete', 'id' => $model->id], [
+                            'class' => 'delete_hypothesis',
+                            'title' => 'Удалить',
+                        ]); ?>
+
+                    <?php endif; ?>
 
                 </div>
 

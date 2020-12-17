@@ -9,7 +9,7 @@ use app\models\User;
 <!--Данные для списка ценностных предложений-->
 <?php foreach ($models as $model) : ?>
 
-    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>" style="margin: 3px 0; padding: 10px;">
+    <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
 
         <div class="col-md-1">
             <div class="row">
@@ -46,16 +46,9 @@ use app\models\User;
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-md-7 text_description_problem" title="<?= $model->description; ?>">
 
-            <?php
-            $gcp_desc = $model->description;
-            if (mb_strlen($gcp_desc) > 180) {
-                $gcp_desc = mb_substr($gcp_desc, 0, 180) . '...';
-            }
-            ?>
-
-            <?= '<div title="'.$model->description.'" style="line-height: 21px;">' . $gcp_desc . '</div>'?>
+            <?= $model->description; ?>
 
         </div>
 
@@ -99,21 +92,42 @@ use app\models\User;
 
                     <?php else : ?>
 
-                        <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $model->id], [
-                            'class' => 'btn btn-default',
-                            'style' => [
-                                'display' => 'flex',
-                                'align-items' => 'center',
-                                'justify-content' => 'center',
-                                'color' => '#FFFFFF',
-                                'background' => '#707F99',
-                                'width' => '120px',
-                                'height' => '40px',
-                                'font-size' => '18px',
-                                'border-radius' => '8px',
-                            ]
-                        ]);
-                        ?>
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $model->id], [
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'width' => '120px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]); ?>
+
+                        <?php else: ?>
+
+                            <?= Html::a('Подтвердить', ['#'], [
+                                'onclick' => 'return false',
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'width' => '120px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]); ?>
+
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
@@ -134,10 +148,14 @@ use app\models\User;
 
                 <div >
 
-                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/gcp/delete', 'id' => $model->id], [
-                        'class' => 'delete_hypothesis',
-                        'title' => 'Удалить',
-                    ]); ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                        <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/gcp/delete', 'id' => $model->id], [
+                            'class' => 'delete_hypothesis',
+                            'title' => 'Удалить',
+                        ]); ?>
+
+                    <?php endif; ?>
 
                 </div>
 

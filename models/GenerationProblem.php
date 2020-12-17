@@ -76,7 +76,8 @@ class GenerationProblem extends \yii\db\ActiveRecord
     {
         return [
             [['interview_id', 'title'], 'required'],
-            [['title', 'description'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 255],
+            [['description'], 'string', 'max' => 2000],
             [['title', 'description'], 'trim'],
             [['time_confirm', 'interview_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
         ];

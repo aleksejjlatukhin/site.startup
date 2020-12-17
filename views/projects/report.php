@@ -66,11 +66,11 @@ use yii\helpers\Html;
 
             <div class="column_stage_confirm"><?= $segment->interview->count_positive; ?></div>
 
-            <div class="column_stage_confirm"><?= $segment->interview->dataMembersOfSegment; ?></div>
+            <div class="column_stage_confirm"><?= $segment->interview->countConfirmMembers; ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->interview->dataDescInterviewsOfModel - $segment->interview->dataMembersOfSegment); ?></div>
+            <div class="column_stage_confirm"><?= ($segment->interview->countDescInterviewsOfModel - $segment->interview->countConfirmMembers); ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->interview->count_respond - $segment->interview->dataDescInterviewsOfModel); ?></div>
+            <div class="column_stage_confirm"><?= ($segment->interview->count_respond - $segment->interview->countDescInterviewsOfModel); ?></div>
 
             <div class="column_stage_confirm">
 
@@ -194,11 +194,11 @@ use yii\helpers\Html;
 
                 <div class="column_stage_confirm"><?= $problem->confirm->count_positive; ?></div>
 
-                <div class="column_stage_confirm"><?= $problem->confirm->dataMembersOfProblem; ?></div>
+                <div class="column_stage_confirm"><?= $problem->confirm->countConfirmMembers; ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->dataDescInterviewsOfModel - $problem->confirm->dataMembersOfProblem); ?></div>
+                <div class="column_stage_confirm"><?= ($problem->confirm->countDescInterviewsOfModel - $problem->confirm->countConfirmMembers); ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->count_respond - $problem->confirm->dataDescInterviewsOfModel); ?></div>
+                <div class="column_stage_confirm"><?= ($problem->confirm->count_respond - $problem->confirm->countDescInterviewsOfModel); ?></div>
 
                 <div class="column_stage_confirm">
 
@@ -333,11 +333,11 @@ use yii\helpers\Html;
 
                         <div class="column_stage_confirm"><?= $gcp->confirm->count_positive; ?></div>
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->dataMembersOfGcp; ?></div>
+                        <div class="column_stage_confirm"><?= $gcp->confirm->countConfirmMembers; ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->dataDescInterviewsOfModel - $gcp->confirm->dataMembersOfGcp); ?></div>
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->countDescInterviewsOfModel - $gcp->confirm->countConfirmMembers); ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->count_respond - $gcp->confirm->dataDescInterviewsOfModel); ?></div>
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->count_respond - $gcp->confirm->countDescInterviewsOfModel); ?></div>
 
                         <div class="column_stage_confirm">
 

@@ -188,7 +188,7 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataRespondsOfModel()
+    public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
         $count = Respond::find()->where(['interview_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
@@ -198,7 +198,7 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataDescInterviewsOfModel()
+    public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует интервью
         $count = Respond::find()->with('descInterview')
@@ -209,7 +209,7 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataMembersOfSegment()
+    public function getCountConfirmMembers()
     {
         // Кол-во представителей сегмента
         $count = Respond::find()->with('descInterview')

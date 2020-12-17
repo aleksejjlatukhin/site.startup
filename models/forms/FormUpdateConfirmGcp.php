@@ -1,9 +1,10 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
+use app\models\ConfirmGcp;
 
 class FormUpdateConfirmGcp extends Model
 {
@@ -19,8 +20,10 @@ class FormUpdateConfirmGcp extends Model
     public function rules()
     {
         return [
+            [['gcp_id', 'count_respond', 'count_positive'], 'required'],
             [['gcp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
 
@@ -30,8 +33,8 @@ class FormUpdateConfirmGcp extends Model
     public function attributeLabels()
     {
         return [
-            'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Необходимое количество позитивных ответов',
+            'count_respond' => 'Количество респондентов, подтвердивших проблему',
+            'count_positive' => 'Необходимое количество респондентов, подтверждающих ценностное предложение',
         ];
     }
 
