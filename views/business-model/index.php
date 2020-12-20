@@ -1,12 +1,10 @@
 <?php
 
 use yii\helpers\Html;
-use yii\bootstrap\Modal;
-use yii\widgets\ActiveForm;
 use app\models\Segment;
+use app\models\User;
 
 $this->title = 'Генерация бизнес-модели';
-
 $this->registerCssFile('@web/css/business-model-index-style.css');
 
 ?>
@@ -163,11 +161,15 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
                     <div class="col-md-12" style="padding: 15px 0;">
 
-                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Бизнес-модель</div></div>',
-                            ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->id],
-                            ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
-                        );
-                        ?>
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Бизнес-модель</div></div>',
+                                ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->id],
+                                ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
+                            );
+                            ?>
+
+                        <?php endif; ?>
 
                     </div>
 
@@ -181,7 +183,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
                 <div class="row" style="margin: 0;">
 
-                    <div class="col-md-9 text_update_page">
+                    <div class="col-md-9 text_update_page" style="margin-bottom: 15px;">
 
                         <?php echo Html::a( 'Бизнес-модель' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]), ['/business-model/mpdf-business-model', 'id' => $model->id], [
                             'class' => 'export_link',
@@ -192,18 +194,23 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
                     <div class="button-update col-md-3">
 
-                        <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
-                            'class' => 'btn btn-default update-hypothesis',
-                            'style' => [
-                                'color' => '#FFFFFF',
-                                'background' => '#52BE7F',
-                                'padding' => '0 7px',
-                                'width' => '190px',
-                                'height' => '40px',
-                                'font-size' => '24px',
-                                'border-radius' => '8px',
-                            ],
-                        ])?>
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
+                                'class' => 'btn btn-default update-hypothesis',
+                                'style' => [
+                                    'color' => '#FFFFFF',
+                                    'background' => '#52BE7F',
+                                    'padding' => '0 7px',
+                                    'width' => '190px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]); ?>
+
+                        <?php endif; ?>
+
                     </div>
                 </div>
 

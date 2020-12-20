@@ -76,6 +76,21 @@ class DescInterviewMvpController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $respond = RespondsMvp::findOne($id);
+        $model = new DescInterviewMvp();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return DescInterviewMvp|array|bool
@@ -85,12 +100,6 @@ class DescInterviewMvpController extends AppController
         $model = new DescInterviewMvp();
         $model->responds_mvp_id = $id;
         $respond = RespondsMvp::findOne($id);
-
-        //Если у респондента уже есть интервью, то отменить действие
-        if ($respond->descInterview){
-            return false;
-        }
-
         $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
         $answers = $respond->answers;
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
@@ -119,23 +128,11 @@ class DescInterviewMvpController extends AppController
 
                         if ($project->save()){
 
-                            $response = $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_mvp_id' => $confirmMvp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }
@@ -145,7 +142,27 @@ class DescInterviewMvpController extends AppController
 
     /**
      * @param $id
-     * @return DescInterviewMvp|array
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = $this->findModel($id);
+        $respond = $model->respond;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -153,7 +170,6 @@ class DescInterviewMvpController extends AppController
         $model = $this->findModel($id);
         $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
         $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
-
         $answers = $respond->answers;
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
@@ -181,23 +197,11 @@ class DescInterviewMvpController extends AppController
 
                         if ($project->save()){
 
-                            $response =  $model;
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        } else {
-
-                            $response = ['error' => true];
+                            $response = ['confirm_mvp_id' => $confirmMvp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                             \Yii::$app->response->data = $response;
                             return $response;
                         }
-                    }else {
-
-                        $response = ['error' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
                     }
                 }
             }

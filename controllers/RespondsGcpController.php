@@ -137,7 +137,6 @@ class RespondsGcpController extends AppController
      */
     public function actionCreate($id)
     {
-        $models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->all();
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
@@ -145,6 +144,7 @@ class RespondsGcpController extends AppController
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
 
         $newRespond = new CreateRespondGcpForm();
@@ -154,7 +154,7 @@ class RespondsGcpController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if (count($models) < $limit_count_respond) {
+                if ($count_models < $limit_count_respond) {
 
                     if ($newRespond->validate(['name'])) {
 
@@ -314,18 +314,17 @@ class RespondsGcpController extends AppController
         $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $id])->all();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-        $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $count_responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->count();
 
         if (Yii::$app->request->isAjax){
 
-            if (count($responds) == 1){
+            if ($count_responds == 1){
 
                 $response = ['zero_value_responds' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

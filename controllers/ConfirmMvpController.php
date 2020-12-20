@@ -4,8 +4,8 @@ namespace app\controllers;
 
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
-use app\models\DescInterviewMvp;
 use app\models\forms\FormCreateBusinessModel;
+use app\models\forms\FormCreateConfirmMvp;
 use app\models\forms\FormUpdateConfirmMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
@@ -16,7 +16,6 @@ use app\models\QuestionsConfirmMvp;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\Segment;
-use app\models\forms\UpdateRespondMvpForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -163,32 +162,12 @@ class ConfirmMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
         $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $id])->all();
-
         $newQuestion = new QuestionsConfirmMvp();
-        $newQuestion->confirm_mvp_id = $id;
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
-
-        $newRespond = new RespondsMvp();
-        $newRespond->confirm_mvp_id = $model->id;
-
-        $updateRespondForms = [];
-        $createDescInterviewForms = [];
-        $updateDescInterviewForms = [];
-
-        foreach ($responds as $i => $respond) {
-
-            $updateRespondForms[] = new UpdateRespondMvpForm($respond->id);
-
-            $createDescInterviewForms[] = new DescInterviewMvp();
-
-            $updateDescInterviewForms[] = $respond->descInterview;
-        }
-
 
         return $this->render('view', [
             'model' => $model,
@@ -201,14 +180,9 @@ class ConfirmMvpController extends AppController
             'interview' => $interview,
             'segment' => $segment,
             'project' => $project,
-            'responds' => $responds,
             'questions' => $questions,
             'newQuestion' => $newQuestion,
-            'newRespond' => $newRespond,
             'queryQuestions' => $queryQuestions,
-            'updateRespondForms' => $updateRespondForms,
-            'createDescInterviewForms' => $createDescInterviewForms,
-            'updateDescInterviewForms' => $updateDescInterviewForms,
         ]);
     }
 
@@ -221,19 +195,13 @@ class ConfirmMvpController extends AppController
     {
         $model = ConfirmMvp::findOne($id);
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $id, 'desc_interview_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->business)  && $model->count_positive <= $count_positive)) {
@@ -270,19 +238,13 @@ class ConfirmMvpController extends AppController
         $model = ConfirmMvp::findOne($id);
         $mvp = $model->mvp;
 
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
 
-        foreach ($model->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $id, 'desc_interview_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -384,12 +346,9 @@ class ConfirmMvpController extends AppController
      */
     public function actionCreate($id)
     {
-        $model = new ConfirmMvp();
-        $model->mvp_id = $id;
-
+        $model = new FormCreateConfirmMvp();
         $mvp = Mvp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
@@ -397,18 +356,17 @@ class ConfirmMvpController extends AppController
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
+        //кол-во респондентов, подтвердивших текущую проблему
+        $count_represent_gcp = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->count();
+
+        $model->count_respond = $count_represent_gcp;
+
         if (!empty($mvp->confirm)){
+            //Если у MVP создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $mvp->confirm->id]);
         }
-
-        $respondsPre = []; // респонденты, кот-е подтвердили ЦП
-        foreach ($responds as $respond){
-            if ($respond->descInterview->status == 1){
-                $respondsPre[] = $respond;
-            }
-        }
-
-        $model->count_respond = count($respondsPre);
 
         return $this->render('create', [
             'model' => $model,
@@ -430,74 +388,51 @@ class ConfirmMvpController extends AppController
      */
     public function actionSaveConfirmMvp($id)
     {
-        $model = new ConfirmMvp();
+        $model = new FormCreateConfirmMvp();
         $model->mvp_id = $id;
 
         $mvp = Mvp::findOne($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
-        if (!empty($mvp->confirm)){
-            return $this->redirect(['view', 'id' => $mvp->confirm->id]);
-        }
-
-        foreach ($responds as $respond){
-            if ($respond->descInterview->status == 1){
-                $respondsPre[] = $respond;
-            }
-        }
-
-        $model->count_respond = count($respondsPre);
-
+        $responds = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->all();
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
+                if ($model = $model->create()) {
 
-                    if ($model->save()) {
+                    //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ЦП
+                    $model->createRespondConfirm($responds);
 
-                        //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ЦП
-                        $model->createRespondConfirm($responds);
+                    //Вопросы, которые будут добавлены по-умолчанию
+                    $model->addQuestionDefault('Что нравится в представленном MVP?');
+                    $model->addQuestionDefault('Что не нравится в представленном MVP?');
+                    $model->addQuestionDefault('Чем отличается ожидаемое решение от представленного?');
+                    $model->addQuestionDefault('Что бы Вы хотели сделать по другому?');
+                    $model->addQuestionDefault('Что показалось неудобным?');
+                    $model->addQuestionDefault('Вы готовы заплатить за такой продукт?');
 
-                        //Вопросы, которые будут добавлены по-умолчанию
-                        $model->addQuestionDefault('Что нравится в представленном MVP?');
-                        $model->addQuestionDefault('Что не нравится в представленном MVP?');
-                        $model->addQuestionDefault('Чем отличается ожидаемое решение от представленного?');
-                        $model->addQuestionDefault('Что бы Вы хотели сделать по другому?');
-                        $model->addQuestionDefault('Что показалось неудобным?');
-                        $model->addQuestionDefault('Вы готовы заплатить за такой продукт?');
+                    $project->updated_at = time();
 
-                        $project->updated_at = time();
+                    if ($project->save()) {
 
-                        if ($project->save()) {
-
-                            $response =  [
-                                'success' => true,
-                                'id' => $model->id,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response =  [
+                            'success' => true,
+                            'id' => $model->id,
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
-                } else {
-
-                    $response =  [
-                        'error' => true,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
-
             }
         }
     }
@@ -510,9 +445,9 @@ class ConfirmMvpController extends AppController
      */
     public function actionAddQuestions($id)
     {
-        $confirmMvp = ConfirmMvp::findOne($id);
+        $model = ConfirmMvp::findOne($id);
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
+        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
         $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
@@ -521,17 +456,15 @@ class ConfirmMvpController extends AppController
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
         $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $id])->all();
-
         $newQuestion = new QuestionsConfirmMvp();
-        $newQuestion->confirm_mvp_id = $id;
 
         //Список вопросов для добавления к списку программы
-        $queryQuestions = $confirmMvp->queryQuestionsGeneralList();
+        $queryQuestions = $model->queryQuestionsGeneralList();
         $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
 
         return $this->render('add-questions', [
             'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
-            'confirmMvp' => $confirmMvp,
+            'model' => $model,
             'mvp' => $mvp,
             'confirmGcp' => $confirmGcp,
             'gcp' => $gcp,
@@ -555,12 +488,18 @@ class ConfirmMvpController extends AppController
     {
         $model = new QuestionsConfirmMvp();
         $model->confirm_mvp_id = $id;
+        $confirmMvp = ConfirmMvp::findOne($id);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
 
         if ($model->load(Yii::$app->request->post())){
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model->save()){
+
+                    $project->updated_at = time();
+                    $project->save();
 
                     $confirmMvpNew = ConfirmMvp::findOne($id);
                     $questions = $confirmMvpNew->questions;
@@ -576,6 +515,7 @@ class ConfirmMvpController extends AppController
                         'model' => $model,
                         'questions' => $questions,
                         'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
@@ -595,22 +535,31 @@ class ConfirmMvpController extends AppController
     public function actionDeleteQuestion($id)
     {
         $model = QuestionsConfirmMvp::findOne($id);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
 
         if(Yii::$app->request->isAjax) {
 
             if ($model->delete()){
 
-                $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
+                $project->updated_at = time();
+                $project->save();
+
+                $confirmMvpNew = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
                 $questions = $confirmMvp->questions;
 
                 //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
-                $confirmMvp->deleteAnswerConfirmMvp($id);
+                $confirmMvpNew->deleteAnswerConfirmMvp($id);
+
                 //Передаем обновленный список вопросов для добавления в программу
-                $queryQuestions = $confirmMvp->queryQuestionsGeneralList();
+                $queryQuestions = $confirmMvpNew->queryQuestionsGeneralList();
 
                 $response = [
+                    'model' => $model,
                     'questions' => $questions,
                     'queryQuestions' => $queryQuestions,
+                    'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
@@ -641,39 +590,20 @@ class ConfirmMvpController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if ($model->count_respond >= $model->count_positive && $model->count_positive > 0){
+                if ($model = $model->update()){
 
-                    if ($confirm_mvp = $model->update()){
+                    $project->updated_at = time();
 
-                        $project->updated_at = time();
+                    if ($project->save()){
 
-                        if ($project->save()){
-
-                            $descInterviews = [];
-                            foreach ($confirm_mvp->responds as $respond) {
-                                if($respond->descInterview) {
-                                    $descInterviews[] = $respond->descInterview;
-                                }
-                            }
-
-                            $response = [
-                                'model' => $confirm_mvp,
-                                'responds' => $confirm_mvp->responds,
-                                'descInterviews' => $descInterviews,
-                                'business-model' => $confirm_mvp->business,
-                                'mvp' => $mvp,
-                            ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = [
+                            'success' => true,
+                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($id), 'mvp' => $mvp]),
+                        ];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
-                }else{
-
-                    $response = ['error' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }

@@ -133,12 +133,12 @@ class RespondsConfirmController extends AppController
      */
     public function actionCreate($id)
     {
-        $models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->all();
         $confirmProblem = ConfirmProblem::findOne($id);
         $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
         $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
 
         $newRespond = new CreateRespondConfirmForm();
@@ -148,7 +148,7 @@ class RespondsConfirmController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                if (count($models) < $limit_count_respond) {
+                if ($count_models < $limit_count_respond) {
 
                     if ($newRespond->validate(['name'])) {
 
@@ -305,15 +305,15 @@ class RespondsConfirmController extends AppController
         $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $model->id]);
         $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
-        $responds = RespondsConfirm::findAll(['confirm_problem_id' => $confirmProblem->id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
         $interview = Interview::findOne(['id' => $problem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $count_responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->count();
 
         if (Yii::$app->request->isAjax){
 
-            if (count($responds) == 1){
+            if ($count_responds == 1){
 
                 $response = ['zero_value_responds' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

@@ -471,11 +471,11 @@ use yii\helpers\Html;
 
                             <div class="column_stage_confirm"><?= $mvp->confirm->count_positive; ?></div>
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->dataMembersOfMvp; ?></div>
+                            <div class="column_stage_confirm"><?= $mvp->confirm->countConfirmMembers; ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->dataDescInterviewsOfModel - $mvp->confirm->dataMembersOfMvp); ?></div>
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->countDescInterviewsOfModel - $mvp->confirm->countConfirmMembers); ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->count_respond - $mvp->confirm->dataDescInterviewsOfModel); ?></div>
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->count_respond - $mvp->confirm->countDescInterviewsOfModel); ?></div>
 
                             <div class="column_stage_confirm">
 

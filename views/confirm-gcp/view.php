@@ -148,7 +148,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
 
 
     <!-- Tab links -->
-    <div class="tab row">
+    <div class="block-link-create-interview tab row">
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
             'class' => 'tablinks link_create_interview col-xs-12 col-md-6 col-lg-3',

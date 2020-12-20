@@ -7,6 +7,8 @@ use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\DescInterviewMvp;
+use app\models\forms\CreateRespondMvpForm;
+use app\models\forms\FormUpdateConfirmMvp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -17,6 +19,7 @@ use app\models\forms\UpdateRespondMvpForm;
 use app\models\User;
 use Yii;
 use app\models\RespondsMvp;
+use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
 
@@ -83,22 +86,19 @@ class RespondsMvpController extends AppController
     public function actionDataAvailability($id)
     {
 
-        $models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
+        $count_models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->count();
 
-        $exist_data_respond = 0;
-        $exist_data_descInterview = 0;
-        foreach ($models as $model){
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count_exist_data_respond = RespondsMvp::find()->where(['confirm_mvp_id' => $id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-            if (!empty($model->info_respond)){
-                $exist_data_respond++;
-            }
-            if (!empty($model->descInterview)){
-                $exist_data_descInterview++;
-            }
-        }
+        //Кол-во респондентов, у кот-х существует анкета
+        $count_exist_data_descInterview = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
 
         if(Yii::$app->request->isAjax) {
-            if (($exist_data_respond == count($models)) || ($exist_data_descInterview > 0)) {
+            if (($count_exist_data_respond == $count_models) || ($count_exist_data_descInterview > 0)) {
 
                 $response =  ['success' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -116,43 +116,51 @@ class RespondsMvpController extends AppController
     }
 
 
+    public function actionGetDataCreateForm($id)
+    {
+        $confirm_mvp = ConfirmMvp::findOne($id);
+        $model = new CreateRespondMvpForm();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('create', ['confirm_mvp' => $confirm_mvp, 'model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
      */
     public function actionCreate($id)
     {
-        $models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
         $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $count_models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->count();
         $limit_count_respond = RespondsMvp::LIMIT_COUNT;
 
-        $newRespond = new RespondsMvp();
+        $newRespond = new CreateRespondMvpForm();
         $newRespond->confirm_mvp_id = $id;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
-            $kol = 0;
-            foreach ($models as $elem){
-                if ($newRespond->id != $elem->id && mb_strtolower(str_replace(' ', '', $newRespond->name)) == mb_strtolower(str_replace(' ', '',$elem->name))){
-                    $kol++;
-                }
-            }
-
             if(Yii::$app->request->isAjax) {
 
-                if (count($models) < $limit_count_respond) {
+                if ($count_models < $limit_count_respond) {
 
-                    if ($kol == 0) {
+                    if ($newRespond->validate(['name'])) {
 
-                        if ($newRespond->save()) {
+                        if ($newRespond = $newRespond->create()) {
 
                             $newRespond->addAnswersForNewRespond();
 
@@ -163,11 +171,15 @@ class RespondsMvpController extends AppController
 
                             if ($project->save()) {
 
-                                $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->all();
+                                $responds = RespondsMvp::findAll(['confirm_mvp_id' => $id]);
+                                $page = floor((count($responds) - 1) / 10) + 1;
 
-                                $response = [
+                                $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
+                                    'page' => $page,
+                                    'confirm_mvp_id' => $id,
+                                    'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', ['model' => ConfirmMvp::findOne($id), 'mvp' => $mvp, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($id)]),
                                 ];
 
                                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -192,50 +204,53 @@ class RespondsMvpController extends AppController
     }
 
 
+    public function actionGetDataUpdateForm($id)
+    {
+        $model = new UpdateRespondMvpForm($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
-     * @return RespondsMvp|array
-     * @throws NotFoundHttpException
+     * @return array
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $updateRespondForm = new UpdateRespondMvpForm($id);
+        $model = new UpdateRespondMvpForm($id);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $models = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
-
-
-        if ($updateRespondForm->load(Yii::$app->request->post())) {
-
-            $kol = 0;
-            foreach ($models as $item){
-                if ($updateRespondForm->id != $item->id && mb_strtolower(str_replace(' ', '',$updateRespondForm->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
-                    $kol++;
-                }
-            }
+        if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($kol == 0){
+                if ($model->validate(['name'])){
 
-                    if ($updateRespondForm->updateRespond($model)){
+                    if ($model->updateRespond()){
 
                         $project->updated_at = time();
 
                         if ($project->save()){
 
+                            $response = ['confirm_mvp_id' => $confirmMvp->id];
                             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $model;
-                            return $model;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
                 }else{
@@ -252,6 +267,44 @@ class RespondsMvpController extends AppController
 
     /**
      * @param $id
+     * @return RespondsMvp
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataModel($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = $model;
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    public function actionGetQueryResponds($id, $page)
+    {
+        $model = ConfirmMvp::findOne($id);
+        $queryResponds = RespondsMvp::find()->where(['confirm_mvp_id' => $id]);
+        $pagesResponds = new Pagination(['totalCount' => $queryResponds->count(), 'page' => ($page - 1), 'pageSize' => 10]);
+        $pagesResponds->pageSizeParam = false; //убираем параметр $per-page
+        $responds = $queryResponds->offset($pagesResponds->offset)->limit(10)->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['ajax_data_responds' => $this->renderAjax('view_ajax', ['model' => $model, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws \Throwable
@@ -262,10 +315,7 @@ class RespondsMvpController extends AppController
         $model = $this->findModel($id);
         $descInterview = DescInterviewMvp::find()->where(['responds_mvp_id' => $model->id])->one();
         $answers = AnswersQuestionsConfirmMvp::find()->where(['respond_id' => $id])->all();
-
         $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-        $responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->all();
-
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
@@ -274,11 +324,12 @@ class RespondsMvpController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $count_responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->count();
 
 
         if (Yii::$app->request->isAjax){
 
-            if (count($responds) == 1){
+            if ($count_responds == 1){
 
                 $response = ['zero_value_responds' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -313,7 +364,11 @@ class RespondsMvpController extends AppController
                     $confirmMvp->save();
                 }
 
-                $response = ['success' => true];
+                $response = [
+                    'success' => true,
+                    'confirm_mvp_id' => $model->confirm_mvp_id,
+                    'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', ['model' => ConfirmMvp::findOne($model->confirm_mvp_id), 'mvp' => $mvp, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->confirm_mvp_id)]),
+                ];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 \Yii::$app->response->data = $response;
                 return $response;

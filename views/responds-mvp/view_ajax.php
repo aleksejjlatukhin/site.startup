@@ -65,7 +65,7 @@ use app\models\User;
 
                     echo '<div class="">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
-                            ['/responds-confirm/data-availability', 'id' => $model->id], [
+                            ['/responds-mvp/data-availability', 'id' => $model->id], [
                             'id' => 'respond_descInterview_form-' . $respond->id,
                             'class' => 'showDescInterviewCreateForm',
                             'title' => 'Добавить анкету'
@@ -144,12 +144,12 @@ use app\models\User;
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
-            Подтверждают проблему: <?= $model->countConfirmMembers;?>
+            Подтверждают MVP: <?= $model->countConfirmMembers;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-            Не подтверждают проблему: <?= ($model->countDescInterviewsOfModel - $model->countConfirmMembers);?>
+            Не подтверждают MVP: <?= ($model->countDescInterviewsOfModel - $model->countConfirmMembers);?>
         </div>
 
         <div class="" style="padding: 0;">
@@ -163,7 +163,7 @@ use app\models\User;
 
                 <?php if ($model->buttonMovingNextStage === true) : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/confirm-mvp/moving-next-stage', 'id' => $model->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -180,7 +180,7 @@ use app\models\User;
 
                 <?php else : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/confirm-mvp/moving-next-stage', 'id' => $model->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -200,9 +200,9 @@ use app\models\User;
 
             <?php else : ?>
 
-                <?php if ($model->problem->exist_confirm == 1) : ?>
+                <?php if ($model->mvp->exist_confirm == 1) : ?>
 
-                    <?= Html::a( 'Далее', ['/gcp/index', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/business-model/index', 'id' => $model->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',

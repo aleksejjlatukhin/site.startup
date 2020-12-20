@@ -51,6 +51,7 @@ class ConfirmMvp extends \yii\db\ActiveRecord
             [['mvp_id', 'count_respond', 'count_positive'], 'required'],
             [['mvp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
 
@@ -68,19 +69,17 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
-    //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
+    //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ГЦП
     public function createRespondConfirm ($responds)
     {
         foreach ($responds as $respond) {
-            if ($respond->descInterview->status == 1){
 
-                $respondConfirm = new RespondsMvp();
-                $respondConfirm->confirm_mvp_id = $this->id;
-                $respondConfirm->name = $respond->name;
-                $respondConfirm->info_respond = $respond->info_respond;
-                $respondConfirm->email = $respond->email;
-                $respondConfirm->save();
-            }
+            $respondConfirm = new RespondsMvp();
+            $respondConfirm->confirm_mvp_id = $this->id;
+            $respondConfirm->name = $respond->name;
+            $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->email = $respond->email;
+            $respondConfirm->save();
         }
     }
 
@@ -197,19 +196,13 @@ class ConfirmMvp extends \yii\db\ActiveRecord
 
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = 0;
-        $count_positive = 0;
+        $count_descInterview = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
 
-        foreach ($this->responds as $respond) {
-
-            if ($respond->descInterview){
-                $count_descInterview++;
-
-                if ($respond->descInterview->status == 1){
-                    $count_positive++;
-                }
-            }
-        }
+        $count_positive = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $this->id, 'desc_interview_mvp.status' => '1'])->count();
 
         if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->business))) {
             return true;
@@ -219,44 +212,34 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
-    public function getDataRespondsOfModel()
+    public function getCountRespondsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if (!empty($respond->info_respond)){
-                $sum++;
-            }
-        }
+        //Кол-во респондентов, у кот-х заполнены данные
+        $count = RespondsMvp::find()->where(['confirm_mvp_id' => $this->id])
+            ->andWhere(['not', ['info_respond' => '']])->count();
 
-        return $sum;
+        return $count;
     }
 
 
-    public function getDataDescInterviewsOfModel()
+    public function getCountDescInterviewsOfModel()
     {
-        $sum = 0;
-        foreach ($this->responds as $respond){
-            if ($respond->descInterview){
-                $sum++;
-            }
-        }
+        // Кол-во респондентов, у кот-х существует анкета
+        $count = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
 
-        return $sum;
+        return $count;
     }
 
 
-    public function getDataMembersOfMvp()
+    public function getCountConfirmMembers()
     {
-        $sumPositive = 0; // Кол-во подтвердивших MVP
-        foreach ($this->responds as $respond){
+        // Кол-во подтвердивших MVP
+        $count = RespondsMvp::find()->with('descInterview')
+            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
+            ->where(['confirm_mvp_id' => $this->id, 'desc_interview_mvp.status' => '1'])->count();
 
-            if ($respond->descInterview){
-                if ($respond->descInterview->status == 1){
-                    $sumPositive++;
-                }
-            }
-        }
-
-        return $sumPositive;
+        return $count;
     }
 }

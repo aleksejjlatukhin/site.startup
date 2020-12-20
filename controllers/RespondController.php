@@ -124,10 +124,10 @@ class RespondController extends AppController
      */
     public function actionCreate($id)
     {
-        $models = Respond::find()->where(['interview_id' => $id])->all();
         $interview = Interview::findOne($id);
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $count_models = Respond::find()->where(['interview_id' => $id])->count();
         $limit_count_respond = Respond::LIMIT_COUNT;
         $newRespond = new CreateRespondForm();
         $newRespond->interview_id = $id;
@@ -136,7 +136,7 @@ class RespondController extends AppController
         {
             if(Yii::$app->request->isAjax) {
 
-                if (count($models) < $limit_count_respond) {
+                if ($count_models < $limit_count_respond) {
 
                     if ($newRespond->validate(['name'])) {
 
@@ -281,14 +281,14 @@ class RespondController extends AppController
         $model = Respond::findOne($id);
         $descInterview = DescInterview::findOne(['respond_id' => $model->id]);
         $interview = Interview::findOne(['id' => $model->interview_id]);
-        $responds = Respond::findAll(['interview_id' => $interview->id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $count_responds = Respond::find()->where(['interview_id' => $interview->id])->count();
         $user = User::findOne(['id' => $project->user_id]);
 
         if (Yii::$app->request->isAjax){
 
-            if (count($responds) == 1){
+            if ($count_responds == 1){
 
                 $response = ['zero_value_responds' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

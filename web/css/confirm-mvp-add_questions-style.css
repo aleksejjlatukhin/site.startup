@@ -126,13 +126,14 @@ a.view_block_description > div {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
     display: none;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 330px);
 }
 
 .form-view-data-confirm {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 330px);
+    margin-bottom: -10px;
 }
 
 .block-buttons-update-data-confirm {
@@ -140,10 +141,35 @@ a.view_block_description > div {
     text-align: right;
 }
 
+.form-view-data-confirm .content-view-data-confirm {
+    margin: 0 5px;
+}
+.form-view-data-confirm .content-view-data-confirm .row {
+    padding-top: 10px;
+}
+.form-view-data-confirm .content-view-data-confirm .row:first-child {
+    padding-top: 20px;
+}
+.form-view-data-confirm .content-view-data-confirm .row:last-child {
+    padding-top: 5px;
+}
+.form-view-data-confirm .content-view-data-confirm .row div:first-child {
+    font-weight: 700;
+}
+.form-view-data-confirm .content-view-data-confirm .row div span {
+    font-weight: 400;
+    padding-left: 10px;
+}
+
+#step_two {
+    min-height: calc(100vh - 330px);
+    margin-bottom: -10px;
+    background: #F2F2F2;
+}
+
 .container-data {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
-    min-height: calc(100vh - 200px);
 }
 
 .row_header_data {

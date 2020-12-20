@@ -86,7 +86,8 @@ class BusinessModelController extends AppController
             $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 

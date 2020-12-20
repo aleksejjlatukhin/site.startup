@@ -105,7 +105,7 @@ use app\models\User;
                         echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
                             'id' => 'descInterview_form-' . $respond->descInterview->id,
                             'class' => 'showDescInterviewUpdateForm',
-                            'title' => 'Редактировать результаты опроса',
+                            'title' => 'Результаты опроса',
                         ]);
                     }
                     ?>

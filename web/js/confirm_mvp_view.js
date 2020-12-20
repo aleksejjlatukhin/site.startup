@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
     var id = (window.location.search).split('?id=')[1];
-    var url = '/responds-gcp/get-query-responds?id=' + id + '&page=1';
+    var url = '/responds-mvp/get-query-responds?id=' + id + '&page=1';
 
     //Загружаем данные респондентов (Шаг 3)
     $.ajax({
@@ -92,7 +92,7 @@ $(body).on('beforeSubmit', '#update_data_confirm', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-gcp/get-query-responds?id=' + id + '&page=1',
+                    url: '/responds-mvp/get-query-responds?id=' + id + '&page=1',
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -175,7 +175,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
 
 
 //Удаление вопроса для анкеты (Шаг 2)
-$(body).on('click', '.delete-question-confirm-gcp', function(e){
+$(body).on('click', '.delete-question-confirm-mvp', function(e){
 
     var url = $(this).attr('href');
 
@@ -341,7 +341,7 @@ $(body).on('change', 'input#confirm_count_positive', function () {
 $(body).on('click', '#showRespondCreateForm', function(e){
 
     var id = location.href.split('=')[1];
-    var url = '/responds-gcp/get-data-create-form?id=' + id;
+    var url = '/responds-mvp/get-data-create-form?id=' + id;
 
     $.ajax({
 
@@ -385,7 +385,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
                     //Загружаем данные респондентов (Шаг 3)
                     $.ajax({
 
-                        url: '/responds-gcp/get-query-responds?id=' + response.confirm_gcp_id + '&page=' + response.page,
+                        url: '/responds-mvp/get-query-responds?id=' + response.confirm_mvp_id + '&page=' + response.page,
                         method: 'POST',
                         cache: false,
                         success: function(response){
@@ -436,7 +436,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 $(body).on('click', '.showRespondUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/responds-gcp/get-data-update-form?id=' + id;
+    var url = '/responds-mvp/get-data-update-form?id=' + id;
 
     $.ajax({
 
@@ -480,7 +480,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-gcp/get-query-responds?id=' + response.confirm_gcp_id + '&page=' + page,
+                    url: '/responds-mvp/get-query-responds?id=' + response.confirm_mvp_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -518,7 +518,7 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
 
     var url_1 = $(this).attr('href');
     var id = $(this).attr('id').split('-')[1];
-    var url_2 = '/desc-interview-gcp/get-data-create-form?id=' + id;
+    var url_2 = '/desc-interview-mvp/get-data-create-form?id=' + id;
     var error_respond_modal = $('#error_respond_modal');
 
     $.ajax({
@@ -583,7 +583,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds-gcp/get-query-responds?id=' + response.confirm_gcp_id + '&page=' + page,
+                url: '/responds-mvp/get-query-responds?id=' + response.confirm_mvp_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -612,7 +612,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/desc-interview-gcp/get-data-update-form?id=' + id;
+    var url = '/desc-interview-mvp/get-data-update-form?id=' + id;
 
     $.ajax({
 
@@ -655,7 +655,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds-gcp/get-query-responds?id=' + response.confirm_gcp_id + '&page=' + page,
+                url: '/responds-mvp/get-query-responds?id=' + response.confirm_mvp_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -684,7 +684,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 $(body).on('click', '.showDeleteRespondModal', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/responds-gcp/get-data-model?id=' + id;
+    var url = '/responds-mvp/get-data-model?id=' + id;
 
     $.ajax({
 
@@ -695,7 +695,7 @@ $(body).on('click', '.showDeleteRespondModal', function(e){
 
             var delete_respond_modal = $('#delete-respond-modal');
             $(delete_respond_modal).find('.modal-body h4').html('Вы уверены, что хотите удалить все данные<br>о респонденте «' + response.name + '»?');
-            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/responds-gcp/delete?id=' + response.id);
+            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/responds-mvp/delete?id=' + response.id);
             $(delete_respond_modal).modal('show');
         },
         error: function(){
@@ -745,7 +745,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                     $('#delete-respond-modal').modal('hide');
                     //Показываем окно с ошибкой
                     $(error_respond_modal).find('.modal-header h3').html('Удаление респондента отклонено');
-                    $(error_respond_modal).find('.modal-body h4').html('Общее количество респондентов не должно быть меньше необходимого количества респондентов, которые должны подтвердить ценностное предложение.');
+                    $(error_respond_modal).find('.modal-body h4').html('Общее количество респондентов не должно быть меньше необходимого количества респондентов, которые должны подтвердить MVP(продукт).');
                     $(error_respond_modal).modal('show');
                 }
             }
@@ -754,7 +754,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-gcp/get-query-responds?id=' + response.confirm_gcp_id + '&page=' + page,
+                    url: '/responds-mvp/get-query-responds?id=' + response.confirm_mvp_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -814,13 +814,13 @@ $(body).on('click', '#button_MovingNextStage', function(e){
                 if (!response.not_completed_descInterviews) {
 
                     if (response.exist_confirm === 1) {
-                        window.location.href = '/mvp/index?id=' + id;
+                        window.location.href = '/business-model/index?id=' + id;
                     }
                     else if (response.exist_confirm === null) {
-                        window.location.href = '/confirm-gcp/exist-confirm?id=' + id;
+                        window.location.href = '/confirm-mvp/exist-confirm?id=' + id;
                     }
                     else if (response.exist_confirm === 0) {
-                        window.location.href = '/confirm-gcp/exist-confirm?id=' + id;
+                        window.location.href = '/confirm-mvp/exist-confirm?id=' + id;
                     }
 
                 } else {

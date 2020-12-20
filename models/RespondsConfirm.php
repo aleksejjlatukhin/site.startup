@@ -50,7 +50,8 @@ class RespondsConfirm extends \yii\db\ActiveRecord
             [['confirm_problem_id', 'name'], 'required'],
             [['confirm_problem_id'], 'integer'],
             [['name', 'info_respond', 'email'], 'trim'],
-            [['name', 'info_respond', 'email'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 100],
+            [['info_respond', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }
