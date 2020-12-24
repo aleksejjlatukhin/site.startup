@@ -29,7 +29,7 @@ class MvpController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = Mvp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $model->project->id])->one();
+            $project = Projects::findOne(['id' => $model->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -46,8 +46,8 @@ class MvpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -61,8 +61,8 @@ class MvpController extends AppController
         }elseif (in_array($action->id, ['index'])){
 
             $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -89,12 +89,12 @@ class MvpController extends AppController
     {
         $models = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
         $confirmGcp = ConfirmGcp::findOne($id);
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         return $this->render('index', [
             'models' => $models,
@@ -117,12 +117,12 @@ class MvpController extends AppController
     {
         $model = new FormCreateMvp();
         $confirmGcp = ConfirmGcp::findOne($id);
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -130,19 +130,14 @@ class MvpController extends AppController
 
                 if ($model->create($id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
-                    $project->updated_at = time();
-
-                    if ($project->save()) {
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => Mvp::find()->where(['confirm_gcp_id' => $id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Mvp::findAll(['confirm_gcp_id' => $id]),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -157,14 +152,7 @@ class MvpController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $confirmGcp = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -172,20 +160,14 @@ class MvpController extends AppController
 
                 if ($model->save()){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => Mvp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Mvp::findAll(['confirm_gcp_id' => $confirmGcp->id]),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -243,11 +225,7 @@ class MvpController extends AppController
                 $this->delTree($pathDelete);
             }
 
-            $project->updated_at = time();
-            $project->save();
-
             if ($model->deleteStage()) {
-
                 return true;
             }
         }

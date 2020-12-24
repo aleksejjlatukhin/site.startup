@@ -3,13 +3,9 @@
 namespace app\controllers;
 
 use app\models\ConfirmGcp;
-use app\models\ConfirmProblem;
 use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
 use app\models\Projects;
 use app\models\RespondsGcp;
-use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\DescInterviewGcp;
@@ -31,10 +27,10 @@ class DescInterviewGcpController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = DescInterviewGcp::findOne(Yii::$app->request->get());
-            $respond = RespondsGcp::find()->where(['id' => $model->responds_gcp_id])->one();
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $respond = RespondsGcp::findOne(['id' => $model->responds_gcp_id]);
+            $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+            $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -51,9 +47,9 @@ class DescInterviewGcpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $respond = RespondsGcp::findOne(Yii::$app->request->get());
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+            $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -98,14 +94,8 @@ class DescInterviewGcpController extends AppController
         $model = new DescInterviewGcp();
         $model->responds_gcp_id = $id;
         $respond = RespondsGcp::findOne($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
         $answers = $respond->answers;
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         if(Yii::$app->request->isAjax) {
 
@@ -119,15 +109,10 @@ class DescInterviewGcpController extends AppController
 
                     if ($model->save()) {
 
-                        $project->updated_at = time();
-
-                        if ($project->save()){
-
-                            $response = ['confirm_gcp_id' => $confirmGcp->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = ['confirm_gcp_id' => $confirmGcp->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 }
             }
@@ -163,15 +148,9 @@ class DescInterviewGcpController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $respond = RespondsGcp::find()->where(['id' => $model->responds_gcp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
+        $respond = RespondsGcp::findOne(['id' => $model->responds_gcp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
         $answers = $respond->answers;
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         if(Yii::$app->request->isAjax) {
 
@@ -185,56 +164,15 @@ class DescInterviewGcpController extends AppController
 
                     if ($model->save()) {
 
-                        $project->updated_at = time();
-
-                        if ($project->save()){
-
-                            $response = ['confirm_gcp_id' => $confirmGcp->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = ['confirm_gcp_id' => $confirmGcp->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 }
             }
         }
     }
-
-    /**
-     * Deletes an existing DescInterviewGcp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    /*public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $respond = RespondsGcp::find()->where(['id' => $model->responds_gcp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $respond->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        $model->delete();
-
-        return $this->redirect(['index']);
-    }*/
 
     /**
      * Finds the DescInterviewGcp model based on its primary key value.

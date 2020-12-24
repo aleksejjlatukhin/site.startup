@@ -4,15 +4,11 @@ namespace app\controllers;
 
 use app\models\AnswersQuestionsConfirmGcp;
 use app\models\ConfirmGcp;
-use app\models\ConfirmProblem;
 use app\models\DescInterviewGcp;
 use app\models\forms\CreateRespondGcpForm;
 use app\models\forms\FormUpdateConfirmGcp;
 use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
 use app\models\Projects;
-use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\RespondsGcp;
@@ -35,9 +31,9 @@ class RespondsGcpController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = RespondsGcp::findOne(Yii::$app->request->get());
-            $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $confirmGcp = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
+            $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -54,8 +50,8 @@ class RespondsGcpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
         $confirmGcp = ConfirmGcp::findOne(Yii::$app->request->get());
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $project = Projects::findOne(['id' => $gcp->project->id]);
 
         /*Ограничение доступа к проэктам пользователя*/
         if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -139,11 +135,6 @@ class RespondsGcpController extends AppController
     {
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
         $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
 
@@ -165,25 +156,20 @@ class RespondsGcpController extends AppController
                             $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
                             $confirmGcp->save();
 
-                            $project->updated_at = time();
+                            $responds = RespondsGcp::findAll(['confirm_gcp_id' => $id]);
+                            $page = floor((count($responds) - 1) / 10) + 1;
 
-                            if ($project->save()) {
+                            $response =  [
+                                'newRespond' => $newRespond,
+                                'responds' => $responds,
+                                'page' => $page,
+                                'confirm_gcp_id' => $id,
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id)]),
+                            ];
 
-                                $responds = RespondsGcp::findAll(['confirm_gcp_id' => $id]);
-                                $page = floor((count($responds) - 1) / 10) + 1;
-
-                                $response =  [
-                                    'newRespond' => $newRespond,
-                                    'responds' => $responds,
-                                    'page' => $page,
-                                    'confirm_gcp_id' => $id,
-                                    'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id)]),
-                                ];
-
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-                            }
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     } else {
                         $response = ['error' => true];
@@ -226,12 +212,6 @@ class RespondsGcpController extends AppController
     {
         $model = new UpdateRespondGcpForm($id);
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -241,15 +221,10 @@ class RespondsGcpController extends AppController
 
                     if ($model->updateRespond()){
 
-                        $project->updated_at = time();
-
-                        if ($project->save()){
-
-                            $response = ['confirm_gcp_id' => $confirmGcp->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = ['confirm_gcp_id' => $confirmGcp->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 }else{
 
@@ -315,11 +290,6 @@ class RespondsGcpController extends AppController
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $id])->all();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
         $count_responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -333,7 +303,7 @@ class RespondsGcpController extends AppController
             }
 
 
-            if ($confirmGcp->count_respond == $confirmGcp->count_positive){
+            elseif ($confirmGcp->count_respond == $confirmGcp->count_positive){
 
                 $response = ['number_less_than_allowed' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -341,9 +311,7 @@ class RespondsGcpController extends AppController
                 return $response;
             }
 
-            $project->updated_at = time();
-
-            if ($project->save()) {
+            else {
 
                 if ($descInterview) {
                     $descInterview->delete();

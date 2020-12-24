@@ -8,9 +8,7 @@ use app\models\DescInterviewConfirm;
 use app\models\forms\CreateRespondConfirmForm;
 use app\models\forms\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
-use app\models\Interview;
 use app\models\Projects;
-use app\models\Segment;
 use app\models\forms\UpdateRespondConfirmForm;
 use app\models\User;
 use Yii;
@@ -32,9 +30,9 @@ class RespondsConfirmController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = RespondsConfirm::findOne(Yii::$app->request->get());
-            $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
+            $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -51,8 +49,8 @@ class RespondsConfirmController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -134,13 +132,9 @@ class RespondsConfirmController extends AppController
     public function actionCreate($id)
     {
         $confirmProblem = ConfirmProblem::findOne($id);
-        $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
         $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
         $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
-
         $newRespond = new CreateRespondConfirmForm();
         $newRespond->confirm_problem_id = $id;
 
@@ -159,25 +153,20 @@ class RespondsConfirmController extends AppController
                             $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
                             $confirmProblem->save();
 
-                            $project->updated_at = time();
+                            $responds = RespondsConfirm::findAll(['confirm_problem_id' => $id]);
+                            $page = floor((count($responds) - 1) / 10) + 1;
 
-                            if ($project->save()) {
+                            $response =  [
+                                'newRespond' => $newRespond,
+                                'responds' => $responds,
+                                'page' => $page,
+                                'confirm_problem_id' => $id,
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id)]),
+                            ];
 
-                                $responds = RespondsConfirm::findAll(['confirm_problem_id' => $id]);
-                                $page = floor((count($responds) - 1) / 10) + 1;
-
-                                $response =  [
-                                    'newRespond' => $newRespond,
-                                    'responds' => $responds,
-                                    'page' => $page,
-                                    'confirm_problem_id' => $id,
-                                    'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id)]),
-                                ];
-
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-                            }
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     } else {
                         $response = ['error' => true];
@@ -220,10 +209,6 @@ class RespondsConfirmController extends AppController
     {
         $model = new UpdateRespondConfirmForm($id);
         $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -233,15 +218,10 @@ class RespondsConfirmController extends AppController
 
                     if ($model->updateRespond()){
 
-                        $project->updated_at = time();
-
-                        if ($project->save()){
-
-                            $response = ['confirm_problem_id' => $confirmProblem->id];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        $response = ['confirm_problem_id' => $confirmProblem->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
                     }
                 }else{
 
@@ -306,9 +286,6 @@ class RespondsConfirmController extends AppController
         $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
         $count_responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -322,7 +299,7 @@ class RespondsConfirmController extends AppController
             }
 
 
-            if ($confirmProblem->count_respond == $confirmProblem->count_positive){
+            elseif ($confirmProblem->count_respond == $confirmProblem->count_positive){
 
                 $response = ['number_less_than_allowed' => true];
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -330,9 +307,7 @@ class RespondsConfirmController extends AppController
                 return $response;
             }
 
-            $project->updated_at = time();
-
-            if ($project->save()) {
+            else {
 
                 if ($descInterview) {
                     $descInterview->delete();

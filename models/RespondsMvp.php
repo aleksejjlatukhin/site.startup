@@ -83,4 +83,26 @@ class RespondsMvp extends \yii\db\ActiveRecord
             $answer->save();
         }
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->confirm->mvp->project->touch('updated_at');
+            $this->confirm->mvp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->confirm->mvp->project->touch('updated_at');
+            $this->confirm->mvp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->confirm->mvp->project->touch('updated_at');
+            $this->confirm->mvp->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }

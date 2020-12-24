@@ -69,6 +69,23 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->gcp->project->touch('updated_at');
+            $this->gcp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->gcp->project->touch('updated_at');
+            $this->gcp->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
+
+
     //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
     public function createRespondConfirm ($responds)
     {

@@ -110,15 +110,14 @@ class BusinessModelController extends AppController
     {
         $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
         $confirmMvp = ConfirmMvp::findOne($id);
-
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         return $this->render('index', [
             'model' => $model,
@@ -158,21 +157,16 @@ class BusinessModelController extends AppController
 
                 if ($businessModel = $model->create($id, $mvp->id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
-                    $project->updated_at = time();
-
-                    if ($project->save()) {
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'model' => BusinessModel::findOne(['confirm_mvp_id' => $id]),
-                                'segment' => $segment,
-                                'gcp' => $gcp,
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'model' => BusinessModel::findOne(['confirm_mvp_id' => $id]),
+                            'segment' => $segment,
+                            'gcp' => $gcp,
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -188,14 +182,8 @@ class BusinessModelController extends AppController
     {
         $model = $this->findModel($id);
         $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $gcp = $model->gcp;
+        $segment = $model->segment;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -203,21 +191,16 @@ class BusinessModelController extends AppController
 
                 if ($model->save()) {
 
-                    $project->updated_at = time();
-
-                    if ($project->save()) {
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'model' => BusinessModel::findOne(['confirm_mvp_id' => $confirmMvp->id]),
-                                'segment' => $segment,
-                                'gcp' => $gcp,
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'model' => BusinessModel::findOne(['confirm_mvp_id' => $confirmMvp->id]),
+                            'segment' => $segment,
+                            'gcp' => $gcp,
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }

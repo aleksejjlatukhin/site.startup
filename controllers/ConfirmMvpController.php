@@ -38,8 +38,8 @@ class ConfirmMvpController extends AppController
         if (in_array($action->id, ['view'])){
 
             $model = ConfirmMvp::findOne(Yii::$app->request->get());
-            $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -54,8 +54,8 @@ class ConfirmMvpController extends AppController
         }elseif (in_array($action->id, ['update'])){
 
             $model = ConfirmMvp::findOne(Yii::$app->request->get());
-            $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -72,7 +72,7 @@ class ConfirmMvpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $mvp = Mvp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -86,7 +86,7 @@ class ConfirmMvpController extends AppController
         }elseif (in_array($action->id, ['save-confirm-mvp'])){
 
             $mvp = Mvp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -103,8 +103,8 @@ class ConfirmMvpController extends AppController
         }elseif (in_array($action->id, ['add-questions'])){
 
             $model = ConfirmMvp::findOne(Yii::$app->request->get());
-            $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -122,9 +122,9 @@ class ConfirmMvpController extends AppController
         } elseif (in_array($action->id, ['delete-question'])){
 
             $question = QuestionsConfirmMvp::findOne(Yii::$app->request->get());
-            $confirm_mvp = ConfirmMvp::find()->where(['id' => $question->confirm_mvp_id])->one();
-            $mvp = Mvp::find()->where(['id' => $confirm_mvp->mvp_id])->one();
-            $project = Projects::find()->where(['id' => $mvp->project->id])->one();
+            $confirm_mvp = ConfirmMvp::findOne(['id' => $question->confirm_mvp_id]);
+            $mvp = Mvp::findOne(['id' => $confirm_mvp->mvp_id]);
+            $project = Projects::findOne(['id' => $mvp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -154,15 +154,15 @@ class ConfirmMvpController extends AppController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
-        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $id])->all();
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $questions = QuestionsConfirmMvp::findAll(['confirm_mvp_id' => $id]);
         $newQuestion = new QuestionsConfirmMvp();
 
         //Список вопросов для добавления к списку программы
@@ -279,18 +279,13 @@ class ConfirmMvpController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionNotExistConfirm($id)
     {
-        $model = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
 
         if ($mvp->exist_confirm === 0) {
 
@@ -301,11 +296,8 @@ class ConfirmMvpController extends AppController
             $mvp->time_confirm = time();
 
             if ($mvp->save()){
-
-                $project->updated_at = time();
-                if ($project->save()){
-                    return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
-                }
+                $mvp->trigger(Mvp::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
             }
         }
     }
@@ -314,28 +306,19 @@ class ConfirmMvpController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionExistConfirm($id)
     {
-        $model = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
 
         $mvp->exist_confirm = 1;
         $mvp->time_confirm = time();
 
         if ($mvp->save()){
-
-            $project->updated_at = time();
-            if ($project->save()){
-                return $this->redirect(['business-model/index', 'id' => $model->id]);
-            }
+            $mvp->trigger(Mvp::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['business-model/index', 'id' => $model->id]);
         }
     }
 
@@ -348,13 +331,13 @@ class ConfirmMvpController extends AppController
     {
         $model = new FormCreateConfirmMvp();
         $mvp = Mvp::findOne($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         //кол-во респондентов, подтвердивших текущую проблему
         $count_represent_gcp = RespondsGcp::find()->with('descInterview')
@@ -390,15 +373,8 @@ class ConfirmMvpController extends AppController
     {
         $model = new FormCreateConfirmMvp();
         $model->mvp_id = $id;
-
         $mvp = Mvp::findOne($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
         $responds = RespondsGcp::find()->with('descInterview')
             ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
             ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->all();
@@ -420,18 +396,14 @@ class ConfirmMvpController extends AppController
                     $model->addQuestionDefault('Что показалось неудобным?');
                     $model->addQuestionDefault('Вы готовы заплатить за такой продукт?');
 
-                    $project->updated_at = time();
 
-                    if ($project->save()) {
-
-                        $response =  [
-                            'success' => true,
-                            'id' => $model->id,
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response =  [
+                        'success' => true,
+                        'id' => $model->id,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -447,15 +419,15 @@ class ConfirmMvpController extends AppController
     {
         $model = ConfirmMvp::findOne($id);
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
-        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
         $interview = Interview::findOne(['id' => $problem->interview_id]);
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
-        $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $id])->all();
+        $questions = QuestionsConfirmMvp::findAll(['confirm_mvp_id' => $id]);
         $newQuestion = new QuestionsConfirmMvp();
 
         //Список вопросов для добавления к списку программы
@@ -488,18 +460,12 @@ class ConfirmMvpController extends AppController
     {
         $model = new QuestionsConfirmMvp();
         $model->confirm_mvp_id = $id;
-        $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
 
         if ($model->load(Yii::$app->request->post())){
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model->save()){
-
-                    $project->updated_at = time();
-                    $project->save();
 
                     $confirmMvpNew = ConfirmMvp::findOne($id);
                     $questions = $confirmMvpNew->questions;
@@ -536,22 +502,16 @@ class ConfirmMvpController extends AppController
     {
         $model = QuestionsConfirmMvp::findOne($id);
         $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
-        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
 
         if(Yii::$app->request->isAjax) {
 
             if ($model->delete()){
-
-                $project->updated_at = time();
-                $project->save();
 
                 $confirmMvpNew = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
                 $questions = $confirmMvp->questions;
 
                 //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
                 $confirmMvpNew->deleteAnswerConfirmMvp($id);
-
                 //Передаем обновленный список вопросов для добавления в программу
                 $queryQuestions = $confirmMvpNew->queryQuestionsGeneralList();
 
@@ -576,15 +536,7 @@ class ConfirmMvpController extends AppController
     public function actionUpdate($id)
     {
         $model = new FormUpdateConfirmMvp($id);
-        $mvp = Mvp::find()->where(['id' => $model->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -592,18 +544,13 @@ class ConfirmMvpController extends AppController
 
                 if ($model = $model->update()){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'success' => true,
-                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($id), 'mvp' => $mvp]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($id), 'mvp' => $mvp]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }

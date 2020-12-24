@@ -84,4 +84,26 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         }
     }
 
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->confirm->problem->project->touch('updated_at');
+            $this->confirm->problem->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->confirm->problem->project->touch('updated_at');
+            $this->confirm->problem->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->confirm->problem->project->touch('updated_at');
+            $this->confirm->problem->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
+
 }

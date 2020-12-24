@@ -85,4 +85,21 @@ class BusinessModel extends \yii\db\ActiveRecord
             TimestampBehavior::class
         ];
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }

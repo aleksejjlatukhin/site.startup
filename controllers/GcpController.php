@@ -28,7 +28,7 @@ class GcpController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = Gcp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $model->project->id])->one();
+            $project = Projects::findOne(['id' => $model->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -45,8 +45,8 @@ class GcpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -60,8 +60,8 @@ class GcpController extends AppController
         }elseif (in_array($action->id, ['index'])){
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -112,10 +112,10 @@ class GcpController extends AppController
     {
         $model = new FormCreateGcp();
         $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -123,19 +123,14 @@ class GcpController extends AppController
 
                 if ($model->create($id, $generationProblem->id, $segment->id, $project->id)) {
 
-                    $project->updated_at = time();
-
-                    if ($project->save()) {
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => Gcp::find()->where(['confirm_problem_id' => $id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Gcp::find()->where(['confirm_problem_id' => $id])->all(),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -150,12 +145,7 @@ class GcpController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $model->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -163,20 +153,14 @@ class GcpController extends AppController
 
                 if ($model->save()){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => Gcp::find()->where(['confirm_problem_id' => $confirmProblem->id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Gcp::find()->where(['confirm_problem_id' => $confirmProblem->id])->all(),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -232,11 +216,7 @@ class GcpController extends AppController
                 $this->delTree($pathDelete);
             }
 
-            $project->updated_at = time();
-            $project->save();
-
             if ($model->deleteStage()) {
-
                 return true;
             }
         }

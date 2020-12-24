@@ -56,4 +56,16 @@ class Authors extends \yii\db\ActiveRecord
             'experience' => 'Опыт работы',
         ];
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }

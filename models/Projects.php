@@ -7,7 +7,6 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
 
-
 class Projects extends ActiveRecord
 {
 
@@ -75,7 +74,7 @@ class Projects extends ActiveRecord
             [['description', 'core_rid', 'layout_technology', 'purpose_project'], 'string', 'max' => 2000],
             ['project_name', 'string', 'min' => 3, 'max' => 32],
             [['project_fullname', 'rid', 'patent_name', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
-            [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology'], 'trim'],
+            [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology', 'purpose_project'], 'trim'],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls', 'maxFiles' => 10],
         ];
     }
@@ -114,11 +113,30 @@ class Projects extends ActiveRecord
     }
 
 
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
+
+
     /* Поведения */
     public function behaviors()
     {
         return [
-            TimestampBehavior::class
+            TimestampBehavior::class,
         ];
     }
 

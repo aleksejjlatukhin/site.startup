@@ -28,7 +28,7 @@ class GenerationProblemController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = GenerationProblem::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $model->project->id])->one();
+            $project = Projects::findOne(['id' => $model->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -45,8 +45,8 @@ class GenerationProblemController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $interview = Interview::findOne(Yii::$app->request->get());
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -60,8 +60,8 @@ class GenerationProblemController extends AppController
         }elseif (in_array($action->id, ['index'])){
 
             $interview = Interview::findOne(Yii::$app->request->get());
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -87,11 +87,10 @@ class GenerationProblemController extends AppController
     public function actionIndex($id)
     {
 
-        $interview = Interview::find()->with('questions')->where(['id' => $id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $models = GenerationProblem::find()->where(['interview_id' => $id])->all();
-
+        $interview = Interview::findOne($id);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $models = GenerationProblem::findAll(['interview_id' => $id]);
 
         return $this->render('index', [
             'models' => $models,
@@ -111,8 +110,8 @@ class GenerationProblemController extends AppController
 
         $model = new FormCreateProblem();
         $interview = Interview::findOne($id);
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -120,19 +119,14 @@ class GenerationProblemController extends AppController
 
                 if ($model->create($interview->id, $segment->id, $project->id)){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => GenerationProblem::find()->where(['interview_id' => $id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => GenerationProblem::findAll(['interview_id' => $id]),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -147,10 +141,7 @@ class GenerationProblemController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $interview = Interview::find()->where(['id' => $model->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $interview = Interview::findOne(['id' => $model->interview_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -158,18 +149,14 @@ class GenerationProblemController extends AppController
 
                 if ($model->save()) {
 
-                    $project->updated_at = time();
-                    if ($project->save()) {
-
-                        $response = [
-                            'renderAjax' => $this->renderAjax('_index_ajax', [
-                                'models' => GenerationProblem::find()->where(['interview_id' => $interview->id])->all(),
-                            ]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => GenerationProblem::findAll(['interview_id' => $interview->id]),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -244,7 +231,7 @@ class GenerationProblemController extends AppController
         $model = $this->findModel($id);
         $segment = Segment::findOne(['id' => $model->segment_id]);
         $project = Projects::findOne(['id' => $model->project_id]);
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $user = User::findOne(['id' => $project->user_id]);
 
         if(Yii::$app->request->isAjax) {
 
@@ -257,11 +244,7 @@ class GenerationProblemController extends AppController
                 $this->delTree($pathDelete);
             }
 
-            $project->updated_at = time();
-            $project->save();
-
             if ($model->deleteStage()) {
-
                 return true;
             }
         }

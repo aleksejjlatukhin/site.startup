@@ -14,6 +14,33 @@ class Interview extends \yii\db\ActiveRecord
         return 'interview';
     }
 
+
+    public function getSegment()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+    }
+
+    public function getQuestions()
+    {
+        return $this->hasMany(Questions::class, ['interview_id' => 'id']);
+    }
+
+    public function getResponds()
+    {
+        return $this->hasMany(Respond::class, ['interview_id' => 'id']);
+    }
+
+    public function getFeedbacks()
+    {
+        return $this->hasMany(FeedbackExpert::class, ['interview_id' => 'id']);
+    }
+
+    public function getProblems()
+    {
+        return $this->hasMany(GenerationProblem::class, ['interview_id' => 'id']);
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -47,29 +74,20 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
-    public function getSegment()
+    public function init()
     {
-        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
-    }
 
-    public function getQuestions()
-    {
-        return $this->hasMany(Questions::class, ['interview_id' => 'id']);
-    }
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->segment->project->touch('updated_at');
+            $this->segment->project->user->touch('updated_at');
+        });
 
-    public function getResponds()
-    {
-        return $this->hasMany(Respond::class, ['interview_id' => 'id']);
-    }
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->segment->project->touch('updated_at');
+            $this->segment->project->user->touch('updated_at');
+        });
 
-    public function getFeedbacks()
-    {
-        return $this->hasMany(FeedbackExpert::class, ['interview_id' => 'id']);
-    }
-
-    public function getProblems()
-    {
-        return $this->hasMany(GenerationProblem::class, ['interview_id' => 'id']);
+        parent::init();
     }
 
 

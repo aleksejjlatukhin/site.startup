@@ -3,8 +3,6 @@
 namespace app\models;
 
 use Yii;
-use yii\helpers\Html;
-
 
 class ConfirmProblem extends \yii\db\ActiveRecord
 {
@@ -71,6 +69,24 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             'need_consumer' => 'Потребность потребителя',
         ];
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->problem->project->touch('updated_at');
+            $this->problem->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->problem->project->touch('updated_at');
+            $this->problem->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
+
 
     //Создание респондентов для программы подтверждения ГПС из представителей сегмента
     public function createRespondConfirm ($responds)

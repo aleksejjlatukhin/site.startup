@@ -30,8 +30,7 @@ class ProfileController extends AppController
         if (in_array($action->id, ['index'])) {
 
             $user = User::findOne(Yii::$app->request->get());
-            if ((Yii::$app->user->id == $user->id) || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if ((Yii::$app->user->id == $user->id) || User::isUserDev(Yii::$app->user->identity['username'])) {
 
                 return parent::beforeAction($action);
 
@@ -60,35 +59,12 @@ class ProfileController extends AppController
      */
     public function actionIndex($id)
     {
-        if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])
-            || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
             $this->layout = '@app/modules/admin/views/layouts/main';
         }
 
         $user = User::findOne($id);
-
-        if ((($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
-
-            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-        }
-
-        if (!empty($user->projects)){
-
-            $project_updated_at = [];
-
-            foreach ($user->projects as $project) {
-
-                $project_updated_at[] = $project->updated_at;
-            }
-
-            if (max($project_updated_at) > $user->updated_at){
-
-                $user->updated_at = max($project_updated_at);
-                $user->save();
-            }
-
-        }
 
         return $this->render('index', [
             'user' => $user,
@@ -104,14 +80,7 @@ class ProfileController extends AppController
         }
 
         $user = User::findOne($id);
-
-        if ((($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
-
-            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-        }
-
         $model = new ProfileForm();
-
         $model->second_name = $user->second_name;
         $model->first_name = $user->first_name;
         $model->middle_name = $user->middle_name;

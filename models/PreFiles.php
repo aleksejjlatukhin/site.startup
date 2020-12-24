@@ -49,4 +49,16 @@ class PreFiles extends \yii\db\ActiveRecord
             'file_name' => 'File Name',
         ];
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }

@@ -69,6 +69,23 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->mvp->project->touch('updated_at');
+            $this->mvp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->mvp->project->touch('updated_at');
+            $this->mvp->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
+
+
     //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ГЦП
     public function createRespondConfirm ($responds)
     {

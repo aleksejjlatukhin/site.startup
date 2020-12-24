@@ -53,4 +53,25 @@ class QuestionsConfirmGcp extends ActiveRecord
             'status' => 'Status',
         ];
     }
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->confirm->gcp->project->touch('updated_at');
+            $this->confirm->gcp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->confirm->gcp->project->touch('updated_at');
+            $this->confirm->gcp->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->confirm->gcp->project->touch('updated_at');
+            $this->confirm->gcp->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }

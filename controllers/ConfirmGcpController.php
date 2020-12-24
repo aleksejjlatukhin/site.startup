@@ -36,8 +36,8 @@ class ConfirmGcpController extends AppController
         if (in_array($action->id, ['view'])){
 
             $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -52,8 +52,8 @@ class ConfirmGcpController extends AppController
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -70,7 +70,7 @@ class ConfirmGcpController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $gcp = Gcp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -84,7 +84,7 @@ class ConfirmGcpController extends AppController
         }elseif (in_array($action->id, ['save-confirm-gcp'])){
 
             $gcp = Gcp::findOne(Yii::$app->request->get());
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -101,8 +101,8 @@ class ConfirmGcpController extends AppController
         }elseif (in_array($action->id, ['add-questions'])){
 
             $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -120,9 +120,9 @@ class ConfirmGcpController extends AppController
         } elseif (in_array($action->id, ['delete-question'])){
 
             $question = QuestionsConfirmGcp::findOne(Yii::$app->request->get());
-            $confirm_gcp = ConfirmGcp::find()->where(['id' => $question->confirm_gcp_id])->one();
-            $gcp = Gcp::find()->where(['id' => $confirm_gcp->gcp_id])->one();
-            $project = Projects::find()->where(['id' => $gcp->project->id])->one();
+            $confirm_gcp = ConfirmGcp::findOne(['id' => $question->confirm_gcp_id]);
+            $gcp = Gcp::findOne(['id' => $confirm_gcp->gcp_id]);
+            $project = Projects::findOne(['id' => $gcp->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -152,13 +152,13 @@ class ConfirmGcpController extends AppController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmGcp = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $id])->all();
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $questions = QuestionsConfirmGcp::findAll(['confirm_gcp_id' => $id]);
         $newQuestion = new QuestionsConfirmGcp();
 
         //Список вопросов для добавления к списку программы
@@ -273,16 +273,13 @@ class ConfirmGcpController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionNotExistConfirm($id)
     {
-        $model = ConfirmGcp::find()->where(['id' => $id])->one();
-        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
 
         if ($gcp->exist_confirm === 0) {
 
@@ -293,11 +290,8 @@ class ConfirmGcpController extends AppController
             $gcp->time_confirm = time();
 
             if ($gcp->save()){
-
-                $project->updated_at = time();
-                if ($project->save()){
-                    return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
-                }
+                $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
             }
         }
     }
@@ -306,26 +300,19 @@ class ConfirmGcpController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionExistConfirm($id)
     {
-        $model = ConfirmGcp::find()->where(['id' => $id])->one();
-        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
 
         $gcp->exist_confirm = 1;
         $gcp->time_confirm = time();
 
         if ($gcp->save()){
-
-            $project->updated_at = time();
-            if ($project->save()){
-                return $this->redirect(['/mvp/index', 'id' => $model->id]);
-            }
+            $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/mvp/index', 'id' => $model->id]);
         }
     }
 
@@ -376,13 +363,8 @@ class ConfirmGcpController extends AppController
     {
         $model = new FormCreateConfirmGcp();
         $model->gcp_id = $id;
-
         $gcp = Gcp::findOne($id);
         $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
         $responds = RespondsConfirm::find()->with('descInterview')
             ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
             ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->all();
@@ -410,18 +392,13 @@ class ConfirmGcpController extends AppController
                     $model->addQuestionDefault('Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?');
 
 
-                    $project->updated_at = time();
-
-                    if ($project->save()) {
-
-                        $response =  [
-                            'success' => true,
-                            'id' => $model->id,
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response =  [
+                        'success' => true,
+                        'id' => $model->id,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -437,13 +414,13 @@ class ConfirmGcpController extends AppController
     {
         $model = ConfirmGcp::findOne($id);
         $formUpdateConfirmGcp = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
         $interview = Interview::findOne(['id' => $problem->interview_id]);
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
-        $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $id])->all();
+        $questions = QuestionsConfirmGcp::findAll(['confirm_gcp_id' => $id]);
         $newQuestion = new QuestionsConfirmGcp();
 
         //Список вопросов для добавления к списку программы
@@ -474,19 +451,12 @@ class ConfirmGcpController extends AppController
     {
         $model = new QuestionsConfirmGcp();
         $model->confirm_gcp_id = $id;
-        $confirmGcp = ConfirmGcp::findOne($id);
-        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-
 
         if ($model->load(Yii::$app->request->post())){
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model->save()){
-
-                    $project->updated_at = time();
-                    $project->save();
 
                     $confirmGcpNew = ConfirmGcp::findOne($id);
                     $questions = $confirmGcpNew->questions;
@@ -522,16 +492,10 @@ class ConfirmGcpController extends AppController
     public function actionDeleteQuestion($id)
     {
         $model = QuestionsConfirmGcp::findOne($id);
-        $confirmGcp = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
-        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
 
         if(Yii::$app->request->isAjax) {
 
             if ($model->delete()){
-
-                $project->updated_at = time();
-                $project->save();
 
                 $confirmGcpNew = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
                 $questions = $confirmGcpNew->questions;
@@ -564,11 +528,6 @@ class ConfirmGcpController extends AppController
     {
         $model = new FormUpdateConfirmGcp($id);
         $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -576,18 +535,13 @@ class ConfirmGcpController extends AppController
 
                 if ($model = $model->update()){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'success' => true,
-                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id), 'gcp' => $gcp]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id), 'gcp' => $gcp]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -657,41 +611,6 @@ class ConfirmGcpController extends AppController
         // return the pdf output as per the destination setting
         return $pdf->render();
     }
-
-
-
-    /**
-     * Deletes an existing ConfirmGcp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    /*public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $gcp = Gcp::find()->where(['id' => $model->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        $model->delete();
-
-        return $this->redirect(['index']);
-    }*/
 
     /**
      * Finds the ConfirmGcp model based on its primary key value.

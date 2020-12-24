@@ -129,7 +129,7 @@ class SegmentController extends AppController
     {
         $model = new FormCreateSegment();
         $model->project_id = $id;
-        $project = Projects::find()->where(['id' => $model->project_id])->one();
+        $project = Projects::findOne(['id' => $model->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -137,42 +137,37 @@ class SegmentController extends AppController
 
                 if ($model->checkFillingFields() == true) {
 
-                    if ($model->validate()) {
+                    if ($model->validate(['name'])) {
 
                         if ($model->create()) {
 
-                            $project->updated_at = time();
+                            $type_sort_id = $_POST['type_sort_id'];
 
-                            if ($project->save()){
+                            if ($type_sort_id != '') {
 
-                                $type_sort_id = $_POST['type_sort_id'];
+                                $sort = new SegmentSort();
 
-                                if ($type_sort_id != '') {
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
 
-                                    $sort = new SegmentSort();
+                            } else {
 
-                                    $response =  [
-                                        'success' => true,
-                                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                                            'models' => $sort->fetchModels($project->id, $type_sort_id),
-                                        ]),
-                                    ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-
-                                } else {
-
-                                    $response =  [
-                                        'success' => true,
-                                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                                            'models' => Segment::find()->where(['project_id' => $project->id])->all(),
-                                        ]),
-                                    ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => Segment::findAll(['project_id' => $project->id]),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
                             }
                         }
 
@@ -208,8 +203,7 @@ class SegmentController extends AppController
     public function actionUpdate($id)
     {
         $segment = $this->findModel($id);
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-
+        $project = Projects::findOne(['id' => $segment->project_id]);
         $model = new FormUpdateSegment($id);
 
         if ($model->load(Yii::$app->request->post())) {
@@ -218,40 +212,37 @@ class SegmentController extends AppController
 
                 if ($model->checkFillingFields() == true) {
 
-                    if ($model->validate()) {
+                    if ($model->validate(['name'])) {
 
                         if ($model->update()) {
 
-                            if ($project->save()){
+                            $type_sort_id = $_POST['type_sort_id'];
 
-                                $type_sort_id = $_POST['type_sort_id'];
+                            if ($type_sort_id != '') {
 
-                                if ($type_sort_id != '') {
+                                $sort = new SegmentSort();
 
-                                    $sort = new SegmentSort();
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
 
-                                    $response =  [
-                                        'success' => true,
-                                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                                            'models' => $sort->fetchModels($project->id, $type_sort_id),
-                                        ]),
-                                    ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
+                            } else {
 
-                                } else {
-
-                                    $response =  [
-                                        'success' => true,
-                                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                                            'models' => Segment::find()->where(['project_id' => $project->id])->all(),
-                                        ]),
-                                    ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
-                                    return $response;
-                                }
+                                $response =  [
+                                    'success' => true,
+                                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                                        'models' => Segment::findAll(['project_id' => $project->id]),
+                                    ]),
+                                ];
+                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                                \Yii::$app->response->data = $response;
+                                return $response;
                             }
                         }
                     }else {
@@ -495,7 +486,7 @@ class SegmentController extends AppController
     {
         $model = $this->findModel($id);
         $project = Projects::findOne(['id' => $model->project_id]);
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $user = User::findOne(['id' => $project->user_id]);
 
         if(Yii::$app->request->isAjax) {
 
@@ -507,11 +498,7 @@ class SegmentController extends AppController
                 $this->delTree($pathDelete);
             }
 
-            $project->updated_at = time();
-            $project->save();
-
             if ($model->deleteStage()) {
-
                 return true;
             }
         }

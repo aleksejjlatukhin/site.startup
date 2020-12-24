@@ -22,10 +22,10 @@ class DescInterviewController extends AppController
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $descInterview = DescInterview::findOne(Yii::$app->request->get());
-            $respond = Respond::find()->where(['id' => $descInterview->respond_id])->one();
-            $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $respond = Respond::findOne(['id' => $descInterview->respond_id]);
+            $interview = Interview::findOne(['id' => $respond->interview_id]);
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -42,9 +42,9 @@ class DescInterviewController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $respond = Respond::findOne(Yii::$app->request->get());
-            $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $interview = Interview::findOne(['id' => $respond->interview_id]);
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if ($project->user_id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -68,11 +68,11 @@ class DescInterviewController extends AppController
     public function actionDownload($id)
     {
         $model = DescInterview::findOne($id);
-        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $respond = Respond::findOne(['id' => $model->respond_id]);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -92,11 +92,11 @@ class DescInterviewController extends AppController
     public function actionDeleteFile($id)
     {
         $model = DescInterview::findOne($id);
-        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $respond = Respond::findOne(['id' => $model->respond_id]);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
             mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
@@ -107,8 +107,6 @@ class DescInterviewController extends AppController
 
         $model->interview_file = null;
         $model->server_file = null;
-        $project->updated_at = time();
-        $project->save();
 
         $model->update();
 
@@ -143,11 +141,11 @@ class DescInterviewController extends AppController
     {
         $model = new DescInterview();
         $model->respond_id = $id;
-        $respond = Respond::find()->where(['id' => $id])->one();
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $respond = Respond::findOne($id);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -172,15 +170,10 @@ class DescInterviewController extends AppController
                         }
                     }
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = ['interview_id' => $interview->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = ['interview_id' => $interview->id];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -215,11 +208,11 @@ class DescInterviewController extends AppController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $respond = Respond::find()->where(['id' => $model->respond_id])->one();
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $respond = Respond::findOne(['id' => $model->respond_id]);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
 
         if ($model->interview_file !== null){
@@ -238,7 +231,6 @@ class DescInterviewController extends AppController
                     mkdir($respond_dir, 0777);
                 }
 
-
                 if ($model->validate() && $model->save()){
 
                     $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
@@ -250,55 +242,14 @@ class DescInterviewController extends AppController
                         }
                     }
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = ['interview_id' => $interview->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = ['interview_id' => $interview->id];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
     }
-
-    /**
-     * Deletes an existing DescInterview model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    /*public function actionDelete($id)
-    {
-        $model = DescInterview::find()->where(['respond_id' => $id])->one();
-        $respond = Respond::findOne($id);
-        $interview = Interview::find()->where(['id' => $respond->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-
-
-        $project->updated_at = time();
-
-        if ($model->server_file !== null){
-            unlink(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/' . $model->server_file);
-        }
-
-        if ($project->save()) {
-
-            Yii::$app->session->setFlash('error', 'Материалы полученные во время интервью ' . date("d.m.Y", strtotime($model->date_fact)) . ' удалены!');
-
-            $model->delete();
-
-            return $this->redirect(['respond/view', 'id' => $respond->id]);
-        }
-    }*/
 
     /**
      * Finds the DescInterview model based on its primary key value.

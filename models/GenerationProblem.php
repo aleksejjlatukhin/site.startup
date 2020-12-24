@@ -5,16 +5,10 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
-/**
- * This is the model class for table "generation_problem".
- *
- * @property string $id
- * @property int $interview_id
- * @property string $description
- * @property string $date_gps
- */
 class GenerationProblem extends \yii\db\ActiveRecord
 {
+
+    const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
 
@@ -25,7 +19,6 @@ class GenerationProblem extends \yii\db\ActiveRecord
     {
         return 'generation_problem';
     }
-
 
     /**
      * GenerationProblem constructor.
@@ -103,6 +96,33 @@ class GenerationProblem extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::class
         ];
+    }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_CLICK_BUTTON_CONFIRM, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        parent::init();
     }
 
 

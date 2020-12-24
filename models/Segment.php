@@ -2,25 +2,9 @@
 
 namespace app\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\helpers\Html;
-use yii\widgets\DetailView;
+use yii\db\ActiveRecord;
 
-/**
- * This is the model class for table "segments".
- *
- * @property string $id
- * @property int $project_id
- * @property string $name
- * @property string $field_of_activity
- * @property string $sort_of_activity
- * @property string $age
- * @property string $income
- * @property string $quantity
- * @property string $market_volume
- * @property string $add_info
- */
 class Segment extends \yii\db\ActiveRecord
 {
 
@@ -35,6 +19,8 @@ class Segment extends \yii\db\ActiveRecord
     const SECONDARY_SPECIAL_EDUCATION = 100;
     const HIGHER_INCOMPLETE_EDUCATION = 200;
     const HIGHER_EDUCATION = 300;
+
+    const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
 
@@ -145,6 +131,32 @@ class Segment extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::class
         ];
+    }
+
+
+    public function init()
+    {
+        $this->on(self::EVENT_CLICK_BUTTON_CONFIRM, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_DELETE, function (){
+            $this->project->touch('updated_at');
+            $this->project->user->touch('updated_at');
+        });
+
+        parent::init();
     }
 
 

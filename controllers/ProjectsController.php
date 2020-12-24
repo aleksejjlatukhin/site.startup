@@ -254,9 +254,7 @@ class ProjectsController extends AppController
 
         if($model->delete()) {
 
-            $project->updated_at = time();
-            $models = PreFiles::find()->where(['project_id' => $project->id])->all();
-            $project->save();
+            $models = PreFiles::findAll(['project_id' => $project->id]);
 
             if (Yii::$app->request->isAjax)
             {
@@ -400,7 +398,6 @@ class ProjectsController extends AppController
         $model = $this->findModel($id);
         $user = User::find()->where(['id' => $model->user_id])->one();
         $models = Projects::find()->where(['user_id' => $user['id']])->all();
-        $workers = Authors::find()->where(['project_id'=>$id])->all();
 
         if ($model->load(Yii::$app->request->post())) {
 

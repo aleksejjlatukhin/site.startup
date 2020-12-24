@@ -34,8 +34,8 @@ class ConfirmProblemController extends AppController
         if (in_array($action->id, ['view'])){
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -50,8 +50,8 @@ class ConfirmProblemController extends AppController
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -68,9 +68,9 @@ class ConfirmProblemController extends AppController
         }elseif (in_array($action->id, ['create'])){
 
             $problem = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $interview = Interview::findOne(['id' => $problem->interview_id]);
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -84,9 +84,9 @@ class ConfirmProblemController extends AppController
         }elseif (in_array($action->id, ['save-confirm-problem'])){
 
             $problem = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-            $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-            $project = Projects::find()->where(['id' => $segment->project_id])->one();
+            $interview = Interview::findOne(['id' => $problem->interview_id]);
+            $segment = Segment::findOne(['id' => $interview->segment_id]);
+            $project = Projects::findOne(['id' => $segment->project_id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -122,9 +122,9 @@ class ConfirmProblemController extends AppController
         } elseif (in_array($action->id, ['delete-question'])){
 
             $question = QuestionsConfirmProblem::findOne(Yii::$app->request->get());
-            $confirm_problem = ConfirmProblem::find()->where(['id' => $question->confirm_problem_id])->one();
-            $problem = GenerationProblem::find()->where(['id' => $confirm_problem->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $confirm_problem = ConfirmProblem::findOne(['id' => $question->confirm_problem_id]);
+            $problem = GenerationProblem::findOne(['id' => $confirm_problem->gps_id]);
+            $project = Projects::findOne(['id' => $problem->project->id]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -154,11 +154,11 @@ class ConfirmProblemController extends AppController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $problem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $id])->all();
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $interview = Interview::findOne(['id' => $problem->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
         $newQuestion = new QuestionsConfirmProblem();
 
         //Список вопросов для добавления к списку программы
@@ -272,14 +272,13 @@ class ConfirmProblemController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionNotExistConfirm($id)
     {
-        $model = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $generationProblem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
 
         if ($generationProblem->exist_confirm === 0) {
 
@@ -290,11 +289,8 @@ class ConfirmProblemController extends AppController
             $generationProblem->time_confirm = time();
 
             if ($generationProblem->save()){
-
-                $project->updated_at = time();
-                if ($project->save()){
-                    return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
-                }
+                $generationProblem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
             }
         }
     }
@@ -303,24 +299,19 @@ class ConfirmProblemController extends AppController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionExistConfirm($id)
     {
-        $model = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $model = $this->findModel($id);
+        $generationProblem = GenerationProblem::findOne(['id' => $model->gps_id]);
 
         $generationProblem->exist_confirm = 1;
         $generationProblem->time_confirm = time();
 
         if ($generationProblem->save()){
-
-            $project->updated_at = time();
-            if ($project->save()){
-                return $this->redirect(['/gcp/index', 'id' => $model->id]);
-            }
+            $generationProblem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/gcp/index', 'id' => $model->id]);
         }
     }
 
@@ -368,11 +359,8 @@ class ConfirmProblemController extends AppController
     {
         $model = new FormCreateConfirmProblem();
         $model->gps_id = $id;
-
         $generationProblem = GenerationProblem::findOne($id);
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
         $responds = Respond::find()->with('descInterview')
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
             ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
@@ -408,15 +396,11 @@ class ConfirmProblemController extends AppController
                     $model->addQuestionDefault('Если не ищут, то почему?');
                     $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
 
-                    $project->updated_at = time();
 
-                    if ($project->save()){
-
-                        $response =  ['success' => true, 'id' => $model->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response =  ['success' => true, 'id' => $model->id];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -465,18 +449,11 @@ class ConfirmProblemController extends AppController
         $model = new QuestionsConfirmProblem();
         $model->confirm_problem_id = $id;
 
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-
         if ($model->load(Yii::$app->request->post())){
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model->save()){
-
-                    $project->updated_at = time();
-                    $project->save();
 
                     $confirmProblemNew = ConfirmProblem::findOne($id);
                     $questions = $confirmProblemNew->questions;
@@ -512,16 +489,10 @@ class ConfirmProblemController extends AppController
     public function actionDeleteQuestion($id)
     {
         $model = QuestionsConfirmProblem::findOne($id);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
 
         if(Yii::$app->request->isAjax) {
 
             if ($model->delete()){
-
-                $project->updated_at = time();
-                $project->save();
 
                 $confirmProblemNew = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
                 $questions = $confirmProblemNew->questions;
@@ -554,9 +525,6 @@ class ConfirmProblemController extends AppController
     {
         $model = new FormUpdateConfirmProblem($id);
         $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -564,18 +532,13 @@ class ConfirmProblemController extends AppController
 
                 if ($model = $model->update()){
 
-                    $project->updated_at = time();
-
-                    if ($project->save()){
-
-                        $response = [
-                            'success' => true,
-                            'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
-                        ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -645,70 +608,6 @@ class ConfirmProblemController extends AppController
         // return the pdf output as per the destination setting
         return $pdf->render();
     }
-
-
-
-    /**
-     * Deletes an existing ConfirmProblem model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    /*public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $generationProblem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $responds = RespondsConfirm::find()->where(['confirm_problem_id' => $model->id])->all();
-        $project->updated_at = time();
-        $user = User::find()->where(['id' => $project->user_id])->one();
-        $_user = Yii::$app->user->identity;
-
-        if (!User::isUserDev(Yii::$app->user->identity['username'])) {
-
-            //Удаление доступно только проектанту, который создал данную модель
-            if ($user->id != $_user['id']){
-                Yii::$app->session->setFlash('error', 'У Вас нет прав на данное действие!');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-
-        $gps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251");
-
-        $gps_dir = mb_strtolower($gps_dir, "windows-1251");
-
-        if (file_exists($gps_dir)){
-            $this->delTree($gps_dir);
-        }
-
-        if ($project->save()){
-
-            foreach ($responds as $respond){
-
-                $descInterview = $respond->descInterview;
-                if (!empty($descInterview)){
-                    $descInterview->delete();
-                }
-            }
-
-
-            RespondsConfirm::deleteAll(['confirm_problem_id' => $id]);
-            FeedbackExpertConfirm::deleteAll(['confirm_problem_id' => $id]);
-
-            Yii::$app->session->setFlash('error', "Ваше интервью удалено, создайте новое интервью!");
-
-            $model->delete();
-
-            return $this->redirect(['create', 'id' => $model->gps_id]);
-        }
-    }*/
 
     /**
      * Finds the ConfirmProblem model based on its primary key value.

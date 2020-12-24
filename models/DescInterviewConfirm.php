@@ -52,4 +52,21 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
             TimestampBehavior::class
         ];
     }
+
+
+    public function init()
+    {
+
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->respond->confirm->problem->project->touch('updated_at');
+            $this->respond->confirm->problem->project->user->touch('updated_at');
+        });
+
+        $this->on(self::EVENT_AFTER_UPDATE, function (){
+            $this->respond->confirm->problem->project->touch('updated_at');
+            $this->respond->confirm->problem->project->user->touch('updated_at');
+        });
+
+        parent::init();
+    }
 }
