@@ -140,7 +140,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
                 <div class="col-md-12" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
 
                 </div>
 
@@ -151,7 +151,7 @@ $this->registerCssFile('@web/css/interview-create-style.css');
                 <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
 
                     <div class="col-md-12" style="font-weight: 700;">
-                        Цель акселерации проблемного интервью
+                        Цель проекта
                     </div>
 
                     <div class="col-md-12">

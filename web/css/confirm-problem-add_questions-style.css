@@ -277,3 +277,16 @@ a#button_add_text_question_confirm:focus {
 /*Стили для формы добавления вопроса
 ---Конец---
 */
+
+/*Стили для формы редактирования вопроса
+---Начало---
+*/
+input#update_text_question_confirm {
+    outline: none; /* Убираем свечение в Chrome и Safari */
+    -webkit-appearance: none; /* Убираем рамку в Chrome и Safari */
+    box-shadow: none; /* Убираем тень в Firefox */
+    padding-right: 40px
+}
+/*Стили для формы редактирования вопроса
+---Конец---
+*/

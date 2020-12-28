@@ -21,6 +21,11 @@ class AnswersQuestionsConfirmMvp extends ActiveRecord
         return $this->hasOne(QuestionsConfirmMvp::class, ['id' => 'question_id']);
     }
 
+    public function getRespond()
+    {
+        return $this->hasOne(RespondsMvp::class, ['id' => 'respond_id']);
+    }
+
     /**
      * {@inheritdoc}
      */

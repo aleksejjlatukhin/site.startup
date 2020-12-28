@@ -6,6 +6,7 @@ use app\models\ConfirmProblem;
 use app\models\forms\FormCreateConfirmGcp;
 use app\models\forms\FormCreateMvp;
 use app\models\forms\FormUpdateConfirmGcp;
+use app\models\forms\FormUpdateQuestionConfirmGcp;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Interview;
@@ -404,6 +405,32 @@ class ConfirmGcpController extends AppController
         }
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
+    public function actionUpdate ($id)
+    {
+        $model = new FormUpdateConfirmGcp($id);
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()){
+
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id), 'gcp' => $gcp]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
 
     /**
      * Страница со списком вопросов
@@ -486,6 +513,87 @@ class ConfirmGcpController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQueryQuestions ($id)
+    {
+        $confirmGcp = $this->findModel($id);
+        $questions = $confirmGcp->questions;
+
+        if(Yii::$app->request->isAjax) {
+            $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQuestionUpdateForm ($id)
+    {
+        $model = new FormUpdateQuestionConfirmGcp($id);
+        $confirmGcp = $this->findModel($model->confirm_gcp_id);
+        $questions = $confirmGcp->questions;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateQuestion ($id)
+    {
+        $model = new FormUpdateQuestionConfirmGcp($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()) {
+
+                    $confirmGcp = $this->findModel($model->confirm_gcp_id);
+                    $questions = $confirmGcp->questions;
+
+                    //Добавляем вопрос в общую базу вопросов
+                    $confirmGcp->addQuestionToGeneralList($model->title);
+                    //Передаем обновленный список вопросов для добавления в программу
+                    $queryQuestions = $confirmGcp->queryQuestionsGeneralList();
+
+                    $response = [
+                        'model' => $model,
+                        'questions' => $questions,
+                        'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -519,38 +627,86 @@ class ConfirmGcpController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
-    public function actionUpdate ($id)
+    public function actionGetDataQuestionsAndAnswers($id)
     {
-        $model = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $model = $this->findModel($id);
+        $questions = $model->questions;
 
-        if ($model->load(Yii::$app->request->post())) {
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        \Yii::$app->response->data = $response;
+        return $response;
 
-            if(Yii::$app->request->isAjax) {
+    }
 
-                if ($model = $model->update()){
 
-                    $response = [
-                        'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id), 'gcp' => $gcp]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
+    public function actionMpdfQuestionsAndAnswers($id)
+    {
+        $model = $this->findModel($id);
+        $questions = $model->questions;
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/confirm-gcp/questions_and_answers_pdf', ['questions' => $questions]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $gcp_desc = $model->gcp->description;
+        if (mb_strlen($gcp_desc) > 25) {
+            $gcp_desc = mb_substr($gcp_desc, 0, 25) . '...';
         }
+
+        $filename = 'Ответы респондентов на вопросы анкеты для подтверждения ЦП: «'.$gcp_desc.'».';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            //'orientation' => Pdf::ORIENT_LANDSCAPE,
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            //'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginTop' => 20,
+            'marginBottom' => 20,
+            'marginFooter' => 5,
+            'defaultFont' => 'RobotoCondensed-Light',
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => $filename,
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы анкеты. ЦП: «'.$gcp_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
     }
 
 
     /**
      * @param $id
      * @return mixed
+     * @throws NotFoundHttpException
      * @throws \Mpdf\MpdfException
      * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
      * @throws \setasign\Fpdi\PdfParser\PdfParserException
@@ -559,7 +715,7 @@ class ConfirmGcpController extends AppController
      */
     public function actionMpdfDataResponds($id)
     {
-        $model = ConfirmGcp::findOne($id);
+        $model = $this->findModel($id);
         $responds = $model->responds;
 
         // get your HTML raw content without any layouts or scripts

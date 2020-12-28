@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
 use app\models\forms\FormUpdateConfirmProblem;
+use app\models\forms\FormUpdateQuestionConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Interview;
 use app\models\Projects;
@@ -407,6 +408,33 @@ class ConfirmProblemController extends AppController
     }
 
     /**
+     * @param $id
+     * @return array
+     */
+    public function actionUpdate ($id)
+    {
+        $model = new FormUpdateConfirmProblem($id);
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()){
+
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
+    /**
      * Страница со списком вопросов
      * @param $id
      * @return string
@@ -483,6 +511,86 @@ class ConfirmProblemController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQueryQuestions ($id)
+    {
+        $confirmProblem = $this->findModel($id);
+        $questions = $confirmProblem->questions;
+
+        if(Yii::$app->request->isAjax) {
+            $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQuestionUpdateForm ($id)
+    {
+        $model = new FormUpdateQuestionConfirmProblem($id);
+        $confirmProblem = $this->findModel($model->confirm_problem_id);
+        $questions = $confirmProblem->questions;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateQuestion ($id)
+    {
+        $model = new FormUpdateQuestionConfirmProblem($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()) {
+
+                    $confirmProblem = $this->findModel($model->confirm_problem_id);
+                    $questions = $confirmProblem->questions;
+
+                    //Добавляем вопрос в общую базу вопросов
+                    $confirmProblem->addQuestionToGeneralList($model->title);
+                    //Передаем обновленный список вопросов для добавления в программу
+                    $queryQuestions = $confirmProblem->queryQuestionsGeneralList();
+
+                    $response = [
+                        'model' => $model,
+                        'questions' => $questions,
+                        'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $id
+     * @return array
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -520,34 +628,93 @@ class ConfirmProblemController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
-    public function actionUpdate ($id)
+    public function actionGetDataQuestionsAndAnswers($id)
     {
-        $model = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $model = $this->findModel($id);
+        $questions = $model->questions;
 
-        if ($model->load(Yii::$app->request->post())) {
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        \Yii::$app->response->data = $response;
+        return $response;
 
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()){
-
-                    $response = [
-                        'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
     }
 
 
     /**
      * @param $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionMpdfQuestionsAndAnswers($id)
+    {
+        $model = $this->findModel($id);
+        $questions = $model->questions;
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/confirm-problem/questions_and_answers_pdf', ['questions' => $questions]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $problem_desc = $model->problem->description;
+        if (mb_strlen($problem_desc) > 25) {
+            $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
+        }
+
+        $filename = 'Ответы респондентов на вопросы анкеты для подтверждения проблемы: «'.$problem_desc.'».';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            //'orientation' => Pdf::ORIENT_LANDSCAPE,
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            //'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginTop' => 20,
+            'marginBottom' => 20,
+            'marginFooter' => 5,
+            'defaultFont' => 'RobotoCondensed-Light',
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => $filename,
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы анкеты. Проблема: «'.$problem_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws NotFoundHttpException
      * @throws \Mpdf\MpdfException
      * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
      * @throws \setasign\Fpdi\PdfParser\PdfParserException
@@ -556,7 +723,7 @@ class ConfirmProblemController extends AppController
      */
     public function actionMpdfDataResponds($id)
     {
-        $model = ConfirmProblem::findOne($id);
+        $model = $this->findModel($id);
         $responds = $model->responds;
 
         // get your HTML raw content without any layouts or scripts

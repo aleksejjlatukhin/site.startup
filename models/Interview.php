@@ -68,8 +68,8 @@ class Interview extends \yii\db\ActiveRecord
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Количество респондентов, соответствующих сегменту',
             'greeting_interview' => 'Приветствие в начале встречи',
-            'view_interview' => 'Представление интервьюера',
-            'reason_interview' => 'Почему мне интересно',
+            'view_interview' => 'Информация о вас для респондентов',
+            'reason_interview' => 'Как вы объясните ваш интерес (причину) к интервью респонденту',
         ];
     }
 

@@ -23,9 +23,11 @@ class QuestionsConfirmGcp extends ActiveRecord
         return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
     }
 
-    public function getAnswer()
+    public function getAnswers()
     {
-        return $this->hasOne(AnswersQuestionsConfirmGcp::class, ['question_id' => 'id']);
+        $answers = AnswersQuestionsConfirmGcp::find()->where(['question_id' => $this->id])
+            ->andWhere(['not', ['answers_questions_confirm_gcp.answer' => '']])->all();
+        return $answers;
     }
 
     /**

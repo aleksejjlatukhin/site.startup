@@ -23,9 +23,11 @@ class QuestionsConfirmMvp extends ActiveRecord
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
     }
 
-    public function getAnswer()
+    public function getAnswers()
     {
-        return $this->hasOne(AnswersQuestionsConfirmMvp::class, ['question_id' => 'id']);
+        $answers = AnswersQuestionsConfirmMvp::find()->where(['question_id' => $this->id])
+            ->andWhere(['not', ['answers_questions_confirm_mvp.answer' => '']])->all();
+        return $answers;
     }
 
     /**

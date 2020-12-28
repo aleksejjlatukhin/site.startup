@@ -170,7 +170,101 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
     });
 
     e.preventDefault();
+    return false;
+});
 
+
+//Получить форму редактирования вопроса для интервью (Шаг 2)
+$(body).on('click', '.showQuestionUpdateForm', function (e) {
+
+    var url = $(this).attr('href');
+    var id = url.split('id=')[1];
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            //Обновляем список вопросов на странице
+            $('#QuestionsTable-container').html(response.ajax_questions_confirm);
+
+            //Добавляем форму редактирования для выбранного вопроса
+            $('.string_question-' + id).html(response.renderAjax);
+
+            //Устанавливаем курсор в поле формы
+            var input = $('#update_text_question_confirm');
+            var inputVal = input.val();
+            input.val('').focus().val(inputVal);
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Отмена редактирования вопроса для интервью (Шаг 2)
+$(body).on('click', '.submit_update_question_cancel', function (e) {
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            //Обновляем список вопросов на странице
+            $('#QuestionsTable-container').html(response.ajax_questions_confirm);
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Редактирование вопроса для интервью (Шаг 2)
+$(body).on('beforeSubmit', '#updateQuestionForm', function(e){
+
+    var data = $(this).serialize();
+    var url = $(this).attr('action');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+
+            //Обновляем список вопросов на странице
+            $('#QuestionsTable-container').html(response.ajax_questions_confirm);
+
+            //Обновляем список вопросов для добавления
+            var queryQuestions = response.queryQuestions;
+            var addNewQuestionForm = $('#addNewQuestion');
+            $(addNewQuestionForm).find('select').html('');
+            $(addNewQuestionForm).find('select').prepend('<\option style=\"font - weight:700;\" value=\"\">Выберите вариант из списка готовых вопросов<\/option>');
+            $.each(queryQuestions, function(index, value) {
+                $(addNewQuestionForm).find('select').append('<\option value=\"' + value.title + '\">' + value.title + '<\/option>');
+            });
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
     return false;
 });
 

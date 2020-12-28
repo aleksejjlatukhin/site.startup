@@ -14,7 +14,7 @@ use yii\helpers\Url;
 
         <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
 
-            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
 
         </div>
 
@@ -46,7 +46,7 @@ use yii\helpers\Url;
     <div class="container-fluid content-view-data-confirm">
 
         <div class="row">
-            <div class="col-md-12">Цель акселерации проблемного интервью</div>
+            <div class="col-md-12">Цель проекта</div>
             <div class="col-md-12"><?= $project->purpose_project;?></div>
         </div>
 
@@ -56,12 +56,12 @@ use yii\helpers\Url;
         </div>
 
         <div class="row">
-            <div class="col-md-12">Представление интервьюера</div>
+            <div class="col-md-12">Информация о вас для респондентов</div>
             <div class="col-md-12"><?= $model->view_interview; ?></div>
         </div>
 
         <div class="row">
-            <div class="col-md-12">Почему мне интересно</div>
+            <div class="col-md-12">Как вы объясните ваш интерес (причину) к интервью респонденту</div>
             <div class="col-md-12"><?= $model->reason_interview; ?></div>
         </div>
 
@@ -98,7 +98,7 @@ use yii\helpers\Url;
 
         <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
 
-            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
 
         </div>
 
@@ -141,7 +141,7 @@ use yii\helpers\Url;
         <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
 
             <div class="col-md-12" style="font-weight: 700;">
-                Цель акселерации проблемного интервью
+                Цель проекта
             </div>
 
             <div class="col-md-12">

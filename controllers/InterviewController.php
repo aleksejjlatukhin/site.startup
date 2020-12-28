@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\forms\FormCreateConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\forms\FormUpdateConfirmSegment;
+use app\models\forms\FormUpdateQuestionConfirmSegment;
 use app\models\Projects;
 use app\models\Questions;
 use app\models\Respond;
@@ -420,6 +421,86 @@ class InterviewController extends AppController
         }
     }
 
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQueryQuestions ($id)
+    {
+        $interview = $this->findModel($id);
+        $questions = $interview->questions;
+
+        if(Yii::$app->request->isAjax) {
+            $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetQuestionUpdateForm ($id)
+    {
+        $model = new FormUpdateQuestionConfirmSegment($id);
+        $interview = $this->findModel($model->interview_id);
+        $questions = $interview->questions;
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateQuestion ($id)
+    {
+        $model = new FormUpdateQuestionConfirmSegment($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()){
+
+                    $interview = $this->findModel($model->interview_id);
+                    $questions = $interview->questions;
+
+                    //Добавляем вопрос в общую базу вопросов
+                    $interview->addQuestionToGeneralList($model->title);
+                    //Передаем обновленный список вопросов для добавления в программу
+                    $queryQuestions = $interview->queryQuestionsGeneralList();
+
+                    $response = [
+                        'model' => $model,
+                        'questions' => $questions,
+                        'queryQuestions' => $queryQuestions,
+                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+    }
 
     /**
      * @param $id

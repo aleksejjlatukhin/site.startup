@@ -365,3 +365,87 @@ a#button_add_text_question_confirm:focus {
 /*Стили для формы добавления вопроса
 ---Конец---
 */
+
+/*Стили для формы редактирования вопроса
+---Начало---
+*/
+input#update_text_question_confirm {
+    outline: none; /* Убираем свечение в Chrome и Safari */
+    -webkit-appearance: none; /* Убираем рамку в Chrome и Safari */
+    box-shadow: none; /* Убираем тень в Firefox */
+    padding-right: 40px
+}
+/*Стили для формы редактирования вопроса
+---Конец---
+*/
+
+/*Стили для таблицы ответов респондентов на вопросы
+---Начало---
+*/
+#showQuestionsAndAnswers .modal-lg {
+    display: flex;
+    justify-content: center;
+    width: 96%;
+}
+#showQuestionsAndAnswers .modal-content {
+    width: 100%;
+}
+#showQuestionsAndAnswers .container-questions-and-answers {
+    margin-top: -20px;
+}
+#showQuestionsAndAnswers .question-container {
+    min-height: 60px;
+    margin: 3px 0;
+    padding: 10px 0;
+    background: #707F99;
+    border-radius: 12px;
+    display:flex;
+    align-items: center;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+}
+#showQuestionsAndAnswers .question-container div span {
+    margin-left: 5px;
+}
+#showQuestionsAndAnswers .answer-container {
+    min-height: 60px;
+    margin: 3px 0;
+    padding: 10px 0;
+    background: #F2F2F2;
+    border-radius: 12px;
+    color: #4F4F4F;
+}
+#showQuestionsAndAnswers .answer-container .respond-block {
+    font-weight: 700;
+}
+
+#showQuestionsAndAnswers a.export_link {
+    padding-left: 5px;
+    color: #828282;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+#showQuestionsAndAnswers a.export_link:hover {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+#showQuestionsAndAnswers a.export_link:focus {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+
+@media screen and (min-width: 992px) {
+
+    #showQuestionsAndAnswers .modal-lg {
+        width: 80%;
+    }
+
+    #showQuestionsAndAnswers .answer-container {
+        display:flex;
+        align-items: center;
+    }
+}
+/*Стили для таблицы ответов респондентов на вопросы
+---Конец---
+*/

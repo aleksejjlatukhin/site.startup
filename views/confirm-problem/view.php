@@ -416,20 +416,20 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             <div class="form-newQuestion-panel" style="display: none;"></div>
 
             <!--Список вопросов-->
-            <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 20px;">
+            <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 30px;">
 
                 <?php foreach ($questions as $q => $question) : ?>
 
                     <div class="col-xs-12 string_question string_question-<?= $question->id; ?>">
 
                         <div class="row style_form_field_questions">
-                            <div class="col-xs-11">
+                            <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10">
                                 <div style="display:flex;">
                                     <div class="number_question" style="padding-right: 15px;"><?= ($q+1) . '. '; ?></div>
                                     <div class="title_question"><?= $question->title; ?></div>
                                 </div>
                             </div>
-                            <div class="col-xs-1 delete_question_link">
+                            <div class="col-xs-4 col-sm-3 col-md-3 col-lg-2 delete_question_link">
 
                                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
@@ -438,6 +438,12 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                                         'title' => Yii::t('yii', 'Delete'),
                                         'class' => 'delete-question-confirm-problem pull-right',
                                         'id' => 'delete_question-'.$question->id,
+                                    ]); ?>
+
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px', 'margin-top' => '3px', ]]), [
+                                        Url::to(['/confirm-problem/get-question-update-form', 'id' => $question->id])], [
+                                        'class' => 'showQuestionUpdateForm pull-right',
+                                        'title' => 'Редактировать вопрос',
                                     ]); ?>
 
                                 <?php endif; ?>
@@ -598,12 +604,16 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                     </div>
                 </div>
 
-                <div class="col-md-1" style="text-align: right; padding: 10px 7px 10px 0;">
+                <div class="col-md-1" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
+
+                    <?= Html::a(Html::img('/images/icons/icon_q&a.png', ['style' => ['width' => '40px']]), ['/confirm-problem/get-data-questions-and-answers', 'id' => $model->id], [
+                        'class' => 'openTableQuestionsAndAnswers', 'style' => ['margin-right' => '8px'], 'title'=> 'Ответы респондентов на вопросы анкеты',
+                    ]) ?>
+
                     <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/confirm-problem/mpdf-data-responds', 'id' => $model->id], [
-                        'target'=>'_blank',
-                        //'data-toggle'=>'tooltip',
-                        'title'=> 'Скачать',
+                        'target' => '_blank', 'title'=> 'Скачать таблицу респондентов',
                     ]);?>
+
                 </div>
 
             </div>

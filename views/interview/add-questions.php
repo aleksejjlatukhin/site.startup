@@ -149,7 +149,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
 
                 <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
 
                 </div>
 
@@ -181,7 +181,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
             <div class="container-fluid content-view-data-confirm">
 
                 <div class="row">
-                    <div class="col-md-12">Цель акселерации проблемного интервью</div>
+                    <div class="col-md-12">Цель проекта</div>
                     <div class="col-md-12"><?= $project->purpose_project;?></div>
                 </div>
 
@@ -191,12 +191,12 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                 </div>
 
                 <div class="row">
-                    <div class="col-md-12">Представление интервьюера</div>
+                    <div class="col-md-12">Информация о вас для респондентов</div>
                     <div class="col-md-12"><?= $model->view_interview; ?></div>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-12">Почему мне интересно</div>
+                    <div class="col-md-12">Как вы объясните ваш интерес (причину) к интервью респонденту</div>
                     <div class="col-md-12"><?= $model->reason_interview; ?></div>
                 </div>
 
@@ -233,7 +233,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
 
                 <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды проблемного интервью</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
 
                 </div>
 
@@ -277,7 +277,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                 <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
 
                     <div class="col-md-12" style="font-weight: 700;">
-                        Цель акселерации проблемного интервью
+                        Цель проекта
                     </div>
 
                     <div class="col-md-12">
@@ -421,31 +421,37 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
             <div class="form-newQuestion-panel" style="display: none;"></div>
 
             <!--Список вопросов-->
-            <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 20px;">
+            <div id="QuestionsTable-container" class="row" style="padding-top: 30px; padding-bottom: 30px;">
 
                 <?php foreach ($questions as $q => $question) : ?>
 
                     <div class="col-xs-12 string_question string_question-<?= $question->id; ?>">
 
                         <div class="row style_form_field_questions">
-                            <div class="col-xs-11">
+                            <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10">
                                 <div style="display:flex;">
                                     <div class="number_question" style="padding-right: 15px;"><?= ($q+1) . '. '; ?></div>
                                     <div class="title_question"><?= $question->title; ?></div>
                                 </div>
                             </div>
-                            <div class="col-xs-1 delete_question_link">
+                            <div class="col-xs-4 col-sm-3 col-md-3 col-lg-2 delete_question_link">
 
                                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                                <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
-                                    Url::to(['/interview/delete-question', 'id' => $question->id])],[
-                                    'title' => Yii::t('yii', 'Delete'),
-                                    'class' => 'delete-question-confirm-segment pull-right',
-                                    'id' => 'delete_question-'.$question->id,
-                                ]); ?>
+                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
+                                        Url::to(['/interview/delete-question', 'id' => $question->id])],[
+                                        'title' => Yii::t('yii', 'Delete'),
+                                        'class' => 'delete-question-confirm-segment pull-right',
+                                        'id' => 'delete_question-'.$question->id,
+                                    ]); ?>
 
-                                <?php endif; ?>
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px', 'margin-top' => '3px', ]]), [
+                                        Url::to(['/interview/get-question-update-form', 'id' => $question->id])], [
+                                        'class' => 'showQuestionUpdateForm pull-right',
+                                        'title' => 'Редактировать вопрос',
+                                    ]); ?>
+
+                                <? endif; ?>
 
                             </div>
                         </div>

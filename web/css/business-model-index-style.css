@@ -123,6 +123,7 @@ a.export_link {
     padding-left: 5px;
     color: #828282;
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 a.export_link:hover {
     color: #4F4F4F;

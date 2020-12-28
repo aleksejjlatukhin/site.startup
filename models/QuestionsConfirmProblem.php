@@ -23,9 +23,11 @@ class QuestionsConfirmProblem extends ActiveRecord
         return $this->hasOne(ConfirmProblem::class, ['id' => 'confirm_problem_id']);
     }
 
-    public function getAnswer()
+    public function getAnswers()
     {
-        return $this->hasOne(AnswersQuestionsConfirmProblem::class, ['question_id' => 'id']);
+        $answers = AnswersQuestionsConfirmProblem::find()->where(['question_id' => $this->id])
+            ->andWhere(['not', ['answers_questions_confirm_problem.answer' => '']])->all();
+        return $answers;
     }
 
     /**

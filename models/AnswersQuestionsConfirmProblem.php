@@ -21,6 +21,11 @@ class AnswersQuestionsConfirmProblem extends ActiveRecord
         return $this->hasOne(QuestionsConfirmProblem::class, ['id' => 'question_id']);
     }
 
+    public function getRespond ()
+    {
+        return $this->hasOne(RespondsConfirm::class, ['id' => 'respond_id']);
+    }
+
     /**
      * {@inheritdoc}
      */

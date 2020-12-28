@@ -21,6 +21,11 @@ class AnswersQuestionsConfirmGcp extends ActiveRecord
         return $this->hasOne(QuestionsConfirmGcp::class, ['id' => 'question_id']);
     }
 
+    public function getRespond()
+    {
+        return $this->hasOne(RespondsGcp::class, ['id' => 'respond_id']);
+    }
+
     /**
      * {@inheritdoc}
      */
