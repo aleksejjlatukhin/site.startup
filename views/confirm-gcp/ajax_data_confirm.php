@@ -154,6 +154,7 @@ use app\models\User;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -169,6 +170,7 @@ use app\models\User;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_positive',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 

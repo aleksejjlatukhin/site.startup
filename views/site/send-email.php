@@ -20,7 +20,7 @@ $this->title = 'Востановление пароля'
 
             <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($model, 'email')->label(false) ?>
+            <?= $form->field($model, 'email', ['options' => ['autocomplete' => 'off']])->label(false) ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary btn-block']) ?>

@@ -31,6 +31,7 @@ use app\models\TypeOfActivityB2B;
             'required' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
+            'autocomplete' => 'off'
         ]);
         ?>
 
@@ -208,7 +209,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'age_from',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -217,7 +219,8 @@ use app\models\TypeOfActivityB2B;
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'age_to',
-                'class' => 'style_form_field_respond form-control'
+                'class' => 'style_form_field_respond form-control',
+                'autocomplete' => 'off'
             ]);
             ?>
 
@@ -339,7 +342,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'income_from',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -348,7 +352,8 @@ use app\models\TypeOfActivityB2B;
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'income_to',
-                'class' => 'style_form_field_respond form-control'
+                'class' => 'style_form_field_respond form-control',
+                'autocomplete' => 'off'
             ]);
             ?>
 
@@ -418,7 +423,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'quantity_from',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -427,7 +433,8 @@ use app\models\TypeOfActivityB2B;
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'quantity_to',
-                'class' => 'style_form_field_respond form-control'
+                'class' => 'style_form_field_respond form-control',
+                'autocomplete' => 'off'
             ]);
             ?>
 
@@ -467,7 +474,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'market_volume_b2c',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -637,7 +645,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'quantity_from_b2b',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -646,7 +655,8 @@ use app\models\TypeOfActivityB2B;
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'quantity_to_b2b',
-                'class' => 'style_form_field_respond form-control'
+                'class' => 'style_form_field_respond form-control',
+                'autocomplete' => 'off'
             ]);
             ?>
 
@@ -716,7 +726,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'income_from_b2b',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -725,7 +736,8 @@ use app\models\TypeOfActivityB2B;
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'income_to_b2b',
-                'class' => 'style_form_field_respond form-control'
+                'class' => 'style_form_field_respond form-control',
+                'autocomplete' => 'off'
             ]);
             ?>
 
@@ -765,7 +777,8 @@ use app\models\TypeOfActivityB2B;
                 ->textInput([
                     'type' => 'number',
                     'id' => 'market_volume_b2b',
-                    'class' => 'style_form_field_respond form-control'
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 

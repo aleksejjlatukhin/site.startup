@@ -46,6 +46,7 @@ $this->title = 'Главная';
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => 'Введите логин или email',
+                                'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -57,6 +58,7 @@ $this->title = 'Главная';
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => 'Введите пароль',
+                                'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -158,6 +160,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => 'Введите email',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>
@@ -256,6 +259,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>
@@ -269,6 +273,7 @@ $this->title = 'Главная';
                             'minlength' => 6,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>
@@ -283,6 +288,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -297,6 +303,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>
@@ -311,6 +318,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>
@@ -325,6 +333,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -339,6 +348,7 @@ $this->title = 'Главная';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>

@@ -1,18 +1,19 @@
 
 $(document).ready(function() {
 
-    //Динамическое изменение высоты и ширины textarea
-    /*---------------------------------------*/
+    /*
+    Динамическое изменение высоты и ширины textarea
+    */
     $('body').on('input', 'textarea', function() {
 
         this.style.height = '60px';
         this.style.width = '100%';
         this.style.height = (this.scrollHeight + 6) + 'px';
     });
-    /*-----------------------------------------*/
 
-    // Показать описание стадии
-    /*--------------------------------------------*/
+    /*
+    Показать описание стадии
+    */
     $('.view_desc_stage').hover(function() {
         $('.arrow_link').find('span').css({
             'height': '2px',
@@ -24,8 +25,9 @@ $(document).ready(function() {
             'transition': 'all 0.2s ease',
         });
     }).on('click', function() {
-        $('.arrow_link').toggleClass('active_arrow_link');
-        if ($('.arrow_link').hasClass('active_arrow_link')) {
+        var arrow_link = $('.arrow_link');
+        $(arrow_link).toggleClass('active_arrow_link');
+        if ($(arrow_link).hasClass('active_arrow_link')) {
 
             $('.block_description_stage').css({
                 'display':'block',
@@ -49,96 +51,33 @@ $(document).ready(function() {
             setTimeout(function() {$('.block_description_stage').css({'display':'none'});}, 1000);
         }
     });
-    /*--------------------------------------------*/
 
 
-    //Показать и скрыть данные
-    /*--------------------------------------------*/
-    $('.faq_item_title_inner').on('click',function(){
-        $(this).parents('.faq_item').find('.faq_item_body').slideToggle(300);
-        $(this).toggleClass('open');
-        if ($(this).hasClass('show_all')){
-            if ($(this).hasClass('open')) {
-                $(this).html('Свернуть все');
-                $('.faq_item_title_inner:not(.open)').trigger('click');
-            } else {
-                $(this).html('Смотреть все');
-                $('.faq_item_title_inner.open').trigger('click');
-            }
-        }
-    });
-    /*--------------------------------------------*/
-
-
-    /*Всплывающие  блоки */
-    $('[data-toggle="popover"]').popover({html:true});
-
-    /*Разворащивающееся меню*/
+    /*
+    Разворащивающееся меню
+    */
     //$('.catalog').dcAccordion({speed:300});
 
-    /*Всплывающие подсказки в сводной таблице проекта(Bootstrap)*/
-    /*$('[data-toggle="tooltip"]').tooltip({
-        placement: "top",
-        delay: {"show": 100, "hide": 100},
-    });*/
-
-    /*Всплывающие подсказки в сводной таблице проекта (Query UI Tooltip)*/
-    $('[data-toggle="tooltip"]').tooltip({
-        /*position: {
-            my: "center bottom-10",
-            at: "center top",
-        },
-        show: {
-            effect: "slideDown",
-            delay: 100
-        },*/
-        position: {
-            my: "center bottom-20",
-            at: "center top",
-            using: function( position, feedback ) {
-                $( this ).css( position );
-                $( "<div>" )
-                    .addClass( "pro-tooltip" )
-                    .addClass( feedback.vertical )
-                    .addClass( feedback.horizontal )
-                    .appendTo( this );
-            }
+    /*
+    Открываем при загругрузке страницы событием click дефолтные вкладки на страницах подтверждений
+    */
+    var url_pathname = location.pathname;
+    var array_search_results = [
+        '/interview/add-questions', '/interview/view', '/confirm-problem/add-questions', '/confirm-problem/view',
+        '/confirm-gcp/add-questions', '/confirm-gcp/view', '/confirm-mvp/add-questions', '/confirm-mvp/view',
+    ];
+    array_search_results.forEach(function (elem) {
+        if(elem.indexOf(url_pathname) !== -1) {
+            document.getElementById("defaultOpen").click();
         }
     });
 
-
-    /*
-    Вкладки на странице "Программа генерации ГПС"
-    ---это небольшая часть(остальное находится ниже)--
-    */
-
-    // Get the element with id="defaultOpen" and click on it
-    document.getElementById("defaultOpen").click();
-
-    /*
-    Вкладки на странице "Программа генерации ГПС"
-    ---это небольшая часть(остальное находится ниже)--
-    */
-
 });
 
-/*
-Отключаем автозаполнение для поля input
----Начало---
-*/
-$('html, body').on('click', 'input', function () {
-    $(this).attr('autocomplete', 'off');
-});
-/*
-Отключаем автозаполнение для поля input
----Конец---
-*/
 
 /*
-Вкладки на странице "Программа генерации ГПС"
----Начало---
+Вкладки на странице "Подтверждение"
 */
-
 function openCity(evt, cityName) {
     // Declare all variables
     var i, tabcontent, tablinks;
@@ -160,15 +99,9 @@ function openCity(evt, cityName) {
     evt.currentTarget.className += " active";
 }
 
-/*
-Вкладки на странице "Программа генерации ГПС"
----Конец---
-*/
-
 
 /*
 Добавляем контент в окно просмотра данных проекта
----Начало---
  */
 $(document).on('click', 'body .openAllInformationProject', function(e) {
 
@@ -191,15 +124,10 @@ $(document).on('click', 'body .openAllInformationProject', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в окно просмотра данных проекта
----Конец---
- */
 
 
 /*
 Добавляем контент в окно просмотра данных сегмента
----Начало---
  */
 $(document).on('click', 'body .openAllInformationSegment', function(e) {
 
@@ -222,15 +150,10 @@ $(document).on('click', 'body .openAllInformationSegment', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в окно просмотра данных сегмента
----Конец---
- */
 
 
 /*
 Добавляем контент в дорожную карту проекта
----Начало---
  */
 $(document).on('click', 'body .openRoadmapProject', function(e) {
 
@@ -255,14 +178,10 @@ $(document).on('click', 'body .openRoadmapProject', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в дорожную карту проекта
----Конец---
- */
+
 
 /*
 Добавляем контент в дорожную карту сегмента
----Начало---
 */
 $(document).on('click', 'body .openRoadmapSegment', function(e) {
 
@@ -287,14 +206,10 @@ $(document).on('click', 'body .openRoadmapSegment', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в дорожную карту сегмента
----Конец---
-*/
+
 
 /*
 При вызове окна удаления гипотезы
----Начало---
 */
 $(document).on('click', 'body .delete_hypothesis', function(e) {
 
@@ -321,14 +236,10 @@ $(document).on('click', 'body .delete_hypothesis', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-При вызове окна удаления гипотезы
----Конец---
-*/
+
 
 /*
 При подтверждении удаления гипотезы
----Начало---
 */
 $(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
 
@@ -353,15 +264,10 @@ $(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-При подтверждении удаления гипотезы
----Конец---
-*/
 
 
 /*
 Добавляем контент в сводную таблицу проекта
----Начало---
  */
 $(document).on('click', 'body .openResultTableProject', function(e) {
 
@@ -384,15 +290,10 @@ $(document).on('click', 'body .openResultTableProject', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в сводную таблицу проекта
----Конец---
- */
 
 
 /*
 Добавляем контент в протокол проекта
----Начало---
  */
 $(document).on('click', 'body .openReportProject', function(e) {
 
@@ -417,7 +318,3 @@ $(document).on('click', 'body .openReportProject', function(e) {
     e.preventDefault();
     return false;
 });
-/*
-Добавляем контент в протокол проекта
----Конец---
- */

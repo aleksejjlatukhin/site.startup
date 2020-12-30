@@ -26,6 +26,7 @@ use yii\helpers\Html;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Иванов Иван Иванович',
+                'autocomplete' => 'off'
             ]) ?>
 
         </div>
@@ -37,6 +38,7 @@ use yii\helpers\Html;
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'ivanov@gmail.com',
+                'autocomplete' => 'off'
             ]); ?>
 
         </div>
@@ -56,6 +58,7 @@ use yii\helpers\Html;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Организация, адрес',
+                'autocomplete' => 'off'
             ]); ?>
 
         </div>

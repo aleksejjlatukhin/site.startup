@@ -31,6 +31,7 @@ use yii\helpers\Html;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -42,6 +43,7 @@ use yii\helpers\Html;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -87,6 +89,7 @@ use yii\helpers\Html;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -119,6 +122,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]); ?>
             </div>
 
@@ -129,6 +133,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -185,6 +190,7 @@ use yii\helpers\Html;
                                 'id' => 'author_fio-' . $i,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => '',
+                                'autocomplete' => 'off'
                             ]); ?>
 
                             <?= $form->field($worker, "[$i]role", [
@@ -195,6 +201,7 @@ use yii\helpers\Html;
                                 'id' => 'author_role-' . $i,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => '',
+                                'autocomplete' => 'off'
                             ]); ?>
 
                             <?= $form->field($worker, "[$i]experience", [
@@ -276,6 +283,7 @@ use yii\helpers\Html;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -307,6 +315,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -351,6 +360,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -371,6 +381,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 
@@ -407,6 +418,7 @@ use yii\helpers\Html;
                     'type' => 'number',
                     'id' => 'invest_amount-' . $model->id,
                     'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
                 ]);?>
             </div>
 
@@ -460,6 +472,7 @@ use yii\helpers\Html;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]) ?>
             </div>
 

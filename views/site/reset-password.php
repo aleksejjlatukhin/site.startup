@@ -51,6 +51,7 @@ $this->title = 'Востановление пароля';
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => 'Введите от 6 до 32 символов',
+                                'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -99,6 +100,7 @@ $this->title = 'Востановление пароля';
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => 'Введите email',
+                            'autocomplete' => 'off'
                         ]) ?>
 
                     </div>

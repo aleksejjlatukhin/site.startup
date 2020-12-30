@@ -212,6 +212,7 @@ use yii\helpers\Url;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 
@@ -227,6 +228,7 @@ use yii\helpers\Url;
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_positive',
+                    'autocomplete' => 'off'
                 ]);
             ?>
 

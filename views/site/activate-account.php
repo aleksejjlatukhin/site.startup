@@ -47,6 +47,7 @@ $this->title = 'Подтверждение регистрации';
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => 'Введите логин или email',
+                                'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
@@ -58,18 +59,10 @@ $this->title = 'Подтверждение регистрации';
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => 'Введите пароль',
+                                'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
-
-                    <!--<div class="col-md-12" style="margin-top: 5px;">
-
-                        <?/*= $form->field($model_login, 'rememberMe', [
-                            'template' => "{input}{label}"
-                        ])->checkbox(['checked' => true],false)->label('Запомнить меня');
-                        */?>
-
-                    </div>-->
 
                     <div class="col-md-12 text-center" style="margin-top: 15px;">
                         <?= Html::submitButton('Отправить', [

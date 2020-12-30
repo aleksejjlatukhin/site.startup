@@ -28,6 +28,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
+                'autocomplete' => 'off'
             ]); ?>
 
         </div>

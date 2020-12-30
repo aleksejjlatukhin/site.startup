@@ -22,6 +22,7 @@ use yii\helpers\Html;
             'required' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => 'Иванов Иван Иванович',
+            'autocomplete' => 'off'
         ]) ?>
 
     </div>

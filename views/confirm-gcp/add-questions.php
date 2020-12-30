@@ -324,6 +324,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_respond',
+                            'autocomplete' => 'off'
                         ]);
                     ?>
 
@@ -339,6 +340,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_positive',
+                            'autocomplete' => 'off'
                         ]);
                     ?>
 

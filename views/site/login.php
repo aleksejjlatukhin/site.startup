@@ -32,13 +32,13 @@ $this->title = 'Страница входа';
         <div class="row" style="display: flex">
             <div class="col-md-3" style="margin: auto;">
 
-                <?= $form->field($model, 'identity')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'identity')->textInput(['maxlength' => true, 'autocomplete' => 'off']); ?>
 
-                <?= $form->field($model, 'password')->passwordInput() ?>
+                <?= $form->field($model, 'password')->passwordInput(['autocomplete' => 'off']); ?>
 
                 <?= $form->field($model, 'rememberMe')->checkbox([
                     'template' => "<div>{input} {label}</div>\n",
-                ]) ?>
+                ]); ?>
 
             </div>
         </div>
