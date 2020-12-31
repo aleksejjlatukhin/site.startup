@@ -100,57 +100,53 @@ class FormUpdateSegment extends FormSegment
 
 
     /**
-     * @return Segment|bool|null
+     * @return Segment|null
      */
     public function update()
     {
-        if ($this->validate()) {
+        $segment = Segment::findOne($this->id);
+        $segment->name = $this->name;
+        $segment->description = $this->description;
+        $segment->add_info = $this->add_info;
 
-            $segment = Segment::findOne($this->id);
-            $segment->name = $this->name;
-            $segment->description = $this->description;
-            $segment->add_info = $this->add_info;
+        if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
 
-            if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
+            $segment->age_from = $this->age_from;
+            $segment->age_to = $this->age_to;
 
-                $segment->age_from = $this->age_from;
-                $segment->age_to = $this->age_to;
+            $segment->gender_consumer = $this->gender_consumer;
+            $segment->education_of_consumer = $this->education_of_consumer;
 
-                $segment->gender_consumer = $this->gender_consumer;
-                $segment->education_of_consumer = $this->education_of_consumer;
+            $segment->income_from = $this->income_from;
+            $segment->income_to = $this->income_to;
 
-                $segment->income_from = $this->income_from;
-                $segment->income_to = $this->income_to;
+            $segment->quantity_from = $this->quantity_from;
+            $segment->quantity_to = $this->quantity_to;
 
-                $segment->quantity_from = $this->quantity_from;
-                $segment->quantity_to = $this->quantity_to;
+            $segment->market_volume = $this->market_volume_b2c;
 
-                $segment->market_volume = $this->market_volume_b2c;
+            $this->updateDirName();
 
-                $this->updateDirName();
+            return $segment->save() ? $segment : null;
 
-                return $segment->save() ? $segment : null;
+        }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
-            }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+            $segment->company_products = $this->company_products;
 
-                $segment->company_products = $this->company_products;
+            $segment->quantity_from = $this->quantity_from_b2b;
+            $segment->quantity_to = $this->quantity_to_b2b;
 
-                $segment->quantity_from = $this->quantity_from_b2b;
-                $segment->quantity_to = $this->quantity_to_b2b;
+            $segment->company_partner = $this->company_partner;
 
-                $segment->company_partner = $this->company_partner;
+            $segment->income_from = $this->income_company_from;
+            $segment->income_to = $this->income_company_to;
 
-                $segment->income_from = $this->income_company_from;
-                $segment->income_to = $this->income_company_to;
+            $segment->market_volume = $this->market_volume_b2b;
 
-                $segment->market_volume = $this->market_volume_b2b;
+            $this->updateDirName();
 
-                $this->updateDirName();
-
-                return $segment->save() ? $segment : null;
-            }
+            return $segment->save() ? $segment : null;
         }
-        return false;
     }
 
 
