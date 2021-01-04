@@ -66,11 +66,13 @@ $(document).ready(function() {
         '/interview/add-questions', '/interview/view', '/confirm-problem/add-questions', '/confirm-problem/view',
         '/confirm-gcp/add-questions', '/confirm-gcp/view', '/confirm-mvp/add-questions', '/confirm-mvp/view',
     ];
-    array_search_results.forEach(function (elem) {
-        if(elem.indexOf(url_pathname) !== -1) {
-            document.getElementById("defaultOpen").click();
-        }
-    });
+    if (url_pathname !== '/') {
+        array_search_results.forEach(function (elem) {
+            if(elem.indexOf(url_pathname) !== -1) {
+                document.getElementById("defaultOpen").click();
+            }
+        });
+    }
 
 });
 
