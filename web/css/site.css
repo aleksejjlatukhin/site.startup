@@ -205,3 +205,20 @@ a.desc::after {
         padding-right: 0;
     }
 }*/
+
+/*Скрытие полосы прокрутки на странице*/
+@-moz-document url-prefix() { /* Disable scrollbar Firefox */
+    html{
+        scrollbar-width: none;
+    }
+}
+body {
+    margin: 0; /* remove default margin */
+    scrollbar-width: none; /* Also needed to disable scrollbar Firefox */
+    -ms-overflow-style: none;  /* Disable scrollbar IE 10+ */
+    overflow-y: scroll;
+}
+body::-webkit-scrollbar {
+    width: 0;
+    background: transparent; /* Disable scrollbar Chrome/Safari/Webkit */
+}
