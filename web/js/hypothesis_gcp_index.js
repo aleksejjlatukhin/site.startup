@@ -1,12 +1,16 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+
 $(document).ready(function() {
 
     //Фон для модального окна информации в заголовке при создании ГЦП
-    var information_create_hypothesis_modal = $('#information_create_hypothesis').find('.modal-content');
-    information_create_hypothesis_modal.css('background-color', '#707F99');
+    var information_create_hypothesis_modal = $('#information_create_hypothesis');
+    $(body).append($(information_create_hypothesis_modal).first());
+    information_create_hypothesis_modal.find('.modal-content').css('background-color', '#707F99');
 
     //Фон для модального окна (при создании ГЦП - недостаточно данных)
-    var info_hypothesis_create_modal_error = $('.hypothesis_create_modal_error').find('.modal-content');
-    info_hypothesis_create_modal_error.css('background-color', '#707F99');
+    var info_hypothesis_create_modal_error = $('.hypothesis_create_modal_error');
+    info_hypothesis_create_modal_error.find('.modal-content').css('background-color', '#707F99');
 
 
 
@@ -34,10 +38,13 @@ var body = $('body');
 //При попытке добавить ГЦП проверяем существуют ли необходимые данные
 //Если данных достаточно - показываем окно с формой
 //Если данных недостаточно - показываем окно с сообщением error
-$('#checking_the_possibility').on('click', function(){
+$(body).on('click', '#checking_the_possibility', function(){
 
     var url = $(this).attr('href');
     var hypothesis_create_modal = $('.hypothesis_create_modal');
+    $(body).append($(hypothesis_create_modal).first());
+    var hypothesis_create_modal_error = $('.hypothesis_create_modal_error');
+    $(body).append($(hypothesis_create_modal_error).first());
 
     $.ajax({
 
@@ -49,7 +56,7 @@ $('#checking_the_possibility').on('click', function(){
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
             }else{
-                $('.hypothesis_create_modal_error').modal('show');
+                $(hypothesis_create_modal_error).modal('show');
             }
         },
         error: function(){
@@ -92,7 +99,8 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 $(body).on('click', '.update-hypothesis', function(e){
 
     var url = $(this).attr('href');
-    var modal = $('.hypothesis_update_modal');
+    var hypothesis_update_modal = $('.hypothesis_update_modal');
+    $(body).append($(hypothesis_update_modal).first());
 
     $.ajax({
         url: url,
@@ -100,9 +108,9 @@ $(body).on('click', '.update-hypothesis', function(e){
         cache: false,
         success: function(response){
 
-            $(modal).modal('show');
-            $(modal).find('.modal-header').find('h3').html('Редактирование гипотезы ценностного предложения - ' + response.model.title);
-            $(modal).find('.modal-body').html(response.renderAjax);
+            $(hypothesis_update_modal).modal('show');
+            $(hypothesis_update_modal).find('.modal-header').find('h3').html('Редактирование гипотезы ценностного предложения - ' + response.model.title);
+            $(hypothesis_update_modal).find('.modal-body').html(response.renderAjax);
         },
         error: function(){
             alert('Ошибка');

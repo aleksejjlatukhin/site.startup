@@ -70,7 +70,7 @@ use yii\helpers\Html;
                 'type' => 2,
                 'removeButton' => false,
                 'name' => 'UpdateRespondForm[date_plan]',
-                'value' => $model->date_plan == null ? date('d.m.yy') : date('d.m.yy', $model->date_plan),
+                'value' => $model->date_plan == null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
                 'readonly' => true,
                 'pluginOptions' => [
                     'autoclose' => true,

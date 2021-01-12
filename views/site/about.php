@@ -274,8 +274,8 @@ $this->title = 'О сервисе';
                 <?= Html::a('Создать проект', ['/'],[
                     'class' => 'btn btn-default',
                     'style' => [
-                        'margin-top' => '50px',
-                        'margin-bottom' => '50px',
+                        'margin-top' => '40px',
+                        'margin-bottom' => '30px',
                         'background' => '#E0E0E0',
                         'color' => '4F4F4F',
                         'border-radius' => '8px',
@@ -291,8 +291,8 @@ $this->title = 'О сервисе';
                 <?= Html::a('Создать проект', ['/projects/index', 'id' => Yii::$app->user->id],[
                     'class' => 'btn btn-default',
                     'style' => [
-                        'margin-top' => '50px',
-                        'margin-bottom' => '50px',
+                        'margin-top' => '40px',
+                        'margin-bottom' => '30px',
                         'background' => '#E0E0E0',
                         'color' => '4F4F4F',
                         'border-radius' => '8px',
@@ -310,3 +310,14 @@ $this->title = 'О сервисе';
 
 
 </div>
+
+
+<?php
+$script = "
+    
+    //Установка Simple ScrollBar
+    const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+";
+$position = \yii\web\View::POS_READY;
+$this->registerJs($script, $position);
+?>

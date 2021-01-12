@@ -72,7 +72,6 @@ class UpdateRespondForm extends Model
 
 
     /**
-     * @param $respond
      * @return Respond|null
      */
     public function updateRespond()

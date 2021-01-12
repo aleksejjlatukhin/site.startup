@@ -167,15 +167,11 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить анкетные данные респондентов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
-            'data-toggle' => 'modal',
-            'data-target' => '#next_step_error',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3 show_modal_next_step_error',
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3',
-            'data-toggle' => 'modal',
-            'data-target' => '#next_step_error',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3 show_modal_next_step_error',
         ]); ?>
 
     </div>
@@ -194,9 +190,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
                     <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'data-toggle' => 'modal',
-                        'data-target' => "#information-add-new-responds",
-                        'title' => 'Посмотреть описание',
+                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
                     ]); ?>
 
                 </div>
@@ -267,9 +261,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
                     <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'data-toggle' => 'modal',
-                        'data-target' => "#information-add-new-responds",
-                        'title' => 'Посмотреть описание',
+                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
                     ]); ?>
 
                 </div>
@@ -379,9 +371,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
                     <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для анкеты</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'data-toggle' => 'modal',
-                        'data-target' => "#information-table-questions",
-                        'title' => 'Посмотреть описание',
+                        'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
                     ]); ?>
 
                 </div>

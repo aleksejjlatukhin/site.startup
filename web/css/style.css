@@ -677,7 +677,7 @@ div.style_form_field_questions {
     width: 100%;
     height: auto;
     position: absolute;
-    top: 0;
+    top: 20px;
     left: 0;
     background-repeat: no-repeat;
     background-position: center center;

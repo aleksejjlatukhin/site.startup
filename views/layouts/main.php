@@ -26,53 +26,64 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+    <div class="shared-container" id="simplebar-shared-container">
 
-    <div class="" style="margin-bottom: -20px;">
+        <div class="wrap">
 
-        <?php
-        NavBar::begin([
-            'id' => 'main_menu_user',
-            'brandLabel' => Yii::$app->name = 'Spaccel',
-            'brandUrl' => Yii::$app->homeUrl,
-            'brandOptions' => ['class' => 'font_nav_menu_brand'],
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-            'renderInnerContainer' => false,
-        ]);
+            <div class="" style="margin-bottom: -20px;">
 
-        $conversation = \app\models\ConversationAdmin::findOne(['user_id' => Yii::$app->user->id]);
-
-        echo Nav::widget([
-            'id' => 'main_navbar_right',
-            'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
-            'items' => [
-                ['label' => 'Главная', 'url' => ['/']],
-                ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
-                ['label' => 'О сервисе', 'url' => ['/about']],
-
-                !Yii::$app->user->isGuest ? ([
-                    'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
-                    'items' => [
-                        ['label' => 'Мой профиль', 'url' => Url::to(['/site/profile', 'id' => Yii::$app->user->identity['id']])],
-                        ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                <?php
+                NavBar::begin([
+                    'id' => 'main_menu_user',
+                    'brandLabel' => Yii::$app->name = 'Spaccel',
+                    'brandUrl' => Yii::$app->homeUrl,
+                    'brandOptions' => ['class' => 'font_nav_menu_brand'],
+                    'options' => [
+                        'class' => 'navbar-inverse navbar-fixed-top',
                     ],
-                ]) : (''),
+                    'renderInnerContainer' => false,
+                ]);
 
-                ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/message/view', 'id' => $conversation->id]],
-            ],
-            'encodeLabels' => false,
-        ]);
-        NavBar::end();
-        ?>
+                $conversation = \app\models\ConversationAdmin::findOne(['user_id' => Yii::$app->user->id]);
+
+                echo Nav::widget([
+                    'id' => 'main_navbar_right',
+                    'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
+                    'items' => [
+                        ['label' => 'Главная', 'url' => ['/']],
+                        ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
+                        ['label' => 'О сервисе', 'url' => ['/about']],
+
+                        !Yii::$app->user->isGuest ? ([
+                            'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                            'items' => [
+                                ['label' => 'Мой профиль', 'url' => Url::to(['/site/profile', 'id' => Yii::$app->user->identity['id']])],
+                                ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                            ],
+                        ]) : (''),
+
+                        ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/message/view', 'id' => $conversation->id]],
+                    ],
+                    'encodeLabels' => false,
+                ]);
+                NavBar::end();
+                ?>
+
+            </div>
+
+            <div class="container-fluid">
+                <?= $content ?>
+            </div>
+
+        </div>
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
+            </div>
+        </footer>
 
     </div>
-
-    <div class="container-fluid">
-        <?= $content ?>
-    </div>
-
 
     <!--All-information Project begin-->
 
@@ -188,15 +199,6 @@ AppAsset::register($this);
     <?php Modal::end(); ?>
 
     <!--Report Project end-->
-
-
-</div>
-
-<footer class="footer">
-    <div class="container-fluid">
-        <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
-    </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>

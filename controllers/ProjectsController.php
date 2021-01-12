@@ -306,8 +306,6 @@ class ProjectsController extends AppController
     {
         $model = new Projects();
         $model->user_id = $id;
-
-        $models = Projects::findAll(['user_id' => $id]);
         $user = User::findOne($id);
 
         if ($model->load(Yii::$app->request->post())) {
@@ -329,7 +327,7 @@ class ProjectsController extends AppController
                 }
 
                 //Проверка на совпадение по названию проекта у данного пользователя
-                if ($model->checkingForMatchByName($models) === false) {
+                if ($model->validate(['project_name'])) {
 
                     if ($model->save()){
 
@@ -397,7 +395,6 @@ class ProjectsController extends AppController
     {
         $model = $this->findModel($id);
         $user = User::find()->where(['id' => $model->user_id])->one();
-        $models = Projects::find()->where(['user_id' => $user['id']])->all();
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -418,7 +415,7 @@ class ProjectsController extends AppController
                 }
 
                 //Проверка на совпадение по названию проекта у данного пользователя
-                if ($model->checkingForMatchByName($models) === false) {
+                if ($model->validate(['project_name']) && $model->updateProjectDirectory()) {
 
                     if ($model->save()){
 

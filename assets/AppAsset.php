@@ -23,11 +23,13 @@ class AppAsset extends AssetBundle
         'css/site.css',
         'css/style.css',
         'css/fonts.css',
+        'css/simplebar.css',
     ];
     public $js = [
         'js/jquery.cookie.js',
         'js/jquery.accordion.js',
         'js/main.js',
+        'js/simplebar.min.js',
     ];
 
     public $jsOptions = ['position' => \yii\web\View::POS_HEAD,];

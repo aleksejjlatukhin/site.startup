@@ -192,7 +192,7 @@ a.view_block_description > div {
 }
 .container-data {
     padding: 0 15px 0 15px;
-    margin-bottom: 110px;
+    margin-bottom: 80px;
     background: #FFFFFF;
     height: 100%;
 }
@@ -254,7 +254,7 @@ a.view_block_description > div {
 
 .information_status_confirm {
     position: absolute;
-    bottom: 90px;
+    bottom: 0;
     width: 100%;
     padding-right: 10px;
     padding-left: 10px;

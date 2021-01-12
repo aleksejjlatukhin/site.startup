@@ -1,3 +1,5 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 //Форма создания модели подтверждения
 $('#new_confirm_problem').on('beforeSubmit', function(e){
@@ -69,3 +71,31 @@ $("input#confirm_count_positive").change(function () {
         $(this).val(value1);
     }
 });
+
+
+var body = $('body');
+var modal_next_step_error = $('#next_step_error');
+var information_add_new_responds_modal = $('#information-add-new-responds');
+
+//Показываем модальное окно - запрет перехода на следующий шаг
+$(body).on('click', '.show_modal_next_step_error', function (e) {
+
+    $(body).append($(modal_next_step_error).first());
+    $(modal_next_step_error).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+
+//Показываем модальное окно - информация о месте добавления новых респондентов
+$(body).on('click', '.show_modal_information_add_new_responds', function (e) {
+
+    $(body).append($(information_add_new_responds_modal).first());
+    $(information_add_new_responds_modal).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+
+
+

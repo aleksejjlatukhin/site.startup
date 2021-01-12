@@ -29,84 +29,95 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+    <div class="shared-container" id="simplebar-shared-container">
 
-    <div style="margin-bottom: -20px;">
+        <div class="wrap">
 
-        <?php
-        NavBar::begin([
-            'id' => 'main_menu_admin',
-            'brandLabel' => Yii::$app->name = 'Spaccel <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">admin-panel</span>',
-            'brandUrl' => ['/admin/default/index'],
-            'brandOptions' => ['class' => 'font_nav_menu_brand'],
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-            'renderInnerContainer' => false,
-        ]);
+            <div style="margin-bottom: -20px;">
 
-
-        if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) :
-
-            echo Nav::widget([
-                'id' => 'main_navbar_right',
-                'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
-                'items' => [
-                    ['label' => 'Главная', 'url' => ['/admin/']],
-                    ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
-                    ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
-
-                    [
-                        'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
-                        'items' => [
-                            ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
-                            ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
-                        ],
+                <?php
+                NavBar::begin([
+                    'id' => 'main_menu_admin',
+                    'brandLabel' => Yii::$app->name = 'Spaccel <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">admin-panel</span>',
+                    'brandUrl' => ['/admin/default/index'],
+                    'brandOptions' => ['class' => 'font_nav_menu_brand'],
+                    'options' => [
+                        'class' => 'navbar-inverse navbar-fixed-top',
                     ],
+                    'renderInnerContainer' => false,
+                ]);
 
-                    ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
-                ],
-                'encodeLabels' => false,
-            ]);
 
-        elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) :
+                if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) :
 
-            echo Nav::widget([
-                'id' => 'main_navbar_right',
-                'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
-                'items' => [
-                    ['label' => 'Главная', 'url' => ['/admin/']],
-                    ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
-                    ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
-
-                    [
-                        'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                    echo Nav::widget([
+                        'id' => 'main_navbar_right',
+                        'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                         'items' => [
-                            ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
-                            ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                            ['label' => 'Главная', 'url' => ['/admin/']],
+                            ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
+                            ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
+
+                            [
+                                'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                                'items' => [
+                                    ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
+                                    ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                                ],
+                            ],
+
+                            ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                         ],
-                    ],
+                        'encodeLabels' => false,
+                    ]);
 
-                    ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
-                ],
-                'encodeLabels' => false,
-            ]);
+                elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) :
 
-        endif;
+                    echo Nav::widget([
+                        'id' => 'main_navbar_right',
+                        'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
+                        'items' => [
+                            ['label' => 'Главная', 'url' => ['/admin/']],
+                            ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
+                            ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
+
+                            [
+                                'label' => Html::img('/images/icons/button_user_menu.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]),
+                                'items' => [
+                                    ['label' => 'Мой профиль', 'url' => Url::to(['/admin/users/profile-admin', 'id' => Yii::$app->user->id])],
+                                    ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                                ],
+                            ],
+
+                            ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+                        ],
+                        'encodeLabels' => false,
+                    ]);
+
+                endif;
 
 
-        NavBar::end();
-        ?>
+                NavBar::end();
+                ?>
+
+            </div>
+
+
+            <div class="container-fluid">
+
+                <?= $content ?>
+
+            </div>
+
+        </div>
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
+            </div>
+        </footer>
 
     </div>
-
-
-    <div class="container-fluid">
-
-        <?= $content ?>
-
-    </div>
-
 
     <!--All-information Project begin-->
 
@@ -189,15 +200,6 @@ AppAsset::register($this);
     <?php Modal::end(); ?>
 
     <!--Report Project end-->
-
-
-</div>
-
-<footer class="footer">
-    <div class="container-fluid">
-        <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
-    </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>

@@ -1,3 +1,6 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+
 var id = (window.location.search).split('?id=')[1];
 if (typeof id === 'undefined') {
     id = 'all_projects';
@@ -60,7 +63,7 @@ $(body).on('click', '.pagination-admin-projects-result .admin-projects-result-pa
         success: function(response){
 
             $('.allContainersDataOfTableResultProject').html(response.renderAjax);
-            $('html, body').animate({scrollTop: 0});
+            simpleBar.getScrollElement().scrollBy({top: $('.select_count_projects').offset().top, behavior: 'smooth'});
         },
         error: function(){
             alert('Ошибка');

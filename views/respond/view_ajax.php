@@ -150,7 +150,7 @@ use app\models\User;
 </div>
 
 
-<div class="row container-fluid" style="position: absolute; bottom: 90px; width: 100%;">
+<div class="row container-fluid" style="position: absolute; bottom: 0; width: 100%;">
 
     <div class="col-md-12" style="color: #4F4F4F; font-size: 16px; display: flex; justify-content: space-between; padding: 10px 20px; border-radius: 12px; border: 2px solid #707F99; align-items: center; margin-top: 30px;">
 

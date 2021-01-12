@@ -1,3 +1,5 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 var body = $('body');
 
@@ -367,3 +369,43 @@ $(body).on('change', 'input#confirm_count_positive', function () {
         $(this).val(value1);
     }
 });
+
+
+//Показываем модальное окно - запрет перехода на следующий шаг
+var modal_next_step_error = $('#next_step_error');
+
+$(body).on('click', '.show_modal_next_step_error', function (e) {
+
+    $(body).append($(modal_next_step_error).first());
+    $(modal_next_step_error).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Показываем модальное окно - информация о добавлении вопросов для интервью
+var modal_information_table_questions = $('#information-table-questions');
+
+$(body).on('click', '.show_modal_information_table_questions', function (e) {
+
+    $(body).append($(modal_information_table_questions).first());
+    $(modal_information_table_questions).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Показываем модальное окно - информация о месте добавления новых респондентов
+var information_add_new_responds_modal = $('#information-add-new-responds');
+
+$(body).on('click', '.show_modal_information_add_new_responds', function (e) {
+
+    $(body).append($(information_add_new_responds_modal).first());
+    $(information_add_new_responds_modal).modal('show');
+
+    e.preventDefault();
+    return false;
+});
+

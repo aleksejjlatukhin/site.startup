@@ -1,3 +1,5 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 $(document).ready(function() {
 
@@ -54,6 +56,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
 
     var url = $(this).attr('href');
     var hypothesis_create_modal = $('.hypothesis_create_modal');
+    $(body).append($(hypothesis_create_modal).first());
 
     $.ajax({
 
@@ -101,13 +104,17 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
             //Если сегмент с таким именем уже существует
             if(response.segment_already_exists){
 
-                $('#segment_already_exists').modal('show');
+                var segment_already_exists = $('#segment_already_exists');
+                $(body).append($(segment_already_exists).first());
+                $(segment_already_exists).modal('show');
             }
 
             //Если данные не загружены
             if(response.data_not_loaded){
 
-                $('#data_not_loaded').modal('show');
+                var data_not_loaded = $('#data_not_loaded');
+                $(body).append($(data_not_loaded).first());
+                $(data_not_loaded).modal('show');
             }
         },
         error: function(){
@@ -125,7 +132,8 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 $(body).on('click', '.update-hypothesis', function(e){
 
     var url = $(this).attr('href');
-    var modal = $('.hypothesis_update_modal');
+    var hypothesis_update_modal = $('.hypothesis_update_modal');
+    $(body).append($(hypothesis_update_modal).first());
 
     $.ajax({
         url: url,
@@ -133,8 +141,8 @@ $(body).on('click', '.update-hypothesis', function(e){
         cache: false,
         success: function(response){
 
-            $(modal).modal('show');
-            $(modal).find('.modal-body').html(response.renderAjax);
+            $(hypothesis_update_modal).modal('show');
+            $(hypothesis_update_modal).find('.modal-body').html(response.renderAjax);
         },
         error: function(){
             alert('Ошибка');
@@ -171,13 +179,17 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
             //Если сегмент с таким именем уже существует
             if(response.segment_already_exists){
 
-                $('#segment_already_exists').modal('show');
+                var segment_already_exists = $('#segment_already_exists');
+                $(body).append($(segment_already_exists).first());
+                $(segment_already_exists).modal('show');
             }
 
             //Если данные не загружены
             if(response.data_not_loaded){
 
-                $('#data_not_loaded').modal('show');
+                var data_not_loaded = $('#data_not_loaded');
+                $(body).append($(data_not_loaded).first());
+                $(data_not_loaded).modal('show');
             }
         },
         error: function(){

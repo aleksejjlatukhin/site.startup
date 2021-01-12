@@ -17,9 +17,7 @@ use yii\helpers\Url;
             <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
 
             <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                'data-toggle' => 'modal',
-                'data-target' => "#information-add-new-responds",
-                'title' => 'Посмотреть описание',
+                'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
             ]); ?>
 
         </div>
@@ -96,9 +94,7 @@ use yii\helpers\Url;
             <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
 
             <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                'data-toggle' => 'modal',
-                'data-target' => "#information-add-new-responds",
-                'title' => 'Посмотреть описание',
+                'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
             ]); ?>
 
         </div>

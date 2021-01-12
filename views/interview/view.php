@@ -395,9 +395,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'data-toggle' => 'modal',
-                        'data-target' => "#information-table-questions",
-                        'title' => 'Посмотреть описание',
+                        'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
                     ]); ?>
 
                 </div>
@@ -547,16 +545,14 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
         <div class="container-fluid container-data">
 
-            <div class="row row_header_data">
+            <div class="row row_header_data top_slide_pagination_responds">
 
                 <div class="col-md-9" style="padding: 10px 0 0 0;">
 
                     <span style="color: #4F4F4F;padding-right: 10px;">Информация о респондентах и интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'data-toggle' => 'modal',
-                        'data-target' => "#information-table-responds",
-                        'title' => 'Посмотреть описание',
+                        'class' => 'show_modal_information_table_responds', 'title' => 'Посмотреть описание',
                     ]); ?>
 
                 </div>

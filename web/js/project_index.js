@@ -1,3 +1,6 @@
+//Установка Simple ScrollBar
+const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+
 $(document).ready(function() {
 
     //Фон для модального окна информации (проект с таким именем уже существует)
@@ -9,7 +12,9 @@ $(document).ready(function() {
 
 var body = $('body');
 var hypothesis_create_modal = $('.hypothesis_create_modal');
+$(body).append($(hypothesis_create_modal).first());
 var hypothesis_update_modal = $('.hypothesis_update_modal');
+$(body).append($(hypothesis_update_modal).first());
 
 
 //Возвращение скролла первого модального окна после закрытия
@@ -75,7 +80,9 @@ $(body).on('beforeSubmit', '#project_create_form', function(e){
             //Если сегмент с таким именем уже существует
             if(response.project_already_exists){
 
-                $('#project_already_exists').modal('show');
+                var project_already_exists = $('#project_already_exists');
+                $(body).append($(project_already_exists).first());
+                $(project_already_exists).modal('show');
             }
         },
         error: function(){
@@ -141,7 +148,9 @@ $(body).on('beforeSubmit', '#project_update_form', function(e){
             //Если сегмент с таким именем уже существует
             if(response.project_already_exists){
 
-                $('#project_already_exists').modal('show');
+                var project_already_exists = $('#project_already_exists');
+                $(body).append($(project_already_exists).first());
+                $(project_already_exists).modal('show');
             }
         },
         error: function(){
@@ -223,7 +232,7 @@ $(body).on('click', '.delete_file', function(e){
                 //Удаляем блок с файлом
                 $(hypothesis_update_modal).find('.one_block_file-' + deleteFileId).remove();
 
-                if (response.count_files == 4){
+                if (response.count_files === 4){
                     $(hypothesis_update_modal).find('.add_files').show();
                     $(hypothesis_update_modal).find('.add_max_files_text').hide();
                 }

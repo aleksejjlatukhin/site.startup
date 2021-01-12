@@ -73,6 +73,7 @@ class Projects extends ActiveRecord
             [['patent_date', 'register_date', 'invest_date', 'date_of_announcement',], 'safe'],
             [['description', 'core_rid', 'layout_technology', 'purpose_project'], 'string', 'max' => 2000],
             ['project_name', 'string', 'min' => 3, 'max' => 32],
+            ['project_name', 'uniqueName'],
             [['project_fullname', 'rid', 'patent_name', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology', 'purpose_project'], 'trim'],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls', 'maxFiles' => 10],
@@ -201,48 +202,35 @@ class Projects extends ActiveRecord
     }
 
 
-    /**
-     * Проверка на совпадение по названию проекта у данного пользователя
-     * @param $models
-     * @return bool
-     */
-    public function checkingForMatchByName ($models)
+    public function uniqueName ($attr)
     {
-        $numberOfMatches = 0;
+        $models = Projects::findAll(['user_id' => $this->user_id]);
+
         if (empty($this->id)) {
             //При создании проекта
             foreach ($models as $item) {
                 if (mb_strtolower(str_replace(' ', '', $this->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                    $numberOfMatches++;
+                    $this->addError($attr, 'Проект с наименованием «'. $this->project_name .'» уже существует!');
                 }
             }
         } else {
             //При редактировании проекта
             foreach ($models as $item) {
-                if ($this->id !== $item->id && mb_strtolower(str_replace(' ', '', $this->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
-                    $numberOfMatches++;
+                if ($this->id != $item->id && mb_strtolower(str_replace(' ', '', $this->project_name)) == mb_strtolower(str_replace(' ', '', $item->project_name))) {
+                    $this->addError($attr, 'Проект с наименованием «'. $this->project_name .'» уже существует!');
                 }
             }
-
-            //Изменение имени дирректории при редактировании проекта
-            $this->updateProjectDirectory($models);
-        }
-
-        if ($numberOfMatches == 0) {
-            return false;
-        }else {
-            return true;
         }
     }
 
 
     /**
      * Изменение имени дирректории при редактировании проекта
-     * @param $models
      */
-    private function updateProjectDirectory ($models)
+    public function updateProjectDirectory()
     {
         $user = User::findOne(['id' => $this->user_id]);
+        $models = Projects::findAll(['user_id' => $this->user_id]);
 
         foreach ($models as $elem){
 
@@ -261,6 +249,7 @@ class Projects extends ActiveRecord
                 rename($old_dir, $new_dir);
             }
         }
+        return true;
     }
 
 
