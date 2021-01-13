@@ -175,7 +175,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
                 <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
@@ -282,7 +282,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
 
                 <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',

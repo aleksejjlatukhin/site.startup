@@ -14,7 +14,7 @@ use yii\helpers\Url;
 
         <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
 
-            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
+            <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
 
         </div>
 
@@ -98,7 +98,7 @@ use yii\helpers\Url;
 
         <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
 
-            <span style="color: #4F4F4F;padding-right: 10px;">Текст легенды интервью</span>
+            <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
 
         </div>
 

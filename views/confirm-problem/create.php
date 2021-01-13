@@ -165,7 +165,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 <div class="col-md-12" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Определение данных, которые необходимо подтвердить</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
