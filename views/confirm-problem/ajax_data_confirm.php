@@ -50,8 +50,38 @@ use yii\helpers\Url;
     <div class="container-fluid content-view-data-confirm">
 
         <div class="row">
+            <div class="col-md-12">Цель проекта</div>
+            <div class="col-md-12"><?= $problem->project->purpose_project;?></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">Приветствие в начале встречи</div>
+            <div class="col-md-12"><?= $problem->segment->interview->greeting_interview; ?></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">Информация о вас для респондентов</div>
+            <div class="col-md-12"><?= $problem->segment->interview->view_interview; ?></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
+            <div class="col-md-12"><?= $problem->segment->interview->reason_interview; ?></div>
+        </div>
+
+        <div class="row">
             <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
             <div class="col-md-12"><?= $problem->description;?></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">Действие для проверки</div>
+            <div class="col-md-12"><?= $problem->action_to_check;?></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">Метрика результата</div>
+            <div class="col-md-12"><?= $problem->result_metric;?></div>
         </div>
 
         <div class="row">
@@ -133,14 +163,41 @@ use yii\helpers\Url;
 
     <div class="container-fluid">
 
-        <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
+        <div class="content-view-data-confirm">
 
-            <div class="col-md-12" style="font-weight: 700;">
-                Формулировка проблемы, которую проверяем
+            <div class="row">
+                <div class="col-md-12">Цель проекта</div>
+                <div class="col-md-12"><?= $problem->project->purpose_project;?></div>
             </div>
 
-            <div class="col-md-12">
-                <?= $problem->description;?>
+            <div class="row">
+                <div class="col-md-12">Приветствие в начале встречи</div>
+                <div class="col-md-12"><?= $problem->segment->interview->greeting_interview; ?></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">Информация о вас для респондентов</div>
+                <div class="col-md-12"><?= $problem->segment->interview->view_interview; ?></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
+                <div class="col-md-12"><?= $problem->segment->interview->reason_interview; ?></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
+                <div class="col-md-12"><?= $problem->description;?></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">Действие для проверки</div>
+                <div class="col-md-12"><?= $problem->action_to_check;?></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">Метрика результата</div>
+                <div class="col-md-12"><?= $problem->result_metric;?></div>
             </div>
 
         </div>

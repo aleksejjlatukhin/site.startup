@@ -222,6 +222,26 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
             <div class="container-fluid content-view-data-confirm">
 
                 <div class="row">
+                    <div class="col-md-12">Цель проекта</div>
+                    <div class="col-md-12"><?= $project->purpose_project;?></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">Приветствие в начале встречи</div>
+                    <div class="col-md-12"><?= $interview->greeting_interview; ?></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">Информация о вас для респондентов</div>
+                    <div class="col-md-12"><?= $interview->view_interview; ?></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
+                    <div class="col-md-12"><?= $interview->reason_interview; ?></div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-12">Формулировка минимально жизнеспособного продукта, который проверяем</div>
                     <div class="col-md-12"><?= $mvp->description;?></div>
                 </div>
@@ -300,14 +320,31 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 
             <div class="container-fluid">
 
-                <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
+                <div class="content-view-data-confirm">
 
-                    <div class="col-md-12" style="font-weight: 700;">
-                        Формулировка минимально жизнеспособного продукта, который проверяем
+                    <div class="row">
+                        <div class="col-md-12">Цель проекта</div>
+                        <div class="col-md-12"><?= $project->purpose_project;?></div>
                     </div>
 
-                    <div class="col-md-12">
-                        <?= $mvp->description;?>
+                    <div class="row">
+                        <div class="col-md-12">Приветствие в начале встречи</div>
+                        <div class="col-md-12"><?= $interview->greeting_interview; ?></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">Информация о вас для респондентов</div>
+                        <div class="col-md-12"><?= $interview->view_interview; ?></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
+                        <div class="col-md-12"><?= $interview->reason_interview; ?></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">Формулировка минимально жизнеспособного продукта, который проверяем</div>
+                        <div class="col-md-12"><?= $mvp->description;?></div>
                     </div>
 
                 </div>

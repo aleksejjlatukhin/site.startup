@@ -47,7 +47,7 @@ class FormUpdateConfirmSegment extends Model
             'count_positive' => 'Количество респондентов, соответствующих сегменту',
             'greeting_interview' => 'Приветствие в начале встречи',
             'view_interview' => 'Информация о вас для респондентов',
-            'reason_interview' => 'Как вы объясните ваш интерес (причину) к интервью респонденту',
+            'reason_interview' => 'Причина и тема (что побудило) для проведения исследования',
         ];
     }
 

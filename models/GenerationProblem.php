@@ -70,8 +70,8 @@ class GenerationProblem extends \yii\db\ActiveRecord
         return [
             [['interview_id', 'title'], 'required'],
             [['title'], 'string', 'max' => 255],
-            [['description'], 'string', 'max' => 2000],
-            [['title', 'description'], 'trim'],
+            [['description', 'action_to_check', 'result_metric'], 'string', 'max' => 2000],
+            [['title', 'description', 'action_to_check', 'result_metric'], 'trim'],
             [['time_confirm', 'interview_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
         ];
     }
@@ -85,7 +85,9 @@ class GenerationProblem extends \yii\db\ActiveRecord
             'id' => 'ID',
             'interview_id' => 'Interview ID',
             'title' => 'Название ГПС',
-            'description' => 'Описание',
+            'description' => 'Описание гипотезы проблемы сегмента',
+            'action_to_check' => 'Действие для проверки',
+            'result_metric' => 'Метрика результата',
             'date_confirm' => 'Дата подтверждения'
         ];
     }

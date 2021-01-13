@@ -12,6 +12,8 @@ use yii\base\Model;
 class FormCreateProblem extends Model
 {
     public $description;
+    public $action_to_check;
+    public $result_metric;
 
     /**
      * {@inheritdoc}
@@ -19,8 +21,20 @@ class FormCreateProblem extends Model
     public function rules()
     {
         return [
-            [['description'], 'trim'],
-            [['description'], 'string', 'max' => 2000],
+            [['description', 'action_to_check', 'result_metric'], 'trim'],
+            [['description', 'action_to_check', 'result_metric'], 'string', 'max' => 2000],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'description' => 'Описание гипотезы проблемы сегмента',
+            'action_to_check' => 'Действие для проверки',
+            'result_metric' => 'Метрика результата',
         ];
     }
 
@@ -37,6 +51,8 @@ class FormCreateProblem extends Model
         $generationProblem->segment_id = $segment_id;
         $generationProblem->interview_id = $interview_id;
         $generationProblem->description = $this->description;
+        $generationProblem->action_to_check = $this->action_to_check;
+        $generationProblem->result_metric = $this->result_metric;
         $last_model_number = explode(' ',$last_model->title)[1];
         $generationProblem->title = 'ГПС ' . ($last_model_number + 1);
 

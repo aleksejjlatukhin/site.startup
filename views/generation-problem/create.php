@@ -69,17 +69,7 @@ use yii\helpers\Url;
 
         </div>
 
-
-        <div class="row" style="color: #4F4F4F; margin-top: 20px;">
-
-            <div class="col-md-12">
-                Описание гипотезы проблемы сегмента
-            </div>
-
-        </div>
-
-
-        <div class="generation-problem-form" style="margin-top: 5px;">
+        <div class="generation-problem-form" style="margin-top: 20px;">
 
             <?php $form = ActiveForm::begin([
                 'id' => 'hypothesisCreateForm',
@@ -89,14 +79,15 @@ use yii\helpers\Url;
                 'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
 
-            <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+            <div class="row">
+
+                <div class="col-md-12">
+
+                    <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
-            <div class="row">
-                <div class="col-md-12">
-
-                    <?= $form->field($model, 'description')->label(false)->textarea([
+                    <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
                         'rows' => 3,
                         'maxlength' => true,
                         'required' => true,
@@ -105,6 +96,35 @@ use yii\helpers\Url;
                     ]) ?>
 
                 </div>
+
+                <div class="col-md-12">
+
+                    <? $placeholder = 'Что нужно сделать, чтобы проверить гипотезу? Какие следует задать вопросы, чтобы проверить гипотезу. Например: каким инструментом пользуются сейчас и какие инструменты пробовали, по каким критериям подбирали инструмент, как проходит процесс учета финансов, какую информацию анализируют.' ?>
+
+                    <?= $form->field($model, 'action_to_check', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
+                        'rows' => 3,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => $placeholder,
+                        'class' => 'style_form_field_respond form-control',
+                    ]) ?>
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <? $placeholder = 'Какой результат покажет, что гипотеза верна? Например: Больше 80% опрошенных ответят, что гибкость настройки для них является ключевым фактором выбора инструмента.' ?>
+
+                    <?= $form->field($model, 'result_metric', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
+                        'rows' => 3,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => $placeholder,
+                        'class' => 'style_form_field_respond form-control',
+                    ]) ?>
+
+                </div>
+
             </div>
 
             <div class="form-group row container-fluid">

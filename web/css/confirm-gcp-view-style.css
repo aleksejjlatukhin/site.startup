@@ -141,19 +141,22 @@ a.view_block_description > div {
 .form-view-data-confirm .content-view-data-confirm {
     margin: 0 5px;
 }
-.form-view-data-confirm .content-view-data-confirm .row {
-    padding-top: 10px;
-}
-.form-view-data-confirm .content-view-data-confirm .row:first-child {
-    padding-top: 20px;
-}
 .form-view-data-confirm .content-view-data-confirm .row:last-child {
     padding-top: 5px;
 }
-.form-view-data-confirm .content-view-data-confirm .row div:first-child {
+.form-update-data-confirm .content-view-data-confirm {
+    margin: 0 5px;
+}
+.content-view-data-confirm .row {
+    padding-top: 10px;
+}
+.content-view-data-confirm .row:first-child {
+    padding-top: 20px;
+}
+.content-view-data-confirm .row div:first-child {
     font-weight: 700;
 }
-.form-view-data-confirm .content-view-data-confirm .row div span {
+.content-view-data-confirm .row div span {
     font-weight: 400;
     padding-left: 10px;
 }

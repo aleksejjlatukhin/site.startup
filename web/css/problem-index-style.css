@@ -131,11 +131,14 @@
     }
 }
 
-.text_description_problem {
+.text_field_problem {
     overflow: hidden;
     max-height: inherit;
     line-height: 19px;
     padding-top: 2px;
+}
+.col-md-3.text_field_problem, .col-md-2.text_field_problem {
+    padding-right: 0;
 }
 
 .block_respond_problem {

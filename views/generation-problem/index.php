@@ -139,7 +139,11 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                 </div>
 
-                <div class="col-md-7" style="padding-left: 10px;">Описание гипотезы проблемы сегмента</div>
+                <div class="col-md-3" style="padding-left: 10px;">Описание гипотезы проблемы сегмента</div>
+
+                <div class="col-md-2">Действие для проверки</div>
+
+                <div class="col-md-2">Метрика результата</div>
 
                 <div class="col-md-1 text-center"><div>Дата создания</div></div>
 
@@ -192,9 +196,21 @@ $this->registerCssFile('@web/css/problem-index-style.css');
                             </div>
                         </div>
 
-                        <div class="col-md-7 text_description_problem" title="<?= $model->description; ?>">
+                        <div class="col-md-3 text_field_problem" title="<?= $model->description; ?>">
 
                             <?= $model->description; ?>
+
+                        </div>
+
+                        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
+
+                            <?= $model->action_to_check; ?>
+
+                        </div>
+
+                        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
+
+                            <?= $model->result_metric; ?>
 
                         </div>
 

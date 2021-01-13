@@ -46,9 +46,21 @@ use app\models\User;
             </div>
         </div>
 
-        <div class="col-md-7 text_description_problem" title="<?= $model->description; ?>">
+        <div class="col-md-3 text_field_problem" title="<?= $model->description; ?>">
 
             <?= $model->description; ?>
+
+        </div>
+
+        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
+
+            <?= $model->action_to_check; ?>
+
+        </div>
+
+        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
+
+            <?= $model->result_metric; ?>
 
         </div>
 

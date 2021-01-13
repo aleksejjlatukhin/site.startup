@@ -196,7 +196,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                 </div>
 
                 <div class="row">
-                    <div class="col-md-12">Как вы объясните ваш интерес (причину) к интервью респонденту</div>
+                    <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
                     <div class="col-md-12"><?= $model->reason_interview; ?></div>
                 </div>
 

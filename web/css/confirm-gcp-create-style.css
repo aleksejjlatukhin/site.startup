@@ -118,6 +118,19 @@ a.view_block_description > div {
     margin: 0 15px;
 }
 
+.content-view-data-confirm {
+    margin: 0 5px;
+}
+.content-view-data-confirm .row {
+    padding-top: 10px;
+}
+.content-view-data-confirm .row:first-child {
+    padding-top: 20px;
+}
+.content-view-data-confirm .row div:first-child {
+    font-weight: 700;
+}
+
 @media screen and (min-width: 1140px) {
 
     .project_info_data {
