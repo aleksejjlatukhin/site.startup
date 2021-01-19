@@ -35,9 +35,7 @@ class DescInterview extends \yii\db\ActiveRecord
 
             if ($this->validate()) {
 
-                //$filename = $this->loadFile->baseName;
                 $filename=Yii::$app->getSecurity()->generateRandomString(15);
-
                 try{
 
                     $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);

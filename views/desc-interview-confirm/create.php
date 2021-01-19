@@ -35,6 +35,37 @@ endforeach;
 
 
 <div class="row">
+
+    <div class="col-md-12" style="margin-top: 15px;">
+
+        <p style="padding-left: 5px;"><b>Приложить файл</b> <span style="color: #BDBDBD; padding-left: 20px;">png, jpg, jpeg, pdf, txt, doc, docx, xls</span></p>
+
+        <div style="display:flex; margin-top: -5px;">
+
+            <?= $form->field($model, 'loadFile')
+                ->fileInput([
+                    'id' => 'descInterviewCreateFile', 'class' => 'sr-only'
+                ])->label('Выберите файл',[
+                    'class'=>'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'color' => '#FFFFFF',
+                        'justify-content' => 'center',
+                        'background' => '#707F99',
+                        'width' => '180px',
+                        'height' => '40px',
+                        'font-size' => '24px',
+                        'border-radius' => '8px',
+                    ],
+                ]); ?>
+
+            <div class='title_file' style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
+
+        </div>
+
+    </div>
+
     <div class="col-md-12">
 
         <?php
@@ -43,7 +74,7 @@ endforeach;
 
         <?= $form->field($model, 'status', [
             'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
-        ])->label('По результатам опроса сделайте вывод о текущей проблеме')->widget(Select2::class, [
+        ])->label('По результатам интервью сделайте вывод о текущей проблеме')->widget(Select2::class, [
             'data' => $selection_list,
             'options' => ['id' => 'descInterview_status'],
             'disabled' => false,  //Сделать поле неактивным
@@ -52,6 +83,7 @@ endforeach;
         ?>
 
     </div>
+
 </div>
 
 <div class="row">

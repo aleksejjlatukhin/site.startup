@@ -166,7 +166,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
             'id' => "defaultOpen",
         ]); ?>
 
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить анкетные данные респондентов</div></div>', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3 show_modal_next_step_error',
         ]); ?>
 
@@ -405,7 +405,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 
                 <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для анкеты</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
@@ -597,7 +597,7 @@ Modal::begin([
 ]); ?>
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Добавить новых респондентов возможно на этапе заполнения анкетных данных.
+    Добавить новых респондентов возможно на этапе заполнения информации о респондентах и интервью.
 </h4>
 
 <?php Modal::end(); ?>
@@ -608,7 +608,7 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'information-table-questions', 'class' => 'information-table-questions'],
     'size' => 'modal-md',
-    'header' => '<h4 style="color: #F2F2F2; padding: 0 30px;">1. Сформулируйте собственный список вопросов для анкеты или отредактируйте список «по-умолчанию».</h4>',
+    'header' => '<h4 style="color: #F2F2F2; padding: 0 30px;">1. Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».</h4>',
 ]); ?>
 
 <h4 style="color: #F2F2F2; padding: 0 30px;">

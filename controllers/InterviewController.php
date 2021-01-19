@@ -2,12 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\AnswersQuestionsConfirmSegment;
 use app\models\forms\FormCreateConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\forms\FormUpdateConfirmSegment;
 use app\models\forms\FormUpdateQuestionConfirmSegment;
 use app\models\Projects;
-use app\models\Questions;
+use app\models\QuestionsConfirmSegment;
 use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
@@ -110,7 +111,7 @@ class InterviewController extends AppController
 
         } elseif (in_array($action->id, ['delete-question'])){
 
-            $question = Questions::findOne(Yii::$app->request->get());
+            $question = QuestionsConfirmSegment::findOne(Yii::$app->request->get());
             $interview = Interview::find()->where(['id' => $question->interview_id])->one();
             $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
             $project = Projects::find()->where(['id' => $segment->project_id])->one();
@@ -144,8 +145,8 @@ class InterviewController extends AppController
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segment::findOne(['id' => $model->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
-        $questions = Questions::findAll(['interview_id' => $id]);
-        $newQuestion = new Questions();
+        $questions = QuestionsConfirmSegment::findAll(['interview_id' => $id]);
+        $newQuestion = new QuestionsConfirmSegment();
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -183,7 +184,7 @@ class InterviewController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems)  && $model->count_positive <= $count_positive)) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1) || (!empty($model->problems)  && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1)) {
 
                 $response =  [
                     'success' => true,
@@ -333,8 +334,8 @@ class InterviewController extends AppController
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segment::findOne(['id' => $model->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
-        $questions = Questions::findAll(['interview_id' => $id]);
-        $newQuestion = new Questions();
+        $questions = QuestionsConfirmSegment::findAll(['interview_id' => $id]);
+        $newQuestion = new QuestionsConfirmSegment();
         $newQuestion->interview_id = $id;
 
         //Список вопросов для добавления к списку программы
@@ -390,7 +391,7 @@ class InterviewController extends AppController
      */
     public function actionAddQuestion($id)
     {
-        $model = new Questions();
+        $model = new QuestionsConfirmSegment();
         $model->interview_id = $id;
 
         if ($model->load(Yii::$app->request->post())){
@@ -402,6 +403,8 @@ class InterviewController extends AppController
                     $interviewNew = Interview::findOne($id);
                     $questions = $interviewNew->questions;
 
+                    //Создание пустого ответа для нового вопроса для каждого респондента
+                    $interviewNew->addAnswerConfirmSegment($model->id);
                     //Добавляем вопрос в общую базу вопросов
                     $interviewNew->addQuestionToGeneralList($model->title);
                     //Передаем обновленный список вопросов для добавления в программу
@@ -510,7 +513,7 @@ class InterviewController extends AppController
      */
     public function actionDeleteQuestion ($id)
     {
-        $model = Questions::findOne($id);
+        $model = QuestionsConfirmSegment::findOne($id);
 
         if(Yii::$app->request->isAjax) {
 
@@ -518,6 +521,9 @@ class InterviewController extends AppController
 
                 $interviewNew = Interview::findOne(['id' => $model->interview_id]);
                 $questions = $interviewNew->questions;
+
+                //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
+                $interviewNew->deleteAnswerConfirmSegment($id);
 
                 //Передаем обновленный список вопросов для добавления в программу
                 $queryQuestions = $interviewNew->queryQuestionsGeneralList();
@@ -579,6 +585,92 @@ class InterviewController extends AppController
             $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/generation-problem/index', 'id' => $id]);
         }
+    }
+
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetDataQuestionsAndAnswers($id)
+    {
+        $model = $this->findModel($id);
+        $questions = $model->questions;
+
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        \Yii::$app->response->data = $response;
+        return $response;
+
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionMpdfQuestionsAndAnswers($id)
+    {
+        $model = $this->findModel($id);
+        $questions = $model->questions;
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('/interview/questions_and_answers_pdf', ['questions' => $questions]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $segment_name = $model->segment->name;
+        if (mb_strlen($segment_name) > 25) {
+            $segment_name = mb_substr($segment_name, 0, 25) . '...';
+        }
+
+        $filename = 'Ответы респондентов на вопросы интервью для подтверждения сегмента: «'.$segment_name.'».';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            //'orientation' => Pdf::ORIENT_LANDSCAPE,
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            //'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@app/web/css/style.css',
+            // any css to be embedded if required
+            //'cssInline' => '.business-model-view-export {color: #3c3c3c;};',
+            'marginTop' => 20,
+            'marginBottom' => 20,
+            'marginFooter' => 5,
+            'defaultFont' => 'RobotoCondensed-Light',
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => $filename,
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы интервью. Сегмент: «'.$segment_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
     }
 
 

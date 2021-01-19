@@ -4,10 +4,13 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\web\NotFoundHttpException;
 
 
 class DescInterviewGcp extends \yii\db\ActiveRecord
 {
+
+    public $loadFile;
 
     /**
      * {@inheritdoc}
@@ -22,6 +25,34 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         return $this->hasOne(RespondsGcp::class, ['id' => 'responds_gcp_id']);
     }
 
+    public function upload($path)
+    {
+        if (!is_dir($path)){
+
+            throw new NotFoundHttpException('Дирректория не существует!');
+
+        }else{
+
+            if ($this->validate()) {
+
+                $filename = Yii::$app->getSecurity()->generateRandomString(15);
+                try{
+
+                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                    $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+                }catch (\Exception $e){
+
+                    throw new NotFoundHttpException('Невозможно загрузить файл!');
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -30,6 +61,8 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         return [
             [['responds_gcp_id', 'status'], 'required'],
             [['responds_gcp_id', 'status'], 'integer'],
+            [['interview_file', 'server_file'], 'string', 'max' => 255],
+            [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
         ];
     }
 
@@ -39,8 +72,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'responds_gcp_id' => 'Responds Gcp ID',
+            'interview_file' => 'Файл',
             'status' => 'Значимость предложения'
         ];
     }

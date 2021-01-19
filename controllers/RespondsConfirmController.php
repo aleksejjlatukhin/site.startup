@@ -10,6 +10,7 @@ use app\models\forms\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\forms\UpdateRespondConfirmForm;
+use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\RespondsConfirm;
@@ -82,10 +83,10 @@ class RespondsConfirmController extends AppController
         $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
 
         //Кол-во респондентов, у кот-х заполнены данные
-        $count_exist_data_respond = RespondsConfirm::find()->where(['confirm_problem_id' => $id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count_exist_data_respond = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-        //Кол-во респондентов, у кот-х существует анкета
+        //Кол-во респондентов, у кот-х существует интервью
         $count_exist_data_descInterview = RespondsConfirm::find()->with('descInterview')
             ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
             ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
@@ -276,16 +277,20 @@ class RespondsConfirmController extends AppController
     /**
      * @param $id
      * @return array|bool
+     * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
     public function actionDelete ($id) {
 
-        $model = RespondsConfirm::findOne($id);
+        $model = $this->findModel($id);
         $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $model->id]);
         $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -315,6 +320,16 @@ class RespondsConfirmController extends AppController
 
                 foreach ($answers as $answer){
                     $answer->delete();
+                }
+
+                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") .'/' .
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") .'/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'.
+                    mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/interviews/'.
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") .'/';
+
+                if (file_exists($del_dir)) {
+                    $this->delTree($del_dir);
                 }
 
                 if ($model->delete()) {

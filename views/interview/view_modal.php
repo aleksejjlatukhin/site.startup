@@ -160,3 +160,21 @@ Modal::begin([
 <h4 class="text-center">Вы не набрали достаточное количество представителей сегмента. Следующий этап будет не доступен. Завершить данное подтверждение?</h4>
 
 <?php Modal::end(); ?>
+
+
+<?php
+//Модальное окно для таблицы ответов респондентов на вопросы интервью
+Modal::begin([
+    'options' => ['id' => 'showQuestionsAndAnswers'],
+    'size' => 'modal-lg',
+    'header' => Html::a('<div style="margin-top: -15px;">Ответы респондентов на вопросы интервью' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+        '/interview/mpdf-questions-and-answers', 'id' => $model->id], [
+        'class' => 'export_link',
+        'target' => '_blank',
+        'title' => 'Скачать в pdf',
+    ]),
+    'headerOptions' => ['class' => 'style_header_modal_form text-center'],
+]); ?>
+
+<!--Контент загружается через Ajax-->
+<?php Modal::end(); ?>

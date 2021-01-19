@@ -4,17 +4,6 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "responds".
- *
- * @property string $id
- * @property int $interview_id
- * @property string $name
- * @property string $info_respond
- * @property string $add_info
- * @property string $date_interview
- * @property string $place_interview
- */
 class Respond extends \yii\db\ActiveRecord
 {
     const LIMIT_COUNT = 100;
@@ -35,6 +24,11 @@ class Respond extends \yii\db\ActiveRecord
     public function getDescInterview()
     {
         return $this->hasOne(DescInterview::class, ['respond_id' => 'id']);
+    }
+
+    public function getAnswers()
+    {
+        return $this->hasMany(AnswersQuestionsConfirmSegment::class, ['respond_id' => 'id']);
     }
 
     /**
@@ -65,6 +59,20 @@ class Respond extends \yii\db\ActiveRecord
             'date_plan' => 'Плановая дата интервью',
             'place_interview' => 'Место проведения интервью',
         ];
+    }
+
+
+    public function addAnswersForNewRespond()
+    {
+        $questions = QuestionsConfirmSegment::find()->where(['interview_id' => $this->interview_id])->all();
+
+        foreach ($questions as $question){
+
+            $answer = new AnswersQuestionsConfirmSegment();
+            $answer->question_id = $question->id;
+            $answer->respond_id = $this->id;
+            $answer->save();
+        }
     }
 
 

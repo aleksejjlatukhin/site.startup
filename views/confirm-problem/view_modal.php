@@ -14,7 +14,7 @@ Modal::begin([
     'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
 ]); ?>
 
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Добавить новых респондентов возможно на этапе заполнения анкетных данных.</h4>
+<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Добавить новых респондентов возможно на этапе заполнения информации о респондентах и интервью.</h4>
 
 <?php Modal::end(); ?>
 
@@ -28,7 +28,7 @@ Modal::begin([
 ]); ?>
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Сформулируйте собственный список вопросов для анкеты или отредактируйте список «по-умолчанию».
+    Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».
 </h4>
 
 <?php Modal::end(); ?>
@@ -43,7 +43,7 @@ Modal::begin([
 ]); ?>
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    2. Затем переходите к заполнению данных опроса, при необходимости добавляйте новых респондентов.
+    2. Затем переходите к заполнению данных по интервью, при необходимости добавляйте новых респондентов.
 </h4>
 
 <?php Modal::end(); ?>
@@ -80,7 +80,7 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'create_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Внесите результаты опроса</h3>',
+    'header' => '<h3 class="text-center">Внесите результаты интервью</h3>',
     'headerOptions' => ['class' => 'style_header_modal_form'],
 ]); ?>
 
@@ -93,7 +93,7 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'update_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Результаты опроса</h3>',
+    'header' => '<h3 class="text-center">Результаты интервью</h3>',
     'headerOptions' => ['class' => 'style_header_modal_form'],
 ]); ?>
 
@@ -176,11 +176,11 @@ Modal::begin([
 
 
 <?php
-//Модальное окно для таблицы ответов респондентов на вопросы анкеты
+//Модальное окно для таблицы ответов респондентов на вопросы интервью
 Modal::begin([
     'options' => ['id' => 'showQuestionsAndAnswers'],
     'size' => 'modal-lg',
-    'header' => Html::a('<div style="margin-top: -15px;">Ответы респондентов на вопросы анкеты' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+    'header' => Html::a('<div style="margin-top: -15px;">Ответы респондентов на вопросы интервью' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
         '/confirm-problem/mpdf-questions-and-answers', 'id' => $model->id], [
         'class' => 'export_link',
         'target' => '_blank',

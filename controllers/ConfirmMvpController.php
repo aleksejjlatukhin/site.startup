@@ -205,7 +205,7 @@ class ConfirmMvpController extends AppController
             ->where(['confirm_mvp_id' => $id, 'desc_interview_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->business)  && $model->count_positive <= $count_positive)) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1) || (!empty($model->business)  && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1)) {
 
                 $response =  [
                     'success' => true,
@@ -347,7 +347,7 @@ class ConfirmMvpController extends AppController
 
         $model->count_respond = $count_represent_gcp;
 
-        if (!empty($mvp->confirm)){
+        if ($mvp->confirm){
             //Если у MVP создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $mvp->confirm->id]);
         }
@@ -680,7 +680,7 @@ class ConfirmMvpController extends AppController
             $mvp_desc = mb_substr($mvp_desc, 0, 25) . '...';
         }
 
-        $filename = 'Ответы респондентов на вопросы анкеты для подтверждения MVP: «'.$mvp_desc.'».';
+        $filename = 'Ответы респондентов на вопросы интервью для подтверждения MVP: «'.$mvp_desc.'».';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -708,7 +708,7 @@ class ConfirmMvpController extends AppController
             // call mPDF methods on the fly
             'methods' => [
                 'SetTitle' => $filename,
-                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы анкеты. MVP: «'.$mvp_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы интервью. MVP: «'.$mvp_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',

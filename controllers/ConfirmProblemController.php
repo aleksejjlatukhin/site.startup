@@ -198,7 +198,7 @@ class ConfirmProblemController extends AppController
 
 
         if(Yii::$app->request->isAjax) {
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps)  && $model->count_positive <= $count_positive)) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1) || (!empty($model->gcps)  && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1)) {
 
                 $response =  [
                     'success' => true,
@@ -669,7 +669,7 @@ class ConfirmProblemController extends AppController
             $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
 
-        $filename = 'Ответы респондентов на вопросы анкеты для подтверждения проблемы: «'.$problem_desc.'».';
+        $filename = 'Ответы респондентов на вопросы интервью для подтверждения проблемы: «'.$problem_desc.'».';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -697,7 +697,7 @@ class ConfirmProblemController extends AppController
             // call mPDF methods on the fly
             'methods' => [
                 'SetTitle' => $filename,
-                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы анкеты. Проблема: «'.$problem_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы интервью. Проблема: «'.$problem_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',

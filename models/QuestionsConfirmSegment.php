@@ -4,15 +4,7 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "questions".
- *
- * @property string $id
- * @property int $interview_id
- * @property string $title
- * @property string $status
- */
-class Questions extends \yii\db\ActiveRecord
+class QuestionsConfirmSegment extends \yii\db\ActiveRecord
 {
 
     public $list_questions;
@@ -22,12 +14,19 @@ class Questions extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'questions';
+        return 'questions_confirm_segment';
     }
 
     public function getConfirm()
     {
         return $this->hasOne(Interview::class, ['id' => 'interview_id']);
+    }
+
+    public function getAnswers()
+    {
+        $answers = AnswersQuestionsConfirmSegment::find()->where(['question_id' => $this->id])
+            ->andWhere(['not', ['answers_questions_confirm_segment.answer' => '']])->all();
+        return $answers;
     }
 
     /**

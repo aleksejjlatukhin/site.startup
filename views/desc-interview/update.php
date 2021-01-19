@@ -19,18 +19,39 @@ use kartik\select2\Select2;
     ]); ?>
 
 
-    <div class="row" style="margin-bottom: 15px;">
+    <div class="row">
 
         <div class="col-md-12">
 
             <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
+                'rows' => 2,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Ответы на вопросы, инсайды, ценная информация',
             ]); ?>
 
         </div>
+
+    </div>
+
+    <?php
+    foreach ($respond->answers as $index => $answer) :
+        ?>
+
+        <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+        ->textarea([
+            'row' => 2,
+            'maxlength' => true,
+            'required' => true,
+            'class' => 'style_form_field_respond form-control',
+        ]);
+        ?>
+
+    <?php
+    endforeach;
+    ?>
+
+    <div class="row" style="margin-bottom: 15px;">
 
         <div class="col-md-12">
 
@@ -149,7 +170,7 @@ use kartik\select2\Select2;
         <div class="col-md-12" style="margin-top: -10px;">
 
             <?= $form->field($model, 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 1,
+                'rows' => 2,
                 'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
@@ -212,6 +233,15 @@ use kartik\select2\Select2;
             <div style="font-weight: 700;">Материалы, полученные в ходе интервью</div>
             <div><?= $model->description; ?></div>
         </div>
+
+        <?php foreach ($respond->answers as $answer) : ?>
+
+            <div class="col-md-12" style="padding: 0 20px; margin-bottom: 5px;">
+                <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+                <div><?= $answer->answer; ?></div>
+            </div>
+
+        <?php endforeach; ?>
 
         <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
             <div style="font-weight: 700;">Варианты проблем</div>

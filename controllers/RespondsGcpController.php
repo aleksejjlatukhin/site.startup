@@ -8,7 +8,9 @@ use app\models\DescInterviewGcp;
 use app\models\forms\CreateRespondGcpForm;
 use app\models\forms\FormUpdateConfirmGcp;
 use app\models\Gcp;
+use app\models\GenerationProblem;
 use app\models\Projects;
+use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\RespondsGcp;
@@ -83,8 +85,8 @@ class RespondsGcpController extends AppController
         $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
 
         //Кол-во респондентов, у кот-х заполнены данные
-        $count_exist_data_respond = RespondsGcp::find()->where(['confirm_gcp_id' => $id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count_exist_data_respond = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         //Кол-во респондентов, у кот-х существует анкета
         $count_exist_data_descInterview = RespondsGcp::find()->with('descInterview')
@@ -137,7 +139,6 @@ class RespondsGcpController extends AppController
         $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
         $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
-
         $newRespond = new CreateRespondGcpForm();
         $newRespond->confirm_gcp_id = $id;
 
@@ -276,20 +277,24 @@ class RespondsGcpController extends AppController
     }
 
 
-
     /**
      * @param $id
      * @return array|bool
+     * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
     public function actionDelete ($id) {
 
-        $model = RespondsGcp::findOne($id);
+        $model = $this->findModel($id);
         $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $id])->all();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -319,6 +324,17 @@ class RespondsGcpController extends AppController
 
                 foreach ($answers as $answer){
                     $answer->delete();
+                }
+
+                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
+                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
+
+                if (file_exists($del_dir)) {
+                    $this->delTree($del_dir);
                 }
 
                 if ($model->delete()) {

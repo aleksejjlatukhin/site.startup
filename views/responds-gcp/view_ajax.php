@@ -45,30 +45,42 @@ use app\models\User;
 
             </div>
 
-            <div class="col-md-5" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->info_respond; ?>">
+            <div class="col-md-3" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->info_respond; ?>">
                 <?= $respond->info_respond; ?>
             </div>
 
-            <div class="col-md-2" style="padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->email; ?>">
-                <?= $respond->email; ?>
+            <div class="col-md-3" style="font-size: 14px; padding: 0 5px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->place_interview; ?>">
+                <?= $respond->place_interview; ?>
             </div>
 
-            <div class="col-md-1 text-center" style="padding: 0; margin-left: -7px;">
+            <div class="col-md-1">
+
+                <?php
+                if (!empty($respond->date_plan)){
+
+                    echo '<div class="text-center" style="padding: 0 5px; margin-left: -10px;">' . date("d.m.y", $respond->date_plan) . '</div>';
+                }
+                ?>
+
+            </div>
+
+            <div class="col-md-1">
 
                 <?php
                 if (!empty($respond->descInterview)){
 
                     $date_fact = date("d.m.y", $respond->descInterview->updated_at);
-                    echo '<div class="">' . Html::encode($date_fact) . '</div>';
+                    echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
-                }elseif (!empty($respond->info_respond) && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
+                }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan)
+                    && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
-                    echo '<div class="">' . Html::a(
+                    echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
                             ['/responds-gcp/data-availability', 'id' => $model->id], [
                             'id' => 'respond_descInterview_form-' . $respond->id,
                             'class' => 'showDescInterviewCreateForm',
-                            'title' => 'Добавить анкету'
+                            'title' => 'Добавить интервью'
                         ]) .
                         '</div>';
                 } ?>
@@ -85,7 +97,7 @@ use app\models\User;
                         echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
                             'id' => 'descInterview_form-' . $respond->descInterview->id,
                             'class' => 'showDescInterviewUpdateForm',
-                            'title' => 'Редактировать результаты опроса',
+                            'title' => 'Редактировать результаты интервью',
                         ]);
                     }
 
@@ -105,7 +117,7 @@ use app\models\User;
                         echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
                             'id' => 'descInterview_form-' . $respond->descInterview->id,
                             'class' => 'showDescInterviewUpdateForm',
-                            'title' => 'Результаты опроса',
+                            'title' => 'Результаты интервью',
                         ]);
                     }
                     ?>

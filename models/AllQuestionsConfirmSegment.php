@@ -7,14 +7,14 @@ namespace app\models;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
-class AllQuestions extends ActiveRecord
+class AllQuestionsConfirmSegment extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'all_questions';
+        return 'all_questions_confirm_segment';
     }
 
     /**

@@ -619,7 +619,12 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                     </div>
                 </div>
 
-                <div class="col-md-1" style="text-align: right; padding: 10px 7px 10px 0;">
+                <div class="col-md-1" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
+
+                    <?= Html::a(Html::img('/images/icons/icon_q&a.png', ['style' => ['width' => '40px']]), ['/interview/get-data-questions-and-answers', 'id' => $model->id], [
+                        'class' => 'openTableQuestionsAndAnswers', 'style' => ['margin-right' => '8px'], 'title'=> 'Ответы респондентов на вопросы интервью',
+                    ]) ?>
+
                     <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/interview/mpdf-data-responds', 'id' => $model->id], [
                         'target'=>'_blank', 'title'=> 'Скачать таблицу респондентов',
                     ]);?>

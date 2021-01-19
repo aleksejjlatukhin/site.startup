@@ -9,6 +9,7 @@ use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\DescInterview;
+use yii\base\Model;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
@@ -146,34 +147,42 @@ class DescInterviewController extends AppController
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $answers = $respond->answers;
 
-        if ($model->load(Yii::$app->request->post())) {
+        if(Yii::$app->request->isAjax) {
 
-            if(Yii::$app->request->isAjax) {
+            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+
+                foreach ($answers as $answer) {
+                    $answer->save(false);
+                }
 
                 $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-                if (!file_exists($respond_dir)){
+                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
+                    mb_convert_encoding($this->translit($respond->name), "windows-1251") . '/';
+                if (!file_exists($respond_dir)) {
                     mkdir($respond_dir, 0777);
                 }
 
-                if ($model->validate() && $model->save()){
+                if ($model->load(Yii::$app->request->post())) {
 
-                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+                    if ($model->validate() && $model->save()) {
 
-                    if ($model->loadFile !== null){
-                        if ($model->upload($respond_dir)){
-                            $model->interview_file = $model->loadFile;
-                            $model->save(false);
+                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                        if ($model->loadFile !== null) {
+                            if ($model->upload($respond_dir)) {
+                                $model->interview_file = $model->loadFile;
+                                $model->save(false);
+                            }
                         }
-                    }
 
-                    $response = ['interview_id' => $interview->id];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                        $response = ['interview_id' => $interview->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }
@@ -213,39 +222,46 @@ class DescInterviewController extends AppController
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
-
+        $answers = $respond->answers;
 
         if ($model->interview_file !== null){
             $model->loadFile = $model->interview_file;
         }
 
-        if ($model->load(Yii::$app->request->post())) {
+        if(Yii::$app->request->isAjax) {
 
-            if(Yii::$app->request->isAjax) {
+            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+
+                foreach ($answers as $answer) {
+                    $answer->save(false);
+                }
 
                 $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-                if (!file_exists($respond_dir)){
+                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
+                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
+                    mb_convert_encoding($this->translit($respond->name), "windows-1251") . '/';
+                if (!file_exists($respond_dir)) {
                     mkdir($respond_dir, 0777);
                 }
 
-                if ($model->validate() && $model->save()){
+                if ($model->load(Yii::$app->request->post())) {
 
-                    $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+                    if ($model->validate() && $model->save()) {
 
-                    if ($model->loadFile !== null){
-                        if ($model->upload($respond_dir)){
-                            $model->interview_file = $model->loadFile;
-                            $model->save(false);
+                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
+
+                        if ($model->loadFile !== null) {
+                            if ($model->upload($respond_dir)) {
+                                $model->interview_file = $model->loadFile;
+                                $model->save(false);
+                            }
                         }
-                    }
 
-                    $response = ['interview_id' => $interview->id];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                        $response = ['interview_id' => $interview->id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }

@@ -4,7 +4,6 @@ use yii\helpers\Html;
 
 ?>
 
-
 <!--Css Style for PDF-->
 <!--https://mpdf.github.io/css-stylesheets/supported-css.html-->
 
@@ -15,31 +14,34 @@ use yii\helpers\Html;
 
         <tr style="background: #F2F2F2;">
             <td colspan="1" style="width: 50px;"></td>
-            <td colspan="3" style="width: 300px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="3" style="width: 265px; padding: 15px 5px; color: #4F4F4F;">
                 <strong>Фамилия, имя, отчество</strong>
             </td>
-            <td colspan="4" style="width: 400px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="3" style="width: 265px; padding: 15px 5px; color: #4F4F4F;">
                 <strong>Данные респондента</strong>
             </td>
-            <td colspan="2" style="width: 200px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
-                <strong>E-mail</strong>
+            <td colspan="3" style="width: 265px; padding: 15px 5px; color: #4F4F4F;">
+                <strong>Место проведения</strong>
             </td>
-            <td colspan="1" style="width: 100px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
-                <strong>Дата опроса</strong>
+            <td colspan="2" style="width: 200px; padding: 15px 5px; color: #4F4F4F; text-align: center;">
+                <strong>Интервью</strong>
             </td>
         </tr>
 
 
         <tr style="background: #F2F2F2; ">
             <td colspan="1" style="width: 50px;"></td>
-            <td colspan="3" style="width: 300px; padding: 10px 5px; color: #4F4F4F; text-align: center;">
+            <td colspan="3" style="width: 265px; padding: 10px 5px; color: #4F4F4F; text-align: center;">
 
             </td>
-            <td colspan="4" style="width: 400px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
+            <td colspan="3" style="width: 265px; padding: 10px 5px; color: #4F4F4F; font-size: 12px;">
                 Кто? Откуда? Чем занят?
             </td>
-            <td colspan="2" style="width: 200px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
-                Адрес электронной почты
+            <td colspan="3" style="width: 265px; padding: 10px 5px; color: #4F4F4F; font-size: 12px;">
+                Организация, адрес
+            </td>
+            <td colspan="1" style="width: 100px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
+                План
             </td>
             <td colspan="1" style="width: 100px; padding: 10px 5px; color: #4F4F4F; text-align: center; font-size: 12px;">
                 Факт
@@ -70,14 +72,14 @@ use yii\helpers\Html;
 
                 </td>
 
-                <td colspan="3" style="width: 300px; padding: 10px 5px; color: #FFFFFF; font-size: 16px; height: 60px;">
+                <td colspan="3" style="width: 265px; padding: 10px 5px; color: #FFFFFF; font-size: 16px; height: 60px;">
 
                     <?=  $respond->name; ?>
 
                 </td>
 
 
-                <td colspan="4" style="width: 400px; padding: 10px 5px; color: #FFFFFF; font-size: 12px; height: 60px;">
+                <td colspan="3" style="width: 265px; padding: 10px 5px; color: #FFFFFF; font-size: 12px; height: 60px;">
 
                     <?php
                     if (!empty($respond->info_respond)){
@@ -92,16 +94,27 @@ use yii\helpers\Html;
 
                 </td>
 
-                <td colspan="2" style="width: 200px; padding: 10px 5px; color: #FFFFFF; height: 60px; text-align: center;">
+                <td colspan="3" style="width: 265px; padding: 10px 5px; color: #FFFFFF; font-size: 12px; height: 60px;">
 
                     <?php
-                    if (!empty($respond->email)){
+                    if (!empty($respond->place_interview)){
 
-                        if(mb_strlen($respond->email) > 25) {
-                            echo '<div title="'.$respond->email.'">' . mb_substr($respond->email, 0, 22) . '...</div>';
+                        if(mb_strlen($respond->place_interview) > 150) {
+                            echo '<div title="'.$respond->place_interview.'">' . mb_substr($respond->place_interview, 0, 147) . '...</div>';
                         }else {
-                            echo $respond->email;
+                            echo $respond->place_interview;
                         }
+                    }
+                    ?>
+
+                </td>
+
+                <td colspan="1" style="width: 100px; text-align: center; color: #FFFFFF; height: 60px; font-size: 15px;">
+
+                    <?php
+                    if (!empty($respond->date_plan)){
+
+                        echo '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $respond->date_plan) . '</div>';
                     }
                     ?>
 
@@ -115,7 +128,7 @@ use yii\helpers\Html;
                         $date_fact = date("d.m.y", $respond->descInterview->updated_at);
                         echo $date_fact;
 
-                    }elseif (!empty($respond->info_respond) && empty($respond->descInterview->updated_at)){
+                    }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan) && empty($respond->descInterview->updated_at)){
 
                         echo Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]);
                     }

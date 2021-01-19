@@ -20,11 +20,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
     }
 
-    public function getFeedbacks()
-    {
-        return $this->hasMany(FeedbackExpertConfirm::class, ['confirm_problem_id' => 'id']);
-    }
-
     public function getResponds()
     {
         return $this->hasMany(RespondsConfirm::class, ['confirm_problem_id' => 'id']);
@@ -97,6 +92,7 @@ class ConfirmProblem extends \yii\db\ActiveRecord
             $respondConfirm->confirm_problem_id = $this->id;
             $respondConfirm->name = $respond->name;
             $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->place_interview = $respond->place_interview;
             $respondConfirm->email = $respond->email;
             $respondConfirm->save();
         }
@@ -239,8 +235,8 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsConfirm::find()->where(['confirm_problem_id' => $this->id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count = RespondsConfirm::find()->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
     }

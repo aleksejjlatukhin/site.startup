@@ -153,7 +153,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             'onclick' => "openCity(event, 'step_two')",
         ]); ?>
 
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить анкетные данные респондентов</div></div>', [
+        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
             'class' => 'tablinks link_create_interview col-xs-12 col-md-6 col-lg-3',
             'onclick' => "openCity(event, 'step_three')",
             'id' => "defaultOpen",
@@ -441,7 +441,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для анкеты</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
@@ -599,7 +599,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
                 <div class="col-md-9" style="padding: 10px 0 0 0;">
 
-                    <span style="color: #4F4F4F;padding-right: 10px;">Информация о респондентах и данные опроса</span>
+                    <span style="color: #4F4F4F;padding-right: 10px;">Информация о респондентах и интервью</span>
 
                     <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
                         'class' => 'show_modal_information_table_responds', 'title' => 'Посмотреть описание',
@@ -628,7 +628,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                     Фамилия, имя, отчество
                 </div>
 
-                <div class="col-md-5" style="padding: 0;">
+                <div class="col-md-3" style="padding: 0;">
                     <div class="headers_data_respond_hi">
                         Данные респондента
                     </div>
@@ -637,28 +637,33 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                     </div>
                 </div>
 
-                <div class="col-md-2" style="padding: 0;">
+                <div class="col-md-3" style="padding: 0;">
                     <div class="headers_data_respond_hi">
-                        E-mail
+                        Место проведения
                     </div>
                     <div class="headers_data_respond_low">
-                        Адрес электронной почты
+                        Организация, адрес
                     </div>
                 </div>
 
-                <div class="col-md-1 text-center" style="padding: 0;">
-                    <div class="headers_data_respond_hi">
-                        Дата опроса
+                <div class="col-md-2">
+                    <div class="row headers_data_respond_hi" style="text-align: center;">
+                        Интервью
                     </div>
-                    <div class="headers_data_respond_low">
-                        Факт
+                    <div class="row headers_data_respond_low">
+                        <div class="col-md-6" style="text-align: center;">
+                            План
+                        </div>
+                        <div class="col-md-6" style="text-align: center;">
+                            Факт
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-md-1" style="text-align: right; padding-top: 10px; padding-bottom: 10px;">
 
                     <?= Html::a(Html::img('/images/icons/icon_q&a.png', ['style' => ['width' => '40px']]), ['/confirm-problem/get-data-questions-and-answers', 'id' => $model->id], [
-                        'class' => 'openTableQuestionsAndAnswers', 'style' => ['margin-right' => '8px'], 'title'=> 'Ответы респондентов на вопросы анкеты',
+                        'class' => 'openTableQuestionsAndAnswers', 'style' => ['margin-right' => '8px'], 'title'=> 'Ответы респондентов на вопросы интервью',
                     ]) ?>
 
                     <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/confirm-problem/mpdf-data-responds', 'id' => $model->id], [

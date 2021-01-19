@@ -4,15 +4,6 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "responds_mvp".
- *
- * @property string $id
- * @property int $confirm_mvp_id
- * @property string $name
- * @property string $info_respond
- * @property string $email
- */
 class RespondsMvp extends \yii\db\ActiveRecord
 {
 
@@ -25,6 +16,7 @@ class RespondsMvp extends \yii\db\ActiveRecord
     {
         return 'responds_mvp';
     }
+
 
     public function getDescInterview()
     {
@@ -49,9 +41,10 @@ class RespondsMvp extends \yii\db\ActiveRecord
         return [
             [['confirm_mvp_id', 'name'], 'required'],
             [['confirm_mvp_id'], 'integer'],
-            [['name', 'info_respond', 'email'], 'trim'],
+            [['date_plan'], 'integer'],
+            [['name', 'info_respond', 'email', 'place_interview'], 'trim'],
             [['name'], 'string', 'max' => 100],
-            [['info_respond', 'email'], 'string', 'max' => 255],
+            [['info_respond', 'email', 'place_interview'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }
@@ -62,11 +55,11 @@ class RespondsMvp extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'confirm_mvp_id' => 'Confirm Mvp ID',
             'name' => 'Респондент',
             'info_respond' => 'Данные респондента',
-            'email' => 'Адрес электронной почты',
+            'email' => 'E-mail',
+            'date_plan' => 'Плановая дата интервью',
+            'place_interview' => 'Место проведения интервью',
         ];
     }
 

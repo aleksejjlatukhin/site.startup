@@ -7,9 +7,12 @@ use app\models\ConfirmMvp;
 use app\models\DescInterviewMvp;
 use app\models\forms\CreateRespondMvpForm;
 use app\models\forms\FormUpdateConfirmMvp;
+use app\models\Gcp;
+use app\models\GenerationProblem;
 use app\models\Mvp;
 use app\models\Projects;
 use app\models\forms\UpdateRespondMvpForm;
+use app\models\Segment;
 use app\models\User;
 use Yii;
 use app\models\RespondsMvp;
@@ -83,8 +86,8 @@ class RespondsMvpController extends AppController
         $count_models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->count();
 
         //Кол-во респондентов, у кот-х заполнены данные
-        $count_exist_data_respond = RespondsMvp::find()->where(['confirm_mvp_id' => $id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count_exist_data_respond = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         //Кол-во респондентов, у кот-х существует анкета
         $count_exist_data_descInterview = RespondsMvp::find()->with('descInterview')
@@ -285,6 +288,11 @@ class RespondsMvpController extends AppController
         $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $id]);
         $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
         $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -313,6 +321,18 @@ class RespondsMvpController extends AppController
 
                 foreach ($answers as $answer){
                     $answer->delete();
+                }
+
+                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
+                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
+                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
+                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/mvps/'.
+                    mb_convert_encoding($this->translit($mvp->title) , "windows-1251") .'/interviews/' .
+                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
+
+                if (file_exists($del_dir)) {
+                    $this->delTree($del_dir);
                 }
 
                 if ($model->delete()) {

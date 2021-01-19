@@ -200,7 +200,7 @@ class ConfirmGcpController extends AppController
             ->where(['confirm_gcp_id' => $id, 'desc_interview_gcp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->mvps)  && $model->count_positive <= $count_positive)) {
+            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1) || (!empty($model->mvps)  && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1)) {
 
                 $response =  [
                     'success' => true,
@@ -645,6 +645,16 @@ class ConfirmGcpController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionMpdfQuestionsAndAnswers($id)
     {
         $model = $this->findModel($id);
@@ -661,7 +671,7 @@ class ConfirmGcpController extends AppController
             $gcp_desc = mb_substr($gcp_desc, 0, 25) . '...';
         }
 
-        $filename = 'Ответы респондентов на вопросы анкеты для подтверждения ЦП: «'.$gcp_desc.'».';
+        $filename = 'Ответы респондентов на вопросы интервью для подтверждения ЦП: «'.$gcp_desc.'».';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -689,7 +699,7 @@ class ConfirmGcpController extends AppController
             // call mPDF methods on the fly
             'methods' => [
                 'SetTitle' => $filename,
-                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы анкеты. ЦП: «'.$gcp_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Ответы респондентов на вопросы интервью. ЦП: «'.$gcp_desc.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',

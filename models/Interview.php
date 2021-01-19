@@ -22,17 +22,12 @@ class Interview extends \yii\db\ActiveRecord
 
     public function getQuestions()
     {
-        return $this->hasMany(Questions::class, ['interview_id' => 'id']);
+        return $this->hasMany(QuestionsConfirmSegment::class, ['interview_id' => 'id']);
     }
 
     public function getResponds()
     {
         return $this->hasMany(Respond::class, ['interview_id' => 'id']);
-    }
-
-    public function getFeedbacks()
-    {
-        return $this->hasMany(FeedbackExpert::class, ['interview_id' => 'id']);
     }
 
     public function getProblems()
@@ -104,11 +99,12 @@ class Interview extends \yii\db\ActiveRecord
 
     public function addQuestionDefault($title)
     {
-        $question = new Questions();
+        $question = new QuestionsConfirmSegment();
         $question->interview_id = $this->id;
         $question->title = $title;
 
         if ($question->save()) {
+            $this->addAnswerConfirmSegment($question->id);
             $this->addQuestionToGeneralList($title);
         }
     }
@@ -120,7 +116,7 @@ class Interview extends \yii\db\ActiveRecord
         $user = $this->segment->project->user;
 
         //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestions::find()
+        $baseQuestions = AllQuestionsConfirmSegment::find()
             ->where([
                 'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
                 'field_of_activity' => $segment->field_of_activity,
@@ -139,7 +135,7 @@ class Interview extends \yii\db\ActiveRecord
 
         if ($existQuestions == 0){
 
-            $general_question = new AllQuestions();
+            $general_question = new AllQuestionsConfirmSegment();
             $general_question->title = $title;
             $general_question->user_id = $user->id;
             $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
@@ -147,6 +143,35 @@ class Interview extends \yii\db\ActiveRecord
             $general_question->sort_of_activity = $segment->sort_of_activity;
             $general_question->specialization_of_activity = $segment->specialization_of_activity;
             $general_question->save();
+        }
+    }
+
+
+    public function addAnswerConfirmSegment ($question_id)
+    {
+        //Создание пустого ответа для нового вопроса для каждого респондента
+        foreach ($this->responds as $respond) {
+
+            $answer = new AnswersQuestionsConfirmSegment();
+            $answer->question_id = $question_id;
+            $answer->respond_id = $respond->id;
+            $answer->save();
+
+        }
+    }
+
+
+    /**
+     * @param $question_id
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function deleteAnswerConfirmSegment ($question_id)
+    {
+        //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
+        foreach ($this->responds as $respond) {
+            $answer = AnswersQuestionsConfirmSegment::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
+            $answer->delete();
         }
     }
 
@@ -161,7 +186,7 @@ class Interview extends \yii\db\ActiveRecord
             $questions[] = $question['title'];
         }
 
-        $allQuestions = AllQuestions::find()
+        $allQuestions = AllQuestionsConfirmSegment::find()
             ->where([
                 'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
                 'field_of_activity' => $segment->field_of_activity,

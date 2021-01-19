@@ -58,7 +58,7 @@ use app\models\User;
                 <?php
                 if (!empty($respond->date_plan)){
 
-                    echo '<div class="text-center" style="padding: 0 5px;">' . date("d.m.y", $respond->date_plan) . '</div>';
+                    echo '<div class="text-center" style="padding: 0 5px; margin-left: -10px;">' . date("d.m.y", $respond->date_plan) . '</div>';
                 }
                 ?>
 
@@ -70,12 +70,12 @@ use app\models\User;
                 if (!empty($respond->descInterview)){
 
                     $date_fact = date("d.m.y", $respond->descInterview->updated_at);
-                    echo '<div class="text-center">' . Html::encode($date_fact) . '</div>';
+                    echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
                 }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan)
                     && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
-                    echo '<div class="text-center">' . Html::a(
+                    echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
                             ['/respond/data-availability', 'id' => $model->id], [
                             'id' => 'respond_descInterview_form-' . $respond->id,

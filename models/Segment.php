@@ -175,9 +175,10 @@ class Segment extends \yii\db\ActiveRecord
             foreach ($responds as $respond) {
 
                 DescInterview::deleteAll(['respond_id' => $respond->id]);
+                AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $respond->id]);
             }
 
-            Questions::deleteAll(['interview_id' => $confirm->id]);
+            QuestionsConfirmSegment::deleteAll(['interview_id' => $confirm->id]);
             Respond::deleteAll(['interview_id' => $confirm->id]);
             $confirm->delete();
         }

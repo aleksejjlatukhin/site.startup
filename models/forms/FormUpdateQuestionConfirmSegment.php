@@ -3,7 +3,7 @@
 
 namespace app\models\forms;
 
-use app\models\Questions;
+use app\models\QuestionsConfirmSegment;
 use yii\base\Model;
 
 class FormUpdateQuestionConfirmSegment extends Model
@@ -16,7 +16,7 @@ class FormUpdateQuestionConfirmSegment extends Model
     
     public function __construct($id, $config = [])
     {
-        $question = Questions::findOne($id);
+        $question = QuestionsConfirmSegment::findOne($id);
         $this->id = $question->id;
         $this->interview_id = $question->interview_id;
         $this->title = $question->title;
@@ -26,7 +26,7 @@ class FormUpdateQuestionConfirmSegment extends Model
 
     public function update()
     {
-        $question = Questions::findOne($this->id);
+        $question = QuestionsConfirmSegment::findOne($this->id);
         $question->title = $this->title;
         return $question->save() ? $question : null;
     }

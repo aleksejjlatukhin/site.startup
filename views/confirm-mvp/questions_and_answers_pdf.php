@@ -1,5 +1,5 @@
 
-<!--Ответы респондентов на вопросы анкеты-->
+<!--Ответы респондентов на вопросы интервью-->
 <?php foreach ($questions as $i => $question) : ?>
 
     <div style="color: #ffffff; background: #707F99; font-size: 18px; margin: 2px 0; padding: 10px;">

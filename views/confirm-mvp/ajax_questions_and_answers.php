@@ -1,5 +1,5 @@
 
-<!--Ответы респондентов на вопросы анкеты-->
+<!--Ответы респондентов на вопросы интервью-->
 <div class="container-questions-and-answers">
 
 <?php foreach ($questions as $i => $question) : ?>

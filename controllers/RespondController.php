@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\AnswersQuestionsConfirmSegment;
 use app\models\DescInterview;
 use app\models\forms\CreateRespondForm;
 use app\models\forms\FormUpdateConfirmSegment;
@@ -140,7 +141,9 @@ class RespondController extends AppController
 
                     if ($newRespond->validate(['name'])) {
 
-                        if ($newRespond->create()) {
+                        if ($newRespond = $newRespond->create()) {
+
+                            $newRespond->addAnswersForNewRespond();
 
                             $interview->count_respond = $interview->count_respond + 1;
                             $interview->save();
@@ -265,15 +268,23 @@ class RespondController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDelete ($id) {
 
-        $model = Respond::findOne($id);
+        $model = $this->findModel($id);
         $descInterview = DescInterview::findOne(['respond_id' => $model->id]);
+        $answers = AnswersQuestionsConfirmSegment::findAll(['respond_id' => $id]);
         $interview = Interview::findOne(['id' => $model->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
-        $count_responds = Respond::find()->where(['interview_id' => $interview->id])->count();
         $user = User::findOne(['id' => $project->user_id]);
+        $count_responds = Respond::find()->where(['interview_id' => $interview->id])->count();
 
         if (Yii::$app->request->isAjax){
 
@@ -297,6 +308,10 @@ class RespondController extends AppController
 
                 if ($descInterview) {
                     $descInterview->delete();
+                }
+
+                foreach ($answers as $answer){
+                    $answer->delete();
                 }
 
                 $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .

@@ -21,11 +21,6 @@ class ConfirmMvp extends \yii\db\ActiveRecord
         return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
     }
 
-    public function getFeedbacks()
-    {
-        return $this->hasMany(FeedbackExpertMvp::class, ['confirm_mvp_id' => 'id']);
-    }
-
     public function getResponds()
     {
         return $this->hasMany(RespondsMvp::class, ['confirm_mvp_id' => 'id']);
@@ -95,6 +90,7 @@ class ConfirmMvp extends \yii\db\ActiveRecord
             $respondConfirm->confirm_mvp_id = $this->id;
             $respondConfirm->name = $respond->name;
             $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->place_interview = $respond->place_interview;
             $respondConfirm->email = $respond->email;
             $respondConfirm->save();
         }
@@ -232,8 +228,8 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsMvp::find()->where(['confirm_mvp_id' => $this->id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count = RespondsMvp::find()->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
     }

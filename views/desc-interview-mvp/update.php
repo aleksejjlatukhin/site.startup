@@ -38,6 +38,121 @@ use yii\helpers\Html;
 
 
     <div class="row">
+
+        <div class="col-md-12" style="margin-top: 15px;">
+
+            <p style="padding-left: 5px;"><b>Приложить файл</b> <span style="color: #BDBDBD; padding-left: 20px;">png, jpg, jpeg, pdf, txt, doc, docx, xls</span></p>
+
+
+            <?php if (!empty($model->interview_file)) : ?>
+
+
+                <div class="feed-exp">
+
+                    <div style="display:flex; margin-top: -5px;margin-bottom: -30px;">
+
+                        <?= $form->field($model, 'loadFile')
+                            ->fileInput([
+                                'id' => 'descInterviewUpdateFile', 'class' => 'sr-only'
+                            ])->label('Выберите файл',[
+                                'class'=>'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'justify-content' => 'center',
+                                    'background' => '#707F99',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]); ?>
+
+                        <div class="file_name_update_form" style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
+
+                    </div>
+
+                </div>
+
+
+                <div style="margin-top: -5px; margin-bottom: 30px;">
+
+                    <div style="display: flex; align-items: center;">
+
+                        <?= Html::a('Скачать файл', ['/desc-interview-mvp/download', 'id' => $model->id], [
+                            'class' => 'btn btn-default interview_file_update',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'color' => '#FFFFFF',
+                                'justify-content' => 'center',
+                                'background' => '#707F99',
+                                'width' => '170px',
+                                'height' => '40px',
+                                'text-align' => 'left',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                                'margin-right' => '5px',
+                            ]
+
+                        ]) . ' ' . Html::a('Удалить файл', ['/desc-interview-mvp/delete-file', 'id' => $model->id], [
+                            'id' => 'link_delete_file',
+                            'class' => "btn btn-default link-delete",
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#E0E0E0',
+                                'color' => '#FFFFFF',
+                                'width' => '170px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ]
+                        ]); ?>
+
+                    </div>
+
+                    <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $model->interview_file;?></div>
+
+                </div>
+
+
+            <?php endif;?>
+
+
+            <?php if (empty($model->interview_file)) : ?>
+
+                <div style="display:flex; margin-top: -5px;">
+
+                    <?= $form->field($model, 'loadFile')
+                        ->fileInput([
+                            'id' => 'descInterviewUpdateFile', 'class' => 'sr-only'
+                        ])->label('Выберите файл',[
+                            'class'=>'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'color' => '#FFFFFF',
+                                'justify-content' => 'center',
+                                'background' => '#707F99',
+                                'width' => '180px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                        ]); ?>
+
+                    <div class="file_name_update_form" style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
+
+                </div>
+
+            <?php endif;?>
+
+
+        </div>
+
         <div class="col-md-12">
 
             <?php
@@ -46,7 +161,7 @@ use yii\helpers\Html;
 
             <?= $form->field($model, 'status', [
                 'template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>',
-            ])->label('По результатам опроса сделайте вывод о текущем продукте (MVP)')->widget(Select2::class, [
+            ])->label('По результатам интервью сделайте вывод о текущем продукте (MVP)')->widget(Select2::class, [
                 'data' => $selection_list,
                 'options' => ['id' => 'descInterview_status_update'],
                 'disabled' => false,  //Сделать поле неактивным
@@ -55,6 +170,7 @@ use yii\helpers\Html;
             ?>
 
         </div>
+
     </div>
 
     <div class="row">
@@ -97,8 +213,53 @@ use yii\helpers\Html;
 
         <?php endforeach; ?>
 
+        <div class="col-md-12">
+
+            <p style="padding-left: 5px; font-weight: 700;">Приложенный файл</p>
+
+            <?php if (!empty($model->interview_file)) : ?>
+
+                <div style="margin-top: -5px; margin-bottom: 30px;">
+
+                    <div style="display: flex; align-items: center;">
+
+                        <?= Html::a('Скачать файл', ['/desc-interview-mvp/download', 'id' => $model->id], [
+                            'class' => 'btn btn-default interview_file_update',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'color' => '#FFFFFF',
+                                'justify-content' => 'center',
+                                'background' => '#707F99',
+                                'width' => '170px',
+                                'height' => '40px',
+                                'text-align' => 'left',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                                'margin-right' => '5px',
+                            ]
+
+                        ]);
+                        ?>
+
+                    </div>
+
+                    <div class="title_name_update_form" style="padding-left: 5px; padding-top: 5px; margin-bottom: -10px;"><?= $model->interview_file;?></div>
+
+                </div>
+
+            <?php endif;?>
+
+            <?php if (empty($model->interview_file)) : ?>
+
+                <div class="col-md-12" style="padding-left: 5px; margin-bottom: 20px;">Файл не выбран</div>
+
+            <?php endif;?>
+
+        </div>
+
         <div class="col-md-12" style="padding: 0 20px; margin-bottom: 5px;">
-            <div style="font-weight: 700;">Вывод по результам опроса о текущем продукте (MVP)</div>
+            <div style="font-weight: 700;">Вывод по результам интервью о текущем продукте (MVP)</div>
             <div>
                 <?php
                 if ($model->status == 1) {

@@ -4,16 +4,6 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "responds_confirm".
- *
- * @property string $id
- * @property int $confirm_problem_id
- * @property string $name
- * @property string $info_respond
- * @property string $date_plan
- * @property string $place_interview
- */
 class RespondsConfirm extends \yii\db\ActiveRecord
 {
     const LIMIT_COUNT = 100;
@@ -49,9 +39,10 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         return [
             [['confirm_problem_id', 'name'], 'required'],
             [['confirm_problem_id'], 'integer'],
-            [['name', 'info_respond', 'email'], 'trim'],
+            [['date_plan'], 'integer'],
+            [['name', 'info_respond', 'email', 'place_interview'], 'trim'],
             [['name'], 'string', 'max' => 100],
-            [['info_respond', 'email'], 'string', 'max' => 255],
+            [['info_respond', 'email', 'place_interview'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
         ];
     }
@@ -62,11 +53,11 @@ class RespondsConfirm extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'confirm_problem_id' => 'Confirm Problem ID',
             'name' => 'Респондент',
             'info_respond' => 'Данные респондента',
-            'email' => 'Адрес электронной почты',
+            'email' => 'E-mail',
+            'date_plan' => 'Плановая дата интервью',
+            'place_interview' => 'Место проведения интервью',
         ];
     }
 

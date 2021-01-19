@@ -22,11 +22,6 @@ class ConfirmGcp extends \yii\db\ActiveRecord
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
 
-    public function getFeedbacks()
-    {
-        return $this->hasMany(FeedbackExpertGcp::class, ['confirm_gcp_id' => 'id']);
-    }
-
     public function getResponds()
     {
         return $this->hasMany(RespondsGcp::class, ['confirm_gcp_id' => 'id']);
@@ -95,6 +90,7 @@ class ConfirmGcp extends \yii\db\ActiveRecord
             $respondConfirm->confirm_gcp_id = $this->id;
             $respondConfirm->name = $respond->name;
             $respondConfirm->info_respond = $respond->info_respond;
+            $respondConfirm->place_interview = $respond->place_interview;
             $respondConfirm->email = $respond->email;
             $respondConfirm->save();
         }
@@ -232,8 +228,8 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsGcp::find()->where(['confirm_gcp_id' => $this->id])
-            ->andWhere(['not', ['info_respond' => '']])->count();
+        $count = RespondsGcp::find()->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
     }

@@ -176,7 +176,7 @@ $(body).on('beforeSubmit', '#addNewQuestion', function(e){
 });
 
 
-//Получить форму редактирования вопроса для анкеты (Шаг 2)
+//Получить форму редактирования вопроса для интервью (Шаг 2)
 $(body).on('click', '.showQuestionUpdateForm', function (e) {
 
     var url = $(this).attr('href');
@@ -210,7 +210,7 @@ $(body).on('click', '.showQuestionUpdateForm', function (e) {
 });
 
 
-//Отмена редактирования вопроса для анкеты (Шаг 2)
+//Отмена редактирования вопроса для интервью (Шаг 2)
 $(body).on('click', '.submit_update_question_cancel', function (e) {
 
     var url = $(this).attr('href');
@@ -235,7 +235,7 @@ $(body).on('click', '.submit_update_question_cancel', function (e) {
 });
 
 
-//Редактирование вопроса для анкеты (Шаг 2)
+//Редактирование вопроса для интервью (Шаг 2)
 $(body).on('beforeSubmit', '#updateQuestionForm', function(e){
 
     var data = $(this).serialize();
@@ -271,7 +271,7 @@ $(body).on('beforeSubmit', '#updateQuestionForm', function(e){
 });
 
 
-//Удаление вопроса для анкеты (Шаг 2)
+//Удаление вопроса для интервью (Шаг 2)
 $(body).on('click', '.delete-question-confirm-gcp', function(e){
 
     var url = $(this).attr('href');
@@ -655,7 +655,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 });
 
 
-//Получение формы создания анкеты для респондента
+//Получение формы создания интервью для респондента
 $(body).on('click', '.showDescInterviewCreateForm', function(e){
 
     var url_1 = $(this).attr('href');
@@ -707,7 +707,15 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
 });
 
 
-//Сохранении данных из формы при создании анкеты
+//После выбора файла в форме создания интервью выводим его имя на экран
+$(body).on('change', '#formCreateDescInterview input[type=file]',function(){
+
+    var filename = $(this).val().split('\\').pop();
+    $('.title_file').html(filename);
+});
+
+
+//Сохранении данных из формы при создании интервью
 $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 
     var data = new FormData(this);
@@ -753,7 +761,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 });
 
 
-//Получение формы редактирования анкеты респондента
+//Получение формы редактирования интервью респондента
 $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
@@ -781,7 +789,15 @@ $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 });
 
 
-//Редактирование анкеты при сохранении данных из формы
+//После выбора файла в форме редактирования интервью выводим его имя на экран
+$(body).on('change', '#formUpdateDescInterview input[type=file]',function(){
+
+    var filename = $(this).val().split('\\').pop();
+    $('.file_name_update_form').html(filename);
+});
+
+
+//Редактирование интервью при сохранении данных из формы
 $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 
     var data = new FormData(this);
@@ -818,6 +834,33 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             $('#update_descInterview_modal').modal('hide');
         },
         error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Удаление файла из формы редактирования интервью
+$(body).on('click', '#link_delete_file', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+
+        type:'POST',
+        cache: false,
+        url: url,
+        success: function() {
+
+            $('.interview_file_update').hide();
+            $('.link-delete').hide();
+            $('.title_name_update_form').hide();
+            $('.feed-exp').show();
+        },
+        error: function() {
             alert('Ошибка');
         }
     });
@@ -1010,7 +1053,7 @@ $(body).on('click', '#cancel-not_exist-confirm', function(e) {
 });
 
 
-//Показать таблицу ответов на вопросы анкеты
+//Показать таблицу ответов на вопросы интервью
 $(body).on('click', '.openTableQuestionsAndAnswers', function (e) {
 
     var url = $(this).attr('href');

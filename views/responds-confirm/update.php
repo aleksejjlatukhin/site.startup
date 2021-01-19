@@ -6,7 +6,6 @@ use yii\helpers\Html;
 
 ?>
 
-
 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) :?>
 
 
@@ -19,6 +18,7 @@ use yii\helpers\Html;
     ]); ?>
 
     <div class="row">
+
         <div class="col-md-6">
 
             <?= $form->field($model, 'name', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
@@ -46,15 +46,43 @@ use yii\helpers\Html;
         <div class="col-md-12">
 
             <?= $form->field($model, 'info_respond', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 2,
-                'maxlength' => true,
+                'rows' => 1,
                 'required' => true,
+                'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Кто? Откуда? Чем занимается?',
             ]); ?>
 
+            <?= $form->field($model, 'place_interview', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => 'Организация, адрес',
+                'autocomplete' => 'off'
+            ]); ?>
+
         </div>
 
+        <div class="col-xs-12 col-sm-6 col-md-4">
+
+            <?= '<label class="control-label" style="padding-left: 15px;">Плановая дата интервью</label>';?>
+            <?= \kartik\date\DatePicker::widget([
+                'type' => 2,
+                'removeButton' => false,
+                'name' => 'UpdateRespondConfirmForm[date_plan]',
+                'value' => $model->date_plan == null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
+                'readonly' => true,
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'dd.mm.yyyy'
+                ],
+                'options' => [
+                    'id' => 'datePlan',
+                    'class' => 'style_form_field_respond form-control'
+                ]
+            ]);?>
+
+        </div>
 
         <div class="form-group col-md-12">
             <?= Html::submitButton('Сохранить', [
@@ -91,6 +119,12 @@ use yii\helpers\Html;
         <div class="col-md-4" style="padding-top: 5px;">
             <div class="bolder">E-mail:</div>
             <?= $model->email; ?>
+            <div class="bolder">Место проведения интервью</div>
+            <?= $model->place_interview; ?>
+            <div class="bolder">Плановая дата интервью:</div>
+            <?php if ($model->date_plan != null) : ?>
+                <?= date('d.m.yy', $model->date_plan); ?>
+            <?php endif; ?>
         </div>
     </div>
 

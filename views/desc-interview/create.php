@@ -17,18 +17,39 @@ use kartik\select2\Select2;
 
 
 
-<div class="row" style="margin-bottom: 15px;">
+<div class="row">
 
     <div class="col-md-12">
 
         <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-            'rows' => 1,
+            'rows' => 2,
             'required' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => 'Ответы на вопросы, инсайды, ценная информация',
         ]); ?>
 
     </div>
+
+</div>
+
+<?php
+foreach ($respond->answers as $index => $answer) :
+    ?>
+
+    <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+    ->textarea([
+        'row' => 2,
+        'maxlength' => true,
+        'required' => true,
+        'class' => 'style_form_field_respond form-control',
+    ]);
+    ?>
+
+<?php
+endforeach;
+?>
+
+<div class="row" style="margin-bottom: 15px;">
 
     <div class="col-md-12">
 
@@ -63,7 +84,7 @@ use kartik\select2\Select2;
     <div class="col-md-12" style="margin-top: -10px;">
 
         <?= $form->field($model, 'result',['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-            'rows' => 1,
+            'rows' => 2,
             'maxlength' => true,
             'required' => true,
             'class' => 'style_form_field_respond form-control',

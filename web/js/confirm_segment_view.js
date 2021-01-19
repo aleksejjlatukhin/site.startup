@@ -1040,3 +1040,31 @@ $(body).on('click', '#cancel-not_exist-confirm', function(e) {
     e.preventDefault();
     return false;
 });
+
+
+//Показать таблицу ответов на вопросы интервью
+$(body).on('click', '.openTableQuestionsAndAnswers', function (e) {
+
+    var url = $(this).attr('href');
+    var showQuestionsAndAnswers_modal = $('#showQuestionsAndAnswers');
+    $(body).append($(showQuestionsAndAnswers_modal).first());
+    var container = $(showQuestionsAndAnswers_modal).find('.modal-body');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(container).html(response.ajax_questions_and_answers);
+            $(showQuestionsAndAnswers_modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
