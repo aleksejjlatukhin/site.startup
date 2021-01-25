@@ -2053,6 +2053,20 @@ body .not_exist_confirm_modal .modal-footer { /*Модальные окно вы
     border-radius: 0 0 5px 5px;
 }
 
+body .confirm_closing_modal .modal-header { /*Модальные окно подтверждения закрытия основного окна - header*/
+    background-color: #707F99;
+    color: #ffffff;
+    border-radius: 5px 5px 0 0;
+}
+body .confirm_closing_modal .modal-body { /*Модальные окно подтверждения закрытия основного окна  - body*/
+    background-color: #F2F2F2;
+    color: #4F4F4F;
+}
+body .confirm_closing_modal .modal-footer { /*Модальные окно подтверждения закрытия основного окна - footer*/
+    background-color: #707F99;
+    border-radius: 0 0 5px 5px;
+}
+
 /*Стили для всплывающих модальных окон
 ---Конец---
 */

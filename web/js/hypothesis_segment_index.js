@@ -31,13 +31,13 @@ $(document).ready(function() {
 
 
     //Возвращение скролла первого модального окна после закрытия второго
-    $('.modal').on('hidden.bs.modal', function (e) {
+    $('.modal').on('hidden.bs.modal', function () {
         if($('.modal:visible').length)
         {
             $('.modal-backdrop').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) - 10);
             $('body').addClass('modal-open');
         }
-    }).on('show.bs.modal', function (e) {
+    }).on('show.bs.modal', function () {
         if($('.modal:visible').length)
         {
             $('.modal-backdrop.in').first().css('z-index', parseInt($('.modal:visible').last().css('z-index')) + 10);
@@ -49,7 +49,12 @@ $(document).ready(function() {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
 
+//Отслеживаем изменения в форме создания сегмента и записываем их в куки
+$(body).on('change', 'form#hypothesisCreateForm', function(){
+    $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+});
 
 //При нажатии на кнопку новый сегмент
 $(body).on('click', '#showHypothesisToCreate', function(e){
@@ -68,6 +73,169 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             $(hypothesis_create_modal).modal('show');
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 
+            //Получение значений полей формы данными из куки, если они есть
+            if ($.cookie('SegmentCreateForm-' + id_page)) {
+
+                var form = decodeURIComponent($.cookie('SegmentCreateForm-' + id_page));
+                var arrData = form.split('&FormCreateSegment');
+
+                var formCreateSegmentName,
+                    formCreateSegmentDescription,
+                    formCreateSegmentType,
+                    formCreateSegmentField_of_activity_b2c,
+                    formCreateSegmentSort_of_activity_b2c,
+                    formCreateSegmentSpecialization_of_activity_b2c,
+                    formCreateSegmentAge_from,
+                    formCreateSegmentAge_to,
+                    formCreateSegmentGender_consumer,
+                    formCreateSegmentEducation_of_consumer,
+                    formCreateSegmentIncome_from,
+                    formCreateSegmentIncome_to,
+                    formCreateSegmentQuantity_from,
+                    formCreateSegmentQuantity_to,
+                    formCreateSegmentMarket_volume_b2c,
+                    formCreateSegmentField_of_activity_b2b,
+                    formCreateSegmentSort_of_activity_b2b,
+                    formCreateSegmentSpecialization_of_activity_b2b,
+                    formCreateSegmentCompany_products,
+                    formCreateSegmentCompany_partner,
+                    formCreateSegmentQuantity_from_b2b,
+                    formCreateSegmentQuantity_to_b2b,
+                    formCreateSegmentIncome_company_from,
+                    formCreateSegmentIncome_company_to,
+                    formCreateSegmentMarket_volume_b2b,
+                    formCreateSegmentAdd_info;
+
+                arrData.forEach(function(item) {
+                    if (item.split('=')[0] === '[name]') formCreateSegmentName = item.split('=')[1];
+                    if (item.split('=')[0] === '[description]') formCreateSegmentDescription = item.split('=')[1];
+                    if (item.split('=')[0] === '[type_of_interaction_between_subjects]') formCreateSegmentType = item.split('=')[1];
+                    if (item.split('=')[0] === '[field_of_activity_b2c]') formCreateSegmentField_of_activity_b2c = item.split('=')[1];
+                    if (item.split('=')[0] === '[sort_of_activity_b2c]') formCreateSegmentSort_of_activity_b2c = item.split('=')[1];
+                    if (item.split('=')[0] === '[specialization_of_activity_b2c]') formCreateSegmentSpecialization_of_activity_b2c = item.split('=')[1];
+                    if (item.split('=')[0] === '[age_from]') formCreateSegmentAge_from = item.split('=')[1];
+                    if (item.split('=')[0] === '[age_to]') formCreateSegmentAge_to = item.split('=')[1];
+                    if (item.split('=')[0] === '[gender_consumer]') formCreateSegmentGender_consumer = item.split('=')[1];
+                    if (item.split('=')[0] === '[education_of_consumer]') formCreateSegmentEducation_of_consumer = item.split('=')[1];
+                    if (item.split('=')[0] === '[income_from]') formCreateSegmentIncome_from = item.split('=')[1];
+                    if (item.split('=')[0] === '[income_to]') formCreateSegmentIncome_to = item.split('=')[1];
+                    if (item.split('=')[0] === '[quantity_from]') formCreateSegmentQuantity_from = item.split('=')[1];
+                    if (item.split('=')[0] === '[quantity_to]') formCreateSegmentQuantity_to = item.split('=')[1];
+                    if (item.split('=')[0] === '[market_volume_b2c]') formCreateSegmentMarket_volume_b2c = item.split('=')[1];
+                    if (item.split('=')[0] === '[field_of_activity_b2b]') formCreateSegmentField_of_activity_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[sort_of_activity_b2b]') formCreateSegmentSort_of_activity_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[specialization_of_activity_b2b]') formCreateSegmentSpecialization_of_activity_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[company_products]') formCreateSegmentCompany_products = item.split('=')[1];
+                    if (item.split('=')[0] === '[company_partner]') formCreateSegmentCompany_partner = item.split('=')[1];
+                    if (item.split('=')[0] === '[quantity_from_b2b]') formCreateSegmentQuantity_from_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[quantity_to_b2b]') formCreateSegmentQuantity_to_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[income_company_from]') formCreateSegmentIncome_company_from = item.split('=')[1];
+                    if (item.split('=')[0] === '[income_company_to]') formCreateSegmentIncome_company_to = item.split('=')[1];
+                    if (item.split('=')[0] === '[market_volume_b2b]') formCreateSegmentMarket_volume_b2b = item.split('=')[1];
+                    if (item.split('=')[0] === '[add_info]') formCreateSegmentAdd_info = item.split('=')[1];
+                });
+
+                //Заполнение полей формы данными из куки
+                $(document.getElementsByName('FormCreateSegment[name]')).val(formCreateSegmentName);
+                $(document.getElementsByName('FormCreateSegment[description]')).val(formCreateSegmentDescription);
+                $(document.getElementsByName('FormCreateSegment[add_info]')).val(formCreateSegmentAdd_info);
+
+                if (formCreateSegmentType === '200') {
+
+                    //Форма для сегмента типа B2B
+                    $(document.getElementsByName('FormCreateSegment[company_products]')).val(formCreateSegmentCompany_products);
+                    $(document.getElementsByName('FormCreateSegment[company_partner]')).val(formCreateSegmentCompany_partner);
+                    $(document.getElementsByName('FormCreateSegment[quantity_from_b2b]')).val(formCreateSegmentQuantity_from_b2b);
+                    $(document.getElementsByName('FormCreateSegment[quantity_to_b2b]')).val(formCreateSegmentQuantity_to_b2b);
+                    $(document.getElementsByName('FormCreateSegment[income_company_from]')).val(formCreateSegmentIncome_company_from);
+                    $(document.getElementsByName('FormCreateSegment[income_company_to]')).val(formCreateSegmentIncome_company_to);
+                    $(document.getElementsByName('FormCreateSegment[market_volume_b2b]')).val(formCreateSegmentMarket_volume_b2b);
+
+                    //Поля типа Select
+                    $('#type-interaction').val(formCreateSegmentType).trigger('change.select2');
+                    if (formCreateSegmentField_of_activity_b2b !== '') {
+                        $('#listOfAreasOfActivityB2B').val(formCreateSegmentField_of_activity_b2b).trigger('change.select2').trigger('select2:select');
+
+                        if (formCreateSegmentSort_of_activity_b2b !== '') {
+
+                            var timerListOfActivitiesB2B = setInterval(function() {
+                                var listOfActivitiesB2B = $('#listOfActivitiesB2B');
+                                if ($(listOfActivitiesB2B).prop('disabled') === false) {
+                                    clearInterval(timerListOfActivitiesB2B);
+                                    $(listOfActivitiesB2B).val(formCreateSegmentSort_of_activity_b2b).trigger('change.select2').trigger('select2:select');
+                                    if (formCreateSegmentSpecialization_of_activity_b2b === '') $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                }
+                            }, 1000);
+
+                            if (formCreateSegmentSpecialization_of_activity_b2b !== '') {
+
+                                var timerListOfSpecializationsB2B = setInterval(function() {
+                                    var listOfSpecializationsB2B = $('#listOfSpecializationsB2B');
+                                    if ($(listOfSpecializationsB2B).prop('disabled') === false) {
+                                        clearInterval(timerListOfSpecializationsB2B);
+                                        $(listOfSpecializationsB2B).val(formCreateSegmentSpecialization_of_activity_b2b).trigger('change.select2').trigger('select2:select');
+                                        $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                    }
+                                }, 1000);
+                            }
+                        }
+                    }
+
+                } else {
+
+                    //Форма для сегмента типа B2C
+                    $(document.getElementsByName('FormCreateSegment[age_from]')).val(formCreateSegmentAge_from);
+                    $(document.getElementsByName('FormCreateSegment[age_to]')).val(formCreateSegmentAge_to);
+                    $(document.getElementsByName('FormCreateSegment[income_from]')).val(formCreateSegmentIncome_from);
+                    $(document.getElementsByName('FormCreateSegment[income_to]')).val(formCreateSegmentIncome_to);
+                    $(document.getElementsByName('FormCreateSegment[quantity_from]')).val(formCreateSegmentQuantity_from);
+                    $(document.getElementsByName('FormCreateSegment[quantity_to]')).val(formCreateSegmentQuantity_to);
+                    $(document.getElementsByName('FormCreateSegment[market_volume_b2c]')).val(formCreateSegmentMarket_volume_b2c);
+
+                    //Поля типа Select
+                    $('#type-interaction').val(formCreateSegmentType).trigger('change.select2');
+                    if (formCreateSegmentField_of_activity_b2c !== '') {
+                        $('#listOfAreasOfActivityB2C').val(formCreateSegmentField_of_activity_b2c).trigger('change.select2').trigger('select2:select');
+
+                        if (formCreateSegmentSort_of_activity_b2c !== '') {
+
+                            var timerListOfActivitiesB2C = setInterval(function() {
+                                var listOfActivitiesB2C = $('#listOfActivitiesB2C');
+                                if ($(listOfActivitiesB2C).prop('disabled') === false) {
+                                    clearInterval(timerListOfActivitiesB2C);
+                                    $(listOfActivitiesB2C).val(formCreateSegmentSort_of_activity_b2c).trigger('change.select2').trigger('select2:select');
+                                    if (formCreateSegmentSpecialization_of_activity_b2c === '') $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                }
+                            }, 1000);
+
+                            if (formCreateSegmentSpecialization_of_activity_b2c !== '') {
+
+                                var timerListOfSpecializationsB2C = setInterval(function() {
+                                    var listOfSpecializationsB2C = $('#listOfSpecializationsB2C');
+                                    if ($(listOfSpecializationsB2C).prop('disabled') === false) {
+                                        clearInterval(timerListOfSpecializationsB2C);
+                                        $(listOfSpecializationsB2C).val(formCreateSegmentSpecialization_of_activity_b2c).trigger('change.select2').trigger('select2:select');
+                                        $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                    }
+                                }, 1000);
+                            }
+                        }
+                    }
+
+                    if (formCreateSegmentGender_consumer !== '') {
+                        $(document.getElementsByName('FormCreateSegment[gender_consumer]')).val(formCreateSegmentGender_consumer).trigger('change.select2');
+                        if (formCreateSegmentSort_of_activity_b2c === '' && formCreateSegmentSpecialization_of_activity_b2c === '' && formCreateSegmentEducation_of_consumer === '') {
+                            $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                        }
+                    }
+                    if (formCreateSegmentEducation_of_consumer !== '') {
+                        $(document.getElementsByName('FormCreateSegment[education_of_consumer]')).val(formCreateSegmentEducation_of_consumer).trigger('change.select2');
+                        if (formCreateSegmentSort_of_activity_b2c === '' && formCreateSegmentSpecialization_of_activity_b2c === '') {
+                            $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                        }
+                    }
+                }
+            }
         },
         error: function(){
             alert('Ошибка');
@@ -99,6 +267,7 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
+                $.cookie('SegmentCreateForm-' + id_page, null);
             }
 
             //Если сегмент с таким именем уже существует
@@ -154,6 +323,33 @@ $(body).on('click', '.update-hypothesis', function(e){
 });
 
 
+var catchChange = false;
+//Отслеживаем изменения в форме редактирования сегмента
+$(body).on('change', 'form#hypothesisUpdateForm', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '.hypothesis_update_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+
+//Подтверждение закрытия окна редактирования сегмента
+$(body).on('click', '#button_confirm_closing_modal', function (e) {
+    catchChange = false;
+    $('#confirm_closing_update_modal').modal('hide');
+    $('.hypothesis_update_modal').modal('hide');
+    e.preventDefault();
+    return false;
+});
+
 
 //Редактирование гипотезы целевого сегмента
 $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
@@ -172,6 +368,7 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
             //Если данные загружены и проверены
             if(response.success){
 
+                if (catchChange === true) catchChange = false;
                 $('.hypothesis_update_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
             }
