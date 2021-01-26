@@ -53,7 +53,18 @@ var id_page = window.location.search.split('=')[1];
 
 //Отслеживаем изменения в форме создания сегмента и записываем их в куки
 $(body).on('change', 'form#hypothesisCreateForm', function(){
-    $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+
+    var url = '/segment/save-file-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
 });
 
 //При нажатии на кнопку новый сегмент
@@ -73,10 +84,9 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             $(hypothesis_create_modal).modal('show');
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 
-            //Получение значений полей формы данными из куки, если они есть
-            if ($.cookie('SegmentCreateForm-' + id_page)) {
+            if (response.file_form_creation) {
 
-                var form = decodeURIComponent($.cookie('SegmentCreateForm-' + id_page));
+                var form = response.file_form_creation;
                 var arrData = form.split('&FormCreateSegment');
 
                 var formCreateSegmentName,
@@ -163,7 +173,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                                 if ($(listOfActivitiesB2B).prop('disabled') === false) {
                                     clearInterval(timerListOfActivitiesB2B);
                                     $(listOfActivitiesB2B).val(formCreateSegmentSort_of_activity_b2b).trigger('change.select2').trigger('select2:select');
-                                    if (formCreateSegmentSpecialization_of_activity_b2b === '') $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                    if (formCreateSegmentSpecialization_of_activity_b2b === '') $(body).find('form#hypothesisCreateForm').trigger('change');
                                 }
                             }, 1000);
 
@@ -174,13 +184,12 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                                     if ($(listOfSpecializationsB2B).prop('disabled') === false) {
                                         clearInterval(timerListOfSpecializationsB2B);
                                         $(listOfSpecializationsB2B).val(formCreateSegmentSpecialization_of_activity_b2b).trigger('change.select2').trigger('select2:select');
-                                        $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                        $(body).find('form#hypothesisCreateForm').trigger('change');
                                     }
                                 }, 1000);
                             }
                         }
                     }
-
                 } else {
 
                     //Форма для сегмента типа B2C
@@ -204,7 +213,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                                 if ($(listOfActivitiesB2C).prop('disabled') === false) {
                                     clearInterval(timerListOfActivitiesB2C);
                                     $(listOfActivitiesB2C).val(formCreateSegmentSort_of_activity_b2c).trigger('change.select2').trigger('select2:select');
-                                    if (formCreateSegmentSpecialization_of_activity_b2c === '') $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                    if (formCreateSegmentSpecialization_of_activity_b2c === '') $(body).find('form#hypothesisCreateForm').trigger('change');
                                 }
                             }, 1000);
 
@@ -215,7 +224,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                                     if ($(listOfSpecializationsB2C).prop('disabled') === false) {
                                         clearInterval(timerListOfSpecializationsB2C);
                                         $(listOfSpecializationsB2C).val(formCreateSegmentSpecialization_of_activity_b2c).trigger('change.select2').trigger('select2:select');
-                                        $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                                        $(body).find('form#hypothesisCreateForm').trigger('change');
                                     }
                                 }, 1000);
                             }
@@ -225,13 +234,13 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                     if (formCreateSegmentGender_consumer !== '') {
                         $(document.getElementsByName('FormCreateSegment[gender_consumer]')).val(formCreateSegmentGender_consumer).trigger('change.select2');
                         if (formCreateSegmentSort_of_activity_b2c === '' && formCreateSegmentSpecialization_of_activity_b2c === '' && formCreateSegmentEducation_of_consumer === '') {
-                            $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                            $(body).find('form#hypothesisCreateForm').trigger('change');
                         }
                     }
                     if (formCreateSegmentEducation_of_consumer !== '') {
                         $(document.getElementsByName('FormCreateSegment[education_of_consumer]')).val(formCreateSegmentEducation_of_consumer).trigger('change.select2');
                         if (formCreateSegmentSort_of_activity_b2c === '' && formCreateSegmentSpecialization_of_activity_b2c === '') {
-                            $.cookie('SegmentCreateForm-' + id_page, $('form#hypothesisCreateForm').serialize(), {expires: 30});
+                            $(body).find('form#hypothesisCreateForm').trigger('change');
                         }
                     }
                 }
@@ -267,7 +276,6 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
-                $.cookie('SegmentCreateForm-' + id_page, null);
             }
 
             //Если сегмент с таким именем уже существует

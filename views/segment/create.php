@@ -560,6 +560,7 @@ use app\models\TypeOfActivityB2B;
                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
             ])->label('Продукция / услуги предприятия *')->textarea([
                 'rows' => 1,
+                'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
             ]);
@@ -574,6 +575,7 @@ use app\models\TypeOfActivityB2B;
                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
             ])->label('Партнеры предприятия *')->textarea([
                 'rows' => 1,
+                'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
             ]);

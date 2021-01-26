@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Янв 19 2021 г., 23:59
+-- Время создания: Янв 27 2021 г., 02:08
 -- Версия сервера: 5.6.43
 -- Версия PHP: 5.6.38
 
@@ -802,12 +802,6 @@ CREATE TABLE `answers_questions_confirm_segment` (
 --
 
 INSERT INTO `answers_questions_confirm_segment` (`id`, `question_id`, `respond_id`, `answer`) VALUES
-(1, 490, 244, 'Ответ 1'),
-(2, 490, 245, ''),
-(4, 491, 244, 'Ответ 2'),
-(5, 491, 245, ''),
-(7, 492, 244, 'Ответ 3'),
-(8, 492, 245, ''),
 (37, 25, 16, ''),
 (38, 25, 17, ''),
 (39, 25, 18, ''),
@@ -1049,8 +1043,7 @@ INSERT INTO `desc_interview` (`id`, `respond_id`, `description`, `interview_file
 (77, 238, 'Материалы, полученные в ходе интервью', '201020Варианты вопросов для подтверждения ГПС и ГЦП.docx', 'vpvSLMU3AbHuhfA.docx', 'Варианты проблем', '1', 1611068525, 1611068526),
 (78, 241, 'Материалы, полученные в ходе интервью', '201020Варианты вопросов для подтверждения ГПС и ГЦП.docx', 'SF3NAaEMRrxm6qS.docx', 'Варианты проблем', '1', 1611068669, 1611068669),
 (79, 242, 'Материалы, полученные в ходе интервью', 'dogovor_gruppy 2020.doc', 'S1CttCWtvGfQC_B.doc', 'Варианты проблем', '1', 1611068683, 1611068683),
-(80, 243, 'Материалы, полученные в ходе интервью', 'интернет маркетинг.doc', 'ifK-2xxvQ6VEImB.doc', 'Варианты проблем', '1', 1611074180, 1611074180),
-(81, 244, 'Материалы, полученные в ходе интервью', 'dogovor_gruppy 2020.doc', 'wdkeX5q1iNNcAiQ.doc', 'Варианты проблем', '1', 1611086550, 1611086550);
+(80, 243, 'Материалы, полученные в ходе интервью', 'интернет маркетинг.doc', 'ifK-2xxvQ6VEImB.doc', 'Варианты проблем', '1', 1611074180, 1611074180);
 
 -- --------------------------------------------------------
 
@@ -1192,8 +1185,7 @@ INSERT INTO `interview` (`id`, `segment_id`, `count_respond`, `count_positive`, 
 (49, 59, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования'),
 (50, 57, 3, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования'),
 (51, 60, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования'),
-(52, 61, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования'),
-(53, 62, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования');
+(52, 61, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования');
 
 -- --------------------------------------------------------
 
@@ -1333,7 +1325,7 @@ INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fu
 (3, 17, 1601402292, 1601402292, 'Проект второй', 'Проект 2', '', '', '', '', NULL, '', '', '', '', '', NULL, '', '', NULL, NULL, NULL, ''),
 (12, 1, 1601510335, 1611068132, 'Полное наименование проекта', 'Проект 1 (такое вот максимально)', 'Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта Описание проекта', 'Разработать упаковку продукта для нового сегмента\r\n', 'Результат интелле ктуальной деятельности Резу льтат интеллек туальной деятельности Резу льтат интеллек туальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности', '', NULL, '', 'Суть результата интеллектуальной деятельности', 'На какой техн ологии основан про ект На какой техно логии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект', '', '', NULL, '', '', NULL, NULL, NULL, ''),
 (18, 9, 1602498891, 1602498891, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', '', 'Результат интеллектуальной деятельности', 'Номер патента 1266349187230918', 1603918800, 'Это достаточно маленький текст, оптимально подходящий для карточек товаров в интернет-магазинах или для небольших информационных публикаций.', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', NULL, '', '', NULL, NULL, NULL, ''),
-(19, 1, 1605197967, 1611086639, 'Полное наименование проекта Описание проекта', 'Проект 2 (проект для spaccel.ru)', 'Описание проекта Описание проекта', 'Разработать рекламный слоган для нового сегмента', 'Результат интеллектуальной деятельности', 'Номер патента 1266349187230918', 1606338000, 'Это достаточно маленький текст, оптимально подходящий для карточек товаров в интернет-магазинах или для небольших информационных публикаций.', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1604264400, 'Адрес сайта', 'Инвестор', 1604523600, 50000, 1605646800, 'Мероприятие, на котором проект анонсирован впервые');
+(19, 1, 1605197967, 1611701162, 'Полное наименование проекта Описание проекта', 'Проект 2 (проект для spaccel.ru)', 'Описание проекта Описание проекта', 'Разработать рекламный слоган для нового сегмента', 'Результат интеллектуальной деятельности', 'Номер патента 1266349187230918', 1606338000, 'Это достаточно маленький текст, оптимально подходящий для карточек товаров в интернет-магазинах или для небольших информационных публикаций.', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1604264400, 'Адрес сайта', 'Инвестор', 1604523600, 50000, 1605646800, 'Мероприятие, на котором проект анонсирован впервые');
 
 -- --------------------------------------------------------
 
@@ -1410,10 +1402,7 @@ INSERT INTO `questions_confirm_segment` (`id`, `interview_id`, `title`, `status`
 (469, 51, 'Что нравится / не нравится в текущем положении вещей?', '1'),
 (470, 51, 'Вас беспокоит данная ситуация?', '1'),
 (480, 52, 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?', '1'),
-(481, 52, 'Что нравится / не нравится в текущем положении вещей?', '1'),
-(490, 53, 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?', '1'),
-(491, 53, 'Что нравится / не нравится в текущем положении вещей?', '1'),
-(492, 53, 'Вас беспокоит данная ситуация?', '1');
+(481, 52, 'Что нравится / не нравится в текущем положении вещей?', '1');
 
 -- --------------------------------------------------------
 
@@ -1449,9 +1438,7 @@ INSERT INTO `responds` (`id`, `interview_id`, `name`, `info_respond`, `email`, `
 (240, 50, 'Петров Петр Петрович', 'Данные респондента', 'petrov@mail.ru', 1611867600, 'Место проведения интервью'),
 (241, 51, 'Пронин Иван Львович', 'Данные респондента', 'pronin@mail.ru', 1611003600, 'Место проведения интервью'),
 (242, 51, 'Тодоренко Никита Петрович', 'Данные респондента', 'todorenko@yandex.ru', 1611003600, 'Место проведения интервью'),
-(243, 52, 'Борисов Сергей Сергеевич', 'Данные респондента', 'borisov@mail.com', 1611003600, 'Место проведения интервью'),
-(244, 53, 'Респондент 1', 'Данные респондента', '', 1611003600, 'Место проведения интервью'),
-(245, 53, 'Респондент 2', 'Данные респондента', '', 1611003600, 'Место проведения интервью');
+(243, 52, 'Борисов Сергей Сергеевич', 'Данные респондента', 'borisov@mail.com', 1611003600, 'Место проведения интервью');
 
 -- --------------------------------------------------------
 
@@ -1539,7 +1526,7 @@ CREATE TABLE `segments` (
   `id` int(11) UNSIGNED NOT NULL,
   `project_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
+  `description` text NOT NULL,
   `type_of_interaction_between_subjects` int(11) NOT NULL DEFAULT '100',
   `field_of_activity` varchar(255) NOT NULL,
   `sort_of_activity` varchar(255) NOT NULL,
@@ -1553,8 +1540,8 @@ CREATE TABLE `segments` (
   `quantity_from` int(11) DEFAULT NULL,
   `quantity_to` int(11) DEFAULT NULL,
   `market_volume` int(11) DEFAULT NULL,
-  `company_products` varchar(255) DEFAULT NULL,
-  `company_partner` varchar(255) DEFAULT NULL,
+  `company_products` text,
+  `company_partner` text,
   `add_info` text,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
@@ -1570,12 +1557,11 @@ INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_inte
 (6, 2, 'Сегмент 1', '', 100, 'Сфера деятельности потребителя', 'Род деятельности потребителя', '', 35, 77, 70, NULL, 917, 5000, 172222, 300000, 51806, NULL, NULL, '', 0, 1598791433, NULL, 1),
 (7, 3, 'Сегмент 1', '', 100, '', '', '', NULL, NULL, 70, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, 0, NULL, NULL),
 (8, 2, 'Сегмент 2', '', 100, '', '', '', NULL, NULL, 70, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, 0, NULL, NULL),
-(57, 19, 'Мебельщики', 'Краткое описание сегмента', 100, 'Деревообрабатывающая и целлюлозно-бумажная промышленность, мебельное производство', 'Деревообрабатывающая и целлюлозно-бумажная промышленность, мебельное производство', 'Аппаратчик производства двуокиси хлора', 4, 5, 50, 50, 5000, 6000, 78, 99, 77, NULL, NULL, '', 1610524494, 1611067006, NULL, NULL),
+(57, 19, 'Мебельщики', 'Краткое описание сегмента', 100, 'Деревообрабатывающая и целлюлозно-бумажная промышленность, мебельное производство', 'Деревообрабатывающая и целлюлозно-бумажная промышленность, мебельное производство', 'Аппаратчик производства двуокиси хлора', 4, 5, 50, 50, 5000, 6000, 78, 99, 77, NULL, NULL, '', 1610524494, 1611590988, NULL, NULL),
 (58, 12, 'Образовательные программы', 'Краткое описание сегмента - Образовательные программы', 200, 'Образование', 'Образование', 'Предоставление услуг', NULL, NULL, NULL, NULL, 88, 90, 5, 6, 44, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1611067293, 1611067293, NULL, NULL),
 (59, 12, 'Event-индустрия', 'Краткое описание сегмента - Event-индустрия', 100, 'Выступления/ Коммуникация', 'Коммуникация/ Передача информации', 'Бизнес-тренер', 6, 50, 70, 300, 60000, 70000, 40, 70, 66, NULL, NULL, '', 1611067396, 1611068107, 1611068107, 1),
 (60, 19, 'Продажа всякой фигни', 'Краткое описание сегмента', 100, 'Менеджмент/ Торговля', 'Торговля', 'Продавец в магазине', 20, 60, 70, 50, 20000, 40000, 50, 60, 55, NULL, NULL, '', 1611068221, 1611068743, 1611068743, 1),
-(61, 19, 'Финансовый сектор', 'Краткое описание сегмента', 200, 'Деятельность финансовая и страховая', 'Деятельность вспомогательная в сфере финансовых услуг и страхования', 'Консалтинговая компания', NULL, NULL, NULL, NULL, 5, 6, 4, 7, 7, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1611074081, 1611074081, NULL, NULL),
-(62, 19, 'Новый сегмент 1', 'Краткое описание сегмента', 200, 'Деятельность в области информации и связи', 'Деятельность в области телевизионного и радиовещания', 'Производственная компания', NULL, NULL, NULL, NULL, 5, 7, 5, 7, 4, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1611086219, 1611086219, NULL, NULL);
+(61, 19, 'Финансовый сектор', 'Краткое описание сегмента', 200, 'Деятельность финансовая и страховая', 'Деятельность вспомогательная в сфере финансовых услуг и страхования', 'Консалтинговая компания', NULL, NULL, NULL, NULL, 5, 6, 4, 7, 7, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1611074081, 1611074081, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4273,7 +4259,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone`, `email`, `username`, `password_hash`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
-(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$zndk8lQ0OmizfSRa1xkUwuAikBaPngYMVt0cIypNdMxechCXJBLYK', '/images/avatar/default.jpg', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1611086639),
+(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$zndk8lQ0OmizfSRa1xkUwuAikBaPngYMVt0cIypNdMxechCXJBLYK', '/images/avatar/default.jpg', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1611701162),
 (9, 'Карпов', 'Антон', 'Петрович', '+7(999)99-99-99', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '/images/avatar/default.jpg', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 15, 1583859778, 1610403525),
 (15, 'Петров', 'Петр', 'Петрович', '2202020', 'admin@mail.com', 'admin', '$2y$13$hAr.OPIIyEQU.Kb5GFDYrO65vrNlUi6HVS1M4RBKXzXaNLKQRlfXC', '/images/avatar/default.jpg', 'pbtKFUaH9JG813KH8lvQEwU9gtHT7UKG', NULL, 20, 10, 20, NULL, 1585211641, 1588906039),
 (16, 'Порошин', 'Виктор', 'Николаевич', '+7(999)99-99-99', 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '/images/avatar/default.jpg', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 0, 20, 21, 1585414934, 1588096859),
@@ -4555,19 +4541,19 @@ ALTER TABLE `all_questions_confirm_segment`
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_gcp`
 --
 ALTER TABLE `answers_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_mvp`
 --
 ALTER TABLE `answers_questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_problem`
 --
 ALTER TABLE `answers_questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=564;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_segment`
@@ -4585,25 +4571,25 @@ ALTER TABLE `authors`
 -- AUTO_INCREMENT для таблицы `business_model`
 --
 ALTER TABLE `business_model`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
 --
 ALTER TABLE `confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_problem`
 --
 ALTER TABLE `confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_admin`
@@ -4621,43 +4607,43 @@ ALTER TABLE `conversation_main_admin`
 -- AUTO_INCREMENT для таблицы `desc_interview`
 --
 ALTER TABLE `desc_interview`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT для таблицы `desc_interview_confirm`
 --
 ALTER TABLE `desc_interview_confirm`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `desc_interview_gcp`
 --
 ALTER TABLE `desc_interview_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `desc_interview_mvp`
 --
 ALTER TABLE `desc_interview_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `gcp`
 --
 ALTER TABLE `gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `generation_problem`
 --
 ALTER TABLE `generation_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `interview`
 --
 ALTER TABLE `interview`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT для таблицы `message_admin`
@@ -4675,7 +4661,7 @@ ALTER TABLE `message_main_admin`
 -- AUTO_INCREMENT для таблицы `mvp`
 --
 ALTER TABLE `mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `pre_files`
@@ -4693,55 +4679,55 @@ ALTER TABLE `projects`
 -- AUTO_INCREMENT для таблицы `questions_confirm_gcp`
 --
 ALTER TABLE `questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_mvp`
 --
 ALTER TABLE `questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_problem`
 --
 ALTER TABLE `questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=239;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_segment`
 --
 ALTER TABLE `questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=502;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=482;
 
 --
 -- AUTO_INCREMENT для таблицы `responds`
 --
 ALTER TABLE `responds`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_confirm`
 --
 ALTER TABLE `responds_confirm`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_gcp`
 --
 ALTER TABLE `responds_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_mvp`
 --
 ALTER TABLE `responds_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT для таблицы `segments`
 --
 ALTER TABLE `segments`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT для таблицы `type_of_activity_b2b`

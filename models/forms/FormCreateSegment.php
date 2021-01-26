@@ -87,6 +87,7 @@ class FormCreateSegment extends FormSegment
                 $segment->market_volume = $this->market_volume_b2c;
 
                 $this->createDirName();
+                $this->deleteFileFormCreation();
 
                 return $segment->save() ? $segment : null;
 
@@ -113,6 +114,7 @@ class FormCreateSegment extends FormSegment
                 $segment->market_volume = $this->market_volume_b2b;
 
                 $this->createDirName();
+                $this->deleteFileFormCreation();
 
                 return $segment->save() ? $segment : null;
             }
@@ -136,6 +138,20 @@ class FormCreateSegment extends FormSegment
 
         if (!file_exists($segment_dir)){
             mkdir($segment_dir, 0777);
+        }
+    }
+
+
+    public function deleteFileFormCreation()
+    {
+        $project = Projects::findOne(['id' => $this->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        $file = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/__segment__form__creation__file/form-creation-file.txt';
+
+        if (file_exists($file)) {
+            unlink($file);
         }
     }
 

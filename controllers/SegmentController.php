@@ -121,6 +121,87 @@ class SegmentController extends AppController
     }
 
 
+    //Создание файла и запись в него состояния формы создания сегмента
+    public function actionSaveFileCreationForm($id)
+    {
+        $project = Projects::findOne($id);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        if(Yii::$app->request->isAjax) {
+
+            $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
+
+            if (!file_exists($segments_dir)){
+                mkdir($segments_dir, 0777);
+            }
+
+            $form_creation_dir = $segments_dir . '/__segment__form__creation__file/';
+            $form_creation_dir = mb_strtolower($form_creation_dir, "windows-1251");
+
+            if (!file_exists($form_creation_dir)){
+                mkdir($form_creation_dir, 0777);
+            }
+
+            // строка, которую будем записывать
+            $string = '';
+            if (isset($_POST['FormCreateSegment'])){
+                foreach ($_POST['FormCreateSegment'] as $key=>$value){
+                    $string .= '&FormCreateSegment['.$key.']='.$value;
+                }
+                // добавим дату изменения файла
+                $string .= '&FormCreateSegment[updated_at]='.time();
+            }
+            // открываем файл, если файл не существует,
+            // делается попытка создать его
+            $fp = fopen($form_creation_dir . 'form-creation-file.txt', 'w');
+            // записываем в файл текст
+            fwrite($fp, $string);
+            // закрываем
+            fclose($fp);
+
+            return true;
+        }
+    }
+
+
+    public function actionGetHypothesisToCreate ($id)
+    {
+        $project = Projects::findOne($id);
+        $user = User::findOne(['id' => $project->user_id]);
+        $model = new FormCreateSegment();
+
+        if(Yii::$app->request->isAjax) {
+
+            $path_file = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
+                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/__segment__form__creation__file/form-creation-file.txt';
+
+            if (file_exists($path_file)){
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('create', [
+                        'model' => $model,
+                        'project' => $project,
+                    ]),
+                    'file_form_creation' => file_get_contents($path_file, FILE_USE_INCLUDE_PATH),
+                ];
+
+            } else {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('create', [
+                        'model' => $model,
+                        'project' => $project
+                    ]),
+                ];
+            }
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
+
+
     /**
      * @param $id
      * @return array|bool
@@ -194,6 +275,21 @@ class SegmentController extends AppController
     }
 
 
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = new FormUpdateSegment($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
 
     /**
      * @param $id
@@ -432,45 +528,6 @@ class SegmentController extends AppController
             return $response;
         }
         return false;
-    }
-
-
-
-    public function actionGetHypothesisToCreate ($id)
-    {
-        $project = Projects::findOne($id);
-        $model = new FormCreateSegment();
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'renderAjax' => $this->renderAjax('create', [
-                    'model' => $model,
-                    'project' => $project
-                ]),
-            ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
-            return $response;
-        }
-    }
-
-
-
-    public function actionGetHypothesisToUpdate ($id)
-    {
-        $model = new FormUpdateSegment($id);
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'model' => $model,
-                'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
-            ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
-            return $response;
-        }
     }
 
 
