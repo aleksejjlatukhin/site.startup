@@ -54,7 +54,7 @@ var id_page = window.location.search.split('=')[1];
 //Отслеживаем изменения в форме создания сегмента и записываем их в куки
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
-    var url = '/segment/save-file-creation-form?id=' + id_page;
+    var url = '/segment/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -84,9 +84,9 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             $(hypothesis_create_modal).modal('show');
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 
-            if (response.file_form_creation) {
+            if (response.cache_form_creation) {
 
-                var form = response.file_form_creation;
+                var form = response.cache_form_creation;
                 var arrData = form.split('&FormCreateSegment');
 
                 var formCreateSegmentName,

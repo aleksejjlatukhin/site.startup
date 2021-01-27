@@ -88,8 +88,13 @@ class SegmentController extends AppController
     public function actionIndex($id)
     {
         $project = Projects::findOne($id);
+        $user = User::findOne(['id' => $project->user_id]);
         $models = Segment::findAll(['project_id' => $project->id]);
         $sortModel = new SortForm();
+
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+        $key = 'user_' . $user->id . '_project_' . $project->id . 'FormCreateSegmentCache'; //Формируем ключ
+        if ($cache->exists($key) === false) $cache->gc($key); // Удаляем просроченый файл кэша
 
         return $this->render('index', [
             'project' => $project,
@@ -121,46 +126,22 @@ class SegmentController extends AppController
     }
 
 
-    //Создание файла и запись в него состояния формы создания сегмента
-    public function actionSaveFileCreationForm($id)
+    public function actionSaveCacheCreationForm($id)
     {
         $project = Projects::findOne($id);
         $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
 
-            $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
-
-            if (!file_exists($segments_dir)){
-                mkdir($segments_dir, 0777);
-            }
-
-            $form_creation_dir = $segments_dir . '/__segment__form__creation__file/';
-            $form_creation_dir = mb_strtolower($form_creation_dir, "windows-1251");
-
-            if (!file_exists($form_creation_dir)){
-                mkdir($form_creation_dir, 0777);
-            }
-
-            // строка, которую будем записывать
-            $string = '';
+            $string = ''; //Строка, которую будем записывать в кэш
             if (isset($_POST['FormCreateSegment'])){
                 foreach ($_POST['FormCreateSegment'] as $key=>$value){
                     $string .= '&FormCreateSegment['.$key.']='.$value;
                 }
-                // добавим дату изменения файла
-                $string .= '&FormCreateSegment[updated_at]='.time();
             }
-            // открываем файл, если файл не существует,
-            // делается попытка создать его
-            $fp = fopen($form_creation_dir . 'form-creation-file.txt', 'w');
-            // записываем в файл текст
-            fwrite($fp, $string);
-            // закрываем
-            fclose($fp);
-
-            return true;
+            $key = 'user_' . $user->id . '_project_' . $project->id . 'FormCreateSegmentCache'; //Формируем ключ
+            $cache->set($key, $string, 3600*24*30); //Создаем файл кэша на 30дней
         }
     }
 
@@ -170,20 +151,20 @@ class SegmentController extends AppController
         $project = Projects::findOne($id);
         $user = User::findOne(['id' => $project->user_id]);
         $model = new FormCreateSegment();
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
-            $path_file = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/__segment__form__creation__file/form-creation-file.txt';
+            $cache_form_creation = $cache->get('user_' . $user->id . '_project_' . $project->id . 'FormCreateSegmentCache');
 
-            if (file_exists($path_file)){
+            if ($cache_form_creation){
 
                 $response = [
                     'renderAjax' => $this->renderAjax('create', [
                         'model' => $model,
                         'project' => $project,
                     ]),
-                    'file_form_creation' => file_get_contents($path_file, FILE_USE_INCLUDE_PATH),
+                    'cache_form_creation' => $cache_form_creation,
                 ];
 
             } else {
@@ -211,6 +192,8 @@ class SegmentController extends AppController
         $model = new FormCreateSegment();
         $model->project_id = $id;
         $project = Projects::findOne(['id' => $model->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -221,6 +204,10 @@ class SegmentController extends AppController
                     if ($model->validate(['name'])) {
 
                         if ($model->create()) {
+
+                            //Удаление кэша формы создания сегмента
+                            $cache_form_creation = $cache->get('user_' . $user->id . '_project_' . $project->id . 'FormCreateSegmentCache');
+                            if ($cache_form_creation) $cache->delete('user_' . $user->id . '_project_' . $project->id . 'FormCreateSegmentCache');
 
                             $type_sort_id = $_POST['type_sort_id'];
 

@@ -9,20 +9,14 @@ use kartik\depdrop\DepDrop;
 use yii\helpers\ArrayHelper;
 use app\models\ProjectSort;
 
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
 $this->title = 'Проекты';
-$this->params['breadcrumbs'][] = $this->title;
 
 $this->registerCssFile('@web/css/projects-index-style.css');
 
 ?>
 <div class="projects-index">
 
-
     <div class="container-fluid container-data row">
-
 
         <div class="row row_header_data_generation" style="margin-top: 10px;">
 
@@ -32,20 +26,14 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
-            ]);
-            ?>
-
+            ]); ?>
 
             <?php
-
             $listFields = ProjectSort::getListFields();
             $listFields = ArrayHelper::map($listFields,'id', 'name');
-
             ?>
 
-
             <div class="col-md-3" style="font-size: 32px; font-weight: 700; padding: 0;">ПРОЕКТЫ</div>
-
 
             <div class="col-md-3">
 
@@ -103,7 +91,6 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             </div>
         </div>
 
-
         <!--Заголовки для списка проектов-->
         <div class="row" style="margin: 0 0 10px 0; padding: 10px;">
 
@@ -129,12 +116,10 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
         </div>
 
-
         <div class="block_all_projects_user">
 
             <!--Данные для списка проектов-->
             <?php foreach ($models as $model) : ?>
-
 
                 <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
 
@@ -221,36 +206,23 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                                 ]); ?>
 
                             <?php endif; ?>
-
                         </div>
                     </div>
-
-
                 </div>
-
             <?php endforeach;?>
-
         </div>
-
     </div>
-
-
 
     <div class="form_authors" style="display: none;">
 
     <?php
-
     $form = ActiveForm::begin([
             'id' => 'form_authors'
-    ]);
-
-    ?>
+    ]); ?>
 
         <div class="form_authors_inputs">
 
             <div class="row row-author row-author-" style="margin-bottom: 15px;">
-
-
 
                 <?= $form->field($new_author, "[0]fio", [
                     'template' => '<div class="col-md-12" style="padding-left: 20px; margin-top: 15px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -281,8 +253,6 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     'placeholder' => '',
                 ]) ?>
 
-
-
                 <div class="col-md-12">
 
                     <?= Html::button('Удалить автора', [
@@ -301,18 +271,12 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                         ]
                     ]); ?>
                 </div>
-
             </div>
-
-
         </div>
-
     <?php
     ActiveForm::end();
     ?>
-
     </div>
-
 
     <!--Модальные окна-->
     <?= $this->render('modal'); ?>
