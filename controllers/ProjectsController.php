@@ -963,11 +963,20 @@ class ProjectsController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
+            // Удаление прикрепленных файлов проекта
             $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                 . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
 
             if (file_exists($pathDelete)){
                 $this->delTree($pathDelete);
+            }
+
+            //Удаление кэша для форм проекта
+            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251");
+
+            if (file_exists($cachePathDelete)){
+                $this->delTree($cachePathDelete);
             }
 
             if ($model->deleteStage()) {
