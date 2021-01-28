@@ -136,7 +136,7 @@ class SegmentController extends AppController
                 }
             }
             $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/';
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
             $key = 'formCreateSegmentCache'; //Формируем ключ
             $cache->set($key, $string, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -153,7 +153,7 @@ class SegmentController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/';
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
             $cache_form_creation = $cache->get('formCreateSegmentCache');
 
             if ($cache_form_creation){
@@ -206,7 +206,7 @@ class SegmentController extends AppController
 
                             //Удаление кэша формы создания сегмента
                             $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/';
+                                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
                             if ($cache->exists('formCreateSegmentCache')) $cache->delete('formCreateSegmentCache');
 
                             $type_sort_id = $_POST['type_sort_id'];
