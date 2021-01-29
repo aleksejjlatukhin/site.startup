@@ -51,7 +51,7 @@ $(document).ready(function() {
 var body = $('body');
 var id_page = window.location.search.split('=')[1];
 
-//Отслеживаем изменения в форме создания сегмента и записываем их в куки
+//Отслеживаем изменения в форме создания сегмента и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
     var url = '/segment/save-cache-creation-form?id=' + id_page;
@@ -145,7 +145,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
                     if (item.split('=')[0] === '[add_info]') formCreateSegmentAdd_info = item.split('=')[1];
                 });
 
-                //Заполнение полей формы данными из куки
+                //Заполнение полей формы данными из кэша
                 $(document.getElementsByName('FormCreateSegment[name]')).val(formCreateSegmentName);
                 $(document.getElementsByName('FormCreateSegment[description]')).val(formCreateSegmentDescription);
                 $(document.getElementsByName('FormCreateSegment[add_info]')).val(formCreateSegmentAdd_info);

@@ -11,6 +11,9 @@ $(document).ready(function() {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
+
+
 var hypothesis_create_modal = $('.hypothesis_create_modal');
 $(body).append($(hypothesis_create_modal).first());
 var hypothesis_update_modal = $('.hypothesis_update_modal');
@@ -18,11 +21,30 @@ $(body).append($(hypothesis_update_modal).first());
 
 
 //Возвращение скролла первого модального окна после закрытия
-//модального окна информации об ошибке
 $('#project_already_exists').on('hidden.bs.modal', function(){
     $(body).addClass('modal-open');
 });
+$('#confirm_closing_update_modal').on('hidden.bs.modal', function(){
+    $(body).addClass('modal-open');
+});
 
+
+
+//Отслеживаем изменения в форме создания проекта и записываем их в кэш
+$(body).on('change', 'form#project_create_form', function(){
+
+    var url = '/projects/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
 
 
 //При нажатии на кнопку Новый проект
@@ -40,6 +62,35 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             $(hypothesis_create_modal).modal('show');
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 
+            //Заполнение полей формы данными из кэша
+            if (response.cache_form_creation) {
+
+                // Данные из кэша к полям модели Projects
+                var formProject = response.cache_form_creation.Projects;
+
+                // Добаляем данные из кэша к полям модели Projects
+                for (var key in formProject) {
+                    $(document.getElementsByName('Projects['+key+']')).val(formProject[key]);
+                }
+
+                // Данные из кэша к полям модели Authors
+                var formAuthors = response.cache_form_creation.Authors;
+
+                // Добавляем формы для авторов, если их больше одного
+                var countOfAdditionalForms = formAuthors.length - 1;
+                if (countOfAdditionalForms > 0) {
+                    for (var i = 0; i < countOfAdditionalForms; i++) {
+                        $('.add_author_create_form').trigger('click');
+                    }
+                }
+
+                // Добаляем данные из кэша к полям модели Authors
+                formAuthors.forEach(function(item, i) {
+                    $(document.getElementsByName('Authors['+i+'][fio]')).val(item.fio);
+                    $(document.getElementsByName('Authors['+i+'][role]')).val(item.role);
+                    $(document.getElementsByName('Authors['+i+'][experience]')).val(item.experience);
+                });
+            }
         },
         error: function(){
             alert('Ошибка');
@@ -119,6 +170,32 @@ $(body).on('click', '.update-hypothesis', function(e){
 });
 
 
+var catchChange = false;
+//Отслеживаем изменения в форме редактирования проекта
+$(body).on('change', 'form#project_update_form', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '.hypothesis_update_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+//Подтверждение закрытия окна редактирования проета
+$(body).on('click', '#button_confirm_closing_modal', function (e) {
+    catchChange = false;
+    $('#confirm_closing_update_modal').modal('hide');
+    $('.hypothesis_update_modal').modal('hide');
+    e.preventDefault();
+    return false;
+});
+
 
 //Редактирование проекта
 $(body).on('beforeSubmit', '#project_update_form', function(e){
@@ -141,6 +218,7 @@ $(body).on('beforeSubmit', '#project_update_form', function(e){
             //Если данные загружены и проверены
             if(response.success){
 
+                if (catchChange === true) catchChange = false;
                 $(hypothesis_update_modal).modal('hide');
                 $('.block_all_projects_user').html(response.renderAjax);
             }
@@ -366,7 +444,7 @@ $(body).on('click', '.remove_author_for_create', function(){
     var numberId = arrId[4];
 
     $(hypothesis_create_modal).find('.row-author-form-create-' + numberId).remove();
-
+    $('form#project_create_form').trigger('change');
 });
 
 
@@ -387,13 +465,13 @@ $(body).on('click', '.remove-author', function(){
             url: url,
             method: 'POST',
             cache: false,
-            success: function(response){},
-            error: function(){alert('Ошибка');}
+            error: function(){
+                alert('Ошибка');
+            }
         });
     }
 
     $(hypothesis_update_modal).find('.row-author-' + numberId).remove();
-
 });
 
 

@@ -146,24 +146,60 @@ class ProjectsController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $user = User::findOne($id);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+            $key = 'formCreateProjectCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetHypothesisToCreate ($id)
     {
         $user = User::findOne($id);
         $model = new Projects();
         $author = new Authors();
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
-            $response = [
-                'renderAjax' => $this->renderAjax('create', [
-                    'user' => $user,
-                    'model' => $model,
-                    'author' => $author
-                ]),
-            ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
-            return $response;
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+            $cache_form_creation = $cache->get('formCreateProjectCache');
+
+            if ($cache_form_creation) {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('create', [
+                        'user' => $user,
+                        'model' => $model,
+                        'author' => $author
+                    ]),
+                    'cache_form_creation' => $cache_form_creation,
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
+            } else {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('create', [
+                        'user' => $user,
+                        'model' => $model,
+                        'author' => $author
+                    ]),
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
         }
     }
 
@@ -307,6 +343,7 @@ class ProjectsController extends AppController
         $model = new Projects();
         $model->user_id = $id;
         $user = User::findOne($id);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -340,6 +377,10 @@ class ProjectsController extends AppController
                             //Загрузка презентационных файлов
                             $model->present_files = UploadedFile::getInstances($model, 'present_files');
                             $model->upload($present_files_dir);
+
+                            //Удаление кэша формы создания проекта
+                            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+                            if ($cache->exists('formCreateProjectCache')) $cache->delete('formCreateProjectCache');
 
                             //Проверка наличия сортировки
                             $type_sort_id = $_POST['type_sort_id'];

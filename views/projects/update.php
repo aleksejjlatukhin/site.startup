@@ -157,7 +157,10 @@ use yii\helpers\Html;
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
-                        ]
+                        ],
+                        'pluginEvents' => [
+                                "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                        ],
                     ]);?>
 
                 </div>
@@ -338,7 +341,10 @@ use yii\helpers\Html;
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
-                        ]
+                        ],
+                        'pluginEvents' => [
+                            "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                        ],
                     ]);?>
 
                 </div>
@@ -445,7 +451,10 @@ use yii\helpers\Html;
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
-                        ]
+                        ],
+                        'pluginEvents' => [
+                            "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                        ],
                     ]);?>
 
                 </div>
@@ -499,7 +508,10 @@ use yii\helpers\Html;
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
-                        ]
+                        ],
+                        'pluginEvents' => [
+                            "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                        ],
                     ]);?>
 
                 </div>

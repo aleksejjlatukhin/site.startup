@@ -232,6 +232,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     'id' => 'author_fio-',
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]); ?>
 
                 <?= $form->field($new_author, "[0]role", [
@@ -242,6 +243,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     'id' => 'author_role-',
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
+                    'autocomplete' => 'off'
                 ]); ?>
 
                 <?= $form->field($new_author, "[0]experience", [
