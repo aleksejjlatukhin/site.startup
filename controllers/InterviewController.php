@@ -173,6 +173,10 @@ class InterviewController extends AppController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = Interview::findOne($id);
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         $count_descInterview = Respond::find()->with('descInterview')
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
@@ -186,20 +190,44 @@ class InterviewController extends AppController
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1) || (!empty($model->problems)  && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1)) {
 
-                $response =  [
-                    'success' => true,
-                    'renderAjax' => $this->renderAjax('/generation-problem/create', [
-                        'interview' => $model,
-                        'model' => new FormCreateProblem(),
-                        'responds' => Respond::find()->with('descInterview')
-                            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-                            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
-                    ]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+                $cache_form_creation = $cache->get('formCreateProblemCache');
 
+                if ($cache_form_creation) {
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/generation-problem/create', [
+                            'interview' => $model,
+                            'model' => new FormCreateProblem(),
+                            'responds' => Respond::find()->with('descInterview')
+                                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                                ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
+                        ]),
+                        'cache_form_creation' => $cache_form_creation,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+
+                }else{
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/generation-problem/create', [
+                            'interview' => $model,
+                            'model' => new FormCreateProblem(),
+                            'responds' => Respond::find()->with('descInterview')
+                                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                                ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
             }else{
 
                 $response = ['error' => true];

@@ -187,7 +187,7 @@ $(body).on('hide.bs.modal', '.hypothesis_update_modal', function(e){
     }
 });
 
-//Подтверждение закрытия окна редактирования проета
+//Подтверждение закрытия окна редактирования проекта
 $(body).on('click', '#button_confirm_closing_modal', function (e) {
     catchChange = false;
     $('#confirm_closing_update_modal').modal('hide');

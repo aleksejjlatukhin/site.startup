@@ -101,6 +101,26 @@ class GenerationProblemController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmSegment = Interview::findOne($id);
+        $segment = Segment::findOne(['id' => $confirmSegment->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+            $key = 'formCreateProblemCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -112,12 +132,20 @@ class GenerationProblemController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if (Yii::$app->request->isAjax) {
 
                 if ($model->create($interview->id, $segment->id, $project->id)){
+
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+                    if ($cache->exists('formCreateProblemCache')) $cache->delete('formCreateProblemCache');
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
