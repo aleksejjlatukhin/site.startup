@@ -190,6 +190,12 @@ class ConfirmGcpController extends AppController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmGcp::findOne($id);
+        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $problem = GenerationProblem::find()->where(['id' => $gcp->problem_id])->one();
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         $count_descInterview = RespondsGcp::find()->with('descInterview')
             ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
@@ -202,17 +208,40 @@ class ConfirmGcpController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1) || (!empty($model->mvps)  && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1)) {
 
-                $response =  [
-                    'success' => true,
-                    'renderAjax' => $this->renderAjax('/mvp/create', [
-                        'confirmGcp' => $model,
-                        'model' => new FormCreateMvp(),
-                    ]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                    '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
+                    '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").'/mvps/formCreate/';
+                $cache_form_creation = $cache->get('formCreateMvpCache');
 
+                if ($cache_form_creation) {
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/mvp/create', [
+                            'confirmGcp' => $model,
+                            'model' => new FormCreateMvp(),
+                        ]),
+                        'cache_form_creation' => $cache_form_creation,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+
+                }else{
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/mvp/create', [
+                            'confirmGcp' => $model,
+                            'model' => new FormCreateMvp(),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
             }else{
 
                 $response = ['error' => true];

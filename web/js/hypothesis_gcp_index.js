@@ -36,7 +36,7 @@ var body = $('body');
 var id_page = window.location.search.split('=')[1];
 
 
-//Отслеживаем изменения в форме создания проблемы и записываем их в кэш
+//Отслеживаем изменения в форме создания ГЦП и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
     var url = '/gcp/save-cache-creation-form?id=' + id_page;
@@ -70,7 +70,9 @@ $(body).on('click', '#checking_the_possibility', function(){
         method: 'POST',
         cache: false,
         success: function(response){
+
             if(response.success){
+
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 

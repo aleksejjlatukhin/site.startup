@@ -109,6 +109,30 @@ class MvpController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmGcp = ConfirmGcp::findOne($id);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::find()->where(['id' => $gcp->problem_id])->one();
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
+                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").'/mvps/formCreate/';
+            $key = 'formCreateMvpCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -123,12 +147,22 @@ class MvpController extends AppController
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if (Yii::$app->request->isAjax) {
 
                 if ($model->create($id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
+
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
+                        '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").'/mvps/formCreate/';
+                    if ($cache->exists('formCreateMvpCache')) $cache->delete('formCreateMvpCache');
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
@@ -216,10 +250,10 @@ class MvpController extends AppController
 
             $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                 . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
-                '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251")) .
+                '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251") .
                 '/generation problems/' . mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251"), "windows-1251") .
                 '/gcps/' . mb_strtolower(mb_convert_encoding($this->translit($gcp->title) , "windows-1251"), "windows-1251") .
-                '/mvps/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251");
+                '/mvps/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251"));
 
             if (file_exists($pathDelete)){
                 $this->delTree($pathDelete);

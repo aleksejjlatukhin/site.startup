@@ -28,7 +28,24 @@ $(document).ready(function() {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
 
+
+//Отслеживаем изменения в форме создания MVP и записываем их в кэш
+$(body).on('change', 'form#hypothesisCreateForm', function(){
+
+    var url = '/mvp/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
 
 
 //При попытке добавить MVP проверяем существуют ли необходимые данные
@@ -48,9 +65,23 @@ $(body).on('click', '#checking_the_possibility', function(){
         method: 'POST',
         cache: false,
         success: function(response){
+
             if(response.success){
+
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+
+                //Заполнение полей формы данными из кэша
+                if (response.cache_form_creation) {
+
+                    // Данные из кэша к полям модели FormCreateMvp
+                    var form = response.cache_form_creation.FormCreateMvp;
+
+                    // Добаляем данные из кэша к полям модели FormCreateMvp
+                    for (var key in form) {
+                        $(document.getElementsByName('FormCreateMvp['+key+']')).val(form[key]);
+                    }
+                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }
@@ -120,6 +151,33 @@ $(body).on('click', '.update-hypothesis', function(e){
 });
 
 
+var catchChange = false;
+//Отслеживаем изменения в форме редактирования MVP
+$(body).on('change', 'form#hypothesisUpdateForm', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '.hypothesis_update_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+//Подтверждение закрытия окна редактирования MVP
+$(body).on('click', '#button_confirm_closing_modal', function (e) {
+    catchChange = false;
+    $('#confirm_closing_update_modal').modal('hide');
+    $('.hypothesis_update_modal').modal('hide');
+    e.preventDefault();
+    return false;
+});
+
+
 //Редактирование гипотезы ценностного предложения
 $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 
@@ -134,6 +192,7 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
         cache: false,
         success: function(response){
 
+            if (catchChange === true) catchChange = false;
             $('.hypothesis_update_modal').modal('hide');
             $('.block_all_hypothesis').html(response.renderAjax);
         },
