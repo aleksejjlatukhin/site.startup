@@ -104,6 +104,28 @@ class GcpController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmProblem = ConfirmProblem::findOne($id);
+        $problem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").'/gcps/formCreate/';
+            $key = 'formCreateGcpCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -116,12 +138,21 @@ class GcpController extends AppController
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if (Yii::$app->request->isAjax) {
 
                 if ($model->create($id, $generationProblem->id, $segment->id, $project->id)) {
+
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").'/gcps/formCreate/';
+                    if ($cache->exists('formCreateGcpCache')) $cache->delete('formCreateGcpCache');
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
