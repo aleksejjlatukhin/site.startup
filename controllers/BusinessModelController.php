@@ -134,6 +134,32 @@ class BusinessModelController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmMvp = ConfirmMvp::findOne($id);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::find()->where(['id' => $mvp->problem_id])->one();
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
+                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
+                '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+            $key = 'formCreateBusinessModelCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return array
@@ -150,12 +176,23 @@ class BusinessModelController extends AppController
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
         $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
         $project = Projects::find()->where(['id' => $segment->project_id])->one();
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
                 if ($businessModel = $model->create($id, $mvp->id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
+
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
+                        '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
+                        '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+                    if ($cache->exists('formCreateBusinessModelCache')) $cache->delete('formCreateBusinessModelCache');
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [

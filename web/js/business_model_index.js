@@ -27,6 +27,24 @@ $(document).ready(function() {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
+
+
+//Отслеживаем изменения в форме создания Бизнес-модели и записываем их в кэш
+$(body).on('change', 'form#hypothesisCreateForm', function(){
+
+    var url = '/business-model/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
 
 
 //При попытке добавить Бизнес-модель проверяем существуют ли необходимые данные
@@ -48,8 +66,21 @@ $(body).on('click', '#checking_the_possibility', function(){
         success: function(response){
 
             if(response.success){
+
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+
+                //Заполнение полей формы данными из кэша
+                if (response.cache_form_creation) {
+
+                    // Данные из кэша к полям модели FormCreateBusinessModel
+                    var form = response.cache_form_creation.FormCreateBusinessModel;
+
+                    // Добаляем данные из кэша к полям модели FormCreateBusinessModel
+                    for (var key in form) {
+                        $(document.getElementsByName('FormCreateBusinessModel['+key+']')).val(form[key]);
+                    }
+                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }
@@ -116,6 +147,33 @@ $(body).on('click', '.update-hypothesis', function(e){
 });
 
 
+var catchChange = false;
+//Отслеживаем изменения в форме редактирования Бизнес-модели
+$(body).on('change', 'form#hypothesisUpdateForm', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '.hypothesis_update_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+//Подтверждение закрытия окна редактирования Бизнес-модели
+$(body).on('click', '#button_confirm_closing_modal', function (e) {
+    catchChange = false;
+    $('#confirm_closing_update_modal').modal('hide');
+    $('.hypothesis_update_modal').modal('hide');
+    e.preventDefault();
+    return false;
+});
+
+
 //Редактирование гипотезы ценностного предложения
 $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 
@@ -130,6 +188,7 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
         cache: false,
         success: function(response){
 
+            if (catchChange === true) catchChange = false;
             $('.hypothesis_update_modal').modal('hide');
             $('.container-business_model').html(response.renderAjax);
         },

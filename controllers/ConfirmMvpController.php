@@ -195,6 +195,13 @@ class ConfirmMvpController extends AppController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmMvp::findOne($id);
+        $mvp = Mvp::findOne(['id' => $model->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::find()->where(['id' => $mvp->problem_id])->one();
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         $count_descInterview = RespondsMvp::find()->with('descInterview')
             ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
@@ -207,17 +214,41 @@ class ConfirmMvpController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1) || (!empty($model->business)  && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1)) {
 
-                $response =  [
-                    'success' => true,
-                    'renderAjax' => $this->renderAjax('/business-model/create', [
-                        'confirmMvp' => $model,
-                        'model' => new FormCreateBusinessModel(),
-                    ]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
+                    '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
+                    '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
+                    '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+                $cache_form_creation = $cache->get('formCreateBusinessModelCache');
 
+                if ($cache_form_creation) {
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/business-model/create', [
+                            'confirmMvp' => $model,
+                            'model' => new FormCreateBusinessModel(),
+                        ]),
+                        'cache_form_creation' => $cache_form_creation,
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+
+                }else{
+
+                    $response =  [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('/business-model/create', [
+                            'confirmMvp' => $model,
+                            'model' => new FormCreateBusinessModel(),
+                        ]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
             }else{
 
                 $response = ['error' => true];
