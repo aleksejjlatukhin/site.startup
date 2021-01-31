@@ -59,9 +59,8 @@ class DescInterview extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['respond_id', 'description', 'result'], 'required'],
+            [['respond_id', 'result'], 'required'],
             [['respond_id', 'status'], 'integer'],
-            [['description'], 'string'],
             [['interview_file', 'server_file'], 'string', 'max' => 255],
             [['result'], 'string', 'max' => 2000],
             [['loadFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, odt, txt, doc, docx, pdf, xlsx, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls',],
@@ -76,7 +75,6 @@ class DescInterview extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'respond_id' => 'Respond ID',
-            'description' => 'Материалы, полученные в ходе интервью',
             'interview_file' => 'Файл',
             'result' => 'Варианты проблем',
             'status' => 'Данный респондент является представителем сегмента?',

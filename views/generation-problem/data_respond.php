@@ -5,18 +5,26 @@ use yii\helpers\Html;
 
 <div class="row" style="margin-bottom: 15px; margin-top: 15px; color: #4F4F4F;">
 
-    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
+    <div class="col-md-12" style="padding: 0 20px;">
         <div style="font-weight: 700;">Респондент</div>
         <div><?= $respond->name; ?></div>
     </div>
 
-    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
-        <div style="font-weight: 700;">Материалы, полученные в ходе интервью</div>
-        <div><?= $descInterview->description; ?></div>
+    <div class="col-md-12" style="padding: 0 20px; font-size: 24px; margin-top: 5px;">
+        <div style="border-bottom: 1px solid #ccc;">Ответы на вопросы интевью</div>
     </div>
 
-    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 15px;">
-        <div style="font-weight: 700;">Варианты проблем</div>
+    <?php foreach ($respond->answers as $index => $answer) : ?>
+
+        <div class="col-md-12" style="padding: 0 20px; margin-top: 10px;">
+            <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+            <div><?= $answer->answer; ?></div>
+        </div>
+
+    <?php endforeach; ?>
+
+    <div class="col-md-12" style="padding: 0 20px; margin-bottom: 10px; margin-top: 10px;">
+        <div style="font-weight: 700; border-top: 1px solid #ccc; padding-top: 10px;">Варианты проблем</div>
         <div><?= $descInterview->result; ?></div>
     </div>
 
@@ -59,7 +67,7 @@ use yii\helpers\Html;
 
         <?php if (empty($descInterview->interview_file)) : ?>
 
-            <div class="col-md-12" style="padding-left: 5px; margin-bottom: 20px;">Файл не выбран</div>
+            <div class="col-md-12" style="padding-left: 5px; margin-bottom: 20px; margin-top: -10px;">Файл не выбран</div>
 
         <?php endif;?>
 

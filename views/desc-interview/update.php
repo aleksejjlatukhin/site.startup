@@ -18,22 +18,6 @@ use kartik\select2\Select2;
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-
-    <div class="row">
-
-        <div class="col-md-12">
-
-            <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 2,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => 'Ответы на вопросы, инсайды, ценная информация',
-            ]); ?>
-
-        </div>
-
-    </div>
-
     <?php
     foreach ($respond->answers as $index => $answer) :
         ?>
