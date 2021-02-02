@@ -65,23 +65,9 @@ $(body).on('click', '#checking_the_possibility', function(){
         method: 'POST',
         cache: false,
         success: function(response){
-
             if(response.success){
-
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
-
-                //Заполнение полей формы данными из кэша
-                if (response.cache_form_creation) {
-
-                    // Данные из кэша к полям модели FormCreateMvp
-                    var form = response.cache_form_creation.FormCreateMvp;
-
-                    // Добаляем данные из кэша к полям модели FormCreateMvp
-                    for (var key in form) {
-                        $(document.getElementsByName('FormCreateMvp['+key+']')).val(form[key]);
-                    }
-                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }

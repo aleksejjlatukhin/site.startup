@@ -176,6 +176,7 @@ class InterviewController extends AppController
         $segment = Segment::findOne(['id' => $model->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $formCreateProblem = new FormCreateProblem();
         $cache = Yii::$app->cache;
 
         $count_descInterview = Respond::find()->with('descInterview')
@@ -186,7 +187,7 @@ class InterviewController extends AppController
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
             ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->count();
 
-        if(Yii::$app->request->isAjax) {
+        if (Yii::$app->request->isAjax) {
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1) || (!empty($model->problems)  && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1)) {
 
@@ -196,38 +197,26 @@ class InterviewController extends AppController
                 $cache_form_creation = $cache->get('formCreateProblemCache');
 
                 if ($cache_form_creation) {
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/generation-problem/create', [
-                            'interview' => $model,
-                            'model' => new FormCreateProblem(),
-                            'responds' => Respond::find()->with('descInterview')
-                                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-                                ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
-                        ]),
-                        'cache_form_creation' => $cache_form_creation,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-
-                }else{
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/generation-problem/create', [
-                            'interview' => $model,
-                            'model' => new FormCreateProblem(),
-                            'responds' => Respond::find()->with('descInterview')
-                                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-                                ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
-                        ]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                    //Заполнение полей модели FormCreateProblem данными из кэша
+                    foreach ($cache_form_creation['FormCreateProblem'] as $key => $value) {
+                        $formCreateProblem[$key] = $value;
+                    }
                 }
+
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/generation-problem/create', [
+                        'interview' => $model,
+                        'model' => $formCreateProblem,
+                        'responds' => Respond::find()->with('descInterview')
+                            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+                            ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
+                    ]),
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
             }else{
 
                 $response = ['error' => true];
@@ -289,6 +278,25 @@ class InterviewController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $segment = Segment::findOne($id);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+            $key = 'formCreateConfirmSegmentCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return string|\yii\web\Response
@@ -297,10 +305,22 @@ class InterviewController extends AppController
     {
         $segment = Segment::findOne($id);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new FormCreateConfirmSegment();
+        $cache = Yii::$app->cache;
 
-        if ($segment->interview){
-            //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
+        $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+            '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+            '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+        $cache_form_creation = $cache->get('formCreateConfirmSegmentCache');
+
+        if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmSegment
+            foreach ($cache_form_creation['FormCreateConfirmSegment'] as $key => $value) {
+                $model[$key] = $value;
+            }
+        }
+
+        if ($segment->interview){ //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['/interview/view', 'id' => $segment->interview->id]);
         }
 
@@ -318,8 +338,12 @@ class InterviewController extends AppController
      */
     public function actionSaveInterview($id)
     {
+        $segment = Segment::findOne($id);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new FormCreateConfirmSegment();
         $model->segment_id = $id;
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -341,6 +365,12 @@ class InterviewController extends AppController
                     $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
                     $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
                     $model->addQuestionDefault('Как принимается решение о покупке?');
+
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+                    if ($cache->exists('formCreateConfirmSegmentCache')) $cache->delete('formCreateConfirmSegmentCache');
 
                     $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

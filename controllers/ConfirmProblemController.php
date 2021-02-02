@@ -191,6 +191,7 @@ class ConfirmProblemController extends AppController
         $segment = Segment::findOne(['id' => $problem->segment_id]);
         $project = Projects::findOne(['id' => $problem->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $formCreateGcp = new FormCreateGcp();
         $cache = Yii::$app->cache;
 
         $count_descInterview = RespondsConfirm::find()->with('descInterview')
@@ -202,7 +203,8 @@ class ConfirmProblemController extends AppController
             ->where(['confirm_problem_id' => $id, 'desc_interview_confirm.status' => '1'])->count();
 
 
-        if(Yii::$app->request->isAjax) {
+        if (Yii::$app->request->isAjax) {
+
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1) || (!empty($model->gcps)  && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1)) {
 
                 $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
@@ -212,34 +214,24 @@ class ConfirmProblemController extends AppController
                 $cache_form_creation = $cache->get('formCreateGcpCache');
 
                 if ($cache_form_creation) {
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/gcp/create', [
-                            'confirmProblem' => $model,
-                            'model' => new FormCreateGcp(),
-                            'segment' => $model->problem->segment,
-                        ]),
-                        'cache_form_creation' => $cache_form_creation,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-
-                }else{
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/gcp/create', [
-                            'confirmProblem' => $model,
-                            'model' => new FormCreateGcp(),
-                            'segment' => $model->problem->segment,
-                        ]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                    //Заполнение полей модели FormCreateGcp данными из кэша
+                    foreach ($cache_form_creation['FormCreateGcp'] as $key => $value) {
+                        $formCreateGcp[$key] = $value;
+                    }
                 }
+
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/gcp/create', [
+                        'confirmProblem' => $model,
+                        'model' => $formCreateGcp,
+                        'segment' => $model->problem->segment,
+                    ]),
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
             }else{
 
                 $response = ['error' => true];

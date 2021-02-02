@@ -64,23 +64,9 @@ $(body).on('click', '#checking_the_possibility', function(){
         method: 'POST',
         cache: false,
         success: function(response){
-
             if(response.success){
-
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
-
-                //Заполнение полей формы данными из кэша
-                if (response.cache_form_creation) {
-
-                    // Данные из кэша к полям модели FormCreateBusinessModel
-                    var form = response.cache_form_creation.FormCreateBusinessModel;
-
-                    // Добаляем данные из кэша к полям модели FormCreateBusinessModel
-                    for (var key in form) {
-                        $(document.getElementsByName('FormCreateBusinessModel['+key+']')).val(form[key]);
-                    }
-                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }

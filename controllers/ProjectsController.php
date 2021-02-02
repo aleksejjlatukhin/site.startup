@@ -175,6 +175,11 @@ class ProjectsController extends AppController
 
             if ($cache_form_creation) {
 
+                //Заполнение полей модели Projects данными из кэша
+                foreach ($cache_form_creation['Projects'] as $key => $value) {
+                    $model[$key] = $value;
+                }
+
                 $response = [
                     'renderAjax' => $this->renderAjax('create', [
                         'user' => $user,

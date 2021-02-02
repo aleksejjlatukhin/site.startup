@@ -72,18 +72,6 @@ $(body).on('click', '#checking_the_possibility', function(){
             if(response.success){
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
-
-                //Заполнение полей формы данными из кэша
-                if (response.cache_form_creation) {
-
-                    // Данные из кэша к полям модели FormCreateProblem
-                    var form = response.cache_form_creation.FormCreateProblem;
-
-                    // Добаляем данные из кэша к полям модели FormCreateProblem
-                    for (var key in form) {
-                        $(document.getElementsByName('FormCreateProblem['+key+']')).val(form[key]);
-                    }
-                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }

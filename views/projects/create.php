@@ -146,7 +146,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[patent_date]',
-                        'value' => $model->patent_date == null ? null : date('d.m.Y', $model->patent_date),
+                        'value' => $model->patent_date == null ? null : $model->patent_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -301,7 +301,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[register_date]',
-                        'value' => $model->register_date == null ? null : date('d.m.Y', $model->register_date),
+                        'value' => $model->register_date == null ? null : $model->register_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -408,7 +408,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[invest_date]',
-                        'value' => $model->invest_date == null ? null : date('d.m.Y', $model->invest_date),
+                        'value' => $model->invest_date == null ? null : $model->invest_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -462,7 +462,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[date_of_announcement]',
-                        'value' => $model->date_of_announcement == null ? null : date('d.m.Y', $model->date_of_announcement),
+                        'value' => $model->date_of_announcement == null ? null : $model->date_of_announcement,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,

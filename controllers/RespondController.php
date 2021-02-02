@@ -104,12 +104,47 @@ class RespondController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $interview = Interview::findOne($id);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+            $key = 'formCreateRespondCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $interview = Interview::findOne($id);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new CreateRespondForm();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+            $cache_form_creation = $cache->get('formCreateRespondCache');
+
+            if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели CreateRespondForm
+                foreach ($cache_form_creation['CreateRespondForm'] as $key => $value) {
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['interview' => $interview, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -128,10 +163,12 @@ class RespondController extends AppController
         $interview = Interview::findOne($id);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $count_models = Respond::find()->where(['interview_id' => $id])->count();
         $limit_count_respond = Respond::LIMIT_COUNT;
         $newRespond = new CreateRespondForm();
         $newRespond->interview_id = $id;
+        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post()))
         {
@@ -147,6 +184,12 @@ class RespondController extends AppController
 
                             $interview->count_respond = $interview->count_respond + 1;
                             $interview->save();
+
+                            //Удаление кэша формы создания
+                            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = Respond::findAll(['interview_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;

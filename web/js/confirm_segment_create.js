@@ -73,8 +73,28 @@ $("input#confirm_count_positive").change(function () {
 });
 
 
-//Показываем модальное окно - запрет перехода на следующий шаг
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
+
+
+//Отслеживаем изменения в форме создания подтверждения и записываем их в кэш
+$(body).on('change', 'form#new_confirm_segment', function(){
+
+    var url = '/interview/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
+
+
+//Показываем модальное окно - запрет перехода на следующий шаг
 var modal_next_step_error = $('#next_step_error');
 
 $(body).on('click', '.show_modal_next_step_error', function (e) {

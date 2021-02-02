@@ -118,12 +118,59 @@ class DescInterviewController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $respond = Respond::findOne($id);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'.
+                mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+            $key = 'formCreateInterviewCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $respond = Respond::findOne($id);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new DescInterview();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'
+                .mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+            $cache_form_creation = $cache->get('formCreateInterviewCache');
+
+            if ($cache_form_creation) { //Если существует кэш
+
+                foreach ($cache_form_creation['AnswersQuestionsConfirmSegment'] as $answerCache) {
+                    foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmSegment
+                        if ($answer['question_id'] == $answerCache['question_id']) {
+                            $answer['answer'] = $answerCache['answer'];
+                        }
+                    }
+                }
+                foreach ($cache_form_creation['DescInterview'] as $key => $value) { //Добавляем данные для полей модели DescInterview
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -148,6 +195,7 @@ class DescInterviewController extends AppController
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
@@ -177,6 +225,14 @@ class DescInterviewController extends AppController
                                 $model->save(false);
                             }
                         }
+
+                        //Удаление кэша формы создания
+                        $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
+                            '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
+                            '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'
+                            .mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
+
 
                         $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

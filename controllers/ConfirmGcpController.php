@@ -195,6 +195,7 @@ class ConfirmGcpController extends AppController
         $segment = Segment::findOne(['id' => $gcp->segment_id]);
         $project = Projects::findOne(['id' => $gcp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $formCreateMvp = new FormCreateMvp();
         $cache = Yii::$app->cache;
 
         $count_descInterview = RespondsGcp::find()->with('descInterview')
@@ -216,32 +217,23 @@ class ConfirmGcpController extends AppController
                 $cache_form_creation = $cache->get('formCreateMvpCache');
 
                 if ($cache_form_creation) {
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/mvp/create', [
-                            'confirmGcp' => $model,
-                            'model' => new FormCreateMvp(),
-                        ]),
-                        'cache_form_creation' => $cache_form_creation,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-
-                }else{
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/mvp/create', [
-                            'confirmGcp' => $model,
-                            'model' => new FormCreateMvp(),
-                        ]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                    //Заполнение полей модели FormCreateMvp данными из кэша
+                    foreach ($cache_form_creation['FormCreateMvp'] as $key => $value) {
+                        $formCreateMvp[$key] = $value;
+                    }
                 }
+
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/mvp/create', [
+                        'confirmGcp' => $model,
+                        'model' => $formCreateMvp,
+                    ]),
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
             }else{
 
                 $response = ['error' => true];

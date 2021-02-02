@@ -201,6 +201,7 @@ class ConfirmMvpController extends AppController
         $segment = Segment::findOne(['id' => $mvp->segment_id]);
         $project = Projects::findOne(['id' => $mvp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $formCreateBusinessModel = new FormCreateBusinessModel();
         $cache = Yii::$app->cache;
 
         $count_descInterview = RespondsMvp::find()->with('descInterview')
@@ -223,32 +224,23 @@ class ConfirmMvpController extends AppController
                 $cache_form_creation = $cache->get('formCreateBusinessModelCache');
 
                 if ($cache_form_creation) {
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/business-model/create', [
-                            'confirmMvp' => $model,
-                            'model' => new FormCreateBusinessModel(),
-                        ]),
-                        'cache_form_creation' => $cache_form_creation,
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
-
-                }else{
-
-                    $response =  [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('/business-model/create', [
-                            'confirmMvp' => $model,
-                            'model' => new FormCreateBusinessModel(),
-                        ]),
-                    ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
-                    return $response;
+                    //Заполнение полей модели FormCreateBusinessModel данными из кэша
+                    foreach ($cache_form_creation['FormCreateBusinessModel'] as $key => $value) {
+                        $formCreateBusinessModel[$key] = $value;
+                    }
                 }
+
+                $response =  [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('/business-model/create', [
+                        'confirmMvp' => $model,
+                        'model' => $formCreateBusinessModel,
+                    ]),
+                ];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+
             }else{
 
                 $response = ['error' => true];

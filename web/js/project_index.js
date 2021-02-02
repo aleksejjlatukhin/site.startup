@@ -65,14 +65,6 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             //Заполнение полей формы данными из кэша
             if (response.cache_form_creation) {
 
-                // Данные из кэша к полям модели Projects
-                var formProject = response.cache_form_creation.Projects;
-
-                // Добаляем данные из кэша к полям модели Projects
-                for (var key in formProject) {
-                    $(document.getElementsByName('Projects['+key+']')).val(formProject[key]);
-                }
-
                 // Данные из кэша к полям модели Authors
                 var formAuthors = response.cache_form_creation.Authors;
 
