@@ -116,10 +116,8 @@ class GcpController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").'/gcps/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/formCreate/';
             $key = 'formCreateGcpCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -148,10 +146,8 @@ class GcpController extends AppController
                 if ($model->create($id, $generationProblem->id, $segment->id, $project->id)) {
 
                     //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").'/gcps/formCreate/';
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                        '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/gcps/formCreate/';
                     if ($cache->exists('formCreateGcpCache')) $cache->delete('formCreateGcpCache');
 
                     $response = [
@@ -249,11 +245,8 @@ class GcpController extends AppController
             }
 
             // Удаление кэша для форм ГЦП
-            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
-                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($model->title), "windows-1251"),"windows-1251");
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$model->id;
 
             if (file_exists($cachePathDelete)){
                 $this->delTree($cachePathDelete);

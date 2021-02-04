@@ -135,8 +135,7 @@ class SegmentController extends AppController
                     $string .= '&FormCreateSegment['.$key.']='.$value;
                 }
             }
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
             $key = 'formCreateSegmentCache'; //Формируем ключ
             $cache->set($key, $string, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -152,8 +151,7 @@ class SegmentController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
             $cache_form_creation = $cache->get('formCreateSegmentCache');
 
             if ($cache_form_creation){
@@ -205,8 +203,7 @@ class SegmentController extends AppController
                         if ($model->create()) {
 
                             //Удаление кэша формы создания сегмента
-                            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").'/segments/formCreate/';
+                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
                             if ($cache->exists('formCreateSegmentCache')) $cache->delete('formCreateSegmentCache');
 
                             $type_sort_id = $_POST['type_sort_id'];
@@ -544,9 +541,7 @@ class SegmentController extends AppController
             }
 
             // Удаление кэша для форм сегмента
-            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"),"windows-1251");
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$model->id;
 
             if (file_exists($cachePathDelete)){
                 $this->delTree($cachePathDelete);

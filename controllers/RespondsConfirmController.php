@@ -111,12 +111,47 @@ class RespondsConfirmController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmProblem = ConfirmProblem::findOne($id);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateRespond/';
+            $key = 'formCreateRespondCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $confirm_problem = ConfirmProblem::findOne($id);
+        $problem = GenerationProblem::findOne(['id' => $confirm_problem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new CreateRespondConfirmForm();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateRespond/';
+            $cache_form_creation = $cache->get('formCreateRespondCache');
+
+            if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели CreateRespondConfirmForm
+                foreach ($cache_form_creation['CreateRespondConfirmForm'] as $key => $value) {
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['confirm_problem' => $confirm_problem, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -134,10 +169,14 @@ class RespondsConfirmController extends AppController
     {
         $confirmProblem = ConfirmProblem::findOne($id);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
         $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
         $newRespond = new CreateRespondConfirmForm();
         $newRespond->confirm_problem_id = $id;
+        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -153,6 +192,11 @@ class RespondsConfirmController extends AppController
 
                             $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
                             $confirmProblem->save();
+
+                            //Удаление кэша формы создания
+                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateRespond/';
+                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = RespondsConfirm::findAll(['confirm_problem_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -322,6 +366,7 @@ class RespondsConfirmController extends AppController
                     $answer->delete();
                 }
 
+                // Удаление прикрепленных файлов
                 $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") .'/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") .'/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'.
@@ -330,6 +375,14 @@ class RespondsConfirmController extends AppController
 
                 if (file_exists($del_dir)) {
                     $this->delTree($del_dir);
+                }
+
+                // Удаление кэша для форм респондента
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$model->id;
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
                 }
 
                 if ($model->delete()) {

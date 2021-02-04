@@ -148,12 +148,8 @@ class BusinessModelController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
-                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
-                '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate/';
             $key = 'formCreateBusinessModelCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -186,12 +182,8 @@ class BusinessModelController extends AppController
                 if ($businessModel = $model->create($id, $mvp->id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
                     //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
-                        '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
-                        '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                        '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate/';
                     if ($cache->exists('formCreateBusinessModelCache')) $cache->delete('formCreateBusinessModelCache');
 
                     $response = [

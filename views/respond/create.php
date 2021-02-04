@@ -5,12 +5,13 @@ use yii\helpers\Html;
 
 ?>
 
-<?php $form = ActiveForm::begin([
-'id' => 'new_respond_form',
-'action' => "/respond/create?id=$interview->id",
-'options' => ['class' => 'g-py-15'],
-'errorCssClass' => 'u-has-error-v1',
-'successCssClass' => 'u-has-success-v1-1',
+<?php
+$form = ActiveForm::begin([
+    'id' => 'new_respond_form',
+    'action' => "/respond/create?id=$interview->id",
+    'options' => ['class' => 'g-py-15'],
+    'errorCssClass' => 'u-has-error-v1',
+    'successCssClass' => 'u-has-success-v1-1',
 ]); ?>
 
 <div class="row">

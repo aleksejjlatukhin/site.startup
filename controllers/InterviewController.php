@@ -191,9 +191,7 @@ class InterviewController extends AppController
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1) || (!empty($model->problems)  && $model->count_positive <= $count_positive && $model->segment->exist_confirm == 1)) {
 
-                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/formCreate/';
                 $cache_form_creation = $cache->get('formCreateProblemCache');
 
                 if ($cache_form_creation) {
@@ -288,9 +286,7 @@ class InterviewController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm/';
             $key = 'formCreateConfirmSegmentCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -309,9 +305,7 @@ class InterviewController extends AppController
         $model = new FormCreateConfirmSegment();
         $cache = Yii::$app->cache;
 
-        $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-            '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-            '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm/';
         $cache_form_creation = $cache->get('formCreateConfirmSegmentCache');
 
         if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmSegment
@@ -367,9 +361,7 @@ class InterviewController extends AppController
                     $model->addQuestionDefault('Как принимается решение о покупке?');
 
                     //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateConfirm/';
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm/';
                     if ($cache->exists('formCreateConfirmSegmentCache')) $cache->delete('formCreateConfirmSegmentCache');
 
                     $response =  ['success' => true, 'id' => $model->id];

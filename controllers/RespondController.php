@@ -115,9 +115,7 @@ class RespondController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond/';
             $key = 'formCreateRespondCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -135,9 +133,7 @@ class RespondController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond/';
             $cache_form_creation = $cache->get('formCreateRespondCache');
 
             if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели CreateRespondForm
@@ -186,9 +182,7 @@ class RespondController extends AppController
                             $interview->save();
 
                             //Удаление кэша формы создания
-                            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/formCreateRespond/';
+                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond/';
                             if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = Respond::findAll(['interview_id' => $id]);
@@ -357,6 +351,7 @@ class RespondController extends AppController
                     $answer->delete();
                 }
 
+                // Удаление прикрепленных файлов
                 $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
                     mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
@@ -364,6 +359,14 @@ class RespondController extends AppController
 
                 if (file_exists($del_dir)) {
                     $this->delTree($del_dir);
+                }
+
+                // Удаление кэша для форм респондента
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                    '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$model->id;
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
                 }
 
 

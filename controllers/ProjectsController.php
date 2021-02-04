@@ -154,7 +154,7 @@ class ProjectsController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
             $key = 'formCreateProjectCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -170,7 +170,7 @@ class ProjectsController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
             $cache_form_creation = $cache->get('formCreateProjectCache');
 
             if ($cache_form_creation) {
@@ -384,7 +384,7 @@ class ProjectsController extends AppController
                             $model->upload($present_files_dir);
 
                             //Удаление кэша формы создания проекта
-                            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").'/projects/formCreate/';
+                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
                             if ($cache->exists('formCreateProjectCache')) $cache->delete('formCreateProjectCache');
 
                             //Проверка наличия сортировки
@@ -1018,8 +1018,7 @@ class ProjectsController extends AppController
             }
 
             //Удаление кэша для форм проекта
-            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251");
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$model->id;
 
             if (file_exists($cachePathDelete)){
                 $this->delTree($cachePathDelete);

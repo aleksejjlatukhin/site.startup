@@ -127,12 +127,57 @@ class DescInterviewConfirmController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $respond = RespondsConfirm::findOne($id);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $respond->confirm_problem_id]);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $key = 'formCreateInterviewCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $respond = RespondsConfirm::findOne($id);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $respond->confirm_problem_id]);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new DescInterviewConfirm();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $cache_form_creation = $cache->get('formCreateInterviewCache');
+
+            if ($cache_form_creation) { //Если существует кэш
+
+                foreach ($cache_form_creation['AnswersQuestionsConfirmProblem'] as $answerCache) {
+                    foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmProblem
+                        if ($answer['question_id'] == $answerCache['question_id']) {
+                            $answer['answer'] = $answerCache['answer'];
+                        }
+                    }
+                }
+                foreach ($cache_form_creation['DescInterviewConfirm'] as $key => $value) { //Добавляем данные для полей модели DescInterviewConfirm
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -158,6 +203,7 @@ class DescInterviewConfirmController extends AppController
         $project = Projects::findOne(['id' => $problem->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
@@ -188,6 +234,12 @@ class DescInterviewConfirmController extends AppController
                                 $model->save(false);
                             }
                         }
+
+                        //Удаление кэша формы создания
+                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                            '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$respond->id.'/';
+                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
+
 
                         $response = ['confirm_problem_id' => $confirmProblem->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

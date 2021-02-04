@@ -130,10 +130,8 @@ class DescInterviewController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'.
-                mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id.'/';
             $key = 'formCreateInterviewCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -152,10 +150,8 @@ class DescInterviewController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'
-                .mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id.'/';
             $cache_form_creation = $cache->get('formCreateInterviewCache');
 
             if ($cache_form_creation) { //Если существует кэш
@@ -227,10 +223,8 @@ class DescInterviewController extends AppController
                         }
 
                         //Удаление кэша формы создания
-                        $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                            '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                            '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/confirm/interviews/'
-                            .mb_strtolower(mb_convert_encoding($this->translit($respond->name), "windows-1251"),"windows-1251").'/formCreateInterview/';
+                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                            '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id.'/';
                         if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
 
 

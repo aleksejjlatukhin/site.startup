@@ -215,12 +215,8 @@ class ConfirmMvpController extends AppController
         if(Yii::$app->request->isAjax) {
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1) || (!empty($model->business)  && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1)) {
 
-                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                    '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
-                    '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
-                    '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($mvp->title), "windows-1251"),"windows-1251").'/business-model/formCreate/';
+                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                    '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate/';
                 $cache_form_creation = $cache->get('formCreateBusinessModelCache');
 
                 if ($cache_form_creation) {

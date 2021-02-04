@@ -112,9 +112,7 @@ class GenerationProblemController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/formCreate/';
             $key = 'formCreateProblemCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -142,9 +140,7 @@ class GenerationProblemController extends AppController
                 if ($model->create($interview->id, $segment->id, $project->id)){
 
                     //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").'/problems/formCreate/';
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/formCreate/';
                     if ($cache->exists('formCreateProblemCache')) $cache->delete('formCreateProblemCache');
 
                     $response = [
@@ -274,10 +270,8 @@ class GenerationProblemController extends AppController
             }
 
             // Удаление кэша для форм проблемы
-            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($model->title), "windows-1251"),"windows-1251");
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$model->id;
 
             if (file_exists($cachePathDelete)){
                 $this->delTree($cachePathDelete);

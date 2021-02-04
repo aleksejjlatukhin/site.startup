@@ -122,11 +122,8 @@ class MvpController extends AppController
         if(Yii::$app->request->isAjax) {
 
             $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").
-                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").'/mvps/formCreate/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/formCreate/';
             $key = 'formCreateMvpCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
@@ -157,11 +154,8 @@ class MvpController extends AppController
                 if ($model->create($id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
 
                     //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                        '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                        '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                        '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
-                        '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").'/mvps/formCreate/';
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                        '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/mvps/formCreate/';
                     if ($cache->exists('formCreateMvpCache')) $cache->delete('formCreateMvpCache');
 
                     $response = [
@@ -248,7 +242,7 @@ class MvpController extends AppController
 
         if(Yii::$app->request->isAjax) {
 
-            // Удаление прикрепленных файлов ГЦП
+            // Удаление прикрепленных файлов MVP
             $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
                 . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
                 '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251") .
@@ -260,13 +254,9 @@ class MvpController extends AppController
                 $this->delTree($pathDelete);
             }
 
-            // Удаление кэша для форм ГЦП
-            $cachePathDelete = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title), "windows-1251"),"windows-1251").
-                '/gcps/'.mb_strtolower(mb_convert_encoding($this->translit($gcp->title), "windows-1251"),"windows-1251").
-                '/mvps/'.mb_strtolower(mb_convert_encoding($this->translit($model->title), "windows-1251"),"windows-1251");
+            // Удаление кэша для форм MVP
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$model->id;
 
             if (file_exists($cachePathDelete)){
                 $this->delTree($cachePathDelete);

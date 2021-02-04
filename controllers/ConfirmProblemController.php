@@ -207,10 +207,8 @@ class ConfirmProblemController extends AppController
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1) || (!empty($model->gcps)  && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1)) {
 
-                $cache->cachePath = '../runtime/cache/forms/'.mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251").
-                    '/projects/'.mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251").
-                    '/segments/'.mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"),"windows-1251").
-                    '/problems/'.mb_strtolower(mb_convert_encoding($this->translit($problem->title), "windows-1251"),"windows-1251").'/gcps/formCreate/';
+                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/formCreate/';
                 $cache_form_creation = $cache->get('formCreateGcpCache');
 
                 if ($cache_form_creation) {
@@ -337,6 +335,25 @@ class ConfirmProblemController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $problem = GenerationProblem::findOne($id);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateConfirm/';
+            $key = 'formCreateConfirmProblemCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     /**
      * @param $id
      * @return string|\yii\web\Response
@@ -348,6 +365,8 @@ class ConfirmProblemController extends AppController
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         //кол-во представителей сегмента
         $count_represent_segment = Respond::find()->with('descInterview')
@@ -355,6 +374,16 @@ class ConfirmProblemController extends AppController
             ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->count();
 
         $model->count_respond = $count_represent_segment;
+
+        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+            '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/confirm/formCreateConfirm/';
+        $cache_form_creation = $cache->get('formCreateConfirmProblemCache');
+
+        if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmProblem
+            foreach ($cache_form_creation['FormCreateConfirmProblem'] as $key => $value) {
+                $model[$key] = $value;
+            }
+        }
 
         if ($generationProblem->confirm){
             //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
@@ -385,6 +414,10 @@ class ConfirmProblemController extends AppController
         $responds = Respond::find()->with('descInterview')
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
             ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
+        $segment = Segment::findOne(['id' => $generationProblem->segment_id]);
+        $project = Projects::findOne(['id' => $generationProblem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -417,6 +450,10 @@ class ConfirmProblemController extends AppController
                     $model->addQuestionDefault('Если не ищут, то почему?');
                     $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
 
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                        '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/confirm/formCreateConfirm/';
+                    if ($cache->exists('formCreateConfirmProblemCache')) $cache->delete('formCreateConfirmProblemCache');
 
                     $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
