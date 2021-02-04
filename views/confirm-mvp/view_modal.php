@@ -191,3 +191,33 @@ Modal::begin([
 
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
+
+
+<?php
+// Подтверждение закрытия окна редактирования
+Modal::begin([
+    'options' => [
+        'id' => 'confirm_closing_update_modal',
+        'class' => 'confirm_closing_modal',
+    ],
+    'size' => 'modal-md',
+    'header' => '<h3 class="text-center header-update-modal">Выберите действие</h3>',
+    'footer' => '<div class="text-center">'.
+
+        Html::a('Отмена', ['#'],[
+            'class' => 'btn btn-default',
+            'style' => ['width' => '120px'],
+            'onclick' => "$('#confirm_closing_update_modal').modal('hide'); return false;"
+        ]).
+
+        Html::a('Ок', ['#'],[
+            'class' => 'btn btn-default',
+            'style' => ['width' => '120px'],
+            'id' => 'button_confirm_closing_modal',
+        ]).
+
+        '</div>'
+]); ?>
+    <h4 class="text-center">Изменения не будут сохранены. Вы действительно хотите закрыть окно?</h4>
+    <!--Контент добавляется через Ajax-->
+<?php Modal::end(); ?>

@@ -138,12 +138,61 @@ class DescInterviewMvpController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $respond = RespondsMvp::findOne($id);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $respond->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $key = 'formCreateInterviewCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $respond = RespondsMvp::findOne($id);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $respond->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new DescInterviewMvp();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $cache_form_creation = $cache->get('formCreateInterviewCache');
+
+            if ($cache_form_creation) { //Если существует кэш
+
+                foreach ($cache_form_creation['AnswersQuestionsConfirmMvp'] as $answerCache) {
+                    foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmMvp
+                        if ($answer['question_id'] == $answerCache['question_id']) {
+                            $answer['answer'] = $answerCache['answer'];
+                        }
+                    }
+                }
+                foreach ($cache_form_creation['DescInterviewMvp'] as $key => $value) { //Добавляем данные для полей модели DescInterviewMvp
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -171,6 +220,7 @@ class DescInterviewMvpController extends AppController
         $project = Projects::findOne(['id' => $mvp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
@@ -203,6 +253,11 @@ class DescInterviewMvpController extends AppController
                                 $model->save(false);
                             }
                         }
+
+                        //Удаление кэша формы создания
+                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
 
                         $response = ['confirm_mvp_id' => $confirmMvp->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

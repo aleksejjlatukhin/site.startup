@@ -79,7 +79,10 @@ use yii\helpers\Html;
                 'options' => [
                     'id' => 'datePlan',
                     'class' => 'style_form_field_respond form-control'
-                ]
+                ],
+                'pluginEvents' => [
+                    "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                ],
             ]);?>
 
         </div>

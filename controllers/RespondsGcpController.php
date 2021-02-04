@@ -114,12 +114,49 @@ class RespondsGcpController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $confirmGcp = ConfirmGcp::findOne($id);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond/';
+            $key = 'formCreateRespondCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $confirm_gcp = ConfirmGcp::findOne($id);
+        $gcp = Gcp::findOne(['id' => $confirm_gcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new CreateRespondGcpForm();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond/';
+            $cache_form_creation = $cache->get('formCreateRespondCache');
+
+            if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели CreateRespondGcpForm
+                foreach ($cache_form_creation['CreateRespondGcpForm'] as $key => $value) {
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['confirm_gcp' => $confirm_gcp, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -141,6 +178,11 @@ class RespondsGcpController extends AppController
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
         $newRespond = new CreateRespondGcpForm();
         $newRespond->confirm_gcp_id = $id;
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -156,6 +198,11 @@ class RespondsGcpController extends AppController
 
                             $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
                             $confirmGcp->save();
+
+                            //Удаление кэша формы создания
+                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond/';
+                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = RespondsGcp::findAll(['confirm_gcp_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -326,6 +373,7 @@ class RespondsGcpController extends AppController
                     $answer->delete();
                 }
 
+                // Удаление прикрепленных файлов
                 $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
                     mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
                     mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
@@ -335,6 +383,14 @@ class RespondsGcpController extends AppController
 
                 if (file_exists($del_dir)) {
                     $this->delTree($del_dir);
+                }
+
+                // Удаление кэша для форм респондента
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$model->id;
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
                 }
 
                 if ($model->delete()) {

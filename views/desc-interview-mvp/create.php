@@ -8,8 +8,8 @@ use kartik\select2\Select2;
 
 
 <?php $form = ActiveForm::begin([
-    'action' => "/desc-interview-mvp/create?id=$respond->id",
     'id' => 'formCreateDescInterview',
+    'action' => "/desc-interview-mvp/create?id=$respond->id",
     'options' => ['class' => 'g-py-15'],
     'errorCssClass' => 'u-has-error-v1',
     'successCssClass' => 'u-has-success-v1-1',
@@ -28,6 +28,8 @@ foreach ($respond->answers as $index => $answer) :
         'class' => 'style_form_field_respond form-control',
     ]);
     ?>
+
+    <?= $form->field($answer, "[$index]question_id")->label(false)->hiddenInput(); ?>
 
 <?php
 endforeach;

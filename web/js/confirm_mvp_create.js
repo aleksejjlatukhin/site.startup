@@ -74,6 +74,26 @@ $("input#confirm_count_positive").change(function () {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
+
+
+//Отслеживаем изменения в форме создания подтверждения и записываем их в кэш
+$(body).on('change', 'form#new_confirm_mvp', function(){
+
+    var url = '/confirm-mvp/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
+
+
 var modal_next_step_error = $('#next_step_error');
 var information_add_new_responds_modal = $('#information-add-new-responds');
 

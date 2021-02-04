@@ -11,8 +11,8 @@ use yii\helpers\Html;
 
 
     <?php $form = ActiveForm::begin([
-        'action' => "/responds-mvp/update?id=$model->id",
         'id' => 'formUpdateRespond',
+        'action' => "/responds-mvp/update?id=$model->id",
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -80,7 +80,10 @@ use yii\helpers\Html;
                 'options' => [
                     'id' => 'datePlan',
                     'class' => 'style_form_field_respond form-control'
-                ]
+                ],
+                'pluginEvents' => [
+                    "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
+                ],
             ]);?>
 
         </div>

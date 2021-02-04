@@ -296,19 +296,31 @@ class ConfirmProblemController extends AppController
     public function actionNotExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $generationProblem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $interview = Interview::findOne(['id' => $problem->interview_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
-        if ($generationProblem->exist_confirm === 0) {
+        if ($problem->exist_confirm === 0) {
 
             return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
         }else {
 
-            $generationProblem->exist_confirm = 0;
-            $generationProblem->time_confirm = time();
+            $problem->exist_confirm = 0;
+            $problem->time_confirm = time();
 
-            if ($generationProblem->save()){
-                $generationProblem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
+            if ($problem->save()){
+
+                // Удаление дирректории для кэша подтверждения
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                    '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
+                }
+
+                $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
             }
         }
@@ -323,13 +335,25 @@ class ConfirmProblemController extends AppController
     public function actionExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $generationProblem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
-        $generationProblem->exist_confirm = 1;
-        $generationProblem->time_confirm = time();
+        $problem->exist_confirm = 1;
+        $problem->time_confirm = time();
 
-        if ($generationProblem->save()){
-            $generationProblem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
+        if ($problem->save()){
+
+            // Удаление дирректории для кэша подтверждения
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
+
+            if (file_exists($cachePathDelete)){
+                $this->delTree($cachePathDelete);
+            }
+
+            $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/gcp/index', 'id' => $model->id]);
         }
     }

@@ -276,6 +276,72 @@ class InterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionNotExistConfirm($id)
+    {
+        $model = $this->findModel($id);
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        if ($segment->exist_confirm === 0) {
+            return $this->redirect(['/segment/index', 'id' => $project->id]);
+
+        }else {
+
+            $segment->exist_confirm = 0;
+            $segment->time_confirm = time();
+
+            if ($segment->save()){
+
+                // Удаление дирректории для кэша подтверждения
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm';
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
+                }
+
+                $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['/segment/index', 'id' => $project->id]);
+            }
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionExistConfirm($id)
+    {
+        $model = $this->findModel($id);
+        $segment = Segment::findOne(['id' => $model->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        $segment->exist_confirm = 1;
+        $segment->time_confirm = time();
+
+        if ($segment->save()){
+
+            // Удаление дирректории для кэша подтверждения
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm';
+
+            if (file_exists($cachePathDelete)){
+                $this->delTree($cachePathDelete);
+            }
+
+            $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/generation-problem/index', 'id' => $id]);
+        }
+    }
+
+
     public function actionSaveCacheCreationForm($id)
     {
         $segment = Segment::findOne($id);
@@ -587,53 +653,6 @@ class InterviewController extends AppController
                 \Yii::$app->response->data = $response;
                 return $response;
             }
-        }
-    }
-
-
-    /**
-     * @param $id
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException
-     */
-    public function actionNotExistConfirm($id)
-    {
-        $model = $this->findModel($id);
-        $segment = Segment::findOne(['id' => $model->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-
-        if ($segment->exist_confirm === 0) {
-            return $this->redirect(['/segment/index', 'id' => $project->id]);
-
-        }else {
-
-            $segment->exist_confirm = 0;
-            $segment->time_confirm = time();
-
-            if ($segment->save()){
-                $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['/segment/index', 'id' => $project->id]);
-            }
-        }
-    }
-
-
-    /**
-     * @param $id
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException
-     */
-    public function actionExistConfirm($id)
-    {
-        $model = $this->findModel($id);
-        $segment = Segment::findOne(['id' => $model->segment_id]);
-
-        $segment->exist_confirm = 1;
-        $segment->time_confirm = time();
-
-        if ($segment->save()){
-            $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
-            return $this->redirect(['/generation-problem/index', 'id' => $id]);
         }
     }
 

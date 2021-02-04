@@ -25,6 +25,7 @@ $(document).ready(function() {
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
 
 //Постраничная навигация
 $(body).on('click', '.pagination-responds-confirm .responds-confirm-pagin-list li a', function(e){
@@ -50,6 +51,14 @@ $(body).on('click', '.pagination-responds-confirm .responds-confirm-pagin-list l
     return false;
 });
 
+
+//Возвращение скролла первого модального окна после закрытия
+$('#confirm_closing_update_modal').on('hidden.bs.modal', function(){
+    $(body).addClass('modal-open');
+});
+$('#error_respond_modal').on('hidden.bs.modal', function(){
+    $(body).addClass('modal-open');
+});
 
 //При нажатии на кнопку редактировать(Шаг 1)
 //показываем форму редактирования и скрываем вид просмотра
@@ -473,6 +482,23 @@ $(body).on('click', '.show_modal_information_table_responds', function (e) {
 });
 
 
+//Отслеживаем изменения в форме создания респондента и записываем их в кэш
+$(body).on('change', 'form#new_respond_form', function(){
+
+    var url = '/responds-mvp/save-cache-creation-form?id=' + id_page;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+});
+
+
 //При нажатии на кнопку Добавить респондента
 $(body).on('click', '#showRespondCreateForm', function(e){
 
@@ -599,6 +625,32 @@ $(body).on('click', '.showRespondUpdateForm', function(e){
 });
 
 
+var catchChange = false;
+//Отслеживаем изменения в форме редактирования дынных респондента
+$(body).on('change', 'form#formUpdateRespond', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '#respond_update_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+//Подтверждение закрытия окна редактирования
+$(body).on('click', '#button_confirm_closing_modal', function (e) {
+    catchChange = false;
+    $('.modal').modal('hide');
+    e.preventDefault();
+    return false;
+});
+
+
 //Сохранении данных из формы редактирование данных респондента
 $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 
@@ -635,6 +687,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 });
 
                 //Закрываем окно редактирования
+                if (catchChange === true) catchChange = false;
                 $('#respond_update_modal').modal('hide');
 
             } else {
@@ -652,6 +705,24 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 
     e.preventDefault();
     return false;
+});
+
+
+//Отслеживаем изменения в форме создания интервью и записываем их в кэш
+$(body).on('change', 'form#formCreateDescInterview', function(){
+
+    var respond_id = $(this).attr('action').split('id=')[1];
+    var url = '/desc-interview-mvp/save-cache-creation-form?id=' + respond_id;
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        error: function(){
+            alert('Ошибка');
+        }
+    });
 });
 
 
@@ -797,6 +868,23 @@ $(body).on('change', '#formUpdateDescInterview input[type=file]',function(){
 });
 
 
+//Отслеживаем изменения в форме редактирования интервью
+$(body).on('change', 'form#formUpdateDescInterview', function(){
+    if (catchChange === false) catchChange = true;
+});
+
+//Если в форме редактирования были внесены изменения,
+//то при любой попытке закрыть окно показать окно подтверждения
+$(body).on('hide.bs.modal', '#update_descInterview_modal', function(e){
+    if(catchChange === true) {
+        $('#confirm_closing_update_modal').appendTo('body').modal('show');
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return false;
+    }
+});
+
+
 //Редактирование интервью при сохранении данных из формы
 $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 
@@ -831,6 +919,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             });
 
             //Закрываем модальное окно с формой
+            if (catchChange === true) catchChange = false;
             $('#update_descInterview_modal').modal('hide');
         },
         error: function(){

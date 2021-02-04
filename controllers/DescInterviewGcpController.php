@@ -133,12 +133,59 @@ class DescInterviewGcpController extends AppController
     }
 
 
+    public function actionSaveCacheCreationForm($id)
+    {
+        $respond = RespondsGcp::findOne($id);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $key = 'formCreateInterviewCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
     public function actionGetDataCreateForm($id)
     {
         $respond = RespondsGcp::findOne($id);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
         $model = new DescInterviewGcp();
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+            $cache_form_creation = $cache->get('formCreateInterviewCache');
+
+            if ($cache_form_creation) { //Если существует кэш
+
+                foreach ($cache_form_creation['AnswersQuestionsConfirmGcp'] as $answerCache) {
+                    foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmGcp
+                        if ($answer['question_id'] == $answerCache['question_id']) {
+                            $answer['answer'] = $answerCache['answer'];
+                        }
+                    }
+                }
+                foreach ($cache_form_creation['DescInterviewGcp'] as $key => $value) { //Добавляем данные для полей модели DescInterviewGcp
+                    $model[$key] = $value;
+                }
+            }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -165,6 +212,7 @@ class DescInterviewGcpController extends AppController
         $project = Projects::findOne(['id' => $gcp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
+        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
@@ -196,6 +244,11 @@ class DescInterviewGcpController extends AppController
                                 $model->save(false);
                             }
                         }
+
+                        //Удаление кэша формы создания
+                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
 
                         $response = ['confirm_gcp_id' => $confirmGcp->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

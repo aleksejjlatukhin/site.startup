@@ -299,6 +299,10 @@ class ConfirmGcpController extends AppController
         $model = $this->findModel($id);
         $gcp = Gcp::findOne(['id' => $model->gcp_id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         if ($gcp->exist_confirm === 0) {
 
@@ -309,6 +313,15 @@ class ConfirmGcpController extends AppController
             $gcp->time_confirm = time();
 
             if ($gcp->save()){
+
+                // Удаление дирректории для кэша подтверждения
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                    '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
+
+                if (file_exists($cachePathDelete)){
+                    $this->delTree($cachePathDelete);
+                }
+
                 $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
             }
@@ -325,13 +338,46 @@ class ConfirmGcpController extends AppController
     {
         $model = $this->findModel($id);
         $gcp = Gcp::findOne(['id' => $model->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
         $gcp->exist_confirm = 1;
         $gcp->time_confirm = time();
 
         if ($gcp->save()){
+
+            // Удаление дирректории для кэша подтверждения
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
+
+            if (file_exists($cachePathDelete)){
+                $this->delTree($cachePathDelete);
+            }
+
             $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/mvp/index', 'id' => $model->id]);
+        }
+    }
+
+
+    public function actionSaveCacheCreationForm($id)
+    {
+        $gcp = Gcp::findOne($id);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+
+        if(Yii::$app->request->isAjax) {
+
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
+            $key = 'formCreateConfirmGcpCache'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
     }
 
@@ -349,6 +395,8 @@ class ConfirmGcpController extends AppController
         $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         //кол-во респондентов, подтвердивших текущую проблему
         $count_represent_problem = RespondsConfirm::find()->with('descInterview')
@@ -356,6 +404,16 @@ class ConfirmGcpController extends AppController
             ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->count();
 
         $model->count_respond = $count_represent_problem;
+
+        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+            '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
+        $cache_form_creation = $cache->get('formCreateConfirmGcpCache');
+
+        if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmGcp
+            foreach ($cache_form_creation['FormCreateConfirmGcp'] as $key => $value) {
+                $model[$key] = $value;
+            }
+        }
 
         if ($gcp->confirm){
             //Если у ГЦП создана программа подтверждения, то перейти на страницу подтверждения
@@ -387,6 +445,11 @@ class ConfirmGcpController extends AppController
         $responds = RespondsConfirm::find()->with('descInterview')
             ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
             ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->all();
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -410,6 +473,10 @@ class ConfirmGcpController extends AppController
                     $model->addQuestionDefault('Вы бы рассказали об этом ценностном предложении своим коллегам?');
                     $model->addQuestionDefault('Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?');
 
+                    //Удаление кэша формы создания
+                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                        '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
+                    if ($cache->exists('formCreateConfirmGcpCache')) $cache->delete('formCreateConfirmGcpCache');
 
                     $response =  [
                         'success' => true,
