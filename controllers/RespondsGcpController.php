@@ -240,10 +240,12 @@ class RespondsGcpController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = new UpdateRespondGcpForm($id);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'gcp' => $gcp])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;
@@ -259,7 +261,7 @@ class RespondsGcpController extends AppController
     public function actionUpdate($id)
     {
         $model = new UpdateRespondGcpForm($id);
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
+        $confirmGcp = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 

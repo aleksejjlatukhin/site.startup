@@ -8,11 +8,11 @@ use yii\helpers\Html;
 ?>
 
 <!--Если пользователь является проектантом-->
-<?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $gcp->exist_confirm === null) : ?>
 
     <?php $form = ActiveForm::begin([
-        'action' => "/desc-interview-gcp/update?id=".$model->id ,
-        'id' => 'formUpdateDescInterview' ,
+        'id' => 'formUpdateDescInterview',
+        'action' => "/desc-interview-gcp/update?id=".$model->id,
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -204,22 +204,26 @@ use yii\helpers\Html;
             <div><?= $respond->name; ?></div>
         </div>
 
-        <?php foreach ($respond->answers as $answer) : ?>
+        <div class="col-md-12" style="padding: 0 20px; font-size: 24px; margin-top: 5px;">
+            <div style="border-bottom: 1px solid #ccc;">Ответы на вопросы интервью</div>
+        </div>
 
-            <div class="col-md-12" style="padding: 0 20px; margin-bottom: 5px;">
+        <?php foreach ($respond->answers as $index => $answer) : ?>
+
+            <div class="col-md-12" style="padding: 0 20px; margin-top: 10px;">
                 <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
                 <div><?= $answer->answer; ?></div>
             </div>
 
         <?php endforeach; ?>
 
-        <div class="col-md-12">
+        <div class="col-md-12" style="margin-top: 10px;">
 
-            <p style="padding-left: 5px; font-weight: 700;">Приложенный файл</p>
+            <p style="padding-left: 5px; font-weight: 700; border-top: 1px solid #ccc; padding-top: 10px;">Приложенный файл</p>
 
             <?php if (!empty($model->interview_file)) : ?>
 
-                <div style="margin-top: -5px; margin-bottom: 30px;">
+                <div style="margin-top: -5px; margin-bottom: 20px;">
 
                     <div style="display: flex; align-items: center;">
 

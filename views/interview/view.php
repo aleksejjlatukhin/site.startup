@@ -155,7 +155,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
 
                     <?= Html::button('Редактировать', [
                         'id' => 'show_form_update_data',
@@ -402,7 +402,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 <div class="col-xs-12 col-md-6" style="padding: 0;">
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
 
                     <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
                         ['class' => 'add_new_question_button pull-right', 'id' => 'buttonAddQuestion']
@@ -436,7 +436,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                             </div>
                             <div class="col-xs-4 col-sm-3 col-md-3 col-lg-2 delete_question_link">
 
-                                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
                                         Url::to(['/interview/delete-question', 'id' => $question->id])],[
@@ -559,7 +559,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 
                 <div class="col-md-3" style="padding: 0;">
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
 
                         <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
                             ['id' => 'showRespondCreateForm', 'class' => 'link_add_respond_text pull-right']

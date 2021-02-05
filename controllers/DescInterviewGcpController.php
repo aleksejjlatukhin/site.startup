@@ -269,11 +269,13 @@ class DescInterviewGcpController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = $this->findModel($id);
-        $respond = $model->respond;
+        $respond = RespondsGcp::findOne(['id' => $model->responds_gcp_id]);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'gcp' => $gcp])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;

@@ -220,10 +220,12 @@ class RespondController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = new UpdateRespondForm($id);
+        $interview = Interview::findOne(['id' => $model->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'segment' => $segment])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;

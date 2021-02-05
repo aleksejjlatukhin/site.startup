@@ -234,10 +234,12 @@ class RespondsConfirmController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = new UpdateRespondConfirmForm($id);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'problem' => $problem])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;

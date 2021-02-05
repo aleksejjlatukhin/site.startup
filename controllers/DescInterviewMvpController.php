@@ -278,11 +278,13 @@ class DescInterviewMvpController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = $this->findModel($id);
-        $respond = $model->respond;
+        $respond = RespondsMvp::find()->where(['id' => $model->responds_mvp_id])->one();
+        $confirmMvp = ConfirmMvp::find()->where(['id' => $respond->confirm_mvp_id])->one();
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'mvp' => $mvp])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;

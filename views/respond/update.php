@@ -7,12 +7,12 @@ use yii\helpers\Html;
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username'])) :?>
+<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) :?>
 
 
     <?php $form = ActiveForm::begin([
-        'action' => "/respond/update?id=$model->id",
         'id' => 'formUpdateRespond',
+        'action' => "/respond/update?id=$model->id",
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',

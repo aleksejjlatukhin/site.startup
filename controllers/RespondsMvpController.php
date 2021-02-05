@@ -241,10 +241,12 @@ class RespondsMvpController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = new UpdateRespondMvpForm($id);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'mvp' => $mvp])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;

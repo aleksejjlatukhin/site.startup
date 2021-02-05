@@ -7,7 +7,7 @@ use yii\helpers\Html;
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username'])) :?>
+<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $mvp->exist_confirm === null) :?>
 
 
     <?php $form = ActiveForm::begin([

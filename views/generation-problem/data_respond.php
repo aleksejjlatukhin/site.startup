@@ -11,7 +11,7 @@ use yii\helpers\Html;
     </div>
 
     <div class="col-md-12" style="padding: 0 20px; font-size: 24px; margin-top: 5px;">
-        <div style="border-bottom: 1px solid #ccc;">Ответы на вопросы интевью</div>
+        <div style="border-bottom: 1px solid #ccc;">Ответы на вопросы интервью</div>
     </div>
 
     <?php foreach ($respond->answers as $index => $answer) : ?>

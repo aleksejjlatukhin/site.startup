@@ -35,11 +35,23 @@ use app\models\User;
 
                 <div class="" style="overflow: hidden; max-height: 60px; padding: 5px 0;">
 
-                    <?=  Html::a($respond->name, ['#'], [
-                        'id' => "respond_name-$respond->id",
-                        'class' => 'container-respond_name_link showRespondUpdateForm',
-                        'title' => 'Редактировать данные респондента',
-                    ]); ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->problem->exist_confirm === null) : ?>
+
+                        <?=  Html::a($respond->name, ['#'], [
+                            'id' => "respond_name-$respond->id",
+                            'class' => 'container-respond_name_link showRespondUpdateForm',
+                            'title' => 'Редактировать данные респондента',
+                        ]); ?>
+
+                    <?php else : ?>
+
+                        <?=  Html::a($respond->name, ['#'], [
+                            'id' => "respond_name-$respond->id",
+                            'class' => 'container-respond_name_link showRespondUpdateForm',
+                            'title' => 'Данные респондента',
+                        ]); ?>
+
+                    <?php endif; ?>
 
                 </div>
 
@@ -87,9 +99,9 @@ use app\models\User;
 
             </div>
 
-            <div class="col-md-1" style="text-align: right;">
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->problem->exist_confirm === null) : ?>
 
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="col-md-1" style="text-align: right;">
 
                     <?php
                     if ($respond->descInterview) {
@@ -109,7 +121,11 @@ use app\models\User;
                     ]);
                     ?>
 
-                <? else : ?>
+                </div>
+
+            <? else : ?>
+
+                <div class="col-md-1" style="text-align: center;">
 
                     <?php
                     if ($respond->descInterview) {
@@ -122,9 +138,9 @@ use app\models\User;
                     }
                     ?>
 
-                <? endif; ?>
+                </div>
 
-            </div>
+            <? endif; ?>
 
         </div>
 
@@ -171,7 +187,7 @@ use app\models\User;
 
         <div class="" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->problem->exist_confirm === null) : ?>
 
                 <?php if ($model->buttonMovingNextStage === true) : ?>
 

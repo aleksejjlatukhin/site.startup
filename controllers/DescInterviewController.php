@@ -247,11 +247,13 @@ class DescInterviewController extends AppController
     public function actionGetDataUpdateForm($id)
     {
         $model = $this->findModel($id);
-        $respond = $model->respond;
+        $respond = Respond::findOne(['id' => $model->respond_id]);
+        $interview = Interview::findOne(['id' => $respond->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'segment' => $segment])];
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             \Yii::$app->response->data = $response;
             return $response;
