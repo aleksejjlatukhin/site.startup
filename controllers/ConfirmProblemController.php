@@ -18,6 +18,7 @@ use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmProblem;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
@@ -287,11 +288,11 @@ class ConfirmProblemController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionNotExistConfirm($id)
     {
@@ -315,10 +316,7 @@ class ConfirmProblemController extends AppController
                 // Удаление дирректории для кэша подтверждения
                 $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
                     '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
+                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
                 $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
@@ -326,11 +324,11 @@ class ConfirmProblemController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionExistConfirm($id)
     {
@@ -348,10 +346,7 @@ class ConfirmProblemController extends AppController
             // Удаление дирректории для кэша подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
                 '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
             $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/gcp/index', 'id' => $model->id]);
@@ -427,57 +422,20 @@ class ConfirmProblemController extends AppController
 
     /**
      * @param $id
-     * @return array|\yii\web\Response
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionSaveConfirmProblem($id)
     {
         $model = new FormCreateConfirmProblem();
         $model->gps_id = $id;
-        $generationProblem = GenerationProblem::findOne($id);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $responds = Respond::find()->with('descInterview')
-            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
-        $segment = Segment::findOne(['id' => $generationProblem->segment_id]);
-        $project = Projects::findOne(['id' => $generationProblem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model = $model->create()){
-
-                    //Создание респондентов для программы подтверждения ГПС из представителей сегмента
-                    $model->createRespondConfirm($responds);
-
-                    //Вопросы, которые будут добавлены по-умолчанию
-                    $model->addQuestionDefault('Какими функциями должен обладать продукт вашей мечты?');
-                    $model->addQuestionDefault('Расскажите поподробнее, каков алгоритм вашей работы?');
-                    $model->addQuestionDefault('Почему вас это беспокоит?');
-                    $model->addQuestionDefault('Каковы последствия этой ситуации?');
-                    $model->addQuestionDefault('Расскажите поподробнее, что произошло в последний раз?');
-                    $model->addQuestionDefault('Что еще пытались сделать?');
-                    $model->addQuestionDefault('Кто будет финансировать покупку?');
-                    $model->addQuestionDefault('С кем еще мне следует переговорить?');
-                    $model->addQuestionDefault('Есть ли еще вопросы, которые мне следовало задать?');
-                    $model->addQuestionDefault('Пытались ли найти решение?');
-                    $model->addQuestionDefault('Эти решения оказались недостаточно эффективными?');
-                    $model->addQuestionDefault('Как справляются с задачей сейчас и сколько денег тратят?');
-                    $model->addQuestionDefault('Сколько времени это занимает?');
-                    $model->addQuestionDefault('Продемонстрировать как они выполняют работу или другую деятельность?');
-                    $model->addQuestionDefault('Что в этом нравится и что нет?');
-                    $model->addQuestionDefault('Какие еще инструменты и процессы пробовали пока не остановились на этом?');
-                    $model->addQuestionDefault('Ищут ли активно сейчас чем это можно заменить?');
-                    $model->addQuestionDefault('Если да, то в чем проблема?');
-                    $model->addQuestionDefault('Если не ищут, то почему?');
-                    $model->addQuestionDefault('На чем теряют деньги, используя текущие инструменты?');
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                        '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/confirm/formCreateConfirm/';
-                    if ($cache->exists('formCreateConfirmProblemCache')) $cache->delete('formCreateConfirmProblemCache');
 
                     $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -488,9 +446,11 @@ class ConfirmProblemController extends AppController
         }
     }
 
+
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate ($id)
     {

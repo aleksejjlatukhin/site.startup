@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\FileHelper;
 
 class RespondsConfirm extends \yii\db\ActiveRecord
 {
@@ -94,7 +95,42 @@ class RespondsConfirm extends \yii\db\ActiveRecord
             $this->confirm->problem->project->user->touch('updated_at');
         });
 
+        $this->on(self::EVENT_BEFORE_DELETE, function (){
+            $this->deleteDataRespond();
+        });
+
         parent::init();
+    }
+
+
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
+    private function deleteDataRespond()
+    {
+        $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $this->id]);
+        $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $this->id]);
+        $confirmProblem = ConfirmProblem::findOne(['id' => $this->confirm_problem_id]);
+        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
+        $segment = Segment::findOne(['id' => $problem->segment_id]);
+        $project = Projects::findOne(['id' => $problem->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        //Удаление интервью респондента
+        if ($descInterview) $descInterview->delete();
+        //Удаление ответов респондента на вопросы интервью
+        foreach ($answers as $answer) $answer->delete();
+        //Удаление дирректории респондента
+        $del_dir = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/interviews/respond-'.$this->id;
+        if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+        //Удаление кэша для форм респондента
+        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        //Обновление данных подтверждения
+        $confirmProblem->count_respond = $confirmProblem->count_respond - 1;
+        $confirmProblem->save();
     }
 
 }

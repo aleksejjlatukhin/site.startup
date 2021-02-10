@@ -6,7 +6,6 @@ use app\models\forms\FormCreateSegment;
 use app\models\forms\FormUpdateSegment;
 use app\models\Projects;
 use app\models\Roadmap;
-use app\models\SegmentSearch;
 use app\models\TypeOfActivityB2B;
 use app\models\TypeOfActivityB2C;
 use app\models\User;
@@ -183,14 +182,14 @@ class SegmentController extends AppController
     /**
      * @param $id
      * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
         $model = new FormCreateSegment();
         $model->project_id = $id;
         $project = Projects::findOne(['id' => $model->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -201,10 +200,6 @@ class SegmentController extends AppController
                     if ($model->validate(['name'])) {
 
                         if ($model->create()) {
-
-                            //Удаление кэша формы создания сегмента
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
-                            if ($cache->exists('formCreateSegmentCache')) $cache->delete('formCreateSegmentCache');
 
                             $type_sort_id = $_POST['type_sort_id'];
 
@@ -275,9 +270,10 @@ class SegmentController extends AppController
         }
     }
 
+
     /**
      * @param $id
-     * @return array|\yii\web\Response
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -515,37 +511,19 @@ class SegmentController extends AppController
     }
 
 
-
     /**
-     * Deletes an existing Segment model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $project = Projects::findOne(['id' => $model->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
 
         if(Yii::$app->request->isAjax) {
-
-            // Удаление прикрепленных файлов сегмента
-            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
-                    '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($model->name), "windows-1251"), "windows-1251"));
-
-            if (file_exists($pathDelete)){
-                $this->delTree($pathDelete);
-            }
-
-            // Удаление кэша для форм сегмента
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$model->id;
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
 
             if ($model->deleteStage()) {
                 return true;

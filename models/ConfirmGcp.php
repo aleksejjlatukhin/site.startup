@@ -82,8 +82,14 @@ class ConfirmGcp extends \yii\db\ActiveRecord
 
 
     //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
-    public function createRespondConfirm ($responds)
+    public function createRespond ()
     {
+        $gcp = Gcp::findOne($this->gcp_id);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirm_problem_id);
+        $responds = RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->all();
+
         foreach ($responds as $respond) {
 
             $respondConfirm = new RespondsGcp();

@@ -84,8 +84,14 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
 
     //Создание респондентов для программы подтверждения ГПС из представителей сегмента
-    public function createRespondConfirm ($responds)
+    public function createRespond ()
     {
+        $problem = GenerationProblem::findOne($this->gps_id);
+        $interview = Interview::findOne($problem->interview_id);
+        $responds = Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
+
         foreach ($responds as $respond) {
 
             $respondConfirm = new RespondsConfirm();

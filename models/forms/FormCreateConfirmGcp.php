@@ -5,8 +5,13 @@ namespace app\models\forms;
 
 use app\models\ConfirmGcp;
 use app\models\Gcp;
+use app\models\GenerationProblem;
+use app\models\Projects;
+use app\models\Segment;
 use app\models\User;
 use yii\base\Model;
+use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 class FormCreateConfirmGcp extends Model
 {
@@ -41,52 +46,64 @@ class FormCreateConfirmGcp extends Model
     }
 
 
+    /**
+     * @return ConfirmGcp
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     */
     public function create()
     {
+        $gcp = Gcp::findOne($this->gcp_id);
+        $problem = GenerationProblem::findOne($gcp->problem_id);
+        $segment = Segment::findOne($gcp->segment_id);
+        $project = Projects::findOne($gcp->project_id);
+        $user = User::findOne($project->user_id);
+
         $model = new ConfirmGcp();
         $model->gcp_id = $this->gcp_id;
         $model->count_respond = $this->count_respond;
         $model->count_positive = $this->count_positive;
-        $this->addDir();
 
-        return $model->save() ? $model : null;
-    }
+        if ($model->save()) {
+            //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
+            $model->createRespond();
+            //Вопросы, которые будут добавлены по-умолчанию
+            $this->addListQuestions($model->id);
+            //Удаление кэша формы создания подтверждения
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm';
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
-
-    private function addDir()
-    {
-        $gcp = Gcp::findOne(['id' => $this->gcp_id]);
-        $problem = $gcp->problem;
-        $segment = $gcp->segment;
-        $project = $gcp->project;
-        $user = User::findOne($project->user_id);
-
-        $mvps_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($problem->title) , "windows-1251") . '/gcps/'
-            . mb_convert_encoding($this->translit($gcp->title) , "windows-1251") . '/mvps/';
-
-        $mvps_dir = mb_strtolower($mvps_dir, "windows-1251");
-
-        if (!file_exists($mvps_dir)){
-            mkdir($mvps_dir, 0777);
+            return $model;
         }
+        throw new NotFoundHttpException('Ошибка. Неудалось создать подтверждение ценностного предложения');
     }
 
 
-    public function translit($s)
+    /**
+     * @param $id
+     * @return bool
+     * @throws NotFoundHttpException
+     */
+    private function addListQuestions ($id)
     {
-        $s = (string) $s; // преобразуем в строковое значение
-        $s = strip_tags($s); // убираем HTML-теги
-        $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
-        $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
-        $s = trim($s); // убираем пробелы в начале и конце строки
-        $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
-        $s = strtr($s, array('а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','ш'=>'sh','щ'=>'shch','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>''));
-        $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
-        $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
-        return $s; // возвращаем результат
+        $model = ConfirmGcp::findOne($id);
 
+        if ($model) {
+            $model->addQuestionDefault('Во сколько обходится эта проблема?');
+            $model->addQuestionDefault('Сколько сейчас платят?');
+            $model->addQuestionDefault('Какой бюджет до этого выделяли?');
+            $model->addQuestionDefault('Что еще пытались сделать?');
+            $model->addQuestionDefault('Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?');
+            $model->addQuestionDefault('Как вы решаете эту проблему сейчас?');
+            $model->addQuestionDefault('Кто будет финансировать покупку?');
+            $model->addQuestionDefault('С кем еще мне следует переговорить?');
+            $model->addQuestionDefault('Решает ли ценностное предложенное вашу проблему?');
+            $model->addQuestionDefault('Вы бы рассказали об этом ценностном предложении своим коллегам?');
+            $model->addQuestionDefault('Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?');
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Неудалось добавить вопросы для подтверждения ценностного предложения');
     }
 }

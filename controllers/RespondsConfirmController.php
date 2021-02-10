@@ -2,9 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\AnswersQuestionsConfirmProblem;
 use app\models\ConfirmProblem;
-use app\models\DescInterviewConfirm;
 use app\models\forms\CreateRespondConfirmForm;
 use app\models\forms\FormUpdateConfirmProblem;
 use app\models\GenerationProblem;
@@ -164,19 +162,17 @@ class RespondsConfirmController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
         $confirmProblem = ConfirmProblem::findOne($id);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
         $limit_count_respond = RespondsConfirm::LIMIT_COUNT;
         $newRespond = new CreateRespondConfirmForm();
         $newRespond->confirm_problem_id = $id;
-        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -187,16 +183,6 @@ class RespondsConfirmController extends AppController
                     if ($newRespond->validate(['name'])) {
 
                         if ($newRespond = $newRespond->create()) {
-
-                            $newRespond->addAnswersForNewRespond();
-
-                            $confirmProblem->count_respond = $confirmProblem->count_respond + 1;
-                            $confirmProblem->save();
-
-                            //Удаление кэша формы создания
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateRespond/';
-                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = RespondsConfirm::findAll(['confirm_problem_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -330,13 +316,8 @@ class RespondsConfirmController extends AppController
     public function actionDelete ($id) {
 
         $model = $this->findModel($id);
-        $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $model->id]);
-        $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
         $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsConfirm::find()->where(['confirm_problem_id' => $confirmProblem->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -360,49 +341,19 @@ class RespondsConfirmController extends AppController
 
             else {
 
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                foreach ($answers as $answer){
-                    $answer->delete();
-                }
-
-                // Удаление прикрепленных файлов
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") .'/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") .'/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'.
-                    mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/interviews/'.
-                    mb_convert_encoding($this->translit($model->name) , "windows-1251") .'/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
-                // Удаление кэша для форм респондента
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$model->id;
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
-
                 if ($model->delete()) {
 
-                    $confirmProblem->count_respond = $confirmProblem->count_respond - 1;
-                    $confirmProblem->save();
+                    $response = [
+                        'success' => true,
+                        'confirm_problem_id' => $model->confirm_problem_id,
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($model->confirm_problem_id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->confirm_problem_id)]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-
-                $response = [
-                    'success' => true,
-                    'confirm_problem_id' => $model->confirm_problem_id,
-                    'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($model->confirm_problem_id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->confirm_problem_id)]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                return false;
             }
-
         }
         return false;
     }

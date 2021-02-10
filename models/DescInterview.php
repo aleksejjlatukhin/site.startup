@@ -4,7 +4,9 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 
 class DescInterview extends \yii\db\ActiveRecord
@@ -23,34 +25,6 @@ class DescInterview extends \yii\db\ActiveRecord
     public function getRespond()
     {
         return $this->hasOne(Respond::class, ['id' => 'respond_id']);
-    }
-
-    public function upload($path)
-    {
-        if (!is_dir($path)){
-
-            throw new NotFoundHttpException('Дирректория не существует!');
-
-        }else{
-
-            if ($this->validate()) {
-
-                $filename=Yii::$app->getSecurity()->generateRandomString(15);
-                try{
-
-                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
-                    $this->server_file = $filename . '.' . $this->loadFile->extension;
-
-                }catch (\Exception $e){
-
-                    throw new NotFoundHttpException('Невозможно загрузить файл!');
-                }
-
-                return true;
-            } else {
-                return false;
-            }
-        }
     }
 
     /**
@@ -104,5 +78,99 @@ class DescInterview extends \yii\db\ActiveRecord
         });
 
         parent::init();
+    }
+
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     */
+    public function create()
+    {
+        $respond = Respond::findOne($this->respond_id);
+        $confirmSegment = Interview::findOne($respond->interview_id);
+        $segment = Segment::findOne($confirmSegment->segment_id);
+        $project = Projects::findOne($segment->project_id);
+        $user = User::findOne($project->user_id);
+
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            // Удаление кэша для форм респондента
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id;
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    public function updateInterview()
+    {
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    private function uploadFileInterview()
+    {
+        $respond = Respond::findOne($this->respond_id);
+        $confirmSegment = Interview::findOne($respond->interview_id);
+        $segment = Segment::findOne($confirmSegment->segment_id);
+        $project = Projects::findOne($segment->project_id);
+        $user = User::findOne($project->user_id);
+
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/interviews/respond-'.$respond->id.'/';
+        if (!is_dir($path)) FileHelper::createDirectory($path);
+
+        if ($this->validate()) {
+
+            $filename=Yii::$app->getSecurity()->generateRandomString(15);
+            try{
+
+                $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+            }catch (\Exception $e){
+
+                throw new NotFoundHttpException('Невозможно загрузить файл!');
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }

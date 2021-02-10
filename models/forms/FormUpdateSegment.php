@@ -8,6 +8,7 @@ use app\models\Projects;
 use app\models\Segment;
 use app\models\TypeOfActivityB2C;
 use app\models\TypeOfActivityB2B;
+use yii\web\NotFoundHttpException;
 
 class FormUpdateSegment extends FormSegment
 {
@@ -101,6 +102,7 @@ class FormUpdateSegment extends FormSegment
 
     /**
      * @return Segment|null
+     * @throws NotFoundHttpException
      */
     public function update()
     {
@@ -125,9 +127,8 @@ class FormUpdateSegment extends FormSegment
 
             $segment->market_volume = $this->market_volume_b2c;
 
-            $this->updateDirName();
-
-            return $segment->save() ? $segment : null;
+            if ($segment->save()) return $segment;
+            throw new NotFoundHttpException('Неудалось сохранить сегмент');
 
         }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
@@ -143,37 +144,8 @@ class FormUpdateSegment extends FormSegment
 
             $segment->market_volume = $this->market_volume_b2b;
 
-            $this->updateDirName();
-
-            return $segment->save() ? $segment : null;
-        }
-    }
-
-
-    public function updateDirName()
-    {
-        $models = Segment::findAll(['project_id' => $this->project_id]);
-        $project = Projects::findOne(['id' => $this->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-
-        foreach ($models as $item){
-
-            if ($this->id == $item->id && mb_strtolower($this->name) !== mb_strtolower($item->name)){
-
-                $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($item->name) , "windows-1251") . '/';
-
-                $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($this->name) , "windows-1251") . '/';
-
-                $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                rename($old_dir, $new_dir);
-            }
+            if ($segment->save()) return $segment;
+            throw new NotFoundHttpException('Неудалось сохранить сегмент');
         }
     }
 

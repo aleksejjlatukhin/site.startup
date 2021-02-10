@@ -8,6 +8,8 @@ use app\models\Projects;
 use app\models\Segment;
 use app\models\TypeOfActivityB2C;
 use app\models\TypeOfActivityB2B;
+use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 
 class FormCreateSegment extends FormSegment
@@ -48,7 +50,9 @@ class FormCreateSegment extends FormSegment
 
 
     /**
-     * @return Segment|bool|null
+     * @return Segment|bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function create()
     {
@@ -86,9 +90,15 @@ class FormCreateSegment extends FormSegment
 
                 $segment->market_volume = $this->market_volume_b2c;
 
-                $this->createDirName();
+                if ($segment->save()) {
 
-                return $segment->save() ? $segment : null;
+                    //Удаление кэша формы создания сегмента
+                    $cachePathDelete = '../runtime/cache/forms/user-'.$segment->project->user->id. '/projects/project-'.$segment->project->id.'/segments/formCreate';
+                    if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+                    return $segment;
+                }
+                throw new NotFoundHttpException('Ошибка. Неудалось сохранить сегмент');
 
             }elseif ($this->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
@@ -112,31 +122,20 @@ class FormCreateSegment extends FormSegment
 
                 $segment->market_volume = $this->market_volume_b2b;
 
-                $this->createDirName();
+                if ($segment->save()) {
 
-                return $segment->save() ? $segment : null;
+                    //Удаление кэша формы создания сегмента
+                    $cachePathDelete = '../runtime/cache/forms/user-'.$segment->project->user->id. '/projects/project-'.$segment->project->id.'/segments/formCreate';
+                    if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+                    return $segment;
+                }
+                throw new NotFoundHttpException('Неудалось сохранить сегмент');
             }
 
         }
 
         return false;
-    }
-
-
-    public function createDirName()
-    {
-        $project = Projects::findOne(['id' => $this->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-
-        $segments_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/';
-
-        $segment_dir = $segments_dir . '/' . mb_convert_encoding($this->translit($this->name) , "windows-1251") . '/';
-        $segment_dir = mb_strtolower($segment_dir, "windows-1251");
-
-        if (!file_exists($segment_dir)){
-            mkdir($segment_dir, 0777);
-        }
     }
 
 

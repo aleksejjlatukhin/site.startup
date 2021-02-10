@@ -5,7 +5,16 @@ namespace app\models\forms;
 
 
 use app\models\BusinessModel;
+use app\models\ConfirmMvp;
+use app\models\Gcp;
+use app\models\GenerationProblem;
+use app\models\Mvp;
+use app\models\Projects;
+use app\models\Segment;
+use app\models\User;
 use yii\base\Model;
+use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 class FormCreateBusinessModel extends Model
 {
@@ -16,6 +25,7 @@ class FormCreateBusinessModel extends Model
     public $distribution_of_sales;
     public $cost;
     public $revenue;
+    public $confirm_mvp_id;
 
     /**
      * {@inheritdoc}
@@ -46,16 +56,28 @@ class FormCreateBusinessModel extends Model
     }
 
 
-    public function create ($confirm_mvp_id, $mvp_id, $gcp_id, $problem_id, $segment_id, $project_id){
+    /**
+     * @return BusinessModel
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     */
+    public function create (){
+
+        $confirmMvp = ConfirmMvp::findOne($this->confirm_mvp_id);
+        $mvp = Mvp::findOne($confirmMvp->mvp_id);
+        $gcp = Gcp::findOne($mvp->gcp_id);
+        $problem = GenerationProblem::findOne($mvp->problem_id);
+        $segment = Segment::findOne($mvp->segment_id);
+        $project = Projects::findOne($mvp->project_id);
+        $user = User::findOne($project->user_id);
 
         $model = new BusinessModel();
-
-        $model->confirm_mvp_id = $confirm_mvp_id;
-        $model->mvp_id = $mvp_id;
-        $model->gcp_id = $gcp_id;
-        $model->problem_id = $problem_id;
-        $model->segment_id = $segment_id;
-        $model->project_id = $project_id;
+        $model->confirm_mvp_id = $this->confirm_mvp_id;
+        $model->mvp_id = $mvp->id;
+        $model->gcp_id = $gcp->id;
+        $model->problem_id = $problem->id;
+        $model->segment_id = $segment->id;
+        $model->project_id = $project->id;
         $model->relations = $this->relations;
         $model->partners = $this->partners;
         $model->distribution_of_sales = $this->distribution_of_sales;
@@ -63,6 +85,15 @@ class FormCreateBusinessModel extends Model
         $model->cost = $this->cost;
         $model->revenue = $this->revenue;
 
-        return $model->save() ? $model : null;
+        if ($model->save()){
+
+            //Удаление кэша формы создания бизнес-модели
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate';
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+            return $model;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось сохранить бизнес-модель');
     }
 }

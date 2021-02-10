@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\FileHelper;
 
 class Respond extends \yii\db\ActiveRecord
 {
@@ -62,6 +63,9 @@ class Respond extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     *
+     */
     public function addAnswersForNewRespond()
     {
         $questions = QuestionsConfirmSegment::find()->where(['interview_id' => $this->interview_id])->all();
@@ -94,6 +98,40 @@ class Respond extends \yii\db\ActiveRecord
             $this->confirm->segment->project->user->touch('updated_at');
         });
 
+        $this->on(self::EVENT_BEFORE_DELETE, function (){
+            $this->deleteDataRespond();
+        });
+
         parent::init();
+    }
+
+
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
+    private function deleteDataRespond()
+    {
+        $descInterview = DescInterview::findOne(['respond_id' => $this->id]);
+        $answers = AnswersQuestionsConfirmSegment::findAll(['respond_id' => $this->id]);
+        $interview = Interview::findOne(['id' => $this->interview_id]);
+        $segment = Segment::findOne(['id' => $interview->segment_id]);
+        $project = Projects::findOne(['id' => $segment->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        //Удаление интервью респондента
+        if ($descInterview) $descInterview->delete();
+        //Удаление ответов респондента на вопросы интервью
+        foreach ($answers as $answer) $answer->delete();
+        //Удаление дирректории респондента
+        $del_dir = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/interviews/respond-'.$this->id;
+        if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+        //Удаление кэша для форм респондента
+        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        //Обновление данных подтверждения
+        $interview->count_respond = $interview->count_respond - 1;
+        $interview->save();
     }
 }

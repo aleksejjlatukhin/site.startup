@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use app\models\AnswersQuestionsConfirmSegment;
 use app\models\forms\FormCreateConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\forms\FormUpdateConfirmSegment;
@@ -15,6 +14,7 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Interview;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 
@@ -22,6 +22,11 @@ use yii\helpers\ArrayHelper;
 class InterviewController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
@@ -275,11 +280,11 @@ class InterviewController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionNotExistConfirm($id)
     {
@@ -300,10 +305,7 @@ class InterviewController extends AppController
 
                 // Удаление дирректории для кэша подтверждения
                 $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm';
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
+                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
                 $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['/segment/index', 'id' => $project->id]);
@@ -311,11 +313,11 @@ class InterviewController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionExistConfirm($id)
     {
@@ -331,10 +333,7 @@ class InterviewController extends AppController
 
             // Удаление дирректории для кэша подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm';
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
             $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/generation-problem/index', 'id' => $id]);
@@ -394,41 +393,20 @@ class InterviewController extends AppController
 
     /**
      * @param $id
-     * @return array|\yii\web\Response
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionSaveInterview($id)
     {
-        $segment = Segment::findOne($id);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $model = new FormCreateConfirmSegment();
         $model->segment_id = $id;
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
                 if ($model = $model->create()){
-
-                    //Создание респондентов по заданному значению count_respond
-                    $model->createRespond();
-
-                    //Вопросы, которые будут добавлены по-умолчанию
-                    $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
-                    $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
-                    $model->addQuestionDefault('Вас беспокоит данная ситуация?');
-                    $model->addQuestionDefault('Что вы пытались с этим сделать?');
-                    $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
-                    $model->addQuestionDefault('Если ничего не делали, то почему?');
-                    $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
-                    $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
-                    $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
-                    $model->addQuestionDefault('Как принимается решение о покупке?');
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm/';
-                    if ($cache->exists('formCreateConfirmSegmentCache')) $cache->delete('formCreateConfirmSegmentCache');
 
                     $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -473,6 +451,10 @@ class InterviewController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
      */
     public function actionUpdate ($id)
     {

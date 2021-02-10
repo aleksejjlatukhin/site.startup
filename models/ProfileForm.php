@@ -93,25 +93,7 @@ class ProfileForm extends Model
         $user->telephone = $this->telephone;
         $user->email = $this->email;
 
-        $this->updateUserDir($user);
-
         return $user->save() ? $user : null;
-    }
-
-
-    private function updateUserDir($user)
-    {
-        if ($user->username != $this->username){
-
-            $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/';
-
-            $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($this['username'], "windows-1251"), "windows-1251")
-                . '/';
-
-            rename($old_dir, $new_dir);
-        }
-
-        return $user->username = $this->username;
     }
 }
 

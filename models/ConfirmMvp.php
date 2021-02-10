@@ -82,8 +82,14 @@ class ConfirmMvp extends \yii\db\ActiveRecord
 
 
     //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ГЦП
-    public function createRespondConfirm ($responds)
+    public function createRespond ()
     {
+        $mvp = Mvp::findOne($this->mvp_id);
+        $confirmGcp = ConfirmGcp::findOne($mvp->confirm_gcp_id);
+        $responds = RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->all();
+
         foreach ($responds as $respond) {
 
             $respondConfirm = new RespondsMvp();

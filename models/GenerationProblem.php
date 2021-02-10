@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 
 class GenerationProblem extends \yii\db\ActiveRecord
 {
@@ -128,9 +129,13 @@ class GenerationProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function deleteStage ()
     {
-
         if ($gcps = $this->gcps) {
             foreach ($gcps as $gcp) {
                 $gcp->deleteStage();
@@ -148,9 +153,19 @@ class GenerationProblem extends \yii\db\ActiveRecord
 
             QuestionsConfirmProblem::deleteAll(['confirm_problem_id' => $confirm->id]);
             RespondsConfirm::deleteAll(['confirm_problem_id' => $confirm->id]);
+
             $confirm->delete();
         }
 
+        // Удаление директории проблемы
+        $problemPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.'/problems/problem-'.$this->id;
+        if (file_exists($problemPathDelete)) FileHelper::removeDirectory($problemPathDelete);
+
+        // Удаление кэша для форм проблемы
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.'/problems/problem-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление проблемы
         $this->delete();
     }
 }

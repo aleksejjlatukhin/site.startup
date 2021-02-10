@@ -22,6 +22,7 @@ use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmMvp;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
@@ -300,6 +301,7 @@ class ConfirmMvpController extends AppController
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionNotExistConfirm($id)
     {
@@ -325,10 +327,7 @@ class ConfirmMvpController extends AppController
                 // Удаление дирректории для кэша подтверждения
                 $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
                     '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm';
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
+                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
                 $mvp->trigger(Mvp::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['mvp/index', 'id' => $confirmGcp->id]);
@@ -341,6 +340,7 @@ class ConfirmMvpController extends AppController
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionExistConfirm($id)
     {
@@ -360,10 +360,7 @@ class ConfirmMvpController extends AppController
             // Удаление дирректории для кэша подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
                 '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm';
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
             $mvp->trigger(Mvp::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['business-model/index', 'id' => $model->id]);
@@ -445,26 +442,16 @@ class ConfirmMvpController extends AppController
         ]);
     }
 
-
     /**
      * @param $id
-     * @return array|\yii\web\Response
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionSaveConfirmMvp($id)
     {
         $model = new FormCreateConfirmMvp();
         $model->mvp_id = $id;
-        $mvp = Mvp::findOne($id);
-        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
-        $responds = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->all();
-        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
-        $segment = Segment::findOne(['id' => $mvp->segment_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -472,26 +459,7 @@ class ConfirmMvpController extends AppController
 
                 if ($model = $model->create()) {
 
-                    //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ЦП
-                    $model->createRespondConfirm($responds);
-
-                    //Вопросы, которые будут добавлены по-умолчанию
-                    $model->addQuestionDefault('Что нравится в представленном MVP?');
-                    $model->addQuestionDefault('Что не нравится в представленном MVP?');
-                    $model->addQuestionDefault('Чем отличается ожидаемое решение от представленного?');
-                    $model->addQuestionDefault('Что бы Вы хотели сделать по другому?');
-                    $model->addQuestionDefault('Что показалось неудобным?');
-                    $model->addQuestionDefault('Вы готовы заплатить за такой продукт?');
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                        '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/formCreateConfirm/';
-                    if ($cache->exists('formCreateConfirmMvpCache')) $cache->delete('formCreateConfirmMvpCache');
-
-                    $response =  [
-                        'success' => true,
-                        'id' => $model->id,
-                    ];
+                    $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
                     return $response;
@@ -500,9 +468,11 @@ class ConfirmMvpController extends AppController
         }
     }
 
+
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {

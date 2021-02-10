@@ -223,23 +223,6 @@ class User extends ActiveRecord implements IdentityInterface
         return $timestamp + $expire >= time();
     }
 
-    //Создание папки username
-    public function createDirName()
-    {
-        if ($this->status === self::STATUS_ACTIVE) {
-
-            $user_dir = UPLOAD . mb_convert_encoding($this->username, "windows-1251") . '/';
-            $user_dir = mb_strtolower($user_dir, "windows-1251");
-            if (!file_exists($user_dir)) {
-                mkdir($user_dir, 0777);
-            }
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 
     //Поиск пользователя по email или login
     public static function findIdentityByUsernameOrEmail($identity)

@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use app\models\AnswersQuestionsConfirmSegment;
-use app\models\DescInterview;
 use app\models\forms\CreateRespondForm;
 use app\models\forms\FormUpdateConfirmSegment;
 use app\models\Interview;
@@ -19,6 +17,11 @@ use yii\web\NotFoundHttpException;
 class RespondController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
@@ -153,18 +156,18 @@ class RespondController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
         $interview = Interview::findOne($id);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_models = Respond::find()->where(['interview_id' => $id])->count();
         $limit_count_respond = Respond::LIMIT_COUNT;
         $newRespond = new CreateRespondForm();
         $newRespond->interview_id = $id;
-        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post()))
         {
@@ -175,15 +178,6 @@ class RespondController extends AppController
                     if ($newRespond->validate(['name'])) {
 
                         if ($newRespond = $newRespond->create()) {
-
-                            $newRespond->addAnswersForNewRespond();
-
-                            $interview->count_respond = $interview->count_respond + 1;
-                            $interview->save();
-
-                            //Удаление кэша формы создания
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond/';
-                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = Respond::findAll(['interview_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -235,22 +229,21 @@ class RespondController extends AppController
 
     /**
      * @param $id
-     * @return Respond|array
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $updateRespondForm = new UpdateRespondForm($id);
+        $model = new UpdateRespondForm($id);
         $interview = Interview::findOne(['id' => $model->interview_id]);
 
-        if ($updateRespondForm->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($updateRespondForm->validate(['name'])){
+                if ($model->validate(['name'])){
 
-                    if ($updateRespondForm->updateRespond()){
+                    if ($model->updateRespond()){
 
                         $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -317,12 +310,9 @@ class RespondController extends AppController
     public function actionDelete ($id) {
 
         $model = $this->findModel($id);
-        $descInterview = DescInterview::findOne(['respond_id' => $model->id]);
-        $answers = AnswersQuestionsConfirmSegment::findAll(['respond_id' => $id]);
         $interview = Interview::findOne(['id' => $model->interview_id]);
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = Respond::find()->where(['interview_id' => $interview->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -345,48 +335,19 @@ class RespondController extends AppController
 
             else {
 
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                foreach ($answers as $answer){
-                    $answer->delete();
-                }
-
-                // Удаление прикрепленных файлов
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                    mb_convert_encoding($this->translit($model->name), "windows-1251") . '/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
-                // Удаление кэша для форм респондента
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                    '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$model->id;
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
-
-
                 if ($model->delete()) {
-                    $interview->count_respond = $interview->count_respond - 1;
-                    $interview->save();
+
+                    $response = [
+                        'success' => true,
+                        'interview_id' => $model->interview_id,
+                        'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($model->interview_id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->interview_id), 'project' => $project]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-
-                $response = [
-                    'success' => true,
-                    'interview_id' => $model->interview_id,
-                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($model->interview_id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->interview_id), 'project' => $project]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                return false;
             }
-
         }
         return false;
     }

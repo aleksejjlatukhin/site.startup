@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\FileHelper;
 
 class RespondsMvp extends \yii\db\ActiveRecord
 {
@@ -96,6 +97,46 @@ class RespondsMvp extends \yii\db\ActiveRecord
             $this->confirm->mvp->project->user->touch('updated_at');
         });
 
+        $this->on(self::EVENT_BEFORE_DELETE, function (){
+            $this->deleteDataRespond();
+        });
+
         parent::init();
     }
+
+
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
+    private function deleteDataRespond()
+    {
+        $descInterview = DescInterviewMvp::findOne(['responds_mvp_id' => $this->id]);
+        $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->id]);
+        $confirmMvp = ConfirmMvp::findOne(['id' => $this->confirm_mvp_id]);
+        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
+        $segment = Segment::findOne(['id' => $mvp->segment_id]);
+        $project = Projects::findOne(['id' => $mvp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        //Удаление интервью респондента
+        if ($descInterview) $descInterview->delete();
+        //Удаление ответов респондента на вопросы интервью
+        foreach ($answers as $answer) $answer->delete();
+        //Удаление дирректории респондента
+        $del_dir = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.
+            '/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/interviews/respond-'.$this->id;
+        if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+        //Удаление кэша для форм респондента
+        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        //Обновление данных подтверждения
+        $confirmMvp->count_respond = $confirmMvp->count_respond - 1;
+        $confirmMvp->save();
+    }
+
 }

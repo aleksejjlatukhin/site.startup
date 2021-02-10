@@ -159,38 +159,27 @@ class BusinessModelController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
         $model = new FormCreateBusinessModel();
+        $model->confirm_mvp_id = $id;
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $confirmGcp = ConfirmGcp::find()->where(['id' => $mvp->confirm_gcp_id])->one();
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $confirmProblem = ConfirmProblem::find()->where(['id' => $gcp->confirm_problem_id])->one();
-        $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
-        $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
-        $segment = Segment::find()->where(['id' => $interview->segment_id])->one();
-        $project = Projects::find()->where(['id' => $segment->project_id])->one();
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
+        $gcp = Gcp::findOne($mvp->gcp_id);
+        $segment = Segment::findOne($mvp->segment_id);
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($businessModel = $model->create($id, $mvp->id, $gcp->id, $generationProblem->id, $segment->id, $project->id)) {
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                        '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate/';
-                    if ($cache->exists('formCreateBusinessModelCache')) $cache->delete('formCreateBusinessModelCache');
+                if ($businessModel = $model->create()) {
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'model' => BusinessModel::findOne(['confirm_mvp_id' => $id]),
-                            'segment' => $segment,
-                            'gcp' => $gcp,
+                            'model' => $businessModel, 'segment' => $segment, 'gcp' => $gcp,
                         ]),
                     ];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -201,6 +190,26 @@ class BusinessModelController extends AppController
         }
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+    }
 
     /**
      * @param $id
@@ -234,29 +243,6 @@ class BusinessModelController extends AppController
             }
         }
     }
-
-
-    /**
-     * @param $id
-     * @return array
-     * @throws NotFoundHttpException
-     */
-    public function actionGetHypothesisToUpdate ($id)
-    {
-        $model = $this->findModel($id);
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'model' => $model,
-                'renderAjax' => $this->renderAjax('update', ['model' => $model]),
-            ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
-            return $response;
-        }
-    }
-
 
     /**
      * export in pdf

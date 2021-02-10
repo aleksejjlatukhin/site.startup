@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 
 class Mvp extends \yii\db\ActiveRecord
 {
@@ -19,7 +20,6 @@ class Mvp extends \yii\db\ActiveRecord
     {
         return 'mvp';
     }
-
 
     /**
      * Mvp constructor.
@@ -127,6 +127,11 @@ class Mvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function deleteStage ()
     {
         if ($businessModel = $this->businessModel) {
@@ -147,6 +152,17 @@ class Mvp extends \yii\db\ActiveRecord
             $confirm->delete();
         }
 
+        // Удаление директории MVP
+        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
+            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->gcp->id.'/mvps/mvp-'.$this->id;
+        if (file_exists($gcpPathDelete)) FileHelper::removeDirectory($gcpPathDelete);
+
+        // Удаление кэша для форм MVP
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
+            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->gcp->id.'/mvps/mvp-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление MVP
         $this->delete();
     }
 }

@@ -291,6 +291,9 @@ $script = '
         //alert(id);
     //});
     
+    //Всплывающие  блоки
+    $(\'[data-toggle="popover"]\').popover({html:true});
+    
     $("body").on("click", "a.update", function(event) {
         event.preventDefault();
         var url = $(this).attr("href");

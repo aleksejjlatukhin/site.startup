@@ -4,6 +4,7 @@ namespace app\models;
 
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 
 class Segment extends \yii\db\ActiveRecord
 {
@@ -160,7 +161,11 @@ class Segment extends \yii\db\ActiveRecord
         parent::init();
     }
 
-
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function deleteStage ()
     {
 
@@ -184,6 +189,15 @@ class Segment extends \yii\db\ActiveRecord
             $confirm->delete();
         }
 
+        // Удаление директории сегмента
+        $segmentPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->id;
+        if (file_exists($segmentPathDelete)) FileHelper::removeDirectory($segmentPathDelete);
+
+        // Удаление кэша для форм сегмента
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление сегмента
         $this->delete();
     }
 }

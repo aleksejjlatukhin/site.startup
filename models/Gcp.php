@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 
 class Gcp extends \yii\db\ActiveRecord
 {
@@ -128,6 +129,11 @@ class Gcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function deleteStage ()
     {
         if ($mvps = $this->mvps) {
@@ -150,6 +156,17 @@ class Gcp extends \yii\db\ActiveRecord
             $confirm->delete();
         }
 
+        // Удаление директории ГЦП
+        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
+            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->id;
+        if (file_exists($gcpPathDelete)) FileHelper::removeDirectory($gcpPathDelete);
+
+        // Удаление кэша для форм ГЦП
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
+            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление ГЦП
         $this->delete();
     }
 }

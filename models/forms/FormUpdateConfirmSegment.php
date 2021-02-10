@@ -10,6 +10,8 @@ use app\models\Segment;
 use app\models\Interview;
 use app\models\Respond;
 use app\models\DescInterview;
+use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 class FormUpdateConfirmSegment extends Model
 {
@@ -41,8 +43,6 @@ class FormUpdateConfirmSegment extends Model
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'segment_id' => 'Segment ID',
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Количество респондентов, соответствующих сегменту',
             'greeting_interview' => 'Приветствие в начале встречи',
@@ -51,6 +51,11 @@ class FormUpdateConfirmSegment extends Model
         ];
     }
 
+    /**
+     * FormUpdateConfirmSegment constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $confirm_segment = Interview::findOne($id);
@@ -66,9 +71,15 @@ class FormUpdateConfirmSegment extends Model
         parent::__construct($config);
     }
 
+    /**
+     * @return Interview|bool|null
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function update()
     {
-
         if ($this->validate()) {
 
             $confirm_segment = Interview::findOne($this->id);
@@ -78,15 +89,21 @@ class FormUpdateConfirmSegment extends Model
             $confirm_segment->view_interview = $this->view_interview;
             $confirm_segment->reason_interview = $this->reason_interview;
 
-            $this->updateCountResponds();
-
-            return $confirm_segment->save() ? $confirm_segment : null;
+            if ($confirm_segment->save()) {
+                $this->updateCountResponds();
+                return $confirm_segment;
+            }
+            throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;
     }
 
 
-    //Редактирование числа респондентов (Шаг 1)
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     private function updateCountResponds ()
     {
         $segment = Segment::findOne($this->segment_id);
@@ -107,53 +124,19 @@ class FormUpdateConfirmSegment extends Model
             $respond = Respond::find()->where(['interview_id' => $this->id])->orderBy(['id' => SORT_DESC])->limit($minus)->all();
             foreach ($respond as $item)
             {
+                // Удаление интервью респондента
                 $descInterview = DescInterview::find()->where(['respond_id' => $item->id])->one();
-
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                    mb_convert_encoding($this->translit($item->name), "windows-1251") . '/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
+                if ($descInterview) $descInterview->delete();
+                // Удаление директории респондента
+                $del_dir = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/interviews/respond-'.$item->id;
+                if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+                // Удаление кэша для форм респондента
+                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$item->id;
+                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                // Удаление респондента
                 $item->delete();
             }
         }
-    }
-
-
-    public function translit($s)
-    {
-        $s = (string) $s; // преобразуем в строковое значение
-        $s = strip_tags($s); // убираем HTML-теги
-        $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
-        $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
-        $s = trim($s); // убираем пробелы в начале и конце строки
-        $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
-        $s = strtr($s, array('а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','ш'=>'sh','щ'=>'shch','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>''));
-        $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
-        $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
-        return $s; // возвращаем результат
-
-    }
-
-    public function delTree($dir)
-    {
-        if ($objs = glob($dir."/*"))
-        {
-            foreach($objs as $obj)
-            {
-                is_dir($obj) ? $this->delTree($obj) : unlink($obj);
-            }
-        }
-        rmdir($dir);
-
     }
 
 }

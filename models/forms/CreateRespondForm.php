@@ -3,8 +3,14 @@
 
 namespace app\models\forms;
 
+use app\models\Interview;
+use app\models\Projects;
 use app\models\Respond;
+use app\models\Segment;
+use app\models\User;
 use yii\base\Model;
+use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 class CreateRespondForm extends Model
 {
@@ -35,12 +41,35 @@ class CreateRespondForm extends Model
     }
 
 
+    /**
+     * @return Respond
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     */
     public function create ()
     {
+        $interview = Interview::findOne($this->interview_id);
+        $segment = Segment::findOne($interview->segment_id);
+        $project = Projects::findOne($segment->project_id);
+        $user = User::findOne($project->user_id);
+
         $model = new Respond();
         $model->interview_id = $this->interview_id;
         $model->name = $this->name;
-        return $model->save() ? $model : null;
+
+        if ($model->save()) {
+            // Добавление пустых ответов на вопросы для нового респондента
+            $model->addAnswersForNewRespond();
+            // Обновление данных подтверждения
+            $interview->count_respond = $interview->count_respond + 1;
+            $interview->save();
+            // Удаление кэша формы создания
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond';
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+            return $model;
+        }
+        throw new NotFoundHttpException('Ошибка. Неудалось добавить нового респондента');
     }
 
     /**

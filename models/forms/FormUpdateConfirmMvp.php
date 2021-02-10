@@ -5,6 +5,7 @@ namespace app\models\forms;
 
 use yii\base\Model;
 use app\models\ConfirmMvp;
+use yii\web\NotFoundHttpException;
 
 class FormUpdateConfirmMvp extends Model
 {
@@ -35,7 +36,11 @@ class FormUpdateConfirmMvp extends Model
         ];
     }
 
-
+    /**
+     * FormUpdateConfirmMvp constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $confirm_mvp = ConfirmMvp::findOne($id);
@@ -48,16 +53,20 @@ class FormUpdateConfirmMvp extends Model
         parent::__construct($config);
     }
 
+    /**
+     * @return ConfirmMvp|bool|null
+     * @throws NotFoundHttpException
+     */
     public function update()
     {
-
         if ($this->validate()) {
 
             $confirm_mvp = ConfirmMvp::findOne($this->id);
             $confirm_mvp->count_respond = $this->count_respond;
             $confirm_mvp->count_positive = $this->count_positive;
 
-            return $confirm_mvp->save() ? $confirm_mvp : null;
+            if ($confirm_mvp->save()) return $confirm_mvp;
+            throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;
     }

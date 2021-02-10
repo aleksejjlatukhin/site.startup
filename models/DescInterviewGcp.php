@@ -4,7 +4,9 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 
 class DescInterviewGcp extends \yii\db\ActiveRecord
@@ -23,34 +25,6 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     public function getRespond()
     {
         return $this->hasOne(RespondsGcp::class, ['id' => 'responds_gcp_id']);
-    }
-
-    public function upload($path)
-    {
-        if (!is_dir($path)){
-
-            throw new NotFoundHttpException('Дирректория не существует!');
-
-        }else{
-
-            if ($this->validate()) {
-
-                $filename = Yii::$app->getSecurity()->generateRandomString(15);
-                try{
-
-                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
-                    $this->server_file = $filename . '.' . $this->loadFile->extension;
-
-                }catch (\Exception $e){
-
-                    throw new NotFoundHttpException('Невозможно загрузить файл!');
-                }
-
-                return true;
-            } else {
-                return false;
-            }
-        }
     }
 
     /**
@@ -101,5 +75,104 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         });
 
         parent::init();
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     */
+    public function create()
+    {
+        $respond = RespondsGcp::findOne($this->responds_gcp_id);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            // Удаление кэша для форм респондента
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id;
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
+    }
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    public function updateInterview()
+    {
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
+    }
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    private function uploadFileInterview()
+    {
+        $respond = RespondsGcp::findOne($this->responds_gcp_id);
+        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
+        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
+        $segment = Segment::findOne(['id' => $gcp->segment_id]);
+        $project = Projects::findOne(['id' => $gcp->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
+
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.
+            '/gcps/gcp-'.$gcp->id.'/interviews/respond-'.$respond->id.'/';
+        if (!is_dir($path)) FileHelper::createDirectory($path);
+
+        if ($this->validate()) {
+
+            $filename = Yii::$app->getSecurity()->generateRandomString(15);
+            try{
+
+                $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+            }catch (\Exception $e){
+
+                throw new NotFoundHttpException('Невозможно загрузить файл!');
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -123,32 +123,22 @@ class GcpController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
         $model = new FormCreateGcp();
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
+        $model->confirm_problem_id = $id;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if (Yii::$app->request->isAjax) {
 
-                if ($model->create($id, $generationProblem->id, $segment->id, $project->id)) {
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                        '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/gcps/formCreate/';
-                    if ($cache->exists('formCreateGcpCache')) $cache->delete('formCreateGcpCache');
+                if ($model->create()) {
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
@@ -162,7 +152,6 @@ class GcpController extends AppController
             }
         }
     }
-
 
     /**
      * @param $id
@@ -217,40 +206,18 @@ class GcpController extends AppController
 
 
     /**
-     * Deletes an existing Gcp model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $generationProblem = GenerationProblem::findOne(['id' => $model->problem_id]);
-        $segment = Segment::findOne(['id' => $model->segment_id]);
-        $project = Projects::findOne(['id' => $model->project_id]);
-        $user = User::find()->where(['id' => $project->user_id])->one();
 
         if(Yii::$app->request->isAjax) {
-
-            // Удаление прикрепленных файлов ГЦП
-            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") .
-                    '/segments/' . mb_strtolower(mb_convert_encoding($this->translit($segment->name), "windows-1251"), "windows-1251") .
-                '/generation problems/' . mb_strtolower(mb_convert_encoding($this->translit($generationProblem->title) , "windows-1251"), "windows-1251") .
-                '/gcps/' . mb_strtolower(mb_convert_encoding($this->translit($model->title) , "windows-1251"), "windows-1251"));
-
-            if (file_exists($pathDelete)){
-                $this->delTree($pathDelete);
-            }
-
-            // Удаление кэша для форм ГЦП
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                '/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$model->id;
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
 
             if ($model->deleteStage()) {
                 return true;

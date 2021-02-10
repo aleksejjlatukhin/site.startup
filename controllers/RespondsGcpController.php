@@ -169,6 +169,8 @@ class RespondsGcpController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
@@ -178,11 +180,6 @@ class RespondsGcpController extends AppController
         $limit_count_respond = RespondsGcp::LIMIT_COUNT;
         $newRespond = new CreateRespondGcpForm();
         $newRespond->confirm_gcp_id = $id;
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -193,16 +190,6 @@ class RespondsGcpController extends AppController
                     if ($newRespond->validate(['name'])) {
 
                         if ($newRespond = $newRespond->create()) {
-
-                            $newRespond->addAnswersForNewRespond();
-
-                            $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
-                            $confirmGcp->save();
-
-                            //Удаление кэша формы создания
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond/';
-                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = RespondsGcp::findAll(['confirm_gcp_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -255,7 +242,7 @@ class RespondsGcpController extends AppController
 
     /**
      * @param $id
-     * @return RespondsGcp|array
+     * @return array
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -336,14 +323,8 @@ class RespondsGcpController extends AppController
     public function actionDelete ($id) {
 
         $model = $this->findModel($id);
-        $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $model->id])->one();
-        $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $id])->all();
         $confirmGcp = ConfirmGcp::find()->where(['id' => $model->confirm_gcp_id])->one();
         $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsGcp::find()->where(['confirm_gcp_id' => $confirmGcp->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -367,50 +348,19 @@ class RespondsGcpController extends AppController
 
             else {
 
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                foreach ($answers as $answer){
-                    $answer->delete();
-                }
-
-                // Удаление прикрепленных файлов
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
-                // Удаление кэша для форм респондента
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$model->id;
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
-
                 if ($model->delete()) {
 
-                    $confirmGcp->count_respond = $confirmGcp->count_respond - 1;
-                    $confirmGcp->save();
+                    $response = [
+                        'success' => true,
+                        'confirm_gcp_id' => $model->confirm_gcp_id,
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($model->confirm_gcp_id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->confirm_gcp_id)]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-
-                $response = [
-                    'success' => true,
-                    'confirm_gcp_id' => $model->confirm_gcp_id,
-                    'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($model->confirm_gcp_id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->confirm_gcp_id)]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                return false;
             }
-
         }
         return false;
     }

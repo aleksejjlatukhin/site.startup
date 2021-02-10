@@ -10,13 +10,17 @@ use app\models\User;
 use Yii;
 use app\models\DescInterview;
 use yii\base\Model;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
-
 
 class DescInterviewController extends AppController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
 
@@ -66,6 +70,11 @@ class DescInterviewController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\console\Response|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionDownload($id)
     {
         $model = DescInterview::findOne($id);
@@ -75,21 +84,23 @@ class DescInterviewController extends AppController
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-            mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
-
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/interviews/respond-'.$respond->id.'/';
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-
             return \Yii::$app->response->sendFile($file, $model->interview_file);
         }
-
+        throw new NotFoundHttpException('Данный файл не найден');
     }
 
 
+    /**
+     * @param $id
+     * @return bool|string
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteFile($id)
     {
         $model = DescInterview::findOne($id);
@@ -98,23 +109,16 @@ class DescInterviewController extends AppController
         $segment = Segment::findOne(['id' => $interview->segment_id]);
         $project = Projects::findOne(['id' => $segment->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $pathDirDelete = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/interviews/respond-'.$respond->id;
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/interviews/' .
-            mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
-
-        unlink($path . $model->server_file);
+        if (file_exists($pathDirDelete)) FileHelper::removeDirectory($pathDirDelete);
 
         $model->interview_file = null;
         $model->server_file = null;
-
         $model->update();
 
-        if (Yii::$app->request->isAjax)
-        {
-            return '';
-        }
+        if (Yii::$app->request->isAjax) return '';
+        else return true;
     }
 
 
@@ -180,6 +184,8 @@ class DescInterviewController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
      */
     public function actionCreate($id)
     {
@@ -187,46 +193,17 @@ class DescInterviewController extends AppController
         $model->respond_id = $id;
         $respond = Respond::findOne($id);
         $interview = Interview::findOne(['id' => $respond->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
-        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
             if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-                foreach ($answers as $answer) {
-                    $answer->save(false);
-                }
-
-                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name), "windows-1251") . '/';
-                if (!file_exists($respond_dir)) {
-                    mkdir($respond_dir, 0777);
-                }
+                foreach ($answers as $answer) $answer->save(false);
 
                 if ($model->load(Yii::$app->request->post())) {
 
-                    if ($model->validate() && $model->save()) {
-
-                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                        if ($model->loadFile !== null) {
-                            if ($model->upload($respond_dir)) {
-                                $model->interview_file = $model->loadFile;
-                                $model->save(false);
-                            }
-                        }
-
-                        //Удаление кэша формы создания
-                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
-                            '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id.'/';
-                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
-
+                    if ($model->create()) {
 
                         $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -265,49 +242,27 @@ class DescInterviewController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
         $respond = Respond::findOne(['id' => $model->respond_id]);
         $interview = Interview::findOne(['id' => $respond->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
 
-        if ($model->interview_file !== null){
-            $model->loadFile = $model->interview_file;
-        }
+        //Если ранее был загружен файл
+        if ($model->interview_file !== null) $model->loadFile = $model->interview_file;
 
         if(Yii::$app->request->isAjax) {
 
             if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-                foreach ($answers as $answer) {
-                    $answer->save(false);
-                }
-
-                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name), "windows-1251") . '/segments/' .
-                    mb_convert_encoding($this->translit($segment->name), "windows-1251") . '/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name), "windows-1251") . '/';
-                if (!file_exists($respond_dir)) {
-                    mkdir($respond_dir, 0777);
-                }
+                foreach ($answers as $answer) $answer->save(false);
 
                 if ($model->load(Yii::$app->request->post())) {
 
-                    if ($model->validate() && $model->save()) {
-
-                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                        if ($model->loadFile !== null) {
-                            if ($model->upload($respond_dir)) {
-                                $model->interview_file = $model->loadFile;
-                                $model->save(false);
-                            }
-                        }
+                    if ($model->updateInterview()) {
 
                         $response = ['interview_id' => $interview->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

@@ -170,6 +170,8 @@ class RespondsMvpController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionCreate($id)
     {
@@ -179,12 +181,6 @@ class RespondsMvpController extends AppController
         $limit_count_respond = RespondsMvp::LIMIT_COUNT;
         $newRespond = new CreateRespondMvpForm();
         $newRespond->confirm_mvp_id = $id;
-        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
-        $segment = Segment::findOne(['id' => $mvp->segment_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($newRespond->load(Yii::$app->request->post())) {
 
@@ -195,16 +191,6 @@ class RespondsMvpController extends AppController
                     if ($newRespond->validate(['name'])) {
 
                         if ($newRespond = $newRespond->create()) {
-
-                            $newRespond->addAnswersForNewRespond();
-
-                            $confirmMvp->count_respond = $confirmMvp->count_respond + 1;
-                            $confirmMvp->save();
-
-                            //Удаление кэша формы создания
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/formCreateRespond/';
-                            if ($cache->exists('formCreateRespondCache')) $cache->delete('formCreateRespondCache');
 
                             $responds = RespondsMvp::findAll(['confirm_mvp_id' => $id]);
                             $page = floor((count($responds) - 1) / 10) + 1;
@@ -257,6 +243,7 @@ class RespondsMvpController extends AppController
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -336,15 +323,8 @@ class RespondsMvpController extends AppController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $descInterview = DescInterviewMvp::findOne(['responds_mvp_id' => $model->id]);
-        $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $id]);
         $confirmMvp = ConfirmMvp::findOne(['id' => $model->confirm_mvp_id]);
         $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
-        $segment = Segment::findOne(['id' => $mvp->segment_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $count_responds = RespondsMvp::find()->where(['confirm_mvp_id' => $confirmMvp->id])->count();
 
         if (Yii::$app->request->isAjax){
@@ -367,51 +347,19 @@ class RespondsMvpController extends AppController
 
             else {
 
-                if ($descInterview) {
-                    $descInterview->delete();
-                }
-
-                foreach ($answers as $answer){
-                    $answer->delete();
-                }
-
-                // Удаление прикрепленных файлов
-                $del_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/mvps/'.
-                    mb_convert_encoding($this->translit($mvp->title) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($model->name) , "windows-1251") . '/';
-
-                if (file_exists($del_dir)) {
-                    $this->delTree($del_dir);
-                }
-
-                // Удаление кэша для форм респондента
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                    '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$model->id;
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
-
                 if ($model->delete()) {
 
-                    $confirmMvp->count_respond = $confirmMvp->count_respond - 1;
-                    $confirmMvp->save();
+                    $response = [
+                        'success' => true,
+                        'confirm_mvp_id' => $model->confirm_mvp_id,
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', ['model' => ConfirmMvp::findOne($model->confirm_mvp_id), 'mvp' => $mvp, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->confirm_mvp_id)]),
+                    ];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
                 }
-
-                $response = [
-                    'success' => true,
-                    'confirm_mvp_id' => $model->confirm_mvp_id,
-                    'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', ['model' => ConfirmMvp::findOne($model->confirm_mvp_id), 'mvp' => $mvp, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->confirm_mvp_id)]),
-                ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
+                return false;
             }
-
         }
         return false;
 

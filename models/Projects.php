@@ -5,7 +5,9 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 class Projects extends ActiveRecord
 {
@@ -160,48 +162,47 @@ class Projects extends ActiveRecord
 
     /**
      * Загрузка презентационных файлов
-     * @param $path
      * @return bool
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function upload($path){
+    private function uploadPresentFiles(){
 
-        if (!is_dir($path)){
+        $path = UPLOAD.'/user-'.$this->user->id.'/project-'.$this->id.'/present_files/';
+        if (!is_dir($path)) FileHelper::createDirectory($path);
 
-            throw new NotFoundHttpException('Дирректория не существует!');
+        if($this->validate()){
 
-        }else{
+            foreach($this->present_files as $file){
 
-            if($this->validate()){
+                $filename = Yii::$app->getSecurity()->generateRandomString(15);
 
-                foreach($this->present_files as $file){
+                try{
 
-                    $filename = Yii::$app->getSecurity()->generateRandomString(15);
+                    $file->saveAs($path . $filename . '.' . $file->extension);
 
-                    try{
+                    $preFiles = new PreFiles();
+                    $preFiles->file_name = $file;
+                    $preFiles->server_file = $filename . '.' . $file->extension;
+                    $preFiles->project_id = $this->id;
+                    $preFiles->save(false);
 
-                        $file->saveAs($path . $filename . '.' . $file->extension);
+                }catch (\Exception $e){
 
-                        $preFiles = new PreFiles();
-                        $preFiles->file_name = $file;
-                        $preFiles->server_file = $filename . '.' . $file->extension;
-                        $preFiles->project_id = $this->id;
-                        $preFiles->save(false);
-
-                    }catch (\Exception $e){
-
-                        throw new NotFoundHttpException('Невозможно загрузить файл!');
-                    }
+                    throw new NotFoundHttpException('Невозможно загрузить файл!');
                 }
-                return true;
-            }else{
-                return false;
             }
+            return true;
+        }else{
+            return false;
         }
+
     }
 
 
+    /**
+     * @param $attr
+     */
     public function uniqueName ($attr)
     {
         $models = Projects::findAll(['user_id' => $this->user_id]);
@@ -225,38 +226,65 @@ class Projects extends ActiveRecord
 
 
     /**
-     * Изменение имени дирректории при редактировании проекта
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
      */
-    public function updateProjectDirectory()
-    {
-        $user = User::findOne(['id' => $this->user_id]);
-        $models = Projects::findAll(['user_id' => $this->user_id]);
+    public function create(){
 
-        foreach ($models as $elem){
+        //Преобразование даты в число
+        if ($this->patent_date) $this->patent_date = strtotime($this->patent_date);
+        if ($this->register_date) $this->register_date = strtotime($this->register_date);
+        if ($this->invest_date) $this->invest_date = strtotime($this->invest_date);
+        if ($this->date_of_announcement) $this->date_of_announcement = strtotime($this->date_of_announcement);
 
-            if ($this->id == $elem->id && mb_strtolower(str_replace(' ', '',$this->project_name)) !== mb_strtolower(str_replace(' ', '',$elem->project_name))){
+        if ($this->save()) {
+            //Сохранение команды(авторов)
+            $this->saveAuthors();
+            //Загрузка презентационных файлов
+            $this->present_files = UploadedFile::getInstances($this, 'present_files');
+            if ($this->present_files) $this->uploadPresentFiles();
+            //Удаление кэша формы создания проекта
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->id. '/projects/formCreate';
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
-                $old_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_convert_encoding($this->translit($elem->project_name), "windows-1251") . '/';
-
-                $old_dir = mb_strtolower($old_dir, "windows-1251");
-
-                $new_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                    . '/' . mb_convert_encoding($this->translit($this->project_name), "windows-1251") . '/';
-
-                $new_dir = mb_strtolower($new_dir, "windows-1251");
-
-                rename($old_dir, $new_dir);
-            }
+            return true;
         }
-        return true;
+        return false;
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    public function updateProject(){
+
+        //Преобразование даты в число
+        if ($this->patent_date) $this->patent_date = strtotime($this->patent_date);
+        if ($this->register_date) $this->register_date = strtotime($this->register_date);
+        if ($this->invest_date) $this->invest_date = strtotime($this->invest_date);
+        if ($this->date_of_announcement) $this->date_of_announcement = strtotime($this->date_of_announcement);
+
+        if ($this->save()) {
+            //Сохранение команды(авторов)
+            $this->saveAuthors();
+            //Загрузка презентационных файлов
+            $this->present_files = UploadedFile::getInstances($this, 'present_files');
+            $this->uploadPresentFiles();
+
+            return true;
+        }
+        return false;
     }
 
 
     /**
      * Сохранение команды(авторов)
      */
-    public function saveAuthors ()
+    private function saveAuthors ()
     {
         $workers = Authors::find()->where(['project_id' => $this->id])->all();
 
@@ -310,62 +338,16 @@ class Projects extends ActiveRecord
                 }
             }
         }
-
-
     }
 
 
     /**
-     * Создание дирректорий проекта
-     * @param $user
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
      */
-    public function createDirectories ($user)
-    {
-        $user_dir = UPLOAD . mb_convert_encoding($user['username'], "windows-1251") . '/';
-        $user_dir = mb_strtolower($user_dir, "windows-1251");
-        if (!file_exists($user_dir)){
-            mkdir($user_dir, 0777);
-        }
-
-        $project_dir = $user_dir . '/' . mb_convert_encoding($this->translit($this->project_name) , "windows-1251") . '/';
-        $project_dir = mb_strtolower($project_dir, "windows-1251");
-        if (!file_exists($project_dir)){
-            mkdir($project_dir, 0777);
-        }
-
-        $present_files_dir = $project_dir . '/present files/';
-        if (!file_exists($present_files_dir)){
-            mkdir($present_files_dir, 0777);
-        }
-
-        $segments_dir = $project_dir . '/segments/';
-        if (!file_exists($segments_dir)){
-            mkdir($segments_dir, 0777);
-        }
-
-        return $present_files_dir;
-    }
-
-
-    public function translit($s)
-    {
-        $s = (string) $s; // преобразуем в строковое значение
-        $s = strip_tags($s); // убираем HTML-теги
-        $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
-        $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
-        $s = trim($s); // убираем пробелы в начале и конце строки
-        $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
-        $s = strtr($s, array('а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'e','ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','ш'=>'sh','щ'=>'shch','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>''));
-        $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
-        $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
-        return $s; // возвращаем результат
-
-    }
-
-
     public function deleteStage ()
     {
-
         if ($segments = $this->segments) {
             foreach ($segments as $segment) {
                 $segment->deleteStage();
@@ -375,6 +357,15 @@ class Projects extends ActiveRecord
         Authors::deleteAll(['project_id' => $this->id]);
         PreFiles::deleteAll(['project_id' => $this->id]);
 
+        // Удаление директории проекта
+        $projectPathDelete = UPLOAD.'/user-'.$this->user->id.'/project-'.$this->id;
+        if (file_exists($projectPathDelete)) FileHelper::removeDirectory($projectPathDelete);
+
+        // Удаление кэша для форм проекта
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->id.'/projects/project-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление проекта
         $this->delete();
     }
 }

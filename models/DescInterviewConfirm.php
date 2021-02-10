@@ -4,7 +4,9 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 
 class DescInterviewConfirm extends \yii\db\ActiveRecord
@@ -24,35 +26,6 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
     {
         return $this->hasOne(RespondsConfirm::class, ['id' => 'responds_confirm_id']);
     }
-
-    public function upload($path)
-    {
-        if (!is_dir($path)){
-
-            throw new NotFoundHttpException('Дирректория не существует!');
-
-        }else{
-
-            if ($this->validate()) {
-
-                $filename = Yii::$app->getSecurity()->generateRandomString(15);
-                try{
-
-                    $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
-                    $this->server_file = $filename . '.' . $this->loadFile->extension;
-
-                }catch (\Exception $e){
-
-                    throw new NotFoundHttpException('Невозможно загрузить файл!');
-                }
-
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
 
     /**
      * {@inheritdoc}
@@ -101,5 +74,103 @@ class DescInterviewConfirm extends \yii\db\ActiveRecord
         });
 
         parent::init();
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     */
+    public function create()
+    {
+        $respond = RespondsConfirm::findOne($this->responds_confirm_id);
+        $confirmProblem = ConfirmProblem::findOne($respond->confirm_problem_id);
+        $problem = GenerationProblem::findOne($confirmProblem->gps_id);
+        $segment = Segment::findOne($problem->segment_id);
+        $project = Projects::findOne($problem->project_id);
+        $user = User::findOne($project->user_id);
+
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            // Удаление кэша для форм респондента
+            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
+                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$respond->id;
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    public function updateInterview()
+    {
+        if ($this->validate() && $this->save()) {
+
+            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+
+            if ($this->loadFile) {
+                if ($this->uploadFileInterview()) {
+                    $this->interview_file = $this->loadFile;
+                    $this->save(false);
+                }
+            }
+
+            return true;
+        }
+        throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
+    }
+
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
+     */
+    private function uploadFileInterview()
+    {
+        $respond = RespondsConfirm::findOne($this->responds_confirm_id);
+        $confirmProblem = ConfirmProblem::findOne($respond->confirm_problem_id);
+        $problem = GenerationProblem::findOne($confirmProblem->gps_id);
+        $segment = Segment::findOne($problem->segment_id);
+        $project = Projects::findOne($problem->project_id);
+        $user = User::findOne($project->user_id);
+
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/interviews/respond-'.$respond->id.'/';
+        if (!is_dir($path)) FileHelper::createDirectory($path);
+
+        if ($this->validate()) {
+
+            $filename = Yii::$app->getSecurity()->generateRandomString(15);
+            try{
+
+                $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
+                $this->server_file = $filename . '.' . $this->loadFile->extension;
+
+            }catch (\Exception $e){
+
+                throw new NotFoundHttpException('Невозможно загрузить файл!');
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }

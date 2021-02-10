@@ -4,10 +4,6 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
-use app\models\ConfirmMvp;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\ProjectSort;
 use app\models\Roadmap;
@@ -19,9 +15,7 @@ use Yii;
 use app\models\Projects;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 use yii\web\Response;
-
 
 class ProjectsController extends AppController
 {
@@ -136,6 +130,7 @@ class ProjectsController extends AppController
         $models = Projects::findAll(['user_id' => $id]);
         $new_author = new Authors();
         $sortModel = new SortForm();
+
 
         return $this->render('index', [
             'user' => $user,
@@ -254,31 +249,28 @@ class ProjectsController extends AppController
     /**
      * @param $id
      * @return \yii\console\Response|Response
+     * @throws NotFoundHttpException
      */
     public function actionDownload($id)
     {
         $model = PreFiles::findOne($id);
-        $project = Projects::find()->where(['id' => $model->project_id])->one();
-        $user = User::find()->where(['id' => $project->user_id])->one();
+        $project = Projects::findOne(['id' => $model->project_id]);
+        $user = User::findOne(['id' => $project->user_id]);
 
-        $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
-
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/present_files/';
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-
-            $project->updated_at = time();
-            $project->save();
-
             return \Yii::$app->response->sendFile($file, $model->file_name);
         }
+        throw new NotFoundHttpException('Данный файл не найден');
     }
 
 
     /**
      * @param $id
      * @return array|Response
+     * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -287,13 +279,9 @@ class ProjectsController extends AppController
         $model = PreFiles::findOne($id);
         $project = Projects::find()->where(['id' => $model->project_id])->one();
         $user = User::find()->where(['id' => $project->user_id])->one();
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/present_files/';
 
-        $path = \Yii::getAlias('upload/'. mb_strtolower(mb_convert_encoding($user['username'], "windows-1251"),"windows-1251")
-            . '/' . mb_strtolower(mb_convert_encoding($this->translit($project->project_name), "windows-1251"),"windows-1251") . '/present files/');
-
-        unlink($path . $model->server_file);
-
-        if($model->delete()) {
+        if(unlink($path . $model->server_file) && $model->delete()) {
 
             $models = PreFiles::findAll(['project_id' => $project->id]);
 
@@ -312,6 +300,7 @@ class ProjectsController extends AppController
                 return $this->redirect(['/projects/index', 'id' => $user->id]);
             }
         }
+        throw new NotFoundHttpException('Данный файл не найден');
     }
 
 
@@ -341,6 +330,7 @@ class ProjectsController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      * @throws \yii\base\Exception
      */
     public function actionCreate($id)
@@ -348,74 +338,44 @@ class ProjectsController extends AppController
         $model = new Projects();
         $model->user_id = $id;
         $user = User::findOne($id);
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                //Преобразование даты в число
-                if ($model->patent_date){
-                    $model->patent_date = strtotime($model->patent_date);
-                }
-                if ($model->register_date){
-                    $model->register_date = strtotime($model->register_date);
-                }
-                if ($model->invest_date){
-                    $model->invest_date = strtotime($model->invest_date);
-                }
-                if ($model->date_of_announcement){
-                    $model->date_of_announcement = strtotime($model->date_of_announcement);
-                }
-
                 //Проверка на совпадение по названию проекта у данного пользователя
                 if ($model->validate(['project_name'])) {
 
-                    if ($model->save()){
+                    if ($model->create()){
 
-                        //Загрузка участников команды проекта (Authors)
-                        $model->saveAuthors();
+                        //Проверка наличия сортировки
+                        $type_sort_id = $_POST['type_sort_id'];
 
-                        //Создание дирректорий проекта
-                        if ($present_files_dir = $model->createDirectories($user)) {
+                        if ($type_sort_id != '') {
 
-                            //Загрузка презентационных файлов
-                            $model->present_files = UploadedFile::getInstances($model, 'present_files');
-                            $model->upload($present_files_dir);
+                            $sort = new ProjectSort();
 
-                            //Удаление кэша формы создания проекта
-                            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
-                            if ($cache->exists('formCreateProjectCache')) $cache->delete('formCreateProjectCache');
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => $sort->fetchModels($user->id, $type_sort_id),
+                                ]),
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
 
-                            //Проверка наличия сортировки
-                            $type_sort_id = $_POST['type_sort_id'];
+                        } else {
 
-                            if ($type_sort_id != '') {
-
-                                $sort = new ProjectSort();
-
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => $sort->fetchModels($user->id, $type_sort_id),
-                                    ]),
-                                ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-
-                            } else {
-
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => Projects::findAll(['user_id' => $user->id]),
-                                    ]),
-                                ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-                            }
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => Projects::findAll(['user_id' => $user->id]),
+                                ]),
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
                 }else{
@@ -446,63 +406,39 @@ class ProjectsController extends AppController
 
             if(Yii::$app->request->isAjax) {
 
-                /*Преобразование даты в число*/
-                if ($model->patent_date){
-                    $model->patent_date = strtotime($model->patent_date);
-                }
-                if ($model->register_date){
-                    $model->register_date = strtotime($model->register_date);
-                }
-                if ($model->invest_date){
-                    $model->invest_date = strtotime($model->invest_date);
-                }
-                if ($model->date_of_announcement){
-                    $model->date_of_announcement = strtotime($model->date_of_announcement);
-                }
-
                 //Проверка на совпадение по названию проекта у данного пользователя
-                if ($model->validate(['project_name']) && $model->updateProjectDirectory()) {
+                if ($model->validate(['project_name'])) {
 
-                    if ($model->save()){
+                    if ($model->updateProject()){
 
-                        //Загрузка участников команды проекта (Authors)
-                        $model->saveAuthors();
+                        //Проверка наличия сортировки
+                        $type_sort_id = $_POST['type_sort_id'];
 
-                        //Проверка существования дирректорий проекта
-                        if ($present_files_dir = $model->createDirectories($user)) {
+                        if ($type_sort_id != '') {
 
-                            $model->present_files = UploadedFile::getInstances($model, 'present_files');
-                            $model->upload($present_files_dir);
+                            $sort = new ProjectSort();
 
-                            //Проверка наличия сортировки
-                            $type_sort_id = $_POST['type_sort_id'];
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => $sort->fetchModels($user->id, $type_sort_id),
+                                ]),
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
 
-                            if ($type_sort_id != '') {
+                        } else {
 
-                                $sort = new ProjectSort();
-
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => $sort->fetchModels($user->id, $type_sort_id),
-                                    ]),
-                                ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-
-                            } else {
-
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => Projects::findAll(['user_id' => $user->id]),
-                                    ]),
-                                ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
-                                return $response;
-                            }
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => Projects::findAll(['user_id' => $user->id]),
+                                ]),
+                            ];
+                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                            \Yii::$app->response->data = $response;
+                            return $response;
                         }
                     }
                 } else{
@@ -1001,33 +937,18 @@ class ProjectsController extends AppController
      * @param $id
      * @return bool
      * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $user = User::find()->where(['id' => $model->user_id])->one();
 
         if(Yii::$app->request->isAjax) {
 
-            // Удаление прикрепленных файлов проекта
-            $pathDelete = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251")
-                . '/' . mb_strtolower(mb_convert_encoding($this->translit($model->project_name), "windows-1251"),"windows-1251"));
-
-            if (file_exists($pathDelete)){
-                $this->delTree($pathDelete);
-            }
-
-            //Удаление кэша для форм проекта
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$model->id;
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
-
-            if ($model->deleteStage()) {
-
+            if ($model->deleteStage())
                 return true;
-            }
         }
         return false;
     }

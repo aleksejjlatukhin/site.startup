@@ -20,6 +20,7 @@ use kartik\mpdf\Pdf;
 use Yii;
 use app\models\ConfirmGcp;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
@@ -288,11 +289,11 @@ class ConfirmGcpController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionNotExistConfirm($id)
     {
@@ -317,10 +318,7 @@ class ConfirmGcpController extends AppController
                 // Удаление дирректории для кэша подтверждения
                 $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
                     '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
-
-                if (file_exists($cachePathDelete)){
-                    $this->delTree($cachePathDelete);
-                }
+                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
                 $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
                 return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
@@ -328,11 +326,11 @@ class ConfirmGcpController extends AppController
         }
     }
 
-
     /**
      * @param $id
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionExistConfirm($id)
     {
@@ -351,10 +349,7 @@ class ConfirmGcpController extends AppController
             // Удаление дирректории для кэша подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
                 '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
-
-            if (file_exists($cachePathDelete)){
-                $this->delTree($cachePathDelete);
-            }
+            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
             $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/mvp/index', 'id' => $model->id]);
@@ -431,25 +426,16 @@ class ConfirmGcpController extends AppController
         ]);
     }
 
-
     /**
      * @param $id
-     * @return array|\yii\web\Response
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
      */
     public function actionSaveConfirmGcp($id)
     {
         $model = new FormCreateConfirmGcp();
         $model->gcp_id = $id;
-        $gcp = Gcp::findOne($id);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $responds = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->all();
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -457,31 +443,7 @@ class ConfirmGcpController extends AppController
 
                 if ($model = $model->create()) {
 
-                    //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
-                    $model->createRespondConfirm($responds);
-
-                    //Вопросы, которые будут добавлены по-умолчанию
-                    $model->addQuestionDefault('Во сколько обходится эта проблема?');
-                    $model->addQuestionDefault('Сколько сейчас платят?');
-                    $model->addQuestionDefault('Какой бюджет до этого выделяли?');
-                    $model->addQuestionDefault('Что еще пытались сделать?');
-                    $model->addQuestionDefault('Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?');
-                    $model->addQuestionDefault('Как вы решаете эту проблему сейчас?');
-                    $model->addQuestionDefault('Кто будет финансировать покупку?');
-                    $model->addQuestionDefault('С кем еще мне следует переговорить?');
-                    $model->addQuestionDefault('Решает ли ценностное предложенное вашу проблему?');
-                    $model->addQuestionDefault('Вы бы рассказали об этом ценностном предложении своим коллегам?');
-                    $model->addQuestionDefault('Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?');
-
-                    //Удаление кэша формы создания
-                    $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                        '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
-                    if ($cache->exists('formCreateConfirmGcpCache')) $cache->delete('formCreateConfirmGcpCache');
-
-                    $response =  [
-                        'success' => true,
-                        'id' => $model->id,
-                    ];
+                    $response =  ['success' => true, 'id' => $model->id];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     \Yii::$app->response->data = $response;
                     return $response;
@@ -490,9 +452,11 @@ class ConfirmGcpController extends AppController
         }
     }
 
+
     /**
      * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
     public function actionUpdate ($id)
     {

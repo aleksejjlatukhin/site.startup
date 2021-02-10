@@ -5,7 +5,7 @@ namespace app\models\forms;
 
 use yii\base\Model;
 use app\models\ConfirmProblem;
-
+use yii\web\NotFoundHttpException;
 
 class FormUpdateConfirmProblem extends Model
 {
@@ -44,6 +44,11 @@ class FormUpdateConfirmProblem extends Model
         ];
     }
 
+    /**
+     * FormUpdateConfirmProblem constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $confirm_problem = ConfirmProblem::findOne($id);
@@ -57,9 +62,12 @@ class FormUpdateConfirmProblem extends Model
         parent::__construct($config);
     }
 
+    /**
+     * @return ConfirmProblem|bool|null
+     * @throws NotFoundHttpException
+     */
     public function update()
     {
-
         if ($this->validate()) {
 
             $confirm_problem = ConfirmProblem::findOne($this->id);
@@ -67,7 +75,8 @@ class FormUpdateConfirmProblem extends Model
             $confirm_problem->count_positive = $this->count_positive;
             $confirm_problem->need_consumer = $this->need_consumer;
 
-            return $confirm_problem->save() ? $confirm_problem : null;
+            if ($confirm_problem->save()) return $confirm_problem;
+            throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;
     }

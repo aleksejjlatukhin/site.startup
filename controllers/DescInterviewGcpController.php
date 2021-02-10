@@ -12,8 +12,8 @@ use app\models\User;
 use Yii;
 use app\models\DescInterviewGcp;
 use yii\base\Model;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 
 
 class DescInterviewGcpController extends AppController
@@ -73,6 +73,11 @@ class DescInterviewGcpController extends AppController
     }
 
 
+    /**
+     * @param $id
+     * @return \yii\console\Response|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionDownload($id)
     {
         $model = DescInterviewGcp::findOne($id);
@@ -84,23 +89,23 @@ class DescInterviewGcpController extends AppController
         $project = Projects::findOne(['id' => $gcp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-            mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
-            mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
-
+        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/interviews/respond-'.$respond->id.'/';
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-
             return \Yii::$app->response->sendFile($file, $model->interview_file);
         }
-
+        throw new NotFoundHttpException('Данный файл не найден');
     }
 
-
+    /**
+     * @param $id
+     * @return bool|string
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteFile($id)
     {
         $model = DescInterviewGcp::findOne($id);
@@ -111,25 +116,17 @@ class DescInterviewGcpController extends AppController
         $segment = Segment::findOne(['id' => $gcp->segment_id]);
         $project = Projects::findOne(['id' => $gcp->project_id]);
         $user = User::findOne(['id' => $project->user_id]);
+        $pathDirDelete = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/interviews/respond-'.$respond->id;
 
-        $path = \Yii::getAlias(UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-            mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-            mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-            . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-            mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
-            mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/');
-
-        unlink($path . $model->server_file);
+        if (file_exists($pathDirDelete)) FileHelper::removeDirectory($pathDirDelete);
 
         $model->interview_file = null;
         $model->server_file = null;
-
         $model->update();
 
-        if (Yii::$app->request->isAjax)
-        {
-            return '';
-        }
+        if (Yii::$app->request->isAjax) return '';
+        else return true;
     }
 
 
@@ -199,56 +196,26 @@ class DescInterviewGcpController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
      */
     public function actionCreate($id)
     {
         $model = new DescInterviewGcp();
         $model->responds_gcp_id = $id;
         $respond = RespondsGcp::findOne($id);
-        $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
-        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $confirmGcp = ConfirmGcp::findOne($respond->confirm_gcp_id);
         $answers = $respond->answers;
-        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
             if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-                foreach ($answers as $answer) {
-                    $answer->save(false);
-                }
-
-                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-                if (!file_exists($respond_dir)){
-                    mkdir($respond_dir, 0777);
-                }
+                foreach ($answers as $answer) $answer->save(false);
 
                 if ($model->load(Yii::$app->request->post())) {
 
-                    if ($model->validate() && $model->save()) {
-
-                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                        if ($model->loadFile !== null){
-                            if ($model->upload($respond_dir)){
-                                $model->interview_file = $model->loadFile;
-                                $model->save(false);
-                            }
-                        }
-
-                        //Удаление кэша формы создания
-                        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id.'/';
-                        if ($cache->exists('formCreateInterviewCache')) $cache->delete('formCreateInterviewCache');
+                    if ($model->create()) {
 
                         $response = ['confirm_gcp_id' => $confirmGcp->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -287,53 +254,27 @@ class DescInterviewGcpController extends AppController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
         $respond = RespondsGcp::findOne(['id' => $model->responds_gcp_id]);
         $confirmGcp = ConfirmGcp::findOne(['id' => $respond->confirm_gcp_id]);
-        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
         $answers = $respond->answers;
 
-        if ($model->interview_file !== null){
-            $model->loadFile = $model->interview_file;
-        }
+        //Если ранее был загружен файл
+        if ($model->interview_file !== null) $model->loadFile = $model->interview_file;
 
         if(Yii::$app->request->isAjax) {
 
             if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
 
-                foreach ($answers as $answer) {
-                    $answer->save(false);
-                }
-
-                $respond_dir = UPLOAD . mb_convert_encoding(mb_strtolower($user['username'], "windows-1251"), "windows-1251") . '/' .
-                    mb_convert_encoding($this->translit($project->project_name) , "windows-1251") . '/segments/'.
-                    mb_convert_encoding($this->translit($segment->name) , "windows-1251") .'/generation problems/'
-                    . mb_convert_encoding($this->translit($problem->title) , "windows-1251") .'/gcps/'.
-                    mb_convert_encoding($this->translit($gcp->title) , "windows-1251") .'/interviews/' .
-                    mb_convert_encoding($this->translit($respond->name) , "windows-1251") . '/';
-                if (!file_exists($respond_dir)){
-                    mkdir($respond_dir, 0777);
-                }
+                foreach ($answers as $answer) $answer->save(false);
 
                 if ($model->load(Yii::$app->request->post())) {
 
-                    if ($model->validate() && $model->save()) {
-
-                        $model->loadFile = UploadedFile::getInstance($model, 'loadFile');
-
-                        if ($model->loadFile !== null){
-                            if ($model->upload($respond_dir)){
-                                $model->interview_file = $model->loadFile;
-                                $model->save(false);
-                            }
-                        }
+                    if ($model->updateInterview()) {
 
                         $response = ['confirm_gcp_id' => $confirmGcp->id];
                         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
