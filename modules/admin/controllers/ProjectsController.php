@@ -1,14 +1,8 @@
 <?php
 
-
 namespace app\modules\admin\controllers;
 
-use app\models\ConfirmMvp;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
 use app\models\Projects;
-use app\models\Segment;
 use app\models\SortForm;
 use app\models\User;
 use Yii;
@@ -17,6 +11,12 @@ use yii\data\Pagination;
 class ProjectsController extends AppAdminController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
         if ($action->id == 'index') {
