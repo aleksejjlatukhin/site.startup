@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use app\models\User;
 use yii\widgets\ActiveForm;
 
 $this->title = 'Cообщения | Администратор';
@@ -18,12 +17,22 @@ $this->title = 'Cообщения | Администратор';
                 <div style="padding: 10px 0; margin-top: -20px;border-bottom: 1px solid #ccc; text-align: center;">
 
                     <span style="margin-left: -100px; padding-right: 10px;">
-                    <?= Html::img([$admin['avatar_image']],['width' => '40px', 'height' => '40px', 'class' => 'round-avatar'])?>
-                </span>
+
+                        <?php if ($admin['avatar_image']) : ?>
+
+                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['width' => '40px', 'height' => '40px', 'class' => 'round-avatar'])?>
+
+                        <?php else : ?>
+
+                            <?= Html::img('/images/avatar/default.jpg', ['width' => '40px', 'height' => '40px', 'class' => 'round-avatar'])?>
+
+                        <?php endif; ?>
+
+                    </span>
 
                     <span style="font-weight: 700;">
-                    Администратор
-                </span>
+                        Администратор
+                    </span>
 
                 </div>
 
@@ -43,7 +52,17 @@ $this->title = 'Cообщения | Администратор';
                                                 <div style="display: flex;">
 
                                                     <div style="padding-right: 15px;">
-                                                        <?= Html::img([$user->avatar_image],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php if ($admin['avatar_image']) : ?>
+
+                                                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php else : ?>
+
+                                                            <?= Html::img('/images/avatar/default.jpg', ['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php endif; ?>
+
                                                     </div>
 
                                                     <div style="padding-top: 5px;">
@@ -84,7 +103,17 @@ $this->title = 'Cообщения | Администратор';
                                                 <div style="display: flex;">
 
                                                     <div style="padding-right: 15px;">
-                                                        <?= Html::img([$admin->avatar_image],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php if ($user['avatar_image']) : ?>
+
+                                                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php else : ?>
+
+                                                            <?= Html::img('/images/avatar/default.jpg', ['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
+
+                                                        <?php endif; ?>
+
                                                     </div>
 
                                                     <div style="padding-top: 5px;">

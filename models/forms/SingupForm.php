@@ -1,9 +1,10 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
+use app\models\User;
 use Yii;
 
 class SingupForm extends Model
@@ -16,6 +17,7 @@ class SingupForm extends Model
     public $email;
     public $username;
     public $uniq_username = true;
+    public $match_username = true;
     public $uniq_email = true;
     public $password;
     public $status;
@@ -26,26 +28,13 @@ class SingupForm extends Model
     public function rules()
     {
         return [
-            [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
+            [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password'], 'required'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password'], 'trim'],
-
-            ['username', 'string', 'min' => 3, 'max' => 32],
-            ['password', 'string', 'min' => 6, 'max' => 32],
             [['second_name', 'first_name', 'middle_name', 'email', 'telephone'], 'string', 'max' => 255],
-
-            ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
+            ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
-            ['username', 'unique',
-                'targetClass' => User::class,
-                'message' => 'Этот логин уже занят.'],
-
-            //[['email'], 'email'],
-            //['email', 'unique',
-                //'targetClass' => User::class,
-                //'message' => 'Эта почта уже зарегистрирована.'
-            //],
             ['email', 'uniqEmail'],
 
             ['confirm', 'default', 'value' => User::NOT_CONFIRM, 'on' => 'emailActivation'],
@@ -77,7 +66,7 @@ class SingupForm extends Model
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
             'telephone' => 'Телефон',
-            'email' => 'Эл.почта',
+            'email' => 'Email',
             'username' => 'Логин',
             'password' => 'Пароль',
             'rememberMe' => 'Запомнить',
@@ -108,8 +97,20 @@ class SingupForm extends Model
         }
     }
 
+    public function matchUsername($attr)
+    {
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
+            $this->match_username = false;
+            $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
+        }
 
-    //Собственное правило для поля username
+        if (preg_match('/\s+/',$this->username)) {
+            $this->match_username = false;
+            $this->addError($attr, 'Не допускается использование пробелов');
+        }
+    }
+
+    //Собственное правило для поля email
     //Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
     public function uniqEmail($attr)
     {
@@ -122,8 +123,6 @@ class SingupForm extends Model
             }
         }
     }
-
-
 
     public function singup()
     {
@@ -150,17 +149,14 @@ class SingupForm extends Model
         }
     }
 
-
     /*Подтвреждение регистрации по email*/
     public function sendActivationEmail($user)
     {
-
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
             ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
             ->setTo($this->email)
             ->setSubject('Регистрация на сайте Spaccel.ru')
             ->send();
-
     }
 
 }

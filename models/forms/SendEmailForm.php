@@ -1,9 +1,10 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
+use app\models\User;
 use Yii;
 
 
@@ -37,12 +38,7 @@ class SendEmailForm extends Model
     public function sendEmail()
     {
         /* @var $user User */
-        $user = User::findOne(
-            [
-                //'status' => User::STATUS_ACTIVE,
-                'email' => $this->email
-            ]
-        );
+        $user = User::findOne(['email' => $this->email]);
 
         if($user){
 
@@ -51,7 +47,6 @@ class SendEmailForm extends Model
             if($user->save()){
 
                 return Yii::$app->mailer->compose('resetPassword', ['user' => $user])
-                    //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
                     ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                     ->setTo($this->email)
                     ->setSubject('Изменение пароля на сайте Spaccel.ru для пользователя ' . $user->username)

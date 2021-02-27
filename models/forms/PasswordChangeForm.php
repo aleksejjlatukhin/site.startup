@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
 use app\models\User;
@@ -35,8 +35,9 @@ class PasswordChangeForm extends Model
     {
         return [
             [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'required'],
+            [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'string', 'min' => 6, 'max' => 32],
+            [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'spaceInPassword'],
             ['currentPassword', 'validatePassword'],
-            ['newPassword', 'string', 'min' => 6, 'max' => 32],
             ['newPasswordRepeat', 'compare', 'compareAttribute' => 'newPassword'],
         ];
     }
@@ -63,6 +64,13 @@ class PasswordChangeForm extends Model
             if (!$this->_user->validatePassword($this->$attribute)) {
                 $this->addError($attribute, 'Ошибка! Неверный текущий пароль.');
             }
+        }
+    }
+
+    public function spaceInPassword ($attr)
+    {
+        if (preg_match('/\s+/',$this->$attr)) {
+            $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
 

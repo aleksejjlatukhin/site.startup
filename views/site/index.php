@@ -254,9 +254,11 @@ $this->title = 'Главная';
                     <div class="col-md-4">
 
                         <?= $form->field($model_signup, 'email', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">E-mail</div><div>{input}</div>'
-                        ])->input('email',[
+                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email</div><div>{input}</div>'
+                        ])->textInput([
+                            'type' => 'email',
                             'required' => true,
+                            'maxlength' => true,
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
                             'autocomplete' => 'off'
@@ -332,7 +334,7 @@ $this->title = 'Главная';
                             'minlength' => 3,
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
+                            'placeholder' => 'Введите от 3 до 32 символов',
                             'autocomplete' => 'off'
                             ]) ?>
 
@@ -347,7 +349,7 @@ $this->title = 'Главная';
                             'minlength' => 6,
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
+                            'placeholder' => 'Введите от 6 до 32 символов',
                             'autocomplete' => 'off'
                         ]) ?>
 
@@ -433,25 +435,6 @@ $this->title = 'Главная';
         'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Измените данные согласно этой информации</h3>',
     ]);
     ?>
-
-    <?php
-    Modal::end();
-    ?>
-
-    <?php
-    // Модальное окно - Ошибка регистрации
-    Modal::begin([
-        'options' => [
-            'id' => 'error_model_singup',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-    ]);
-    ?>
-
-    <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-        Ошибка. Не отправляются письма на указанный email.
-    </h4>
 
     <?php
     Modal::end();
@@ -650,7 +633,7 @@ $script = "
     });
     
     
-    //Отправка формы для получения письма на почту для сены пароля
+    //Отправка формы для получения письма на почту для смены пароля
     $('body').on('beforeSubmit', '#form_send_email', function(e){
     
         var data = $(this).serialize();
@@ -699,6 +682,9 @@ $script = "
         var data = $(this).serialize();
         var url = $(this).attr('action');
         
+        var error_user_singup_modal = $('#error_user_singup').find('.modal-body');
+        error_user_singup_modal.html('');
+        
         $.ajax({
         
             url: url,
@@ -707,27 +693,24 @@ $script = "
             cache: false,
             success: function(response){
             
-                var error_user_singup_modal = $('#error_user_singup').find('.modal-body');
-                error_user_singup_modal.html('');
-            
                 if(response['error_uniq_email']) {
-                    error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - эта почта уже зарегистрирована;<\/h4>');
+                    error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - почтовый адрес уже зарегистрирован;<\/h4>');
                 }
                 
                 if(response['error_uniq_username']) {
-                    error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - этот логин уже занят;<\/h4>');
+                    error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин уже зарегистрирован;<\/h4>');
+                }
+                
+                if(response['error_match_username']) {
+                    error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин должен содержать только латинские символы и цыфры, не допускается использование пробелов;<\/h4>');
                 }
                 
                 if(response['error_exist_agree']) {
                     error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - необходимо принять пользовательское соглашение;<\/h4>');
                 }
                 
-                if(response['error_uniq_email'] || response['error_uniq_username'] || response['error_exist_agree']) {
+                if(response['error_uniq_email'] || response['error_uniq_username'] || response['error_exist_agree'] || response['error_match_username']) {
                     $('#error_user_singup').modal('show');
-                }
-                
-                if(response['error_model_singup']){
-                    $('#error_model_singup').modal('show');
                 }
                 
                 if(response['success_singup']){

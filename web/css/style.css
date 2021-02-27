@@ -1,4 +1,23 @@
 
+/*Стили для иконки с аватаркой пользователя
+---Начало---
+*/
+.icon_user_avatar {
+    width: 44px;
+    padding: 1px;
+    margin: -10px 0;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+}
+.icon_user_avatar_default {
+    width: 44px;
+    padding: 0;
+    margin: -10px 0;
+}
+/*Стили для иконки с аватаркой пользователя
+---Конец---
+*/
+
 .feed-exp
 {
     display: none;
@@ -1055,20 +1074,21 @@ input[type="checkbox"]:checked + label:before {
 }
 .roadmap_row_header {
     display: flex;
+    min-width: 1280px;
     align-items: center;
     padding: 7px 0;
 }
 .roadmap_block_stage {
-    width: 145px;
+    width: 11.6%;
 }
 .roadmap_block_stage:nth-child(1) {
-    width: 250px;
+    width: 20%;
     font-size: 16px;
     font-weight: 700;
     padding-left: 10px;
 }
 .roadmap_block_stage:nth-child(2) {
-    width: 100px;
+    width: 8%;
 }
 .roadmap_block_stage > div:nth-child(1) {
     font-size: 13px;
@@ -1088,7 +1108,8 @@ input[type="checkbox"]:checked + label:before {
 
 
 .roadmap_row_dates {
-    max-width: 1370px;
+    max-width: 100%;
+    min-width: 1280px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -1097,16 +1118,18 @@ input[type="checkbox"]:checked + label:before {
     padding: 2px 0;
 }
 .roadmap_block_name_segment {
-    width: 250px;
+    width: 20%;
     padding: 0 10px;
     font-size: 18px;
     border-right: 1px solid #E0E0E0;
     height: 50px;
     display: flex;
     align-items: center;
+    line-height: 18px;
+    overflow: hidden;
 }
 .roadmap_block_date_segment {
-    width: 100px;
+    width: 8%;
     border-right: 1px solid #E0E0E0;
     height: 50px;
     display: flex;
@@ -1115,13 +1138,19 @@ input[type="checkbox"]:checked + label:before {
 }
 
 .roadmap_block_date {
-    width: 145px;
+    width: 11.6%;
     border-right: 1px solid #E0E0E0;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 10px;
+}
+@media screen and (min-width: 1500px) {
+
+    .roadmap_block_date {
+        justify-content: space-around;
+    }
 }
 .roadmap_block_date:last-child {
     border: none;
@@ -2065,6 +2094,21 @@ body .confirm_closing_modal .modal-body { /*Модальные окно подт
 body .confirm_closing_modal .modal-footer { /*Модальные окно подтверждения закрытия основного окна - footer*/
     background-color: #707F99;
     border-radius: 0 0 5px 5px;
+}
+body .data_profile_error .modal-content { /*Модальное окно сообщений об ошибках при работе с профилем пользователя*/
+    background-color: #707F99;
+    color: #F2F2F2;
+}
+body .data_profile_error .modal-header h3 { /*Модальное окно сообщений об ошибках при работе с профилем пользователя*/
+    text-align: center;
+    padding: 0 30px;
+}
+body .data_profile_error .modal-body h4 { /*Модальное окно сообщений об ошибках при работе с профилем пользователя*/
+    padding: 0 30px;
+}
+body .data_profile_error .modal-footer h4 { /*Модальное окно сообщений об ошибках при работе с профилем пользователя*/
+    text-align: center;
+    padding: 0 30px;
 }
 
 /*Стили для всплывающих модальных окон

@@ -67,7 +67,7 @@ $this->title = 'Админка | Пользователи';
                     'attribute' => 'fio',
                     'label' => 'ФИО',
                     'value' => function ($data) {
-                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/admin/users/profile-admin/', 'id' => $data->id])) . '</div>';
+                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/admin/profile/index', 'id' => $data->id])) . '</div>';
                     },
                     'format' => 'html',
                     'options' => ['width' => '450'],
@@ -320,6 +320,9 @@ $script = '
         //var id = $(this).closest("tr").find(".nr").text();
         //alert(id);
     //});
+    
+    //Всплывающие  блоки
+    $(\'[data-toggle="popover"]\').popover({html:true});
     
     $("body").on("click", "a.update", function(event) {
         event.preventDefault();

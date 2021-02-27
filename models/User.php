@@ -36,9 +36,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_image'], 'filter', 'filter' => 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_image'], 'string', 'max' => 255],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'status', 'role', 'confirm'], 'required'],
+            [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
+            [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'required'],
             [['role', 'status', 'confirm', 'id_admin'], 'integer'],
             ['email', 'email'],
             ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
@@ -48,9 +48,6 @@ class User extends ActiveRecord implements IdentityInterface
             ['username', 'unique', 'message' => 'Этот логин уже занят.'],
             ['email', 'unique', 'message' => 'Эта почта уже зарегистрирована.'],
             ['secret_key', 'unique'],
-            ['avatar_image', 'default', 'value' => function () {
-                return \Yii::getAlias('@web/images/avatar/default.jpg');
-            }],
         ];
     }
 
@@ -66,7 +63,7 @@ class User extends ActiveRecord implements IdentityInterface
             'middle_name' => 'Отчество',
             'telephone' => 'Телефон',
             'username' => 'Логин',
-            'email' => 'Эл.почта',
+            'email' => 'Email',
             'password' => 'Password',
             'status' => 'Статус',
             'role' => 'Проектная роль',

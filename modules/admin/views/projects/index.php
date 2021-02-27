@@ -1,8 +1,4 @@
 <?php
-use yii\helpers\Html;
-use yii\helpers\Url;
-use app\models\ProjectSort;
-use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 ?>

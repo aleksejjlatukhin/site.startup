@@ -3,17 +3,7 @@
 
 namespace app\modules\admin\controllers;
 
-
-use app\models\ConfirmMvp;
 use app\models\ConversationAdmin;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
-use app\models\Mvp;
-use app\models\PasswordChangeForm;
-use app\models\ProfileForm;
-use app\models\Projects;
-use app\models\Segment;
 use app\models\User;
 use yii\data\ActiveDataProvider;
 use Yii;
@@ -21,6 +11,12 @@ use Yii;
 class UsersController extends AppAdminController
 {
 
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\web\HttpException
+     */
     public function beforeAction($action)
     {
         if ($action->id == 'index') {
@@ -86,52 +82,12 @@ class UsersController extends AppAdminController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'profile') {
-
-            $user = User::findOne(Yii::$app->request->get());
-            $admin = User::findOne(['id' => $user->id_admin]);
-
-            if ($admin->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif ($action->id == 'profile-admin') {
-
-            $admin = User::findOne(Yii::$app->request->get());
-
-            if ($admin->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (($action->id == 'update-profile') || ($action->id == 'change-password')) {
-
-            $admin = User::findOne(Yii::$app->request->get());
-
-            if ($admin->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])) {
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
         }else{
             return parent::beforeAction($action);
         }
 
 
     }
-
 
 
     public function actionIndex()
@@ -147,27 +103,6 @@ class UsersController extends AppAdminController
         ]);
 
         $users = User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])->all();
-        foreach ($users as $user){
-
-            if (!empty($user->projects)){
-
-                $project_update_at = [];
-
-                foreach ($user->projects as $project) {
-
-                    $project_updated_at[] = $project->updated_at;
-                }
-
-                if (max($project_updated_at) > $user->updated_at){
-
-                    $user->updated_at = max($project_updated_at);
-                    $user->save();
-                }
-
-            }
-        }
-
-
         $admins = User::find()->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])->all();
 
         foreach ($admins as $admin) {
@@ -314,113 +249,9 @@ class UsersController extends AppAdminController
             }
         }
 
-
         return $this->render('group',[
             'dataProvider' => $dataProvider,
 
-        ]);
-    }
-
-
-
-    public function actionProfile($id)
-    {
-        $user = User::findOne($id);
-
-        return $this->render('profile',[
-
-            'user' => $user,
-        ]);
-    }
-
-
-
-    public function actionProfileAdmin ($id)
-    {
-        $admin = User::findOne($id);
-
-        if (!(($admin->role == User::ROLE_ADMIN) || ($admin->role == User::ROLE_MAIN_ADMIN)  || ($admin->role == User::ROLE_DEV))) {
-
-            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-        }
-
-        $users = User::find()->where(['id_admin' => $id])->all();
-
-        $countProjects = 0;
-
-        foreach ($users as $user) {
-
-            $countProjects += count($user->projects);
-        }
-
-
-        return $this->render('profile-admin',[
-
-            'admin' => $admin,
-            'users' => $users,
-            'countProjects' => $countProjects,
-        ]);
-    }
-
-
-
-    public function actionUpdateProfile($id)
-    {
-
-        $user = User::findOne($id);
-
-        if (!(($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
-
-            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-        }
-
-        $model = new ProfileForm();
-
-        $model->second_name = $user->second_name;
-        $model->first_name = $user->first_name;
-        $model->middle_name = $user->middle_name;
-        $model->telephone = $user->telephone;
-        $model->username = $user->username;
-        $model->email = $user->email;
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()){
-
-            if ($model->update()){
-
-                return $this->redirect(['/admin/users/profile-admin', 'id' => $id]);
-            }
-        }
-
-        return $this->render('update-profile', [
-            'user' => $user,
-            'model' => $model,
-        ]);
-
-    }
-
-    public function actionChangePassword($id)
-    {
-
-        $user = User::findOne($id);
-
-        if (!(($user->role == User::ROLE_ADMIN) || ($user->role == User::ROLE_MAIN_ADMIN)  || ($user->role == User::ROLE_DEV))) {
-
-            throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
-        }
-
-        $model = new PasswordChangeForm($user, []);
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()){
-
-            if ($model->changePassword()){
-
-                return $this->redirect(['/admin/users/profile-admin', 'id' => $id]);
-            }
-        }
-
-        return $this->render('change-password', [
-            'user' => $user,
-            'model' => $model,
         ]);
     }
 

@@ -107,8 +107,8 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
             }
 
             $gcp_description = $gcp->description;
-            if (mb_strlen($gcp_description) > 35){
-                $gcp_description = mb_substr($gcp_description, 0, 35) . '...';
+            if (mb_strlen($gcp_description) > 30){
+                $gcp_description = mb_substr($gcp_description, 0, 30) . '...';
             }
             ?>
 

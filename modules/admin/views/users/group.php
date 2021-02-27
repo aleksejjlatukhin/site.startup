@@ -62,7 +62,7 @@ $this->title = 'Админка | Пользователи';
                     'attribute' => 'fio',
                     'label' => 'ФИО',
                     'value' => function ($data) {
-                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/admin/users/profile', 'id' => $data->id])) . '</div>';
+                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/profile/index', 'id' => $data->id])) . '</div>';
                     },
                     'format' => 'html',
                     'options' => ['width' => '450'],

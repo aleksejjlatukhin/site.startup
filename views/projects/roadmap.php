@@ -78,10 +78,6 @@ $content .= '<div class="content_roadmap">
 foreach ($roadmaps as $roadmap) {
 
     $segment_name = $roadmap->getProperty('segment_name');
-    if (mb_strlen($segment_name) > 25) {
-        $segment_name = mb_substr($segment_name, 0, 25) . '...';
-    }
-
 
     if ($roadmap->getProperty('fact_segment_confirm') != null) {
 

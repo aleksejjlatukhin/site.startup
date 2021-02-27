@@ -5,10 +5,10 @@ namespace app\controllers;
 use Yii;
 use yii\web\Response;
 use app\models\LoginForm;
-use app\models\SingupForm;
+use app\models\forms\SingupForm;
 use app\models\User;
 use app\models\ResetPasswordForm;
-use app\models\SendEmailForm;
+use app\models\forms\SendEmailForm;
 use yii\helpers\Url;
 use app\models\AccountActivation;
 
@@ -104,27 +104,20 @@ class SiteController extends AppController
                                     //Письмо с подтверждение не отправлено
                                     $response = [
                                         'error_singup_send_email' => true,
-                                        'message' => 'Ошибка. Не отправляются письма на указанный email.',
+                                        'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
                                     ];
                                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                                     \Yii::$app->response->data = $response;
                                     return $response;
                                 }
-
                             }
-                        } else {
-
-                            //Возникла ошибка при регистрации
-                            $response = ['error_model_singup' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
-                            return $response;
                         }
                     } else {
 
                         $response = [
                             'error_uniq_email' => false,
                             'error_uniq_username' => false,
+                            'error_match_username' => false,
                             'error_exist_agree' => false,
                         ];
 
@@ -134,6 +127,10 @@ class SiteController extends AppController
 
                         if ($model->uniq_username === false) {
                             $response['error_uniq_username'] = true;
+                        }
+
+                        if ($model->match_username === false) {
+                            $response['error_match_username'] = true;
                         }
 
                         if ($model->exist_agree != 1) {
