@@ -1,15 +1,11 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $content string */
-
 use app\models\User;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use app\assets\ProfileAsset;
-use yii\bootstrap\Modal;
 
 ProfileAsset::register($this);
 ?>
@@ -118,60 +114,6 @@ ProfileAsset::register($this);
         </footer>
 
     </div>
-
-    <!--All-information Project begin-->
-
-    <?php // Модальное окно - данные проекта
-    Modal::begin([
-        'options' => ['id' => 'data_project_modal'],
-        'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
-    ]); ?>
-    <!--Контент добавляется через Ajax-->
-    <?php Modal::end(); ?>
-
-    <!--All-information Project end-->
-
-
-    <!--Roadmap Project begin-->
-
-    <?php // Модальное окно - дорожная карта проекта
-    Modal::begin([
-        'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
-        'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
-    ]); ?>
-    <!--Контент добавляется через Ajax-->
-    <?php Modal::end(); ?>
-
-    <!--Roadmap Project end-->
-
-
-    <!--Result Project begin-->
-
-    <?php // Модальное окно - сводная таблица проекта
-    Modal::begin([
-        'options' => ['id' => 'showResultTableProject', 'class' => 'showResultTableProject'],
-        'size' => 'modal-lg',
-    ]); ?>
-    <!--Контент добавляется через Ajax-->
-    <?php Modal::end(); ?>
-
-    <!--Result Project end-->
-
-
-    <!--Report Project begin-->
-
-    <?php // Модальное окно - протокол проекта
-    Modal::begin([
-        'options' => ['id' => 'showReportProject', 'class' => 'showReportProject'],
-        'size' => 'modal-lg',
-        'header' => '<h2 class="text-center" style="font-size: 32px; color: #4F4F4F;"></h2>',
-    ]); ?>
-    <!--Контент добавляется через Ajax-->
-    <?php Modal::end(); ?>
-
-    <!--Report Project end-->
 
 <?php $this->endBody() ?>
 </body>
