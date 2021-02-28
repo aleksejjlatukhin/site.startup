@@ -15,7 +15,7 @@ use app\models\RespondsConfirm;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
-class RespondsConfirmController extends AppController
+class RespondsConfirmController extends AppUserPartController
 {
 
     /**

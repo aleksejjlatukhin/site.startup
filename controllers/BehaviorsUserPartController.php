@@ -5,11 +5,10 @@ namespace app\controllers;
 
 use app\models\User;
 use Yii;
-use yii\web\Controller;
 use yii\filters\AccessControl;
 
 
-class BehaviorsController extends Controller
+class BehaviorsUserPartController extends AppController
 {
     /*public $layout = '@app/modules/admin/views/layouts/main';*/
 

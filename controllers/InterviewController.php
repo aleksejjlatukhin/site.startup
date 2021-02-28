@@ -19,7 +19,7 @@ use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 
 
-class InterviewController extends AppController
+class InterviewController extends AppUserPartController
 {
 
     /**

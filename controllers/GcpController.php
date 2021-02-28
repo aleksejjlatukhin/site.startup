@@ -14,7 +14,7 @@ use app\models\Gcp;
 use yii\web\NotFoundHttpException;
 
 
-class GcpController extends AppController
+class GcpController extends AppUserPartController
 {
 
     /**

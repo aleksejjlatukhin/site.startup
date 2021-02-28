@@ -20,7 +20,7 @@ use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
 
-class RespondsMvpController extends AppController
+class RespondsMvpController extends AppUserPartController
 {
 
     /**

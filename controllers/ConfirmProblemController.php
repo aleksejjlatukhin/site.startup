@@ -22,7 +22,7 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
-class ConfirmProblemController extends AppController
+class ConfirmProblemController extends AppUserPartController
 {
 
     /**

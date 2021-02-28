@@ -15,7 +15,7 @@ use yii\web\NotFoundHttpException;
 use app\models\SortForm;
 use app\models\SegmentSort;
 
-class SegmentController extends AppController
+class SegmentController extends AppUserPartController
 {
 
     /**

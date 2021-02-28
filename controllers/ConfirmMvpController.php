@@ -26,7 +26,7 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
-class ConfirmMvpController extends AppController
+class ConfirmMvpController extends AppUserPartController
 {
 
     /**

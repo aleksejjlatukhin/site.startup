@@ -12,7 +12,7 @@ use app\models\forms\SendEmailForm;
 use yii\helpers\Url;
 use app\models\AccountActivation;
 
-class SiteController extends AppController
+class SiteController extends AppUserPartController
 {
     public $layout = 'base';
 

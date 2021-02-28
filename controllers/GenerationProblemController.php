@@ -14,7 +14,7 @@ use app\models\GenerationProblem;
 use yii\web\NotFoundHttpException;
 
 
-class GenerationProblemController extends AppController
+class GenerationProblemController extends AppUserPartController
 {
 
     /**

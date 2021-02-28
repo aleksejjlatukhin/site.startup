@@ -16,7 +16,7 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
-class DescInterviewGcpController extends AppController
+class DescInterviewGcpController extends AppUserPartController
 {
 
     /**

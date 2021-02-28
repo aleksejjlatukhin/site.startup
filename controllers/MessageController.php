@@ -9,7 +9,7 @@ use app\models\ConversationAdmin;
 use Yii;
 use app\models\MessageAdmin;
 
-class MessageController extends AppController
+class MessageController extends AppUserPartController
 {
 
     public function beforeAction($action)

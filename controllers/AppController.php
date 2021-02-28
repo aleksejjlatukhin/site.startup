@@ -3,8 +3,9 @@
 
 namespace app\controllers;
 
+use yii\web\Controller;
 
-class AppController extends BehaviorsController
+class AppController extends Controller
 {
 
 }

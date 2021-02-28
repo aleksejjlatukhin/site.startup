@@ -17,7 +17,7 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class ProjectsController extends AppController
+class ProjectsController extends AppUserPartController
 {
 
     /**

@@ -13,7 +13,7 @@ use app\models\User;
 use yii\web\NotFoundHttpException;
 
 
-class ProfileController extends AppController
+class ProfileController extends AppUserPartController
 {
     public $layout = 'profile';
 

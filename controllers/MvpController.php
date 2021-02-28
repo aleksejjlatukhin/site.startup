@@ -15,7 +15,7 @@ use Yii;
 use app\models\Mvp;
 use yii\web\NotFoundHttpException;
 
-class MvpController extends AppController
+class MvpController extends AppUserPartController
 {
 
     /**

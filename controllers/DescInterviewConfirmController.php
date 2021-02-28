@@ -14,7 +14,7 @@ use app\models\DescInterviewConfirm;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
-class DescInterviewConfirmController extends AppController
+class DescInterviewConfirmController extends AppUserPartController
 {
 
     /**

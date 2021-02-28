@@ -15,7 +15,7 @@ use yii\helpers\Html;
             <div class="col-md-4">
                 <div class="pull-right">
                     <?= Html::a('<span>Автор:</span><span>' . $project->user->second_name . '</span><span>' . $project->user->first_name . '</span><span>' . $project->user->middle_name . '</span>',
-                        ['/admin/users/profile', 'id' => $project->user_id]); ?>
+                        ['/profile/index', 'id' => $project->user_id]); ?>
                 </div>
             </div>
         </div>

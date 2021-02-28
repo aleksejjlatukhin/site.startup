@@ -19,7 +19,7 @@ use yii\web\NotFoundHttpException;
 use app\models\forms\UpdateRespondGcpForm;
 
 
-class RespondsGcpController extends AppController
+class RespondsGcpController extends AppUserPartController
 {
 
     /**

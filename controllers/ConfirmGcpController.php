@@ -24,7 +24,7 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
-class ConfirmGcpController extends AppController
+class ConfirmGcpController extends AppUserPartController
 {
 
     /**

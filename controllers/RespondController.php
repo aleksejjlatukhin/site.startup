@@ -14,7 +14,7 @@ use app\models\Respond;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
-class RespondController extends AppController
+class RespondController extends AppUserPartController
 {
 
     /**

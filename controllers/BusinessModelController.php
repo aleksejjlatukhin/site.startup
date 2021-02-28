@@ -19,7 +19,7 @@ use yii\web\NotFoundHttpException;
 use kartik\mpdf\Pdf;
 
 
-class BusinessModelController extends AppController
+class BusinessModelController extends AppUserPartController
 {
 
     /**
