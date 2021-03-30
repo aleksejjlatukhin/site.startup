@@ -89,10 +89,6 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
             'yii\\bootstrap\\' => 14,
             'yii\\' => 4,
         ),
-        'w' => 
-        array (
-            'wbraganca\\dynamicform\\' => 22,
-        ),
         's' => 
         array (
             'setasign\\Fpdi\\' => 14,
@@ -125,6 +121,7 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         ),
         'W' => 
         array (
+            'Workerman\\' => 10,
             'Webmozart\\Assert\\' => 17,
         ),
         'S' => 
@@ -211,10 +208,6 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         array (
             0 => __DIR__ . '/..' . '/yiisoft/yii2',
         ),
-        'wbraganca\\dynamicform\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/wbraganca/yii2-dynamicform/src',
-        ),
         'setasign\\Fpdi\\' => 
         array (
             0 => __DIR__ . '/..' . '/setasign/fpdi/src',
@@ -288,6 +281,10 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'cebe\\markdown\\' => 
         array (
             0 => __DIR__ . '/..' . '/cebe/markdown',
+        ),
+        'Workerman\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/workerman/workerman',
         ),
         'Webmozart\\Assert\\' => 
         array (

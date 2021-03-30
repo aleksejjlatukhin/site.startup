@@ -3,8 +3,8 @@
 namespace app\modules\admin\models;
 
 use app\models\User;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
-use Yii;
 
 
 class ConversationMainAdmin extends ActiveRecord
@@ -28,16 +28,11 @@ class ConversationMainAdmin extends ActiveRecord
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
+    /* Поведения */
+    public function behaviors()
     {
         return [
-            'id' => 'ID',
-            'main_admin_id' => 'Главный Администратор',
-            'admin_id' => 'Администратор',
-            'updated_at' => 'Статус прочтения',
+            TimestampBehavior::class
         ];
     }
 
@@ -46,25 +41,12 @@ class ConversationMainAdmin extends ActiveRecord
     {
 
         return $this->hasOne(User::class, ['id' => 'admin_id']);
-        /*$admin = User::findOne([
-            'role' => User::ROLE_ADMIN,
-            'id' => $this->admin_id,
-        ]);
-
-        return $admin;*/
     }
-
 
 
     public function getMainAdmin ()
     {
         return $this->hasOne(User::class, ['id' => 'main_admin_id']);
-        /*$main_admin = User::findOne([
-            'role' => User::ROLE_MAIN_ADMIN,
-            'id' => $this->main_admin_id,
-        ]);
-
-        return $main_admin;*/
     }
 
 
@@ -76,10 +58,7 @@ class ConversationMainAdmin extends ActiveRecord
 
     public function getLastMessage ()
     {
-
-        $last_message = MessageMainAdmin::find()->where(['conversation_id' => $this->id])->orderBy('updated_at DESC')->one();
-
-        return $last_message;
+        return $this->hasOne(MessageMainAdmin::class, ['conversation_id' => 'id'])->orderBy('created_at DESC');
     }
 
 

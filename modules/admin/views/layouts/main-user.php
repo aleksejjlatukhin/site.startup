@@ -1,19 +1,16 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $content string */
-
-use app\widgets\Alert;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\User;
 use yii\bootstrap\Modal;
 
 AppAsset::register($this);
+$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/images/icons/favicon.png']);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -29,9 +26,11 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
+    <?php $user = User::findOne(Yii::$app->user->id); ?>
+
     <div class="shared-container" id="simplebar-shared-container">
 
-        <div class="wrap">
+        <div class="wrap" id="identifying_recipient_new_message-<?= Yii::$app->user->id; ?>">
 
             <div style="margin-bottom: -20px;">
 
@@ -67,7 +66,8 @@ AppAsset::register($this);
                                 ],
                             ],
 
-                            ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+                            ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger'])
+                                : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                         ],
                         'encodeLabels' => false,
                     ]);
@@ -91,7 +91,8 @@ AppAsset::register($this);
                                 ],
                             ],
 
-                            ['label' => Html::img('/images/icons/icon_messanger.png', ['style' => ['width' => '44px', 'padding' => '0', 'margin' => '-10px 0']]), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+                            ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger'])
+                                : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                         ],
                         'encodeLabels' => false,
                     ]);

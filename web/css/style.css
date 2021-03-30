@@ -1,3 +1,86 @@
+/*
+PRELOADER
+--- begin ---
+*/
+#preloader {
+    position: fixed;
+    z-index: 999989;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #707F99;
+    color: #ffffff;
+    transition: 1s;
+}
+#preloader #cont {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 90px;
+    height: 20px;
+    margin: auto;
+}
+#preloader #cont .round {
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    margin: 0 0.5px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    position: relative;
+    top: -50px;
+    animation: fall 1s linear infinite;
+    animation-timing-function: ease-in-out;
+}
+
+#preloader #cont .round:nth-child(1) {
+    background-color: darkcyan;
+    animation-delay: 0.45s;
+}
+#preloader #cont .round:nth-child(2) {
+    background-color: #3eaaaa;
+    animation-delay: 0.3s;
+}
+#preloader #cont .round:nth-child(3) {
+    background-color: #aae0e0;
+    animation-delay: 0.15s;
+}
+#preloader #cont .round:nth-child(4) {
+    background-color: #ffffff;
+    animation-delay: 0s;
+}
+
+@keyframes fall {
+    0% {
+        top: -50px;
+    }
+    50% {
+        top: 0;
+    }
+    100% {
+        top: -50px;
+    }
+}
+
+#preloader #loading {
+    position: absolute;
+    text-align: center;
+    top: 70%;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    font-size: 2em;
+    font-weight: 700;
+}
+/*
+PRELOADER
+--- end ---
+*/
 
 /*Стили для иконки с аватаркой пользователя
 ---Начало---
@@ -210,132 +293,478 @@
 ---Конец--
 */
 
-
-/* Скругление аватарки в беседах*/
-.round-avatar {
-    border-radius: 100px; /* Радиус скругления */
-    border: 1px solid #ccc; /* Параметры рамки */
+/*
+Стили для иконки сообщений в шапке сайта
+---Начало---
+*/
+.icon_messanger {
+    width: 44px;
+    padding: 0;
+    margin: -10px 0;
 }
+.countUnreadMessages {
+    display: flex;
+    min-width: 24px;
+    min-height: 24px;
+    opacity: 0;
+    position: absolute;
+    bottom: -2px;
+    left: 47px;
+    background: #ff5349;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #ffffff;
+    box-shadow: inset rgba(0,0,0,.6) 2px 1px 6px;
+    border-radius: 50%;
+}
+.countUnreadMessages.active {
+    opacity: 1;
+}
+/*
+Стили для иконки сообщений в шапке сайта
+---Конец---
+*/
 
-/*Ссылки для беседы*/
+/*
+Стили для иконки сообщений в блоках бесед
+---Начало---
+*/
+.countUnreadMessagesSender {
+    display: flex;
+    min-width: 16px;
+    min-height: 16px;
+    opacity: 0;
+    position: absolute;
+    bottom: 22px;
+    left: 56px;
+    background: #ff5349;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #ffffff;
+    box-shadow: inset rgba(0,0,0,.6) 0 0 4px;
+    border-radius: 50%;
+}
+.countUnreadMessagesSender.active {
+    opacity: 1;
+}
+/*
+Стили для иконки сообщений в блоках бесед
+---Конец---
+*/
 
+/*
+Стили для значка онлайн в иконке беседы
+---Начало---
+*/
+.checkStatusOnlineUser {
+    display: flex;
+    min-width: 14px;
+    min-height: 14px;
+    opacity: 0;
+    position: absolute;
+    top: 23px;
+    left: 18px;
+    background: #00FF66;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #ffffff;
+    box-shadow: inset rgba(0,0,0,.6) 0 0 4px;
+    border-radius: 50%;
+}
+.checkStatusOnlineUser.active {
+    opacity: 1;
+}
+/*
+Стили для значка онлайн в иконке беседы
+---Конец---
+*/
+
+/*
+Стили для блока поиска беседы
+---Начало---
+*/
 .conversation-link {
-     text-decoration: none;
-     font-weight: 700;
-     outline: none;
+    text-decoration: none;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 10px;
+    font-weight: 700;
+    transition: .3s;
+    outline: none;
+    cursor: pointer;
  }
 .conversation-link:hover {
     text-decoration: none;
-    /*background-color: #9acfea;*/
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#347ab6+0,347ab6+100 */
-    background: rgb(52,122,182); /* Old browsers */
-    background: -moz-linear-gradient(left,  rgba(52,122,182,1) 0%, rgba(52,122,182,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#347ab6', endColorstr='#347ab6',GradientType=1 ); /* IE6-9 */
+    background: #7F9FC5;
     color: #fff;
 
 }
-.conversation-link:active {
+.conversation-link:focus {
     text-decoration: none;
-    /*background-color: #9acfea;*/
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#347ab6+0,347ab6+100 */
-    background: rgb(52,122,182); /* Old browsers */
-    background: -moz-linear-gradient(left,  rgba(52,122,182,1) 0%, rgba(52,122,182,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#347ab6', endColorstr='#347ab6',GradientType=1 ); /* IE6-9 */
+    background: #7F9FC5;
     color: #fff;
+}
+.conversation-link:last-child {
+    border-bottom-width: 0;
+    border-radius: 0 0 8px 8px;
+}
 
+.user_picture_search {
+    width: 40px;
+    height: 40px;
+    padding: 1px;
+    margin-right: 15px;
+    background: #4F4F4F;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
 }
-.conversation-link-data {
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 12px;
-    color: #2b2b2b;
+.user_picture_search_default {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+    background: #4F4F4F;
+    border-radius: 8px;
 }
-.conversation-link-time {
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 12px;
-    color: #2b2b2b;
+
+.conversations_query {
+    display: none;
+    width: calc(100% - 32px);
+    position: absolute;
+    top: 41px;
+    left: 1px;
+    max-height: 60vh;
+    background: #ffffff;
+    margin-left: 15px;
+    border-top-width: 0;
+    border-radius: 0 0 12px 12px;
+    z-index: 9999;
+    overflow: auto;
+    box-shadow:
+            inset rgba(0,0,0,.6) 0 -3px 3px,
+            rgba(0,0,0,.8) 0 3px 8px -3px;
+}
+.block_no_search_result {
+    padding: 30px;
+    color: #787878;
+    text-align: center;
+}
+/*
+Ссылки для беседы для блока поиска
+---Конец---
+*/
+
+
+/*
+Стили для блока выбора беседы
+---Начало---
+*/
+.col-sm-6.conversation-list-menu,
+.col-lg-4.conversation-list-menu {
+    background: #707F99;
+    border-top: 1px solid #ffffff;
+    min-height: calc(100vh - 171px);
+    color: #ffffff;
+    padding: 0;
+}
+#conversation-list-menu {
+    max-height: calc(100vh - 171px);
+    overflow-y: auto;
+}
+
+
+.container-user_messages {
+    position: relative;
+    display:flex;
+    background: #707F99;
+    color: #FFFFFF;
+    padding: 0 5px;
+    min-height: 100px;
+    height: 100px;
+    border-bottom: 1px solid #ffffff;
+    transition: .3s;
+    cursor: pointer;
+}
+.container-user_messages:hover {
+    background: #7F9FC5;
+}
+.container-user_messages:focus {
+    background: #7F9FC5;
+}
+.container-user_messages div {
+    overflow: hidden;
+    max-height: inherit;
+}
+.container-user_messages.active-message {
+    background: #7F9FC5;
+}
+
+
+.user_picture {
+    width: 60px;
+    height: 60px;
+    padding: 1px;
+    margin: 20px 10px;
+    background: #4F4F4F;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+}
+.user_picture_default {
+    width: 60px;
+    height: 60px;
+    margin: 20px 10px;
+    background: #4F4F4F;
+    border-radius: 10px;
+}
+.icon_sender_last_message {
+    width: 20px;
+    height: 20px;
     margin-right: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
 }
-.conversation-link-text {
-    text-decoration: none;
-    font-weight: 400;
-    font-size: 13px;
-    color: #2b2b2b;
-    padding-top: 5px;
-}
-.conversation-link>:hover .conversation-link-text{
-    color: #fff;
+.icon_sender_last_message_default {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background: #4F4F4F;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
 }
 
+
+.container_user_messages_text_content {
+    margin: 20px 5px 20px 0;
+    position: relative;
+    width: 100%;
+}
+.container_user_messages_text_content .block_top {
+    font-weight: 700;
+    line-height: 18px;
+    height: 36px;
+}
+.container_user_messages_text_content .block_top div:nth-child(2) {
+    font-size: 14px;
+}
+.container_user_messages_text_content .block_bottom_exist_message {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+}
+.container_user_messages_text_content .block_bottom_exist_message div {
+    height: 20px;
+}
+.container_user_messages_text_content .block_bottom_not_exist_message {
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    color: #ACACAC;
+}
+.block_not_conversations {
+    padding: 30px;
+    border-bottom: 1px solid #ffffff;
+}
+
+
+.title_block_conversation {
+    padding: 38px 15% 38px 15%;
+    border-bottom: 1px solid #ffffff;
+}
+.title_block_conversation .title {
+    overflow: hidden;
+    text-align: center;
+    color: #ACACAC;
+    font-weight: 700;
+}
+.title_block_conversation .title:before,
+.title_block_conversation .title:after {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+    height: 1px;
+    background: #ACACAC;
+    position: relative;
+}
+.title_block_conversation .title:before {
+    margin-left: -100%;
+    left: -15px;
+}
+.title_block_conversation .title:after {
+    margin-right: -100%;
+    right: -15px;
+}
+/*
+Стили для блока выбора беседы
+---Конец---
+*/
 
 
 /*Блок прокрутки в сообщениях
 ---Начало---
 */
-
 .chat {
-    /*width: 760px;*/
-    padding: 20px 0;
-    height: 80vh;
-    background-color: rgb(226, 226, 226);
+    background: #ffffff;
+    max-height: calc(100vh - 200px);
+    height: calc(100vh - 200px);
+    position: relative;
+}
+.data-chat {
+    padding: 10px 0;
+    background: #ffffff;
+    max-height: calc(100vh - 290px);
     overflow-y: auto;
 }
-
+.messages-pagination-list {
+    position: absolute;
+    top: -100%;
+}
+.block_for_link_next_page_masseges {
+    margin-top: 10px;
+}
+a.button_next_page_masseges {
+    color: #ACACAC;
+    text-decoration: none;
+    transition: .3s color ease;
+}
+a.button_next_page_masseges:hover {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+a.button_next_page_masseges:focus {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+.create-message {
+    margin: 35px 0 0 0;
+    position: absolute;
+    bottom: -30px;
+    width: 100%;
+}
+.create-message .form-send-email {
+    position: relative;
+}
+.create-message .form-send-email #input_send_message {
+    min-height: 50px;
+    max-height: 20vh;
+    min-width: 100%;
+    max-width: 100%;
+    padding: 15px 60px 15px 70px;
+    line-height: 19px;
+    resize: none;
+}
+.create-message .form-send-email #submit_send_message {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: -1;
+}
+.create-message .form-send-email #input_message_files {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: -1;
+}
+.create-message .form-send-email .send_message_button {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.create-message .form-send-email .attach_files_button {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    height: 30px;
+    width: 26px;
+    cursor: pointer;
+}
+.create-message .block_attach_files {
+    display: none;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    margin-top: -5px;
+}
+.dayAndDayMessage {
+    text-align: center;
+    margin: 10px 0;
+    color: #7F9FC5;
+}
 .message {
-    text-align: left;
+    display: flex;
     margin-top: 15px;
     margin-bottom: 15px;
-    /*width: 100%;*/
+    padding: 15px;
     overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #ACACAC;
+}
+.message.unreadmessage {
+    background: #f8f4ff;
+}
+.message.unreadmessage .icon_read_message {
+    opacity: 0;
+}
+.sender_data {
+    width: 100%;
+}
+.sender_data .sender_info {
+    display:flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #707F99;
+}
+.sender_data .sender_info .interlocutor {
+    color: #52BE7F;
+}
+.sender_data .sender_info div:nth-child(2) {
+    display: flex;
+    justify-content: flex-end;
     font-size: 14px;
-    font-family: "Helvetica", sans-serif;
 }
-.income {
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom: 13px;
-    margin-left: 10px;
-    max-width: 50%;
-    float: left;
-}
-.income_data {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 15px;
-    background-color: rgb(255, 255, 255);
-    border-radius: 10px;
-}
-.send {
-    padding-left: 15px;
-    padding-bottom: 13px;
-    padding-right: 15px;
+.sender_data .sender_info div:nth-child(2) .icon_read_message {
+    width: 15px;
+    height: 15px;
     margin-right: 10px;
-    max-width: 50%;
-    float: right;
 }
-.send_data {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 15px;
-    /*background-color: rgb(41, 167, 222);*/
-    border-radius: 10px;
-    color: rgb(255, 255, 255);
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#347ab6+0,347ab6+100 */
-    background: rgb(52,122,182); /* Old browsers */
-    background: -moz-linear-gradient(left,  rgba(52,122,182,1) 0%, rgba(52,122,182,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(52,122,182,1) 0%,rgba(52,122,182,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#347ab6', endColorstr='#347ab6',GradientType=1 ); /* IE6-9 */
+.sender_data .message-description {
+    padding-top: 5px;
+    line-height: 19px;
 }
-::-webkit-scrollbar {
-    display: none;
+.sender_data .message-description .message-description-files {
+    margin-top: 10px;
 }
-
+.sender_data .message-description .message-description-files div {
+    height: 20px;
+    overflow: hidden;
+}
+.data-chat .block_not_exist_message {
+    display: flex;
+    min-height: calc(100vh - 370px);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: #ACACAC;
+}
+.user_picture_message {
+    width: 40px;
+    height: 40px;
+    padding: 1px;
+    margin-right: 15px;
+    background: #4F4F4F;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+}
+.user_picture_default_message {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+    background: #4F4F4F;
+    border-radius: 8px;
+}
 /*Блок прокрутки в сообщениях
 ---Конец---
 */

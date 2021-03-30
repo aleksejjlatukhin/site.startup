@@ -285,3 +285,27 @@ $(body).on('click', '.delete_image', function (e) {
     e.preventDefault();
     return false;
 });
+
+
+// Обновление информации о последнем визите пользователя
+setInterval(function(){
+
+    if ($(body).find('.user_is_online').length > 0) {
+
+        var url = '/admin/profile/get-user-is-online?id='+user_id;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                if(response.user_online)
+                    $(body).find('.user_is_online').html(response.message);
+                else if (response.user_logout)
+                    $(body).find('.user_is_online').html(response.message);
+            }, error: function(){
+                alert('Ошибка');
+            }
+        });
+    }
+}, 180000);

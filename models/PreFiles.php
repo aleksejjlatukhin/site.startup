@@ -4,13 +4,6 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "pre_files".
- *
- * @property int $id
- * @property int $project_id
- * @property string $file_name
- */
 class PreFiles extends \yii\db\ActiveRecord
 {
     /**

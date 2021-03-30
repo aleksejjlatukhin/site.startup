@@ -68,6 +68,34 @@ class ProfileController extends AppAdminController
 
     /**
      * @param $id
+     * @return array|bool
+     */
+    public function actionGetUserIsOnline($id)
+    {
+        $user = User::findOne($id);
+
+        if (Yii::$app->request->isAjax) {
+
+            if ($user->checkOnline === true) {
+
+                $response = ['user_online' => true, 'message' => 'Пользователь сейчас Online'];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
+
+                $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                \Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
      * @return array
      */
     public function actionUpdateProfile($id)

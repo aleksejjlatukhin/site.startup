@@ -63,6 +63,18 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
 
+        <?php if (!User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <div class="col-md-12">
+                <div class="user_is_online">
+                    <?php if ($user->checkOnline === true) : ?>
+                        Пользователь сейчас Online
+                    <?php elseif($user->checkOnline !== true && $user->checkOnline !== false) : ?>
+                        Пользователь был в сети <?= $user->checkOnline;?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
 
         <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
@@ -276,8 +288,7 @@ use yii\widgets\ActiveForm;
 
         <div class="col-md-6">
             <?= Html::button('Отмена', [
-                'id' => 'show_form_view_data',
-                'class' => 'btn btn-default',
+                'class' => 'show_form_view_data btn btn-default',
                 'style' => [
                     'background' => '#E0E0E0',
                     'padding' => '0 7px',
@@ -376,8 +387,7 @@ use yii\widgets\ActiveForm;
 
             <div class="col-md-6">
                 <?= Html::button('Отмена', [
-                    'id' => 'show_form_view_data',
-                    'class' => 'btn btn-default',
+                    'class' => 'show_form_view_data btn btn-default',
                     'style' => [
                         'background' => '#E0E0E0',
                         'padding' => '0 7px',

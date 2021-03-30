@@ -19,7 +19,7 @@ $(body).on('click', '#show_form_change_password', function () {
 });
 
 // Скрыть все формы и показать просмотр профиля
-$(body).on('click', '#show_form_view_data', function () {
+$(body).on('click', '.show_form_view_data', function () {
     $('.update_user_form').hide();
     $('.change_password_content').hide();
     $('.view_user_form').show();
@@ -60,7 +60,7 @@ $(body).on('beforeSubmit', '#update_data_profile', function(e){
             }
             if (response.success) {
                 // Скрыть форму редактирования профиля и показать просмотр профиля
-                $('#show_form_view_data').trigger('click');
+                $('.show_form_view_data').trigger('click');
                 // Обновляем контент страницы
                 $('.data_user_content').html(response.renderAjax);
                 // Меняем название ссылки выхода
@@ -100,7 +100,7 @@ $(body).on('beforeSubmit', '#form_change_password_user', function(e){
 
             if (response.success) {
                 // Скрыть форму изменения пароля и показать просмотр профиля
-                $('#show_form_view_data').trigger('click');
+                $('.show_form_view_data').trigger('click');
                 // Очистить форму после сохранения
                 $('#form_change_password_user')[0].reset();
             }
@@ -287,3 +287,25 @@ $(body).on('click', '.delete_image', function (e) {
 });
 
 
+// Обновление информации о последнем визите пользователя
+setInterval(function(){
+
+    if ($(body).find('.user_is_online').length > 0) {
+
+        var url = '/profile/get-user-is-online?id='+user_id;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                if(response.user_online)
+                    $(body).find('.user_is_online').html(response.message);
+                else if (response.user_logout)
+                    $(body).find('.user_is_online').html(response.message);
+            }, error: function(){
+                alert('Ошибка');
+            }
+        });
+    }
+}, 180000);

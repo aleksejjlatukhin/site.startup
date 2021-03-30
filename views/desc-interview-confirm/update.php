@@ -81,6 +81,7 @@ use yii\helpers\Html;
                     <div style="display: flex; align-items: center;">
 
                         <?= Html::a('Скачать файл', ['/desc-interview-confirm/download', 'id' => $model->id], [
+                            'target' => '_blank',
                             'class' => 'btn btn-default interview_file_update',
                             'style' => [
                                 'display' => 'flex',
@@ -227,6 +228,7 @@ use yii\helpers\Html;
                     <div style="display: flex; align-items: center;">
 
                         <?= Html::a('Скачать файл', ['/desc-interview-confirm/download', 'id' => $model->id], [
+                            'target' => '_blank',
                             'class' => 'btn btn-default interview_file_update',
                             'style' => [
                                 'display' => 'flex',

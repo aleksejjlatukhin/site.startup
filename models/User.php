@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\modules\admin\models\ConversationMainAdmin;
+use app\modules\admin\models\MessageMainAdmin;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
@@ -105,16 +106,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-//        return static::findOne(['access_token' => $token]);
+        //return static::findOne(['access_token' => $token]);
     }
 
-    /** Находит пользователя по имени и возвращает объект найденного пользователя.
-     *  Вызываеться из модели LoginForm.
-     */
+
+    /* Находит пользователя по имени и возвращает объект найденного пользователя. */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username]);
     }
+
 
     /* Находит пользователя по емайл */
     public static function findByEmail($email)
@@ -234,6 +235,18 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
+    public function getCheckingOnline()
+    {
+        return $this->hasOne(CheckingOnlineUser::class, ['user_id' => 'id']);
+    }
+
+
+    public function getCheckOnline()
+    {
+        if ($checkingOnline = $this->checkingOnline) return $checkingOnline->isOnline();
+        return false;
+    }
+
 
     //Получить объект главного Админа
     public function getMainAdmin ()
@@ -242,20 +255,22 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
+    //Получить объект техподдержки
+    public function getDevelopment ()
+    {
+        return User::findOne(['role' => User::ROLE_DEV]);
+    }
+
+
     //Отправка письма на почту пользователю при изменении его статуса
     public function sendEmailUserStatus()
     {
         /* @var $user User */
-        $user = User::findOne(
-            [
-                'email' => $this->email,
-            ]
-        );
+        $user = User::findOne(['email' => $this->email]);
 
         if($user){
 
             return Yii::$app->mailer->compose('change-status', ['user' => $user])
-                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                 ->setTo($this->email)
                 ->setSubject('Изменение Вашего статуса на сайте Spaccel.ru')
@@ -265,7 +280,25 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
 
+    //Создание беседы техподдержки и пользователя при активации его статуса
+    public function createConversationDevelopment ()
+    {
 
+        $convers = ConversationDevelopment::findOne(['user_id' => $this->id]);
+
+        if (!($convers)) {
+
+            $conversation = new ConversationDevelopment();
+            $conversation->user_id = $this->id;
+            $conversation->dev_id = $this->development->id;
+            return $conversation->save() ? $conversation : null;
+
+        }else{
+
+            return $convers;
+        }
+
+    }
 
     //Создание беседы главного админа и админа при активации его статуса
     public function createConversationMainAdmin ()
@@ -287,8 +320,6 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-
-
     //Создание беседы админа и проектанта при активации его статуса
     public function createConversationAdmin ($user)
     {
@@ -309,8 +340,6 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-
-
     //Отправка письма админу
     public function sendEmailAdmin($user)
     {
@@ -318,7 +347,6 @@ class User extends ActiveRecord implements IdentityInterface
         if($user) {
 
             return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
-                //->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name.' (отправлено роботом)'])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                 ->setTo([Yii::$app->params['adminEmail']])
                 ->setSubject('Регистрация нового пользователя на сайте Spaccel.ru')
@@ -328,6 +356,129 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
 
+
+    /**
+     * @return bool|int|string
+     * Общее кол-во непрочитанных сообщений пользователя
+     */
+    public function getCountUnreadMessages()
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->username)) {
+
+            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = ($countUnreadMessagesAdmin + $countUnreadMessagesDev);
+        }
+        elseif (self::isUserAdmin($this->username)) {
+
+            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = ($countUnreadMessagesAdmin + $countUnreadMessagesMainAdmin + $countUnreadMessagesDev);
+        }
+        elseif (self::isUserMainAdmin($this->username)) {
+
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = ($countUnreadMessagesMainAdmin + $countUnreadMessagesDev);
+        }
+        elseif (self::isUserDev($this->username)) {
+
+            $count = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * @return bool|int|string
+     * Кол-во непрочитанных сообщений от Админа
+     */
+    public function getCountUnreadMessagesFromAdmin ()
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->username)) {
+
+            $count = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * @return bool|int|string
+     * Кол-во непрочитанных сообщений от Техподдержки
+     */
+    public function getCountUnreadMessagesFromDev ()
+    {
+        $count = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * @return bool|int|string
+     * Кол-во непрочитанных сообщений от главного админа
+     */
+    public function getCountUnreadMessagesFromMainAdmin ()
+    {
+        $count = 0;
+
+        if (self::isUserAdmin($this->username)) {
+
+            $count = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * @return bool|int|string
+     * Кол-во непрочитанных сообщений пользователя,
+     * где он является отправителем
+     */
+    public function getCountUnreadMessagesFromUser ()
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->username)) {
+
+            $count = MessageAdmin::find()->where(['sender_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    public function getCountUnreadMessagesDevelopmentFromUser ()
+    {
+        $count = MessageDevelopment::find()->where(['sender_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * @return bool|int|string
+     * Кол-во непрочитанных сообщений алдминистратора,
+     * где он является отправителем
+     */
+    public function getCountUnreadMessagesMainAdminFromAdmin ()
+    {
+        $count = 0;
+
+        if (self::isUserAdmin($this->username)) {
+
+            $count = MessageMainAdmin::find()->where(['sender_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
 
 
     //Проверка на пользователя

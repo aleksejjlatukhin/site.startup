@@ -13,26 +13,6 @@ $this->registerCssFile('@web/css/profile-style.css');
 
     <div class="row profile_menu" style="height: 51px;">
 
-        <?/*= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) */?><!--
-
-        <?/*= Html::a('Сводные таблицы', ['#'], [
-            'class' => 'link_in_the_header',
-        ]) */?>
-
-        <?/*= Html::a('Дорожные карты', ['#'], [
-            'class' => 'link_in_the_header',
-        ]) */?>
-
-        <?/*= Html::a('Протоколы', ['#'], [
-            'class' => 'link_in_the_header',
-        ]) */?>
-
-        --><?/*= Html::a('Презентации', ['#'], [
-            'class' => 'link_in_the_header',
-        ]) */?>
-
     </div>
 
 
@@ -94,93 +74,126 @@ $this->registerCssFile('@web/css/profile-style.css');
 
             <div class="row">
 
-                <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
+                <?php if ($user->id == Yii::$app->user->id) : ?>
 
-                <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
 
-                <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
 
-                    <?php if ($user['status'] == User::STATUS_ACTIVE) : ?>
-                        <span style="padding-left: 10px;">Активирован</span>
-                    <?php elseif ($user['status'] == User::STATUS_NOT_ACTIVE) : ?>
-                        <span style="padding-left: 10px;">Не активирован</span>
-                    <?php elseif ($user['status'] == User::STATUS_DELETED) : ?>
-                        <span style="padding-left: 10px;">Заблокирован</span>
-                    <?php endif; ?>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
 
-                </div>
+                        <?php if ($user['status'] == User::STATUS_ACTIVE) : ?>
+                            <span style="padding-left: 10px;">Активирован</span>
+                        <?php elseif ($user['status'] == User::STATUS_NOT_ACTIVE) : ?>
+                            <span style="padding-left: 10px;">Не активирован</span>
+                        <?php elseif ($user['status'] == User::STATUS_DELETED) : ?>
+                            <span style="padding-left: 10px;">Заблокирован</span>
+                        <?php endif; ?>
+
+                    </div>
+
+                <?php else : ?>
+
+                    <div class="col-md-12">
+                        <div class="user_is_online">
+                            <?php if ($user->checkOnline === true) : ?>
+                                Пользователь сейчас Online
+                            <?php elseif($user->checkOnline !== true && $user->checkOnline !== false) : ?>
+                                Пользователь был в сети <?= $user->checkOnline;?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
+
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
+
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
+
+                        <?php if ($user['status'] == User::STATUS_ACTIVE) : ?>
+                            <span style="padding-left: 10px;">Активирован</span>
+                        <?php elseif ($user['status'] == User::STATUS_NOT_ACTIVE) : ?>
+                            <span style="padding-left: 10px;">Не активирован</span>
+                        <?php elseif ($user['status'] == User::STATUS_DELETED) : ?>
+                            <span style="padding-left: 10px;">Заблокирован</span>
+                        <?php endif; ?>
+
+                    </div>
+
+                <?php endif; ?>
 
             </div>
 
-            <div class="view_user_form row">
 
-                <?php $form = ActiveForm::begin([
-                    'options' => ['class' => 'g-py-15'],
-                    'errorCssClass' => 'u-has-error-v1',
-                    'successCssClass' => 'u-has-success-v1-1',
-                ]); ?>
+            <?php if ($user->id == Yii::$app->user->id) : ?>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'second_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
+                <div class="view_user_form row">
+
+                    <?php $form = ActiveForm::begin([
+                        'options' => ['class' => 'g-py-15'],
+                        'errorCssClass' => 'u-has-error-v1',
+                        'successCssClass' => 'u-has-success-v1-1',
                     ]); ?>
-                </div>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'first_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'second_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'middle_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'first_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'telephone', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'middle_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'email', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'telephone', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'username', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'email', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
-                <?php if ($user->id == Yii::$app->user->id) : ?>
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'username', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
 
                     <div class="col-md-6">
                         <?= Html::button('Редактировать профиль', [
@@ -217,57 +230,131 @@ $this->registerCssFile('@web/css/profile-style.css');
                         ]);?>
                     </div>
 
-                <?php endif; ?>
+                    <?php ActiveForm::end(); ?>
 
-                <?php ActiveForm::end(); ?>
+                </div>
+
+            <?php else : ?>
+
+                <div class="view_user_form row" style="padding-top: 15px;">
+
+                    <?php $form = ActiveForm::begin([
+                        'options' => ['class' => 'g-py-15'],
+                        'errorCssClass' => 'u-has-error-v1',
+                        'successCssClass' => 'u-has-success-v1-1',
+                    ]); ?>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'second_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'first_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'middle_name', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'telephone', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'email', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <div class="col-md-4">
+                        <?= $form->field($user, 'username', [
+                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                        ])->textInput([
+                            'maxlength' => true,
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                        ]); ?>
+                    </div>
+
+                    <?php ActiveForm::end(); ?>
 
 
-                <?php if (User::isUserMainAdmin(Yii::$app->user->identity['username']) ||  User::isUserDev(Yii::$app->user->identity['username'])) :?>
+                    <?php if (User::isUserMainAdmin(Yii::$app->user->identity['username']) ||  User::isUserDev(Yii::$app->user->identity['username'])) :?>
 
-                    <?php if ($count_users > 0) : ?>
+                        <?php if ($count_users > 0) : ?>
 
-                        <div class="col-md-4 text-center" style="margin-top: 37px; font-weight: 700; font-size: 24px;">Администрирование:</div>
+                            <div class="col-md-4 text-center" style="margin-top: 22px; font-weight: 700; font-size: 24px;">Администрирование:</div>
 
-                        <div class="col-md-4">
-                            <?= Html::a('<div class="text-center">Пользователи - ' . $count_users . '</div>',
-                                Url::to(['/admin/users/group', 'id' => $user['id']]), [
-                                'class' => 'btn btn-default',
-                                'style' => [
-                                    'color' => '#FFFFFF',
-                                    'background' => '#707F99',
-                                    'padding' => '0 7px',
-                                    'width' => '100%',
-                                    'height' => '40px',
-                                    'font-size' => '24px',
-                                    'border-radius' => '8px',
-                                    'margin-top' => '35px',
-                                ]
-                            ])?>
-                        </div>
+                            <div class="col-md-4">
+                                <?= Html::a('<div class="text-center">Пользователи - ' . $count_users . '</div>',
+                                    Url::to(['/admin/users/group', 'id' => $user['id']]), [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'color' => '#FFFFFF',
+                                            'background' => '#707F99',
+                                            'padding' => '0 7px',
+                                            'width' => '100%',
+                                            'height' => '40px',
+                                            'font-size' => '24px',
+                                            'border-radius' => '8px',
+                                            'margin-top' => '20px',
+                                        ]
+                                    ])?>
+                            </div>
 
-                        <div class="col-md-4">
-                            <?= Html::a( '<div class="text-center">Проекты - ' . $countProjects . '</div>',
-                                Url::to(['/admin/projects/group', 'id' => $user['id']]), [
-                                'class' => 'btn btn-default',
-                                'style' => [
-                                    'color' => '#FFFFFF',
-                                    'background' => '#707F99',
-                                    'padding' => '0 7px',
-                                    'width' => '100%',
-                                    'height' => '40px',
-                                    'font-size' => '24px',
-                                    'border-radius' => '8px',
-                                    'margin-top' => '35px',
-                                ]
-                            ]);?>
-                        </div>
+                            <div class="col-md-4">
+                                <?= Html::a( '<div class="text-center">Проекты - ' . $countProjects . '</div>',
+                                    Url::to(['/admin/projects/group', 'id' => $user['id']]), [
+                                        'class' => 'btn btn-default',
+                                        'style' => [
+                                            'color' => '#FFFFFF',
+                                            'background' => '#707F99',
+                                            'padding' => '0 7px',
+                                            'width' => '100%',
+                                            'height' => '40px',
+                                            'font-size' => '24px',
+                                            'border-radius' => '8px',
+                                            'margin-top' => '20px',
+                                        ]
+                                    ]);?>
+                            </div>
+
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
-                <?php endif; ?>
+                </div>
 
+            <?php endif; ?>
 
-            </div>
 
             <div class="update_user_form row">
 

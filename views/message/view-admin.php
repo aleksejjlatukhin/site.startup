@@ -2,337 +2,651 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use app\models\User;
 use yii\widgets\ActiveForm;
+use app\models\MessageAdmin;
 
-$this->title = 'Сообщения | Проектант';
+$this->title = 'Сообщения';
+$this->registerCssFile('@web/css/admin-message-view.css');
 ?>
 
-    <br>
-    <div class="row">
+<div class="admin-message-view">
 
-        <div class="col-md-8" style="border-right: 1px solid #ccc; padding-right: 0;">
+    <!--Preloader begin-->
+    <div id="preloader">
+        <div id="cont">
+            <div class="round"></div>
+            <div class="round"></div>
+            <div class="round"></div>
+            <div class="round"></div>
+        </div>
+        <div id="loading">Loading</div>
+    </div>
+    <!--Preloader end-->
 
-            <div class="data-message">
+    <div class="row message_menu">
 
-                <div style="padding: 10px 0; margin-top: -20px;border-bottom: 1px solid #ccc; text-align: center;">
+        <div class="col-sm-6 col-lg-4 search-block">
 
-                <span style="float: left; padding-top: 5px;">
-                    <?php if (User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
-                        <?= Html::a('<< Назад', Url::to(['/admin/message/index', 'id' => \Yii::$app->user->id]), ['class' => 'btn btn-sm btn-default'])?>
-                    <?php endif; ?>
-                </span>
+            <?php $form = ActiveForm::begin([
+                'id' => 'search_user_conversation',
+                'action' => Url::to(['/admin/message/get-conversation-query', 'id' => $admin->id]),
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]); ?>
 
-                    <span style="margin-left: -100px; padding-right: 10px;">
-                    <?= Html::img([$user['avatar_image']],['width' => '40px', 'height' => '40px', 'class' => 'round-avatar'])?>
-                </span>
+            <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                ->textInput([
+                    'id' => 'search_conversation',
+                    'placeholder' => 'Поиск',
+                    'class' => 'style_form_field_respond',
+                    'autocomplete' => 'off'])
+                ->label(false);
+            ?>
 
-                    <span style="font-weight: 700;">
-                    <?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name ?>
-                </span>
+            <?php ActiveForm::end(); ?>
 
-                </div>
-
-                <div class="chat">
-
-                    <?php if (!empty($messages)) : ?>
-
-                        <div class="data-chat">
-
-                            <?php foreach ($messages as $message) : ?>
-
-                                <?php if ($message->sender_id != $user->id) : ?>
-
-                                    <div class="row message message_id_<?= $message->id;?>" style="margin: 0;">
-                                        <div class="income">
-                                            <div class="income_data">
-                                                <div style="display: flex;">
-
-                                                    <div style="padding-right: 15px;">
-                                                        <?= Html::img([$user->avatar_image],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
-                                                    </div>
-
-                                                    <div style="padding-top: 5px;">
-
-                                                        <div style="font-size: 13px; font-weight: 700;">
-                                                        <span style="padding-right: 30px;">
-                                                            Администратор
-                                                        </span>
-                                                        </div>
-
-                                                        <div style="font-size: 13px; font-weight: 700;">
-                                                        <span style="padding-right: 5px; font-size: 12px;">
-                                                        <?= date('H:i', $message['updated_at']); ?>
-                                                        </span>
-
-                                                            <span style="font-size: 12px;">
-                                                        <?= date('d.m.Y', $message['updated_at']); ?>
-                                                        </span>
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="message-description" style="padding: 10px 5px;">
-                                                    <?= $message->description; ?>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                <?php else : ?>
-
-                                    <div class="row message message_id_<?= $message->id;?>" style="margin: 0;">
-                                        <div class="send">
-                                            <div class="send_data">
-                                                <div style="display: flex;">
-
-                                                    <div style="padding-right: 15px;">
-                                                        <?= Html::img([$user->avatar_image],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar'])?>
-                                                    </div>
-
-                                                    <div style="padding-top: 5px;">
-
-                                                        <div style="font-size: 13px; font-weight: 700;">
-                                                        <span style="padding-right: 30px;">
-                                                            <?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?>
-                                                        </span>
-                                                        </div>
-
-                                                        <div style="font-size: 13px; font-weight: 700;">
-                                                        <span style="padding-right: 5px; font-size: 12px;">
-                                                            <?= date('H:i', $message['updated_at']); ?>
-                                                        </span>
-
-                                                            <span style="font-size: 12px;">
-                                                            <?= date('d.m.Y', $message['updated_at']); ?>
-                                                        </span>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-
-                                                <div class="message-description" style="padding: 10px 5px;">
-                                                    <?= $message->description; ?>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                <?php endif; ?>
-
-                            <?php endforeach; ?>
-
-                        </div>
-
-                        <div class="create-message" style="margin: 15px 20px;">
-
-                            <?php $form = ActiveForm::begin(['id' => 'create-message-admin']); ?>
-
-                            <? $placeholder = 'Напишите сообщение' ?>
-
-                            <?= $form->field($model, 'description')->label(false)->textarea(['rows' => 3, 'placeholder' => $placeholder]) ?>
-
-                            <div class="form-group">
-
-                                <?= Html::submitButton('Отправить', [
-                                    'class' => 'btn btn-primary',
-                                    'style' => [
-                                        'font-weight' => '700',
-                                        'font-size' => '13px',
-                                    ]
-                                ]) ?>
-
-                            </div>
-
-                            <?php ActiveForm::end(); ?>
-                        </div>
-
-                    <?php else : ?>
-
-                        <div class="message not-message" style="display: flex">
-                            <div class="income" style="margin: 0 auto; text-align: center;">
-                                <div class="income_data">
-                                    У Вас нет пока общих сообщений с данным пользователем...
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="data-chat"></div>
-
-                        <div class="create-message" style="margin: 15px 20px; padding-top: 35vh;">
-
-                            <?php $form = ActiveForm::begin(['id' => 'create-message-admin']); ?>
-
-                            <? $placeholder = 'Напишите сообщение' ?>
-
-                            <?= $form->field($model, 'description')->label(false)->textarea(['rows' => 3, 'placeholder' => $placeholder]) ?>
-
-                            <div class="form-group">
-
-                                <?= Html::submitButton('Отправить', [
-                                    'class' => 'btn btn-primary',
-                                    'style' => [
-                                        'font-weight' => '700',
-                                        'font-size' => '13px',
-                                    ]
-                                ]) ?>
-
-                            </div>
-
-                            <?php ActiveForm::end(); ?>
-                        </div>
-
-                    <?php endif; ?>
-
-
-                </div>
+            <!--Беседы полученные в запросе поиска (по умолчанию это все доступные пользователи)-->
+            <div class="conversations_query" id="conversations_query">
+                <!--Сюда добавляем результат поиска-->
             </div>
+
         </div>
 
-        <div class="col-md-4">
-
-            <p style="padding-bottom: 20px; border-bottom: 1px solid #ccc; margin-bottom: 0; font-weight: 700; padding-left: 10px;">
-                Другие проектанты:
-            </p>
-
-            <?php foreach ($conversations as $conversation) : ?>
-
-                <?php if ($conversation->id != Yii::$app->request->get('id')) : ?>
-
-                    <?= Html::a('
-                        <div class="conversation-link" style="padding: 10px 10px; border-bottom: 1px solid #ccc; font-size: 13px;">
-                        <span style="padding-right: 15px;">'.Html::img([$conversation->user['avatar_image']],['width' => '30px', 'height' => '30px', 'class' => 'round-avatar']).'</span>
-                        <span>'. $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name .'</span>
-                        </div>', ['/message/view', 'id' => $conversation->id], ['class' => 'conversation-link'])
-                    ?>
-
-                <?php endif; ?>
-
-            <?php endforeach; ?>
+        <div class="col-sm-6 col-lg-8">
 
         </div>
 
     </div>
 
+    <div class="row all_content_messages">
 
-<?php
+        <div class="col-sm-6 col-lg-4 conversation-list-menu">
 
-$script = "
+            <div id="conversation-list-menu">
 
-    //Блок прокрутки в сообщениях
-     $(document).ready(function() {
-         $('.chat').stop().animate({
-           scrollTop: $('.chat')[0].scrollHeight
-         }, 800);
-         
-     });
-    
-    
-    
-     $('form').on('beforeSubmit', function(e){
-        
-        var data = $(this).serialize();
-        var messages = ".$messages.";
-        
-        $.ajax({
-        
-            url: '". Url::to(['view', 'id' => \Yii::$app->request->get('id')])."',
-            method: 'POST',
-            data: data,
-            success: function(response){
-                
-                //Создаем время и дату в нужном формате
-                var date =  + response.message['updated_at'];
-                var newTime = new Date();
-                var fullTime = ('0' + newTime.getHours(date)).slice(-2) + ':' + ('0' + newTime.getMinutes(date)).slice(-2);
-                var newDate = new Date();
-                var fullDate = ('0' + newDate.getDate(date)).slice(-2) + '.' + ('0' + (newDate.getMonth(date) + 1)).slice(-2) + '.' + newDate.getFullYear(date);
-                
-                
-                
-                
-                if (messages.length > 1) {  //Если до отправки формы в беседе уже были сообщения
-                
-                    if (response.message['sender_id'] != response.user['id']) {
-                
-                        $('.data-chat').append('<\div class=\"row message message_id_' + response.message['id'] + '\" style=\"margin: 0;\"><\div class=\"income\"><\div class=\"income_data\"><\div style=\"display: flex;\"><\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.admin['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">Администратор<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 10px; font-size: 12px;\">' + fullTime + '<\/span><\span style=\"font-size: 12px;\">' + fullDate + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.message['description'] + '<\/div><\/div><\/div>');
-                    
-                    }else {
-                    
-                        $('.data-chat').append('<\div class=\"row message message_id_' + response.message['id'] + '\" style=\"margin: 0;\"><\div class=\"send\"><\div class=\"send_data\"><\div style=\"display: flex;\"><\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.user['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">' + response.user['second_name'] + ' ' + response.user['first_name'] + ' ' + response.user['middle_name'] + '<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 10px; font-size: 12px;\">' + fullTime + '<\/span><\span style=\"font-size: 12px;\">' + fullDate + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.message['description'] + '<\/div><\/div><\/div>');
-                    }
-                
-                }else {  //Если до отправки формы в беседе не было сообщений
-                
-                    if (response.message['sender_id'] != response.user['id']) {
-                    
-                        $('.not-message').empty();
-                        $('.create-message').css('padding-top', '0');    
-                        $('.data-chat').append('<\div class=\"row message message_id_' + response.message['id'] + '\" style=\"margin: 0;\"><\div class=\"income\"><\div class=\"income_data\"><\div style=\"display: flex;\"><\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.admin['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">Администратор<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 10px; font-size: 12px;\">' + fullTime + '<\/span><\span style=\"font-size: 12px;\">' + fullDate + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.message['description'] + '<\/div><\/div><\/div>');
-                    
-                    } else {
-                    
-                        $('.not-message').empty();
-                        $('.create-message').css('padding-top', '0');
-                        $('.data-chat').append('<\div class=\"row message message_id_' + response.message['id'] + '\" style=\"margin: 0;\"><\div class=\"send\"><\div class=\"send_data\"><\div style=\"display: flex;\"><\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.user['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">' + response.user['second_name'] + ' ' + response.user['first_name'] + ' ' + response.user['middle_name'] + '<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 10px; font-size: 12px;\">' + fullTime + '<\/span><\span style=\"font-size: 12px;\">' + fullDate + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.message['description'] + '<\/div><\/div><\/div>');
-                    }
-                    
-                }
-                
-                $('#create-message-admin')[0].reset();
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-        e.preventDefault();
+                <!--Блок беседы с главным админом и техподдержкой-->
+                <div class="containerAdminMainConversation">
 
-        return false;
-     });
-     
-     
-     
-     //Автоматическое обновление страницы
-     function reloadcontent() {
-         $.ajax ({
-             url: '". Url::to(['update', 'id' => \Yii::$app->request->get('id')])."',
-             cache: false,
-             success: function(response) {
-        
-                 if (response.messages.length > 0) {
-                
-                     $('.data-chat').html('');
-                     $('.not-message').empty();
-                     $('.create-message').css('padding-top', '0');
-                    
-                     for (var i = 0; i < response.messages.length; i++) {
-                        
-                         if (response.messages[i]['sender_id'] != response.user['id']) {
-                        
-                             $('.data-chat').append('<\div class=\"row message message_id_' + response.messages[i]['id'] + '\" style=\"margin: 0;\"><\div class=\"income\"><\div class=\"income_data\"><\div style=\"display: flex;\">   <\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.admin['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">Администратор<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 8px; font-size: 12px;\">' + response.times[i] + '<\/span><\span style=\"font-size: 12px;\">' + response.dates[i] + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.messages[i]['description'] + '<\/div><\/div><\/div><\/div>');
-                           
-                         }else {
-                        
-                             $('.data-chat').append('<\div class=\"row message message_id_' + response.messages[i]['id'] + '\" style=\"margin: 0;\"><\div class=\"send\"><\div class=\"send_data\"><\div style=\"display: flex;\">   <\div style=\"padding-right: 15px;\"><\img class=\"round-avatar\" style=\"width: 50px; height: 50px;\" src='+ response.user['avatar_image'] +' ><\/div><\div style=\"padding-top: 5px;\"><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 30px;\">' + response.user['second_name'] + ' ' + response.user['first_name'] + ' ' + response.user['middle_name'] + '<\/span><\/div><\div style=\"font-size: 13px; font-weight: 700;\"><\span style=\"padding-right: 8px; font-size: 12px;\">' + response.times[i] + '<\/span><\span style=\"font-size: 12px;\">' + response.dates[i] + '<\/span><\/div><\/div><\/div><\div class=\"message-description\" style=\"padding: 10px 5px;\">' + response.messages[i]['description'] + '<\/div><\/div><\/div><\/div>');
-                         }
-                     }
-                 } 
-             }
-         });
-     }
-     
-     
-     function timeUpdate(){  //Установка таймера на обновление страницы
-        
-        reloadcontent();
-     }
-     setInterval (timeUpdate,10000);
-     
-     
-";
+                    <div class="container-user_messages" id="adminMainConversation-<?= $conversationAdminMain->id;?>">
 
-$this->registerJs($script);
+                        <!--Проверка существования аватарки-->
+                        <?php if ($conversationAdminMain->mainAdmin->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$conversationAdminMain->mainAdmin->id.'/avatar/'.$conversationAdminMain->mainAdmin->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
+
+                        <!--Кол-во непрочитанных сообщений от главного админа-->
+                        <?php if ($admin->countUnreadMessagesFromMainAdmin) : ?>
+                            <div class="countUnreadMessagesSender active"><?= $admin->countUnreadMessagesFromMainAdmin; ?></div>
+                        <?php else : ?>
+                            <div class="countUnreadMessagesSender"></div>
+                        <?php endif; ?>
+
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($admin->mainAdmin->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
+
+                        <div class="container_user_messages_text_content">
+
+                            <div class="row block_top">
+
+                                <div class="col-xs-8">Главный администратор</div>
+
+                                <div class="col-xs-4 text-right">
+                                    <?php if ($conversationAdminMain->lastMessage) : ?>
+                                        <?= date('d.m.y H:i', $conversationAdminMain->lastMessage->created_at); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php if ($conversationAdminMain->lastMessage) : ?>
+                                <div class="block_bottom_exist_message">
+
+                                    <?php if ($conversationAdminMain->lastMessage->sender->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversationAdminMain->lastMessage->sender->id.'/avatar/'.$conversationAdminMain->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                    <?php endif; ?>
+
+                                    <div>
+                                        <?php if ($conversationAdminMain->lastMessage->description) : ?>
+                                            <?= $conversationAdminMain->lastMessage->description; ?>
+                                        <?php else : ?>
+                                            ...
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php else : ?>
+                                <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+
+                    <div class="container-user_messages" id="conversationTechnicalSupport-<?= $conversation_development->id;?>">
+
+                        <!--Проверка существования аватарки-->
+                        <?php if ($conversation_development->development->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$conversation_development->development->id.'/avatar/'.$conversation_development->development->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
+
+                        <!--Кол-во непрочитанных сообщений от техподдержки-->
+                        <?php if ($admin->countUnreadMessagesFromDev) : ?>
+                            <div class="countUnreadMessagesSender active"><?= $admin->countUnreadMessagesFromDev; ?></div>
+                        <?php else : ?>
+                            <div class="countUnreadMessagesSender"></div>
+                        <?php endif; ?>
+
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($admin->development->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
+
+                        <div class="container_user_messages_text_content">
+
+                            <div class="row block_top">
+
+                                <div class="col-xs-8">Техническая поддержка</div>
+
+                                <div class="col-xs-4 text-right">
+                                    <?php if ($conversation_development->lastMessage) : ?>
+                                        <?= date('d.m.y H:i', $conversation_development->lastMessage->created_at); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php if ($conversation_development->lastMessage) : ?>
+                                <div class="block_bottom_exist_message">
+
+                                    <?php if ($conversation_development->lastMessage->sender->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation_development->lastMessage->sender->id.'/avatar/'.$conversation_development->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                    <?php endif; ?>
+
+                                    <div>
+                                        <?php if ($conversation_development->lastMessage->description) : ?>
+                                            <?= $conversation_development->lastMessage->description; ?>
+                                        <?php else : ?>
+                                            ...
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php else : ?>
+                                <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--Блок для загрузки бесед с пользователями-->
+                <div class="containerForAllConversations">
+
+                    <div class="title_block_conversation">
+                        <div class="title">Пользователи сервиса</div>
+                    </div>
+
+                    <?php if ($allConversations) : ?>
+
+                        <?php foreach ($allConversations as $conversation) : ?>
+
+                            <?php if ($conversation->user_id != $user->id) : ?>
+
+                                <div class="container-user_messages" id="conversation-<?= $conversation->id;?>">
+
+                                    <!--Проверка существования аватарки-->
+                                    <?php if ($conversation->user->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                    <?php endif; ?>
+
+                                    <!--Кол-во непрочитанных сообщений от техподдержки-->
+                                    <?php if ($conversation->user->countUnreadMessagesFromUser) : ?>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesFromUser; ?></div>
+                                    <?php else : ?>
+                                        <div class="countUnreadMessagesSender"></div>
+                                    <?php endif; ?>
+
+                                    <!--Проверка онлайн статуса-->
+                                    <?php if ($conversation->user->checkOnline === true) : ?>
+                                        <div class="checkStatusOnlineUser active"></div>
+                                    <?php else : ?>
+                                        <div class="checkStatusOnlineUser"></div>
+                                    <?php endif; ?>
+
+                                    <div class="container_user_messages_text_content">
+
+                                        <div class="row block_top">
+
+                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+
+                                            <div class="col-xs-4 text-right">
+                                                <?php if ($conversation->lastMessage) : ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <?php if ($conversation->lastMessage) : ?>
+                                            <div class="block_bottom_exist_message">
+
+                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php else : ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                <?php endif; ?>
+
+                                                <div>
+                                                    <?php if ($conversation->lastMessage->description) : ?>
+                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php else : ?>
+                                                        ...
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php else : ?>
+                                            <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div class="container-user_messages active-message" id="conversation-<?= $conversation->id;?>">
+
+                                    <!--Проверка существования аватарки-->
+                                    <?php if ($conversation->user->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                    <?php endif; ?>
+
+                                    <!--Кол-во непрочитанных сообщений от техподдержки-->
+                                    <?php if ($conversation->user->countUnreadMessagesFromUser) : ?>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesFromUser; ?></div>
+                                    <?php else : ?>
+                                        <div class="countUnreadMessagesSender"></div>
+                                    <?php endif; ?>
+
+                                    <!--Проверка онлайн статуса-->
+                                    <?php if ($conversation->user->checkOnline === true) : ?>
+                                        <div class="checkStatusOnlineUser active"></div>
+                                    <?php else : ?>
+                                        <div class="checkStatusOnlineUser"></div>
+                                    <?php endif; ?>
+
+                                    <div class="container_user_messages_text_content">
+
+                                        <div class="row block_top">
+
+                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+
+                                            <div class="col-xs-4 text-right">
+                                                <?php if ($conversation->lastMessage) : ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <?php if ($conversation->lastMessage) : ?>
+                                            <div class="block_bottom_exist_message">
+
+                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php else : ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                <?php endif; ?>
+
+                                                <div>
+                                                    <?php if ($conversation->lastMessage->description) : ?>
+                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php else : ?>
+                                                        ...
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php else : ?>
+                                            <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </div>
+
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+
+                    <?php else : ?>
+
+                        <div class="text-center block_not_conversations">Нет сообщений</div>
+
+                    <?php endif; ?>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-8">
+
+            <div class="button_open_close_list_users" style="">Открыть список пользователей</div>
+
+            <div class="chat">
+
+                <?php if ($messages) : ?>
+
+                    <div class="data-chat" id="data-chat">
+
+                        <?php if ($countMessages > $pagesMessages->pageSize) : ?>
+
+                            <div class="pagination-messages">
+                                <?= \yii\widgets\LinkPager::widget([
+                                    'pagination' => $pagesMessages,
+                                    'activePageCssClass' => 'pagination_active_page',
+                                    'options' => ['class' => 'messages-pagination-list pagination'],
+                                    'maxButtonCount' => 1,
+                                ]); ?>
+                            </div>
+
+                            <div class="text-center block_for_link_next_page_masseges">
+                                <?= Html::a('Посмотреть предыдущие сообщения', ['#'], ['class' => 'button_next_page_masseges'])?>
+                            </div>
+
+                        <?php endif; ?>
+
+                        <?php $totalDateMessages = array(); // Массив общих дат сообщений ?>
+
+                        <?php foreach ($messages as $i => $message) : ?>
+
+                            <?php
+                            // Вывод общих дат для сообщений
+                            if (!in_array($message->dayAndDateRus, $totalDateMessages)) {
+                                array_push($totalDateMessages, $message->dayAndDateRus);
+                                echo '<div class="dayAndDayMessage">'.$message->dayAndDateRus.'</div>';
+                            }
+                            ?>
+
+                            <?php if ($message->sender_id != $user->id) : ?>
+
+                                <?php if ($message->status == MessageAdmin::NO_READ_MESSAGE) : ?>
+
+                                    <div class="message addressee-user unreadmessage" id="message_id-<?= $message->id;?>">
+
+                                        <?php if ($admin->avatar_image) : ?>
+                                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php else : ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                        <?php endif; ?>
+
+                                        <div class="sender_data">
+                                            <div class="sender_info">
+                                                <div>Администратор</div>
+                                                <div>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
+                                                    <?= date('H:i', $message['created_at']); ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="message-description">
+
+                                                <?php if ($message->description) : ?>
+                                                    <?= $message->description; ?>
+                                                <?php endif; ?>
+
+                                                <?php if ($message->files) : ?>
+                                                    <div class="message-description-files">
+                                                        <?php foreach ($message->files as $file) : ?>
+                                                            <div>
+                                                                <?= Html::a($file->file_name, ['/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                <?php else : ?>
+
+                                    <div class="message addressee-user" id="message_id-<?= $message->id;?>">
+
+                                        <?php if ($admin->avatar_image) : ?>
+                                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php else : ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                        <?php endif; ?>
+
+                                        <div class="sender_data">
+                                            <div class="sender_info">
+                                                <div>Администратор</div>
+                                                <div>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
+                                                    <?= date('H:i', $message['created_at']); ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="message-description">
+
+                                                <?php if ($message->description) : ?>
+                                                    <?= $message->description; ?>
+                                                <?php endif; ?>
+
+                                                <?php if ($message->files) : ?>
+                                                    <div class="message-description-files">
+                                                        <?php foreach ($message->files as $file) : ?>
+                                                            <div>
+                                                                <?= Html::a($file->file_name, ['/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                <?php endif; ?>
+
+                            <?php else : ?>
+
+                                <?php if ($message->status == MessageAdmin::NO_READ_MESSAGE) : ?>
+
+                                    <div class="message addressee-admin unreadmessage" id="message_id-<?= $message->id;?>">
+
+                                        <?php if ($user->avatar_image) : ?>
+                                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php else : ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                        <?php endif; ?>
+
+                                        <div class="sender_data">
+                                            <div class="sender_info">
+                                                <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                                                <div>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
+                                                    <?= date('H:i', $message['created_at']); ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="message-description">
+
+                                                <?php if ($message->description) : ?>
+                                                    <?= $message->description; ?>
+                                                <?php endif; ?>
+
+                                                <?php if ($message->files) : ?>
+                                                    <div class="message-description-files">
+                                                        <?php foreach ($message->files as $file) : ?>
+                                                            <div>
+                                                                <?= Html::a($file->file_name, ['/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                <?php else : ?>
+
+                                    <div class="message addressee-admin" id="message_id-<?= $message->id;?>">
+
+                                        <?php if ($user->avatar_image) : ?>
+                                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php else : ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                        <?php endif; ?>
+
+                                        <div class="sender_data">
+                                            <div class="sender_info">
+                                                <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                                                <div>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
+                                                    <?= date('H:i', $message['created_at']); ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="message-description">
+
+                                                <?php if ($message->description) : ?>
+                                                    <?= $message->description; ?>
+                                                <?php endif; ?>
+
+                                                <?php if ($message->files) : ?>
+                                                    <div class="message-description-files">
+                                                        <?php foreach ($message->files as $file) : ?>
+                                                            <div>
+                                                                <?= Html::a($file->file_name, ['/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                <?php endif; ?>
+
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                    <div class="create-message">
+
+                        <?php
+                        $form = ActiveForm::begin([
+                            'id' => 'create-message-admin',
+                            'action' => Url::to(['/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
+                            'errorCssClass' => 'u-has-error-v1',
+                            'successCssClass' => 'u-has-success-v1-1',
+                        ]);
+                        ?>
+
+                        <div class="form-send-email">
+
+                            <?= $form->field($formMessage, 'description')->label(false)->textarea([
+                                'id' => 'input_send_message',
+                                'rows' => 1,
+                                'maxlength' => true,
+                                'required' => true,
+                                'class' => 'style_form_field_respond form-control',
+                                'placeholder' => 'Напишите ваше сообщение',
+                                'autocomplete' => 'off'
+                            ]) ?>
+
+                            <?= $form->field($formMessage, 'message_files[]', ['template' => "{label}\n{input}"])->fileInput(['id' => 'input_message_files', 'multiple' => true, 'accept' => 'text/plain, application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/x-png, image/jpeg'])->label(false) ?>
+
+                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']); ?>
+
+                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']); ?>
+
+                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']); ?>
+
+                        </div>
+
+                        <?php ActiveForm::end(); ?>
+
+                        <!--Сюда загружаем названия загруженных файлов или сообшение о превышении кол-ва файлов-->
+                        <div class="block_attach_files"></div>
+                    </div>
+
+
+                <?php else : // Если отсутствуют сообщения ?>
+
+                    <div class="data-chat" id="data-chat">
+                        <div class="block_not_exist_message">
+                            У Вас нет пока общих сообщений с данным пользователем...
+                        </div>
+                    </div>
+
+                    <div class="create-message">
+
+                        <?php
+                        $form = ActiveForm::begin([
+                            'id' => 'create-message-admin',
+                            'action' => Url::to(['/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
+                            'errorCssClass' => 'u-has-error-v1',
+                            'successCssClass' => 'u-has-success-v1-1',
+                        ]);
+                        ?>
+
+                        <div class="form-send-email">
+
+                            <?= $form->field($formMessage, 'description')->label(false)->textarea([
+                                'id' => 'input_send_message',
+                                'rows' => 1,
+                                'maxlength' => true,
+                                'required' => true,
+                                'class' => 'style_form_field_respond form-control',
+                                'placeholder' => 'Напишите ваше сообщение',
+                                'autocomplete' => 'off'
+                            ]) ?>
+
+                            <?= $form->field($formMessage, 'message_files[]', ['template' => "{label}\n{input}"])->fileInput(['id' => 'input_message_files', 'multiple' => true, 'accept' => 'text/plain, application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/x-png, image/jpeg'])->label(false) ?>
+
+                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']); ?>
+
+                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']); ?>
+
+                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']); ?>
+
+                        </div>
+
+                        <?php ActiveForm::end(); ?>
+
+                        <!--Сюда загружаем названия загруженных файлов или сообшение о превышении кол-ва файлов-->
+                        <div class="block_attach_files"></div>
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/message_view_admin.js'); ?>
+<?php $this->registerJsFile('@web/js/form_message_admin.js'); ?>

@@ -144,14 +144,17 @@ class UsersController extends AppAdminController
             if ($model->save()){
 
                 if(($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_ADMIN)) {
-
                     //Создание беседы между админом и главным админом
                     $model->createConversationMainAdmin();
 
                 } elseif(($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
-
                     //Создание беседы между админом и проектантом
                     $model->createConversationAdmin($model);
+                }
+
+                if(($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {
+                    //Создание беседы между техподдержкой и пользователем
+                    $model->createConversationDevelopment();
                 }
 
                 //Отправка письма на почту пользователю при изменении его статуса

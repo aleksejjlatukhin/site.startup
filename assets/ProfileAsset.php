@@ -22,6 +22,7 @@ class ProfileAsset extends AssetBundle
         'js/main.js',
         'js/simplebar.min.js',
         'js/croppie.min.js',
+        'js/server_connect.js',
     ];
 
     public $jsOptions = ['position' => \yii\web\View::POS_HEAD,];

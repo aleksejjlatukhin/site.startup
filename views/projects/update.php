@@ -586,11 +586,11 @@ use yii\helpers\Html;
                                 echo '<div style="display: flex; margin: 2px 0; align-items: center;" class="one_block_file-'.$file->id.'">' .
                                     Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>'. Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) .'</div></div>', ['download', 'id' => $file->id], [
                                         'title' => 'Скачать файл',
+                                        'target' => '_blank',
                                         'class' => 'btn btn-default prefiles',
                                         'style' => [
                                             'display' => 'flex',
                                             'align-items' => 'center',
-                                            //'color' => '#FFFFFF',
                                             'justify-content' => 'center',
                                             'background' => '#E0E0E0',
                                             'width' => '320px',

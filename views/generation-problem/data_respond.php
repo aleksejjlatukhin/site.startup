@@ -39,6 +39,7 @@ use yii\helpers\Html;
                 <div style="display: flex; align-items: center;">
 
                     <?= Html::a('Скачать файл', ['/desc-interview/download', 'id' => $descInterview->id], [
+                        'target' => '_blank',
                         'class' => "btn btn-default interview_file_view-$descInterview->id",
                         'style' => [
                             'display' => 'flex',

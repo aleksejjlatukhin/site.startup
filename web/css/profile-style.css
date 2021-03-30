@@ -24,6 +24,15 @@
     min-width: 320px;
 }
 
+.user_is_online {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #c5c5c5;
+    color: #808080;
+}
+
 .view_user_form, .update_user_form {
     padding: 50px 0 0 0;
 }

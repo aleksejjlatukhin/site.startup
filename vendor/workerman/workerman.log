@@ -1,0 +1,376 @@
+2021-03-03 20:18:56 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php:24
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(637): {closure}(Object(Workerman\Connection\TcpConnection), '{"id":"1"}')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php(41): Workerman\Worker::runAll()
+#7 {main}
+2021-03-03 20:18:57 pid:1 Worker process terminated
+2021-03-03 20:21:00 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php:24
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(637): {closure}(Object(Workerman\Connection\TcpConnection), '{"id":"1"}')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php(41): Workerman\Worker::runAll()
+#7 {main}
+2021-03-03 20:21:00 pid:1 Worker process terminated
+2021-03-03 20:26:37 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php:24
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(637): {closure}(Object(Workerman\Connection\TcpConnection), '{"id":"1"}')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #97)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php(41): Workerman\Worker::runAll()
+#7 {main}
+2021-03-03 20:26:37 pid:1 Worker process terminated
+2021-03-03 20:29:01 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php:24
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(637): {closure}(Object(Workerman\Connection\TcpConnection), '{"id":"1"}')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\web\workerman-start.php(41): Workerman\Worker::runAll()
+#7 {main}
+2021-03-03 20:29:01 pid:1 Worker process terminated
+2021-03-17 09:51:33 pid:1 Error: Call to undefined function debug() in D:\programs\open_server\OSPanel\domains\site.startup\server.php:14
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2497): {closure}(Object(Workerman\Connection\TcpConnection))
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Worker->acceptConnection(Resource id #87)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\server.php(29): Workerman\Worker::runAll()
+#7 {main}
+2021-03-17 09:51:33 pid:1 Worker process terminated
+2021-03-17 16:09:16 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(36): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:09:17 pid:1 Worker process terminated
+2021-03-17 16:10:16 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(35): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:10:16 pid:1 Worker process terminated
+2021-03-17 16:15:47 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(35): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:15:47 pid:1 Worker process terminated
+2021-03-17 16:18:56 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(38): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:18:56 pid:1 Worker process terminated
+2021-03-17 16:19:29 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(39): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:19:30 pid:1 Worker process terminated
+2021-03-17 16:23:21 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:19
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(41): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:23:21 pid:1 Worker process terminated
+2021-03-17 16:23:59 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:19
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(42): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:23:59 pid:1 Worker process terminated
+2021-03-17 16:24:40 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(35): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:24:40 pid:1 Worker process terminated
+2021-03-17 16:26:14 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(36): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:26:14 pid:1 Worker process terminated
+2021-03-17 16:26:59 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(36): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:26:59 pid:1 Worker process terminated
+2021-03-17 16:29:45 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:18
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(37): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:29:45 pid:1 Worker process terminated
+2021-03-17 16:44:02 pid:1 Error: Call to undefined function dump() in D:\programs\open_server\OSPanel\domains\site.startup\server.php:27
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(44): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:44:02 pid:1 Worker process terminated
+2021-03-17 16:50:26 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:28
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(47): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:50:26 pid:1 Worker process terminated
+2021-03-17 16:52:03 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:29
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(48): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:52:03 pid:1 Worker process terminated
+2021-03-17 16:52:34 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:29
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET /?username=...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET /?username=...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(48): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 16:52:34 pid:1 Worker process terminated
+2021-03-17 19:26:33 pid:1 Error: Class 'Yii' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:21
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #91)
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\server.php(57): Workerman\Worker::runAll()
+#9 {main}
+2021-03-17 19:26:34 pid:1 Worker process terminated
+2021-03-17 19:30:08 pid:1 Error: Class 'Yii' not found in D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\db\ActiveRecord.php:410
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\db\ActiveRecord.php(174): yii\db\ActiveRecord::find()
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\db\BaseActiveRecord.php(112): yii\db\ActiveRecord::findByCondition(1)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\server.php(21): yii\db\BaseActiveRecord::findOne(1)
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #104)
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#10 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#11 D:\programs\open_server\OSPanel\domains\site.startup\server.php(57): Workerman\Worker::runAll()
+#12 {main}
+2021-03-17 19:30:08 pid:1 Worker process terminated
+2021-03-17 21:33:28 pid:1 yii\base\ErrorException: Undefined index: username in D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php:30
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(30): yii\base\ErrorHandler->handleError(8, 'Undefined index...', 'D:\\programs\\ope...', 30, Array)
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): app\commands\{closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(66): Workerman\Worker::runAll()
+#10 {main}
+2021-03-17 21:33:28 pid:1 Worker process terminated
+2021-03-17 21:34:46 pid:1 yii\base\UnknownPropertyException: Getting unknown property: yii\console\Application::user in D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\base\Component.php:154
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\di\ServiceLocator.php(77): yii\base\Component->__get('user')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(31): yii\di\ServiceLocator->__get('user')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): app\commands\{closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#10 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(67): Workerman\Worker::runAll()
+#11 {main}
+2021-03-17 21:34:46 pid:1 Worker process terminated
+2021-03-17 21:35:35 pid:1 yii\base\UnknownPropertyException: Getting unknown property: yii\console\Application::user in D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\base\Component.php:154
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\yiisoft\yii2\di\ServiceLocator.php(77): yii\base\Component->__get('user')
+#1 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(31): yii\di\ServiceLocator->__get('user')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): app\commands\{closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#10 D:\programs\open_server\OSPanel\domains\site.startup\commands\server.php(67): Workerman\Worker::runAll()
+#11 {main}
+2021-03-17 21:35:35 pid:1 Worker process terminated
+2021-03-17 21:50:44 pid:1 yii\base\ErrorException: Undefined index: username in D:\programs\open_server\OSPanel\domains\site.startup\server.php:25
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\server.php(25): yii\base\ErrorHandler->handleError(8, 'Undefined index...', 'D:\\programs\\ope...', 25, Array)
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\server.php(61): Workerman\Worker::runAll()
+#10 {main}
+2021-03-17 21:50:44 pid:1 Worker process terminated
+2021-03-17 21:52:39 pid:1 yii\base\ErrorException: Undefined index: username in D:\programs\open_server\OSPanel\domains\site.startup\server.php:25
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\server.php(25): yii\base\ErrorHandler->handleError(8, 'Undefined index...', 'D:\\programs\\ope...', 25, Array)
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\server.php(61): Workerman\Worker::runAll()
+#10 {main}
+2021-03-17 21:52:39 pid:1 Worker process terminated
+2021-03-17 21:56:43 pid:1 yii\base\ErrorException: Undefined index: username in D:\programs\open_server\OSPanel\domains\site.startup\server.php:22
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\server.php(22): yii\base\ErrorHandler->handleError(8, 'Undefined index...', 'D:\\programs\\ope...', 22, Array)
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(392): {closure}(Object(Workerman\Connection\TcpConnection), 'GET / HTTP/1.1\r...')
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Protocols\Websocket.php(57): Workerman\Protocols\Websocket::dealHandshake('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Connection\TcpConnection.php(600): Workerman\Protocols\Websocket::input('GET / HTTP/1.1\r...', Object(Workerman\Connection\TcpConnection))
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Connection\TcpConnection->baseRead(Resource id #112)
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#7 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#8 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#9 D:\programs\open_server\OSPanel\domains\site.startup\server.php(58): Workerman\Worker::runAll()
+#10 {main}
+2021-03-17 21:56:43 pid:1 Worker process terminated
+2021-03-17 22:32:11 pid:1 Error: Class 'app\models\User' not found in D:\programs\open_server\OSPanel\domains\site.startup\server.php:17
+Stack trace:
+#0 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2497): app\{closure}(Object(Workerman\Connection\TcpConnection))
+#1 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Events\Select.php(293): Workerman\Worker->acceptConnection(Resource id #87)
+#2 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(2430): Workerman\Events\Select->loop()
+#3 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1418): Workerman\Worker->run()
+#4 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(1361): Workerman\Worker::forkWorkersForWindows()
+#5 D:\programs\open_server\OSPanel\domains\site.startup\vendor\workerman\workerman\Worker.php(542): Workerman\Worker::forkWorkers()
+#6 D:\programs\open_server\OSPanel\domains\site.startup\server.php(60): Workerman\Worker::runAll()
+#7 {main}
+2021-03-17 22:32:12 pid:1 Worker process terminated

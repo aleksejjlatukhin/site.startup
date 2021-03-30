@@ -30,6 +30,7 @@ class AppAsset extends AssetBundle
         'js/jquery.accordion.js',
         'js/main.js',
         'js/simplebar.min.js',
+        'js/server_connect.js',
     ];
 
     public $jsOptions = ['position' => \yii\web\View::POS_HEAD,];

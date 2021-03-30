@@ -2,345 +2,284 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use app\models\User;
+use yii\widgets\ActiveForm;
 
-
-
-$this->title = 'Админка | Сообщения | История';
+$this->title = 'Сообщения';
+$this->registerCssFile('@web/css/admin-message-index.css');
 ?>
 
+<div class="admin-message-index">
 
-    <br>
-    <div class="row">
+    <!--Preloader begin-->
+    <div id="preloader">
+        <div id="cont">
+            <div class="round"></div>
+            <div class="round"></div>
+            <div class="round"></div>
+            <div class="round"></div>
+        </div>
+        <div id="loading">Loading</div>
+    </div>
+    <!--Preloader end-->
 
-        <div class="col-md-9" style="border-right: 1px solid #ccc;">
+    <div class="row message_menu">
 
-            <div class="search_box" style="border-bottom: 1px solid #ccc; padding-bottom: 40px;">
-                <form id="search_form" method="get" action="<?= Url::to(['/admin/message/index'])?>">
-                    <input type="hidden" name="id" value="<?= $admin['id'];?>">
-                    <input class="col-md-12" value="<?= Yii::$app->request->get('query');?>" type="text" placeholder="Поиск" name="query" id="input_search">
-                </form>
+        <div class="col-sm-6 col-lg-4 search-block">
+
+            <?php $form = ActiveForm::begin([
+                'id' => 'search_user_conversation',
+                'action' => Url::to(['/admin/message/get-conversation-query', 'id' => $admin->id]),
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]); ?>
+
+                <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                    ->textInput([
+                        'id' => 'search_conversation',
+                        'placeholder' => 'Поиск',
+                        'class' => 'style_form_field_respond',
+                        'autocomplete' => 'off'])
+                    ->label(false);
+                ?>
+
+            <?php ActiveForm::end(); ?>
+
+            <!--Беседы полученные в запросе поиска (по умолчанию это все доступные пользователи)-->
+            <div class="conversations_query" id="conversations_query">
+                <!--Сюда добавляем результат поиска-->
             </div>
 
-            <?php if (!empty($query)) : ?>
+        </div>
 
-                <br>
+        <div class="col-sm-6 col-lg-8">
 
-                <!--Беседы в запросе после перезагрузки страницы-->
-                <div class="convers_post" style="display: none;margin-top: -20px;min-height: 80vh;">
+        </div>
 
-                    <?php foreach ($conversations_query as $conversation) : ?>
+    </div>
 
-                        <?= Html::a('
-                    <div class="conversation-link" style="padding: 10px 10px; border-bottom: 1px solid #ccc;">
-                    <span style="padding-right: 15px;">'.Html::img([$conversation->user['avatar_image']],['width' => '40px', 'height' => '40px', 'class' => 'round-avatar']).'</span>
-                    <span>'. $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name .'</span>
-                    </div>', ['/message/view', 'id' => $conversation->id], ['class' => 'conversation-link'])
-                        ?>
+    <div class="row all_content_messages">
 
-                    <?php endforeach; ?>
+        <div class="col-sm-6 col-lg-4 conversation-list-menu">
 
+            <div id="conversation-list-menu">
+
+                <!--Блок беседы с главным админом и техподдержкой-->
+                <div class="containerAdminMainConversation">
+
+                    <div class="container-user_messages" id="adminMainConversation-<?= $conversationAdminMain->id;?>">
+
+                        <!--Проверка существования аватарки-->
+                        <?php if ($conversationAdminMain->mainAdmin->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$conversationAdminMain->mainAdmin->id.'/avatar/'.$conversationAdminMain->mainAdmin->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
+
+                        <!--Кол-во непрочитанных сообщений от главного админа-->
+                        <?php if ($admin->countUnreadMessagesFromMainAdmin) : ?>
+                            <div class="countUnreadMessagesSender active"><?= $admin->countUnreadMessagesFromMainAdmin; ?></div>
+                        <?php else : ?>
+                            <div class="countUnreadMessagesSender"></div>
+                        <?php endif; ?>
+
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($admin->mainAdmin->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
+
+                        <div class="container_user_messages_text_content">
+
+                            <div class="row block_top">
+
+                                <div class="col-xs-8">Главный администратор</div>
+
+                                <div class="col-xs-4 text-right">
+                                    <?php if ($conversationAdminMain->lastMessage) : ?>
+                                        <?= date('d.m.y H:i', $conversationAdminMain->lastMessage->created_at); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php if ($conversationAdminMain->lastMessage) : ?>
+                                <div class="block_bottom_exist_message">
+
+                                    <?php if ($conversationAdminMain->lastMessage->sender->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversationAdminMain->lastMessage->sender->id.'/avatar/'.$conversationAdminMain->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                    <?php endif; ?>
+
+                                    <div>
+                                        <?php if ($conversationAdminMain->lastMessage->description) : ?>
+                                            <?= $conversationAdminMain->lastMessage->description; ?>
+                                        <?php else : ?>
+                                            ...
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php else : ?>
+                                <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+
+                    <div class="container-user_messages" id="conversationTechnicalSupport-<?= $conversation_development->id;?>">
+
+                        <!--Проверка существования аватарки-->
+                        <?php if ($conversation_development->development->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$conversation_development->development->id.'/avatar/'.$conversation_development->development->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
+
+                        <!--Кол-во непрочитанных сообщений от техподдержки-->
+                        <?php if ($admin->countUnreadMessagesFromDev) : ?>
+                            <div class="countUnreadMessagesSender active"><?= $admin->countUnreadMessagesFromDev; ?></div>
+                        <?php else : ?>
+                            <div class="countUnreadMessagesSender"></div>
+                        <?php endif; ?>
+
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($admin->development->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
+
+                        <div class="container_user_messages_text_content">
+
+                            <div class="row block_top">
+
+                                <div class="col-xs-8">Техническая поддержка</div>
+
+                                <div class="col-xs-4 text-right">
+                                    <?php if ($conversation_development->lastMessage) : ?>
+                                        <?= date('d.m.y H:i', $conversation_development->lastMessage->created_at); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php if ($conversation_development->lastMessage) : ?>
+                                <div class="block_bottom_exist_message">
+
+                                    <?php if ($conversation_development->lastMessage->sender->avatar_image) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation_development->lastMessage->sender->id.'/avatar/'.$conversation_development->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                    <?php else : ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                    <?php endif; ?>
+
+                                    <div>
+                                        <?php if ($conversation_development->lastMessage->description) : ?>
+                                            <?= $conversation_development->lastMessage->description; ?>
+                                        <?php else : ?>
+                                            ...
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php else : ?>
+                                <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
                 </div>
 
-            <?php else : ?>
+                <!--Блок для загрузки бесед с пользователями-->
+                <div class="containerForAllConversations">
 
-                <!--Беседы, у которых есть сообщения-->
-                <div class="convers_exist" style="padding: 0; min-height: 80vh;">
+                    <div class="title_block_conversation">
+                        <div class="title">Пользователи сервиса</div>
+                    </div>
 
-                    <?php if ($conversations_exist) : ?>
+                    <?php if ($allConversations) : ?>
 
-                        <?php foreach ($conversations_exist as $conversation) : ?>
+                        <?php foreach ($allConversations as $conversation) : ?>
 
-                            <?php if ($conversation->lastMessage->sender_id == $conversation->admin->id) : ?>
+                            <div class="container-user_messages" id="conversation-<?= $conversation->id;?>">
 
-                                <?= Html::a('
-                            <div class="conversation-link" style="display: flex; padding: 15px 0; border-bottom: 1px solid #ccc;">
-                            
-                                <div style="padding: 0 15px 0 10px;">'.Html::img([$conversation->user['avatar_image']],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar']).'</div>
-                                <div style="padding: 0 15px 0 10px; width: 100%;">
-                                
-                                    <div style="padding-top: 5px; display: flex; justify-content: space-between; ">
-                                    
-                                        <span>'. $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name .'</span>
-                                        
-                                        <div style="padding-bottom: 5px; display: flex">
-                                            <div class="conversation-link-time">'. date('H:i', $conversation['updated_at']) .'</div>
-                                            <div class="conversation-link-data">'. date('d.m.Y', $conversation['updated_at']) .'</div>
+                                <!--Проверка существования аватарки-->
+                                <?php if ($conversation->user->avatar_image) : ?>
+                                    <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                <?php else : ?>
+                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                <?php endif; ?>
+
+                                <!--Кол-во непрочитанных сообщений от пользователя-->
+                                <?php if ($conversation->user->countUnreadMessagesFromUser) : ?>
+                                    <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesFromUser; ?></div>
+                                <?php else : ?>
+                                    <div class="countUnreadMessagesSender"></div>
+                                <?php endif; ?>
+
+                                <!--Проверка онлайн статуса-->
+                                <?php if ($conversation->user->checkOnline === true) : ?>
+                                    <div class="checkStatusOnlineUser active"></div>
+                                <?php else : ?>
+                                    <div class="checkStatusOnlineUser"></div>
+                                <?php endif; ?>
+
+                                <div class="container_user_messages_text_content">
+
+                                    <div class="row block_top">
+
+                                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+
+                                        <div class="col-xs-4 text-right">
+                                            <?php if ($conversation->lastMessage) : ?>
+                                                <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                            <?php endif; ?>
                                         </div>
-                                        
                                     </div>
-                                    
-                                    <span>'. Html::img([$conversation->admin['avatar_image']], ['width' => '20px', 'height' => '20px', 'class' => 'round-avatar']).'</span>
-                                    <span class="conversation-link-text">'. mb_substr($conversation->lastMessage->description, 0, 90) .'...</span>
-                                </div>
-                                
-                            </div>', ['/message/view', 'id' => $conversation->id], ['class' => 'conversation-link'])
-                                ?>
 
-                            <?php else : ?>
+                                    <?php if ($conversation->lastMessage) : ?>
+                                        <div class="block_bottom_exist_message">
 
-                                <?= Html::a('
-                            <div class="conversation-link" style="display: flex; padding: 15px 0; border-bottom: 1px solid #ccc;">
-                            
-                                <div style="padding: 0 15px 0 10px;">'.Html::img([$conversation->user['avatar_image']],['width' => '50px', 'height' => '50px', 'class' => 'round-avatar']).'</div>
-                                <div style="padding: 0 15px 0 10px; width: 100%;">
-                                
-                                    <div style="padding-top: 5px; display: flex; justify-content: space-between; ">
-                                    
-                                        <span>'. $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name .'</span>
-                                        
-                                        <div style="display: flex">
-                                            <div class="conversation-link-time">'. date('H:i', $conversation['updated_at']) .'</div>
-                                            <div class="conversation-link-data">'. date('d.m.Y', $conversation['updated_at']) .'</div>
+                                            <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
+                                                <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                            <?php else : ?>
+                                                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                            <?php endif; ?>
+
+                                            <div>
+                                                <?php if ($conversation->lastMessage->description) : ?>
+                                                    <?= $conversation->lastMessage->description; ?>
+                                                <?php else : ?>
+                                                    ...
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
-                                        
-                                    </div>
-                                    
-                                    <div class="conversation-link-text">'. mb_substr($conversation->lastMessage->description, 0, 90) .'...</div>
-                                </div>
-                                
-                            </div>', ['/message/view', 'id' => $conversation->id], ['class' => 'conversation-link'])
-                                ?>
+                                    <?php else : ?>
+                                        <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                                    <?php endif; ?>
 
-                            <?php endif; ?>
+                                </div>
+                            </div>
 
                         <?php endforeach; ?>
 
                     <?php else : ?>
 
-                        <div  class="not_message" style="text-align: center; font-size: 13px; padding-top: 20px;">
-                            <p style="font-weight: 700;">Ваша история сообщений пока пуста...</p>
-                            <p>(выберите в поиске пользователя, которому Вы хотите написать сообщение)</p>
-                        </div>
+                        <div class="text-center block_not_conversations">Нет сообщений</div>
 
                     <?php endif; ?>
 
                 </div>
-
-
-                <div class="convers_all" style="display: none;min-height: 80vh;">
-                    <!--Все беседы Главного Администратора-->
-                    <?php foreach ($conversations as $conversation) : ?>
-
-                        <?= Html::a('
-                    <div class="conversation-link" style="padding: 10px 10px; border-bottom: 1px solid #ccc;">
-                    <span style="padding-right: 15px;">'.Html::img([$conversation->user['avatar_image']],['width' => '40px', 'height' => '40px', 'class' => 'round-avatar']).'</span>
-                    <span>'. $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name .'</span>
-                    </div>', ['/message/view', 'id' => $conversation->id], ['class' => 'conversation-link'])
-                        ?>
-
-                    <?php endforeach; ?>
-                </div>
-
-            <?php endif; ?>
-
-            <!--Блок для вывода бесед, которые оказались в запросе через Ajax-->
-            <div class="convers_query" style="display: none; min-height: 80vh;">
-
             </div>
-
         </div>
 
-        <div class="col-md-3">
-
-            <p style="text-align: center; font-weight: 700; padding-bottom: 20px;">
-                Сообщения | История
-            </p>
-
-            <h4 style="text-align: center; font-weight: 700;">
-                Категории:
-            </h4>
-
-            <p style="text-align: center; font-weight: 700; color: green;">
-                Проектанты
-            </p>
-
-            <p style="text-align: center; font-weight: 700;">
-                <?= Html::a('Главный администратор', Url::to(['/admin/message/view', 'id' => $convers_main->id])) ?>
-            </p>
+        <div class="col-sm-6 col-lg-8">
+            <div class="message_index_block_right_info">
+                Выберите пользователя (перейдите к беседе с пользователем)
+            </div>
         </div>
+
     </div>
 
+</div>
 
-
-<?php
-
-$script = '
-
-
-jQuery(function($){                    //Отслеживаем событие клика по полю поиска
-	$(document).mouseup(function (e){ // событие клика по веб-документу
-		var div = $("#search_form"); // тут указываем ID элемента
-		var div1 = $(".convers_all"); // блок со всеми беседами
-		var query = $("#input_search").val(); // значение поля поиск
-		if (!div.is(e.target)  // если клик был не по нашему блоку
-		    && div.has(e.target).length === 0 && div1.has(e.target).length === 0) { // и не по его дочерним элементам
-			//div.hide(); // скрываем его
-			
-			if (query.length === 0) { // если поле поиск пусто
-			
-			    $(".convers_exist").show(); //Показываем беседы с существующими сообщениями
-		        $(".convers_all").hide();  //Скрываем блок со всеми беседами
-		    }
-		    
-		}else { //если клик был по полю поиск
-		
-		    $(".convers_exist").hide(); //Скрываем беседы с существующими сообщениями
-            
-            if (query.length === 0) { // если поле поиск пусто
-            
-                $(".convers_all").show(); //Показываем все беседы
-            
-            }
-		}
-	});
-});
-
-
-
-$("#input_search").on("input", function() {   //Отслеживаем запросы в поле поиска
-
-        //Запрет на отправку формы
-        this.addEventListener("keydown", function(event) {
-            if(event.keyCode == 13) {
-               event.preventDefault();
-            }
-        }); 
-        
-        var data = $(this).serialize();
-        var url = $(this).attr("action");
-        var query = $("#input_search").val();
-        
-        query = $.trim(query);
-        
-        if (query.length > 0) { // Если поле поиск не пусто
-            
-            $(".convers_all").hide();    //Скрываем блок со всеми беседами
-            $(".convers_query").show(); // Показываем блок с беседами по запросу
-            
-            $.ajax({
-            
-                url: url,
-                method: "GET",
-                data: data,
-                cache: true,
-                success: function(response){ 
-                    
-                    window.history.pushState("Details", "Title", "/admin/message/index?id='.$admin["id"].'&query=" + query); // формируем URL согласно вводным данным
-                    
-                    $(".convers_query").empty(); // Очищаем блок от прошлого запроса
-                    
-                    for (var i=0; i<response["convers"].length; i++) {   // Выводим беседы по запросу
-                        
-                        //alert(response.users[i]["second_name"]);
-                        //$(".convers_query").append("<\div class=\"item_\" style=\"padding-top: 20px;\">" + response.users[i]["second_name"] + " " + response.users[i]["first_name"] + " " + response.users[i]["middle_name"] + "<\/div>");
-                        
-                        $(".convers_query").append("<\a class=\"conversation-link\" href=\"/message/view?id=" + response.convers[i]["id"] + "\"><\div class=\"conversation-link\" style=\"padding: 10px 10px; border-bottom: 1px solid #ccc;\"><\span style=\"padding-right: 15px;\"><\img style=\"width: 40px; height: 40px;\", class=\"round-avatar\" src=\"" + response.users[i]["avatar_image"] + "\" ><\/span><\span>" + response.users[i]["second_name"] + " " + response.users[i]["first_name"] + " " + response.users[i]["middle_name"] + "<\/span><\/div><\/a>");
-                        
-                    }
-                    
-                    $(".convers_post").hide(); // Скрываем беседы по запросу передаваемые через параметр
-
-                },
-                error: function(){
-                    alert("Ошибка");
-                }
-            });
-            return false;
-            
-        }else {  // Если поле поиск пусто  
-            
-            window.history.pushState("Details", "Title", "/admin/message/index?id='.$admin["id"].'");
-            $(".convers_all").show();
-            $(".convers_query").hide();
-        }
-});
-
-
-// Показываем беседы по запросу, которые выводим через параметр и скрываем их в Ajax-запросе, который находится выше
-var querySearch = $("#input_search").val();
-if (querySearch.length > 0) {
-    if ($(".convers_query").html().trim() === "") {
-        $(".convers_post").show();
-    }
-}
-
-
-// Отслеживаем клик по кнопкам браузера (вперед, назад)
-addEventListener("popstate",function(e){
-   //alert("go Back!");
-   //alert(window.location.search);
-   var search = window.location.search;
-   searchArr = search.split("query=");
-   
-   if (searchArr[1]) { // Если в URL есть запрос из поля поиска
-      $("#input_search").val(decodeURI(searchArr[1])); // Декадируем строку и передаем значение в поле input
-      $(".convers_exist").hide();  // Скрываем беседы с существующими сообщениями
-      $(".convers_all").hide();    // Скрываем блок со всеми беседами
-      $(".convers_query").show();  // Показываем беседы по запросу
-        
-   }else {  // Если в URL нет запроса из поля поиска
-      $("#input_search").val(null); // Устанавливаем пустое значение для поля поиска
-      $("#input_search").blur();    // Убираем курсор из поля поиска
-      $(".convers_exist").show();   // Скрываем беседы с существующими сообщениями
-      $(".convers_query").hide();   // Скрываем беседы по запросу
-      $(".convers_all").hide();     // Скрываем блок со всеми беседами
-      $(".convers_post").hide();    // Скрываем беседы по запросу передаваемые через параметр
-   }
-   
-},false);
-
-
-
-
-
-
-';
-
-$this->registerJs($script);
-
-
-
-
-$script2 = "
-
-     //Автоматическое обновление страницы
-     function reloadcontent() {
-         $.ajax ({
-             url: '". Url::to(['update-conversations', 'id' => \Yii::$app->request->get('id')])."',
-             cache: false,
-             success: function(response) {
-        
-                 if (response.convers.length > 0) {
-                
-                     $('.convers_exist').html('');
-                     $('.not-message').empty();
-                    
-                    
-                     for (var i = 0; i < response.convers.length; i++) {
-
-                         if (response.last[i]['sender_id'] == response.main['id']) {
-                        
-                             $('.convers_exist').append('<\a class=\"conversation-link\" href=\"/message/view?id=' + response.convers[i]['id'] + '\"><\div class=\"conversation-link\" style=\"display: flex; padding: 15px 0; border-bottom: 1px solid #ccc;\"><\div style=\"padding: 0 15px 0 10px;\"><\img src=\"' + response.users[i]['avatar_image'] + '\" style=\"width: 50px; height: 50px;\" class =\"round-avatar\"><\/div><\div style=\"padding: 0 15px 0 10px; width: 100%;\"> <\div style=\"padding-top: 5px; display: flex; justify-content: space-between;\"> <\span>' + response.users[i]['second_name'] + ' ' + response.users[i]['first_name'] + ' ' + response.users[i]['middle_name'] + '<\/span><\div><\div style=\"padding-bottom: 5px; display: flex;\"><\div class=\"conversation-link-time\">' + response.times[i] + '<\/div><\div class=\"conversation-link-data\">' + response.dates[i] + '<\/div><\/div><\/div><\/div><\span><\img src=\"' + response.main['avatar_image'] + '\" style=\"width: 20px; height: 20px;\" class=\"round-avatar\"><\/span><\span style=\"padding-left: 4px;\" class=\"conversation-link-text\">' + response.last[i]['description'].substr(0, 90) + '...' + '<\/span>  <\/div>   <\/div><\/a>');
-                         
-                         }else {
-                         
-                            $('.convers_exist').append('<\a class=\"conversation-link\" href=\"/message/view?id=' + response.convers[i]['id'] + '\"><\div class=\"conversation-link\" style=\"display: flex; padding: 15px 0; border-bottom: 1px solid #ccc;\"><\div style=\"padding: 0 15px 0 10px;\"><\img src=\"' + response.users[i]['avatar_image'] + '\" style=\"width: 50px; height: 50px;\" class =\"round-avatar\"><\/div><\div style=\"padding: 0 15px 0 10px; width: 100%;\"> <\div style=\"padding-top: 5px; display: flex; justify-content: space-between;\"> <\span>' + response.users[i]['second_name'] + ' ' + response.users[i]['first_name'] + ' ' + response.users[i]['middle_name'] + '<\/span><\div><\div style=\"display: flex;\"><\div class=\"conversation-link-time\">' + response.times[i] + '<\/div><\div class=\"conversation-link-data\">' + response.dates[i] + '<\/div><\/div><\/div><\/div><\div class=\"conversation-link-text\">' + response.last[i]['description'].substr(0, 90) + '...' + '<\/div>  <\/div>   <\/div><\/a>');
-                         }
-                     }
-                 } 
-             }
-         });
-     }
-     
-     
-     function timeUpdate(){  //Установка таймера на обновление страницы
-        
-        reloadcontent();
-     }
-     setInterval (timeUpdate,10000);
-
-
-";
-
-$this->registerJs($script2);
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/admin_message_index.js'); ?>
