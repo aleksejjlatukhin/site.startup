@@ -9,14 +9,14 @@ setInterval(function(){
     id_user = $(body).find('.wrap').attr('id').split('-')[1];
     identifyingBlock = $(body).find('#identifying_recipient_new_message-' + id_user);
 
-    $.ajax({
-        url: '/message/get-count-unread-messages?id=' + id_user,
-        method: 'POST',
-        cache: false,
-        success: function(response){
+    // Извещаем получателя о новом сообщении
+    if (id_user !== '0' && $(identifyingBlock).length) {
 
-            // Извещаем получателя о новом сообщении
-            if ($(identifyingBlock).length) {
+        $.ajax({
+            url: '/message/get-count-unread-messages?id=' + id_user,
+            method: 'POST',
+            cache: false,
+            success: function (response) {
 
                 // Меняем в шапке сайта в иконке количество непрочитанных сообщений
                 var countUnreadMessages = $(body).find('.countUnreadMessages');
@@ -33,7 +33,7 @@ setInterval(function(){
                         $(countUnreadMessages).removeClass('active');
                 }
             }
-        }
-    });
+        });
+    }
 
 }, 30000);
