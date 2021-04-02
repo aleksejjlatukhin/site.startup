@@ -173,6 +173,47 @@ $(document).ready(function () {
 // Обновляем данные на странице
 setInterval(function(){
 
+
+    // Если высота блока сообщений не имеет скролла, то при открытии
+    // страницы непрочитанные сообщения станут прочитанными
+    var timeoutReadMessage;
+    var heightScreen = $(body).height(); // Высота экрана
+    var scrollHeight = simpleBarDataChatUser.getScrollElement().scrollHeight; // Высота скролла
+    var chat = $(body).find('.data-chat');
+    if (scrollHeight <= heightScreen - 290) {
+
+        if(timeoutReadMessage) clearTimeout(timeoutReadMessage);
+        timeoutReadMessage = setTimeout(function() { //чтобы не искать одно и то же несколько раз
+
+            $(chat).find('.addressee-user.unreadmessage').each(function (index, item) {
+
+                var message_id = $(item).attr('id').split('-')[1];
+                var url = '/message/read-message-admin?id=' + message_id;
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    cache: false,
+                    success: function(response){
+                        // Меняем стили для прочитанного сообщения
+                        if (response.success) $(item).removeClass('unreadmessage');
+                        // Меняем в шапке сайта в иконке количество непрочитанных сообщений
+                        var countUnreadMessagesAfterRead = $(body).find('.countUnreadMessages');
+                        var newQuantityAfterRead = response.countUnreadMessages;
+                        $(countUnreadMessagesAfterRead).html(newQuantityAfterRead);
+                        if (newQuantityAfterRead < 1) $(countUnreadMessagesAfterRead).removeClass('active');
+                        // Меняем в блоке бесед кол-во непрочитанных сообщений для конкретной беседы
+                        var blockConversation = $('#conversation-list-menu').find(response.blockConversation);
+                        var blockCountUnreadMessagesConversation = $(blockConversation).find('.countUnreadMessagesSender');
+                        var countUnreadMessagesForConversation = response.countUnreadMessagesForConversation;
+                        $(blockCountUnreadMessagesConversation).html(countUnreadMessagesForConversation);
+                        if (countUnreadMessagesForConversation < 1) $(blockCountUnreadMessagesConversation).removeClass('active');
+                    }
+                });
+            });
+        },100);
+    }
+
     // Обновляем беседы пользователя
     $.ajax({
         url: '/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
@@ -193,7 +234,6 @@ setInterval(function(){
 
 
     // Проверяем прочитал ли админ сообщения
-    var chat = $(body).find('.data-chat');
     $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
         var message_id = $(item).attr('id').split('-')[1];

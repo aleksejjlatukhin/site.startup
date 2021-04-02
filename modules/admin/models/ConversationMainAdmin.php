@@ -19,11 +19,7 @@ class ConversationMainAdmin extends ActiveRecord
     {
         return [
 
-            [['id', 'main_admin_id', 'admin_id'], 'integer'],
-            ['updated_at', 'default', 'value' => function () {
-                return $this->getLastMessage()->created_at;
-            }],
-
+            [['id', 'main_admin_id', 'admin_id', 'updated_at'], 'integer'],
         ];
     }
 
@@ -32,7 +28,15 @@ class ConversationMainAdmin extends ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::class
+            //Использование поведения TimestampBehavior ActiveRecord
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    \yii\db\BaseActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
+                    \yii\db\BaseActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+
+                ],
+            ],
         ];
     }
 

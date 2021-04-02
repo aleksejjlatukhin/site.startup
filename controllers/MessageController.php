@@ -272,15 +272,16 @@ class MessageController extends AppUserPartController
 
     /**
      * @param $id
+     * @param $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesAdmin ($id)
+    public function actionCheckNewMessagesAdmin ($id, $idLastMessageOnPage)
     {
-        $lastMessageOnPage = MessageAdmin::findOne($id);
-        $conversation = $lastMessageOnPage->conversation;
+        $conversation = ConversationAdmin::findOne($id);
         $user = $conversation->user;
         $admin = $conversation->admin;
-        $messages = MessageAdmin::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $id])->all();
+        $lastMessageOnPage = MessageAdmin::findOne($idLastMessageOnPage);
+        $messages = MessageAdmin::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -719,13 +720,19 @@ class MessageController extends AppUserPartController
     }
 
 
-    public function actionCheckNewMessagesDevelopment ($id)
+    /**
+     * @param $id
+     * @param $idLastMessageOnPage
+     * @return array|bool
+     */
+    public function actionCheckNewMessagesDevelopment ($id, $idLastMessageOnPage)
     {
-        $lastMessageOnPage = MessageDevelopment::findOne($id);
-        $conversation = $lastMessageOnPage->conversation;
+
+        $conversation = ConversationDevelopment::findOne($id);
         $development = $conversation->development;
         $user = $conversation->user;
-        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $id])->all();
+        $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
+        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
         if(Yii::$app->request->isAjax) {
 

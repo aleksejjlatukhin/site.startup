@@ -16,10 +16,7 @@ class ConversationDevelopment extends ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'dev_id', 'user_id'], 'integer'],
-            ['updated_at', 'default', 'value' => function () {
-                return $this->getLastMessage()->created_at;
-            }],
+            [['id', 'dev_id', 'user_id', 'updated_at'], 'integer'],
         ];
     }
 
@@ -27,7 +24,15 @@ class ConversationDevelopment extends ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::class
+            //Использование поведения TimestampBehavior ActiveRecord
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    \yii\db\BaseActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
+                    \yii\db\BaseActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+
+                ],
+            ],
         ];
     }
 

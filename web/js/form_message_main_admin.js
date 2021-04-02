@@ -1,4 +1,5 @@
 var body = $('body');
+var chat = $(body).find('#data-chat');
 // Автоматическое обновление блока сообшений
 var autoUpdateDataChat = true;
 
@@ -13,7 +14,10 @@ $(body).on('click', '.send_message_button', function () {
 $(body).on('beforeSubmit', '#create-message-main-admin', function (e) {
 
     var form = $(this);
-    var idLastMessage = $('.message:last').attr('id').split('-')[1];
+    var idLastMessage; // ID последнего сообщения на странице
+    var lastMessage = $(chat).find('.message:last');
+    if ($(lastMessage).length) { idLastMessage = $(lastMessage).attr('id').split('-')[1]; }
+    else { idLastMessage = 0; }
     var url = form.attr('action') + '&idLastMessageOnPage=' + idLastMessage;
     var formData = new FormData(form[0]);
 
@@ -51,7 +55,6 @@ $(body).on('beforeSubmit', '#create-message-main-admin', function (e) {
             if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
 
             // Обновляем сообщения на странице
-            var chat = $(body).find('#data-chat');
             // Если в беседе ранее не было сообщений, то удаляем этот блок с текстом
             if ($(chat).find('.block_not_exist_message').length)
                 $(chat).find('.block_not_exist_message').remove();
@@ -215,8 +218,13 @@ setInterval(function(){
     // Проверяем, есть ли сообщения, у которых id больше,
     // чем у последнего на странице, если есть, то добавить их в конец чата
     var chat = $(body).find('.data-chat');
-    var idLastMessage = $('.message:last').attr('id').split('-')[1];
-    var url = '/admin/message/check-new-messages-main-admin?id=' + idLastMessage;
+    var conversation_id = window.location.search.split('=')[1];
+    var idLastMessage; // ID последнего сообщения на странице
+    var lastMessage = $(chat).find('.message:last');
+    if ($(lastMessage).length) idLastMessage = $(lastMessage).attr('id').split('-')[1];
+    else idLastMessage = 0;
+
+    var url = '/admin/message/check-new-messages-main-admin?id=' + conversation_id + '&idLastMessageOnPage=' + idLastMessage;
 
     if (autoUpdateDataChat === true) {
 
@@ -227,6 +235,10 @@ setInterval(function(){
             success: function (response) {
 
                 if (response.checkNewMessages === true) {
+                    // Если в беседе ранее не было сообщений, то удаляем этот блок с текстом
+                    if ($(chat).find('.block_not_exist_message').length)
+                        $(chat).find('.block_not_exist_message').remove();
+                    // Добавляем новые сообщения в конец чата
                     $(chat).find('.simplebar-content').append(response.addNewMessagesAjax);
                 }
             }

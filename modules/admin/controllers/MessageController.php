@@ -141,14 +141,6 @@ class MessageController extends AppAdminController
 
         elseif (User::isUserDev(Yii::$app->user->identity['username'])) {
 
-            // Временный код - добавление бесед пользователей и техподдержки
-            $users = User::find()->all();
-            foreach ($users as $user){
-                if ($user->id != $id) {
-                    $user->createConversationDevelopment();
-                }
-            }
-
             $development = User::findOne($id);
             // Форма поиска
             $searchForm = new SearchForm();
@@ -383,15 +375,16 @@ class MessageController extends AppAdminController
 
     /**
      * @param $id
+     * @param $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesMainAdmin ($id)
+    public function actionCheckNewMessagesMainAdmin ($id, $idLastMessageOnPage)
     {
-        $lastMessageOnPage = MessageMainAdmin::findOne($id);
-        $conversation = $lastMessageOnPage->conversation;
+        $conversation = ConversationMainAdmin::findOne($id);
         $main_admin = $conversation->mainAdmin;
         $admin = $conversation->admin;
-        $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $id])->all();
+        $lastMessageOnPage = MessageMainAdmin::findOne($idLastMessageOnPage);
+        $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -962,15 +955,16 @@ class MessageController extends AppAdminController
 
     /**
      * @param $id
+     * @param $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesDevelopment ($id)
+    public function actionCheckNewMessagesDevelopment ($id, $idLastMessageOnPage)
     {
-        $lastMessageOnPage = MessageDevelopment::findOne($id);
-        $conversation = $lastMessageOnPage->conversation;
+        $conversation = ConversationDevelopment::findOne($id);
         $development = $conversation->development;
         $user = $conversation->user;
-        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $id])->all();
+        $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
+        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
         if(Yii::$app->request->isAjax) {
 
