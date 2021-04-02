@@ -1,4 +1,6 @@
 var body = $('body');
+// Автоматическое обновление блока сообшений
+var autoUpdateDataChat = true;
 
 
 // Передаем событие клика по кнопке сохранить сообщение
@@ -11,7 +13,8 @@ $(body).on('click', '.send_message_button', function () {
 $(body).on('beforeSubmit', '#create-message-development', function (e) {
 
     var form = $(this);
-    var url = form.attr('action');
+    var idLastMessage = $('.message:last').attr('id').split('-')[1];
+    var url = form.attr('action') + '&idLastMessageOnPage=' + idLastMessage;
     var formData = new FormData(form[0]);
 
     $.ajax({
@@ -24,8 +27,43 @@ $(body).on('beforeSubmit', '#create-message-development', function (e) {
         cache: false,
         success: function(response){
 
-            // Отправляем данные workerman
-            websocket.send(JSON.stringify(response));
+            // Обновляем кол-во непрочитанных сообщений в шапке сайта
+            var countUnreadMessages = $(body).find('.countUnreadMessages');
+            if (response.countUnreadMessages > 0) {
+
+                if ($(countUnreadMessages).hasClass('active')) {
+                    $(countUnreadMessages).html(response.countUnreadMessages);
+                } else {
+                    $(countUnreadMessages).addClass('active');
+                    $(countUnreadMessages).html(response.countUnreadMessages);
+                }
+            } else {
+                if ($(countUnreadMessages).hasClass('active'))
+                    $(countUnreadMessages).removeClass('active');
+            }
+
+            // Обновляем беседы на странице
+            var conversation_list_menu = $('#conversation-list-menu');
+            var conversation_id = $(conversation_list_menu).find('.active-message').attr('id');
+            conversation_id = '#' + conversation_id;
+            if (response.sender === 'admin') $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminAjax);
+            else if (response.sender === 'development') $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsForDevelopmentAjax);
+            if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
+
+            // Обновляем сообщения на странице
+            var chat = $(body).find('#data-chat');
+            // Если в беседе ранее не было сообщений, то удаляем этот блок с текстом
+            if ($(chat).find('.block_not_exist_message').length)
+                $(chat).find('.block_not_exist_message').remove();
+            // Добавляем новые сообщения в конец чата
+            $(chat).find('.simplebar-content').append(response.addNewMessagesAjax);
+
+            // Делаем скролл чата на странице отправителя
+            if (response.sender === 'admin')
+                simpleBarDataChatAdmin.getScrollElement().scrollTop = simpleBarDataChatAdmin.getScrollElement().scrollHeight;
+            else if (response.sender === 'development')
+                simpleBarDataChatDevelopment.getScrollElement().scrollTop = simpleBarDataChatDevelopment.getScrollElement().scrollHeight;
+
             // Очищаем форму сообщений
             $('#create-message-development')[0].reset();
             $('#input_send_message').html('');
@@ -43,73 +81,18 @@ $(body).on('beforeSubmit', '#create-message-development', function (e) {
         },
         error: function(){
             alert('Ошибка');
+        },
+        beforeSend: function() {
+            autoUpdateDataChat = false;
+        },
+        complete: function () {
+            autoUpdateDataChat = true;
         }
     });
 
     e.preventDefault();
     return false;
 });
-
-
-// Обновляем данные на странице
-websocket.onmessage = function(response) {
-
-    // Получаем данные отправленные с сервера
-    var data = JSON.parse(response.data);
-
-    // Отслеживаем событие отправки сообщения
-    if (data.action === 'send-message') {
-
-        // Указываем по какому блоку определять получателя сообщения
-        var identifyingBlockAdressee = $(body).find('#identifying_recipient_new_message-' + data.adressee_id);
-        // Указываем по какому блоку определять отправителя сообщения
-        var identifyingBlockSender = $(body).find('#identifying_recipient_new_message-' + data.sender_id);
-        // Блок чата, куда добавляются сообщения
-        var chat = $(body).find('#data-chat');
-
-        // Добавляем новое сообщение на страницу получателя
-        if ($(identifyingBlockAdressee).length && data.location_pathname === window.location.pathname
-            && data.conversation_id === window.location.search.split('=')[1]) {
-
-            // Если в беседе ранее не было сообщений, то удаляем этот блок с текстом
-            if ($(chat).find('.block_not_exist_message').length)
-                $(chat).find('.block_not_exist_message').remove();
-            // Добавляем новое сообщение в конец чата
-            $(chat).find('.simplebar-content').append(data.messageAjax);
-        }
-
-        // Добавляем новое сообщение на страницу отправителя
-        if ($(identifyingBlockSender).length) {
-
-            // Если в беседе ранее не было сообщений, то удаляем этот блок с текстом
-            if ($(chat).find('.block_not_exist_message').length)
-                $(chat).find('.block_not_exist_message').remove();
-            // Добавляем новое сообщение в конец чата
-            $(chat).find('.simplebar-content').append(data.messageAjax);
-        }
-
-        // Делаем скролл чата только на странице отправителя
-        if (data.sender === 'development' && $(identifyingBlockSender).length)
-            simpleBarDataChatDevelopment.getScrollElement().scrollTop = simpleBarDataChatDevelopment.getScrollElement().scrollHeight;
-        else if (data.sender === 'admin' && $(identifyingBlockSender).length)
-            simpleBarDataChatAdmin.getScrollElement().scrollTop = simpleBarDataChatAdmin.getScrollElement().scrollHeight;
-    }
-
-    // Отслеживаем событие прочитывания сообщения
-    else if (data.action === 'read-message') {
-
-        var message_id = data.message.id;
-
-        // Указываем по какому блоку определять получателя сообщения
-        var identifyingBlockAdresseeAfterRead = $(body).find('#identifying_recipient_new_message-' + data.message.adressee_id);
-        // Указываем по какому блоку определять отправителя сообщения
-        var identifyingBlockSenderAfterRead = $(body).find('#identifying_recipient_new_message-' + data.message.sender_id);
-
-        if ($(identifyingBlockAdresseeAfterRead).length || $(identifyingBlockSenderAfterRead).length) // Делаем сообщение прочитанным
-            $(body).find('.data-chat').find('#message_id-' + message_id).removeClass('unreadmessage');
-    }
-
-};
 
 
 // Отслеживаем высоту textarea и изменяем высоту блока сообщений
@@ -129,15 +112,7 @@ $(body).on('input', 'textarea#input_send_message', function () {
     var conversation_id = window.location.search.split('=')[1];
     var url = '/admin/message/save-cache-message-development-form?id=' + conversation_id;
     var data = $(this).serialize();
-    $.ajax({
-        url: url,
-        data: data,
-        method: 'POST',
-        cache: false,
-        error: function(){
-            alert('Ошибка');
-        }
-    });
+    $.ajax({url: url, data: data, method: 'POST'});
 
 });
 
@@ -232,3 +207,31 @@ $(body).on('click', '.button_next_page_masseges', function (e) {
     e.preventDefault();
     return false;
 });
+
+
+// Обновляем данные на странице
+setInterval(function(){
+
+    // Проверяем, есть ли сообщения, у которых id больше,
+    // чем у последнего на странице, если есть, то добавить их в конец чата
+    var chat = $(body).find('.data-chat');
+    var idLastMessage = $('.message:last').attr('id').split('-')[1];
+    var url = '/admin/message/check-new-messages-development?id=' + idLastMessage;
+
+    if (autoUpdateDataChat === true) {
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+
+                if (response.checkNewMessages === true) {
+                    $(chat).find('.simplebar-content').append(response.addNewMessagesAjax);
+                }
+            }
+        });
+    }
+
+
+}, 30000);

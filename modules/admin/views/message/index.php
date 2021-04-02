@@ -129,7 +129,7 @@ $this->registerCssFile('@web/css/admin-message-index.css');
                 </div>
 
                 <!--Блок для бесед с администраторами-->
-                <div class="containerForConversations">
+                <div class="containerForAllConversations">
 
                     <div class="title_block_conversation">
                         <div class="title">Администраторы</div>

@@ -1,5 +1,7 @@
-//Установка Simple ScrollBar для блока выбора беседы
+// Установка Simple ScrollBar для блока выбора беседы
 const simpleBarConversations = new SimpleBar(document.getElementById('conversation-list-menu'));
+// Получаем id пользователя
+var user_id = window.location.search.split('=')[1];
 
 
 // Установка прелоадера
@@ -46,58 +48,22 @@ $(body).on('click', '.link_open_and_close_menu_profile', function () {
 });
 
 
-$(document).ready(function () {
-
-    // Отслеживаем событие workerman
-    websocket.addEventListener('message', function (response) {
-
-        // Получаем данные отправленные с сервера
-        var data = JSON.parse(response.data);
-        // Отслеживаем событие отправки сообщения
-        if (data.action === 'send-message') {
-
-            // Указываем по какому блоку определять получателя сообщения
-            var identifyingBlockAdressee = $(body).find('#identifying_recipient_new_message-' + data.adressee_id);
-            // Указываем по какому блоку определять отправителя сообщения
-            var identifyingBlockSender = $(body).find('#identifying_recipient_new_message-' + data.sender_id);
-
-            // Обновляем блок с беседами пользователя
-            if ($(identifyingBlockAdressee).length || identifyingBlockSender.length)
-                $(body).find('#conversation-list-menu').html(data.conversationsForUserAjax);
-        }
-    });
-});
-
-
-// Обновляем статус онлайн
+// Обновляем беседы пользователя
 setInterval(function(){
 
-    var user_id = window.location.search.split('=')[1];
-    var url = '/message/get-users-is-online?id=' + user_id + '&pathname=index';
-
     $.ajax({
-        url: url,
+        url: '/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
         method: 'POST',
         cache: false,
         success: function(response){
 
-            var blockAdminOnline = $(body).find('#adminConversation-' + response.admin.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockAdminOnline).hasClass('active')) {
-                if (response.admin.isOnline !== true) $(blockAdminOnline).removeClass('active');
-            } else {
-                if (response.admin.isOnline === true) $(blockAdminOnline).addClass('active');
-            }
+            var blockConversationAdmin = $(body).find('#conversation-list-menu').find(response.blockConversationAdmin);
+            var blockConversationDevelopment = $(body).find('#conversation-list-menu').find(response.blockConversationDevelopment);
 
-            var blockDevOnline = $(body).find('#conversationTechnicalSupport-' + response.development.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockDevOnline).hasClass('active')) {
-                if (response.development.isOnline !== true) $(blockDevOnline).removeClass('active');
-            } else {
-                if (response.development.isOnline === true) $(blockDevOnline).addClass('active');
-            }
+            $(blockConversationAdmin).html(response.conversationAdminForUserAjax);
+            $(blockConversationDevelopment).html(response.conversationDevelopmentForUserAjax);
 
-        }, error: function(){
-            alert('Ошибка');
         }
     });
 
-}, 180000);
+}, 30000);

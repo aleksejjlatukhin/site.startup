@@ -585,5 +585,5 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 </div>
 
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/admin_message_technical_suport_development.js'); ?>
+<?php $this->registerJsFile('@web/js/admin_main_message_technical_suport_development.js'); ?>
 <?php $this->registerJsFile('@web/js/form_message_development_and_main_admin.js'); ?>

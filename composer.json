@@ -25,8 +25,7 @@
         "kartik-v/yii2-detail-view": "dev-master",
         "kartik-v/yii2-widget-depdrop": "dev-master",
         "kartik-v/yii2-widget-switchinput": "dev-master",
-        "kartik-v/yii2-widget-datepicker": "dev-master",
-        "workerman/workerman": "^4.0"
+        "kartik-v/yii2-widget-datepicker": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -121,7 +121,6 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         ),
         'W' => 
         array (
-            'Workerman\\' => 10,
             'Webmozart\\Assert\\' => 17,
         ),
         'S' => 
@@ -281,10 +280,6 @@ class ComposerStaticInit8a376af8f2680b3c5e57c48d839a30eb
         'cebe\\markdown\\' => 
         array (
             0 => __DIR__ . '/..' . '/cebe/markdown',
-        ),
-        'Workerman\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/workerman/workerman',
         ),
         'Webmozart\\Assert\\' => 
         array (

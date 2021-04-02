@@ -2,9 +2,12 @@
 const simpleBarConversations = new SimpleBar(document.getElementById('conversation-list-menu'));
 //Установка Simple ScrollBar для блока сообщений
 const simpleBarDataChatAdmin = new SimpleBar(document.getElementById('data-chat'));
+// Получаем id беседы пользователя с админом
+var conversation_id = window.location.search.split('=')[1];
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
 
 // Прокрутка во время работы прелоадера
 window.addEventListener('DOMContentLoaded', function() {
@@ -111,9 +114,6 @@ $(body).on('input', 'form#search_user_conversation', function(e) {
 
             // Выводим результаты поиска
             $('.conversations_query').html(response.renderAjax);
-
-        }, error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -173,33 +173,6 @@ $(body).on('click', '.button_open_close_list_users', function () {
 
 $(document).ready(function () {
 
-    // Отслеживаем событие workerman
-    websocket.addEventListener('message', function (response) {
-
-        // Получаем данные отправленные с сервера
-        var data = JSON.parse(response.data);
-        // Отслеживаем событие отправки сообщения
-        if (data.action === 'send-message') {
-
-            // Указываем по какому блоку определять получателя сообщения
-            var identifyingBlockAdressee = $(body).find('#identifying_recipient_new_message-' + data.adressee_id);
-            // Указываем по какому блоку определять отправителя сообщения
-            var identifyingBlockSender = $(body).find('#identifying_recipient_new_message-' + data.sender_id);
-
-            var conversation_list_menu = $('#conversation-list-menu');
-            var conversation_id = $(conversation_list_menu).find('.active-message').attr('id');
-            conversation_id = '#' + conversation_id;
-
-            // Обновляем блок с беседами админа
-            if ($(identifyingBlockAdressee).length || identifyingBlockSender.length) {
-                $(conversation_list_menu).html(data.conversationsForAdminAjax);
-                $(conversation_list_menu).find(conversation_id).addClass('active-message');
-            }
-        }
-    });
-
-
-
     // Если высота блока сообщений не имеет скролла, то при открытии
     // страницы непрочитанные сообщения станут прочитанными
     var timeoutReadMessage;
@@ -214,18 +187,26 @@ $(document).ready(function () {
             $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-admin?id=' + message_id;
+                var url = '/admin/message/read-message-main-admin?id=' + message_id;
 
                 $.ajax({
                     url: url,
                     method: 'POST',
                     cache: false,
                     success: function(response){
-                        // Отправляем данные workerman
-                        websocket.send(JSON.stringify(response));
-                    },
-                    error: function(){
-                        alert('Ошибка');
+                        // Меняем стили для прочитанного сообщения
+                        if (response.success) $(item).removeClass('unreadmessage');
+                        // Меняем в шапке сайта в иконке количество непрочитанных сообщений
+                        var countUnreadMessagesAfterRead = $(body).find('.countUnreadMessages');
+                        var newQuantityAfterRead = response.countUnreadMessages;
+                        $(countUnreadMessagesAfterRead).html(newQuantityAfterRead);
+                        if (newQuantityAfterRead < 1) $(countUnreadMessagesAfterRead).removeClass('active');
+                        // Меняем в блоке бесед кол-во непрочитанных сообщений для конкретной беседы
+                        var blockConversation = $('#conversation-list-menu').find(response.blockConversation);
+                        var blockCountUnreadMessagesConversation = $(blockConversation).find('.countUnreadMessagesSender');
+                        var countUnreadMessagesForConversation = response.countUnreadMessagesForConversation;
+                        $(blockCountUnreadMessagesConversation).html(countUnreadMessagesForConversation);
+                        if (countUnreadMessagesForConversation < 1) $(blockCountUnreadMessagesConversation).removeClass('active');
                     }
                 });
             });
@@ -249,18 +230,26 @@ $(document).ready(function () {
                 if (posTop + ($(item).height() / 2) <= $(chat).height() || scrollTop + $(item).height() > scrollHeight - $(chat).height()) {
 
                     var message_id = $(item).attr('id').split('-')[1];
-                    var url = '/admin/message/read-message-admin?id=' + message_id;
+                    var url = '/admin/message/read-message-main-admin?id=' + message_id;
 
                     $.ajax({
                         url: url,
                         method: 'POST',
                         cache: false,
                         success: function(response){
-                            // Отправляем данные workerman
-                            websocket.send(JSON.stringify(response));
-                        },
-                        error: function(){
-                            alert('Ошибка');
+                            // Меняем стили для прочитанного сообщения
+                            if (response.success) $(item).removeClass('unreadmessage');
+                            // Меняем в шапке сайта в иконке количество непрочитанных сообщений
+                            var countUnreadMessagesAfterRead = $(body).find('.countUnreadMessages');
+                            var newQuantityAfterRead = response.countUnreadMessages;
+                            $(countUnreadMessagesAfterRead).html(newQuantityAfterRead);
+                            if (newQuantityAfterRead < 1) $(countUnreadMessagesAfterRead).removeClass('active');
+                            // Меняем в блоке бесед кол-во непрочитанных сообщений для конкретной беседы
+                            var blockConversation = $('#conversation-list-menu').find(response.blockConversation);
+                            var blockCountUnreadMessagesConversation = $(blockConversation).find('.countUnreadMessagesSender');
+                            var countUnreadMessagesForConversation = response.countUnreadMessagesForConversation;
+                            $(blockCountUnreadMessagesConversation).html(countUnreadMessagesForConversation);
+                            if (countUnreadMessagesForConversation < 1) $(blockCountUnreadMessagesConversation).removeClass('active');
                         }
                     });
                 }
@@ -270,47 +259,48 @@ $(document).ready(function () {
 });
 
 
-// Обновляем статус онлайн
+// Обновляем данные на странице
 setInterval(function(){
 
-    var conversation_id = window.location.search.split('=')[1];
-    var url = '/admin/message/get-users-is-online?id=' + conversation_id + '&pathname=view';
-
+    // Обновляем беседы админа
     $.ajax({
-        url: url,
+        url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
         method: 'POST',
         cache: false,
         success: function(response){
 
-            var blockAdminMainOnline = $(body).find('#adminMainConversation-' + response.mainAdmin.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockAdminMainOnline).hasClass('active')) {
-                if (response.mainAdmin.isOnline !== true) $(blockAdminMainOnline).removeClass('active');
-            } else {
-                if (response.mainAdmin.isOnline === true) $(blockAdminMainOnline).addClass('active');
-            }
+            var conversation_list_menu = $('#conversation-list-menu');
+            var conversation_id = $(conversation_list_menu).find('.active-message').attr('id');
+            conversation_id = '#' + conversation_id;
 
-            var blockDevOnline = $(body).find('#conversationTechnicalSupport-' + response.development.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockDevOnline).hasClass('active')) {
-                if (response.development.isOnline !== true) $(blockDevOnline).removeClass('active');
-            } else {
-                if (response.development.isOnline === true) $(blockDevOnline).addClass('active');
-            }
+            $(conversation_list_menu).find(response.blockConversationAdminMain).html(response.conversationAdminMainForAdminAjax);
+            $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminAjax);
+            $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsUserForAdminAjax);
+            if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
 
-            $.each(response.users, function (index, item) {
-
-                var blockUserOnline = $('#conversation-list-menu').find('#conversation-' + item.conversation_id).find('.checkStatusOnlineUser');
-
-                if ($(blockUserOnline).hasClass('active')) {
-                    if (item.isOnline !== true) $(blockUserOnline).removeClass('active');
-                } else {
-                    if (item.isOnline === true) $(blockUserOnline).addClass('active');
-                }
-            });
-
-
-        }, error: function(){
-            alert('Ошибка');
         }
     });
 
-}, 180000);
+
+    // Проверяем прочитал ли главный админ сообщения
+    var chat = $(body).find('.data-chat');
+    $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
+
+        var message_id = $(item).attr('id').split('-')[1];
+        var url = '/admin/message/checking-unread-message-main-admin?id=' + message_id;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+
+                if (response.checkRead === true) {
+                    $(item).removeClass('unreadmessage');
+                }
+            }
+        });
+    });
+
+
+}, 30000);

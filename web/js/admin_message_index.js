@@ -1,5 +1,7 @@
 //Установка Simple ScrollBar для блока выбора беседы
 const simpleBarConversations = new SimpleBar(document.getElementById('conversation-list-menu'));
+// Получаем id пользователя
+var user_id = window.location.search.split('=')[1];
 
 
 // Установка прелоадера
@@ -97,9 +99,6 @@ $(body).on('input', 'form#search_user_conversation', function(e) {
 
             // Выводим результаты поиска
             $('.conversations_query').html(response.renderAjax);
-
-        }, error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -140,70 +139,21 @@ $(body).on('click', '.container-user_messages', function () {
 });
 
 
-$(document).ready(function () {
-
-    // Отслеживаем событие workerman
-    websocket.addEventListener('message', function (response) {
-
-        // Получаем данные отправленные с сервера
-        var data = JSON.parse(response.data);
-        // Отслеживаем событие отправки сообщения
-        if (data.action === 'send-message') {
-
-            // Указываем по какому блоку определять получателя сообщения
-            var identifyingBlockAdressee = $(body).find('#identifying_recipient_new_message-' + data.adressee_id);
-            // Указываем по какому блоку определять отправителя сообщения
-            var identifyingBlockSender = $(body).find('#identifying_recipient_new_message-' + data.sender_id);
-
-            // Обновляем блок с беседами пользователя
-            if ($(identifyingBlockAdressee).length || identifyingBlockSender.length)
-                $(body).find('#conversation-list-menu').html(data.conversationsForAdminAjax);
-        }
-    });
-});
-
-
-// Обновляем статус онлайн
+// Обновляем данные на странице
 setInterval(function(){
 
-    var user_id = window.location.search.split('=')[1];
-    var url = '/admin/message/get-users-is-online?id=' + user_id + '&pathname=index';
-
+    // Обновляем беседы админа
     $.ajax({
-        url: url,
+        url: '/admin/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
         method: 'POST',
         cache: false,
         success: function(response){
 
-            var blockAdminMainOnline = $(body).find('#adminMainConversation-' + response.mainAdmin.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockAdminMainOnline).hasClass('active')) {
-                if (response.mainAdmin.isOnline !== true) $(blockAdminMainOnline).removeClass('active');
-            } else {
-                if (response.mainAdmin.isOnline === true) $(blockAdminMainOnline).addClass('active');
-            }
-
-            var blockDevOnline = $(body).find('#conversationTechnicalSupport-' + response.development.conversation_id).find('.checkStatusOnlineUser');
-            if ($(blockDevOnline).hasClass('active')) {
-                if (response.development.isOnline !== true) $(blockDevOnline).removeClass('active');
-            } else {
-                if (response.development.isOnline === true) $(blockDevOnline).addClass('active');
-            }
-
-            $.each(response.users, function (index, item) {
-
-                var blockUserOnline = $('#conversation-list-menu').find('#conversation-' + item.conversation_id).find('.checkStatusOnlineUser');
-
-                if ($(blockUserOnline).hasClass('active')) {
-                    if (item.isOnline !== true) $(blockUserOnline).removeClass('active');
-                } else {
-                    if (item.isOnline === true) $(blockUserOnline).addClass('active');
-                }
-            });
-
-
-        }, error: function(){
-            alert('Ошибка');
+            var conversation_list_menu = $('#conversation-list-menu');
+            $(conversation_list_menu).find(response.blockConversationAdminMain).html(response.conversationAdminMainForAdminAjax);
+            $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminAjax);
+            $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsUserForAdminAjax);
         }
     });
 
-}, 180000);
+}, 30000);

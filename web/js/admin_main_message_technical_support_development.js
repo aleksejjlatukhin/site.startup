@@ -1,22 +1,26 @@
 //Установка Simple ScrollBar для блока выбора беседы
 const simpleBarConversations = new SimpleBar(document.getElementById('conversation-list-menu'));
 //Установка Simple ScrollBar для блока сообщений
-const simpleBarDataChatMainAdmin = new SimpleBar(document.getElementById('data-chat'));
+const simpleBarDataChatDevelopment = new SimpleBar(document.getElementById('data-chat'));
 // Получаем id беседы техподдержки с главным админом
 var conversation_id = window.location.search.split('=')[1];
 
 
 var body = $('body');
+var id_page = window.location.search.split('=')[1];
 
-// Прокрутка блока сообщений (во время работы прелоадера)
+
+// Прокрутка во время работы прелоадера
 window.addEventListener('DOMContentLoaded', function() {
-
-    // Первое непрочитанное сообщение для пользователя
-    var unreadmessage = $(body).find('.addressee-main_admin.unreadmessage:first');
-    if ($(unreadmessage).length)
-        simpleBarDataChatMainAdmin.getScrollElement().scrollTop = $(unreadmessage).offset().top - $(unreadmessage).height() - $('.data-chat').height();
+    // Прокрутка до блока активной беседы
+    var linkAllConversation = $('.containerForAllConversations').find('#adminConversation-'+id_page);
+    simpleBarConversations.getScrollElement().scrollTop = $(linkAllConversation).offset().top - 211;
+    // Прокрутка блока сообщений
+    var unreadmessage = $(body).find('.addressee-development.unreadmessage:first');
+    if ($(unreadmessage).length) // Первое непрочитанное сообщение для пользователя
+        simpleBarDataChatDevelopment.getScrollElement().scrollTop = $(unreadmessage).offset().top - $(unreadmessage).height() - $('.data-chat').height();
     else
-        simpleBarDataChatMainAdmin.getScrollElement().scrollTop = simpleBarDataChatMainAdmin.getScrollElement().scrollHeight;
+        simpleBarDataChatDevelopment.getScrollElement().scrollTop = simpleBarDataChatDevelopment.getScrollElement().scrollHeight;
 });
 
 
@@ -130,8 +134,11 @@ $(body).keydown('form#search_user_conversation', function(e) {
 // Переход на страницу диалога через выбор в поиске
 $(body).on('click', '.conversation-link', function () {
     var id = $(this).attr('id').split('-')[1];
-    if (($(this).attr('id').split('-')[0] === 'adminConversation')) {
-        window.location.href = '/admin/message/view?id='+id;
+    if ($(this).attr('id').split('-')[0] === 'adminConversation') {
+        window.location.href = '/admin/message/technical-support?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'conversation')) {
+        window.location.href = '/message/technical-support?id='+id;
     }
 });
 
@@ -139,10 +146,11 @@ $(body).on('click', '.conversation-link', function () {
 // Переход на страницу диалога через выбор в списке
 $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
-    if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
+    if ($(this).attr('id').split('-')[0] === 'adminConversation') {
         window.location.href = '/admin/message/technical-support?id='+id;
-    } else if ($(this).attr('id').split('-')[0] === 'adminConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'conversation')) {
+        window.location.href = '/message/technical-support?id='+id;
     }
 });
 
@@ -166,19 +174,18 @@ $(body).on('click', '.button_open_close_list_users', function () {
 
 $(document).ready(function () {
 
-
     // Если высота блока сообщений не имеет скролла, то при открытии
     // страницы непрочитанные сообщения станут прочитанными
     var timeoutReadMessage;
     var heightScreen = $(body).height(); // Высота экрана
-    var scrollHeight = simpleBarDataChatMainAdmin.getScrollElement().scrollHeight; // Высота скролла
+    var scrollHeight = simpleBarDataChatDevelopment.getScrollElement().scrollHeight; // Высота скролла
     if (scrollHeight <= heightScreen - 290) {
 
         var chat = $(body).find('.data-chat');
         if(timeoutReadMessage) clearTimeout(timeoutReadMessage);
         timeoutReadMessage = setTimeout(function() { //чтобы не искать одно и то же несколько раз
 
-            $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
+            $(chat).find('.addressee-development.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
                 var url = '/admin/message/read-message-development?id=' + message_id;
@@ -207,17 +214,18 @@ $(document).ready(function () {
         },100);
     }
 
+
     // Отслеживаем скролл непрочитанных сообщений
-    simpleBarDataChatMainAdmin.getScrollElement().addEventListener('scroll', function () {
+    simpleBarDataChatDevelopment.getScrollElement().addEventListener('scroll', function () {
 
         var chat = $(body).find('.data-chat');
         if(timeoutReadMessage) clearTimeout(timeoutReadMessage);
         timeoutReadMessage = setTimeout(function() { //чтобы не искать одно и то же несколько раз
 
-            $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
+            $(chat).find('.addressee-development.unreadmessage').each(function (index, item) {
 
-                var scrollTop = simpleBarDataChatMainAdmin.getScrollElement().scrollTop,
-                    scrollHeight = simpleBarDataChatMainAdmin.getScrollElement().scrollHeight,
+                var scrollTop = simpleBarDataChatDevelopment.getScrollElement().scrollTop,
+                    scrollHeight = simpleBarDataChatDevelopment.getScrollElement().scrollHeight,
                     posTop = $(item).offset().top;
 
                 if (posTop + ($(item).height() / 2) <= $(chat).height() || scrollTop + $(item).height() > scrollHeight - $(chat).height()) {
@@ -249,14 +257,13 @@ $(document).ready(function () {
             });
         },100);
     });
-
 });
 
 
 // Обновляем данные на странице
 setInterval(function(){
 
-    // Обновляем беседы главного админа
+    // Обновляем беседы техподдержки
     $.ajax({
         url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=technical-support',
         method: 'POST',
@@ -267,17 +274,16 @@ setInterval(function(){
             var conversation_id = $(conversation_list_menu).find('.active-message').attr('id');
             conversation_id = '#' + conversation_id;
 
-            $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminMainAjax);
-            $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsAdminForAdminMainAjax);
+            $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsForDevelopmentAjax);
             if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
 
         }
     });
 
 
-    // Проверяем прочитала ли техподдержка сообщения
+    // Проверяем прочитал ли главный админ сообщения
     var chat = $(body).find('.data-chat');
-    $(chat).find('.addressee-development.unreadmessage').each(function (index, item) {
+    $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
 
         var message_id = $(item).attr('id').split('-')[1];
         var url = '/admin/message/checking-unread-message-development?id=' + message_id;

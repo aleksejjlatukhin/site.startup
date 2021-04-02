@@ -88,7 +88,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
 
         <footer class="footer">
-            <div class="container-fluid" id="identifying_recipient_message-<?= $user_id;?>">
+            <div class="container-fluid">
                 <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
             </div>
         </footer>
