@@ -150,7 +150,7 @@ class Projects extends ActiveRecord
         foreach ($this->authors as $author) {
 
             $j++;
-            $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: 700;">Сотрудник №'.$j.'</div>';
+            $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$j.'</div>';
             $string .= '<div>ФИО: ' . $author->fio . '</div>';
             $string .= '<div>Роль в проекте: ' . $author->role . '</div>';
             $string .= '<div>Опыт работы: ' . $author->experience . '</div></div>';

@@ -65,6 +65,19 @@ if (empty($project->date_of_announcement)) {
     $date_of_announcement = $default_value;
 }
 
+?>
+
+<div class="block_export_link_hypothesis">
+    <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+        '/projects/mpdf-project', 'id' => $project->id], [
+        'class' => 'export_link_hypothesis',
+        'target' => '_blank',
+        'title' => 'Скачать в pdf',
+    ]); ?>
+</div>
+
+<?php
+
 $string .= '<div class="row container-fluid" style="color: #4F4F4F;">';
 
 $string .= '<div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Описание проекта</div></div>

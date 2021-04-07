@@ -149,7 +149,11 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
                 <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
 
-                <div class="col-md-2"></div>
+                <div class="col-md-2 text-right" style="padding-right: 8px;">
+                    <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/generation-problem/mpdf-table-problems', 'id' => $interview->id], [
+                        'target'=>'_blank', 'title'=> 'Экспорт в pdf',
+                    ]);?>
+                </div>
 
             </div>
 

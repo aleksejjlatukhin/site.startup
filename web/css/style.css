@@ -2484,6 +2484,13 @@ a.link_for_description_stage:focus {
 /*Стили для всплывающих модальных окон
 ---Начало---
 */
+body #data_project_modal .modal-header {
+    border-bottom: none;
+}
+
+body .data_segment_modal .modal-header {
+    border-bottom: none;
+}
 
 body .next_step_error .modal-content { /*невозможность перехода на следующий этап*/
     background-color: #707F99;
@@ -2541,5 +2548,36 @@ body .data_profile_error .modal-footer h4 { /*Модальное окно соо
 }
 
 /*Стили для всплывающих модальных окон
+---Конец---
+*/
+
+
+/*Стили для ссылки экспорта гипотезы в pdf
+---Начало---
+*/
+.block_export_link_hypothesis {
+    display: flex;
+    margin-top: -25px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+a.export_link_hypothesis {
+    margin: 0 auto;
+    padding-left: 5px;
+    color: #828282;
+    font-size: 24px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a.export_link_hypothesis:hover {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+a.export_link_hypothesis:focus {
+    color: #4F4F4F;
+    text-decoration: none;
+}
+/*Стили для ссылки экспорта гипотезы в pdf
 ---Конец---
 */

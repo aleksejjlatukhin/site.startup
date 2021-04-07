@@ -128,7 +128,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
     Modal::begin([
         'options' => ['id' => 'data_project_modal'],
         'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные по проекту</h3>',
     ]); ?>
     <!--Контент добавляется через Ajax-->
     <?php Modal::end(); ?>
@@ -140,9 +139,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
     <?php // Модальное окно - Данные сегмента
     Modal::begin([
-        'options' => ['id' => 'data_segment_modal', 'class' => 'data_segment_modal',],
+        'options' => ['id' => 'data_segment_modal', 'class' => 'data_segment_modal'],
         'size' => 'modal-lg',
-        'header' => '<h3 class="text-center">Исходные данные сегмента</h3>',
     ]); ?>
     <!--Контент добавляется через Ajax-->
     <?php Modal::end(); ?>

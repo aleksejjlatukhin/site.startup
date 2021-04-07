@@ -33,7 +33,7 @@ class ConfirmProblemController extends AppUserPartController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
 
             $model = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
@@ -180,10 +180,11 @@ class ConfirmProblemController extends AppUserPartController
         ]);
     }
 
+
     /**
      * Проверка данных подтверждения на этапе разработки ГЦП
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionDataAvailabilityForNextStep($id)
     {
@@ -239,12 +240,14 @@ class ConfirmProblemController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
+
 
     /**
      * Завершение подтверждения ГПС и переход на следующий этап
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionMovingNextStage($id)
     {
@@ -286,11 +289,13 @@ class ConfirmProblemController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
+
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return bool|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -322,11 +327,13 @@ class ConfirmProblemController extends AppUserPartController
                 return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
             }
         }
+        return false;
     }
+
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return bool|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -351,6 +358,7 @@ class ConfirmProblemController extends AppUserPartController
             $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/gcp/index', 'id' => $model->id]);
         }
+        return false;
     }
 
 
@@ -422,7 +430,7 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -444,12 +452,13 @@ class ConfirmProblemController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdate ($id)
@@ -473,6 +482,7 @@ class ConfirmProblemController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -509,9 +519,8 @@ class ConfirmProblemController extends AppUserPartController
     }
 
     /**
-     * Метод для добавления новых вопросов
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionAddQuestion($id)
     {
@@ -546,12 +555,13 @@ class ConfirmProblemController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetQueryQuestions ($id)
@@ -565,12 +575,13 @@ class ConfirmProblemController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetQuestionUpdateForm ($id)
@@ -589,12 +600,13 @@ class ConfirmProblemController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdateQuestion ($id)
@@ -627,11 +639,12 @@ class ConfirmProblemController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -663,6 +676,7 @@ class ConfirmProblemController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
 
 

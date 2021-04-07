@@ -1,15 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-//use yii\grid\GridView;
-use kartik\grid\GridView;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\User;
-use yii\bootstrap\Modal;
-use yii\widgets\DetailView;
-use app\models\TypeOfActivityB2B;
-use app\models\TypeOfActivityB2C;
 use kartik\depdrop\DepDrop;
 use yii\helpers\ArrayHelper;
 use app\models\Segment;
@@ -215,7 +209,11 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                     </div>
                 </div>
 
-                <div class="col-md-1"></div>
+                <div class="col-md-1 text-right" style="padding-right: 5px;">
+                    <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/segment/mpdf-table-segments', 'id' => $project->id], [
+                        'target'=>'_blank', 'title'=> 'Экспорт в pdf',
+                    ]);?>
+                </div>
 
             </div>
 

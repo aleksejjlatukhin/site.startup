@@ -30,7 +30,7 @@ class InterviewController extends AppUserPartController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['view'])){
+        if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
 
             $model = Interview::findOne(Yii::$app->request->get());
             $segment = Segment::find()->where(['id' => $model->segment_id])->one();
@@ -173,7 +173,7 @@ class InterviewController extends AppUserPartController
     /**
      * Проверка данных подтверждения на этапе генерации ГПС
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionDataAvailabilityForNextStep($id)
     {
@@ -228,14 +228,13 @@ class InterviewController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
-
-
 
     /**
      * Завершение подтверждения сегмента и переход на следующий этап
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionMovingNextStage($id)
     {
@@ -278,11 +277,13 @@ class InterviewController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
+
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return bool|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -311,11 +312,12 @@ class InterviewController extends AppUserPartController
                 return $this->redirect(['/segment/index', 'id' => $project->id]);
             }
         }
+        return false;
     }
 
     /**
      * @param $id
-     * @return \yii\web\Response
+     * @return bool|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -338,6 +340,7 @@ class InterviewController extends AppUserPartController
             $segment->trigger(Segment::EVENT_CLICK_BUTTON_CONFIRM);
             return $this->redirect(['/generation-problem/index', 'id' => $id]);
         }
+        return false;
     }
 
 
@@ -393,7 +396,7 @@ class InterviewController extends AppUserPartController
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -415,6 +418,7 @@ class InterviewController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -447,10 +451,9 @@ class InterviewController extends AppUserPartController
         ]);
     }
 
-
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\base\ErrorException
@@ -479,13 +482,13 @@ class InterviewController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
-
 
     /**
      * Метод для добавления новых вопросов
      * @param $id
-     * @return array
+     * @return array|bool
      */
     public function actionAddQuestion($id)
     {
@@ -520,12 +523,13 @@ class InterviewController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetQueryQuestions ($id)
@@ -539,12 +543,12 @@ class InterviewController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
-
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetQuestionUpdateForm ($id)
@@ -563,12 +567,13 @@ class InterviewController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdateQuestion ($id)
@@ -601,11 +606,13 @@ class InterviewController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
+
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -636,6 +643,7 @@ class InterviewController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
 
 

@@ -28,7 +28,7 @@ class ProjectsController extends AppUserPartController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot'])){
+        if (in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot']) || in_array($action->id, ['mpdf-project'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
@@ -856,6 +856,59 @@ class ProjectsController extends AppUserPartController
             ]
         );
     }*/
+
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionMpdfProject($id) {
+
+        $model = Projects::findOne($id);
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('mpdf_project', ['project' => $model]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $filename = 'Презентация проекта «'.$model->project_name .'».pdf';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            //'orientation' => Pdf::ORIENT_LANDSCAPE,
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            'cssFile' => '@app/web/css/mpdf-hypothesis-style.css',
+            'marginFooter' => 5,
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => [$model->project_name],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Проект «'.$model->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
+    }
 
 
     /**

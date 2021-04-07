@@ -1,8 +1,18 @@
 <?php
 
 use app\models\Segment;
+use yii\helpers\Html;
 
 ?>
+
+<div class="block_export_link_hypothesis">
+    <?= Html::a('<div style="margin-top: -15px;">Исходные данные сегмента' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+        '/segment/mpdf-segment', 'id' => $segment->id], [
+        'class' => 'export_link_hypothesis',
+        'target' => '_blank',
+        'title' => 'Скачать в pdf',
+    ]); ?>
+</div>
 
 <div class="row container-fluid" style="color: #4F4F4F;">
 

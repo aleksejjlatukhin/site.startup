@@ -184,7 +184,11 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
             <div class="col-md-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
 
-            <div class="col-md-2"></div>
+            <div class="col-md-2 text-right" style="padding-right: 8px;">
+                <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/gcp/mpdf-table-gcps', 'id' => $confirmProblem->id], [
+                    'target'=>'_blank', 'title'=> 'Экспорт в pdf',
+                ]);?>
+            </div>
 
         </div>
 

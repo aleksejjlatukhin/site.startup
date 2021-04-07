@@ -9,6 +9,7 @@ use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
+use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Gcp;
 use yii\web\NotFoundHttpException;
@@ -57,7 +58,7 @@ class GcpController extends AppUserPartController
                 throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['index'])){
+        }elseif (in_array($action->id, ['index']) || in_array($action->id, ['mpdf-table-gcps'])){
 
             $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
             $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
@@ -78,7 +79,6 @@ class GcpController extends AppUserPartController
         }
 
     }
-
 
     /**
      * @param $id
@@ -125,7 +125,7 @@ class GcpController extends AppUserPartController
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -151,11 +151,12 @@ class GcpController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -180,12 +181,13 @@ class GcpController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetHypothesisToUpdate ($id)
@@ -202,6 +204,62 @@ class GcpController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionMpdfTableGcps ($id) {
+
+        $confirm_problem = ConfirmProblem::findOne($id);
+        $problem_description = mb_substr($confirm_problem->problem->description, 0, 50).'...';
+        $models = $confirm_problem->gcps;
+
+        // get your HTML raw content without any layouts or scripts
+        $content = $this->renderPartial('mpdf_table_gcps', ['models' => $models]);
+
+        $destination = Pdf::DEST_BROWSER;
+        //$destination = Pdf::DEST_DOWNLOAD;
+
+        $filename = 'ЦП для проблемы «'.$problem_description.'».pdf';
+
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            //'format' => Pdf::FORMAT_TABLOID,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_LANDSCAPE,
+            //'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => $destination,
+            'filename' => $filename,
+            'content' => $content,
+            'cssFile' => '@app/web/css/mpdf-index-table-hypothesis-style.css',
+            'marginFooter' => 5,
+            // call mPDF methods on the fly
+            'methods' => [
+                'SetTitle' => ['ЦП для проблемы «'.$problem_description.'»'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">ЦП для проблемы «'.$problem_description.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
+                //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
+                //'SetAuthor' => 'Kartik Visweswaran',
+                //'SetCreator' => 'Kartik Visweswaran',
+                //'SetKeywords' => 'Krajee, Yii2, Export, PDF, MPDF, Output, Privacy, Policy, yii2-mpdf',
+            ]
+        ]);
+
+        // return the pdf output as per the destination setting
+        return $pdf->render();
     }
 
 
