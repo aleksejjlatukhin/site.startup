@@ -8,7 +8,16 @@ use yii\helpers\Html;
 
     <div class="containerHeaderTableResultProject">
         <div class="headerTableResultProject">
-            <div class="text-center"><span>Проект:</span> <?= $project->project_name; ?></div>
+            <div class="text-center">
+
+                <?= Html::a('<div style="margin-top: -50px;">Проект: ' . $project->project_name . ' ' . Html::img('/images/icons/icon_export_light.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '5px']]) . '</div>', [
+                    '/projects/result-export', 'id' => $project->id], [
+                    'class' => 'export_link_hypothesis',
+                    'target' => '_blank',
+                    'title' => 'Скачать в pdf',
+                ]); ?>
+
+            </div>
         </div>
     </div>
 

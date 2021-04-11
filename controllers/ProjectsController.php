@@ -4,6 +4,9 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
+use app\models\Gcp;
+use app\models\GenerationProblem;
+use app\models\Mvp;
 use app\models\PreFiles;
 use app\models\ProjectSort;
 use app\models\Roadmap;
@@ -13,6 +16,7 @@ use app\models\User;
 use kartik\mpdf\Pdf;
 use Yii;
 use app\models\Projects;
+use yii\data\ArrayDataProvider;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -28,7 +32,7 @@ class ProjectsController extends AppUserPartController
     public function beforeAction($action)
     {
 
-        if (in_array($action->id, ['result']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot']) || in_array($action->id, ['mpdf-project'])){
+        if (in_array($action->id, ['result']) || in_array($action->id, ['result-export']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot']) || in_array($action->id, ['mpdf-project'])){
 
             $model = Projects::findOne(Yii::$app->request->get());
 
@@ -573,7 +577,7 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return string
      */
-    /*public function actionResultTest($id)
+    public function actionResultExport($id)
     {
 
         $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
@@ -594,7 +598,7 @@ class ProjectsController extends AppUserPartController
 
                         foreach ($gcps as $gcp) {
 
-                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps){
+                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps) {
 
                                 $mvps = Mvp::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
 
@@ -638,8 +642,9 @@ class ProjectsController extends AppUserPartController
                     }
                 }
 
-            }if ((empty($segment->interview) || empty($segment->problems))
-                || (empty($segment->interview) && empty($segment->problems))){
+            }
+            if ((empty($segment->interview) || empty($segment->problems))
+                || (empty($segment->interview) && empty($segment->problems))) {
 
                 $businessModel = new BusinessModel();
                 $businessModel->segment_id = $segment->id;
@@ -648,134 +653,100 @@ class ProjectsController extends AppUserPartController
         }
 
 
-
-
-        //Добавление номера сегмента
-        $j = 0;
+        //Добавление нумерации
+        $numberSegment = 0;
         foreach ($businessModels as $k => $businessModel) {
-            if ($businessModels[$k]->segment->id !== $businessModels[$k-1]->segment->id) {
-                $j++;
-                $businessModels[$k]->segment->name = $j . '. ' . $businessModels[$k]->segment->name;
-            }else {
-                $businessModels[$k]->segment->name = $businessModels[$k-1]->segment->name;
+
+            if ($businessModels[$k]->segment->id !== $businessModels[$k - 1]->segment->id) {
+                //Добавление номера сегмента
+                $numberSegment++;
+                $businessModels[$k]->segment->name = 'Сегмент ' . $numberSegment . ': ' . $businessModels[$k]->segment->name;
+
+                if ($businessModels[$k]->problem->title !== '' && $businessModels[$k]->problem) {
+                    //Добавление номера ГПС
+                    $numberProblem = explode('ГПС ', $businessModels[$k]->problem->title)[1];
+                    $businessModels[$k]->problem->title = 'ГПС ' . $numberSegment . '.' . $numberProblem;
+
+                    if ($businessModels[$k]->problem->gcps) {
+                        //Добавление номера ГПС
+                        $numberGcp = explode('ГЦП ', $businessModels[$k]->gcp->title)[1];
+                        $businessModels[$k]->gcp->title = 'ГЦП ' . $numberSegment . '.' . $numberProblem . '.' . $numberGcp;
+
+                        if ($businessModels[$k]->gcp->mvps) {
+                            //Добавление номера MVP
+                            $numberMvp = explode('MVP ', $businessModels[$k]->mvp->title)[1];
+                            $businessModels[$k]->mvp->title = 'MVP ' . $numberSegment . '.' . $numberProblem . '.' . $numberGcp . '.' . $numberMvp;
+                        }
+                    }
+                }
+
+            } else {
+                //Добавление номера сегмента
+                $businessModels[$k]->segment->name = $businessModels[$k - 1]->segment->name;
+
+                if ($businessModels[$k]->problem->title !== '' && $businessModels[$k]->problem) {
+                    //Добавление номера ГПС
+                    $numberProblem = explode('ГПС ', $businessModels[$k]->problem->title)[1];
+                    $businessModels[$k]->problem->title = 'ГПС ' . $numberSegment . '.' . $numberProblem;
+
+                    if ($businessModels[$k]->problem->gcps) {
+                        //Добавление номера ГПС
+                        $numberGcp = explode('ГЦП ', $businessModels[$k]->gcp->title)[1];
+                        $businessModels[$k]->gcp->title = 'ГЦП ' . $numberSegment . '.' . $numberProblem . '.' . $numberGcp;
+
+                        if ($businessModels[$k]->gcp->mvps) {
+                            //Добавление номера MVP
+                            $numberMvp = explode('MVP ', $businessModels[$k]->mvp->title)[1];
+                            $businessModels[$k]->mvp->title = 'MVP ' . $numberSegment . '.' . $numberProblem . '.' . $numberGcp . '.' . $numberMvp;
+                        }
+                    }
+                }
             }
         }
 
-
-        //Добавление номера ГПС
-        foreach ($businessModels as $k => $businessModel) {
-
-            if ($businessModels[$k]->problem->title !== '' && $businessModels[$k]->problem) {
-
-                $arrS = explode('. ' . $businessModels[$k]->problem->segment->name, $businessModels[$k]->segment->name);
-                $numberSegment = $arrS[0];
-
-                $arrP = explode('ГПС ', $businessModels[$k]->problem->title);
-                $numberProblem = $arrP[1];
-
-                $businessModels[$k]->problem->title = 'ГПС ' . $numberSegment . '.' . $numberProblem;
-            }
-        }
-
-
-        //Добавление номера ГЦП
+        // Отслеживаем совпадения в столбцах
         foreach ($businessModels as $k => $businessModel) {
 
             if ($businessModels[$k]->problem->gcps) {
 
-                $arrP = explode('ГПС ', $businessModels[$k]->problem->title);
-                $numberProblem = $arrP[1];
-
-                $arrG = explode('ГЦП ', $businessModels[$k]->gcp->title);
-                $numberGcp = $arrG[1];
-
-                $businessModels[$k]->gcp->title = 'ГЦП ' . $numberProblem . '.' . $numberGcp;
-            }
-        }
-
-
-        //Добавление номера сегмента ГMVP
-        foreach ($businessModels as $k => $businessModel) {
-
-            if ($businessModels[$k]->gcp->mvps) {
-
-                $arrP = explode('ГЦП ', $businessModels[$k]->gcp->title);
-                $numberGcp = $arrP[1];
-
-                $arrG = explode('ГMVP ', $businessModels[$k]->mvp->title);
-                $numberMvp = $arrG[1];
-
-                $businessModels[$k]->mvp->title = 'ГMVP ' . $numberGcp . '.' . $numberMvp;
-            }
-        }
-
-
-
-
-        foreach ($businessModels as $k => $businessModel) {
-
-            if ($businessModels[$k]->problem->gcps) {
-                $i = 0;
                 foreach ($businessModels[$k]->problem->gcps as $gcp) {
                     //Если id следующего ГЦП равно id предыдущего, то выполняем следующее
-                    if ($businessModels[$k+1]->gcp->id === $businessModels[$k]->gcp->id) {
+                    if ($businessModels[$k + 1]->gcp->id === $businessModels[$k]->gcp->id) {
 
-                        $i++;
-                        if ($i > 1) {
-                            $businessModels[$k+1]->gcp->title = '';
-                            $businessModels[$k+1]->gcp->created_at = null;
-                            $businessModels[$k+1]->gcp->time_confirm = null;
-                        }
+                        $businessModels[$k + 1]->gcp->title = '';
+                        $businessModels[$k + 1]->gcp->created_at = null;
+                        $businessModels[$k + 1]->gcp->time_confirm = null;
                     }
                 }
             }
 
             if ($businessModels[$k]->segment->problems) {
-                $i = 0;
+
                 foreach ($businessModels[$k]->segment->problems as $problem) {
                     //Если id следующего ГПС равно id предыдущего, то выполняем следующее
-                    if ($businessModels[$k+1]->problem->id === $businessModels[$k]->problem->id) {
+                    if ($businessModels[$k + 1]->problem->id === $businessModels[$k]->problem->id) {
 
-                        $i++;
-                        if ($i > 1) {
-                            $businessModels[$k+1]->problem->title = '';
-                            $businessModels[$k+1]->problem->created_at = null;
-                            $businessModels[$k+1]->problem->time_confirm = null;
-                        }
+                        $businessModels[$k + 1]->problem->title = '';
+                        $businessModels[$k + 1]->problem->created_at = null;
+                        $businessModels[$k + 1]->problem->time_confirm = null;
                     }
                 }
             }
         }
 
 
-
-        //debug($businessModels);
-
-//        foreach ($mvps as $mvp) {
-//            //debug($mvp->valueProposition->exist_confirm);
-//        }
-
-        $dataProvider = new ArrayDataProvider([
-            'allModels' => $businessModels,
-            //'pagination' => [
-                //'pageSize' => 100,
-            //],
-            'pagination' => false,
-            'sort' => false,
-        ]);
-
-
         $project = Projects::findOne($id);
         $project_filename = str_replace(' ', '_', $project->project_name);
+        $dataProvider = new ArrayDataProvider(['allModels' => $businessModels, 'pagination' => false, 'sort' => false]);
 
-        return $this->render('result-test', [
+
+        return $this->render('result-export',[
             'dataProvider' => $dataProvider,
             'project' => $project,
             'project_filename' => $project_filename,
-            ]
-        );
+        ]);
 
-    }*/
+    }
 
 
     /**
