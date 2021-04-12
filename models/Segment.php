@@ -93,7 +93,7 @@ class Segment extends \yii\db\ActiveRecord
             [['quantity_from', 'quantity_to'], 'integer'],
             [['market_volume'], 'integer'],
             [['add_info'], 'string'],
-            [['name',], 'string', 'min' => 6, 'max' => 65],
+            [['name',], 'string', 'min' => 2, 'max' => 65],
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
             [['field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'string', 'max' => 255],
         ];
