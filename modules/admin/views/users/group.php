@@ -1,162 +1,209 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\helpers\Url;
 use app\models\User;
 
-
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Админка | Пользователи';
+$this->title = 'Пользователи | Трекер «'.$admin->second_name.' '.$admin->first_name.' '.$admin->middle_name.'»';
+$this->registerCssFile('@web/css/users-index-style.css');
 ?>
 
 
-    <div class="users-index">
+<div class="users-index">
 
-        <h3><?= $this->title; ?></h3>
+    <h3 style="margin: 30px 0 0 0;"><?= $this->title; ?></h3>
 
+    <div class="container-fluid">
 
+        <div class="row" style="display:flex; align-items: center; padding: 30px 0 15px 0; font-weight: 700;">
 
-        <br>
+            <div class="col-md-3" style="padding-left: 30px;">
+                Фамилия, имя, отчество
+            </div>
 
-        <?= GridView::widget([
-            'dataProvider' => $dataProvider,
-            'options' => ['width' => '70'],
-            //'summary' => false,
-            'columns' => [
+            <div class="col-md-3 text-center">
+                Проекты
+            </div>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">№</div>',
-                    'class' => 'yii\grid\SerialColumn',
-                    'options' => ['width' => '20'],
-                    'contentOptions' => ['style' => ['padding' => '20px 10px', 'font-size' => '13px', 'font-weight' => '700']],
-                ],
+            <div class="col-md-2 text-center">
+                Статус
+            </div>
 
-                /*[
-                    'attribute' => 'id',
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">ID</div>',
-                    'value' => function ($data){
-                        return '<div class="nr" style="padding-top: 10px;">'. $data->id .'</div>';
-                    },
-                    'format' => 'raw',
-                    'enableSorting' => false,
-                ],*/
+            <div class="col-md-2 text-center">
+                E-mail, телефон
+            </div>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Фото</div>',
-                    'attribute' => 'avatar_image',
-                    'label' => 'Фото',
-                    'value' => function($data){
-                        return Html::img('@web' . $data->avatar_image, ['alt' => 'Аватарка', 'style' => ['width' => '35px', 'height' => '35px']]);
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '45'],
-                    'enableSorting' => false,
-                ],*/
+            <div class="col-md-1 text-center">
+                Дата измен.
+            </div>
 
+            <div class="col-md-1 text-center">
+                Дата регистр.
+            </div>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">ФИО</div>',
-                    'attribute' => 'fio',
-                    'label' => 'ФИО',
-                    'value' => function ($data) {
-                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/profile/index', 'id' => $data->id])) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '450'],
-                    'enableSorting' => false,
-                ],
+        </div>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Логин</div>',
-                    'attribute' => 'username',
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px;">' . $data->username . '</div>';
-                    },
-                    'format' => 'html',
-                    'enableSorting' => false,
-                    'options' => ['width' => '110'],
-                ],*/
+        <div class="row block_all_users">
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Электронная почта</div>',
-                    'attribute' => 'email',
-                    'label' => 'Электронная почта',
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px;">' . $data->email . '</div>';
-                    },
-                    'format' => 'html',
-                    'enableSorting' => false,
-                    'options' => ['width' => '200'],
-                ],*/
+            <?php foreach ($users as $user) : ?>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Телефон</div>',
-                    'attribute' => 'telephone',
-                    'value' => function($data){
-                        if(!empty($data->telephone)){
-                            return '<div style="text-align: center; padding-top: 10px;">' . $data->telephone . '</div>';
-                        }
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '140'],
-                    'enableSorting' => false,
-                ],*/
+                <div class="row container-one_user user_container_number-<?=$user->id;?>">
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Статус</div>',
-                    'attribute' => 'status',
-                    'value' => function($data) use ($form){
+                    <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $user->id;?>">
 
-                        $string = '';
+                        <!--Проверка существования аватарки-->
+                        <?php if ($user->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
 
-                        if ($data->status === User::STATUS_DELETED){
-                            $string = '<div style="color: red;text-align: center;">Заблокирован</div>';
-                        }elseif ($data->status === User::STATUS_NOT_ACTIVE){
-                            $string = '<div style="color: blue;text-align: center;">Не активирован</div>';
-                        }elseif ($data->status === User::STATUS_ACTIVE){
-                            $string = '<div style="color: green;text-align: center;">Активирован</div>';
-                        }
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($user->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
 
+                        <div class="block-fio-and-date-last-visit">
+                            <div class="block-fio"><?= $user->second_name.' '.$user->first_name.' '.$user->middle_name; ?></div>
+                            <div class="block-date-last-visit">
+                                <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
+                                    Пользователь был в сети <?= $user->checkOnline;?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
-                        return '<div style="padding-top: 10px; font-weight: 700; font-size: 13px;">' . $string . '</div>';
-                    },
-                    'format' => 'raw',
-                    'options' => ['width' => '220'],
-                    'enableSorting' => false,
-                ],
+                    </div>
 
+                    <div class="col-md-3 column-tracker">
 
-                [
-                    'header' => '<div style="text-align: center; height: 40px;line-height: 40px;">Последнее изменение</div>',
-                    'attribute' => 'updated_at',
-                    //'format' => ['date', 'dd.MM.yyyy'],
-                    'value' => function($data){
-                        return '<div class="date_update_'. $data->id .'" style="text-align: center; padding-top: 10px; font-size: 13px; font-weight: 700;">' . date('d.m.yy', $data->updated_at) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '220'],
-                    'enableSorting' => false,
-                ],
+                        <?= Html::a( 'Проекты - '.count($user->projects), Url::to(['/projects/index', 'id' => $user->id]),[
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#E0E0E0',
+                                'width' => '180px',
+                                'height' => '40px',
+                                'font-size' => '18px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-default',
+                        ]);?>
 
-                [
-                    'header' => '<div style="text-align: center; height: 40px;line-height: 40px;">Дата регистрации</div>',
-                    'attribute' => 'created_at',
-                    //'format' => ['date', 'dd.MM.yyyy'],
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px; font-size: 13px; font-weight: 700;">' . date('d.m.yy', $data->created_at) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '220'],
-                    'enableSorting' => false,
-                ],
+                    </div>
 
-            ],
-        ]); ?>
+                    <div class="col-md-2 column-user-status">
+
+                        <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
+
+                            <?php if ($user->status === User::STATUS_DELETED) : ?>
+
+                                <?= Html::submitButton('Заблокирован', [
+                                    'class' => 'btn btn-lg btn-danger open_change_status_modal',
+                                    'id' => 'open_change_status_modal-'.$user->id,
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'background' => '#d9534f',
+                                        'width' => '180px',
+                                        'height' => '40px',
+                                        'font-size' => '18px',
+                                        'border-radius' => '8px',
+                                    ],
+                                ]);?>
+
+                            <?php elseif ($user->status === User::STATUS_NOT_ACTIVE) : ?>
+
+                                <?= Html::submitButton('Не активирован', [
+                                    'class' => 'btn btn-lg btn-default open_change_status_modal',
+                                    'id' => 'open_change_status_modal-'.$user->id,
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'background' => '#FFFFFF',
+                                        'width' => '180px',
+                                        'height' => '40px',
+                                        'font-size' => '18px',
+                                        'border-radius' => '8px',
+                                    ],
+                                ]);?>
+
+                            <?php elseif ($user->status === User::STATUS_ACTIVE) : ?>
+
+                                <?= Html::submitButton('Активирован', [
+                                    'class' => 'btn btn-lg btn-success open_change_status_modal',
+                                    'id' => 'open_change_status_modal-'.$user->id,
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'background' => '#52BE7F',
+                                        'width' => '180px',
+                                        'height' => '40px',
+                                        'font-size' => '18px',
+                                        'border-radius' => '8px',
+                                    ],
+                                ]);?>
+
+                            <?php endif; ?>
+
+                        <?php else : ?>
+
+                            <?php if ($user->status === User::STATUS_DELETED) : ?>
+
+                                <h4 class="text-danger">Заблокирован</h4>
+
+                            <?php elseif ($user->status === User::STATUS_NOT_ACTIVE) : ?>
+
+                                <h4 class="text-primary">Не активирован</h4>
+
+                            <?php elseif ($user->status === User::STATUS_ACTIVE) : ?>
+
+                                <h4 class="text-success">Активирован</h4>
+
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="col-md-2 text-center">
+                        <div class=""><?= $user->email; ?></div>
+                        <div class=""><?= $user->telephone; ?></div>
+                    </div>
+
+                    <div class="col-md-1 text-center">
+                        <?= date('d.m.Y', $user->updated_at); ?>
+                    </div>
+
+                    <div class="col-md-1 text-center">
+                        <?= date('d.m.Y', $user->created_at); ?>
+                    </div>
+
+                </div>
+
+            <?php endforeach; ?>
+
+            <div class="pagination-users">
+                <?= \yii\widgets\LinkPager::widget([
+                    'pagination' => $pages,
+                    'activePageCssClass' => 'pagination_active_page',
+                    'options' => ['class' => 'pagination-users-list'],
+                ]); ?>
+            </div>
+
+        </div>
 
     </div>
+
+</div>
+
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/users_index_main_admin.js'); ?>
 
 
 

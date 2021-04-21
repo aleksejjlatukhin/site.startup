@@ -17,9 +17,7 @@ $this->title = 'Подтверждение регистрации';
 
         <div class="content_main_page">
 
-
             <?php if (Yii::$app->user->isGuest) : ?>
-
 
                 <div class="row style_form_login">
 
@@ -28,7 +26,6 @@ $this->title = 'Подтверждение регистрации';
                     <div class="col-md-12 text-center" style=" margin: 0 0 15px 0;">Ссылка подтверждения регистрации была просрочена или изменена.</div>
 
                     <div class="col-md-12 text-center" style=" margin: 0 0 15px 0;">Заполните форму и получите новое письмо для подтверждения.</div>
-
 
                     <?php $form = ActiveForm::begin([
                         'id' => 'login_user_form',
@@ -219,152 +216,9 @@ $this->title = 'Подтверждение регистрации';
                 </div>
 
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-
-<?php
-
-
-$script = "
-
-    //Вернуться к форме входа
-    $('body').on('click', '#go_back_login_form', function(){
-        $('.style_error_not_user').hide();
-        $('.style_form_login').show();
-    });
-    
-    //Вернуться к форме входа
-    $('body').on('click', '#go_to_back_login_form', function(){
-        $('.style_go_password_recovery_for_email').hide();
-        $('.style_form_login').show();
-    });
-    
-    //Вернуться к форме входа
-    $('body').on('click', '#go2_to_back_login_form', function(){
-        $('.style_answer_for_password_recovery').hide();
-        $('.style_form_login').show();
-    });
-    
-    //Вернуться к форме входа
-    $('body').on('click', '#go3_to_back_login_form', function(){
-        $('.style_form_singup').hide();
-        $('.content_main_page_block_text').show();
-        $('.style_form_login').show();
-    })
-    
-    //Вернуться к форме входа
-    $('body').on('click', '#go4_to_back_login_form', function(){
-        $('.style_error_not_confirm_singup').hide();
-        $('.style_form_login').show();
-    })
-    
-    
-    //Перейти к отправке почты для восстановления пароля
-    $('body').on('click', '#go_password_recovery_for_email', function(){
-        $('.style_error_not_user').hide();
-        $('.style_go_password_recovery_for_email').show();
-    });
-    
-    //Вернуться к отправке почты для восстановления пароля
-    $('body').on('click', '#go_back_password_recovery_for_email', function(){
-        $('.style_answer_for_password_recovery').hide();
-        $('.style_go_password_recovery_for_email').show();
-    });
-
-    //Отправка формы для входа пользователя
-    $('body').on('beforeSubmit', '#login_user_form', function(e){
-    
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
-        
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
-                
-                if(response['error_not_user']) {
-                    $('.style_form_login').hide();
-                    $('.style_error_not_user').show();
-                }
-                
-                if(response['error_not_confirm_singup']) {
-                    $('.style_form_login').hide();
-                    $('.style_error_not_confirm_singup').find('.ajax-message').html('');
-                    $('.style_error_not_confirm_singup').find('.ajax-message').html(response['message']);
-                    $('.style_error_not_confirm_singup').show();
-                }
-                
-                if(response['user_success']) {
-                    location.reload();
-                }
-                
-                if(response['admin_success']) {
-                    window.location.href = \"/admin\";
-                }
-                
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-    
-        e.preventDefault();
-
-        return false;
-    });
-    
-    
-    //Отправка формы для получения письма на почту для сены пароля
-    $('body').on('beforeSubmit', '#form_send_email', function(e){
-    
-        var data = $(this).serialize();
-        var url = $(this).attr('action');
-        
-        $.ajax({
-        
-            url: url,
-            method: 'POST',
-            data: data,
-            cache: false,
-            success: function(response){
-                
-                if(response['success']) {
-                   
-                    $('.style_go_password_recovery_for_email').hide();
-                    $('.style_answer_for_password_recovery').find('.title').html(response['message']['title']);
-                    $('.style_answer_for_password_recovery').find('.text').html(response['message']['text']);
-                    $('.style_answer_for_password_recovery').show();
-                }
-                
-                if(response['error']) {
-                   
-                    $('.style_go_password_recovery_for_email').hide();
-                    $('.style_answer_for_password_recovery').find('.title').html(response['message']['title']);
-                    $('.style_answer_for_password_recovery').find('.text').html(response['message']['text']);
-                    $('.style_answer_for_password_recovery').find('.link_back').find('a').attr('id', 'go_back_password_recovery_for_email');
-                    $('.style_answer_for_password_recovery').show();
-                }
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-    
-        e.preventDefault();
-
-        return false;
-    });
-    
-";
-$position = \yii\web\View::POS_READY;
-$this->registerJs($script, $position);
-
-?>
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/site_activate_account.js'); ?>

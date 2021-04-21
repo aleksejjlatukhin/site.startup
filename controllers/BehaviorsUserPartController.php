@@ -7,10 +7,8 @@ use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 
-
 class BehaviorsUserPartController extends AppController
 {
-    /*public $layout = '@app/modules/admin/views/layouts/main';*/
 
     public function beforeAction($action)
     {
@@ -44,7 +42,7 @@ class BehaviorsUserPartController extends AppController
                     [
                         'allow' => true,
                         'controllers' => ['site'],
-                        'actions' => ['singup', 'error', 'login', 'index', 'about', 'send-email', 'reset-password', 'activate-account'],
+                        'actions' => ['singup', 'error', 'login', 'index', 'about', 'send-email', 'reset-password', 'activate-account', 'confidentiality-policy'],
                         'verbs' => ['GET', 'POST'],
                         'roles' => ['?']
                     ],

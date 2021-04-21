@@ -5,6 +5,7 @@ namespace app\models;
 use app\modules\admin\models\ConversationMainAdmin;
 use app\modules\admin\models\MessageMainAdmin;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
 use Yii;
@@ -14,6 +15,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_NOT_ACTIVE = 1;
     const STATUS_ACTIVE = 10;
+    const STATUS_REMOVE = 200;
 
     const ROLE_USER = 10;
     const ROLE_ADMIN = 20;
@@ -252,6 +254,15 @@ class User extends ActiveRecord implements IdentityInterface
     public function getMainAdmin ()
     {
         return User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+    }
+
+    //Получить объект Админа
+    public function getAdmin ()
+    {
+        if ($this->role === self::ROLE_USER) {
+            return $this->hasOne(self::class, ['id' => 'id_admin']);
+        }
+        return false;
     }
 
 
@@ -545,5 +556,59 @@ class User extends ActiveRecord implements IdentityInterface
         } else {
             return false;
         }
+    }
+
+
+    /**
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
+    public function removeAllDataUser ()
+    {
+        // Удаление проектов
+        if ($projects = $this->projects){
+            foreach ($projects as $project) {
+                $project->deleteStage();
+            }
+        }
+
+        if ($this->role === self::ROLE_USER) {
+            // Удаление беседы и сообщений с админом
+            if ($conversation_admin = ConversationAdmin::findOne(['user_id' => $this->id])) {
+                MessageAdmin::deleteAll(['conversation_id' => $conversation_admin->id]);
+                $conversation_admin->delete();
+            }
+        }
+        elseif ($this->role === self::ROLE_ADMIN) {
+            // Удаление беседы и сообщений с главным админом
+            if ($conversations_main_admin = ConversationMainAdmin::findOne(['admin_id' => $this->id])) {
+                MessageMainAdmin::deleteAll(['conversation_id' => $conversations_main_admin->id]);
+                $conversations_main_admin->delete();
+            }
+        }
+
+        // Удаление беседы и сообщений с тех.поддержкой
+        if ($conversation_dev = ConversationDevelopment::findOne(['user_id' => $this->id])) {
+            MessageDevelopment::deleteAll(['conversation_id' => $conversation_dev->id]);
+            $conversation_dev->delete();
+        }
+
+        // Удаление проверки на онлайн
+        $checkingOnline = $this->checkingOnline;
+        if ($checkingOnline) $checkingOnline->delete();
+
+        // Удаление директории пользователя
+        $projectPathDelete = UPLOAD.'/user-'.$this->id;
+        if (file_exists($projectPathDelete)) FileHelper::removeDirectory($projectPathDelete);
+
+        // Удаление кэша для форм пользователя
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->id;
+        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+        // Удаление пользователя
+        $this->delete();
+
+        return true;
     }
 }

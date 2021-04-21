@@ -71,7 +71,7 @@ class SingupForm extends Model
             'password' => 'Пароль',
             'rememberMe' => 'Запомнить',
             'role' => 'Проектная роль пользователя',
-            'exist_agree' => 'Я принимаю пользовательское соглашение'
+            'exist_agree' => ''
         ];
     }
 

@@ -1,567 +1,235 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 use app\models\User;
-use yii\bootstrap\Modal;
-use yii\helpers\ArrayHelper;
 
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Админка | Пользователи';
+$this->title = 'Пользователи';
+$this->registerCssFile('@web/css/users-index-style.css');
 ?>
 
+<div class="users-index">
 
-    <div class="users-index">
+    <div class="switches-between-users" style="display: flex; margin: 30px 0 0 0;">
 
-        <h3><?= $this->title; ?></h3>
+        <?= Html::button( 'Проектанты', [
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#52BE7F',
+                'width' => '180px',
+                'height' => '40px',
+                'font-size' => '24px',
+                'border-radius' => '8px 0 0 8px',
+            ],
+            'class' => 'btn btn-lg btn-success',
+        ]);?>
 
-        <div class="">
-            <?= Html::a('Проектанты',Url::to(['/admin/users/index']), ['class' => 'btn btn-success'])?>
-            <?= Html::a('Администраторы',Url::to(['/admin/users/admins']), ['class' => 'btn btn-default'])?>
+        <?= Html::a( 'Трекеры', Url::to(['/admin/users/admins']),[
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#E0E0E0',
+                'width' => '180px',
+                'height' => '40px',
+                'font-size' => '24px',
+                'border-radius' => '0 8px 8px 0',
+            ],
+            'class' => 'btn btn-lg btn-default',
+        ]);?>
+
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row" style="display:flex; align-items: center; padding: 30px 0 15px 0; font-weight: 700;">
+
+            <div class="col-md-3" style="padding-left: 30px;">
+                Фамилия, имя, отчество
+            </div>
+
+            <div class="col-md-3 text-center">
+                Трекер
+            </div>
+
+            <div class="col-md-2 text-center">
+                Статус
+            </div>
+
+            <div class="col-md-2 text-center">
+                E-mail, телефон
+            </div>
+
+            <div class="col-md-1 text-center">
+                Дата измен.
+            </div>
+
+            <div class="col-md-1 text-center">
+                Дата регистр.
+            </div>
+
         </div>
 
-        <br>
+        <div class="row block_all_users">
 
-        <?= GridView::widget([
-            'dataProvider' => $dataProvider,
-            'options' => ['width' => '70'],
-            //'summary' => false,
-            'columns' => [
+            <?php foreach ($users as $user) : ?>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">№</div>',
-                    'class' => 'yii\grid\SerialColumn',
-                    'options' => ['width' => '20'],
-                    'contentOptions' => ['style' => ['padding' => '20px 10px', 'font-size' => '13px', 'font-weight' => '700']],
-                ],
+                <div class="row container-one_user user_container_number-<?=$user->id;?>">
 
-                /*[
-                    'attribute' => 'id',
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">ID</div>',
-                    'value' => function ($data){
-                        return '<div class="nr" style="padding-top: 10px;">'. $data->id .'</div>';
-                    },
-                    'format' => 'raw',
-                    'enableSorting' => false,
-                ],*/
+                    <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $user->id;?>">
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Фото</div>',
-                    'attribute' => 'avatar_image',
-                    'label' => 'Фото',
-                    'value' => function($data){
-                        return Html::img('@web' . $data->avatar_image, ['alt' => 'Аватарка', 'style' => ['width' => '35px', 'height' => '35px']]);
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '45'],
-                    'enableSorting' => false,
-                ],*/
+                        <!--Проверка существования аватарки-->
+                        <?php if ($user->avatar_image) : ?>
+                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php else : ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                        <?php endif; ?>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">ФИО</div>',
-                    'attribute' => 'fio',
-                    'label' => 'ФИО',
-                    'value' => function ($data) {
-                        return '<div style="padding: 10px 0; text-align: center; font-weight: 700;">' . Html::a($data->second_name . ' ' . $data->first_name . ' ' . $data->middle_name, Url::to(['/profile/index', 'id' => $data->id])) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '350'],
-                    'enableSorting' => false,
-                ],
+                        <!--Проверка онлайн статуса-->
+                        <?php if ($user->checkOnline === true) : ?>
+                            <div class="checkStatusOnlineUser active"></div>
+                        <?php else : ?>
+                            <div class="checkStatusOnlineUser"></div>
+                        <?php endif; ?>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Логин</div>',
-                    'attribute' => 'username',
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px;">' . $data->username . '</div>';
-                    },
-                    'format' => 'html',
-                    'enableSorting' => false,
-                    'options' => ['width' => '110'],
-                ],*/
+                        <div class="block-fio-and-date-last-visit">
+                            <div class="block-fio"><?= $user->second_name.' '.$user->first_name.' '.$user->middle_name; ?></div>
+                            <div class="block-date-last-visit">
+                                <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
+                                    Пользователь был в сети <?= $user->checkOnline;?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Электронная почта</div>',
-                    'attribute' => 'email',
-                    'label' => 'Электронная почта',
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px;">' . $data->email . '</div>';
-                    },
-                    'format' => 'html',
-                    'enableSorting' => false,
-                    'options' => ['width' => '200'],
-                ],*/
+                    </div>
 
-                /*[
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Телефон</div>',
-                    'attribute' => 'telephone',
-                    'value' => function($data){
-                        if(!empty($data->telephone)){
-                            return '<div style="text-align: center; padding-top: 10px;">' . $data->telephone . '</div>';
-                        }
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '140'],
-                    'enableSorting' => false,
-                ],*/
+                    <div class="col-md-3 column-tracker">
 
+                        <?php if ($admin = $user->admin) : ?>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Администратор</div>',
-                    'attribute' => 'id_admin',
-                    'value' => function ($data){
-                        if ($data->id_admin === null) {
+                            <?= Html::submitButton($admin->second_name.' '.mb_substr($admin->first_name, 0, 1).'.'.mb_substr($admin->middle_name, 0, 1).'.', [
+                                'class' => 'btn btn-lg btn-success open_add_admin_modal',
+                                'id' => 'open_add_admin_modal-'.$user->id,
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#52BE7F',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]);?>
 
-                            return '<div style="margin: 5px;padding: 0; text-align: center;">
+                        <?php else : ?>
 
-                                        '. Html::submitButton("<div id='adm_modal_".$data->id."' style='font-weight: 700;'>Не установлен</div>", [
-                                    "class" => "btn btn-sm btn-default",
-                                    "id" => "sub_adm_modal_$data->id",
-                                    "data-toggle" => "modal",
-                                    "data-target" => "#admin_modal_" . $data->id,
-                                    "style" => ["width" => "170px"],
-                                ]) .'
-                                        
-                                    </div>';
+                            <?= Html::submitButton('Не установлен', [
+                                'class' => 'btn btn-lg btn-default open_add_admin_modal',
+                                'id' => 'open_add_admin_modal-'.$user->id,
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#FFFFFF',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]);?>
 
-                        }else {
+                        <?php endif; ?>
 
-                            $admin = User::findOne([
-                                'id' => $data->id_admin,
-                            ]);
+                    </div>
 
-                            return '<div style="margin: 5px;padding: 0; text-align: center;">
+                    <div class="col-md-2 column-user-status">
 
-                                        '. Html::submitButton('<div id="adm_modal_'.$data->id.'" style="font-weight: 700;">' . $admin->second_name . ' ' . mb_substr($admin->first_name, 0,1) . '.' . mb_substr($admin->middle_name, 0,1) . '.</div>' , [
-                                    "class" => "btn btn-sm btn-success",
-                                    "id" => "sub_adm_modal_$data->id",
-                                    "data-toggle" => "modal",
-                                    "data-target" => "#admin_modal_" . $data->id,
-                                    "style" => ["width" => "170px"],
-                                ]) .'
-                                        
-                                    </div>';
-                        }
-                    },
-                    'format' => 'raw',
-                    'options' => ['width' => '190'],
-                    'enableSorting' => false,
-                ],
+                        <?php if ($user->status === User::STATUS_DELETED) : ?>
 
+                            <?= Html::submitButton('Заблокирован', [
+                                'class' => 'btn btn-lg btn-danger open_change_status_modal',
+                                'id' => 'open_change_status_modal-'.$user->id,
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#d9534f',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]);?>
 
-                [
-                    'header' => '<div style="text-align: center;height: 40px;line-height: 40px;">Статус</div>',
-                    'attribute' => 'status',
-                    'value' => function($data) use ($form) {
+                        <?php elseif ($user->status === User::STATUS_NOT_ACTIVE) : ?>
 
-                        if ($data->status === User::STATUS_DELETED) {
+                            <?= Html::submitButton('Не активирован', [
+                                'class' => 'btn btn-lg btn-default open_change_status_modal',
+                                'id' => 'open_change_status_modal-'.$user->id,
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#FFFFFF',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]);?>
 
-                            $string = '<div class="use-status">Заблокирован</div>';
+                        <?php elseif ($user->status === User::STATUS_ACTIVE) : ?>
 
-                            return '<div class="navbar-form navbar-inner" style="margin: 5px;padding: 0;text-align: center;">
-                                        <button style="width: 170px; font-weight: 700;"
-                                                id="btn_' . $data->id . '" 
-                                                class="btn btn-sm btn-danger"
-                                                data-container="body"
-                                                data-toggle="popover"
-                                                data-trigger="focus"
-                                                data-placement="bottom"
-                                                data-title="Изменить статус"
-                                                data-content="
-                                                        <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'active']) . ' >Активировать</a></p>
-                                                    ">
-                                            <span id="string_' . $data->id . '" >' . $string . '</span>
-                                        </button>
-                                    </div>';
+                            <?= Html::submitButton('Активирован', [
+                                'class' => 'btn btn-lg btn-success open_change_status_modal',
+                                'id' => 'open_change_status_modal-'.$user->id,
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#52BE7F',
+                                    'width' => '180px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ],
+                            ]);?>
 
-                        } elseif ($data->status === User::STATUS_NOT_ACTIVE) {
+                        <?php endif; ?>
 
-                            if ($data->id_admin !== null) {
+                    </div>
 
-                                $string = '<div class="use-status">Не активирован</div>';
+                    <div class="col-md-2 text-center">
+                        <div class=""><?= $user->email; ?></div>
+                        <div class=""><?= $user->telephone; ?></div>
+                    </div>
 
-                                return '<div class="navbar-form navbar-inner" style="margin: 5px;padding: 0;text-align: center;">
-                                        <button style="width: 170px; font-weight: 700;"
-                                                id="btn_' . $data->id . '"
-                                                class="btn btn-sm btn-primary"
-                                                data-container="body"
-                                                data-toggle="popover"
-                                                data-trigger="focus"
-                                                data-placement="bottom"
-                                                data-title="Изменить статус"
-                                                data-content="
-                                                        <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'active']) . ' >Активировать</a></p>
-                                                        <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'delete']) . ' >Заблокировать</a></p>
-                                                    ">
-                                            <span id="string_' . $data->id . '" >' . $string . '</span>
-                                        </button>
-                                    </div>';
-                            }else {
+                    <div class="col-md-1 text-center">
+                        <?= date('d.m.Y', $user->updated_at); ?>
+                    </div>
 
-                                $string = '<div class="use-status">Не активирован</div>';
+                    <div class="col-md-1 text-center">
+                        <?= date('d.m.Y', $user->created_at); ?>
+                    </div>
 
-                                return '<div class="navbar-form navbar-inner" data-toggle="modal" data-target="#not-admin-for-user_' . $data->id . '" id="not-admin-user_' . $data->id . '" style="margin: 5px;padding: 0;text-align: center;">
-                                        <button class="btn btn-sm btn-primary" style="width: 170px; font-weight: 700;">
-                                        <div class="use-status">Не активирован</div></button></div>' .
+                </div>
 
-                                        '<div class="navbar-form navbar-inner" id="not-admin_' . $data->id . '" style="margin: 5px;padding: 0;text-align: center; display: none;">
-                                            <button style="width: 170px; font-weight: 700;"
-                                                    id="btn_' . $data->id . '"
-                                                    class="btn btn-sm btn-primary"
-                                                    data-container="body"
-                                                    data-toggle="popover"
-                                                    data-trigger="focus"
-                                                    data-placement="bottom"
-                                                    data-title="Изменить статус"
-                                                    data-content="
-                                                            <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'active']) . ' >Активировать</a></p>
-                                                            <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'delete']) . ' >Заблокировать</a></p>
-                                                        ">
-                                                <span id="string_' . $data->id . '" >' . $string . '</span>
-                                            </button>
-                                        </div>';
-                            }
-                        } elseif ($data->status === User::STATUS_ACTIVE) {
+            <?php endforeach; ?>
 
-                            $string = '<div class="use-status">Активирован</div>';
+            <div class="pagination-users">
+                <?= \yii\widgets\LinkPager::widget([
+                    'pagination' => $pages,
+                    'activePageCssClass' => 'pagination_active_page',
+                    'options' => ['class' => 'pagination-users-list'],
+                ]); ?>
+            </div>
 
-                            return '<div class="navbar-form navbar-inner" style="margin: 5px;padding: 0;text-align: center;">
-                                        <button style="width: 170px; font-weight: 700;"
-                                                id="btn_' . $data->id . '"
-                                                class="btn btn-sm btn-success"
-                                                data-container="body"
-                                                data-toggle="popover"
-                                                data-trigger="focus"
-                                                data-placement="bottom"
-                                                data-title="Изменить статус"
-                                                data-content="
-                                                        <p><a class=\'update\' href=' . Url::to(['/admin/users/status-update', 'id' => $data->id, 'status' => 'delete']) . '>Заблокировать</a></p>
-                                                    ">
-                                            <span id="string_' . $data->id . '" >' . $string . '</span>
-                                        </button>
-                                    </div>';
-                        }
-
-                    },
-                    'format' => 'raw',
-                    'options' => ['width' => '190'],
-                    'enableSorting' => false,
-                ],
-
-
-                [
-                    'header' => '<div style="text-align: center; ">Последнее изменение</div>',
-                    'attribute' => 'updated_at',
-                    //'format' => ['date', 'dd.MM.yyyy'],
-                    'value' => function($data){
-                        return '<div class="date_update_'. $data->id .'" style="text-align: center; padding-top: 10px; font-size: 13px; font-weight: 700;">' . date('d.m.yy', $data->updated_at) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '110'],
-                    'enableSorting' => false,
-                ],
-
-                [
-                    'header' => '<div style="text-align: center;">Дата регистрации</div>',
-                    'attribute' => 'created_at',
-                    //'format' => ['date', 'dd.MM.yyyy'],
-                    'value' => function($data){
-                        return '<div style="text-align: center; padding-top: 10px; font-size: 13px; font-weight: 700;">' . date('d.m.yy', $data->created_at) . '</div>';
-                    },
-                    'format' => 'html',
-                    'options' => ['width' => '110'],
-                    'enableSorting' => false,
-                ],
-
-            ],
-        ]); ?>
-
+        </div>
     </div>
+</div>
 
-
-<?php
-
-$script = '
-    //$(".use-status").click(function () {
-        //var id = $(this).closest("tr").find(".nr").text();
-        //alert(id);
-    //});
-    
-    //Всплывающие  блоки
-    $(\'[data-toggle="popover"]\').popover({html:true});
-    
-    $("body").on("click", "a.update", function(event) {
-        event.preventDefault();
-        var url = $(this).attr("href");
-        var data = $(this).serialize();
-
-        $.ajax({
-        
-            url: url,
-            method: "GET",
-            data: data,
-            success: function(response){
-                
-                var dateUpdate = ".date_update_" + response.id;
-                var date = new Date().toLocaleDateString();
-                $(dateUpdate).html(date);
-                
-                
-                //alert(response.status);
-                var btnID = "#btn_" + response.id;
-                var str = "#string_" + response.id;
-                
-                if (response.status === 10){
-                
-                    var str_href = "";
-                    str_href += "<\p><\a class=\"update\" href=\"/admin/users/status-update?id=";
-                    str_href += response.id;
-                    str_href += "&status=delete\">Заблокировать<\/a><\p>";
-                
-                    $(btnID).attr("data-content", str_href);
-                    $(btnID).attr("class", "btn btn-sm btn-success")
-                    $(str).html("<\div class=\"use-status\" >Активирован<\/div>");
-                    
-                }else {
-                
-                    var str_href = "";
-                    str_href += "<\p><\a class=\"update\" href=\"/admin/users/status-update?id=";
-                    str_href += response.id;
-                    str_href += "&status=active\">Активировать<\/a><\p>";
-                    
-                    $(btnID).attr("data-content", str_href);
-                    $(btnID).attr("class", "btn btn-sm btn-danger");
-                    $(str).html("<\div class=\"use-status\" >Заблокирован<\/div>");
-                }
-                //alert(response.status);
-                
-            },
-            error: function(){
-                alert("Ошибка");
-            }
-        });
-        
-        return false;
-    });
-    
-';
-$this->registerJs($script);
-?>
-
-<!--https://jsfiddle.net/FnDvL/-->
-
-
-
-
-<?php
-
-foreach ($users as $user) :
-
-
-$script2 = '    
-
-    //Выбор администратора
-    $("#valueSelectAdmin_'.$user->id.'").click(function () {
-    
-        var urlSaveAdmin = $("#saveAdmin_'.$user->id.'").attr("href");
-        
-        var arrUrl = urlSaveAdmin.split("admin=");
-    
-        if (arrUrl.length > 1) {
-            urlSaveAdmin = arrUrl.shift();
-            urlSaveAdmin += "admin=";
-        }    
-          
-        var idAdmin = $(this).val();
-        var urls = urlSaveAdmin + idAdmin;
-        $("#saveAdmin_'.$user->id.'").attr("href", urls);
-
-    });
-    
-    
-    
-    //Сохранение администратора
-    $("body").on("click", "#saveAdmin_'.$user->id.'", function(event) {
-        event.preventDefault();
-        var url = $(this).attr("href");
-        var data = $(this).serialize();
-
-        $.ajax({
-        
-            url: url,
-            method: "GET",
-            data: data,
-            success: function(response){
-            
-                var dateUpdate = ".date_update_" + response.model["id"];
-                var date = new Date().toLocaleDateString();
-                $(dateUpdate).html(date);
-                
-                var adminFio = "";
-                
-                if (response.admin){
-                    
-                     adminFio = response.admin["second_name"] + " " + response.admin["first_name"].substring(0,1)
-                     + "." + response.admin["middle_name"].substring(0,1) + ".";
-                     $("#sub_adm_modal_'.$user->id.'").removeClass();
-                     $("#sub_adm_modal_'.$user->id.'").addClass("btn btn-sm btn-success");
-                     
-                     // Разблокировать активацию пользователя
-                     $("#not-admin-user_'.$user->id.'").hide();
-                     $("#not-admin_'.$user->id.'").show();
-                     
-                
-                }else {
-                    //adminFio = "Не установлен";
-                    //$("#sub_adm_modal_'.$user->id.'").removeClass();
-                    //$("#sub_adm_modal_'.$user->id.'").addClass("btn btn-sm btn-default");
-                    
-                    
-                     adminFio = response.admin_replace["second_name"] + " " + response.admin_replace["first_name"].substring(0,1)
-                     + "." + response.admin_replace["middle_name"].substring(0,1) + ".";
-                     $("#sub_adm_modal_'.$user->id.'").removeClass();
-                     $("#sub_adm_modal_'.$user->id.'").addClass("btn btn-sm btn-success");
-                     
-                     // Разблокировать активацию пользователя
-                     $("#not-admin-user_'.$user->id.'").hide();
-                     $("#not-admin_'.$user->id.'").show();
-                   
-                }
-                               
-                $("#adm_modal_'.$user->id.'").html(adminFio);
-                
-                  
-            },
-            error: function(){
-                alert("Ошибка");
-            }
-        });
-        
-        return false;
-    });
-';
-
-$this->registerJs($script2);
-?>
-
-
-
-
-
-<?php if (($user->status === User::STATUS_NOT_ACTIVE) && ($user->id_admin === null)) : ?>
-<?php
-
-    Modal::begin([
-        'options' => [
-            'id' => 'not-admin-for-user_' . $user->id
-        ],
-        'size' => 'modal-sm',
-        'header' => '<h4 style="text-align: center; margin-bottom: -5px;">Сначала необходимо назначить администратора</h4>',
-        /*'toggleButton' => [
-        'label' => 'Модальное окно',
-        ],*/
-        //'footer' => '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>',
-    ]);
-    Modal::end();
-
-?>
-<?php endif; ?>
-
-
-
-
-
-
-<?php if ($user->status === User::STATUS_DELETED) : ?>
-
-
-<?php
-
-    Modal::begin([
-    'options' => [
-    'id' => 'admin_modal_' . $user->id
-    ],
-    'size' => 'modal-sm',
-    'header' => '<h3 style="text-align: center; margin-bottom: -5px; color: red;">Запрещено!</h3>',
-    /*'toggleButton' => [
-    'label' => 'Модальное окно',
-    ],*/
-    //'footer' => '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>',
-    ]);
-
-?>
-
-
-
-    <p style="text-align: center;">Попытка изменить администратора заблокированному пользователю.</p>
-
-<?php else : ?>
-
-
-<?php
-
-    Modal::begin([
-        'options' => [
-            'id' => 'admin_modal_' . $user->id
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 style="text-align: center; margin-bottom: -5px;">Назначение администратора</h3>',
-        /*'toggleButton' => [
-        'label' => 'Модальное окно',
-        ],*/
-        //'footer' => '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>',
-    ]);
-
-?>
-
-<?php $form = ActiveForm::begin(['id' => 'adminAddForm_' . $user->id]); ?>
-
-    <?
-        $items = ArrayHelper::map($admins,'id','username');
-
-        if ($user->id_admin === null) {
-
-            $params = [
-                //'prompt' => 'Выберите администратора',
-                'id' => 'valueSelectAdmin_' . $user->id,
-            ];
-
-        }else {
-
-            $params = [
-                //'prompt' => 'Выберите администратора',
-                'id' => 'valueSelectAdmin_' . $user->id,
-            ];
-        }
-
-    ?>
-
-    <?= $form->field($user, 'id_admin', ['template' => '<div style="display:flex; margin: 15px 0;"><div style="margin: 0 auto; width: 320px;">{input}</div></div>'])->dropDownList($items,$params) ?>
-
-    <div class="form-addAdmin" style="text-align: center;margin-top: 20px; margin-bottom: 10px;">
-
-        <?php if ($user->id_admin !== null) : ?>
-
-            <?= Html::a("Сохранить", ["/admin/users/add-admin", "id" => $user->id, "admin" => $user->id_admin], ["class" => "btn btn-success", "data-dismiss" => "modal", "id" => "saveAdmin_" . $user->id, "style" => ["width" => "320px"]]);?>
-
-        <?php else: ?>
-
-            <?= Html::a("Сохранить", ["/admin/users/add-admin", "id" => $user->id, "admin" => ""], ["class" => "btn btn-success", "data-dismiss" => "modal", "id" => "saveAdmin_" . $user->id, "style" => ["width" => "320px"]]);?>
-
-        <?php endif; ?>
-
-    </div>
-
-<?php ActiveForm::end(); ?>
-
-<?php endif; ?>
-
-
-<?php
-    Modal::end();
-
-endforeach;
+<!--Подключение скриптов-->
+<?php $this->registerJsFile('@web/js/users_index_main_admin.js'); ?>

@@ -5,11 +5,13 @@ namespace app\modules\admin\controllers;
 
 use app\models\ConversationAdmin;
 use app\models\User;
-use yii\data\ActiveDataProvider;
 use Yii;
+use yii\data\Pagination;
 
 class UsersController extends AppAdminController
 {
+
+    public $layout = '@app/modules/admin/views/layouts/users';
 
     /**
      * @param $action
@@ -19,6 +21,7 @@ class UsersController extends AppAdminController
      */
     public function beforeAction($action)
     {
+
         if ($action->id == 'index') {
 
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
@@ -71,7 +74,7 @@ class UsersController extends AppAdminController
 
         }elseif ($action->id == 'group') {
 
-            $user = User::findOne(Yii::$app->request->get());
+            $user = User::findOne(Yii::$app->request->get('id'));
 
             if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
@@ -90,172 +93,264 @@ class UsersController extends AppAdminController
     }
 
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM]),
-            'pagination' => [
-                'pageSize' => 5,
-            ],
-            'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC],
-            ],
-        ]);
-
-        $users = User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])->all();
-        $admins = User::find()->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])->all();
-
-        foreach ($admins as $admin) {
-            $admin->username = $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name;
-        }
+        $countUsersOnPage = 20;
+        $query = User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])->orderBy(['updated_at' => SORT_DESC]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
         return $this->render('index',[
-            'dataProvider' => $dataProvider,
-            'admins' => $admins,
             'users' => $users,
+            'pages' => $pages,
         ]);
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionGetModalAddAdminToUser ($id)
+    {
+        $user = User::findOne($id);
+        $admins = User::find()->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])->all();
+        foreach ($admins as $admin) {$admin->username = $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name;}
+
+        if (Yii::$app->request->isAjax){
+
+            $response = [
+                'renderAjax' => $this->renderAjax('get_modal_add_admin_to_user', ['user' => $user, 'admins' => $admins]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionGetModalUpdateStatus ($id)
+    {
+        $model = User::findOne($id);
+
+        if (Yii::$app->request->isAjax){
+
+            $response = [
+                'renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $model]),
+            ];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @return string
+     */
     public function actionAdmins()
     {
-        $dataProvider = new ActiveDataProvider(['query' => User::find()->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])]);
+        $countUsersOnPage = 20;
+        $query = User::find()->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])->orderBy(['updated_at' => SORT_DESC]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
         return $this->render('admins',[
-            'dataProvider' => $dataProvider,
+            'users' => $users,
+            'pages' => $pages,
         ]);
     }
 
 
-    public function actionStatusUpdate ($id, $status)
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionStatusUpdate ($id)
     {
-
         $model = User::findOne($id);
 
-        if ($status == 'active'){
-            $model->status = User::STATUS_ACTIVE;
+        if ($model->load(Yii::$app->request->post())) {
 
-        }elseif ($status == 'delete'){
-            $model->status = User::STATUS_DELETED;
-        }
+            if (Yii::$app->request->isAjax) {
 
-        if (Yii::$app->request->isAjax){
+                if ($model->save()) {
 
-            if ($model->save()){
+                    if (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_ADMIN)) {
+                        //Создание беседы между админом и главным админом
+                        $model->createConversationMainAdmin();
 
-                if(($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_ADMIN)) {
-                    //Создание беседы между админом и главным админом
-                    $model->createConversationMainAdmin();
+                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
+                        //Создание беседы между админом и проектантом
+                        $model->createConversationAdmin($model);
+                    }
 
-                } elseif(($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
-                    //Создание беседы между админом и проектантом
-                    $model->createConversationAdmin($model);
+                    if (($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {
+                        //Создание беседы между техподдержкой и пользователем
+                        $model->createConversationDevelopment();
+                    }
+
+                    //Отправка письма на почту пользователю при изменении его статуса
+                    $model->sendEmailUserStatus();
+
+                    $response = ['model' => $model];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+
                 }
-
-                if(($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {
-                    //Создание беседы между техподдержкой и пользователем
-                    $model->createConversationDevelopment();
-                }
-
-                //Отправка письма на почту пользователю при изменении его статуса
-                $model->sendEmailUserStatus();
-
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $model;
-                return $model;
-
             }
         }
         return false;
     }
 
 
-
-    public function actionAddAdmin ($id, $admin)
+    /**
+     * @param $id
+     * @param $id_admin
+     * @return array|bool
+     */
+    public function actionAddAdmin ($id, $id_admin)
     {
-
         $model = User::findOne($id);
+        $admin = User::findOne($id_admin);
+        $admin->username = $admin->second_name.' '.mb_substr($admin->first_name, 0, 1).'.'.mb_substr($admin->middle_name, 0, 1).'.';
 
-        $_admin_replace = User::findOne(['role' => User::ROLE_ADMIN, 'status' => User::STATUS_ACTIVE, 'confirm' => User::CONFIRM]);
+        if ($model->load(Yii::$app->request->post())) {
 
-        $_admin = User::findOne([
-            'id' => $admin,
-        ]);
+            if (Yii::$app->request->isAjax) {
 
-        if ($_admin) {
+                if ($model->save()) {
 
-            $model->id_admin = $admin;
-        }else {
-            $model->id_admin = $_admin_replace->id;
-        }
+                    $conversation = ConversationAdmin::findOne(['user_id' => $model->id]);
+                    if ($conversation) {
+                        $conversation->admin_id = $model->id_admin;
+                        $conversation->save();
+                    }
 
-        if (Yii::$app->request->isAjax){
+                    $response = ['user' => $model, 'admin' => $admin];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
 
-            if ($model->save()){
-
-                $conversation = ConversationAdmin::findOne([
-                    'user_id' => $model->id,
-                    ]);
-
-                if ($conversation) {
-
-                    $conversation->admin_id = $model->id_admin;
-                    $conversation->save();
                 }
-
-                $response = [
-                    'model' => $model,
-                    'admin' => $_admin,
-                    'admin_replace' => $_admin_replace,
-                ];
-
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
-                return $response;
-
             }
         }
         return false;
     }
 
 
-    public function actionGroup($id)
+    /**
+     * @param $id
+     * @param null $page
+     * @return string
+     */
+    public function actionGroup($id, $page = null)
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id]),
-            /*'pagination' => [
-                'pageSize' => 5,
-            ],*/
-            'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC],
-            ],
-        ]);
-
-        $users = User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => Yii::$app->user->id])->all();
-        foreach ($users as $user){
-
-            if (!empty($user->projects)){
-
-                $projects_updated_at = [];
-
-                foreach ($user->projects as $project) {
-
-                    $projects_updated_at[] = $project->updated_at;
-                }
-
-                if (max($projects_updated_at) > $user->updated_at){
-
-                    $user->updated_at = max($projects_updated_at);
-                    $user->save();
-                }
-
-            }
-        }
+        $admin = User::findOne($id);
+        $countUsersOnPage = 20;
+        $query = User::find()->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])->orderBy(['updated_at' => SORT_DESC]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
         return $this->render('group',[
-            'dataProvider' => $dataProvider,
-
+            'admin' => $admin,
+            'users' => $users,
+            'pages' => $pages,
         ]);
+
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public function actionUpdateDataColumnUser ($id)
+    {
+        $user = User::findOne($id);
+
+        if (Yii::$app->request->isAjax){
+
+            $response = ['renderAjax' => $this->renderAjax('update_column_user', ['user' => $user])];
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws \Throwable
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUserDelete ($id)
+    {
+        $user = User::findOne($id);
+
+        if (Yii::$app->request->isAjax) {
+
+            if ($user->role === User::ROLE_ADMIN) {
+
+                $subscribers = User::findAll(['id_admin' => $id]);
+
+                if ($subscribers) {
+
+                    $response = ['error' => true, 'message' => 'Запрещено удаление трекера, у которого есть пользователи!'];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+                else {
+                    if ($user->removeAllDataUser()) {
+
+                        $response = ['success' => true];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                    else {
+                        $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                        \Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                }
+            }
+            elseif ($user->role === User::ROLE_USER) {
+
+                if ($user->removeAllDataUser()) {
+
+                    $response = ['success' => true];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+                else {
+                    $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    \Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
     }
 
 }

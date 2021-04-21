@@ -101,6 +101,7 @@ $config = [
             'rules' => [
                 'about' => 'site/about',
                 'send-email' => 'site/send-email',
+                'confidentiality-policy' => 'site/confidentiality-policy',
                 'update-profile' => 'profile/update-profile',
                 'change-password' => 'profile/change-password',
                 'profile' => 'profile/index',

@@ -404,4 +404,13 @@ class SiteController extends AppUserPartController
 
         return $this->render('about', compact('user'));
     }
+
+
+    /**
+     * @return string
+     */
+    public function actionConfidentialityPolicy()
+    {
+        return $this->render('confidentiality-policy');
+    }
 }
