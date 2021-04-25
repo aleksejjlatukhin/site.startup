@@ -222,3 +222,8 @@ body::-webkit-scrollbar {
     width: 0;
     background: transparent; /* Disable scrollbar Chrome/Safari/Webkit */
 }
+
+/* Убираем стрелочку у иконки профиля */
+.caret {
+    display: none;
+}

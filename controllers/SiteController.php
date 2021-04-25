@@ -413,4 +413,13 @@ class SiteController extends AppUserPartController
     {
         return $this->render('confidentiality-policy');
     }
+
+
+    /**
+     * @return string
+     */
+    public function actionMethodologicalGuide()
+    {
+        return $this->render('methodological-guide');
+    }
 }

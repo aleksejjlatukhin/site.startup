@@ -102,6 +102,7 @@ $config = [
                 'about' => 'site/about',
                 'send-email' => 'site/send-email',
                 'confidentiality-policy' => 'site/confidentiality-policy',
+                'methodological-guide' => 'site/methodological-guide',
                 'update-profile' => 'profile/update-profile',
                 'change-password' => 'profile/change-password',
                 'profile' => 'profile/index',
