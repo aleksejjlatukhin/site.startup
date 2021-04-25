@@ -1,5 +1,9 @@
 .methodological-guide {
     color: #333333;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .main-header {
