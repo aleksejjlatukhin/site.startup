@@ -50,7 +50,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'id' => 'main_navbar_right',
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
-                        ['label' => 'Главная', 'url' => ['/']],
                         ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]],
                         ['label' => 'О сервисе', 'url' => ['/about']],
 
@@ -64,10 +63,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                         ]) : (''),
 
 
-                        ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger'])
-                            : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger']), 'url' => ['/message/index', 'id' => Yii::$app->user->id]],
+                        ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
+                            : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/message/index', 'id' => Yii::$app->user->id]],
 
-                        ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messanger']), 'url' => ['/site/methodological-guide']],
+                        ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messanger', 'title' => 'Методическое руководство']), 'url' => ['/site/methodological-guide']],
                     ],
                     'encodeLabels' => false,
                 ]);
