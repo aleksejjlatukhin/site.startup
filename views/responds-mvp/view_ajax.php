@@ -208,21 +208,43 @@ use app\models\User;
 
                 <?php else : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-mvp/moving-next-stage', 'id' => $model->id],[
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#E0E0E0',
-                            'color' => '#FFFFFF',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                        ],
-                        'class' => 'btn btn-lg btn-default',
-                        'id' => 'button_MovingNextStage',
-                    ]);?>
+                    <?php if (($model->count_respond - $model->countDescInterviewsOfModel) == '0') : ?>
+
+                        <?= Html::a( 'Далее', ['/confirm-mvp/moving-next-stage', 'id' => $model->id],[
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#eb5757',
+                                'color' => '#FFFFFF',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-default',
+                            'id' => 'button_MovingNextStage',
+                        ]);?>
+
+                    <?php else : ?>
+
+                        <?= Html::a( 'Далее', ['/confirm-mvp/moving-next-stage', 'id' => $model->id],[
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#E0E0E0',
+                                'color' => '#FFFFFF',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-default',
+                            'id' => 'button_MovingNextStage',
+                        ]);?>
+
+                    <?php endif; ?>
 
                 <?php endif; ?>
 
