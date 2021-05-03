@@ -11,7 +11,9 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Внесите данные для создания бизнес-модели</h3>',
+    'header' => Html::a('Внесите данные для создания бизнес-модели' . Html::img('/images/icons/icon_report_next.png'), ['/business-model/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
 ]);
 ?>
 
@@ -25,7 +27,9 @@ Modal::begin([
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Редактирование бизнес-модели</h3>',
+    'header' => Html::a('Редактирование бизнес-модели' . Html::img('/images/icons/icon_report_next.png'), ['/business-model/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
 ]);
 ?>
 

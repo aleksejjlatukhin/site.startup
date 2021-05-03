@@ -77,6 +77,32 @@ var body = $('body');
 var id_page = window.location.search.split('=')[1];
 
 
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //Отслеживаем изменения в форме создания подтверждения и записываем их в кэш
 $(body).on('change', 'form#new_confirm_problem', function(){
 
@@ -106,16 +132,3 @@ $(body).on('click', '.show_modal_next_step_error', function (e) {
     e.preventDefault();
     return false;
 });
-
-//Показываем модальное окно - информация о месте добавления новых респондентов
-$(body).on('click', '.show_modal_information_add_new_responds', function (e) {
-
-    $(body).append($(information_add_new_responds_modal).first());
-    $(information_add_new_responds_modal).modal('show');
-
-    e.preventDefault();
-    return false;
-});
-
-
-

@@ -182,6 +182,51 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
+     * @return bool|string
+     */
+    public function actionGetInstructionStepOne ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction_step_one');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstructionStepTwo ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction_step_two');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstructionStepThree ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction_step_three');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
      * Проверка данных подтверждения на этапе разработки ГЦП
      * @param $id
      * @return array|bool

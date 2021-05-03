@@ -12,15 +12,15 @@ use yii\helpers\Url;
 
     <div class="row row_header_data">
 
-        <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
-
-            <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
+        <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
+            <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/interview/get-instruction-step-one'],[
+                'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+            ]); ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
 
                 <?= Html::button('Редактировать', [
                     'id' => 'show_form_update_data',
@@ -96,10 +96,10 @@ use yii\helpers\Url;
 
     <div class="row row_header_data">
 
-        <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
-
-            <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
+        <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
+            <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/interview/get-instruction-step-one'],[
+                'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+            ]); ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">

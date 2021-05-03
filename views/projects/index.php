@@ -10,7 +10,6 @@ use yii\helpers\ArrayHelper;
 use app\models\ProjectSort;
 
 $this->title = 'Проекты';
-
 $this->registerCssFile('@web/css/projects-index-style.css');
 
 ?>
@@ -33,7 +32,11 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             $listFields = ArrayHelper::map($listFields,'id', 'name');
             ?>
 
-            <div class="col-md-3" style="font-size: 32px; font-weight: 700; padding: 0;">ПРОЕКТЫ</div>
+            <div class="col-md-3" style="padding: 2px 0;">
+                <?= Html::a('Проекты' . Html::img('/images/icons/icon_report_next.png'), ['/projects/get-instruction'],[
+                    'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+                ]); ?>
+            </div>
 
             <div class="col-md-3">
 
@@ -78,16 +81,11 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             ?>
 
             <div class="col-md-3" style="padding: 0;">
-
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
                     <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->id],
                         ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
-                    );
-                    ?>
-
+                    ); ?>
                 <?php endif; ?>
-
             </div>
         </div>
 
@@ -168,21 +166,21 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                         <div class="row" style="display:flex; align-items: center; justify-content: space-between; padding-right: 15px;">
 
-                             <?= Html::a('Далее', Url::to(['/segment/index', 'id' => $model->id]), [
-                                 'class' => 'btn btn-default',
-                                 'style' => [
-                                     'display' => 'flex',
-                                     'align-items' => 'center',
-                                     'justify-content' => 'center',
-                                     'color' => '#FFFFFF',
-                                     'background' => '#52BE7F',
-                                     'width' => '120px',
-                                     'height' => '40px',
-                                     'font-size' => '18px',
-                                     'border-radius' => '8px',
-                                 ]
-                             ]);
-                             ?>
+                            <?= Html::a('Далее', Url::to(['/segment/index', 'id' => $model->id]), [
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#52BE7F',
+                                    'width' => '120px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]);
+                            ?>
 
                             <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
@@ -215,10 +213,10 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
     <div class="form_authors" style="display: none;">
 
-    <?php
-    $form = ActiveForm::begin([
+        <?php
+        $form = ActiveForm::begin([
             'id' => 'form_authors'
-    ]); ?>
+        ]); ?>
 
         <div class="form_authors_inputs">
 
@@ -275,9 +273,9 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 </div>
             </div>
         </div>
-    <?php
-    ActiveForm::end();
-    ?>
+        <?php
+        ActiveForm::end();
+        ?>
     </div>
 
     <!--Модальные окна-->

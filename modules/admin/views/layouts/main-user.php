@@ -122,6 +122,18 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
     </div>
 
+    <!--instruction_page begin-->
+
+    <?php // Модальное окно - Инструкция для стадии разработки
+    Modal::begin([
+        'options' => ['class' => 'modal_instruction_page'],
+        'size' => 'modal-lg',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--instruction_page end-->
+
     <!--All-information Project begin-->
 
     <?php // Модальное окно - данные проекта

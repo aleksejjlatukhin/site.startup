@@ -128,7 +128,7 @@ use yii\helpers\Html;
             <?= $model->place_interview; ?>
             <div class="bolder">Плановая дата интервью:</div>
             <?php if ($model->date_plan != null) : ?>
-                <?= date('d.m.yy', $model->date_plan); ?>
+                <?= date('d.m.Y', $model->date_plan); ?>
             <?php endif; ?>
         </div>
     </div>

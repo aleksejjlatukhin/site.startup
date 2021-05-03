@@ -10,10 +10,10 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => '<div class="text-center" style="font-size: 24px; color: #4F4F4F; font-weight: 700;">Сформулируйте описание продукта (MVP)</div>',
-]);
-?>
-
+    'header' => Html::a('Формулировка минимально жизнеспособного продукта' . Html::img('/images/icons/icon_report_next.png'), ['/mvp/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
+]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
 
@@ -23,10 +23,10 @@ Modal::begin([
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center" style="color: #4F4F4F; font-weight: 700;"></h3>',
-]);
-?>
-
+    'header' => Html::a('Редактирование продукта: <span></span>' . Html::img('/images/icons/icon_report_next.png'), ['/mvp/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
+]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
 
@@ -37,8 +37,7 @@ Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal_error'],
     'size' => 'modal-md',
     'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Недостаточно данных для создания нового продукта (MVP).</h3>',
-]);
-?>
+]); ?>
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
     Вернитесь к подтверждению ценностного предложения.

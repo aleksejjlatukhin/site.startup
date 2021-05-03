@@ -30,6 +30,32 @@ var body = $('body');
 var id_page = window.location.search.split('=')[1];
 
 
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //Отслеживаем изменения в форме создания Бизнес-модели и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
@@ -85,6 +111,7 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
     var url = $(this).attr('action');
     var data = $(this).serialize();
+    var id = url.split('=')[1];
 
     $.ajax({
 
@@ -94,8 +121,11 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
         cache: false,
         success: function(response){
 
-            $('.hypothesis_create_modal').modal('hide');
-            $('.container-business_model').html(response.renderAjax);
+            if (response.success) {
+                $('.hypothesis_create_modal').modal('hide');
+                location.href = '/business-model/index?id=' + id;
+                //$('.container-business_model').html(response.renderAjax);
+            }
         },
         error: function(){
             alert('Ошибка');

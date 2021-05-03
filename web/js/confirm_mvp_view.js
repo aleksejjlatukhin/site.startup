@@ -27,6 +27,33 @@ $(document).ready(function() {
 var body = $('body');
 var id_page = window.location.search.split('=')[1];
 
+
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //Постраничная навигация
 $(body).on('click', '.pagination-responds-confirm .responds-confirm-pagin-list li a', function(e){
 
@@ -440,45 +467,6 @@ $(body).on('change', 'input#confirm_count_positive', function () {
         value1 = valueMin;
         $(this).val(value1);
     }
-});
-
-
-//Показываем модальное окно - информация о добавлении вопросов для интервью
-var modal_information_table_questions = $('#information-table-questions');
-
-$(body).on('click', '.show_modal_information_table_questions', function (e) {
-
-    $(body).append($(modal_information_table_questions).first());
-    $(modal_information_table_questions).modal('show');
-
-    e.preventDefault();
-    return false;
-});
-
-
-//Показываем модальное окно - информация о месте добавления новых респондентов
-var information_add_new_responds_modal = $('#information-add-new-responds');
-
-$(body).on('click', '.show_modal_information_add_new_responds', function (e) {
-
-    $(body).append($(information_add_new_responds_modal).first());
-    $(information_add_new_responds_modal).modal('show');
-
-    e.preventDefault();
-    return false;
-});
-
-
-//Показываем модальное окно - информация о работе с таблицей респондентов
-var information_table_responds = $('#information-table-responds');
-
-$(body).on('click', '.show_modal_information_table_responds', function (e) {
-
-    $(body).append($(information_table_responds).first());
-    $(information_table_responds).modal('show');
-
-    e.preventDefault();
-    return false;
 });
 
 

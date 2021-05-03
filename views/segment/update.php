@@ -1,4 +1,5 @@
 <?php
+
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
@@ -11,6 +12,11 @@ use app\models\TypeOfActivityB2B;
 
 ?>
 
+<div class="text-center">
+    <?= Html::a('Скачать исходные данные по сегменту', ['/segment/mpdf-segment', 'id' => $model->id], [
+        'class' => 'export_link_hypothesis_for_user', 'target' => '_blank', 'title' => 'Скачать в pdf',
+    ]); ?>
+</div>
 
 <div class="segment-update-form">
 

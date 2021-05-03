@@ -185,14 +185,10 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
+                <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
@@ -276,14 +272,10 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
+                <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
@@ -403,14 +395,10 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
+                <div class="col-xs-12 col-md-6" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Список вопросов для интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-two'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="col-xs-12 col-md-6" style="padding: 0;">
@@ -583,36 +571,6 @@ Modal::begin([
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
     Пройдите последовательно этапы подтверждения продукта (MVP). Далее переходите к генерации бизнес-модели.
-</h4>
-
-<?php Modal::end(); ?>
-
-
-<?php
-// Информация о месте добавления новых респондентов
-Modal::begin([
-    'options' => ['id' => 'information-add-new-responds', 'class' => 'information-table-questions'],
-    'size' => 'modal-md',
-    'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-]); ?>
-
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Добавить новых респондентов возможно на этапе заполнения информации о респондентах и интервью.
-</h4>
-
-<?php Modal::end(); ?>
-
-
-<?php
-// Описание выполнения задачи на данной странице
-Modal::begin([
-    'options' => ['id' => 'information-table-questions', 'class' => 'information-table-questions'],
-    'size' => 'modal-md',
-    'header' => '<h4 style="color: #F2F2F2; padding: 0 30px;">1. Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».</h4>',
-]); ?>
-
-<h4 style="color: #F2F2F2; padding: 0 30px;">
-    2. Когда список будет готов переходите по ссылке «Далее».
 </h4>
 
 <?php Modal::end(); ?>

@@ -177,14 +177,10 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-sm-12 col-md-9" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
+                <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
@@ -284,14 +280,10 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-sm-12 col-md-6" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
+                <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
@@ -439,27 +431,18 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-xs-12 col-md-6" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Список вопросов для интервью</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_table_questions', 'title' => 'Посмотреть описание',
+                <div class="col-xs-12 col-md-6" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Список вопросов для интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-two'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="col-xs-12 col-md-6" style="padding: 0;">
-
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $problem->exist_confirm === null) : ?>
-
                         <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
                             ['class' => 'add_new_question_button pull-right', 'id' => 'buttonAddQuestion']
-                        );
-                        ?>
-
+                        ); ?>
                     <?php endif; ?>
-
                 </div>
 
             </div>
@@ -588,7 +571,6 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
 
 
-
     <!--ПРОГРАММА ПОДТВЕРЖДЕНИЯ ГПС (ШАГ 3)-->
     <div id="step_three" class="tabcontent row">
 
@@ -597,26 +579,18 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 
             <div class="row row_header_data top_slide_pagination_responds">
 
-                <div class="col-md-9" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Информация о респондентах и интервью</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_table_responds', 'title' => 'Посмотреть описание',
+                <div class="col-md-9" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Информация о респондентах и интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-three'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
                 <div class="col-md-3" style="padding: 0;">
-
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $problem->exist_confirm === null) : ?>
-
                         <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
                             ['id' => 'showRespondCreateForm', 'class' => 'link_add_respond_text pull-right']
                         ); ?>
-
                     <?php endif; ?>
-
                 </div>
 
             </div>

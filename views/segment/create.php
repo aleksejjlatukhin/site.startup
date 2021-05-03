@@ -12,6 +12,21 @@ use app\models\TypeOfActivityB2B;
 ?>
 
 
+<style>
+    .select2-container--krajee .select2-selection {
+        font-size: 16px;
+        height: 40px;
+        padding-left: 15px;
+        padding-top: 8px;
+        padding-bottom: 15px;
+        border-radius: 12px;
+    }
+    .select2-container--krajee .select2-selection--single .select2-selection__arrow {
+        height: 39px;
+    }
+</style>
+
+
 <div class="segment-form-create">
 
     <?php $form = ActiveForm::begin([

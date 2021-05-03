@@ -2,14 +2,8 @@
 
 use yii\helpers\Html;
 use app\models\User;
-use yii\bootstrap\Modal;
-use yii\widgets\ActiveForm;
-
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Разработка MVP';
-
 $this->registerCssFile('@web/css/mvp-index-style.css');
 ?>
 
@@ -152,26 +146,28 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
 
     <div class="container-fluid container-data row">
 
-        <div class="container-fluid row">
+        <div class="row" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
 
-            <div class="col-md-12" style="padding: 15px 0;">
+            <div class="col-md-8" style="padding-top: 17px; padding-bottom: 17px;">
+                <?= Html::a('Продукты MVP' . Html::img('/images/icons/icon_report_next.png'), ['/mvp/get-instruction'],[
+                    'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+                ]); ?>
+            </div>
 
+            <div class="col-md-4" style="padding-top: 15px; padding-bottom: 15px;">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый продукт (MVP)</div></div>',
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый продукт MVP</div></div>',
                         ['/confirm-gcp/data-availability-for-next-step', 'id' => $confirmGcp->id],
                         ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
                     ); ?>
-
                 <?php endif; ?>
-
             </div>
 
         </div>
 
 
         <!--Заголовки для списка MVP-->
-        <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px; padding-top: 0;">
+        <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px;">
 
             <div class="col-md-1 ">
                 <div class="row">

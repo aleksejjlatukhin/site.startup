@@ -109,6 +109,8 @@ class BusinessModelController extends AppUserPartController
     public function actionIndex ($id)
     {
         $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
+        if (!$model) return $this->redirect(['/business-model/instruction', 'id' => $id]);
+
         $confirmMvp = ConfirmMvp::findOne($id);
         $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
         $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
@@ -134,6 +136,40 @@ class BusinessModelController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
+        if ($model) return $this->redirect(['/business-model/index', 'id' => $id]);
+
+        return $this->render('index_first', [
+            'confirmMvp' => ConfirmMvp::findOne($id),
+        ]);
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return bool
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $confirmMvp = ConfirmMvp::findOne($id);
@@ -153,12 +189,13 @@ class BusinessModelController extends AppUserPartController
             $key = 'formCreateBusinessModelCache'; //Формируем ключ
             $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      */
@@ -178,6 +215,7 @@ class BusinessModelController extends AppUserPartController
                 if ($businessModel = $model->create()) {
 
                     $response = [
+                        'success' => true,
                         'renderAjax' => $this->renderAjax('_index_ajax', [
                             'model' => $businessModel, 'segment' => $segment, 'gcp' => $gcp,
                         ]),
@@ -188,11 +226,13 @@ class BusinessModelController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
+
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetHypothesisToUpdate ($id)
@@ -209,11 +249,12 @@ class BusinessModelController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -242,6 +283,7 @@ class BusinessModelController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
     /**

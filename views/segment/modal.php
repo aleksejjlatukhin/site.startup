@@ -11,7 +11,9 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Создание нового сегмента</h3>',
+    'header' => Html::a('Генерация гипотезы сегмента' . Html::img('/images/icons/icon_report_next.png'), ['/segment/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
 ]);
 ?>
 
@@ -27,7 +29,9 @@ Modal::end();
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Редактирование данных сегмента</h3>',
+    'header' => Html::a('Редактирование сегмента' . Html::img('/images/icons/icon_report_next.png'), ['/segment/get-instruction'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['style' => ['text-align' => 'center']]
 ]);
 ?>
 

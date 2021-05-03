@@ -7,49 +7,6 @@ use yii\helpers\Html;
 
 
 <?php
-// Информация о месте добавления новых респондентов
-Modal::begin([
-    'options' => ['id' => 'information-add-new-responds', 'class' => 'information-table-questions'],
-    'size' => 'modal-md',
-    'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-]); ?>
-
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Добавить новых респондентов возможно на этапе заполнения информации о респондентах и интервью.</h4>
-
-<?php Modal::end(); ?>
-
-
-<?php
-// Описание выполнения задачи на шаге 2
-Modal::begin([
-    'options' => ['id' => 'information-table-questions', 'class' => 'information-table-questions'],
-    'size' => 'modal-md',
-    'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-]); ?>
-
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Сформулируйте собственный список вопросов для интервью или отредактируйте список «по-умолчанию».
-</h4>
-
-<?php Modal::end(); ?>
-
-
-<?php
-// Описание выполнения задачи на шаге 3
-Modal::begin([
-    'options' => ['id' => 'information-table-responds', 'class' => 'information-table-questions'],
-    'size' => 'modal-md',
-    'header' => '<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">1. Пройдите последовательно по ссылкам в таблице, заполняя информацию о каждом респонденте.</h4>',
-]); ?>
-
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    2. Затем переходите к заполнению данных по интервью, при необходимости добавляйте новых респондентов.
-</h4>
-
-<?php Modal::end(); ?>
-
-
-<?php
 // Форма добавления нового респондента
 Modal::begin([
     'options' => ['id' => 'respondCreate_modal'],
@@ -67,8 +24,9 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'respond_update_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Сведения о респонденте</h3>',
-    'headerOptions' => ['class' => 'style_header_modal_form'],
+    'header' => Html::a('Сведения о респонденте' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-three'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
 ]); ?>
 
 <!--Контент загружается через Ajax-->
@@ -80,8 +38,9 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'create_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Внесите результаты интервью</h3>',
-    'headerOptions' => ['class' => 'style_header_modal_form'],
+    'header' => Html::a('Внесите результаты интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-three'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
 ]); ?>
 
 <!--Контент загружается через Ajax-->
@@ -93,8 +52,9 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'update_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => '<h3 class="text-center">Результаты интервью</h3>',
-    'headerOptions' => ['class' => 'style_header_modal_form'],
+    'header' => Html::a('Результаты интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-three'],[
+        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
+    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
 ]); ?>
 
 <!--Контент загружается через Ajax-->

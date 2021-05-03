@@ -178,14 +178,10 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-md-12" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
-                    <?= Html::a(Html::img('/images/icons/icon_info.png'), ['#'], [
-                        'class' => 'show_modal_information_add_new_responds', 'title' => 'Посмотреть описание',
+                <div class="col-md-12" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                     ]); ?>
-
                 </div>
 
             </div>
@@ -312,20 +308,6 @@ Modal::begin([
 
 <?php Modal::end(); ?>
 
-
-<?php
-// Информация о месте добавления новых респондентов
-Modal::begin([
-    'options' => ['id' => 'information-add-new-responds', 'class' => 'next_step_error'],
-    'size' => 'modal-md',
-    'header' => '<h3 class="text-center" style="color: #F2F2F2; padding: 0 30px;">Информация</h3>',
-]); ?>
-
-<h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Добавить новых респондентов возможно на этапе заполнения информации о респондентах и интервью.
-</h4>
-
-<?php Modal::end(); ?>
 
 <!--Подключение скриптов-->
 <?php $this->registerJsFile('@web/js/confirm_mvp_create.js'); ?>

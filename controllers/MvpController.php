@@ -89,6 +89,8 @@ class MvpController extends AppUserPartController
     public function actionIndex($id)
     {
         $models = Mvp::find()->where(['confirm_gcp_id' => $id])->all();
+        if (!$models) return $this->redirect(['/mvp/instruction', 'id' => $id]);
+
         $confirmGcp = ConfirmGcp::findOne($id);
         $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
         $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
@@ -110,6 +112,36 @@ class MvpController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        return $this->render('index_first', [
+            'confirmGcp' => ConfirmGcp::findOne($id),
+        ]);
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $confirmGcp = ConfirmGcp::findOne($id);
@@ -147,7 +179,9 @@ class MvpController extends AppUserPartController
 
                 if ($model->create()) {
 
-                    $response = ['renderAjax' => $this->renderAjax('_index_ajax', [
+                    $response = [
+                        'count' => Mvp::find()->where(['confirm_gcp_id' => $id])->count(),
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
                         'models' => Mvp::findAll(['confirm_gcp_id' => $id])
                     ])];
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

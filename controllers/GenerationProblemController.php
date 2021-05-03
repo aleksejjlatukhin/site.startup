@@ -93,6 +93,8 @@ class GenerationProblemController extends AppUserPartController
         $project = Projects::findOne(['id' => $segment->project_id]);
         $models = GenerationProblem::findAll(['interview_id' => $id]);
 
+        if (!$models) return $this->redirect(['/generation-problem/instruction', 'id' => $id]);
+
         return $this->render('index', [
             'models' => $models,
             'interview' => $interview,
@@ -102,6 +104,35 @@ class GenerationProblemController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        return $this->render('index_first', [
+            'interview' => Interview::findOne($id),
+        ]);
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+    /**
+     * @param $id
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $confirmSegment = Interview::findOne($id);
@@ -138,6 +169,7 @@ class GenerationProblemController extends AppUserPartController
                 if ($model->create()){
 
                     $response = [
+                        'count' => GenerationProblem::find()->where(['interview_id' => $id])->count(),
                         'renderAjax' => $this->renderAjax('_index_ajax', [
                             'models' => GenerationProblem::findAll(['interview_id' => $id]),
                         ]),

@@ -27,7 +27,35 @@ $('#project_already_exists').on('hidden.bs.modal', function(){
 $('#confirm_closing_update_modal').on('hidden.bs.modal', function(){
     $(body).addClass('modal-open');
 });
+$('.modal_instruction_page').on('hidden.bs.modal', function(){
+    $(body).addClass('modal-open');
+});
 
+
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
 
 
 //Отслеживаем изменения в форме создания проекта и записываем их в кэш
@@ -100,6 +128,7 @@ $(body).on('beforeSubmit', '#project_create_form', function(e){
 
     var form = $(this);
     var url = form.attr('action');
+    var id = url.split('=')[1];
     var formData = new FormData(form[0]);
     formData.append('type_sort_id', $('#listType').val());
 
@@ -116,11 +145,16 @@ $(body).on('beforeSubmit', '#project_create_form', function(e){
             //Если данные загружены и проверены
             if(response.success){
 
-                $(hypothesis_create_modal).modal('hide');
-                $('.block_all_projects_user').html(response.renderAjax);
+                if (response.count === '1') {
+                    $(hypothesis_create_modal).modal('hide');
+                    location.href = '/projects/index?id=' + id;
+                } else {
+                    $(hypothesis_create_modal).modal('hide');
+                    $(body).find('.block_all_projects_user').html(response.renderAjax);
+                }
             }
 
-            //Если сегмент с таким именем уже существует
+            //Если проект с таким именем уже существует
             if(response.project_already_exists){
 
                 var project_already_exists = $('#project_already_exists');

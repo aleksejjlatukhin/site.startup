@@ -1,26 +1,15 @@
 <?php
 
 use yii\helpers\Html;
-use kartik\grid\GridView;
-use yii\bootstrap\Modal;
-use yii\widgets\DetailView;
 use app\models\User;
-use yii\helpers\Url;
-use yii\widgets\ActiveForm;
-
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Разработка гипотез ценностных предложений';
-
 $this->registerCssFile('@web/css/gcp-index-style.css');
 
 ?>
 <div class="gcp-index">
 
-
     <div class="row project_info_data">
-
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name">
             <span>Проект:</span>
@@ -149,26 +138,28 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
     <div class="container-fluid container-data row">
 
-        <div class="container-fluid row">
+        <div class="row" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
 
-            <div class="col-md-12" style="padding: 15px 0;">
+            <div class="col-md-6" style="padding-top: 17px; padding-bottom: 17px;">
+                <?= Html::a('Ценностные предложения' . Html::img('/images/icons/icon_report_next.png'), ['/gcp/get-instruction'],[
+                    'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+                ]); ?>
+            </div>
 
+            <div class="col-md-6" style="padding-top: 15px; padding-bottom: 15px;">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
                     <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новое ценностное предложение</div></div>',
                         ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->id],
                         ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
                     ); ?>
-
                 <?php endif; ?>
-
             </div>
 
         </div>
 
 
         <!--Заголовки для списка ценностных предложений-->
-        <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px; padding-top: 0;">
+        <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px;">
 
             <div class="col-md-1 ">
                 <div class="row">

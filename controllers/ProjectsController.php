@@ -132,19 +132,46 @@ class ProjectsController extends AppUserPartController
     {
         $user = User::findOne($id);
         $models = Projects::findAll(['user_id' => $id]);
-        $new_author = new Authors();
-        $sortModel = new SortForm();
 
+        if (!$models) return $this->redirect(['/projects/instruction', 'id' => $id]);
 
         return $this->render('index', [
             'user' => $user,
             'models' => $models,
-            'new_author' => $new_author,
-            'sortModel' => $sortModel,
+            'new_author' => new Authors(),
+            'sortModel' => new SortForm(),
         ]);
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        return $this->render('index_first', [
+            'user' => User::findOne($id),
+        ]);
+    }
 
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $user = User::findOne($id);
@@ -160,6 +187,10 @@ class ProjectsController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetHypothesisToCreate ($id)
     {
         $user = User::findOne($id);
@@ -205,9 +236,14 @@ class ProjectsController extends AppUserPartController
                 return $response;
             }
         }
+        return false;
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetHypothesisToUpdate ($id)
     {
         $model = Projects::findOne($id);
@@ -225,13 +261,14 @@ class ProjectsController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $current_id
      * @param $type_sort_id
-     * @return array
+     * @return array|bool
      */
     public function actionSortingModels($current_id, $type_sort_id)
     {
@@ -247,6 +284,7 @@ class ProjectsController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
@@ -332,7 +370,7 @@ class ProjectsController extends AppUserPartController
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\ErrorException
      * @throws \yii\base\Exception
@@ -360,7 +398,7 @@ class ProjectsController extends AppUserPartController
                             $sort = new ProjectSort();
 
                             $response =  [
-                                'success' => true,
+                                'success' => true, 'count' => Projects::find()->where(['user_id' => $user->id])->count(),
                                 'renderAjax' => $this->renderAjax('_index_ajax', [
                                     'models' => $sort->fetchModels($user->id, $type_sort_id),
                                 ]),
@@ -392,12 +430,13 @@ class ProjectsController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
@@ -455,6 +494,7 @@ class ProjectsController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 

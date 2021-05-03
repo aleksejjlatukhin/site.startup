@@ -132,10 +132,10 @@ $this->registerCssFile('@web/css/interview-create-style.css');
 
             <div class="row row_header_data">
 
-                <div class="col-md-12" style="padding: 10px 0 0 0;">
-
-                    <span style="color: #4F4F4F;padding-right: 10px;">Исходные данные подтверждения</span>
-
+                <div class="col-md-12" style="padding: 5px 0 0 0;">
+                    <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/interview/get-instruction-step-one'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+                    ]); ?>
                 </div>
 
             </div>

@@ -6,6 +6,11 @@ use yii\helpers\Html;
 
 ?>
 
+<div class="text-center">
+    <?= Html::a('Скачать исходные данные по проекту', ['/projects/mpdf-project', 'id' => $model->id], [
+        'class' => 'export_link_hypothesis_for_user', 'target' => '_blank', 'title' => 'Скачать в pdf',
+    ]); ?>
+</div>
 
 <div class="form-update-project" style="overflow: hidden;">
 

@@ -12,18 +12,18 @@ use yii\helpers\Url;
         <div class="row" style="color: #4F4F4F; margin-top: 10px; margin-bottom: 15px;">
 
             <div class="col-md-12">
-                Варианты проблем, полученные от респондентов (представителей сегмента)
+                <div class="pull-left" style="padding: 0 10px; border-bottom: 1px solid;">Варианты проблем, полученные от респондентов (представителей сегмента)</div>
             </div>
 
         </div>
 
-        <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px;">
+        <div class="row" style="color: #4F4F4F; padding-left: 10px; margin-bottom: 5px; font-weight: 700;">
 
-            <div class="col-md-4 roboto_condensed_bold">
+            <div class="col-md-4">
                 Респонденты
             </div>
 
-            <div class="col-md-8 roboto_condensed_bold">
+            <div class="col-md-8">
                 Варианты проблем
             </div>
 

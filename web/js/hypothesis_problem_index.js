@@ -7,11 +7,6 @@ $(document).ready(function() {
     var info_hypothesis_create_modal_error = $('.hypothesis_create_modal_error');
     info_hypothesis_create_modal_error.find('.modal-content').css('background-color', '#707F99');
 
-    //Фон для модального окна информации при создании ГПС
-    var information_create_hypothesis_modal = $('#information_create_hypothesis');
-    $(body).append($(information_create_hypothesis_modal).first());
-    information_create_hypothesis_modal.find('.modal-content').css('background-color', '#707F99');
-
 
     //Возвращение скролла первого модального окна после закрытия второго
     $('.modal').on('hidden.bs.modal', function () {
@@ -33,6 +28,32 @@ $(document).ready(function() {
 
 var body = $('body');
 var id_page = window.location.search.split('=')[1];
+
+
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
 
 
 //Отслеживаем изменения в форме создания проблемы и записываем их в кэш
@@ -90,6 +111,7 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
     var url = $(this).attr('action');
     var data = $(this).serialize();
+    var id = url.split('=')[1];
 
     $.ajax({
 
@@ -99,8 +121,13 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
         cache: false,
         success: function(response){
 
-            $('.hypothesis_create_modal').modal('hide');
-            $('.block_all_hypothesis').html(response.renderAjax);
+            if (response.count === '1') {
+                $('.hypothesis_create_modal').modal('hide');
+                location.href = '/generation-problem/index?id=' + id;
+            } else {
+                $('.hypothesis_create_modal').modal('hide');
+                $('.block_all_hypothesis').html(response.renderAjax);
+            }
         },
         error: function(){
             alert('Ошибка');
@@ -126,7 +153,7 @@ $(body).on('click', '.update-hypothesis', function(e){
         success: function(response){
 
             $(hypothesis_update_modal).modal('show');
-            $(hypothesis_update_modal).find('.modal-header').find('span').html('Редактирование гипотезы проблемы сегмента - ' + response.model.title);
+            $(hypothesis_update_modal).find('.modal-header').find('span').html(response.model.title);
             $(hypothesis_update_modal).find('.modal-body').html(response.renderAjax);
         },
         error: function(){

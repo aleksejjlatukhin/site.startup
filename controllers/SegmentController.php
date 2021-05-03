@@ -104,20 +104,48 @@ class SegmentController extends AppUserPartController
     {
         $project = Projects::findOne($id);
         $models = Segment::findAll(['project_id' => $project->id]);
-        $sortModel = new SortForm();
+
+        if (!$models) return $this->redirect(['/segment/instruction', 'id' => $id]);
 
         return $this->render('index', [
             'project' => $project,
             'models' => $models,
-            'sortModel' => $sortModel,
+            'sortModel' => new SortForm(),
         ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        return $this->render('index_first', [
+            'project' => Projects::findOne($id),
+        ]);
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
     /**
      * @param $current_id
      * @param $type_sort_id
-     * @return array
+     * @return array|bool
      */
     public function actionSortingModels($current_id, $type_sort_id)
     {
@@ -133,9 +161,14 @@ class SegmentController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $project = Projects::findOne($id);
@@ -154,9 +187,14 @@ class SegmentController extends AppUserPartController
             $key = 'formCreateSegmentCache'; //Формируем ключ
             $cache->set($key, $string, 3600*24*30); //Создаем файл кэша на 30дней
         }
+        return false;
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetHypothesisToCreate ($id)
     {
         $project = Projects::findOne($id);
@@ -192,6 +230,7 @@ class SegmentController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
@@ -224,7 +263,7 @@ class SegmentController extends AppUserPartController
                                 $sort = new SegmentSort();
 
                                 $response =  [
-                                    'success' => true,
+                                    'success' => true, 'count' => Segment::find()->where(['project_id' => $id])->count(),
                                     'renderAjax' => $this->renderAjax('_index_ajax', [
                                         'models' => $sort->fetchModels($project->id, $type_sort_id),
                                     ]),
@@ -270,6 +309,10 @@ class SegmentController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetHypothesisToUpdate ($id)
     {
         $model = new FormUpdateSegment($id);
@@ -284,12 +327,13 @@ class SegmentController extends AppUserPartController
             \Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -355,6 +399,7 @@ class SegmentController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 

@@ -87,6 +87,8 @@ class GcpController extends AppUserPartController
     public function actionIndex($id)
     {
         $models = Gcp::find()->where(['confirm_problem_id' => $id])->all();
+        if (!$models) return $this->redirect(['/gcp/instruction', 'id' => $id]);
+
         $confirmProblem = ConfirmProblem::findOne($id);
         $generationProblem = GenerationProblem::find()->where(['id' => $confirmProblem->gps_id])->one();
         $interview = Interview::find()->where(['id' => $generationProblem->interview_id])->one();
@@ -101,6 +103,33 @@ class GcpController extends AppUserPartController
             'segment' => $segment,
             'project' => $project,
         ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInstruction ($id)
+    {
+        return $this->render('index_first', [
+            'confirmProblem' => ConfirmProblem::findOne($id),
+        ]);
+    }
+
+
+    /**
+     * @return bool|string
+     */
+    public function actionGetInstruction ()
+    {
+        if(Yii::$app->request->isAjax) {
+            $response = $this->renderAjax('instruction');
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
@@ -141,6 +170,7 @@ class GcpController extends AppUserPartController
                 if ($model->create()) {
 
                     $response = [
+                        'count' => Gcp::find()->where(['confirm_problem_id' => $id])->count(),
                         'renderAjax' => $this->renderAjax('_index_ajax', [
                             'models' => Gcp::find()->where(['confirm_problem_id' => $id])->all(),
                         ]),

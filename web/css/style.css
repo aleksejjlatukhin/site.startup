@@ -975,8 +975,11 @@ a.button_next_page_masseges:focus {
 */
 .style_header_modal_form {
     border-bottom: none;
-    font-size: 24px;
-    font-family: 'RobotoCondensed-Bold', serif;
+}
+.style_header_modal_form h3{
+    margin-top: 5px;
+    font-size: 28px;
+    font-weight: 700;
     color: #333333;
 }
 /*Стиль для заголовком модальных окон с формами
@@ -2507,6 +2510,23 @@ a.link_for_description_stage:focus {
 /*Стили для всплывающих модальных окон
 ---Начало---
 */
+body .modal_instruction_page .modal-header {
+    border-bottom: none;
+}
+body .modal_instruction_page .modal-body .methodological-guide h3.header-text {
+    margin-top: -20px;
+    padding-top: 0;
+}
+
+body .hypothesis_create_modal .modal-header,
+body .hypothesis_update_modal .modal-header {
+    border-bottom: none;
+}
+body .hypothesis_create_modal .modal-body,
+body .hypothesis_update_modal .modal-body {
+    margin-top: -20px;
+}
+
 body #data_project_modal .modal-header {
     border-bottom: none;
 }
@@ -2610,7 +2630,7 @@ body #result_singup .modal-content { /* Фон для модального ок�
 */
 
 
-/*Стили для ссылки экспорта гипотезы в pdf
+/*Стили для ссылки экспорта гипотезы в pdf для админа
 ---Начало---
 */
 .block_export_link_hypothesis {
@@ -2628,14 +2648,71 @@ a.export_link_hypothesis {
     text-decoration: none;
     transition: color 0.3s ease;
 }
-a.export_link_hypothesis:hover {
-    color: #4F4F4F;
-    text-decoration: none;
-}
+a.export_link_hypothesis:hover,
 a.export_link_hypothesis:focus {
     color: #4F4F4F;
     text-decoration: none;
 }
-/*Стили для ссылки экспорта гипотезы в pdf
+/*Стили для ссылки экспорта гипотезы в pdf для админа
+---Конец---
+*/
+
+/*Стили для ссылки экспорта гипотезы в pdf для проектанта
+---Начало---
+*/
+a.export_link_hypothesis_for_user {
+    margin: 0 auto;
+    padding-left: 5px;
+    color: #4F4F4F;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+a.export_link_hypothesis_for_user:hover,
+a.export_link_hypothesis_for_user:focus {
+    color: #333333;
+    /*text-decoration: none;*/
+}
+/*Стили для ссылки экспорта гипотезы в pdf для проектанта
+---Конец---
+*/
+
+/* Стили для ссылкок на показ инструкции по разработке проекта
+---Начало---
+*/
+a.link_to_instruction_page {
+    font-size: 28px;
+    font-weight: 700;
+    text-decoration: none;
+    color: #4F4F4F;
+}
+a.link_to_instruction_page:hover,
+a.link_to_instruction_page:focus {
+    text-decoration: none;
+    color: #4F4F4F;
+}
+a.link_to_instruction_page img {
+    height: 22px;
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+
+a.link_to_instruction_page_in_modal {
+    font-size: 28px;
+    font-weight: 700;
+    text-decoration: none;
+    color: #4F4F4F;
+    transition: color .3s ease;
+}
+a.link_to_instruction_page_in_modal:hover,
+a.link_to_instruction_page_in_modal:focus {
+    text-decoration: none;
+    color: #333333;
+}
+a.link_to_instruction_page_in_modal img {
+    height: 22px;
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+/* Стили для ссылкок на показ инструкции по разработке проекта
 ---Конец---
 */

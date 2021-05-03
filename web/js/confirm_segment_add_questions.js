@@ -17,6 +17,33 @@ $(body).on('click', '#show_form_view_data', function(){
     $('.form-view-data-confirm').show();
 });
 
+
+// Показать инструкцию для стадии разработки
+$(body).on('click', '.open_modal_instruction_page', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('.modal_instruction_page');
+    $(body).append($(modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).find('.modal-body').html(response);
+            $(modal).modal('show');
+        },
+        error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //Редактирование исходных даннных программы подтверждения сегмента (Шаг 1)
 $(body).on('beforeSubmit', '#update_data_interview', function(e){
 
@@ -377,19 +404,6 @@ $(body).on('click', '.show_modal_next_step_error', function (e) {
 
     $(body).append($(modal_next_step_error).first());
     $(modal_next_step_error).modal('show');
-
-    e.preventDefault();
-    return false;
-});
-
-
-//Показываем модальное окно - информация о добавлении вопросов для интервью
-var modal_information_table_questions = $('#information-table-questions');
-
-$(body).on('click', '.show_modal_information_table_questions', function (e) {
-
-    $(body).append($(modal_information_table_questions).first());
-    $(modal_information_table_questions).modal('show');
 
     e.preventDefault();
     return false;
