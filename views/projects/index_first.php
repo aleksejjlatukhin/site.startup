@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use app\models\User;
+use yii\widgets\ActiveForm;
 
 $this->title = 'Проекты';
 $this->registerCssFile('@web/css/projects-index-style.css');
@@ -116,6 +117,73 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         </div>
 
+    </div>
+
+    <div class="form_authors" style="display: none;">
+
+        <?php
+        $form = ActiveForm::begin([
+            'id' => 'form_authors'
+        ]); ?>
+
+        <div class="form_authors_inputs">
+
+            <div class="row row-author row-author-" style="margin-bottom: 15px;">
+
+                <?= $form->field($new_author, "[0]fio", [
+                    'template' => '<div class="col-md-12" style="padding-left: 20px; margin-top: 15px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'required' => true,
+                    'id' => 'author_fio-',
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
+
+                <?= $form->field($new_author, "[0]role", [
+                    'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'required' => true,
+                    'id' => 'author_role-',
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
+
+                <?= $form->field($new_author, "[0]experience", [
+                    'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
+                ])->textarea([
+                    'rows' => 2,
+                    'id' => 'author_experience-',
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                ]) ?>
+
+                <div class="col-md-12">
+
+                    <?= Html::button('Удалить автора', [
+                        'id' => 'remove-author-',
+                        'class' => "remove-author btn btn-default",
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#E0E0E0',
+                            'color' => '#FFFFFF',
+                            'width' => '200px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                        ]
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+        <?php
+        ActiveForm::end();
+        ?>
     </div>
 
     <!--Модальные окна-->

@@ -151,6 +151,7 @@ class ProjectsController extends AppUserPartController
     {
         return $this->render('index_first', [
             'user' => User::findOne($id),
+            'new_author' => new Authors(),
         ]);
     }
 
