@@ -30,7 +30,8 @@ class CreateRespondConfirmForm extends FormCreateRespondent
         $this->cachePath = self::getCachePath($confirm);
         $cacheName = 'formCreateRespondCache';
         if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
-            foreach ($cache[basename(self::class)] as $key => $value) $this[$key] = $value;
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
 
         parent::__construct($config);

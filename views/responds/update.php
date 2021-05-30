@@ -69,7 +69,7 @@ use yii\helpers\Html;
             <?= \kartik\date\DatePicker::widget([
                 'type' => 2,
                 'removeButton' => false,
-                'name' => basename(get_class($model)).'[date_plan]',
+                'name' => explode('\\', get_class($model))[3].'[date_plan]',
                 'value' => $model->date_plan == null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
                 'readonly' => true,
                 'pluginOptions' => [
