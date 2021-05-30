@@ -12,11 +12,21 @@ use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
 use kartik\mpdf\Pdf;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use Throwable;
 use Yii;
 use app\models\Interview;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
+use yii\web\Response;
 
 
 class InterviewController extends AppUserPartController
@@ -25,7 +35,7 @@ class InterviewController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -43,7 +53,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
@@ -61,7 +71,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -75,7 +85,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['save-interview'])){
@@ -92,7 +102,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         } elseif (in_array($action->id, ['add-questions'])){
@@ -111,7 +121,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         } elseif (in_array($action->id, ['delete-question'])){
@@ -130,7 +140,7 @@ class InterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -177,8 +187,8 @@ class InterviewController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_one');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -192,8 +202,8 @@ class InterviewController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_two');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -207,8 +217,8 @@ class InterviewController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_three');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -261,15 +271,15 @@ class InterviewController extends AppUserPartController
                             ->where(['interview_id' => $id, 'desc_interview.status' => '1'])->all(),
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }else{
 
                 $response = ['error' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -300,8 +310,8 @@ class InterviewController extends AppUserPartController
             if (count($model->responds) > $count_descInterview && empty($model->problems)) {
 
                 $response = ['not_completed_descInterviews' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } elseif ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems))) {
@@ -310,15 +320,15 @@ class InterviewController extends AppUserPartController
                     'success' => true,
                     'exist_confirm' => $segment->exist_confirm,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }else{
 
                 $response = ['error' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -328,9 +338,9 @@ class InterviewController extends AppUserPartController
 
     /**
      * @param $id
-     * @return bool|\yii\web\Response
+     * @return bool|Response
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionNotExistConfirm($id)
     {
@@ -362,9 +372,9 @@ class InterviewController extends AppUserPartController
 
     /**
      * @param $id
-     * @return bool|\yii\web\Response
+     * @return bool|Response
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionExistConfirm($id)
     {
@@ -408,7 +418,7 @@ class InterviewController extends AppUserPartController
 
     /**
      * @param $id
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate($id)
     {
@@ -443,12 +453,12 @@ class InterviewController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionSaveInterview($id)
     {
         $model = new FormCreateConfirmSegment();
-        $model->segment_id = $id;
+        $model->setHypothesisId($id);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -457,8 +467,8 @@ class InterviewController extends AppUserPartController
                 if ($model = $model->create()){
 
                     $response =  ['success' => true, 'id' => $model->id];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -479,7 +489,6 @@ class InterviewController extends AppUserPartController
         $project = Projects::findOne(['id' => $segment->project_id]);
         $questions = QuestionsConfirmSegment::findAll(['interview_id' => $id]);
         $newQuestion = new QuestionsConfirmSegment();
-        $newQuestion->interview_id = $id;
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -496,39 +505,43 @@ class InterviewController extends AppUserPartController
         ]);
     }
 
+
     /**
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmSegment($id);
-        $confirm_segment = Interview::findOne($id);
-        $segment = Segment::findOne(['id' => $confirm_segment->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
+        $confirm = Interview::findOne($id);
+        $segment = Segment::findOne($confirm->segmentId);
+        $project = Projects::findOne($segment->projectId);
 
         if ($model->load(Yii::$app->request->post())) {
 
             if(Yii::$app->request->isAjax) {
 
-                if ($update_confirm_segment = $model->update()){
+                if ($confirm = $model->update()){
 
                     $response = [
                         'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $update_confirm_segment, 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id), 'project' => $project]),
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
+                            'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id),
+                            'model' => $confirm, 'project' => $project
+                        ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
         }
         return false;
     }
+
 
     /**
      * Метод для добавления новых вопросов
@@ -562,8 +575,8 @@ class InterviewController extends AppUserPartController
                         'queryQuestions' => $queryQuestions,
                         'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -584,12 +597,13 @@ class InterviewController extends AppUserPartController
 
         if(Yii::$app->request->isAjax) {
             $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
     }
+
 
     /**
      * @param $id
@@ -608,8 +622,8 @@ class InterviewController extends AppUserPartController
                 'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -645,8 +659,8 @@ class InterviewController extends AppUserPartController
                         'queryQuestions' => $queryQuestions,
                         'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -658,8 +672,8 @@ class InterviewController extends AppUserPartController
     /**
      * @param $id
      * @return array|bool
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionDeleteQuestion ($id)
     {
@@ -683,8 +697,8 @@ class InterviewController extends AppUserPartController
                     'queryQuestions' => $queryQuestions,
                     'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -703,8 +717,8 @@ class InterviewController extends AppUserPartController
         $questions = $model->questions;
 
         $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        \Yii::$app->response->data = $response;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        Yii::$app->response->data = $response;
         return $response;
 
     }
@@ -714,11 +728,11 @@ class InterviewController extends AppUserPartController
      * @param $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfQuestionsAndAnswers($id)
     {
@@ -781,11 +795,11 @@ class InterviewController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfDataResponds($id)
     {

@@ -228,7 +228,7 @@ $this->registerCssFile('@web/css/confirm-gcp-create-style.css');
 
                     <?= $form->field($model, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов, подтвердивших проблему</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                    ])->label('<div style="padding-top: 5px;">Количество респондентов, подтвердивших проблему</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,
@@ -241,11 +241,43 @@ $this->registerCssFile('@web/css/confirm-gcp-create-style.css');
 
                 </div>
 
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+
+                    <?php $btnContent = '<div class="changeBtnContent">Добавить новых респондентов</div><div style="font-weight: 400;font-size: 13px;">(Общее количечество респондентов - от 1 до 100)</div>'; ?>
+
+                    <?= $form->field($model, 'add_count_respond', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label(Html::button($btnContent, [
+                        'id' => 'switch_add_count_respond',
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'font-weight' => '700',
+                            'line-height' => '18px',
+                            'margin-top' => '-10px',
+                            'background' => '#E0E0E0',
+                            'padding' => '0 7px',
+                            'width' => '300px',
+                            'height' => '50px',
+                            'font-size' => '16px',
+                            'border-radius' => '8px',
+                        ]
+                    ])
+                    )->textInput([
+                        'type' => 'number',
+                        'readonly' => true,
+                        'class' => 'style_form_field_respond form-control',
+                        'id' => 'confirm_add_count_respond',
+                        'autocomplete' => 'off'
+                    ]);
+                    ?>
+
+                </div>
+
                 <div class="row">
 
                     <?= $form->field($model, 'count_positive', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('Необходимое количество респондентов, подтверждающих ценностное предложение')
+                    ])->label('<div style="padding-top: 5px;">Необходимое количество респондентов, подтверждающих ценностное предложение</div>')
                         ->textInput([
                             'type' => 'number',
                             'required' => true,

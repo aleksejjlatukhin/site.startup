@@ -5,6 +5,7 @@ namespace app\controllers;
 
 use app\models\CheckingOnlineUser;
 use app\models\User;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use Yii;
 
@@ -14,7 +15,7 @@ class AppController extends Controller
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     public function beforeAction($action)
     {

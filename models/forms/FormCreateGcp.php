@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
+use yii\base\ErrorException;
 use yii\base\Model;
 use app\models\User;
 use app\models\Projects;
@@ -21,6 +22,7 @@ class FormCreateGcp extends Model
     public $contrast;
     public $confirm_problem_id;
 
+
     /**
      * {@inheritdoc}
      */
@@ -32,6 +34,7 @@ class FormCreateGcp extends Model
             [['benefit'], 'string', 'max' => 500],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -49,7 +52,7 @@ class FormCreateGcp extends Model
     /**
      * @return Gcp
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create()
     {

@@ -2,13 +2,17 @@
 
 namespace app\models;
 
-use Yii;
+use app\models\interfaces\RespondsInterface;
+use Throwable;
+use yii\base\ErrorException;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
-class RespondsMvp extends \yii\db\ActiveRecord
+class RespondsMvp extends ActiveRecord implements RespondsInterface
 {
 
-    const LIMIT_COUNT = 100;
 
     /**
      * {@inheritdoc}
@@ -19,20 +23,99 @@ class RespondsMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить интевью респондента
+     * @return mixed|ActiveQuery
+     */
     public function getDescInterview()
     {
         return $this->hasOne(DescInterviewMvp::class, ['responds_mvp_id' => 'id']);
     }
 
+
+    /**
+     * Получить модель подтверждения
+     * @return mixed|ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
     }
 
+
+    /**
+     * Получить ответы респондента на вопросы
+     * @return mixed|ActiveQuery
+     */
     public function getAnswers()
     {
         return $this->hasMany(AnswersQuestionsConfirmMvp::class, ['respond_id' => 'id']);
     }
+
+
+    /**
+     * Установить id подтверждения
+     * @param $confirmId
+     * @return mixed
+     */
+    public function setConfirmId($confirmId)
+    {
+        return $this->confirm_mvp_id = $confirmId;
+    }
+
+
+    /**
+     * Получить id подтверждения
+     * @return mixed
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_mvp_id;
+    }
+
+
+    /**
+     * Установить имя респондента
+     * @param $name
+     * @return mixed
+     */
+    public function setName($name)
+    {
+        return $this->name = $name;
+    }
+
+
+    /**
+     * Получить имя респондента
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param array $params
+     * @return mixed|void
+     */
+    public function setParams(array $params)
+    {
+        $this->info_respond = $params['info_respond'];
+        $this->place_interview = $params['place_interview'];
+        $this->email = $params['email'];
+    }
+
+
+    /**
+     * Установить плановую дату интервью
+     * @param $datePlan
+     */
+    public function setDatePlan($datePlan)
+    {
+        $this->date_plan = $datePlan;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -50,6 +133,7 @@ class RespondsMvp extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -62,20 +146,6 @@ class RespondsMvp extends \yii\db\ActiveRecord
             'date_plan' => 'Плановая дата интервью',
             'place_interview' => 'Место проведения интервью',
         ];
-    }
-
-
-    public function addAnswersForNewRespond()
-    {
-        $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $this->confirm_mvp_id])->all();
-
-        foreach ($questions as $question){
-
-            $answer = new AnswersQuestionsConfirmMvp();
-            $answer->question_id = $question->id;
-            $answer->respond_id = $this->id;
-            $answer->save();
-        }
     }
 
 
@@ -106,21 +176,23 @@ class RespondsMvp extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление связанных данных
+     * по событию EVENT_BEFORE_DELETE
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
         $descInterview = DescInterviewMvp::findOne(['responds_mvp_id' => $this->id]);
         $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->id]);
-        $confirmMvp = ConfirmMvp::findOne(['id' => $this->confirm_mvp_id]);
-        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $mvp->problem_id]);
-        $segment = Segment::findOne(['id' => $mvp->segment_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $confirm = ConfirmMvp::findOne($this->confirmId);
+        $mvp = Mvp::findOne($confirm->mvpId);
+        $gcp = Gcp::findOne($mvp->gcpId);
+        $problem = GenerationProblem::findOne($mvp->problemId);
+        $segment = Segment::findOne($mvp->segmentId);
+        $project = Projects::findOne($mvp->projectId);
+        $user = User::findOne($project->userId);
 
         //Удаление интервью респондента
         if ($descInterview) $descInterview->delete();
@@ -134,9 +206,6 @@ class RespondsMvp extends \yii\db\ActiveRecord
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
             '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$this->id;
         if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-        //Обновление данных подтверждения
-        $confirmMvp->count_respond = $confirmMvp->count_respond - 1;
-        $confirmMvp->save();
     }
 
 }

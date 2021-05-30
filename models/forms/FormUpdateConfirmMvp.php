@@ -3,16 +3,47 @@
 
 namespace app\models\forms;
 
-use yii\base\Model;
 use app\models\ConfirmMvp;
+use app\models\EditorCountResponds;
+use Throwable;
+use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
-class FormUpdateConfirmMvp extends Model
+class FormUpdateConfirmMvp extends FormUpdateConfirm
 {
-    public $id;
-    public $mvp_id;
-    public $count_respond;
-    public $count_positive;
+
+
+    /**
+     * FormUpdateConfirmMvp constructor.
+     * @param $confirmId
+     * @param array $config
+     */
+    public function __construct($confirmId, $config = [])
+    {
+        $confirm = ConfirmMvp::findOne($confirmId);
+        $this->_editorCountRespond = new EditorCountResponds();
+
+        $this->setParams([
+            'id' => $confirmId,
+            'count_respond' => $confirm->count_respond,
+            'count_positive' => $confirm->count_positive,
+        ]);
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param array $params
+     * @return mixed|void
+     */
+    protected function setParams(array $params)
+    {
+        $this->id = $params['id'];
+        $this->count_respond = $params['count_respond'];
+        $this->count_positive = $params['count_positive'];
+    }
+
 
     /**
      * {@inheritdoc}
@@ -20,10 +51,11 @@ class FormUpdateConfirmMvp extends Model
     public function rules()
     {
         return [
-            [['mvp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -32,40 +64,29 @@ class FormUpdateConfirmMvp extends Model
     {
         return [
             'count_respond' => 'Количество респондентов',
-            'count_positive' => 'Необходимое количество позитивных ответов',
+            'count_positive' => 'Количество респондентов, соответствующих продукту (MVP)',
         ];
     }
 
-    /**
-     * FormUpdateConfirmMvp constructor.
-     * @param $id
-     * @param array $config
-     */
-    public function __construct($id, $config = [])
-    {
-        $confirm_mvp = ConfirmMvp::findOne($id);
-
-        $this->id = $id;
-        $this->mvp_id = $confirm_mvp->mvp_id;
-        $this->count_respond = $confirm_mvp->count_respond;
-        $this->count_positive = $confirm_mvp->count_positive;
-
-        parent::__construct($config);
-    }
 
     /**
      * @return ConfirmMvp|bool|null
      * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function update()
     {
         if ($this->validate()) {
 
-            $confirm_mvp = ConfirmMvp::findOne($this->id);
-            $confirm_mvp->count_respond = $this->count_respond;
-            $confirm_mvp->count_positive = $this->count_positive;
+            $confirm = ConfirmMvp::findOne($this->id);
+            $confirm->setCountRespond($this->count_respond);
+            $confirm->setCountPositive($this->count_positive);
 
-            if ($confirm_mvp->save()) return $confirm_mvp;
+            if ($confirm->save()) {
+                $this->_editorCountRespond->edit($confirm);
+                return $confirm;
+            }
             throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;

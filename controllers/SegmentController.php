@@ -6,15 +6,23 @@ use app\models\forms\FormCreateSegment;
 use app\models\forms\FormUpdateSegment;
 use app\models\Projects;
 use app\models\Roadmap;
-use app\models\TypeOfActivityB2B;
-use app\models\TypeOfActivityB2C;
 use app\models\User;
 use kartik\mpdf\Pdf;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use Throwable;
 use Yii;
 use app\models\Segment;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use app\models\SortForm;
 use app\models\SegmentSort;
+use yii\web\Response;
 
 class SegmentController extends AppUserPartController
 {
@@ -22,7 +30,7 @@ class SegmentController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -41,7 +49,7 @@ class SegmentController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['mpdf-segment'])){
@@ -56,7 +64,7 @@ class SegmentController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['index']) || in_array($action->id, ['mpdf-table-segments'])){
@@ -70,7 +78,7 @@ class SegmentController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -86,7 +94,7 @@ class SegmentController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -121,6 +129,9 @@ class SegmentController extends AppUserPartController
      */
     public function actionInstruction ($id)
     {
+        $models = Segment::findAll(['project_id' => $id]);
+        if ($models) return $this->redirect(['/segment/index', 'id' => $id]);
+
         return $this->render('index_first', [
             'project' => Projects::findOne($id),
         ]);
@@ -134,8 +145,8 @@ class SegmentController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -157,8 +168,8 @@ class SegmentController extends AppUserPartController
                 'models' => $sort->fetchModels($current_id, $type_sort_id)
                 ])
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -226,8 +237,8 @@ class SegmentController extends AppUserPartController
                     ]),
                 ];
             }
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -238,13 +249,12 @@ class SegmentController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionCreate($id)
     {
         $model = new FormCreateSegment();
         $model->project_id = $id;
-        $project = Projects::findOne(['id' => $model->project_id]);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -265,23 +275,23 @@ class SegmentController extends AppUserPartController
                                 $response =  [
                                     'success' => true, 'count' => Segment::find()->where(['project_id' => $id])->count(),
                                     'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                        'models' => $sort->fetchModels($id, $type_sort_id),
                                     ]),
                                 ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
 
                             } else {
 
                                 $response =  [
-                                    'success' => true,
+                                    'success' => true, 'count' => Segment::find()->where(['project_id' => $id])->count(),
                                     'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => Segment::findAll(['project_id' => $project->id]),
+                                        'models' => Segment::findAll(['project_id' => $id]),
                                     ]),
                                 ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
                         }
@@ -290,8 +300,8 @@ class SegmentController extends AppUserPartController
 
                         //Сегмент с таким именем уже существует
                         $response =  ['segment_already_exists' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
 
@@ -299,8 +309,8 @@ class SegmentController extends AppUserPartController
 
                     //Данные не загружены
                     $response =  ['data_not_loaded' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -323,8 +333,8 @@ class SegmentController extends AppUserPartController
                 'model' => $model,
                 'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -364,8 +374,8 @@ class SegmentController extends AppUserPartController
                                         'models' => $sort->fetchModels($project->id, $type_sort_id),
                                     ]),
                                 ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
 
                             } else {
@@ -376,8 +386,8 @@ class SegmentController extends AppUserPartController
                                         'models' => Segment::findAll(['project_id' => $project->id]),
                                     ]),
                                 ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
                         }
@@ -385,16 +395,16 @@ class SegmentController extends AppUserPartController
 
                         //Сегмент с таким именем уже существует
                         $response =  ['segment_already_exists' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 } else {
 
                     //Данные не загружены
                     $response =  ['data_not_loaded' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -403,13 +413,12 @@ class SegmentController extends AppUserPartController
     }
 
 
-
     /**
      * @return array
      */
     public function actionListTypeSort()
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
         if (isset($_POST['depdrop_parents'])) {
 
@@ -427,106 +436,6 @@ class SegmentController extends AppUserPartController
 
 
     /**
-     * @return array
-     */
-    public function actionListOfActivitiesForSelectedAreaB2c()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if (isset($_POST['depdrop_parents'])) {
-
-            $parents = $_POST['depdrop_parents'];
-
-            if ($parents != null && $parents[0] != 0) {
-
-                $cat_id = $parents[0];
-                $out = TypeOfActivityB2C::getListOfActivities($cat_id);
-                return ['output' => $out, 'selected' => ''];
-            }
-        }
-        return ['output' => '', 'selected' => ''];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function actionListOfSpecializationsForSelectedActivityB2c()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if (isset($_POST['depdrop_parents'])) {
-
-            $parents = $_POST['depdrop_parents'];
-
-            if ($parents != null && $parents[0] != 0) {
-
-                $cat_id = $parents[0];
-                $out = TypeOfActivityB2C::getListOfActivities($cat_id);
-                return ['output' => $out, 'selected' => ''];
-            }
-        }
-        return ['output' => '', 'selected' => ''];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function actionListOfActivitiesForSelectedAreaB2b()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if (isset($_POST['depdrop_parents'])) {
-
-            $parents = $_POST['depdrop_parents'];
-
-            if ($parents != null && $parents[0] != 0) {
-
-                $cat_id = $parents[0];
-                $out = TypeOfActivityB2B::getListOfActivities($cat_id);
-                return ['output' => $out, 'selected' => ''];
-            }
-        }
-
-        return ['output' => '', 'selected' => ''];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function actionListOfSpecializationsForSelectedActivityB2b()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if (isset($_POST['depdrop_parents'])) {
-
-            $parents = $_POST['depdrop_parents'];
-
-            if ($parents != null && $parents[0] != 0) {
-
-                $out = [
-                    ['id' => 'Производственная компания', 'name' => 'Производственная компания'],
-                    ['id' => 'Государственное учреждение', 'name' => 'Государственное учреждение'],
-                    ['id' => 'Предоставление услуг', 'name' => 'Предоставление услуг'],
-                    ['id' => 'Торговая компания', 'name' => 'Торговая компания'],
-                    ['id' => 'Консалтинговая компания', 'name' => 'Консалтинговая компания'],
-                    ['id' => 'Финансовая компания', 'name' => 'Финансовая компания'],
-                    ['id' => 'Организация рекламы', 'name' => 'Организация рекламы'],
-                    ['id' => 'Научно-образовательное учреждение', 'name' => 'Научно-образовательное учреждение'],
-                    ['id' => 'IT компания', 'name' => 'IT компания'],
-                    ['id' => 'Иное', 'name' => 'Иное'],
-                ];
-                return ['output' => $out, 'selected' => ''];
-            }
-        }
-        return ['output' => '', 'selected' => ''];
-    }
-
-
-
-    /**
      * @param $id
      * @return array|bool
      */
@@ -540,8 +449,8 @@ class SegmentController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('all-information', ['segment' => $segment]),
                 'segment' => $segment,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -551,11 +460,11 @@ class SegmentController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfSegment ($id) {
 
@@ -604,11 +513,11 @@ class SegmentController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfTableSegments ($id) {
 
@@ -670,8 +579,8 @@ class SegmentController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('roadmap', ['roadmap' => $roadmap]),
                 'segment' => $segment,
                 ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -682,9 +591,9 @@ class SegmentController extends AppUserPartController
      * @param $id
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

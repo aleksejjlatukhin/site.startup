@@ -11,18 +11,20 @@ table.all_headers_data_segments tr td {
     padding: 5px;
     font-weight: bold;
 }
-.block_segmnet_name {
-    width: 210px;
+.block_segment_name {
+    width: 270px;
 }
-.block_segmnet_type {
+.block_segment_type {
     width: 50px;
     text-align: center;
 }
-.block_segmnet_params {
-    width: 200px;
+.block_segment_params {
+    width: 270px;
+    text-align: center;
 }
-.block_segmnet_market_volume {
+.block_segment_market_volume {
     width: 120px;
+    text-align: center;
 }
 
 table.block_all_segments {
@@ -34,7 +36,7 @@ table.block_all_segments tr td {
 table.block_all_segments tr td {
     padding: 5px;
 }
-table.block_all_segments tr td.block_segmnet_status {
+table.block_all_segments tr td.block_segment_status {
     width: 40px;
     text-align: center;
 }

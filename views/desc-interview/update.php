@@ -18,22 +18,19 @@ use kartik\select2\Select2;
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-    <?php
-    foreach ($respond->answers as $index => $answer) :
-        ?>
+    <?php if ($respond->answers) : ?>
+        <?php foreach ($respond->answers as $index => $answer) : ?>
 
-        <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
-        ->textarea([
-            'row' => 2,
-            'maxlength' => true,
-            'required' => true,
-            'class' => 'style_form_field_respond form-control',
-        ]);
-        ?>
+            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+            ->textarea([
+                'row' => 2,
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+            ]); ?>
 
-    <?php
-    endforeach;
-    ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
     <div class="row" style="margin-bottom: 15px;">
 

@@ -6,7 +6,6 @@ use app\models\Segment;
 
 ?>
 
-
 <!--Данные для списка сегментов-->
 <?php foreach ($models as $model) : ?>
 
@@ -41,26 +40,11 @@ use app\models\Segment;
 
                 </div>
 
-                <div class="col-md-8">
+                <div class="col-md-11">
 
                     <div class="hypothesis_title" style="padding-left: 15px;">
                         <?= $model->name;?>
                     </div>
-
-                </div>
-
-                <div class="col-md-3 text-center">
-
-                    <?php
-
-                    if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
-                        echo '<div class="">B2C</div>';
-                    }
-                    elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B) {
-                        echo '<div class="">B2B</div>';
-                    }
-
-                    ?>
 
                 </div>
 
@@ -69,26 +53,35 @@ use app\models\Segment;
         </div>
 
 
-        <div class="col-md-2 text_description_segment" title="<?= $model->field_of_activity; ?>">
+        <div class="col-md-3 text_description_segment">
 
-            <?= $model->field_of_activity; ?>
+            <div class="row" style="display:flex; align-items: center; padding-left: 5px;">
+
+                <div class="col-md-3 text-center">
+                    <?php
+                    if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C)
+                        echo '<div class="">B2C</div>';
+                    elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B)
+                        echo '<div class="">B2B</div>';
+                    ?>
+                </div>
+
+                <div class="col-md-8 text-center" title="<?= $model->field_of_activity; ?>">
+                    <?= $model->field_of_activity; ?>
+                </div>
+
+            </div>
 
         </div>
 
-        <div class="col-md-2 text_description_segment" title="<?= $model->sort_of_activity; ?>">
+        <div class="col-md-3 text-center text_description_segment" title="<?= $model->sort_of_activity; ?>">
 
             <?= $model->sort_of_activity; ?>
 
         </div>
 
-        <div class="col-md-2 text_description_segment" title="<?= $model->specialization_of_activity; ?>">
 
-            <?= $model->specialization_of_activity; ?>
-
-        </div>
-
-
-        <div class="col-md-1 text-right">
+        <div class="col-md-1 text-center">
 
             <?= number_format($model->market_volume, 0, '', ' '); ?>
 

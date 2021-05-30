@@ -2,12 +2,18 @@
 
 namespace app\models;
 
-use Yii;
-use yii\helpers\Html;
+use app\models\interfaces\ConfirmationInterface;
+use Throwable;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
-
-class ConfirmGcp extends \yii\db\ActiveRecord
+class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 {
+
+    const STAGE = 6;
+    const LIMIT_COUNT_RESPOND = 100;
+
 
     /**
      * {@inheritdoc}
@@ -17,25 +23,114 @@ class ConfirmGcp extends \yii\db\ActiveRecord
         return 'confirm_gcp';
     }
 
+
+    /**
+     * @return int
+     */
+    public function getStage()
+    {
+        return self::STAGE;
+    }
+
+
+    /**
+     * Проверка на ограничение кол-ва респондентов
+     * @return bool
+     */
+    public function checkingLimitCountRespond()
+    {
+        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        else return false;
+    }
+
+
+    /**
+     * Получить объект текущего Gcp
+     * @return ActiveQuery
+     */
     public function getGcp()
     {
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
 
+
+    /**
+     * Получить респондентов привязанных к подтверждению
+     * @return ActiveQuery
+     */
     public function getResponds()
     {
         return $this->hasMany(RespondsGcp::class, ['confirm_gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить все объекты Mvp данного подтверждения
+     * @return ActiveQuery
+     */
     public function getMvps()
     {
         return $this->hasMany(Mvp::class, ['confirm_gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить вопросы привязанные к подтверждению
+     * @return ActiveQuery
+     */
     public function getQuestions()
     {
         return $this->hasMany(QuestionsConfirmGcp::class, ['confirm_gcp_id' => 'id']);
     }
+
+
+    /**
+     * Установить кол-во респондентов
+     * @param $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+
+    /**
+     * @param $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function setGcpId($id)
+    {
+        return $this->gcp_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getGcpId()
+    {
+        return $this->gcp_id;
+    }
+
+
+    /**
+     * Получить гипотезу подтверждения
+     * @return ActiveQuery
+     */
+    public function getHypothesis()
+    {
+        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+    }
+
 
     /**
      * {@inheritdoc}
@@ -49,6 +144,7 @@ class ConfirmGcp extends \yii\db\ActiveRecord
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -81,56 +177,15 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
-    //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
-    public function createRespond ()
-    {
-        $gcp = Gcp::findOne($this->gcp_id);
-        $confirmProblem = ConfirmProblem::findOne($gcp->confirm_problem_id);
-        $responds = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->all();
-
-        foreach ($responds as $respond) {
-
-            $respondConfirm = new RespondsGcp();
-            $respondConfirm->confirm_gcp_id = $this->id;
-            $respondConfirm->name = $respond->name;
-            $respondConfirm->info_respond = $respond->info_respond;
-            $respondConfirm->place_interview = $respond->place_interview;
-            $respondConfirm->email = $respond->email;
-            $respondConfirm->save();
-        }
-    }
-
-
-    public function addQuestionDefault ($title)
-    {
-        $question = new QuestionsConfirmGcp();
-        $question->confirm_gcp_id = $this->id;
-        $question->title = $title;
-
-        if ($question->save()) {
-            $this->addAnswerConfirmGcp($question->id);
-            $this->addQuestionToGeneralList($title);
-        }
-    }
-
-
+    /**
+     * Добавляем вопрос в общую базу,
+     * если у данного пользователя его там ещё нет
+     * @param $title
+     */
     public function addQuestionToGeneralList($title)
     {
-        $segment = $this->gcp->segment;
         $user = $this->gcp->project->user;
-
-        //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmGcp::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity,
-                /*'user_id' => $user->id*/
-            ])->select('title')->all();
-
+        $baseQuestions = AllQuestionsConfirmGcp::find()->where(['user_id' => $user->id])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){
@@ -140,24 +195,21 @@ class ConfirmGcp extends \yii\db\ActiveRecord
         }
 
         if ($existQuestions == 0){
-
             $general_question = new AllQuestionsConfirmGcp();
             $general_question->title = $title;
             $general_question->user_id = $user->id;
-            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
-            $general_question->field_of_activity = $segment->field_of_activity;
-            $general_question->sort_of_activity = $segment->sort_of_activity;
-            $general_question->specialization_of_activity = $segment->specialization_of_activity;
             $general_question->save();
         }
     }
 
 
+    /**
+     * Создание пустого ответа для нового вопроса для каждого респондента
+     * @param $question_id
+     */
     public function addAnswerConfirmGcp ($question_id)
     {
-        //Создание пустого ответа для нового вопроса для каждого респондента
         foreach ($this->responds as $respond) {
-
             $answer = new AnswersQuestionsConfirmGcp();
             $answer->question_id = $question_id;
             $answer->respond_id = $respond->id;
@@ -167,9 +219,15 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Удаление ответов по данному вопросу
+     * у всех респондентов данного подтверждения
+     * @param $question_id
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function deleteAnswerConfirmGcp ($question_id)
     {
-        //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
         foreach ($this->responds as $respond) {
             $answer = AnswersQuestionsConfirmGcp::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
             $answer->delete();
@@ -177,32 +235,38 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Список вопросов, который будет показан для добавления нового вопроса
+     * @return array
+     */
     public function queryQuestionsGeneralList()
     {
-        $segment = $this->gcp->segment;
+        $user = $this->gcp->project->user;
+        $questions = []; //Добавляем в массив вопросы уже привязанные к данной программе
+        foreach ($this->questions as $question) $questions[] = $question['title'];
 
-        //Добавляем в массив $questions вопросы уже привязанные к данной программе
-        $questions = [];
-        foreach ($this->questions as $question) {
-            $questions[] = $question['title'];
-        }
-
-        $allQuestions = AllQuestionsConfirmGcp::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity
-            ])
+        // Вопросы, предлагаемые по-умолчанию на данном этапе
+        $defaultQuestions = AllQuestionsConfirmGcp::defaultListQuestions();
+        // Вопросы, которые когда-либо добавлял пользователь на данном этапе
+        $attachQuestions = AllQuestionsConfirmGcp::find()
+            ->where(['user_id' => $user->id])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
             ->all();
 
-        $queryQuestions = $allQuestions;
+        $qs = array(); // Добавляем в массив вопросы, предлагаемые по-умолчанию на данном этапе
+        foreach ($defaultQuestions as $question) $qs[] = $question['title'];
+        // Убираем из списка вопросов, которые когда-либо добавлял пользователь на данном этапе
+        // вопросы, которые совпадают  с вопросами по-умолчанию
+        foreach ($attachQuestions as $key => $queryQuestion) {
+            if (in_array($queryQuestion['title'], $qs)) {
+                unset($attachQuestions[$key]);
+            }
+        }
 
-        //Убираем из списка для добавления вопросов,
-        //вопросы уже привязанные к данной программе
+        //Убираем из списка для добавления вопросов, вопросы уже привязанные к данной программе
+        $queryQuestions = array_merge($defaultQuestions, $attachQuestions);
         foreach ($queryQuestions as $key => $queryQuestion) {
             if (in_array($queryQuestion['title'], $questions)) {
                 unset($queryQuestions[$key]);
@@ -213,6 +277,9 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return bool
+     */
     public function getButtonMovingNextStage()
     {
         $count_descInterview = RespondsGcp::find()->with('descInterview')
@@ -231,6 +298,9 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
@@ -241,6 +311,9 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
@@ -252,6 +325,9 @@ class ConfirmGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountConfirmMembers()
     {
         // Кол-во подтвердивших ЦП

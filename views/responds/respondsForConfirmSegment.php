@@ -35,7 +35,7 @@ use app\models\User;
 
                 <div class="" style="overflow: hidden; max-height: 60px; padding: 5px 0;">
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->segment->exist_confirm === null) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
 
                         <?=  Html::a($respond->name, ['#'], [
                             'id' => "respond_name-$respond->id",
@@ -89,7 +89,7 @@ use app\models\User;
 
                     echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
-                            ['/respond/data-availability', 'id' => $model->id], [
+                            ['/responds/data-availability', 'stage' => $confirm->stage, 'id' => $confirm->id], [
                             'id' => 'respond_descInterview_form-' . $respond->id,
                             'class' => 'showDescInterviewCreateForm',
                             'title' => 'Добавить интервью'
@@ -107,7 +107,7 @@ use app\models\User;
                 <div class="col-md-2"></div>
             <?php endif; ?>
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->segment->exist_confirm === null) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
 
                 <div class="col-md-1" style="text-align: right;">
 
@@ -171,35 +171,35 @@ use app\models\User;
     <div class="col-md-12" style="color: #4F4F4F; font-size: 16px; display: flex; justify-content: space-between; padding: 10px 20px; border-radius: 12px; border: 2px solid #707F99; align-items: center; margin-top: 30px;">
 
         <div class="" style="padding: 0;">
-            Необходимо респондентов: <?= $model->count_positive;?>
+            Необходимо респондентов: <?= $confirm->count_positive;?>
         </div>
 
         <div class="" style="padding: 0;">
-            Внесено респондентов: <?= $model->countRespondsOfModel;?>
+            Внесено респондентов: <?= $confirm->countRespondsOfModel;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
-            Соответствуют сегменту: <?= $model->countConfirmMembers;?>
+            Соответствуют сегменту: <?= $confirm->countConfirmMembers;?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-            Не соответствуют сегменту: <?= ($model->countDescInterviewsOfModel - $model->countConfirmMembers);?>
+            Не соответствуют сегменту: <?= ($confirm->countDescInterviewsOfModel - $confirm->countConfirmMembers);?>
         </div>
 
         <div class="" style="padding: 0;">
             <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);?>
-            Не опрошены: <?= ($model->count_respond - $model->countDescInterviewsOfModel);?>
+            Не опрошены: <?= ($confirm->count_respond - $confirm->countDescInterviewsOfModel);?>
         </div>
 
         <div class="" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->segment->exist_confirm === null) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
 
-                <?php if ($model->buttonMovingNextStage === true) : ?>
+                <?php if ($confirm->buttonMovingNextStage === true) : ?>
 
-                    <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
                     'style' => [
                         'display' => 'flex',
                         'align-items' => 'center',
@@ -216,9 +216,9 @@ use app\models\User;
 
                 <?php else : ?>
 
-                    <?php if (($model->count_respond - $model->countDescInterviewsOfModel) == '0') : ?>
+                    <?php if (($confirm->count_respond - $confirm->countDescInterviewsOfModel) == '0') : ?>
 
-                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $model->id],[
+                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -236,7 +236,7 @@ use app\models\User;
 
                     <?php else : ?>
 
-                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $model->id],[
+                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -258,9 +258,9 @@ use app\models\User;
 
             <?php else : ?>
 
-                <?php if ($model->segment->exist_confirm == 1) : ?>
+                <?php if ($confirm->hypothesis->exist_confirm == 1) : ?>
 
-                    <?= Html::a( 'Далее', ['/generation-problem/index', 'id' => $model->id],[
+                    <?= Html::a( 'Далее', ['/generation-problem/index', 'id' => $confirm->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',

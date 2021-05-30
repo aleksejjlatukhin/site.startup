@@ -4,11 +4,11 @@
 namespace app\models;
 
 use yii\base\Model;
-use yii\helpers\Html;
-use yii\helpers\Url;
+use yii\db\ActiveRecord;
 
 class ProjectSort extends Model
 {
+
     public static $array = [
 
         '0' => ['id' => '1', 'parent_id' => '0', 'name' => 'по наименованию'],
@@ -23,6 +23,9 @@ class ProjectSort extends Model
     ];
 
 
+    /**
+     * @return array
+     */
     public static function getListFields()
     {
         $listFields = self::$array;
@@ -38,6 +41,11 @@ class ProjectSort extends Model
         return $listFields;
     }
 
+
+    /**
+     * @param $area_id
+     * @return array
+     */
     public static function getListTypes($area_id)
     {
         $listTypes = self::$array;
@@ -54,6 +62,11 @@ class ProjectSort extends Model
     }
 
 
+    /**
+     * @param $user_id
+     * @param $type_sort_id
+     * @return array|ActiveRecord[]
+     */
     public function fetchModels ($user_id, $type_sort_id)
     {
         $array_sort = self::$array;

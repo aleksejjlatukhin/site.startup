@@ -2,12 +2,13 @@
 
 namespace app\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
-
-class BusinessModel extends \yii\db\ActiveRecord
+class BusinessModel extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -16,35 +17,66 @@ class BusinessModel extends \yii\db\ActiveRecord
         return 'business_model';
     }
 
+
+    /**
+     * Получить объект проекта
+     * @return ActiveQuery
+     */
     public function getProject ()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
+
+    /**
+     * Получить объект сегмента
+     * @return ActiveQuery
+     */
     public function getSegment ()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
+
+    /**
+     * Получить объект проблемы
+     * @return ActiveQuery
+     */
     public function getProblem ()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
     }
 
+
+    /**
+     * Получить объект Gcp
+     * @return ActiveQuery
+     */
     public function getGcp ()
     {
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
 
+
+    /**
+     * Получить объект Mvp
+     * @return ActiveQuery
+     */
     public function getMvp ()
     {
         return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
     }
 
+
+    /**
+     * Получить объект подтверждения Mvp
+     * @return ActiveQuery
+     */
     public function getConfirmMvp()
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -59,6 +91,7 @@ class BusinessModel extends \yii\db\ActiveRecord
             [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -78,7 +111,9 @@ class BusinessModel extends \yii\db\ActiveRecord
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [

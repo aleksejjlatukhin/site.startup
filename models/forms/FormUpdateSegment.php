@@ -3,17 +3,14 @@
 
 namespace app\models\forms;
 
-use app\models\User;
-use app\models\Projects;
 use app\models\Segment;
-use app\models\TypeOfActivityB2C;
-use app\models\TypeOfActivityB2B;
 use yii\web\NotFoundHttpException;
 
 class FormUpdateSegment extends FormSegment
 {
 
     public $id;
+
 
     /**
      * FormUpdateSegment constructor.
@@ -32,10 +29,8 @@ class FormUpdateSegment extends FormSegment
 
         if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C){
 
-            $field_of_activity = TypeOfActivityB2C::findOne(['name' => $model->field_of_activity]);
-            $this->field_of_activity_b2c = $field_of_activity->id;
+            $this->field_of_activity_b2c = $model->field_of_activity;
             $this->sort_of_activity_b2c = $model->sort_of_activity;
-            $this->specialization_of_activity_b2c = $model->specialization_of_activity;
             $this->age_from = $model->age_from;
             $this->age_to = $model->age_to;
             $this->gender_consumer = $model->gender_consumer;
@@ -48,11 +43,8 @@ class FormUpdateSegment extends FormSegment
 
         }elseif ($model->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
-            $field_of_activity = TypeOfActivityB2B::findOne(['name' => $model->field_of_activity]);
-            $this->field_of_activity_b2b = $field_of_activity->id;
+            $this->field_of_activity_b2b = $model->field_of_activity;
             $this->sort_of_activity_b2b = $model->sort_of_activity;
-            $this->specialization_of_activity_b2b = $model->specialization_of_activity;
-
             $this->company_products = $model->company_products;
             $this->quantity_from_b2b = $model->quantity_from;
             $this->quantity_to_b2b = $model->quantity_to;
@@ -75,10 +67,10 @@ class FormUpdateSegment extends FormSegment
         if ($this->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
-                && !empty($this->sort_of_activity_b2c) && !empty($this->specialization_of_activity_b2c)
-                && !empty($this->age_from) && !empty($this->age_to) && !empty($this->gender_consumer)
-                && !empty($this->education_of_consumer) && !empty($this->income_from) && !empty($this->income_to)
-                && !empty($this->quantity_from) && !empty($this->quantity_to) && !empty($this->market_volume_b2c)) {
+                && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
+                && !empty($this->gender_consumer) && !empty($this->education_of_consumer) && !empty($this->income_from)
+                && !empty($this->income_to) && !empty($this->quantity_from) && !empty($this->quantity_to)
+                && !empty($this->market_volume_b2c)) {
 
                 return true;
             } else {
@@ -87,16 +79,16 @@ class FormUpdateSegment extends FormSegment
         } elseif ($this->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
-                && !empty($this->sort_of_activity_b2b) && !empty($this->specialization_of_activity_b2b)
-                && !empty($this->company_products) && !empty($this->company_partner) && !empty($this->quantity_from_b2b)
-                && !empty($this->quantity_to_b2b) && !empty($this->income_company_from) && !empty($this->income_company_to)
-                && !empty($this->market_volume_b2b)) {
+                && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
+                && !empty($this->quantity_from_b2b) && !empty($this->quantity_to_b2b) && !empty($this->income_company_from)
+                && !empty($this->income_company_to) && !empty($this->market_volume_b2b)) {
 
                 return true;
             } else {
                 return false;
             }
         }
+        return false;
     }
 
 
@@ -113,18 +105,16 @@ class FormUpdateSegment extends FormSegment
 
         if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
 
+            $segment->field_of_activity = $this->field_of_activity_b2c;
+            $segment->sort_of_activity = $this->sort_of_activity_b2c;
             $segment->age_from = $this->age_from;
             $segment->age_to = $this->age_to;
-
             $segment->gender_consumer = $this->gender_consumer;
             $segment->education_of_consumer = $this->education_of_consumer;
-
             $segment->income_from = $this->income_from;
             $segment->income_to = $this->income_to;
-
             $segment->quantity_from = $this->quantity_from;
             $segment->quantity_to = $this->quantity_to;
-
             $segment->market_volume = $this->market_volume_b2c;
 
             if ($segment->save()) return $segment;
@@ -132,16 +122,14 @@ class FormUpdateSegment extends FormSegment
 
         }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
 
+            $segment->field_of_activity = $this->field_of_activity_b2b;
+            $segment->sort_of_activity = $this->sort_of_activity_b2b;
             $segment->company_products = $this->company_products;
-
             $segment->quantity_from = $this->quantity_from_b2b;
             $segment->quantity_to = $this->quantity_to_b2b;
-
             $segment->company_partner = $this->company_partner;
-
             $segment->income_from = $this->income_company_from;
             $segment->income_to = $this->income_company_to;
-
             $segment->market_volume = $this->market_volume_b2b;
 
             if ($segment->save()) return $segment;
@@ -150,6 +138,9 @@ class FormUpdateSegment extends FormSegment
     }
 
 
+    /**
+     * @param $attr
+     */
     public function uniqueName($attr)
     {
         $models = Segment::findAll(['project_id' => $this->project_id]);

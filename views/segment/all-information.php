@@ -31,11 +31,8 @@ use yii\helpers\Html;
         <div style="font-weight: 700;">Сфера деятельности потребителя</div>
         <div style="margin-bottom: 10px;"><?= $segment->field_of_activity; ?></div>
 
-        <div style="font-weight: 700;">Вид деятельности потребителя</div>
+        <div style="font-weight: 700;">Вид / специализация деятельности потребителя</div>
         <div style="margin-bottom: 10px;"><?= $segment->sort_of_activity; ?></div>
-
-        <div style="font-weight: 700;">Специализация вида деятельности потребителя</div>
-        <div style="margin-bottom: 10px;"><?= $segment->specialization_of_activity; ?></div>
 
         <div style="font-weight: 700;">Возраст потребителя</div>
         <div style="margin-bottom: 10px;">
@@ -93,11 +90,8 @@ use yii\helpers\Html;
         <div style="font-weight: 700;">Сфера деятельности предприятия</div>
         <div style="margin-bottom: 10px;"><?= $segment->field_of_activity; ?></div>
 
-        <div style="font-weight: 700;">Вид деятельности предприятия</div>
+        <div style="font-weight: 700;">Вид / специализация деятельности предприятия</div>
         <div style="margin-bottom: 10px;"><?= $segment->sort_of_activity; ?></div>
-
-        <div style="font-weight: 700;">Специализация вида деятельности предприятия</div>
-        <div style="margin-bottom: 10px;"><?= $segment->specialization_of_activity; ?></div>
 
         <div style="font-weight: 700;">Продукция / услуги предприятия</div>
         <div style="margin-bottom: 10px;"><?= $segment->company_products; ?></div>

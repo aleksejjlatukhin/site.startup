@@ -14,9 +14,14 @@ use app\modules\admin\models\form\SearchForm;
 use app\modules\admin\models\MessageMainAdmin;
 use app\models\ConversationAdmin;
 use Yii;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\data\Pagination;
 use yii\helpers\FileHelper;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class MessageController extends AppAdminController
 {
@@ -24,8 +29,8 @@ class MessageController extends AppAdminController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\web\HttpException
+     * @throws BadRequestHttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -41,7 +46,7 @@ class MessageController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
@@ -60,15 +65,15 @@ class MessageController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
         elseif (in_array($action->id, ['index'])) {
 
-            $admin = User::findOne(['id' => \Yii::$app->request->get(), 'role' => User::ROLE_ADMIN]);
-            $mainAdmin = User::findOne(['id' => \Yii::$app->request->get(), 'role' => User::ROLE_MAIN_ADMIN]);
-            $development = User::findOne(['id' => \Yii::$app->request->get(), 'role' => User::ROLE_DEV]);
+            $admin = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_ADMIN]);
+            $mainAdmin = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_MAIN_ADMIN]);
+            $development = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_DEV]);
 
             /*Ограничение доступа к проэктам пользователя*/
             if ($admin->id == Yii::$app->user->id || $mainAdmin->id == Yii::$app->user->id || $development->id == Yii::$app->user->id){
@@ -77,7 +82,7 @@ class MessageController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
@@ -192,8 +197,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 elseif ($pathname === 'view') {
@@ -217,8 +222,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 elseif ($pathname === 'technical-support') {
@@ -242,8 +247,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -264,8 +269,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 elseif ($pathname === 'view') {
@@ -284,8 +289,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 elseif ($pathname === 'technical-support') {
@@ -303,8 +308,8 @@ class MessageController extends AppAdminController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -319,8 +324,8 @@ class MessageController extends AppAdminController
                             'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 elseif ($pathname === 'technical-support') {
@@ -333,8 +338,8 @@ class MessageController extends AppAdminController
                             'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -357,14 +362,14 @@ class MessageController extends AppAdminController
             if ($message->status == MessageMainAdmin::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkRead' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -396,14 +401,14 @@ class MessageController extends AppAdminController
                         'messages' => $messages, 'main_admin' => $main_admin, 'admin' => $admin, 'lastMessageOnPage' => $lastMessageOnPage,
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkNewMessages' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -524,8 +529,8 @@ class MessageController extends AppAdminController
                 'messages' => $messages, 'pagesMessages' => $pagesMessages,
                 'main_admin' => $main_admin, 'admin' => $admin,
             ]), 'lastPage' => $lastPage];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -562,8 +567,8 @@ class MessageController extends AppAdminController
      * @param $idLastMessageOnPage
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function actionSendMessage ($id, $idLastMessageOnPage)
     {
@@ -603,8 +608,8 @@ class MessageController extends AppAdminController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -635,8 +640,8 @@ class MessageController extends AppAdminController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -672,8 +677,8 @@ class MessageController extends AppAdminController
                 ])->all();
 
             $response = ['renderAjax' => $this->renderAjax('admin_conversations_query', ['conversations_query' => $conversations_query])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
     }
@@ -705,8 +710,8 @@ class MessageController extends AppAdminController
                 ])->all();
 
             $response = ['renderAjax' => $this->renderAjax('conversations_query', ['conversations_query' => $conversations_query])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
     }
@@ -737,8 +742,8 @@ class MessageController extends AppAdminController
                 ])->all();
 
             $response = ['renderAjax' => $this->renderAjax('conversations_query', ['conversations_query' => $conversations_query])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
     }
@@ -768,8 +773,8 @@ class MessageController extends AppAdminController
                     'blockConversation' => $blockConversation,
                     'countUnreadMessagesForConversation' => $countUnreadMessagesForConversation,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -780,7 +785,7 @@ class MessageController extends AppAdminController
     /**
      * @param $category
      * @param $id
-     * @return \yii\console\Response|\yii\web\Response
+     * @return \yii\console\Response|Response
      * @throws NotFoundHttpException
      */
     public function actionDownload ($category, $id)
@@ -794,7 +799,7 @@ class MessageController extends AppAdminController
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-            return \Yii::$app->response->sendFile($file, $model->file_name);
+            return Yii::$app->response->sendFile($file, $model->file_name);
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
@@ -937,14 +942,14 @@ class MessageController extends AppAdminController
             if ($message->status == MessageDevelopment::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkRead' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -989,14 +994,14 @@ class MessageController extends AppAdminController
                     ];
                 }
 
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkNewMessages' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -1034,8 +1039,8 @@ class MessageController extends AppAdminController
                     'messages' => $messages, 'pagesMessages' => $pagesMessages,
                     'development' => $development, 'user' => $user,
                 ]), 'lastPage' => $lastPage];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
             elseif (User::isUserAdmin($user->username)) {
@@ -1044,8 +1049,8 @@ class MessageController extends AppAdminController
                     'messages' => $messages, 'pagesMessages' => $pagesMessages,
                     'development' => $development, 'user' => $user,
                 ]), 'lastPage' => $lastPage];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -1082,8 +1087,8 @@ class MessageController extends AppAdminController
      * @param $idLastMessageOnPage
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function actionSendMessageDevelopment ($id, $idLastMessageOnPage)
     {
@@ -1123,8 +1128,8 @@ class MessageController extends AppAdminController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -1155,8 +1160,8 @@ class MessageController extends AppAdminController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -1188,8 +1193,8 @@ class MessageController extends AppAdminController
                                 ]),
                             ];
 
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
 
@@ -1206,8 +1211,8 @@ class MessageController extends AppAdminController
                                 ]),
                             ];
 
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
@@ -1244,8 +1249,8 @@ class MessageController extends AppAdminController
                     'blockConversation' => $blockConversation,
                     'countUnreadMessagesForConversation' => $countUnreadMessagesForConversation,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }

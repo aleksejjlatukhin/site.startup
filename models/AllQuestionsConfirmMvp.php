@@ -3,7 +3,6 @@
 
 namespace app\models;
 
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 class AllQuestionsConfirmMvp extends ActiveRecord
@@ -17,44 +16,66 @@ class AllQuestionsConfirmMvp extends ActiveRecord
         return 'all_questions_confirm_mvp';
     }
 
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['title', 'user_id', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'required'],
-            [['title', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'string', 'max' => 255],
-            [['title', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'trim'],
-            [['user_id', 'created_at', 'updated_at'], 'integer'],
-            ['type_of_interaction_between_subjects', 'default', 'value' => Segment::TYPE_B2C],
-            ['type_of_interaction_between_subjects',  'in', 'range' => [
-                Segment::TYPE_B2C,
-                Segment::TYPE_B2B
-            ]]
+            [['title', 'user_id'], 'required'],
+            [['title'], 'string', 'max' => 255],
+            [['title'], 'trim'],
+            [['user_id', 'created_at'], 'integer'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
      */
     public function attributeLabels()
     {
-        return [
-            'id' => 'ID',
-            'title' => 'Описание вопроса',
-            'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
-            'field_of_activity' => 'Сфера деятельности потребителя',
-            'sort_of_activity' => 'Вид деятельности потребителя',
-            'specialization_of_activity' => 'Специализация вида деятельности потребителя',
-        ];
+        return ['title' => 'Описание вопроса'];
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
-            TimestampBehavior::class
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+            ],
         ];
+    }
+
+
+    /**
+     * Вопросы по-умолчанию
+     * @return array
+     */
+    public static function defaultListQuestions()
+    {
+        $array = [
+            '0' => ['title' => 'Чем вы занимаетесь в настоящее время?'],
+            '1' => ['title' => 'Что понравилось в решении и что нет?'],
+            '2' => ['title' => 'Вписывается ли предложение в формат вашей деятельности?'],
+            '3' => ['title' => 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?'],
+            '4' => ['title' => 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?'],
+            '5' => ['title' => 'Какая цена решения должна быть по мнению респондентов?'],
+            '6' => ['title' => 'Сколько сейчас платят?'],
+            '7' => ['title' => 'Какой бюджет до этого выделяли?'],
+            '8' => ['title' => 'Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?'],
+            '9' => ['title' => 'Кто будет финансировать покупку?'],
+            '10' => ['title' => 'С кем еще мне следует переговорить?'],
+            '11' => ['title' => 'Вы бы рассказали об этом продукте своим коллегам?'],
+            '12' => ['title' => 'Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?']
+        ];
+
+        return $array;
     }
 }

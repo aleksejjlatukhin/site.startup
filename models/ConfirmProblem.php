@@ -2,10 +2,18 @@
 
 namespace app\models;
 
-use Yii;
+use app\models\interfaces\ConfirmationInterface;
+use Throwable;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
-class ConfirmProblem extends \yii\db\ActiveRecord
+class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 {
+
+    const STAGE = 4;
+    const LIMIT_COUNT_RESPOND = 100;
+
 
     /**
      * {@inheritdoc}
@@ -15,11 +23,41 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return 'confirm_problem';
     }
 
+
+    /**
+     * @return int
+     */
+    public function getStage()
+    {
+        return self::STAGE;
+    }
+
+
+    /**
+     * Проверка на ограничение кол-ва респондентов
+     * @return bool
+     */
+    public function checkingLimitCountRespond()
+    {
+        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        else return false;
+    }
+
+
+    /**
+     * Получить объект текущей проблемы
+     * @return ActiveQuery
+     */
     public function getProblem()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
     }
 
+
+    /**
+     * Получить респондентов привязанных к подтверждению
+     * @return ActiveQuery
+     */
     public function getResponds()
     {
         return $this->hasMany(RespondsConfirm::class, ['confirm_problem_id' => 'id']);
@@ -30,9 +68,76 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         return $this->hasMany(Gcp::class, ['confirm_problem_id' => 'id']);
     }
 
+
+    /**
+     * Получить вопросы привязанные к подтверждению
+     * @return ActiveQuery
+     */
     public function getQuestions()
     {
         return $this->hasMany(QuestionsConfirmProblem::class, ['confirm_problem_id' => 'id']);
+    }
+
+
+    /**
+     * Установить кол-во респондентов
+     * @param $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+
+    /**
+     * Установить id проблемы
+     * @param $id
+     * @return mixed
+     */
+    public function setProblemId($id)
+    {
+        return $this->gps_id = $id;
+    }
+
+
+    /**
+     * Установить количество респондентов
+     * @param $count
+     * @return mixed
+     */
+    public function setCountPositive($count)
+    {
+        return $this->count_positive = $count;
+    }
+
+
+    /**
+     * Уствновить потребность потребителя
+     * @param $needConsumer
+     * @return mixed
+     */
+    public function setNeedConsumer($needConsumer)
+    {
+        return $this->need_consumer = $needConsumer;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProblemId()
+    {
+        return $this->gps_id;
+    }
+
+
+    /**
+     * Получить гипотезу подтверждения
+     * @return ActiveQuery
+     */
+    public function getHypothesis()
+    {
+        return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
     }
 
 
@@ -57,8 +162,6 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'gps_id' => 'Gps ID',
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Необходимое количество позитивных ответов',
             'need_consumer' => 'Потребность потребителя',
@@ -83,56 +186,15 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
-    //Создание респондентов для программы подтверждения ГПС из представителей сегмента
-    public function createRespond ()
-    {
-        $problem = GenerationProblem::findOne($this->gps_id);
-        $interview = Interview::findOne($problem->interview_id);
-        $responds = Respond::find()->with('descInterview')
-            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->all();
-
-        foreach ($responds as $respond) {
-
-            $respondConfirm = new RespondsConfirm();
-            $respondConfirm->confirm_problem_id = $this->id;
-            $respondConfirm->name = $respond->name;
-            $respondConfirm->info_respond = $respond->info_respond;
-            $respondConfirm->place_interview = $respond->place_interview;
-            $respondConfirm->email = $respond->email;
-            $respondConfirm->save();
-        }
-    }
-
-
-    public function addQuestionDefault ($title)
-    {
-        $question = new QuestionsConfirmProblem();
-        $question->confirm_problem_id = $this->id;
-        $question->title = $title;
-
-        if ($question->save()) {
-            $this->addAnswerConfirmProblem($question->id);
-            $this->addQuestionToGeneralList($title);
-        }
-    }
-
-
+    /**
+     * Добавляем вопрос в общую базу,
+     * если у данного пользователя его там ещё нет
+     * @param $title
+     */
     public function addQuestionToGeneralList($title)
     {
-        $segment = $this->problem->segment;
         $user = $this->problem->project->user;
-
-        //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmProblem::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity,
-                /*'user_id' => $user->id*/
-            ])->select('title')->all();
-
+        $baseQuestions = AllQuestionsConfirmProblem::find()->where(['user_id' => $user->id])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){
@@ -142,23 +204,21 @@ class ConfirmProblem extends \yii\db\ActiveRecord
         }
 
         if ($existQuestions == 0){
-
             $general_question = new AllQuestionsConfirmProblem();
             $general_question->title = $title;
             $general_question->user_id = $user->id;
-            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
-            $general_question->field_of_activity = $segment->field_of_activity;
-            $general_question->sort_of_activity = $segment->sort_of_activity;
-            $general_question->specialization_of_activity = $segment->specialization_of_activity;
             $general_question->save();
         }
     }
 
+
+    /**
+     * Создание пустого ответа для нового вопроса для каждого респондента
+     * @param $question_id
+     */
     public function addAnswerConfirmProblem ($question_id)
     {
-        //Создание пустого ответа для нового вопроса для каждого респондента
         foreach ($this->responds as $respond) {
-
             $answer = new AnswersQuestionsConfirmProblem();
             $answer->question_id = $question_id;
             $answer->respond_id = $respond->id;
@@ -169,13 +229,14 @@ class ConfirmProblem extends \yii\db\ActiveRecord
 
 
     /**
+     * Удаление ответов по данному вопросу
+     * у всех респондентов данного подтверждения
      * @param $question_id
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function deleteAnswerConfirmProblem ($question_id)
     {
-        //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
         foreach ($this->responds as $respond) {
             $answer = AnswersQuestionsConfirmProblem::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
             $answer->delete();
@@ -183,32 +244,38 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Список вопросов, который будет показан для добавления нового вопроса
+     * @return array
+     */
     public function queryQuestionsGeneralList()
     {
-        $segment = $this->problem->segment;
+        $user = $this->problem->project->user;
+        $questions = []; //Добавляем в массив вопросы уже привязанные к данной программе
+        foreach ($this->questions as $question) $questions[] = $question['title'];
 
-        //Добавляем в массив $questions вопросы уже привязанные к данной программе
-        $questions = [];
-        foreach ($this->questions as $question) {
-            $questions[] = $question['title'];
-        }
-
-        $allQuestions = AllQuestionsConfirmProblem::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity
-            ])
+        // Вопросы, предлагаемые по-умолчанию на данном этапе
+        $defaultQuestions = AllQuestionsConfirmProblem::defaultListQuestions();
+        // Вопросы, которые когда-либо добавлял пользователь на данном этапе
+        $attachQuestions = AllQuestionsConfirmProblem::find()
+            ->where(['user_id' => $user->id])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
             ->all();
 
-        $queryQuestions = $allQuestions;
+        $qs = array(); // Добавляем в массив вопросы, предлагаемые по-умолчанию на данном этапе
+        foreach ($defaultQuestions as $question) $qs[] = $question['title'];
+        // Убираем из списка вопросов, которые когда-либо добавлял пользователь на данном этапе
+        // вопросы, которые совпадают  с вопросами по-умолчанию
+        foreach ($attachQuestions as $key => $queryQuestion) {
+            if (in_array($queryQuestion['title'], $qs)) {
+                unset($attachQuestions[$key]);
+            }
+        }
 
-        //Убираем из списка для добавления вопросов,
-        //вопросы уже привязанные к данной программе
+        //Убираем из списка для добавления вопросов, вопросы уже привязанные к данной программе
+        $queryQuestions = array_merge($defaultQuestions, $attachQuestions);
         foreach ($queryQuestions as $key => $queryQuestion) {
             if (in_array($queryQuestion['title'], $questions)) {
                 unset($queryQuestions[$key]);
@@ -219,6 +286,9 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return bool
+     */
     public function getButtonMovingNextStage()
     {
 
@@ -238,6 +308,9 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
@@ -248,6 +321,9 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
@@ -259,6 +335,9 @@ class ConfirmProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountConfirmMembers()
     {
         //Кол-во респондентов, кот-е подтвердили проблему

@@ -2,16 +2,21 @@
 
 namespace app\models;
 
-use Yii;
+use Throwable;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\db\ActiveRecord;
 
-class Mvp extends \yii\db\ActiveRecord
+class Mvp extends ActiveRecord
 {
 
     const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
+
 
     /**
      * {@inheritdoc}
@@ -20,6 +25,7 @@ class Mvp extends \yii\db\ActiveRecord
     {
         return 'mvp';
     }
+
 
     /**
      * Mvp constructor.
@@ -33,35 +39,114 @@ class Mvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить объект подтверждения данного Mvp
+     * @return ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmMvp::class, ['mvp_id' => 'id']);
     }
 
+
+    /**
+     * Получить объект текущего проекта
+     * @return ActiveQuery
+     */
     public function getProject ()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
+
+    /**
+     * Получить объект текущего сегмента
+     * @return ActiveQuery
+     */
     public function getSegment ()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
+
+    /**
+     * Получить объект текущей проблемы
+     * @return ActiveQuery
+     */
     public function getProblem ()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
     }
 
+
+    /**
+     * Получить объект текущего Gcp
+     * @return ActiveQuery
+     */
     public function getGcp ()
     {
         return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
     }
 
+
+    /**
+     * Получить объект бизнес-модели
+     * @return ActiveQuery
+     */
     public function getBusinessModel ()
     {
         return $this->hasOne(BusinessModel::class, ['mvp_id' => 'id']);
     }
+
+
+    /**
+     * Получить респондентов, которые
+     * подтвердтлт текущее Gcp
+     * @return array|ActiveRecord[]
+     */
+    public function getRespondsAgents()
+    {
+        return RespondsGcp::find()->with('descInterview')
+            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
+            ->where(['confirm_gcp_id' => $this->confirm_gcp_id, 'desc_interview_gcp.status' => '1'])->all();
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getGcpId()
+    {
+        return $this->gcp_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProblemId()
+    {
+        return $this->problem_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -78,6 +163,7 @@ class Mvp extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -91,7 +177,10 @@ class Mvp extends \yii\db\ActiveRecord
         ];
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -128,9 +217,10 @@ class Mvp extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление Mvp и связанных данных
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function deleteStage ()
     {

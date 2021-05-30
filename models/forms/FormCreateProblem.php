@@ -8,16 +8,19 @@ use app\models\Interview;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
+use yii\base\ErrorException;
 use yii\base\Model;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateProblem extends Model
 {
+
     public $description;
     public $action_to_check;
     public $result_metric;
     public $interview_id;
+
 
     /**
      * {@inheritdoc}
@@ -30,6 +33,7 @@ class FormCreateProblem extends Model
             [['interview_id'], 'integer'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -47,7 +51,7 @@ class FormCreateProblem extends Model
     /**
      * @return GenerationProblem
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create()
     {

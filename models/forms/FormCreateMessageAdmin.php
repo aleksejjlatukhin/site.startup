@@ -4,6 +4,7 @@ namespace app\models\forms;
 
 use app\models\MessageAdmin;
 use app\models\MessageFiles;
+use Exception;
 use yii\base\Model;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
@@ -12,6 +13,7 @@ use yii\web\UploadedFile;
 
 class FormCreateMessageAdmin extends Model
 {
+
     public $description;
     public $conversation_id;
     public $sender_id;
@@ -65,7 +67,6 @@ class FormCreateMessageAdmin extends Model
 
 
     /**
-     * @param $message
      * @return bool
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
@@ -92,7 +93,7 @@ class FormCreateMessageAdmin extends Model
                     $messageFile->category = $this->category;
                     $messageFile->save(false);
 
-                }catch (\Exception $e){
+                }catch (Exception $e){
 
                     throw new NotFoundHttpException('Невозможно загрузить файл!');
                 }

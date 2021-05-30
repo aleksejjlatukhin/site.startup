@@ -2,10 +2,12 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
-class PreFiles extends \yii\db\ActiveRecord
+class PreFiles extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -14,10 +16,16 @@ class PreFiles extends \yii\db\ActiveRecord
         return 'pre_files';
     }
 
+
+    /**
+     * Получить объект проекта
+     * @return ActiveQuery
+     */
     public function getProject()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -30,6 +38,7 @@ class PreFiles extends \yii\db\ActiveRecord
             [['file_name', 'server_file'], 'string', 'max' => 255],
         ];
     }
+
 
     /**
      * {@inheritdoc}

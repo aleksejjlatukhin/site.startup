@@ -2,9 +2,18 @@
 
 namespace app\models;
 
+use app\models\interfaces\ConfirmationInterface;
+use Throwable;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
-class Interview extends \yii\db\ActiveRecord
+class Interview extends ActiveRecord implements ConfirmationInterface
 {
+
+    const STAGE = 2;
+    const LIMIT_COUNT_RESPOND = 100;
+
 
     /**
      * {@inheritdoc}
@@ -15,24 +24,121 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int
+     */
+    public function getStage()
+    {
+        return self::STAGE;
+    }
+
+
+    /**
+     * Проверка на ограничение кол-ва респондентов
+     * @return bool
+     */
+    public function checkingLimitCountRespond()
+    {
+        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        else return false;
+    }
+
+
+    /**
+     * Получить объект текущего сегмента
+     * @return ActiveQuery
+     */
     public function getSegment()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
+
+    /**
+     * Получить вопросы привязанные к подтверждению
+     * @return ActiveQuery
+     */
     public function getQuestions()
     {
         return $this->hasMany(QuestionsConfirmSegment::class, ['interview_id' => 'id']);
     }
 
+
+    /**
+     * Получить респондентов привязанных к подтверждению
+     * @return ActiveQuery
+     */
     public function getResponds()
     {
         return $this->hasMany(Respond::class, ['interview_id' => 'id']);
     }
 
+
+    /**
+     * Получить все проблемы по данному сегменту
+     * @return ActiveQuery
+     */
     public function getProblems()
     {
         return $this->hasMany(GenerationProblem::class, ['interview_id' => 'id']);
+    }
+
+
+    /**
+     * Установить кол-во респондентов
+     * @param $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+
+    /**
+     * @param $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params)
+    {
+        $this->greeting_interview = $params['greeting_interview'];
+        $this->view_interview = $params['view_interview'];
+        $this->reason_interview = $params['reason_interview'];
+    }
+
+
+    /**
+     * @param $id
+     */
+    public function setSegmentId($id)
+    {
+        $this->segment_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+
+    /**
+     * Получить гипотезу подтверждения
+     * @return ActiveQuery
+     */
+    public function getHypothesis()
+    {
+        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
 
@@ -58,8 +164,6 @@ class Interview extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'segment_id' => 'Segment ID',
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Количество респондентов, соответствующих сегменту',
             'greeting_interview' => 'Приветствие в начале встречи',
@@ -86,45 +190,15 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
-    public function createRespond()
-    {
-        for ($i = 1; $i <= $this->count_respond; $i++ )
-        {
-            $newRespond[$i] = new Respond();
-            $newRespond[$i]->interview_id = $this->id;
-            $newRespond[$i]->name = 'Респондент ' . $i;
-            $newRespond[$i]->save();
-        }
-    }
-
-    public function addQuestionDefault($title)
-    {
-        $question = new QuestionsConfirmSegment();
-        $question->interview_id = $this->id;
-        $question->title = $title;
-
-        if ($question->save()) {
-            $this->addAnswerConfirmSegment($question->id);
-            $this->addQuestionToGeneralList($title);
-        }
-    }
-
-
+    /**
+     * Добавляем вопрос в общую базу,
+     * если у данного пользователя его там ещё нет
+     * @param $title
+     */
     public function addQuestionToGeneralList($title)
     {
-        $segment = $this->segment;
         $user = $this->segment->project->user;
-
-        //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmSegment::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity,
-                /*'user_id' => $user->id*/
-            ])->select('title')->all();
-
+        $baseQuestions = AllQuestionsConfirmSegment::find()->where(['user_id' => $user->id])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){
@@ -134,41 +208,38 @@ class Interview extends \yii\db\ActiveRecord
         }
 
         if ($existQuestions == 0){
-
             $general_question = new AllQuestionsConfirmSegment();
             $general_question->title = $title;
             $general_question->user_id = $user->id;
-            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
-            $general_question->field_of_activity = $segment->field_of_activity;
-            $general_question->sort_of_activity = $segment->sort_of_activity;
-            $general_question->specialization_of_activity = $segment->specialization_of_activity;
             $general_question->save();
         }
     }
 
 
+    /**
+     * Создание пустого ответа для нового вопроса для каждого респондента
+     * @param $question_id
+     */
     public function addAnswerConfirmSegment ($question_id)
     {
-        //Создание пустого ответа для нового вопроса для каждого респондента
         foreach ($this->responds as $respond) {
-
             $answer = new AnswersQuestionsConfirmSegment();
             $answer->question_id = $question_id;
             $answer->respond_id = $respond->id;
             $answer->save();
-
         }
     }
 
 
     /**
+     * Удаление ответов по данному вопросу
+     * у всех респондентов данного подтверждения
      * @param $question_id
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function deleteAnswerConfirmSegment ($question_id)
     {
-        //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
         foreach ($this->responds as $respond) {
             $answer = AnswersQuestionsConfirmSegment::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
             $answer->delete();
@@ -176,32 +247,39 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Список вопросов, который будет показан для добавления нового вопроса
+     * @return array
+     */
     public function queryQuestionsGeneralList()
     {
-        $segment = $this->segment;
+        $user = $this->segment->project->user;
+        $questions = array(); // Добавляем в массив вопросы уже привязанные к данной программе
+        foreach ($this->questions as $question) $questions[] = $question['title'];
 
-        //Добавляем в массив $questions вопросы уже привязанные к данной программе
-        $questions = [];
-        foreach ($this->questions as $question) {
-            $questions[] = $question['title'];
-        }
-
-        $allQuestions = AllQuestionsConfirmSegment::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity
-            ])
+        // Вопросы, предлагаемые по-умолчанию на данном этапе
+        $defaultQuestions = AllQuestionsConfirmSegment::defaultListQuestions();
+        // Вопросы, которые когда-либо добавлял пользователь на данном этапе
+        $attachQuestions = AllQuestionsConfirmSegment::find()
+            ->where(['user_id' => $user->id])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
             ->all();
 
-        $queryQuestions = $allQuestions;
 
-        //Убираем из списка для добавления вопросов,
-        //вопросы уже привязанные к данной программе
+        $qs = array(); // Добавляем в массив вопросы, предлагаемые по-умолчанию на данном этапе
+        foreach ($defaultQuestions as $question) $qs[] = $question['title'];
+        // Убираем из списка вопросов, которые когда-либо добавлял пользователь на данном этапе
+        // вопросы, которые совпадают  с вопросами по-умолчанию
+        foreach ($attachQuestions as $key => $queryQuestion) {
+            if (in_array($queryQuestion['title'], $qs)) {
+                unset($attachQuestions[$key]);
+            }
+        }
+
+        //Убираем из списка для добавления вопросов, вопросы уже привязанные к данной программе
+        $queryQuestions = array_merge($defaultQuestions, $attachQuestions);
         foreach ($queryQuestions as $key => $queryQuestion) {
             if (in_array($queryQuestion['title'], $questions)) {
                 unset($queryQuestions[$key]);
@@ -212,6 +290,9 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return bool
+     */
     public function getButtonMovingNextStage()
     {
 
@@ -231,6 +312,9 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
@@ -241,6 +325,9 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует интервью
@@ -252,6 +339,9 @@ class Interview extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountConfirmMembers()
     {
         // Кол-во представителей сегмента
@@ -261,4 +351,5 @@ class Interview extends \yii\db\ActiveRecord
 
         return $count;
     }
+
 }

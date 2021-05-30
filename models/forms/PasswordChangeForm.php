@@ -13,10 +13,12 @@ class PasswordChangeForm extends Model
     public $newPassword;
     public $newPasswordRepeat;
 
+
     /**
      * @var User
      */
     private $_user;
+
 
     /**
      * @param User $user
@@ -27,6 +29,7 @@ class PasswordChangeForm extends Model
         $this->_user = $user;
         parent::__construct($config);
     }
+
 
     /**
      * @inheritdoc
@@ -42,6 +45,7 @@ class PasswordChangeForm extends Model
         ];
     }
 
+
     /**
      * @inheritdoc
      */
@@ -53,6 +57,7 @@ class PasswordChangeForm extends Model
             'currentPassword' => 'Актуальный пароль',
         ];
     }
+
 
     /**
      * @param string $attribute
@@ -67,12 +72,17 @@ class PasswordChangeForm extends Model
         }
     }
 
+
+    /**
+     * @param $attr
+     */
     public function spaceInPassword ($attr)
     {
         if (preg_match('/\s+/',$this->$attr)) {
             $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
+
 
     /**
      * @return boolean

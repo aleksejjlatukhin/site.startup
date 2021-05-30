@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 class AnswersQuestionsConfirmGcp extends ActiveRecord
@@ -16,15 +17,26 @@ class AnswersQuestionsConfirmGcp extends ActiveRecord
         return 'answers_questions_confirm_gcp';
     }
 
+
+    /**
+     * Получить объект вопроса
+     * @return ActiveQuery
+     */
     public function getQuestion()
     {
         return $this->hasOne(QuestionsConfirmGcp::class, ['id' => 'question_id']);
     }
 
+
+    /**
+     * Получить объект респондента
+     * @return ActiveQuery
+     */
     public function getRespond()
     {
         return $this->hasOne(RespondsGcp::class, ['id' => 'respond_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -37,6 +49,7 @@ class AnswersQuestionsConfirmGcp extends ActiveRecord
             [['answer'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

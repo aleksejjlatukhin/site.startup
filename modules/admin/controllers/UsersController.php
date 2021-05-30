@@ -5,8 +5,14 @@ namespace app\modules\admin\controllers;
 
 use app\models\ConversationAdmin;
 use app\models\User;
+use Throwable;
 use Yii;
+use yii\base\ErrorException;
 use yii\data\Pagination;
+use yii\db\StaleObjectException;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
+use yii\web\Response;
 
 class UsersController extends AppAdminController
 {
@@ -16,8 +22,8 @@ class UsersController extends AppAdminController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\web\HttpException
+     * @throws BadRequestHttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -29,7 +35,7 @@ class UsersController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif ($action->id == 'admins') {
@@ -39,7 +45,7 @@ class UsersController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif ($action->id == 'status-update') {
@@ -54,7 +60,7 @@ class UsersController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif ($action->id == 'add-admin') {
@@ -69,7 +75,7 @@ class UsersController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif ($action->id == 'group') {
@@ -82,7 +88,7 @@ class UsersController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -126,8 +132,8 @@ class UsersController extends AppAdminController
             $response = [
                 'renderAjax' => $this->renderAjax('get_modal_add_admin_to_user', ['user' => $user, 'admins' => $admins]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -147,8 +153,8 @@ class UsersController extends AppAdminController
             $response = [
                 'renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $model]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -205,8 +211,8 @@ class UsersController extends AppAdminController
                     $model->sendEmailUserStatus();
 
                     $response = ['model' => $model];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
 
                 }
@@ -240,8 +246,8 @@ class UsersController extends AppAdminController
                     }
 
                     $response = ['user' => $model, 'admin' => $admin];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
 
                 }
@@ -285,8 +291,8 @@ class UsersController extends AppAdminController
         if (Yii::$app->request->isAjax){
 
             $response = ['renderAjax' => $this->renderAjax('update_column_user', ['user' => $user])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -296,9 +302,9 @@ class UsersController extends AppAdminController
     /**
      * @param $id
      * @return array|bool
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionUserDelete ($id)
     {
@@ -313,22 +319,22 @@ class UsersController extends AppAdminController
                 if ($subscribers) {
 
                     $response = ['error' => true, 'message' => 'Запрещено удаление трекера, у которого есть пользователи!'];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 else {
                     if ($user->removeAllDataUser()) {
 
                         $response = ['success' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                     else {
                         $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -338,14 +344,14 @@ class UsersController extends AppAdminController
                 if ($user->removeAllDataUser()) {
 
                     $response = ['success' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 else {
                     $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }

@@ -2,17 +2,22 @@
 
 namespace app\models;
 
+use Exception;
 use Yii;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 
-class DescInterview extends \yii\db\ActiveRecord
+class DescInterview extends ActiveRecord
 {
 
     public $loadFile;
+
 
     /**
      * {@inheritdoc}
@@ -22,10 +27,16 @@ class DescInterview extends \yii\db\ActiveRecord
         return 'desc_interview';
     }
 
+
+    /**
+     * Получить объект респондента
+     * @return ActiveQuery
+     */
     public function getRespond()
     {
         return $this->hasOne(Respond::class, ['id' => 'respond_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -41,6 +52,7 @@ class DescInterview extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -55,7 +67,10 @@ class DescInterview extends \yii\db\ActiveRecord
         ];
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -83,7 +98,7 @@ class DescInterview extends \yii\db\ActiveRecord
 
     /**
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      * @throws \yii\base\Exception
      */
     public function create()
@@ -163,7 +178,7 @@ class DescInterview extends \yii\db\ActiveRecord
                 $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
                 $this->server_file = $filename . '.' . $this->loadFile->extension;
 
-            }catch (\Exception $e){
+            }catch (Exception $e){
 
                 throw new NotFoundHttpException('Невозможно загрузить файл!');
             }

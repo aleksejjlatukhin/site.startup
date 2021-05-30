@@ -10,9 +10,19 @@ use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
 use kartik\mpdf\Pdf;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use Throwable;
 use Yii;
 use app\models\Gcp;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class GcpController extends AppUserPartController
@@ -21,7 +31,7 @@ class GcpController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -40,7 +50,7 @@ class GcpController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -55,7 +65,7 @@ class GcpController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['index']) || in_array($action->id, ['mpdf-table-gcps'])){
@@ -71,7 +81,7 @@ class GcpController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -125,8 +135,8 @@ class GcpController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -156,7 +166,7 @@ class GcpController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionCreate($id)
     {
@@ -175,8 +185,8 @@ class GcpController extends AppUserPartController
                             'models' => Gcp::find()->where(['confirm_problem_id' => $id])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -205,8 +215,8 @@ class GcpController extends AppUserPartController
                             'models' => Gcp::find()->where(['confirm_problem_id' => $confirmProblem->id])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -230,8 +240,8 @@ class GcpController extends AppUserPartController
                 'model' => $model,
                 'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -241,11 +251,11 @@ class GcpController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfTableGcps ($id) {
 
@@ -297,9 +307,9 @@ class GcpController extends AppUserPartController
      * @param $id
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

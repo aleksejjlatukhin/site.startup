@@ -2,16 +2,21 @@
 
 namespace app\models;
 
-use Yii;
+use Throwable;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
-class GenerationProblem extends \yii\db\ActiveRecord
+class GenerationProblem extends ActiveRecord
 {
 
     const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
+
 
     /**
      * {@inheritdoc}
@@ -20,6 +25,7 @@ class GenerationProblem extends \yii\db\ActiveRecord
     {
         return 'generation_problem';
     }
+
 
     /**
      * GenerationProblem constructor.
@@ -33,35 +39,124 @@ class GenerationProblem extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить все объекты Gcp данной проблемы
+     * @return ActiveQuery
+     */
     public function getGcps()
     {
         return $this->hasMany(Gcp::class, ['problem_id' => 'id']);
     }
 
+
+    /**
+     * Получить все объекты Mvp данной проблемы
+     * @return ActiveQuery
+     */
     public function getMvps()
     {
         return $this->hasMany(Mvp::class, ['problem_id' => 'id']);
     }
 
+
+    /**
+     * Получить все бизнес-модели данной проблемы
+     * @return ActiveQuery
+     */
     public function getBusinessModels ()
     {
         return $this->hasMany(BusinessModel::class, ['problem_id' => 'id']);
     }
 
+
+    /**
+     * Получить объект подтверждения данной проблемы
+     * @return ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmProblem::class, ['gps_id' => 'id']);
     }
 
+
+    /**
+     * Получить объект текущего сегмента
+     * @return ActiveQuery
+     */
     public function getSegment()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
+
+    /**
+     * Получить объект текущего проекта
+     * @return ActiveQuery
+     */
     public function getProject ()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function setSegmentId($id)
+    {
+        return $this->segment_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function setProjectId($id)
+    {
+        return $this->project_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmSegmentId()
+    {
+        return $this->interview_id;
+    }
+
+
+    /**
+     * Получить представителей сегмента
+     * @return array|ActiveRecord[]
+     */
+    public function getRespondsAgents()
+    {
+        return Respond::find()->with('descInterview')
+            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
+            ->where(['interview_id' => $this->interview_id, 'desc_interview.status' => '1'])->all();
+    }
+
 
     /**
      * {@inheritdoc}
@@ -93,7 +188,10 @@ class GenerationProblem extends \yii\db\ActiveRecord
         ];
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -130,9 +228,10 @@ class GenerationProblem extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление проблемы и связанных данных
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function deleteStage ()
     {

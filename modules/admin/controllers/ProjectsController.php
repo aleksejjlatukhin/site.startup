@@ -7,6 +7,9 @@ use app\models\SortForm;
 use app\models\User;
 use Yii;
 use yii\data\Pagination;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
+use yii\web\Response;
 
 class ProjectsController extends AppAdminController
 {
@@ -14,8 +17,8 @@ class ProjectsController extends AppAdminController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\web\HttpException
+     * @throws BadRequestHttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -26,7 +29,7 @@ class ProjectsController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif ($action->id == 'group') {
@@ -39,7 +42,7 @@ class ProjectsController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -93,8 +96,8 @@ class ProjectsController extends AppAdminController
         if(Yii::$app->request->isAjax) {
 
             $response = ['renderAjax' => $this->renderAjax('_index_ajax', ['projects' => $projects, 'pages' => $pages])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;

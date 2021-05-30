@@ -14,9 +14,18 @@ use app\models\Segment;
 use app\models\SortForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use Throwable;
 use Yii;
 use app\models\Projects;
+use yii\base\ErrorException;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\data\ArrayDataProvider;
+use yii\db\StaleObjectException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -43,7 +52,7 @@ class ProjectsController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['mpdf-business-model'])){
@@ -58,7 +67,7 @@ class ProjectsController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -66,7 +75,7 @@ class ProjectsController extends AppUserPartController
 
             if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             }else {
 
@@ -85,7 +94,7 @@ class ProjectsController extends AppUserPartController
 
                     }else {
 
-                        throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                     }
                 }
             }
@@ -101,7 +110,7 @@ class ProjectsController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
@@ -115,7 +124,7 @@ class ProjectsController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -162,8 +171,8 @@ class ProjectsController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -219,8 +228,8 @@ class ProjectsController extends AppUserPartController
                     ]),
                     'cache_form_creation' => $cache_form_creation,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
@@ -232,8 +241,8 @@ class ProjectsController extends AppUserPartController
                         'author' => $author
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -258,8 +267,8 @@ class ProjectsController extends AppUserPartController
                     'workers' => $workers
                 ]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -281,8 +290,8 @@ class ProjectsController extends AppUserPartController
                 'models' => $sort->fetchModels($current_id, $type_sort_id)
                 ])
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -304,7 +313,7 @@ class ProjectsController extends AppUserPartController
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-            return \Yii::$app->response->sendFile($file, $model->file_name);
+            return Yii::$app->response->sendFile($file, $model->file_name);
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
@@ -314,8 +323,8 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return array|Response
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionDeleteFile($id)
     {
@@ -335,8 +344,8 @@ class ProjectsController extends AppUserPartController
                     'count_files' => count($models),
                     'project_id' => $project->id,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }else{
@@ -352,7 +361,7 @@ class ProjectsController extends AppUserPartController
      */
     public function actionListTypeSort()
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
         if (isset($_POST['depdrop_parents'])) {
 
@@ -373,8 +382,8 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function actionCreate($id)
     {
@@ -404,8 +413,8 @@ class ProjectsController extends AppUserPartController
                                     'models' => $sort->fetchModels($user->id, $type_sort_id),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
 
                         } else {
@@ -416,8 +425,8 @@ class ProjectsController extends AppUserPartController
                                     'models' => Projects::findAll(['user_id' => $user->id]),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
@@ -425,8 +434,8 @@ class ProjectsController extends AppUserPartController
 
                     //Проект с таким именем уже существует
                     $response =  ['project_already_exists' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -439,7 +448,7 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function actionUpdate($id)
     {
@@ -468,8 +477,8 @@ class ProjectsController extends AppUserPartController
                                     'models' => $sort->fetchModels($user->id, $type_sort_id),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
 
                         } else {
@@ -480,8 +489,8 @@ class ProjectsController extends AppUserPartController
                                     'models' => Projects::findAll(['user_id' => $user->id]),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
@@ -489,8 +498,8 @@ class ProjectsController extends AppUserPartController
 
                     //Проект с таким именем уже существует
                     $response =  ['project_already_exists' => true];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -513,8 +522,8 @@ class ProjectsController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('all-information', ['project' => $project]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -540,8 +549,8 @@ class ProjectsController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('roadmap', ['roadmaps' => $roadmaps]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -563,8 +572,8 @@ class ProjectsController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('result', ['project' => $project, 'segments' => $segments]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -606,8 +615,8 @@ class ProjectsController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('report', ['segments' => $segments]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -873,11 +882,11 @@ class ProjectsController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfProject($id) {
 
@@ -926,11 +935,11 @@ class ProjectsController extends AppUserPartController
     /**
      * @param $id
      * @return mixed
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfBusinessModel($id) {
 
@@ -983,8 +992,8 @@ class ProjectsController extends AppUserPartController
 
     /**
      * @param $id
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionDeleteAuthor($id)
     {
@@ -1002,9 +1011,9 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

@@ -12,6 +12,7 @@ use app\models\Mvp;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
+use yii\base\ErrorException;
 use yii\base\Model;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
@@ -59,7 +60,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return BusinessModel
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create (){
 

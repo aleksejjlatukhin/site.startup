@@ -3,23 +3,63 @@
 
 namespace app\models\forms;
 
+use app\models\CreatorNewRespondsOnConfirmFirstStep;
 use app\models\Interview;
 use app\models\Projects;
-use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
-use yii\base\Model;
+use yii\base\ErrorException;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
-class FormCreateConfirmSegment extends Model
+class FormCreateConfirmSegment extends FormCreateConfirm
 {
-    public $segment_id;
-    public $count_respond;
-    public $count_positive;
+
     public $greeting_interview;
     public $view_interview;
     public $reason_interview;
+
+
+    /**
+     * FormCreateConfirmSegment constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function setHypothesisId($id)
+    {
+        return $this->hypothesis_id = $id;
+    }
+
+
+    /**
+     * @param $count
+     * @return mixed
+     */
+    public function setCountRespond($count)
+    {
+        return $this->count_respond = $count;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getHypothesisId()
+    {
+        return $this->hypothesis_id;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -27,8 +67,8 @@ class FormCreateConfirmSegment extends Model
     public function rules()
     {
         return [
-            [['segment_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
-            [['segment_id'], 'integer'],
+            [['hypothesis_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
+            [['hypothesis_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => '2000'],
@@ -55,27 +95,27 @@ class FormCreateConfirmSegment extends Model
     /**
      * @return Interview
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create ()
     {
-        $segment = Segment::findOne($this->segment_id);
-        $project = Projects::findOne($segment->project_id);
-        $user = User::findOne($project->user_id);
+        $segment = Segment::findOne($this->hypothesisId);
+        $project = Projects::findOne($segment->projectId);
+        $user = User::findOne($project->userId);
 
         $model = new Interview();
-        $model->segment_id = $this->segment_id;
-        $model->count_respond = $this->count_respond;
-        $model->count_positive = $this->count_positive;
-        $model->greeting_interview = $this->greeting_interview;
-        $model->view_interview = $this->view_interview;
-        $model->reason_interview = $this->reason_interview;
+        $model->setSegmentId($this->hypothesisId);
+        $model->setCountRespond($this->count_respond);
+        $model->setCountPositive($this->count_positive);
+        $model->setParams([
+            'greeting_interview' => $this->greeting_interview,
+            'view_interview' => $this->view_interview,
+            'reason_interview' => $this->reason_interview
+        ]);
 
         if ($model->save()) {
             //Создание респондентов по заданному значению count_respond
-            $model->createRespond();
-            //Вопросы, которые будут добавлены по-умолчанию
-            $this->addListQuestions($model->id);
+            $this->_creatorNewResponds->create($model, $this);
             //Удаление кэша формы создания подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm';
             if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
@@ -85,30 +125,4 @@ class FormCreateConfirmSegment extends Model
         throw new NotFoundHttpException('Ошибка. Неудалось создать подтверждение сегмента');
     }
 
-
-    /**
-     * @param $id
-     * @return bool
-     * @throws NotFoundHttpException
-     */
-    private function addListQuestions ($id)
-    {
-        $model = Interview::findOne($id);
-
-        if ($model) {
-            $model->addQuestionDefault('Как и посредством какого инструмента / процесса вы справляетесь с задачей?');
-            $model->addQuestionDefault('Что нравится / не нравится в текущем положении вещей?');
-            $model->addQuestionDefault('Вас беспокоит данная ситуация?');
-            $model->addQuestionDefault('Что вы пытались с этим сделать?');
-            $model->addQuestionDefault('Что вы делали с этим в последний раз, какие шаги предпринимали?');
-            $model->addQuestionDefault('Если ничего не делали, то почему?');
-            $model->addQuestionDefault('Сколько денег / времени на это тратится сейчас?');
-            $model->addQuestionDefault('Есть ли деньги на решение сложившейся ситуации сейчас?');
-            $model->addQuestionDefault('Что влияет на решение о покупке продукта?');
-            $model->addQuestionDefault('Как принимается решение о покупке?');
-
-            return true;
-        }
-        throw new NotFoundHttpException('Ошибка. Неудалось добавить вопросы для подтверждения сегмента');
-    }
 }

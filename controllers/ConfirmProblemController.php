@@ -15,11 +15,21 @@ use app\models\RespondsConfirm;
 use app\models\Segment;
 use app\models\User;
 use kartik\mpdf\Pdf;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use Throwable;
 use Yii;
 use app\models\ConfirmProblem;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class ConfirmProblemController extends AppUserPartController
@@ -28,7 +38,7 @@ class ConfirmProblemController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -46,7 +56,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
@@ -64,7 +74,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -80,7 +90,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['save-confirm-problem'])){
@@ -99,7 +109,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         } elseif (in_array($action->id, ['add-questions'])){
@@ -118,7 +128,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         } elseif (in_array($action->id, ['delete-question'])){
@@ -137,7 +147,7 @@ class ConfirmProblemController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -156,10 +166,10 @@ class ConfirmProblemController extends AppUserPartController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
+        $problem = GenerationProblem::findOne($model->problemId);
+        $interview = Interview::findOne($problem->confirmSegmentId);
+        $segment = Segment::findOne($interview->segmentId);
+        $project = Projects::findOne($segment->projectId);
         $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
         $newQuestion = new QuestionsConfirmProblem();
 
@@ -188,8 +198,8 @@ class ConfirmProblemController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_one');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -203,8 +213,8 @@ class ConfirmProblemController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_two');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -218,8 +228,8 @@ class ConfirmProblemController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction_step_three');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -234,10 +244,10 @@ class ConfirmProblemController extends AppUserPartController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmProblem::findOne($id);
-        $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $problem = GenerationProblem::findOne($model->problemId);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $user = User::findOne($project->userId);
         $formCreateGcp = new FormCreateGcp();
         $cache = Yii::$app->cache;
 
@@ -273,15 +283,15 @@ class ConfirmProblemController extends AppUserPartController
                         'segment' => $model->problem->segment,
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }else{
 
                 $response = ['error' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -312,8 +322,8 @@ class ConfirmProblemController extends AppUserPartController
             if (count($model->responds) > $count_descInterview && empty($model->gcps)) {
 
                 $response = ['not_completed_descInterviews' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps))) {
@@ -322,15 +332,15 @@ class ConfirmProblemController extends AppUserPartController
                     'success' => true,
                     'exist_confirm' => $problem->exist_confirm,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             }else{
 
                 $response = ['error' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -340,18 +350,18 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param $id
-     * @return bool|\yii\web\Response
+     * @return bool|Response
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionNotExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $problem = GenerationProblem::findOne($model->problemId);
+        $interview = Interview::findOne($problem->confirmSegmentId);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $user = User::findOne($project->userId);
 
         if ($problem->exist_confirm === 0) {
 
@@ -378,17 +388,17 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param $id
-     * @return bool|\yii\web\Response
+     * @return bool|Response
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $problem = GenerationProblem::findOne($model->problemId);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $user = User::findOne($project->userId);
 
         $problem->exist_confirm = 1;
         $problem->time_confirm = time();
@@ -407,12 +417,15 @@ class ConfirmProblemController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     */
     public function actionSaveCacheCreationForm($id)
     {
         $problem = GenerationProblem::findOne($id);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $user = User::findOne($project->userId);
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
 
         if(Yii::$app->request->isAjax) {
@@ -428,27 +441,27 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param $id
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate($id)
     {
         $model = new FormCreateConfirmProblem();
-        $generationProblem = GenerationProblem::findOne($id);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $problem = GenerationProblem::findOne($id);
+        $confirmSegment = Interview::findOne($problem->confirmSegmentId);
+        $segment = Segment::findOne($confirmSegment->segmentId);
+        $project = Projects::findOne($segment->projectId);
+        $user = User::findOne($project->userId);
         $cache = Yii::$app->cache;
 
         //кол-во представителей сегмента
         $count_represent_segment = Respond::find()->with('descInterview')
             ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-            ->where(['interview_id' => $interview->id, 'desc_interview.status' => '1'])->count();
+            ->where(['interview_id' => $confirmSegment->id, 'desc_interview.status' => '1'])->count();
 
-        $model->count_respond = $count_represent_segment;
+        $model->setCountRespond($count_represent_segment);
 
         $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-            '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/confirm/formCreateConfirm/';
+            '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateConfirm/';
         $cache_form_creation = $cache->get('formCreateConfirmProblemCache');
 
         if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmProblem
@@ -457,16 +470,16 @@ class ConfirmProblemController extends AppUserPartController
             }
         }
 
-        if ($generationProblem->confirm){
+        if ($problem->confirm){
             //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $generationProblem->confirm->id]);
+            return $this->redirect(['view', 'id' => $problem->confirm->id]);
         }
 
 
         return $this->render('create', [
             'model' => $model,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
         ]);
@@ -476,13 +489,13 @@ class ConfirmProblemController extends AppUserPartController
     /**
      * @param $id
      * @return array|bool
+     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
      */
     public function actionSaveConfirmProblem($id)
     {
         $model = new FormCreateConfirmProblem();
-        $model->gps_id = $id;
+        $model->setHypothesisId($id);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -491,8 +504,8 @@ class ConfirmProblemController extends AppUserPartController
                 if ($model = $model->create()){
 
                     $response =  ['success' => true, 'id' => $model->id];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -505,11 +518,13 @@ class ConfirmProblemController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionUpdate ($id)
     {
         $model = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
+        $problem = GenerationProblem::findOne($id);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -519,10 +534,13 @@ class ConfirmProblemController extends AppUserPartController
 
                     $response = [
                         'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', ['model' => $model, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id), 'problem' => $problem]),
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
+                            'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id),
+                            'model' => $model, 'problem' => $problem
+                        ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -539,10 +557,10 @@ class ConfirmProblemController extends AppUserPartController
     {
         $model = ConfirmProblem::findOne($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
+        $problem = GenerationProblem::findOne($model->gps_id);
+        $interview = Interview::findOne($problem->confirmSegmentId);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
         $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
         $newQuestion = new QuestionsConfirmProblem();
 
@@ -594,8 +612,8 @@ class ConfirmProblemController extends AppUserPartController
                         'queryQuestions' => $queryQuestions,
                         'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -616,8 +634,8 @@ class ConfirmProblemController extends AppUserPartController
 
         if(Yii::$app->request->isAjax) {
             $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -641,8 +659,8 @@ class ConfirmProblemController extends AppUserPartController
                 'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -678,8 +696,8 @@ class ConfirmProblemController extends AppUserPartController
                         'queryQuestions' => $queryQuestions,
                         'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -690,8 +708,8 @@ class ConfirmProblemController extends AppUserPartController
     /**
      * @param $id
      * @return array|bool
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionDeleteQuestion($id)
     {
@@ -716,8 +734,8 @@ class ConfirmProblemController extends AppUserPartController
                     'queryQuestions' => $queryQuestions,
                     'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -736,8 +754,8 @@ class ConfirmProblemController extends AppUserPartController
         $questions = $model->questions;
 
         $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        \Yii::$app->response->data = $response;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        Yii::$app->response->data = $response;
         return $response;
 
     }
@@ -747,11 +765,11 @@ class ConfirmProblemController extends AppUserPartController
      * @param $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfQuestionsAndAnswers($id)
     {
@@ -815,11 +833,11 @@ class ConfirmProblemController extends AppUserPartController
      * @param $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfDataResponds($id)
     {

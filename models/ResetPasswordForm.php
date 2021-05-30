@@ -3,16 +3,19 @@
 
 namespace app\models;
 
-use Yii;
 use yii\base\Model;
-use yii\base\InvalidArgumentException;
 
 class ResetPasswordForm extends Model
 {
+
     public $password;
     public $exist = true;
     private $_user;
 
+
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -22,6 +25,10 @@ class ResetPasswordForm extends Model
         ];
     }
 
+
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -29,18 +36,26 @@ class ResetPasswordForm extends Model
         ];
     }
 
+
+    /**
+     * ResetPasswordForm constructor.
+     * @param $key
+     * @param array $config
+     */
     public function __construct($key, $config = [])
     {
         if(empty($key) || !is_string($key))
-            //throw new InvalidArgumentException('Ключ не может быть пустым.');
-            $this->exist = false;
+            $this->exist = false; // Ключ не может быть пустым
         $this->_user = User::findBySecretKey($key);
         if(!$this->_user)
-            //throw new InvalidArgumentException('Не верный ключ.');
-            $this->exist = false;
+            $this->exist = false; // Не верный ключ
         parent::__construct($config);
     }
 
+
+    /**
+     * @return bool
+     */
     public function resetPassword()
     {
         /* @var $user User */

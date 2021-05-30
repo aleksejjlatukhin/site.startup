@@ -217,7 +217,6 @@ use yii\helpers\Url;
             ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                 ->textInput([
                     'type' => 'number',
-                    'readonly' => true,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',

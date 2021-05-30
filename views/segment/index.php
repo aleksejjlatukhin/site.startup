@@ -180,34 +180,32 @@ $this->registerCssFile('@web/css/segments-index-style.css');
             <div class="col-md-3 headers_data_hypothesis_hi">
                 <div class="row">
                     <div class="col-md-1" style="padding: 0;"></div>
-                    <div class="col-md-8">Наименование сегмента</div>
-                    <div class="col-md-3 text-center">Тип</div>
+                    <div class="col-md-11">Наименование сегмента</div>
                 </div>
             </div>
 
-            <div class="col-md-2 headers_data_hypothesis_hi" style="padding-left: 10px;">
-                Сфера деятельности
+            <div class="col-md-3 headers_data_hypothesis_hi">
+                <div class="row">
+                    <div class="col-md-3 text-center">Тип</div>
+                    <div class="col-md-8 text-center">Сфера деятельности</div>
+                </div>
             </div>
 
-            <div class="col-md-2 headers_data_hypothesis_hi">
-                Вид деятельности
+            <div class="col-md-3 headers_data_hypothesis_hi text-center">
+                Вид / специализация деятельности
             </div>
 
-            <div class="col-md-2 headers_data_hypothesis_hi">
-                Специализация
-            </div>
-
-            <div class="col-md-2 text-center" style="padding-right: 100px;">
+            <div class="col-md-1 text-center">
 
                 <div class="headers_data_hypothesis_hi">
                     Платеже&shy;способность
                 </div>
-                <div class="headers_data_hypothesis_low" style="padding-left: 10px;">
+                <div class="headers_data_hypothesis_low">
                     млн. руб./год
                 </div>
             </div>
 
-            <div class="col-md-1 text-right" style="padding-right: 5px;">
+            <div class="col-md-2 text-right" style="padding-right: 5px;">
                 <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/segment/mpdf-table-segments', 'id' => $project->id], [
                     'target'=>'_blank', 'title'=> 'Экспорт в pdf',
                 ]);?>
@@ -252,26 +250,11 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-11">
 
                                 <div class="hypothesis_title" style="padding-left: 15px;">
                                     <?= $model->name;?>
                                 </div>
-
-                            </div>
-
-                            <div class="col-md-3 text-center">
-
-                                <?php
-
-                                if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
-                                    echo '<div class="">B2C</div>';
-                                }
-                                elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B) {
-                                    echo '<div class="">B2B</div>';
-                                }
-
-                                ?>
 
                             </div>
 
@@ -280,26 +263,35 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                     </div>
 
 
-                    <div class="col-md-2 text_description_segment" title="<?= $model->field_of_activity; ?>">
+                    <div class="col-md-3 text_description_segment">
 
-                        <?= $model->field_of_activity; ?>
+                        <div class="row" style="display:flex; align-items: center; padding-left: 5px;">
+
+                            <div class="col-md-3 text-center">
+                                <?php
+                                if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C)
+                                    echo '<div class="">B2C</div>';
+                                elseif ($model->type_of_interaction_between_subjects === Segment::TYPE_B2B)
+                                    echo '<div class="">B2B</div>';
+                                ?>
+                            </div>
+
+                            <div class="col-md-8 text-center" title="<?= $model->field_of_activity; ?>">
+                                <?= $model->field_of_activity; ?>
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <div class="col-md-2 text_description_segment" title="<?= $model->sort_of_activity; ?>">
+                    <div class="col-md-3 text-center text_description_segment" title="<?= $model->sort_of_activity; ?>">
 
                         <?= $model->sort_of_activity; ?>
 
                     </div>
 
-                    <div class="col-md-2 text_description_segment" title="<?= $model->specialization_of_activity; ?>">
 
-                        <?= $model->specialization_of_activity; ?>
-
-                    </div>
-
-
-                    <div class="col-md-1 text-right">
+                    <div class="col-md-1 text-center">
 
                         <?= number_format($model->market_volume, 0, '', ' '); ?>
 

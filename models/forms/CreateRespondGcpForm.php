@@ -4,85 +4,125 @@
 namespace app\models\forms;
 
 use app\models\ConfirmGcp;
+use app\models\CreatorAnswersForNewRespond;
 use app\models\Gcp;
 use app\models\GenerationProblem;
+use app\models\interfaces\ConfirmationInterface;
 use app\models\Projects;
 use app\models\RespondsGcp;
 use app\models\Segment;
 use app\models\User;
-use yii\base\Model;
-use yii\helpers\FileHelper;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
-class CreateRespondGcpForm extends Model
+class CreateRespondGcpForm extends FormCreateRespondent
 {
 
-    public $name;
-    public $confirm_gcp_id;
 
     /**
-     * {@inheritdoc}
+     * CreateRespondGcpForm constructor.
+     * @param ConfirmGcp $confirm
+     * @param array $config
      */
-    public function rules()
+    public function __construct(ConfirmGcp $confirm, $config = [])
     {
-        return [
-            [['name'], 'required'],
-            [['name'], 'trim'],
-            [['name'], 'uniqueName'],
-            [['name'], 'string', 'max' => 100],
-        ];
+        $this->_creatorAnswers = new CreatorAnswersForNewRespond();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($confirm);
+        $cacheName = 'formCreateRespondCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            foreach ($cache[basename(self::class)] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
     }
 
+
     /**
-     * {@inheritdoc}
+     * @param $id
+     * @return mixed
      */
-    public function attributeLabels()
+    public function setConfirmId($id)
     {
-        return [
-            'name' => 'Фамилия, имя, отчество',
-        ];
+        return $this->confirm_id = $id;
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_id;
+    }
+
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function setName($name)
+    {
+        return $this->name = $name;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * Получить путь к кэшу формы
+     * @param ConfirmationInterface $confirm
+     * @return string
+     */
+    public static function getCachePath(ConfirmationInterface $confirm)
+    {
+        $gcp = Gcp::findOne($confirm->gcpId);
+        $problem = GenerationProblem::findOne(['id' => $gcp->problemId]);
+        $segment = Segment::findOne($gcp->segmentId);
+        $project = Projects::findOne($gcp->projectId);
+        $user = User::findOne($project->userId);
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond/';
+        return $cachePath;
+    }
+
 
     /**
      * @return RespondsGcp
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create ()
     {
-        $confirmGcp = ConfirmGcp::findOne($this->confirm_gcp_id);
-        $gcp = Gcp::findOne($confirmGcp->gcp_id);
-        $problem = GenerationProblem::findOne($gcp->problem_id);
-        $segment = Segment::findOne($gcp->segment_id);
-        $project = Projects::findOne($gcp->project_id);
-        $user = User::findOne($project->user_id);
-
         $model = new RespondsGcp();
-        $model->confirm_gcp_id = $this->confirm_gcp_id;
-        $model->name = $this->name;
+        $model->setConfirmId($this->confirmId);
+        $model->setName($this->name);
 
         if ($model->save()) {
             // Добавление пустых ответов на вопросы для нового респондента
-            $model->addAnswersForNewRespond();
-            // Обновление данных подтверждения
-            $confirmGcp->count_respond = $confirmGcp->count_respond + 1;
-            $confirmGcp->save();
+            $this->_creatorAnswers->create($model);
             // Удаление кэша формы создания
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateRespond';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Неудалось добавить нового респондента');
     }
 
+
     /**
      * @param $attr
      */
     public function uniqueName($attr)
     {
-        $models = RespondsGcp::findAll(['confirm_gcp_id' => $this->confirm_gcp_id]);
+        $models = RespondsGcp::findAll(['confirm_gcp_id' => $this->confirmId]);
 
         foreach ($models as $item){
 

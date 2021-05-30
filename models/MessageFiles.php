@@ -7,10 +7,12 @@ use yii\db\ActiveRecord;
 
 class MessageFiles extends ActiveRecord
 {
+
     const CATEGORY_ADMIN = 1;
     const CATEGORY_MAIN_ADMIN = 2;
     const CATEGORY_TECHNICAL_SUPPORT = 3;
     const CATEGORY_EXPERT = 4;
+
 
     /**
      * {@inheritdoc}
@@ -19,6 +21,7 @@ class MessageFiles extends ActiveRecord
     {
         return 'message_files';
     }
+
 
     /**
      * {@inheritdoc}

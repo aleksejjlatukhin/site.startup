@@ -32,11 +32,8 @@ $this->title = 'Бизнес-модель';
                 <div class="export_business_model_mini_header">Сфера деятельности:</div>
                 <?= $model->segment->field_of_activity; ?>
 
-                <div class="export_business_model_mini_header">Вид деятельности:</div>
+                <div class="export_business_model_mini_header">Вид / специализация деятельности:</div>
                 <?= $model->segment->sort_of_activity; ?>
-
-                <div class="export_business_model_mini_header">Специализация вида деятельности:</div>
-                <?= $model->segment->specialization_of_activity; ?>
 
             </td>
             <td rowspan="2" class="block-200-export">

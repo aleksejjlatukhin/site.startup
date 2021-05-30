@@ -15,9 +15,14 @@ use app\modules\admin\models\form\SearchForm;
 use app\modules\admin\models\MessageMainAdmin;
 use Yii;
 use app\models\MessageAdmin;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\data\Pagination;
 use yii\helpers\FileHelper;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class MessageController extends AppUserPartController
 {
@@ -25,8 +30,8 @@ class MessageController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\web\HttpException
+     * @throws BadRequestHttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -46,7 +51,7 @@ class MessageController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
@@ -65,7 +70,7 @@ class MessageController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
@@ -82,7 +87,7 @@ class MessageController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }
@@ -139,8 +144,8 @@ class MessageController extends AppUserPartController
                         'blockConversationAdmin' => '#adminConversation-' . $conversation_admin->id,
                         'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
 
 
@@ -162,8 +167,8 @@ class MessageController extends AppUserPartController
                         'blockConversationAdmin' => '#adminConversation-' . $conversation_admin->id,
                         'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
 
                 } elseif ($pathname === 'technical-support') {
@@ -184,8 +189,8 @@ class MessageController extends AppUserPartController
                         'blockConversationAdmin' => '#adminConversation-' . $conversation_admin->id,
                         'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -213,8 +218,8 @@ class MessageController extends AppUserPartController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -230,8 +235,8 @@ class MessageController extends AppUserPartController
                             'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -254,14 +259,14 @@ class MessageController extends AppUserPartController
             if ($message->status == MessageAdmin::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkRead' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -293,14 +298,14 @@ class MessageController extends AppUserPartController
                         'messages' => $messages, 'user' => $user, 'admin' => $admin, 'lastMessageOnPage' => $lastMessageOnPage,
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkNewMessages' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -321,8 +326,8 @@ class MessageController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = ['countUnreadMessages' => $countUnreadMessages];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
 
@@ -438,8 +443,8 @@ class MessageController extends AppUserPartController
                 'messages' => $messages, 'pagesMessages' => $pagesMessages,
                 'user' => $user, 'admin' => $admin,
             ]), 'lastPage' => $lastPage];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -475,8 +480,8 @@ class MessageController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function actionSendMessage ($id, $idLastMessageOnPage)
     {
@@ -517,8 +522,8 @@ class MessageController extends AppUserPartController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -549,8 +554,8 @@ class MessageController extends AppUserPartController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -585,8 +590,8 @@ class MessageController extends AppUserPartController
                     'blockConversation' => $blockConversation,
                     'countUnreadMessagesForConversation' => $countUnreadMessagesForConversation,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -597,7 +602,7 @@ class MessageController extends AppUserPartController
     /**
      * @param $category
      * @param $id
-     * @return \yii\console\Response|\yii\web\Response
+     * @return \yii\console\Response|Response
      * @throws NotFoundHttpException
      */
     public function actionDownload ($category, $id)
@@ -611,7 +616,7 @@ class MessageController extends AppUserPartController
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-            return \Yii::$app->response->sendFile($file, $model->file_name);
+            return Yii::$app->response->sendFile($file, $model->file_name);
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
@@ -704,14 +709,14 @@ class MessageController extends AppUserPartController
             if ($message->status == MessageDevelopment::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkRead' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -745,14 +750,14 @@ class MessageController extends AppUserPartController
                     ]),
                 ];
 
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
 
             } else {
                 $response = ['checkNewMessages' => false];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -788,8 +793,8 @@ class MessageController extends AppUserPartController
                 'messages' => $messages, 'pagesMessages' => $pagesMessages,
                 'user' => $user, 'development' => $development,
             ]), 'lastPage' => $lastPage];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -825,8 +830,8 @@ class MessageController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function actionSendMessageDevelopment ($id, $idLastMessageOnPage)
     {
@@ -865,8 +870,8 @@ class MessageController extends AppUserPartController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -897,8 +902,8 @@ class MessageController extends AppUserPartController
                             ]),
                         ];
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -932,8 +937,8 @@ class MessageController extends AppUserPartController
                     'blockConversation' => $blockConversation,
                     'countUnreadMessagesForConversation' => $countUnreadMessagesForConversation,
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }

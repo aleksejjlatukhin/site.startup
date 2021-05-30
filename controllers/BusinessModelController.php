@@ -13,10 +13,18 @@ use app\models\Mvp;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
+use Mpdf\MpdfException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
 use Yii;
 use app\models\BusinessModel;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use kartik\mpdf\Pdf;
+use yii\web\Response;
 
 
 class BusinessModelController extends AppUserPartController
@@ -25,7 +33,7 @@ class BusinessModelController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -43,7 +51,7 @@ class BusinessModelController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['update'])){
@@ -60,7 +68,7 @@ class BusinessModelController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -77,7 +85,7 @@ class BusinessModelController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['mpdf-business-model'])){
@@ -92,7 +100,7 @@ class BusinessModelController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -158,8 +166,8 @@ class BusinessModelController extends AppUserPartController
     {
         if(Yii::$app->request->isAjax) {
             $response = $this->renderAjax('instruction');
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -197,7 +205,7 @@ class BusinessModelController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function actionCreate($id)
     {
@@ -220,8 +228,8 @@ class BusinessModelController extends AppUserPartController
                             'model' => $businessModel, 'segment' => $segment, 'gcp' => $gcp,
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -245,8 +253,8 @@ class BusinessModelController extends AppUserPartController
                 'model' => $model,
                 'renderAjax' => $this->renderAjax('update', ['model' => $model]),
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -277,8 +285,8 @@ class BusinessModelController extends AppUserPartController
                             'gcp' => $gcp,
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -291,11 +299,11 @@ class BusinessModelController extends AppUserPartController
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Mpdf\MpdfException
-     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-     * @throws \setasign\Fpdi\PdfParser\PdfParserException
-     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-     * @throws \yii\base\InvalidConfigException
+     * @throws MpdfException
+     * @throws CrossReferenceException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws InvalidConfigException
      */
     public function actionMpdfBusinessModel($id) {
 

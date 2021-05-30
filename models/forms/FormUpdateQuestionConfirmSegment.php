@@ -13,7 +13,12 @@ class FormUpdateQuestionConfirmSegment extends Model
     public $interview_id;
     public $title;
 
-    
+
+    /**
+     * FormUpdateQuestionConfirmSegment constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $question = QuestionsConfirmSegment::findOne($id);
@@ -24,6 +29,9 @@ class FormUpdateQuestionConfirmSegment extends Model
     }
 
 
+    /**
+     * @return QuestionsConfirmSegment|null
+     */
     public function update()
     {
         $question = QuestionsConfirmSegment::findOne($this->id);
@@ -44,6 +52,7 @@ class FormUpdateQuestionConfirmSegment extends Model
             [['title'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

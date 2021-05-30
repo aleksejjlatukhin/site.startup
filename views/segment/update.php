@@ -4,11 +4,9 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use kartik\select2\Select2;
-use kartik\depdrop\DepDrop;
 use app\models\Segment;
 use yii\helpers\ArrayHelper;
-use app\models\TypeOfActivityB2C;
-use app\models\TypeOfActivityB2B;
+use app\models\TypeOfActivity;
 
 ?>
 
@@ -34,7 +32,6 @@ use app\models\TypeOfActivityB2B;
             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-5">{input}</div>'
         ])->label('Наименование сегмента *')->textInput([
             'maxlength' => true,
-            'required' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
             'autocomplete' => 'off'
@@ -50,7 +47,6 @@ use app\models\TypeOfActivityB2B;
         ])->label('Краткое описание сегмента *')->textarea([
             'rows' => 1,
             'maxlength' => true,
-            'required' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
         ]);
@@ -71,10 +67,7 @@ use app\models\TypeOfActivityB2B;
             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12 type_of_interaction">{input}</div>'
         ])->label('Вид информационного и экономического взаимодействия между субъектами рынка *')->widget(Select2::class, [
             'data' => $list_of_interactions,
-            'options' => [
-                'id' => 'type-interaction-' . $model->id,
-            ],
-            'disabled' => true,  //Сделать поле неактивным
+            'options' => ['id' => 'type-interaction-' . $model->id],
             'hideSearch' => true, //Скрытие поиска
         ]);
         ?>
@@ -89,23 +82,14 @@ use app\models\TypeOfActivityB2B;
 
             <div class="row" style="margin-bottom: 10px;">
 
-                <?php
-                $listOfAreasOfActivityB2C = TypeOfActivityB2C::getListOfAreasOfActivity();
-                $listOfAreasOfActivityB2C = ArrayHelper::map($listOfAreasOfActivityB2C,'id', 'name');
-                ?>
-
                 <?= $form->field($model, 'field_of_activity_b2c', [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Сфера деятельности потребителя *')->widget(Select2::class, [
-                    'data' => $listOfAreasOfActivityB2C,
-                    'options' => [
-                        'placeholder' => 'Выберите cферу деятельности потребителя',
-                        'id' => 'listOfAreasOfActivityB2C-' . $model->id,
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => ['allowClear' => true]
-                ]);
-                ?>
+                ])->label('Сфера деятельности потребителя *')->textInput([
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
 
             </div>
 
@@ -114,46 +98,12 @@ use app\models\TypeOfActivityB2B;
 
                 <?= $form->field($model, 'sort_of_activity_b2c', [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Вид деятельности потребителя *')->widget(DepDrop::class, [
-                    'type' => DepDrop::TYPE_SELECT2,
-                    'select2Options' => ['pluginOptions' => ['allowClear' => true]],
-                    'options' => [
-                        'id' => 'listOfActivitiesB2C-' . $model->id,
-                        'placeholder' => 'Выберите вид деятельности потребителя'
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => [
-                        'depends' => ['listOfAreasOfActivityB2C'],
-                        'placeholder' => 'Выберите вид деятельности потребителя',
-                        'nameParam' => 'name',
-                        'url' => Url::to(['/segment/list-of-activities-for-selected-area-b2c'])
-                    ]
-                ]);
-                ?>
-
-            </div>
-
-
-            <div class="row" style="margin-bottom: 10px;">
-
-                <?= $form->field($model, 'specialization_of_activity_b2c', [
-                    'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Специализация вида деятельности потребителя *')->widget(DepDrop::class, [
-                    'type' => DepDrop::TYPE_SELECT2,
-                    'select2Options' => ['pluginOptions' => ['allowClear' => true]],
-                    'options' => [
-                        'id' => 'listOfSpecializationsB2C-' . $model->id,
-                        'placeholder' => 'Выберите cпециализацию вида деятельности потребителя',
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => [
-                        'depends' => ['listOfActivitiesB2C'],
-                        'placeholder' => 'Выберите cпециализацию вида деятельности потребителя',
-                        'nameParam' => 'name',
-                        'url' => Url::to(['/segment/list-of-specializations-for-selected-activity-b2c'])
-                    ]
-                ]);
-                ?>
+                ])->label('Вид / специализация деятельности потребителя *')->textInput([
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
 
             </div>
 
@@ -356,7 +306,7 @@ use app\models\TypeOfActivityB2B;
             </script>
 
 
-            <div class="row" style="margin-bottom: 10px; margin-top: 0px;">
+            <div class="row" style="margin-bottom: 10px; margin-top: 0;">
 
                 <?= $form->field($model, 'income_from', [
                     'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
@@ -516,25 +466,17 @@ use app\models\TypeOfActivityB2B;
 
         <div class="form-update-template-b2b-<?= $model->id; ?>">
 
-            <div class="row" style="margin-bottom: 10px;">
 
-                <?php
-                $listOfAreasOfActivityB2B = TypeOfActivityB2B::getListOfAreasOfActivity();
-                $listOfAreasOfActivityB2B = ArrayHelper::map($listOfAreasOfActivityB2B,'id', 'name');
-                ?>
+            <div class="row" style="margin-bottom: 10px;">
 
                 <?= $form->field($model, 'field_of_activity_b2b', [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Сфера деятельности предприятия *')->widget(Select2::class, [
-                    'data' => $listOfAreasOfActivityB2B,
-                    'options' => [
-                        'placeholder' => 'Выберите cферу деятельности предприятия',
-                        'id' => 'listOfAreasOfActivityB2B-' . $model->id,
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => ['allowClear' => true]
-                ]);
-                ?>
+                ])->label('Сфера деятельности предприятия *')->textInput([
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
 
             </div>
 
@@ -543,46 +485,12 @@ use app\models\TypeOfActivityB2B;
 
                 <?= $form->field($model, 'sort_of_activity_b2b', [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Вид деятельности предприятия *')->widget(DepDrop::class, [
-                    'type' => DepDrop::TYPE_SELECT2,
-                    'select2Options' => ['pluginOptions' => ['allowClear' => true]],
-                    'options' => [
-                        'id' => 'listOfActivitiesB2B-' . $model->id,
-                        'placeholder' => 'Выберите вид деятельности предприятия',
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => [
-                        'depends' => ['listOfAreasOfActivityB2B'],
-                        'placeholder' => 'Выберите вид деятельности предприятия',
-                        'nameParam' => 'name',
-                        'url' => Url::to(['/segment/list-of-activities-for-selected-area-b2b'])
-                    ]
-                ]);
-                ?>
-
-            </div>
-
-
-            <div class="row" style="margin-bottom: 10px;">
-
-                <?= $form->field($model, 'specialization_of_activity_b2b', [
-                    'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-                ])->label('Специализация вида деятельности предприятия *')->widget(DepDrop::class, [
-                    'type' => DepDrop::TYPE_SELECT2,
-                    'select2Options' => ['pluginOptions' => ['allowClear' => true]],
-                    'options' => [
-                        'id' => 'listOfSpecializationsB2B-' . $model->id,
-                        'placeholder' => 'Выберите cпециализацию вида деятельности предприятия',
-                    ],
-                    'disabled' => true,  //Сделать поле неактивным
-                    'pluginOptions' => [
-                        'depends' => ['listOfActivitiesB2B'],
-                        'placeholder' => 'Выберите cпециализацию вида деятельности предприятия',
-                        'nameParam' => 'name',
-                        'url' => Url::to(['/segment/list-of-specializations-for-selected-activity-b2b'])
-                    ]
-                ]);
-                ?>
+                ])->label('Вид / специализация деятельности потребителя *')->textInput([
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'placeholder' => '',
+                    'autocomplete' => 'off'
+                ]); ?>
 
             </div>
 

@@ -9,6 +9,7 @@ use Yii;
 
 class ProfileForm extends Model
 {
+
     public $id;
     public $second_name;
     public $first_name;
@@ -22,6 +23,9 @@ class ProfileForm extends Model
     public $checking_mail_sending = true;
 
 
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -36,6 +40,11 @@ class ProfileForm extends Model
     }
 
 
+    /**
+     * ProfileForm constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $user = User::findOne($id);
@@ -46,6 +55,9 @@ class ProfileForm extends Model
     }
 
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -59,8 +71,12 @@ class ProfileForm extends Model
     }
 
 
-    /*Собственное правило для поля username*/
-    /*Переводим все логины в нижний регистр и сравниваем их с тем, что в форме*/
+    /**
+     * Собственное правило для поля username
+     * Переводим все логины в нижний регистр
+     * и сравниваем их с тем, что в форме
+     * @param $attr
+     */
     public function uniqUsername($attr)
     {
         $users = User::find()->all();
@@ -74,6 +90,9 @@ class ProfileForm extends Model
     }
 
 
+    /**
+     * @param $attr
+     */
     public function matchUsername($attr)
     {
         if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
@@ -88,6 +107,9 @@ class ProfileForm extends Model
     }
 
 
+    /**
+     * @param $attr
+     */
     public function uniqEmail($attr)
     {
         $users = User::find()->all();
@@ -101,7 +123,10 @@ class ProfileForm extends Model
     }
 
 
-    /*Отправка уведомления на email*/
+    /**
+     * Отправка уведомления на email
+     * @return bool
+     */
     public function sendEmail()
     {
         try {
@@ -119,6 +144,7 @@ class ProfileForm extends Model
             return  false;
         }
     }
+
 
     /**
      * @return $this|User|null

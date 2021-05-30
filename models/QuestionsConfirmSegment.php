@@ -2,12 +2,15 @@
 
 namespace app\models;
 
-use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
-class QuestionsConfirmSegment extends \yii\db\ActiveRecord
+class QuestionsConfirmSegment extends ActiveRecord
 {
 
     public $list_questions;
+
 
     /**
      * {@inheritdoc}
@@ -17,17 +20,28 @@ class QuestionsConfirmSegment extends \yii\db\ActiveRecord
         return 'questions_confirm_segment';
     }
 
+
+    /**
+     * Получить объект подтверждения
+     * @return ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(Interview::class, ['id' => 'interview_id']);
     }
 
+
+    /**
+     * Получить все ответы на данный вопрос
+     * @return array|ActiveRecord[]
+     */
     public function getAnswers()
     {
         $answers = AnswersQuestionsConfirmSegment::find()->where(['question_id' => $this->id])
             ->andWhere(['not', ['answers_questions_confirm_segment.answer' => '']])->all();
         return $answers;
     }
+
 
     /**
      * {@inheritdoc}
@@ -36,24 +50,29 @@ class QuestionsConfirmSegment extends \yii\db\ActiveRecord
     {
         return [
             [['interview_id', 'title'], 'required'],
-            [['interview_id'], 'integer'],
-            [['status'], 'boolean'],
-            [['status'], 'default', 'value' => '1'],
+            [['interview_id', 'created_at', 'updated_at'], 'integer'],
             [['title', 'list_questions'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
      */
     public function attributeLabels()
     {
+        return ['title' => 'Описание вопроса'];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
         return [
-            'id' => 'ID',
-            'interview_id' => 'Interview ID',
-            'title' => 'Описание вопроса',
-            'status' => 'Status',
+            TimestampBehavior::class
         ];
     }
 

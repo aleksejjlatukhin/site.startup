@@ -15,10 +15,8 @@ abstract class FormSegment extends Model
     public $type_of_interaction_between_subjects;
     public $field_of_activity_b2c;
     public $sort_of_activity_b2c;
-    public $specialization_of_activity_b2c;
     public $field_of_activity_b2b;
     public $sort_of_activity_b2b;
-    public $specialization_of_activity_b2b;
     public $age_from;
     public $age_to;
     public $income_from;
@@ -44,11 +42,13 @@ abstract class FormSegment extends Model
      */
     abstract public function checkFillingFields ();
 
+
     /**
      * Проверка на уникальное имя сегмента
      * @param $attr
      */
     abstract public function uniqueName($attr);
+
 
     /**
      * {@inheritdoc}
@@ -56,9 +56,8 @@ abstract class FormSegment extends Model
     public function rules()
     {
         return [
-            [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c'], 'safe'],
-            [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b'], 'string', 'max' => 255],
-            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'specialization_of_activity_b2c', 'specialization_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
+            [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b'], 'string', 'max' => 255],
+            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
             ['name', 'string', 'min' => 2, 'max' => 65],
             ['name', 'uniqueName'],
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
@@ -77,6 +76,9 @@ abstract class FormSegment extends Model
     }
 
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -85,10 +87,8 @@ abstract class FormSegment extends Model
             'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
             'field_of_activity_b2c' => 'Сфера деятельности потребителя',
             'field_of_activity_b2b' => 'Сфера деятельности предприятия',
-            'sort_of_activity_b2c' => 'Вид деятельности потребителя',
-            'sort_of_activity_b2b' => 'Вид деятельности предприятия',
-            'specialization_of_activity_b2c' => 'Специализация вида деятельности потребителя',
-            'specialization_of_activity_b2b' => 'Специализация вида деятельности предприятия',
+            'sort_of_activity_b2c' => 'Вид / специализация деятельности потребителя',
+            'sort_of_activity_b2b' => 'Вид / специализация деятельности предприятия',
             'age_from' => 'Возраст потребителя',
             'age_to' => 'Возраст потребителя',
             'income_from' => 'Доход потребителя',

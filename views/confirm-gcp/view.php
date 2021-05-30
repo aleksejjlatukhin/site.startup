@@ -349,7 +349,6 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
                     ])->label('<div>Количество респондентов, подтвердивших проблему</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                         ->textInput([
                             'type' => 'number',
-                            'readonly' => true,
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_respond',
@@ -559,7 +558,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
 
                 <div class="col-md-3" style="padding: 0;">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $gcp->exist_confirm === null) : ?>
-                        <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['#'],
+                        <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить респондента</div></div>', ['/responds/get-data-create-form', 'stage' => $model->stage , 'id' => $model->id],
                             ['id' => 'showRespondCreateForm', 'class' => 'link_add_respond_text pull-right']
                         ); ?>
                     <?php endif; ?>

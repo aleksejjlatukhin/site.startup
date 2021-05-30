@@ -6,9 +6,14 @@ use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
 use app\models\Projects;
+use Throwable;
 use Yii;
 use app\models\User;
+use yii\base\Exception;
+use yii\db\StaleObjectException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class ProfileController extends AppAdminController
@@ -17,7 +22,7 @@ class ProfileController extends AppAdminController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -32,7 +37,7 @@ class ProfileController extends AppAdminController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{
             return parent::beforeAction($action);
@@ -79,14 +84,14 @@ class ProfileController extends AppAdminController
             if ($user->checkOnline === true) {
 
                 $response = ['user_online' => true, 'message' => 'Пользователь сейчас Online'];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
 
                 $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -125,8 +130,8 @@ class ProfileController extends AppAdminController
                                     'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
 
                         }
@@ -134,8 +139,8 @@ class ProfileController extends AppAdminController
 
                             //Письмо с уведомлением не отправлено
                             $response = ['error_send_email' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
@@ -160,8 +165,8 @@ class ProfileController extends AppAdminController
                         $response['error_match_username'] = true;
                     }
 
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -184,8 +189,8 @@ class ProfileController extends AppAdminController
                     if ($model->changePassword()) {
 
                         $response = ['success' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
 
@@ -194,8 +199,8 @@ class ProfileController extends AppAdminController
                     if (!$model->validate(['currentPassword'])) {
 
                         $response = ['errorCurrentPassword' => 'true'];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -207,9 +212,9 @@ class ProfileController extends AppAdminController
     /**
      * @param $id
      * @return array|bool
-     * @throws \Throwable
-     * @throws \yii\base\Exception
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws Exception
+     * @throws StaleObjectException
      */
     public function actionLoadAvatarImage ($id)
     {
@@ -234,8 +239,8 @@ class ProfileController extends AppAdminController
                             'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
 
@@ -244,8 +249,8 @@ class ProfileController extends AppAdminController
                 if ($result = $avatarForm->loadMaxImage()) {
 
                     $response = $result;
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 return false;
@@ -266,8 +271,8 @@ class ProfileController extends AppAdminController
         if (Yii::$app->request->isAjax) {
 
             $response = ['path_max' => '/web/upload/user-' . $user->id . '/avatar/' . $user->avatar_max_image,];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
 
         }
@@ -313,8 +318,8 @@ class ProfileController extends AppAdminController
                         'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }

@@ -8,10 +8,14 @@ use yii\db\ActiveRecord;
 class CheckingOnlineUser extends ActiveRecord
 {
 
+    /**
+     * @return string
+     */
     public static function tableName()
     {
         return 'checking_online_user';
     }
+
 
     /**
      * {@inheritdoc}
@@ -46,6 +50,7 @@ class CheckingOnlineUser extends ActiveRecord
         return $this->save() ? $this : null;
     }
 
+
     /**
      * @return bool|mixed
      */
@@ -56,8 +61,11 @@ class CheckingOnlineUser extends ActiveRecord
     }
 
 
-    // Возвращает дату по русски + время
-    function getDateRusAndTime(){
+    /**
+     * Возвращает дату по русски + время
+     * @return string
+     */
+    public function getDateRusAndTime(){
 
         $monthes = array(
             1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',

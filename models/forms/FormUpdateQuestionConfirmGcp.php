@@ -14,6 +14,11 @@ class FormUpdateQuestionConfirmGcp extends Model
     public $title;
 
 
+    /**
+     * FormUpdateQuestionConfirmGcp constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $question = QuestionsConfirmGcp::findOne($id);
@@ -24,12 +29,16 @@ class FormUpdateQuestionConfirmGcp extends Model
     }
 
 
+    /**
+     * @return QuestionsConfirmGcp|null
+     */
     public function update()
     {
         $question = QuestionsConfirmGcp::findOne($this->id);
         $question->title = $this->title;
         return $question->save() ? $question : null;
     }
+
 
     /**
      * {@inheritdoc}
@@ -43,6 +52,7 @@ class FormUpdateQuestionConfirmGcp extends Model
             [['title'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

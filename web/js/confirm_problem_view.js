@@ -4,7 +4,7 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 $(document).ready(function() {
 
     var id = (window.location.search).split('?id=')[1];
-    var url = '/responds-confirm/get-query-responds?id=' + id + '&page=1';
+    var url = '/responds/get-query-responds?stage=4&id=' + id + '&page=1';
 
     //Загружаем данные респондентов (Шаг 3)
     $.ajax({
@@ -130,7 +130,7 @@ $(body).on('beforeSubmit', '#update_data_confirm', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-confirm/get-query-responds?id=' + id + '&page=1',
+                    url: '/responds/get-query-responds?stage=4&id=' + id + '&page=1',
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -473,7 +473,7 @@ $(body).on('change', 'input#confirm_count_positive', function () {
 //Отслеживаем изменения в форме создания респондента и записываем их в кэш
 $(body).on('change', 'form#new_respond_form', function(){
 
-    var url = '/responds-confirm/save-cache-creation-form?id=' + id_page;
+    var url = '/responds/save-cache-creation-form?stage=4&id=' + id_page;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -490,8 +490,7 @@ $(body).on('change', 'form#new_respond_form', function(){
 //При нажатии на кнопку Добавить респондента
 $(body).on('click', '#showRespondCreateForm', function(e){
 
-    var id = location.href.split('=')[1];
-    var url = '/responds-confirm/get-data-create-form?id=' + id;
+    var url = $(this).attr('href');
     var respondCreate_modal = $('#respondCreate_modal');
     $(body).append($(respondCreate_modal).first());
 
@@ -538,7 +537,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
                     //Загружаем данные респондентов (Шаг 3)
                     $.ajax({
 
-                        url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + response.page,
+                        url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + response.page,
                         method: 'POST',
                         cache: false,
                         success: function(response){
@@ -589,7 +588,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 $(body).on('click', '.showRespondUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/responds-confirm/get-data-update-form?id=' + id;
+    var url = '/responds/get-data-update-form?stage=4&id=' + id;
     var respond_update_modal = $('#respond_update_modal');
     $(body).append($(respond_update_modal).first());
 
@@ -662,7 +661,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
+                    url: '/responds/get-query-responds?stage=4&id=' + response.confirm_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -795,7 +794,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
+                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -894,7 +893,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
+                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -951,7 +950,7 @@ $(body).on('click', '#link_delete_file', function(e){
 $(body).on('click', '.showDeleteRespondModal', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/responds-confirm/get-data-model?id=' + id;
+    var url = '/responds/get-data-model?stage=4&id=' + id;
     var delete_respond_modal = $('#delete-respond-modal');
     $(body).append($(delete_respond_modal).first());
 
@@ -963,7 +962,7 @@ $(body).on('click', '.showDeleteRespondModal', function(e){
         success: function(response){
 
             $(delete_respond_modal).find('.modal-body h4').html('Вы уверены, что хотите удалить все данные<br>о респонденте «' + response.name + '»?');
-            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/responds-confirm/delete?id=' + response.id);
+            $(delete_respond_modal).find('.modal-footer #confirm-delete-respond').attr('href', '/responds/delete?stage=4&id=' + response.id);
             $(delete_respond_modal).modal('show');
         },
         error: function(){
@@ -1023,7 +1022,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds-confirm/get-query-responds?id=' + response.confirm_problem_id + '&page=' + page,
+                    url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){

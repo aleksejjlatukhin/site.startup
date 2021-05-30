@@ -25,6 +25,10 @@ class SingupForm extends Model
     public $role;
     public $exist_agree = true;
 
+
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -59,6 +63,10 @@ class SingupForm extends Model
         ];
     }
 
+
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -75,7 +83,11 @@ class SingupForm extends Model
         ];
     }
 
-    //Согласие на обработку данных
+
+    /**
+     * Согласие на обработку данных
+     * @param $attr
+     */
     public function existAgree($attr)
     {
         if ($this->exist_agree != 1){
@@ -83,8 +95,13 @@ class SingupForm extends Model
         }
     }
 
-    //Собственное правило для поля username
-    //Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
+
+    /**
+     * Собственное правило для поля username
+     * Переводим все логины в нижний регистр
+     * и сравниваем их с тем, что в форме
+     * @param $attr
+     */
     public function uniqUsername($attr)
     {
         $users = User::find()->all();
@@ -97,6 +114,10 @@ class SingupForm extends Model
         }
     }
 
+
+    /**
+     * @param $attr
+     */
     public function matchUsername($attr)
     {
         if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
@@ -110,8 +131,12 @@ class SingupForm extends Model
         }
     }
 
-    //Собственное правило для поля email
-    //Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
+
+    /**
+     * Собственное правило для поля email
+     * Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
+     * @param $attr
+     */
     public function uniqEmail($attr)
     {
         $users = User::find()->all();
@@ -124,6 +149,10 @@ class SingupForm extends Model
         }
     }
 
+
+    /**
+     * @return User|bool|null
+     */
     public function singup()
     {
         if ($this->exist_agree == 1){
@@ -147,9 +176,15 @@ class SingupForm extends Model
 
             return $user->save() ? $user : null;
         }
+        return false;
     }
 
-    /*Подтвреждение регистрации по email*/
+
+    /**
+     * Подтвреждение регистрации по email
+     * @param $user
+     * @return bool
+     */
     public function sendActivationEmail($user)
     {
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])

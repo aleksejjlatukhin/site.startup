@@ -10,24 +10,24 @@ use Yii;
 
 class SendEmailForm extends Model
 {
+
     public $email;
 
+
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
             ['email', 'filter', 'filter' => 'trim'],
-            //['email', 'required'],
-            //['email', 'email'],
-            //['email', 'exist',
-                //'targetClass' => User::class,
-                //'filter' => [
-                    //'status' => User::STATUS_ACTIVE
-                //],
-                //'message' => 'Данный адрес эл.почты не зарегистрирован.'
-            //],
         ];
     }
 
+
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -35,6 +35,10 @@ class SendEmailForm extends Model
         ];
     }
 
+
+    /**
+     * @return bool
+     */
     public function sendEmail()
     {
         /* @var $user User */

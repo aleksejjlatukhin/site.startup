@@ -2,12 +2,17 @@
 
 namespace app\models;
 
-use Yii;
+use app\models\interfaces\RespondsInterface;
+use Throwable;
+use yii\base\ErrorException;
+use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\db\ActiveRecord;
 
-class RespondsConfirm extends \yii\db\ActiveRecord
+class RespondsConfirm extends ActiveRecord implements RespondsInterface
 {
-    const LIMIT_COUNT = 100;
+
 
     /**
      * {@inheritdoc}
@@ -17,20 +22,100 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         return 'responds_confirm';
     }
 
+
+    /**
+     * Получить интевью респондента
+     * @return mixed|ActiveQuery
+     */
     public function getDescInterview()
     {
         return $this->hasOne(DescInterviewConfirm::class, ['responds_confirm_id' => 'id']);
     }
 
+
+    /**
+     * Получить модель подтверждения
+     * @return mixed|ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmProblem::class, ['id' => 'confirm_problem_id']);
     }
 
+
+    /**
+     * Получить ответы респондента на вопросы
+     * @return mixed|ActiveQuery
+     */
     public function getAnswers()
     {
         return $this->hasMany(AnswersQuestionsConfirmProblem::class, ['respond_id' => 'id']);
     }
+
+
+    /**
+     * Установить id подтверждения
+     * @param $confirmId
+     * @return mixed
+     */
+    public function setConfirmId($confirmId)
+    {
+        return $this->confirm_problem_id = $confirmId;
+    }
+
+
+    /**
+     * Получить id подтверждения
+     * @return mixed
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_problem_id;
+    }
+
+
+    /**
+     * Установить имя респондента
+     * @param $name
+     * @return mixed
+     */
+    public function setName($name)
+    {
+        return $this->name = $name;
+    }
+
+
+    /**
+     * Получить имя респондента
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param array $params
+     * @return mixed|void
+     */
+    public function setParams(array $params)
+    {
+        $this->info_respond = $params['info_respond'];
+        $this->place_interview = $params['place_interview'];
+        $this->email = $params['email'];
+    }
+
+
+    /**
+     * Установить плановую дату интервью
+     * @param $datePlan
+     */
+    public function setDatePlan($datePlan)
+    {
+        $this->date_plan = $datePlan;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -48,6 +133,7 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -60,20 +146,6 @@ class RespondsConfirm extends \yii\db\ActiveRecord
             'date_plan' => 'Плановая дата интервью',
             'place_interview' => 'Место проведения интервью',
         ];
-    }
-
-
-    public function addAnswersForNewRespond()
-    {
-        $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $this->confirm_problem_id])->all();
-
-        foreach ($questions as $question){
-
-            $answer = new AnswersQuestionsConfirmProblem();
-            $answer->question_id = $question->id;
-            $answer->respond_id = $this->id;
-            $answer->save();
-        }
     }
 
 
@@ -104,19 +176,21 @@ class RespondsConfirm extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление связанных данных
+     * по событию EVENT_BEFORE_DELETE
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
         $descInterview = DescInterviewConfirm::findOne(['responds_confirm_id' => $this->id]);
         $answers = AnswersQuestionsConfirmProblem::findAll(['respond_id' => $this->id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $this->confirm_problem_id]);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $confirm = ConfirmProblem::findOne($this->confirmId);
+        $problem = GenerationProblem::findOne($confirm->problemId);
+        $segment = Segment::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $user = User::findOne($project->userId);
 
         //Удаление интервью респондента
         if ($descInterview) $descInterview->delete();
@@ -128,9 +202,6 @@ class RespondsConfirm extends \yii\db\ActiveRecord
         //Удаление кэша для форм респондента
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$this->id;
         if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-        //Обновление данных подтверждения
-        $confirmProblem->count_respond = $confirmProblem->count_respond - 1;
-        $confirmProblem->save();
     }
 
 }

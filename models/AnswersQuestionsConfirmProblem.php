@@ -3,11 +3,12 @@
 
 namespace app\models;
 
-
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 class AnswersQuestionsConfirmProblem extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -16,15 +17,26 @@ class AnswersQuestionsConfirmProblem extends ActiveRecord
         return 'answers_questions_confirm_problem';
     }
 
+
+    /**
+     * Получить объект вопроса
+     * @return ActiveQuery
+     */
     public function getQuestion()
     {
         return $this->hasOne(QuestionsConfirmProblem::class, ['id' => 'question_id']);
     }
 
+
+    /**
+     * Получить объект респондента
+     * @return ActiveQuery
+     */
     public function getRespond ()
     {
         return $this->hasOne(RespondsConfirm::class, ['id' => 'respond_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -37,6 +49,7 @@ class AnswersQuestionsConfirmProblem extends ActiveRecord
             [['answer'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

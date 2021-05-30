@@ -19,11 +19,8 @@ use app\models\Segment;
         <h4>Сфера деятельности потребителя</h4>
         <div><?= $segment->field_of_activity; ?></div>
 
-        <h4>Вид деятельности потребителя</h4>
+        <h4>Вид / специализация деятельности потребителя</h4>
         <div><?= $segment->sort_of_activity; ?></div>
-
-        <h4>Специализация вида деятельности потребителя</h4>
-        <div><?= $segment->specialization_of_activity; ?></div>
 
         <h4>Возраст потребителя</h4>
         <div>
@@ -81,11 +78,8 @@ use app\models\Segment;
         <h4>Сфера деятельности предприятия</h4>
         <div><?= $segment->field_of_activity; ?></div>
 
-        <h4>Вид деятельности предприятия</h4>
+        <h4>Вид / специализация деятельности предприятия</h4>
         <div><?= $segment->sort_of_activity; ?></div>
-
-        <h4>Специализация вида деятельности предприятия</h4>
-        <div><?= $segment->specialization_of_activity; ?></div>
 
         <h4>Продукция / услуги предприятия</h4>
         <div><?= $segment->company_products; ?></div>

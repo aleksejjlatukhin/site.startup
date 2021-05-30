@@ -14,6 +14,11 @@ class FormUpdateQuestionConfirmMvp extends Model
     public $title;
 
 
+    /**
+     * FormUpdateQuestionConfirmMvp constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $question = QuestionsConfirmMvp::findOne($id);
@@ -24,12 +29,16 @@ class FormUpdateQuestionConfirmMvp extends Model
     }
 
 
+    /**
+     * @return QuestionsConfirmMvp|null
+     */
     public function update()
     {
         $question = QuestionsConfirmMvp::findOne($this->id);
         $question->title = $this->title;
         return $question->save() ? $question : null;
     }
+
 
     /**
      * {@inheritdoc}
@@ -43,6 +52,7 @@ class FormUpdateQuestionConfirmMvp extends Model
             [['title'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

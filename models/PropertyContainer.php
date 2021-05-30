@@ -3,15 +3,12 @@
 
 namespace app\models;
 
-
 use yii\base\Exception;
 use app\models\interfaces\PropertyContainerInterface;
 
-/**
- * Паттерн "Контейнер свойств"
- * */
 class PropertyContainer implements PropertyContainerInterface
 {
+
     /**
      * @var array
      */
@@ -28,6 +25,7 @@ class PropertyContainer implements PropertyContainerInterface
         $this->propertyContainer[$propertyName] = $value;
     }
 
+
     /**
      * @param $propertyName
      * @return mixed
@@ -36,6 +34,7 @@ class PropertyContainer implements PropertyContainerInterface
     {
         unset($this->propertyContainer[$propertyName]);
     }
+
 
     /**
      * @param $propertyName
@@ -46,10 +45,12 @@ class PropertyContainer implements PropertyContainerInterface
         return $this->propertyContainer[$propertyName] ? $this->propertyContainer[$propertyName] : null;
     }
 
+
     /**
      * @param $propertyName
      * @param $value
      * @return mixed
+     * @throws Exception
      */
     public function setProperty($propertyName, $value)
     {

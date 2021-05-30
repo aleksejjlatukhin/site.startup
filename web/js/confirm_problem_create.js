@@ -1,14 +1,21 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
+
+var body = $('body'),
+    id_page = window.location.search.split('=')[1],
+    confirm_count_respond = $(body).find('input#confirm_count_respond'),
+    confirm_add_count_respond = $(body).find('input#confirm_add_count_respond'),
+    confirm_count_positive = $(body).find('input#confirm_count_positive');
+
+
 //Форма создания модели подтверждения
-$('#new_confirm_problem').on('beforeSubmit', function(e){
+$(body).on('beforeSubmit', '#new_confirm_problem', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         data: data,
@@ -16,7 +23,6 @@ $('#new_confirm_problem').on('beforeSubmit', function(e){
         success: function(response){
 
             if (response.success) {
-
                 window.location.href = '/confirm-problem/add-questions?id=' + response.id;
             }
         },
@@ -30,42 +36,49 @@ $('#new_confirm_problem').on('beforeSubmit', function(e){
 });
 
 
-//Если задано, что count_respond < count_positive, то count_respond = count_positive
-$("input#confirm_count_respond").change(function () {
-    var value1 = $("input#confirm_count_positive").val();
-    var value2 = $(this).val();
-    var valueMax = 100;
-    var valueMin = 1;
+// Отслеживаем изменения в поле add_count_respond
+$(confirm_add_count_respond).change(function () {
 
-    if (parseInt(value2) < parseInt(value1)){
-        value2 = value1;
-        $(this).val(value2);
+    var value1 = $(this).val(),
+        value2 = $(confirm_count_respond).val(),
+        value3 = $(confirm_count_positive).val(),
+        valueMax = 100,
+        valueMin = 1;
+
+    if (parseInt(value1) > (parseInt(valueMax) - parseInt(value2))){
+        value1 = (parseInt(valueMax) - parseInt(value2));
+        $(this).val(value1);
     }
-    if (parseInt(value2) > parseInt(valueMax)){
-        value2 = valueMax;
-        $(this).val(value2);
+    if (parseInt(value1) < parseInt(valueMin)){
+        value1 = valueMin;
+        $(this).val(value1);
     }
-    if (parseInt(value2) < parseInt(valueMin)){
-        value2 = valueMin;
-        $(this).val(value2);
+
+    if (parseInt(value3) > (parseInt(value1) + parseInt(value2))) {
+        value3 = (parseInt(value1) + parseInt(value2));
+        $(confirm_count_positive).val(value3);
     }
 });
 
-//Если задано, что count_positive > count_respond, то count_positive = count_respond
-$("input#confirm_count_positive").change(function () {
-    var value1 = $(this).val();
-    var value2 = $("input#confirm_count_respond").val();
-    var valueMax = 100;
-    var valueMin = 1;
+
+// Отслеживаем изменения в поле count_positive
+$(confirm_count_positive).change(function () {
+
+    var valueMin = 1,
+        value1 = $(this).val(),
+        value2;
+
+    if ($(confirm_add_count_respond).val() !== ''){
+        value2 = (parseInt($(confirm_count_respond).val()) + parseInt($(confirm_add_count_respond).val()));
+    } else {
+        value2 = parseInt($(confirm_count_respond).val());
+    }
 
     if (parseInt(value1) > parseInt(value2)){
         value1 = value2;
         $(this).val(value1);
     }
-    if (parseInt(value1) > parseInt(valueMax)){
-        value1 = valueMax;
-        $(this).val(value1);
-    }
+
     if (parseInt(value1) < parseInt(valueMin)){
         value1 = valueMin;
         $(this).val(value1);
@@ -73,8 +86,34 @@ $("input#confirm_count_positive").change(function () {
 });
 
 
-var body = $('body');
-var id_page = window.location.search.split('=')[1];
+// Переключатель для поля добавления новых респондентов
+$(body).on('click', '#switch_add_count_respond', function () {
+
+    var field = $('#confirm_add_count_respond'),
+        form = $('form#new_confirm_problem'),
+        changeBtnContent = $(this).find('.changeBtnContent');
+
+    if (typeof $(field).attr('readonly') === 'undefined') {
+        $(field).attr('readonly', true).val('');
+        if (parseInt($(confirm_count_respond).val()) < parseInt($(confirm_count_positive).val()))
+            $(confirm_count_positive).val($(confirm_count_respond).val());
+        // Обновляем кэш на формы
+        $(form).trigger('change');
+        $(changeBtnContent).html('Добавить новых респондентов');
+    } else {
+        $(field).removeAttr('readonly');
+        $(changeBtnContent).html('Не добавлять новых респондентов');
+    }
+});
+
+
+// Если в кэше есть значение для поля add_count_respond,
+// то делаем его активным
+$(document).ready(function () {
+    if ($(confirm_add_count_respond).val() !== '') {
+        $('#switch_add_count_respond').trigger('click');
+    }
+});
 
 
 // Показать инструкцию для стадии разработки

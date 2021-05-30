@@ -8,9 +8,14 @@ use app\models\forms\ProfileForm;
 use app\models\Projects;
 use app\models\Roadmap;
 use app\models\Segment;
+use Throwable;
 use Yii;
 use app\models\User;
+use yii\base\Exception;
+use yii\db\StaleObjectException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class ProfileController extends AppUserPartController
@@ -21,7 +26,7 @@ class ProfileController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -36,7 +41,7 @@ class ProfileController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else {
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{
             return parent::beforeAction($action);
@@ -46,6 +51,7 @@ class ProfileController extends AppUserPartController
 
     /**
      * Lists all User models.
+     * @param $id
      * @return mixed
      */
     public function actionIndex($id)
@@ -77,14 +83,14 @@ class ProfileController extends AppUserPartController
             if ($user->checkOnline === true) {
 
                 $response = ['user_online' => true, 'message' => 'Пользователь сейчас Online'];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
 
                 $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -119,8 +125,8 @@ class ProfileController extends AppUserPartController
                                     'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                                 ]),
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
 
                         }
@@ -128,8 +134,8 @@ class ProfileController extends AppUserPartController
 
                             //Письмо с уведомлением не отправлено
                             $response = ['error_send_email' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
@@ -154,8 +160,8 @@ class ProfileController extends AppUserPartController
                         $response['error_match_username'] = true;
                     }
 
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
             }
@@ -174,8 +180,8 @@ class ProfileController extends AppUserPartController
                     if ($model->changePassword()) {
 
                         $response = ['success' => true];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
 
@@ -184,8 +190,8 @@ class ProfileController extends AppUserPartController
                     if (!$model->validate(['currentPassword'])) {
 
                         $response = ['errorCurrentPassword' => 'true'];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
@@ -197,9 +203,9 @@ class ProfileController extends AppUserPartController
     /**
      * @param $id
      * @return array|bool
-     * @throws \Throwable
-     * @throws \yii\base\Exception
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws Exception
+     * @throws StaleObjectException
      */
     public function actionLoadAvatarImage ($id)
     {
@@ -220,8 +226,8 @@ class ProfileController extends AppUserPartController
                             'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                         ]),
                     ];
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
 
@@ -230,8 +236,8 @@ class ProfileController extends AppUserPartController
                 if ($result = $avatarForm->loadMaxImage()) {
 
                     $response = $result;
-                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    \Yii::$app->response->data = $response;
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
                     return $response;
                 }
                 return false;
@@ -252,8 +258,8 @@ class ProfileController extends AppUserPartController
         if (Yii::$app->request->isAjax) {
 
             $response = ['path_max' => '/web/upload/user-' . $user->id . '/avatar/' . $user->avatar_max_image,];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
 
         }
@@ -299,8 +305,8 @@ class ProfileController extends AppUserPartController
                         'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
                     ]),
                 ];
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                \Yii::$app->response->data = $response;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
                 return $response;
             }
         }
@@ -335,8 +341,8 @@ class ProfileController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = ['projects' => $projects];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -354,8 +360,8 @@ class ProfileController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = ['renderAjax' => $this->renderAjax('_result_ajax', ['project' => $project])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -397,8 +403,8 @@ class ProfileController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('_roadmap_ajax', ['roadmaps' => $roadmaps]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -456,8 +462,8 @@ class ProfileController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('_report_ajax', ['segments' => $segments]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;
@@ -494,8 +500,8 @@ class ProfileController extends AppUserPartController
                 'renderAjax' => $this->renderAjax('_presentation_ajax', ['project' => $project]),
                 'project' => $project,
             ];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
         return false;

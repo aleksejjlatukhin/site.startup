@@ -2,16 +2,21 @@
 
 namespace app\models;
 
-use Yii;
+use Throwable;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\db\ActiveRecord;
 
-class Gcp extends \yii\db\ActiveRecord
+class Gcp extends ActiveRecord
 {
 
     const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
+
 
     /**
      * {@inheritdoc}
@@ -34,35 +39,105 @@ class Gcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить объект подтверждения данного Gcp
+     * @return ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmGcp::class, ['gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить все бизнес-модели данного Gcp
+     * @return ActiveQuery
+     */
     public function getBusinessModels ()
     {
         return $this->hasMany(BusinessModel::class, ['gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить все объекты Mvp данного Gcp
+     * @return ActiveQuery
+     */
     public function getMvps ()
     {
         return $this->hasMany(Mvp::class, ['gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить объект текущей проблемы
+     * @return ActiveQuery
+     */
     public function getProblem()
     {
         return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
     }
 
+
+    /**
+     * Получить объект текущего сегмента
+     * @return ActiveQuery
+     */
     public function getSegment ()
     {
         return $this->hasOne(Segment::class, ['id' => 'segment_id']);
     }
 
+
+    /**
+     * Получить объект текущего проекта
+     * @return ActiveQuery
+     */
     public function getProject ()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProblemId()
+    {
+        return $this->problem_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+
+    /**
+     * Получить респондентов, которые
+     * подтвердтлт текущую проблему
+     * @return array|ActiveRecord[]
+     */
+    public function getRespondsAgents()
+    {
+        return RespondsConfirm::find()->with('descInterview')
+            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
+            ->where(['confirm_problem_id' => $this->confirm_problem_id, 'desc_interview_confirm.status' => '1'])->all();
+    }
+
 
     /**
      * {@inheritdoc}
@@ -76,6 +151,7 @@ class Gcp extends \yii\db\ActiveRecord
             [['title'], 'string', 'max' => 255],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -93,7 +169,9 @@ class Gcp extends \yii\db\ActiveRecord
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -130,9 +208,10 @@ class Gcp extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление Gcp и связанных данных
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function deleteStage ()
     {

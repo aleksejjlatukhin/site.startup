@@ -2,14 +2,14 @@
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 ?>
-
 
 <?php
 $form = ActiveForm::begin([
     'id' => 'new_respond_form',
-    'action' => "/responds-confirm/create?id=$confirm_problem->id",
+    'action' => Url::to(['/responds/create', 'stage' => $confirm->stage, 'id' => $confirm->id]),
     'options' => ['class' => 'g-py-15'],
     'errorCssClass' => 'u-has-error-v1',
     'successCssClass' => 'u-has-success-v1-1',

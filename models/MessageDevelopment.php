@@ -4,21 +4,28 @@
 namespace app\models;
 
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 class MessageDevelopment extends ActiveRecord
 {
 
+    const READ_MESSAGE = 20;
+    const NO_READ_MESSAGE = 10;
+
+
+    /**
+     * @return string
+     */
     public static function tableName()
     {
         return 'message_development';
     }
 
 
-    const READ_MESSAGE = 20;
-    const NO_READ_MESSAGE = 10;
-
-
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -30,6 +37,7 @@ class MessageDevelopment extends ActiveRecord
             }],
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -46,6 +54,7 @@ class MessageDevelopment extends ActiveRecord
         ];
     }
 
+
     public function init()
     {
         $this->on(self::EVENT_AFTER_INSERT, function (){
@@ -55,7 +64,10 @@ class MessageDevelopment extends ActiveRecord
         parent::init();
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -63,28 +75,53 @@ class MessageDevelopment extends ActiveRecord
         ];
     }
 
+
+    /**
+     * Получить объект беседы
+     * @return ActiveQuery
+     */
     public function getConversation()
     {
         return $this->hasOne(ConversationDevelopment::class, ['id' => 'conversation_id']);
     }
 
+
+    /**
+     * Получить объект отправителя
+     * @return ActiveQuery
+     */
     public function getSender ()
     {
         return $this->hasOne(User::class, ['id' => 'sender_id']);
     }
 
+
+    /**
+     * Получить объект получателя
+     * @return ActiveQuery
+     */
     public function getAdressee ()
     {
         return $this->hasOne(User::class, ['id' => 'adressee_id']);
     }
 
+
+    /**
+     * Получить прикрепленные файлы
+     * @return MessageFiles[]
+     */
     public function getFiles ()
     {
         return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_TECHNICAL_SUPPORT, 'message_id' => $this->id]);
     }
 
-    // День и дата по-русски
-    function getDayAndDateRus(){
+
+    /**
+     * Получить дату отправления сообщения
+     * День и дата по-русски
+     * @return string
+     */
+    public function getDayAndDateRus(){
 
         $days = array(
             'Воскресенье', 'Понедельник', 'Вторник', 'Среда',
@@ -110,8 +147,13 @@ class MessageDevelopment extends ActiveRecord
         }
     }
 
-    // Дата по-русски
-    function getDateRus(){
+
+    /**
+     * Получить дату отправления сообщения
+     * Дата по-русски
+     * @return string
+     */
+    public function getDateRus(){
 
         $monthes = array(
             1 => 'Января', 2 => 'Февраля', 3 => 'Марта', 4 => 'Апреля',

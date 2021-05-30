@@ -2,17 +2,22 @@
 
 namespace app\models;
 
+use Exception;
 use Yii;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 
-class DescInterviewGcp extends \yii\db\ActiveRecord
+class DescInterviewGcp extends ActiveRecord
 {
 
     public $loadFile;
+
 
     /**
      * {@inheritdoc}
@@ -22,10 +27,16 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         return 'desc_interview_gcp';
     }
 
+
+    /**
+     * Получить объект респондента
+     * @return ActiveQuery
+     */
     public function getRespond()
     {
         return $this->hasOne(RespondsGcp::class, ['id' => 'responds_gcp_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -40,6 +51,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -52,7 +64,9 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -81,7 +95,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
     /**
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      * @throws \yii\base\Exception
      */
     public function create()
@@ -115,6 +129,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
     }
 
+
     /**
      * @return bool
      * @throws NotFoundHttpException
@@ -137,6 +152,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
         }
         throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
     }
+
 
     /**
      * @return bool
@@ -165,7 +181,7 @@ class DescInterviewGcp extends \yii\db\ActiveRecord
                 $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
                 $this->server_file = $filename . '.' . $this->loadFile->extension;
 
-            }catch (\Exception $e){
+            }catch (Exception $e){
 
                 throw new NotFoundHttpException('Невозможно загрузить файл!');
             }

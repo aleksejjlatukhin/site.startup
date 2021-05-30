@@ -3,81 +3,121 @@
 
 namespace app\models\forms;
 
+use app\models\CreatorAnswersForNewRespond;
+use app\models\interfaces\ConfirmationInterface;
 use app\models\Interview;
 use app\models\Projects;
 use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
-use yii\base\Model;
-use yii\helpers\FileHelper;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
-class CreateRespondForm extends Model
+class CreateRespondForm extends FormCreateRespondent
 {
-    public $name;
-    public $interview_id;
+
 
     /**
-     * {@inheritdoc}
+     * CreateRespondForm constructor.
+     * @param Interview $confirm
+     * @param array $config
      */
-    public function rules()
+    public function __construct(Interview $confirm, $config = [])
     {
-        return [
-            [['name'], 'required'],
-            [['name'], 'trim'],
-            [['name'], 'uniqueName'],
-            [['name'], 'string', 'max' => 100],
-        ];
+        $this->_creatorAnswers = new CreatorAnswersForNewRespond();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($confirm);
+        $cacheName = 'formCreateRespondCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            foreach ($cache[basename(self::class)] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
     }
 
+
     /**
-     * {@inheritdoc}
+     * @param $id
+     * @return mixed
      */
-    public function attributeLabels()
+    public function setConfirmId($id)
     {
-        return [
-            'name' => 'Фамилия, имя, отчество',
-        ];
+        return $this->confirm_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_id;
+    }
+
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function setName($name)
+    {
+        return $this->name = $name;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * Получить путь к кэшу формы
+     * @param ConfirmationInterface $confirm
+     * @return string
+     */
+    public static function getCachePath(ConfirmationInterface $confirm)
+    {
+        $segment = Segment::findOne($confirm->segmentId);
+        $project = Projects::findOne($segment->projectId);
+        $user = User::findOne($project->userId);
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond/';
+        return $cachePath;
     }
 
 
     /**
      * @return Respond
+     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
      */
     public function create ()
     {
-        $interview = Interview::findOne($this->interview_id);
-        $segment = Segment::findOne($interview->segment_id);
-        $project = Projects::findOne($segment->project_id);
-        $user = User::findOne($project->user_id);
-
         $model = new Respond();
-        $model->interview_id = $this->interview_id;
-        $model->name = $this->name;
+        $model->setConfirmId($this->confirm_id);
+        $model->setName($this->name);
 
         if ($model->save()) {
             // Добавление пустых ответов на вопросы для нового респондента
-            $model->addAnswersForNewRespond();
-            // Обновление данных подтверждения
-            $interview->count_respond = $interview->count_respond + 1;
-            $interview->save();
+            $this->_creatorAnswers->create($model);
             // Удаление кэша формы создания
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateRespond';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Неудалось добавить нового респондента');
     }
 
+
     /**
      * @param $attr
      */
     public function uniqueName($attr)
     {
-        $models = Respond::findAll(['interview_id' => $this->interview_id]);
+        $models = Respond::findAll(['interview_id' => $this->confirmId]);
 
         foreach ($models as $item){
 

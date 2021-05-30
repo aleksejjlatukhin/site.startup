@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use Throwable;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\web\Response;
 use app\models\LoginForm;
 use app\models\forms\SingupForm;
@@ -64,9 +66,9 @@ class SiteController extends AppUserPartController
 
 
     /**
-     * @return array
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @return array|bool
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionSingup()
     {
@@ -93,8 +95,8 @@ class SiteController extends AppUserPartController
                                         'success_singup' => true,
                                         'message' => 'Письмо с подтверждением регистрации отправлено на указанный email.',
                                     ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
+                                    Yii::$app->response->format = Response::FORMAT_JSON;
+                                    Yii::$app->response->data = $response;
                                     return $response;
 
                                 } else {
@@ -106,8 +108,8 @@ class SiteController extends AppUserPartController
                                         'error_singup_send_email' => true,
                                         'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
                                     ];
-                                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                    \Yii::$app->response->data = $response;
+                                    Yii::$app->response->format = Response::FORMAT_JSON;
+                                    Yii::$app->response->data = $response;
                                     return $response;
                                 }
                             }
@@ -137,13 +139,14 @@ class SiteController extends AppUserPartController
                             $response['error_exist_agree'] = true;
                         }
 
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
                     }
                 }
             }
         }
+        return false;
     }
 
 
@@ -197,13 +200,11 @@ class SiteController extends AppUserPartController
                 'model_send_email' => $model_send_email,
             ]);
         }
-
     }
 
+
     /**
-     * Login action.
-     *
-     * @return array
+     * @return array|bool
      */
     public function actionLogin()
     {
@@ -232,8 +233,8 @@ class SiteController extends AppUserPartController
                                     'error_not_confirm_singup' => true,
                                     'message' => 'Проверьте email, Вам отправлено новое письмо для подтверждения регистрации.'
                                 ];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
 
@@ -243,8 +244,8 @@ class SiteController extends AppUserPartController
                                 'error_not_confirm_singup' => true,
                                 'message' => 'Проверьте email, Вам было отправлено письмо для подтверждения регистрации.'
                             ];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     } else {
@@ -255,24 +256,24 @@ class SiteController extends AppUserPartController
                                 || User::isUserDev(Yii::$app->user->identity['username'])) {
 
                                 $response = ['admin_success' => true];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
 
                             if (User::isUserSimple(Yii::$app->user->identity['username'])) {
 
                                 $response = ['user_success' => true];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
 
                             if (($user->confirm == User::CONFIRM) && ($user->status == User::STATUS_NOT_ACTIVE || $user->status == User::STATUS_DELETED)) {
 
                                 $response = ['user_success' => true];
-                                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                                \Yii::$app->response->data = $response;
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
                                 return $response;
                             }
 
@@ -280,14 +281,15 @@ class SiteController extends AppUserPartController
 
                             //Если пара логин-пароль не существует
                             $response = ['error_not_user' => true];
-                            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                            \Yii::$app->response->data = $response;
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
                             return $response;
                         }
                     }
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -304,7 +306,7 @@ class SiteController extends AppUserPartController
 
 
     /**
-     * @return array
+     * @return array|bool
      */
     public function actionSendEmail()
     {
@@ -326,8 +328,8 @@ class SiteController extends AppUserPartController
                                 'text' => 'На указанный адрес отправлено письмо со сслылкой для восстановления пароля.'
                             ],
                         ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
 
                     else:
@@ -340,14 +342,15 @@ class SiteController extends AppUserPartController
                                 'text' => 'Письмо на email не отправлено, указанный адрес не зарегистрирован.'
                             ],
                         ];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
                         return $response;
 
                     endif;
                 }
             }
         }
+        return false;
     }
 
 

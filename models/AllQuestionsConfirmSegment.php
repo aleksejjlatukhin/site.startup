@@ -3,12 +3,11 @@
 
 namespace app\models;
 
-
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 class AllQuestionsConfirmSegment extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -17,21 +16,17 @@ class AllQuestionsConfirmSegment extends ActiveRecord
         return 'all_questions_confirm_segment';
     }
 
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['title', 'user_id', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'required'],
-            [['title', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'string', 'max' => 255],
-            [['title', 'field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'trim'],
-            [['user_id', 'created_at', 'updated_at'], 'integer'],
-            ['type_of_interaction_between_subjects', 'default', 'value' => Segment::TYPE_B2C],
-            ['type_of_interaction_between_subjects',  'in', 'range' => [
-                Segment::TYPE_B2C,
-                Segment::TYPE_B2B
-            ]]
+            [['title', 'user_id'], 'required'],
+            [['title'], 'string', 'max' => 255],
+            [['title'], 'trim'],
+            [['user_id', 'created_at'], 'integer'],
         ];
     }
 
@@ -41,21 +36,49 @@ class AllQuestionsConfirmSegment extends ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
-            'id' => 'ID',
-            'title' => 'Описание вопроса',
-            'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
-            'field_of_activity' => 'Сфера деятельности потребителя',
-            'sort_of_activity' => 'Вид деятельности потребителя',
-            'specialization_of_activity' => 'Специализация вида деятельности потребителя',
-        ];
+        return ['title' => 'Описание вопроса'];
     }
 
-    /* Поведения */
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
-            TimestampBehavior::class
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+            ],
         ];
+    }
+
+
+    /**
+     * Вопросы по-умолчанию
+     * @return array
+     */
+    public static function defaultListQuestions()
+    {
+        $array = [
+            '0' => ['title' => 'Чем вы занимаетесь в настоящее время?'],
+            '1' => ['title' => 'На каком этапе проекта вы находитесь?'],
+            '2' => ['title' => 'Что получается и что не получается в вашем проекте? Приведите примеры.'],
+            '3' => ['title' => 'Как вы определяете цели, задачи и последовательность действий?'],
+            '4' => ['title' => 'Как вы добиваетесь достижения поставленной цели?'],
+            '5' => ['title' => 'Что пытались сделать, чтобы определить верные последовательные действия?'],
+            '6' => ['title' => 'Как вы решали проблему в последний раз, какие шаги предпринимали?'],
+            '7' => ['title' => 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?'],
+            '8' => ['title' => 'Что не нравится в текущем положении вещей?'],
+            '9' => ['title' => 'Что вы пытались с этим сделать?'],
+            '10' => ['title' => 'Если ничего не делали, то почему?'],
+            '11' => ['title' => 'Сколько денег / времени на это тратится сейчас?'],
+            '12' => ['title' => 'Что влияет на решение о покупке продукта?'],
+            '13' => ['title' => 'Как принимается решение о покупке?'],
+            '14' => ['title' => 'Расскажите, что произойдет, если вы не сможете решать потребность? Что при решении доставляет вам неудобство?'],
+            '15' => ['title' => 'Расскажите, пожалуйста, про последний раз, когда вы сталкивались с этими сложностями. Почему это было тяжело?']
+        ];
+
+        return $array;
     }
 }

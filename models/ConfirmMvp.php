@@ -2,11 +2,18 @@
 
 namespace app\models;
 
-use Yii;
+use app\models\interfaces\ConfirmationInterface;
+use Throwable;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
-
-class ConfirmMvp extends \yii\db\ActiveRecord
+class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 {
+
+    const STAGE = 8;
+    const LIMIT_COUNT_RESPOND = 100;
+
 
     /**
      * {@inheritdoc}
@@ -16,24 +23,111 @@ class ConfirmMvp extends \yii\db\ActiveRecord
         return 'confirm_mvp';
     }
 
+
+    /**
+     * @return int
+     */
+    public function getStage()
+    {
+        return self::STAGE;
+    }
+
+
+    /**
+     * Проверка на ограничение кол-ва респондентов
+     * @return bool
+     */
+    public function checkingLimitCountRespond()
+    {
+        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        else return false;
+    }
+
+
+    /**
+     * Получить объект текущего Mvp
+     * @return ActiveQuery
+     */
     public function getMvp()
     {
         return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
     }
 
+
+    /**
+     * Получить респондентов привязанных к подтверждению
+     * @return ActiveQuery
+     */
     public function getResponds()
     {
         return $this->hasMany(RespondsMvp::class, ['confirm_mvp_id' => 'id']);
     }
 
+
+    /**
+     * Получить объект бизнес модели
+     * @return ActiveQuery
+     */
     public function getBusiness()
     {
         return $this->hasOne(BusinessModel::class, ['confirm_mvp_id' => 'id']);
     }
 
+
+    /**
+     * Получить вопросы привязанные к подтверждению
+     * @return ActiveQuery
+     */
     public function getQuestions()
     {
         return $this->hasMany(QuestionsConfirmMvp::class, ['confirm_mvp_id' => 'id']);
+    }
+
+
+    /**
+     * Установить кол-во респондентов
+     * @param $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+
+    /**
+     * @param $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+
+    /**
+     * @param $id
+     */
+    public function setMvpId($id)
+    {
+        $this->mvp_id = $id;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getMvpId()
+    {
+        return $this->mvp_id;
+    }
+
+
+    /**
+     * Получить гипотезу подтверждения
+     * @return ActiveQuery
+     */
+    public function getHypothesis()
+    {
+        return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
     }
 
 
@@ -81,56 +175,15 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
-    //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ГЦП
-    public function createRespond ()
-    {
-        $mvp = Mvp::findOne($this->mvp_id);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirm_gcp_id);
-        $responds = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $confirmGcp->id, 'desc_interview_gcp.status' => '1'])->all();
-
-        foreach ($responds as $respond) {
-
-            $respondConfirm = new RespondsMvp();
-            $respondConfirm->confirm_mvp_id = $this->id;
-            $respondConfirm->name = $respond->name;
-            $respondConfirm->info_respond = $respond->info_respond;
-            $respondConfirm->place_interview = $respond->place_interview;
-            $respondConfirm->email = $respond->email;
-            $respondConfirm->save();
-        }
-    }
-
-
-    public function addQuestionDefault ($title)
-    {
-        $question = new QuestionsConfirmMvp();
-        $question->confirm_mvp_id = $this->id;
-        $question->title = $title;
-
-        if ($question->save()) {
-            $this->addAnswerConfirmMvp($question->id);
-            $this->addQuestionToGeneralList($title);
-        }
-    }
-
-
+    /**
+     * Добавляем вопрос в общую базу,
+     * если у данного пользователя его там ещё нет
+     * @param $title
+     */
     public function addQuestionToGeneralList($title)
     {
-        $segment = $this->mvp->segment;
         $user = $this->mvp->project->user;
-
-        //Добавляем вопрос в общую базу, если его там ещё нет
-        $baseQuestions = AllQuestionsConfirmMvp::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity,
-                /*'user_id' => $user->id*/
-            ])->select('title')->all();
-
+        $baseQuestions = AllQuestionsConfirmMvp::find()->where(['user_id' => $user->id])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){
@@ -140,24 +193,21 @@ class ConfirmMvp extends \yii\db\ActiveRecord
         }
 
         if ($existQuestions == 0){
-
             $general_question = new AllQuestionsConfirmMvp();
             $general_question->title = $title;
             $general_question->user_id = $user->id;
-            $general_question->type_of_interaction_between_subjects = $segment->type_of_interaction_between_subjects;
-            $general_question->field_of_activity = $segment->field_of_activity;
-            $general_question->sort_of_activity = $segment->sort_of_activity;
-            $general_question->specialization_of_activity = $segment->specialization_of_activity;
             $general_question->save();
         }
     }
 
 
+    /**
+     * Создание пустого ответа для нового вопроса для каждого респондента
+     * @param $question_id
+     */
     public function addAnswerConfirmMvp ($question_id)
     {
-        //Создание пустого ответа для нового вопроса для каждого респондента
         foreach ($this->responds as $respond) {
-
             $answer = new AnswersQuestionsConfirmMvp();
             $answer->question_id = $question_id;
             $answer->respond_id = $respond->id;
@@ -167,9 +217,15 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Удаление ответов по данному вопросу
+     * у всех респондентов данного подтверждения
+     * @param $question_id
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function deleteAnswerConfirmMvp ($question_id)
     {
-        //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
         foreach ($this->responds as $respond) {
             $answer = AnswersQuestionsConfirmMvp::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
             $answer->delete();
@@ -177,32 +233,37 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return array
+     */
     public function queryQuestionsGeneralList()
     {
-        $segment = $this->mvp->segment;
+        $user = $this->mvp->project->user;
+        $questions = []; //Добавляем в массив $questions вопросы уже привязанные к данной программе
+        foreach ($this->questions as $question) $questions[] = $question['title'];
 
-        //Добавляем в массив $questions вопросы уже привязанные к данной программе
-        $questions = [];
-        foreach ($this->questions as $question) {
-            $questions[] = $question['title'];
-        }
-
-        $allQuestions = AllQuestionsConfirmMvp::find()
-            ->where([
-                'type_of_interaction_between_subjects' => $segment->type_of_interaction_between_subjects,
-                'field_of_activity' => $segment->field_of_activity,
-                'sort_of_activity' => $segment->sort_of_activity,
-                'specialization_of_activity' => $segment->specialization_of_activity
-            ])
+        // Вопросы, предлагаемые по-умолчанию на данном этапе
+        $defaultQuestions = AllQuestionsConfirmMvp::defaultListQuestions();
+        // Вопросы, которые когда-либо добавлял пользователь на данном этапе
+        $attachQuestions = AllQuestionsConfirmMvp::find()
+            ->where(['user_id' => $user->id])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
             ->all();
 
-        $queryQuestions = $allQuestions;
+        $qs = array(); // Добавляем в массив вопросы, предлагаемые по-умолчанию на данном этапе
+        foreach ($defaultQuestions as $question) $qs[] = $question['title'];
+        // Убираем из списка вопросов, которые когда-либо добавлял пользователь на данном этапе
+        // вопросы, которые совпадают  с вопросами по-умолчанию
+        foreach ($attachQuestions as $key => $queryQuestion) {
+            if (in_array($queryQuestion['title'], $qs)) {
+                unset($attachQuestions[$key]);
+            }
+        }
 
-        //Убираем из списка для добавления вопросов,
-        //вопросы уже привязанные к данной программе
+        //Убираем из списка для добавления вопросов, вопросы уже привязанные к данной программе
+        $queryQuestions = array_merge($defaultQuestions, $attachQuestions);
         foreach ($queryQuestions as $key => $queryQuestion) {
             if (in_array($queryQuestion['title'], $questions)) {
                 unset($queryQuestions[$key]);
@@ -213,6 +274,9 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return bool
+     */
     public function getButtonMovingNextStage()
     {
         $count_descInterview = RespondsMvp::find()->with('descInterview')
@@ -231,6 +295,9 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
@@ -241,6 +308,9 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
@@ -252,6 +322,9 @@ class ConfirmMvp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @return int|string
+     */
     public function getCountConfirmMembers()
     {
         // Кол-во подтвердивших MVP

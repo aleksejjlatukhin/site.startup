@@ -11,12 +11,11 @@ use app\models\Segment;
     <table class="all_headers_data_segments">
 
         <tr>
-            <td class="block_segmnet_name" colspan="2">Наименование сегмента</td>
-            <td class="block_segmnet_type">Тип</td>
-            <td class="block_segmnet_params">Сфера деятельности</td>
-            <td class="block_segmnet_params">Вид деятельности</td>
-            <td class="block_segmnet_params">Специализация</td>
-            <td class="block_segmnet_market_volume">
+            <td class="block_segment_name" colspan="2">Наименование сегмента</td>
+            <td class="block_segment_type">Тип</td>
+            <td class="block_segment_params">Сфера деятельности</td>
+            <td class="block_segment_params">Вид / специализация деятельности</td>
+            <td class="block_segment_market_volume">
                 <div>Платеже- способность</div>
                 <div>млн. руб./год</div>
             </td>
@@ -30,7 +29,7 @@ use app\models\Segment;
 
         <tr>
 
-            <td class="block_segmnet_status">
+            <td class="block_segment_status">
                 <?php
                 if ($model->exist_confirm === 1) {
 
@@ -52,9 +51,9 @@ use app\models\Segment;
                 ?>
             </td>
 
-            <td class="block_segmnet_name"><?= $model->name; ?></td>
+            <td class="block_segment_name"><?= $model->name; ?></td>
 
-            <td class="block_segmnet_type">
+            <td class="block_segment_type">
                 <?php
 
                 if ($model->type_of_interaction_between_subjects === Segment::TYPE_B2C) {
@@ -67,10 +66,9 @@ use app\models\Segment;
                 ?>
             </td>
 
-            <td class="block_segmnet_params"><?= $model->field_of_activity; ?></td>
-            <td class="block_segmnet_params"><?= $model->sort_of_activity; ?></td>
-            <td class="block_segmnet_params"><?= $model->specialization_of_activity; ?></td>
-            <td class="block_segmnet_market_volume"><?= number_format($model->market_volume, 0, '', ' '); ?></td>
+            <td class="block_segment_params"><?= $model->field_of_activity; ?></td>
+            <td class="block_segment_params"><?= $model->sort_of_activity; ?></td>
+            <td class="block_segment_market_volume"><?= number_format($model->market_volume, 0, '', ' '); ?></td>
 
         </tr>
 

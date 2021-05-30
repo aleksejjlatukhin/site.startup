@@ -4,7 +4,11 @@
 namespace app\models\forms;
 
 use app\models\User;
+use Throwable;
+use Yii;
+use yii\base\Exception;
 use yii\base\Model;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
 class AvatarForm extends Model
@@ -40,9 +44,9 @@ class AvatarForm extends Model
 
     /**
      * @return bool
-     * @throws \Throwable
-     * @throws \yii\base\Exception
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws Exception
+     * @throws StaleObjectException
      */
     public function loadMinImage()
     {
@@ -53,7 +57,7 @@ class AvatarForm extends Model
             $path = UPLOAD . 'user-' . $this->userId . '/avatar/';
             if (!is_dir($path)) FileHelper::createDirectory($path);
 
-            $str = \Yii::$app->security->generateRandomString(8);
+            $str = Yii::$app->security->generateRandomString(8);
             $file = 'avatar_' . $str . '_min.png';
             $uploadfile = $path . $file;
 
@@ -87,7 +91,7 @@ class AvatarForm extends Model
 
     /**
      * @return array
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function loadMaxImage()
     {
@@ -127,6 +131,9 @@ class AvatarForm extends Model
     }
 
 
+    /**
+     * @return bool
+     */
     public function deleteUnusedImage ()
     {
         if ($_POST['imageMax']) {

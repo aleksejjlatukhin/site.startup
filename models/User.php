@@ -4,7 +4,12 @@ namespace app\models;
 
 use app\modules\admin\models\ConversationMainAdmin;
 use app\modules\admin\models\MessageMainAdmin;
+use Throwable;
+use yii\base\ErrorException;
+use yii\base\Exception;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
@@ -12,6 +17,7 @@ use Yii;
 
 class User extends ActiveRecord implements IdentityInterface
 {
+
     const STATUS_DELETED = 0;
     const STATUS_NOT_ACTIVE = 1;
     const STATUS_ACTIVE = 10;
@@ -28,10 +34,15 @@ class User extends ActiveRecord implements IdentityInterface
 
     public $password;
 
+
+    /**
+     * @return string
+     */
     public static function tableName()
     {
         return 'user';
     }
+
 
     /**
      * @inheritdoc
@@ -53,6 +64,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['secret_key', 'unique'],
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -77,14 +89,19 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    /* Связи */
+    /**
+     * Получить все проекты пользователя
+     * @return ActiveQuery
+     */
     public function getProjects()
     {
         return $this->hasMany(Projects::class, ['user_id' => 'id']);
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -93,7 +110,11 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    /* Аутентификация пользователей */
+    /**
+     * Аутентификация пользователей
+     * @param int|string $id
+     * @return User|IdentityInterface|null
+     */
     public static function findIdentity($id)
     {
         return static::findOne([
@@ -112,20 +133,29 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    /* Находит пользователя по имени и возвращает объект найденного пользователя. */
+    /**
+     * Находит пользователя по имени и возвращает объект найденного пользователя
+     * @param $username
+     * @return User|null
+     */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username]);
     }
 
 
-    /* Находит пользователя по емайл */
+    /**
+     * Находит пользователя по емайл
+     * @param $email
+     * @return User|null
+     */
     public static function findByEmail($email)
     {
         return static::findOne([
             'email' => $email
         ]);
     }
+
 
     /**
      * @inheritdoc
@@ -135,6 +165,7 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->id;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -142,6 +173,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->auth_key;
     }
+
 
     /**
      * @inheritdoc
@@ -155,35 +187,46 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Сравнивает полученный пароль с паролем в поле password_hash, для текущего пользователя, в таблице user.
      * Вызываеться из модели LoginForm.
+     * @param $password
+     * @return bool
      */
     public function validatePassword($password)
     {
-        //return $this->password === $password;
-        return \Yii::$app->security->validatePassword($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
+
 
     /**
      * Генерирует случайную строку из 32 шестнадцатеричных символов и присваивает (при записи) полученное значение полю auth_key
      * таблицы user для нового пользователя.
      * Вызываеться из модели RegForm.
+     * @throws Exception
      */
     public function generateAuthKey()
     {
-        $this->auth_key = \Yii::$app->security->generateRandomString();
+        $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
+
     /**
-     * Генерирует хеш из введенного пароля и присваивает (при записи) полученное значение полю password_hash таблицы user для
-     * нового пользователя.
+     * Генерирует хеш из введенного пароля и присваивает (при записи)
+     * полученное значение полю password_hash таблицы user для нового пользователя.
      * Вызываеться из модели SingupForm.
+     * @param $password
+     * @throws Exception
      */
     public function setPassword($password)
     {
-        $this->password_hash = \Yii::$app->security->generatePasswordHash($password);
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
-    //Поиск пользователя по переданному секретному ключу
-    // для смены пароля через почту
+
+    /**
+     * Поиск пользователя по переданному секретному ключу
+     * для смены пароля через почту
+     * @param $key
+     * @return User|null
+     */
     public static function findBySecretKey($key)
     {
         if (!static::isSecretKeyExpire($key)) {
@@ -194,29 +237,39 @@ class User extends ActiveRecord implements IdentityInterface
         ]);
     }
 
-    // Генерация секретного ключа
-    // для смены пароля через почту
+
+    /**
+     * Генерация секретного ключа
+     * для смены пароля через почту
+     * @throws Exception
+     */
     public function generateSecretKey()
     {
-        $this->secret_key = \Yii::$app->security->generateRandomString() . '_' . time();
+        $this->secret_key = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
 
-    // Удаление секретного ключа
-    // для смены пароля через почту
+    /**
+     * Удаление секретного ключа
+     * для смены пароля через почту
+     */
     public function removeSecretKey()
     {
         $this->secret_key = null;
     }
 
 
-    //Проверка срока действия секретного ключа
+    /**
+     * Проверка срока действия секретного ключ
+     * @param $key
+     * @return bool
+     */
     public static function isSecretKeyExpire($key)
     {
         if (empty($key)) {
             return false;
         }
-        $expire = \Yii::$app->params['secretKeyExpire'];
+        $expire = Yii::$app->params['secretKeyExpire'];
         $parts = explode('_', $key);
         $timestamp = (int)end($parts);
 
@@ -224,7 +277,11 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    //Поиск пользователя по email или login
+    /**
+     * Поиск пользователя по email или login
+     * @param $identity
+     * @return bool|mixed|ActiveRecord
+     */
     public static function findIdentityByUsernameOrEmail($identity)
     {
         $users = self::find()->all();
@@ -237,12 +294,20 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
+    /**
+     * Получить объект проверки статуса онлайн
+     * @return ActiveQuery
+     */
     public function getCheckingOnline()
     {
         return $this->hasOne(CheckingOnlineUser::class, ['user_id' => 'id']);
     }
 
 
+    /**
+     * Получить статус пользователя онлайн или время посл.активности
+     * @return bool
+     */
     public function getCheckOnline()
     {
         if ($checkingOnline = $this->checkingOnline) return $checkingOnline->isOnline();
@@ -250,13 +315,20 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    //Получить объект главного Админа
+    /**
+     * Получить объект главного Админа
+     * @return User|null
+     */
     public function getMainAdmin ()
     {
         return User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
     }
 
-    //Получить объект Админа
+
+    /**
+     * Получить объект Админа
+     * @return bool|ActiveQuery
+     */
     public function getAdmin ()
     {
         if ($this->role === self::ROLE_USER) {
@@ -266,14 +338,20 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    //Получить объект техподдержки
+    /**
+     * Получить объект техподдержки
+     * @return User|null
+     */
     public function getDevelopment ()
     {
         return User::findOne(['role' => User::ROLE_DEV]);
     }
 
 
-    //Отправка письма на почту пользователю при изменении его статуса
+    /**
+     * Отправка письма на почту пользователю при изменении его статуса
+     * @return bool
+     */
     public function sendEmailUserStatus()
     {
         /* @var $user User */
@@ -291,10 +369,13 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
 
-    //Создание беседы техподдержки и пользователя при активации его статуса
+
+    /**
+     * Создание беседы техподдержки и пользователя при активации его статуса
+     * @return ConversationDevelopment|null
+     */
     public function createConversationDevelopment ()
     {
-
         $convers = ConversationDevelopment::findOne(['user_id' => $this->id]);
 
         if (!($convers)) {
@@ -311,10 +392,13 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-    //Создание беседы главного админа и админа при активации его статуса
+
+    /**
+     * Создание беседы главного админа и админа при активации его статуса
+     * @return ConversationMainAdmin|null
+     */
     public function createConversationMainAdmin ()
     {
-
         $convers = ConversationMainAdmin::findOne(['admin_id' => $this->id]);
 
         if (!($convers)) {
@@ -331,10 +415,14 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-    //Создание беседы админа и проектанта при активации его статуса
+
+    /**
+     * Создание беседы админа и проектанта при активации его статуса
+     * @param $user
+     * @return ConversationAdmin|null
+     */
     public function createConversationAdmin ($user)
     {
-
         $convers = ConversationAdmin::findOne(['user_id' => $user->id]);
 
         if (!($convers)) {
@@ -351,10 +439,14 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-    //Отправка письма админу
+
+    /**
+     * Отправка письма админу
+     * @param $user
+     * @return bool
+     */
     public function sendEmailAdmin($user)
     {
-
         if($user) {
 
             return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
@@ -467,6 +559,9 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
+    /**
+     * @return bool|int|string
+     */
     public function getCountUnreadMessagesDevelopmentFromUser ()
     {
         $count = MessageDevelopment::find()->where(['sender_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
@@ -492,7 +587,11 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    //Проверка на пользователя
+    /**
+     * Проверка на пользователя
+     * @param $username
+     * @return bool
+     */
     public static function isUserSimple($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_USER, 'status' => self::STATUS_ACTIVE]))
@@ -503,7 +602,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Админа
+
+    /**
+     * Проверка на Админа
+     * @param $username
+     * @return bool
+     */
     public static function isUserAdmin($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN, 'status' => self::STATUS_ACTIVE]))
@@ -514,7 +618,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Главного Админа
+
+    /**
+     * Проверка на Главного Админа
+     * @param $username
+     * @return bool
+     */
     public static function isUserMainAdmin($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_MAIN_ADMIN, 'status' => self::STATUS_ACTIVE]))
@@ -525,7 +634,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Эксперта
+
+    /**
+     * Проверка на Эксперта
+     * @param $username
+     * @return bool
+     */
     public static function isUserExpert($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_EXPERT, 'status' => self::STATUS_ACTIVE]))
@@ -536,7 +650,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Разработчика
+
+    /**
+     * Проверка на Разработчика
+     * @param $username
+     * @return bool
+     */
     public static function isUserDev($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_DEV, 'status' => self::STATUS_ACTIVE]))
@@ -547,7 +666,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    //Проверка на Статус
+
+    /**
+     * Проверка на Статус
+     * @param $username
+     * @return bool
+     */
     public static function isActiveStatus($username)
     {
         if (static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]))
@@ -560,9 +684,9 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function removeAllDataUser ()
     {

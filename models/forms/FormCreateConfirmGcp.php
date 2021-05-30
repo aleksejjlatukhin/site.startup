@@ -4,21 +4,60 @@
 namespace app\models\forms;
 
 use app\models\ConfirmGcp;
+use app\models\CreatorNewRespondsOnConfirmFirstStep;
+use app\models\CreatorRespondsFromAgentsOnConfirmFirstStep;
 use app\models\Gcp;
 use app\models\GenerationProblem;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
-use yii\base\Model;
+use yii\base\ErrorException;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
-class FormCreateConfirmGcp extends Model
+class FormCreateConfirmGcp extends FormCreateConfirm
 {
 
-    public $gcp_id;
-    public $count_respond;
-    public $count_positive;
+    /**
+     * FormCreateConfirmGcp constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
+        $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function setHypothesisId($id)
+    {
+        return $this->hypothesis_id = $id;
+    }
+
+
+    /**
+     * @param $count
+     * @return mixed
+     */
+    public function setCountRespond($count)
+    {
+        return $this->count_respond = $count;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getHypothesisId()
+    {
+        return $this->hypothesis_id;
+    }
 
 
     /**
@@ -27,10 +66,10 @@ class FormCreateConfirmGcp extends Model
     public function rules()
     {
         return [
-            [['gcp_id', 'count_respond', 'count_positive'], 'required'],
-            [['gcp_id'], 'integer'],
-            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
-            [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
+            [['hypothesis_id', 'count_respond', 'count_positive'], 'required'],
+            [['hypothesis_id'], 'integer'],
+            [['count_respond', 'count_positive', 'add_count_respond'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
+            [['count_respond', 'count_positive', 'add_count_respond'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
 
@@ -49,26 +88,26 @@ class FormCreateConfirmGcp extends Model
     /**
      * @return ConfirmGcp
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create()
     {
-        $gcp = Gcp::findOne($this->gcp_id);
-        $problem = GenerationProblem::findOne($gcp->problem_id);
-        $segment = Segment::findOne($gcp->segment_id);
-        $project = Projects::findOne($gcp->project_id);
-        $user = User::findOne($project->user_id);
+        $gcp = Gcp::findOne($this->hypothesisId);
+        $problem = GenerationProblem::findOne($gcp->problemId);
+        $segment = Segment::findOne($gcp->segmentId);
+        $project = Projects::findOne($gcp->projectId);
+        $user = User::findOne($project->userId);
 
         $model = new ConfirmGcp();
-        $model->gcp_id = $this->gcp_id;
-        $model->count_respond = $this->count_respond;
-        $model->count_positive = $this->count_positive;
+        $model->setGcpId($this->hypothesisId);
+        $model->setCountRespond(array_sum([$this->count_respond, $this->add_count_respond]));
+        $model->setCountPositive($this->count_positive);
 
         if ($model->save()) {
             //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
-            $model->createRespond();
-            //Вопросы, которые будут добавлены по-умолчанию
-            $this->addListQuestions($model->id);
+            $this->_creatorResponds->create($model, $this);
+            // Добавление новых респондентов для программы подтверждения ГЦП
+            if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
             //Удаление кэша формы создания подтверждения
             $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
                 '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm';
@@ -77,33 +116,5 @@ class FormCreateConfirmGcp extends Model
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Неудалось создать подтверждение ценностного предложения');
-    }
-
-
-    /**
-     * @param $id
-     * @return bool
-     * @throws NotFoundHttpException
-     */
-    private function addListQuestions ($id)
-    {
-        $model = ConfirmGcp::findOne($id);
-
-        if ($model) {
-            $model->addQuestionDefault('Во сколько обходится эта проблема?');
-            $model->addQuestionDefault('Сколько сейчас платят?');
-            $model->addQuestionDefault('Какой бюджет до этого выделяли?');
-            $model->addQuestionDefault('Что еще пытались сделать?');
-            $model->addQuestionDefault('Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?');
-            $model->addQuestionDefault('Как вы решаете эту проблему сейчас?');
-            $model->addQuestionDefault('Кто будет финансировать покупку?');
-            $model->addQuestionDefault('С кем еще мне следует переговорить?');
-            $model->addQuestionDefault('Решает ли ценностное предложенное вашу проблему?');
-            $model->addQuestionDefault('Вы бы рассказали об этом ценностном предложении своим коллегам?');
-            $model->addQuestionDefault('Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?');
-
-            return true;
-        }
-        throw new NotFoundHttpException('Ошибка. Неудалось добавить вопросы для подтверждения ценностного предложения');
     }
 }

@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 class AnswersQuestionsConfirmSegment extends ActiveRecord
@@ -16,15 +17,26 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
         return 'answers_questions_confirm_segment';
     }
 
+
+    /**
+     * Получить объект вопроса
+     * @return ActiveQuery
+     */
     public function getQuestion()
     {
         return $this->hasOne(QuestionsConfirmSegment::class, ['id' => 'question_id']);
     }
 
+
+    /**
+     * Получить объект респондента
+     * @return ActiveQuery
+     */
     public function getRespond ()
     {
         return $this->hasOne(Respond::class, ['id' => 'respond_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -37,6 +49,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
             [['answer'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

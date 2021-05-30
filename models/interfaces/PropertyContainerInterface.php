@@ -3,9 +3,6 @@
 namespace app\models\interfaces;
 
 
-/**
- * Паттерн "Контейнер свойств"
- * */
 interface PropertyContainerInterface
 {
 
@@ -16,17 +13,20 @@ interface PropertyContainerInterface
      */
     public function addProperty($propertyName, $value);
 
+
     /**
      * @param $propertyName
      * @return mixed
      */
     public function deleteProperty($propertyName);
 
+
     /**
      * @param $propertyName
      * @return mixed
      */
     public function getProperty($propertyName);
+
 
     /**
      * @param $propertyName

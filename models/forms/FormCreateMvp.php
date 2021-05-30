@@ -10,6 +10,7 @@ use app\models\Mvp;
 use app\models\Projects;
 use app\models\Segment;
 use app\models\User;
+use yii\base\ErrorException;
 use yii\base\Model;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
@@ -19,6 +20,7 @@ class FormCreateMvp extends Model
 
     public $description;
     public $confirm_gcp_id;
+
 
     /**
      * {@inheritdoc}
@@ -31,10 +33,11 @@ class FormCreateMvp extends Model
         ];
     }
 
+
     /**
      * @return Mvp
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
     public function create()
     {

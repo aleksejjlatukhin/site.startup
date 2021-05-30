@@ -4,23 +4,14 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\db\ActiveRecord;
 
-/**
- * LoginForm is the model behind the login form.
- *
- * @property User|null $user This property is read-only.
- *
- */
 class LoginForm extends Model
 {
-    //public $username;
-    // login or email
+
     public $identity;
     public $password;
-    //public $email;
     public $rememberMe = true;
-    //public $status;
-
     private $_user = false;
 
 
@@ -30,36 +21,29 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-
             ['identity', 'filter', 'filter' => 'trim'],
             ['identity', 'required'],
-
-            //[['email', 'password'], 'required', 'on' => 'default'],
-            //['email', 'email'],
-            // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
             ['password', 'validatePassword'],
         ];
     }
 
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
             'identity' => 'Логин или адрес эл.почты',
-            //'email' => 'Эл.почта',
             'password' => 'Пароль',
             'rememberMe' => 'Запомнить',
         ];
     }
 
+
     /**
-     * Validates the password.
-     * This method serves as the inline validation for password.
-     *
-     * @param string $attribute the attribute currently being validated
-     * @param array $params the additional name-value pairs given in the rule
+     * @param $attribute
      */
     public function validatePassword($attribute)
     {
@@ -72,24 +56,10 @@ class LoginForm extends Model
         }
     }
 
+
     /**
-     * Logs in a user using the provided username and password.
-     * @return boolean whether the user is logged in successfully
+     * @return bool
      */
-    /*public function login()
-    {
-        if ($this->validate()) {
-            if($this->rememberMe){
-                $u = $this->getUser();
-                $u->generateAuthKey();
-                $u->save();
-            }
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
-        }
-        return false;
-    }*/
-
-
     public function login()
     {
         if ($this->validate()) {
@@ -106,27 +76,25 @@ class LoginForm extends Model
         }
     }
 
+
     /**
-     * Finds user by [[username]]
-     *
-     * @return User|null
+     * @return bool|mixed|ActiveRecord
      */
     public function getUser()
     {
-        if ($this->_user === false) {
-            //$this->_user = User::findByUsername($this->username);
-            //$this->_user = User::findByEmail($this->email);
+        if ($this->_user === false)
             $this->_user = User::findIdentityByUsernameOrEmail($this->identity);
-        }
-
         return $this->_user;
     }
 
 
-    /*Подтвреждение регистрации по email*/
+    /**
+     * Подтвреждение регистрации по email
+     * @param $user
+     * @return bool
+     */
     public function sendActivationEmail($user)
     {
-
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
             ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
             ->setTo($user->email)

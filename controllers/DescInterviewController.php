@@ -7,11 +7,17 @@ use app\models\Projects;
 use app\models\Respond;
 use app\models\Segment;
 use app\models\User;
+use Throwable;
 use Yii;
 use app\models\DescInterview;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\base\Model;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class DescInterviewController extends AppUserPartController
 {
@@ -19,7 +25,7 @@ class DescInterviewController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -41,7 +47,7 @@ class DescInterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -60,7 +66,7 @@ class DescInterviewController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -72,7 +78,7 @@ class DescInterviewController extends AppUserPartController
 
     /**
      * @param $id
-     * @return \yii\console\Response|\yii\web\Response
+     * @return \yii\console\Response|Response
      * @throws NotFoundHttpException
      */
     public function actionDownload($id)
@@ -88,7 +94,7 @@ class DescInterviewController extends AppUserPartController
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-            return \Yii::$app->response->sendFile($file, $model->interview_file);
+            return Yii::$app->response->sendFile($file, $model->interview_file);
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
@@ -97,9 +103,9 @@ class DescInterviewController extends AppUserPartController
     /**
      * @param $id
      * @return bool|string
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionDeleteFile($id)
     {
@@ -142,6 +148,10 @@ class DescInterviewController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetDataCreateForm($id)
     {
         $respond = Respond::findOne($id);
@@ -158,8 +168,7 @@ class DescInterviewController extends AppUserPartController
                 '/segments/segment-'.$segment->id.'/confirm/interviews/respond-'.$respond->id.'/';
             $cache_form_creation = $cache->get('formCreateInterviewCache');
 
-            if ($cache_form_creation) { //Если существует кэш
-
+            if ($cache_form_creation['AnswersQuestionsConfirmSegment']) { //Если существует кэш для ответов на вопросы
                 foreach ($cache_form_creation['AnswersQuestionsConfirmSegment'] as $answerCache) {
                     foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmSegment
                         if ($answer['question_id'] == $answerCache['question_id']) {
@@ -167,25 +176,29 @@ class DescInterviewController extends AppUserPartController
                         }
                     }
                 }
+            }
+
+            if ($cache_form_creation['DescInterview']) { //Если существует кэш для DescInterview
                 foreach ($cache_form_creation['DescInterview'] as $key => $value) { //Добавляем данные для полей модели DescInterview
                     $model[$key] = $value;
                 }
             }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
+     * @throws ErrorException
+     * @throws Exception
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
      */
     public function actionCreate($id)
     {
@@ -196,29 +209,26 @@ class DescInterviewController extends AppUserPartController
         $answers = $respond->answers;
 
         if(Yii::$app->request->isAjax) {
-
-            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
-
-                foreach ($answers as $answer) $answer->save(false);
-
-                if ($model->load(Yii::$app->request->post())) {
-
-                    if ($model->create()) {
-
-                        $response = ['interview_id' => $interview->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+            if ($model->load(Yii::$app->request->post())) {
+                if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+                    foreach ($answers as $answer)
+                        $answer->save(false);
+                }
+                if ($model->create()) {
+                    $response = ['interview_id' => $interview->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetDataUpdateForm($id)
@@ -231,18 +241,19 @@ class DescInterviewController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'segment' => $segment])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
+     * @throws Exception
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
      */
     public function actionUpdate($id)
     {
@@ -252,26 +263,25 @@ class DescInterviewController extends AppUserPartController
         $answers = $respond->answers;
 
         //Если ранее был загружен файл
-        if ($model->interview_file !== null) $model->loadFile = $model->interview_file;
+        if ($model->interview_file !== null) {
+            $model->loadFile = $model->interview_file;
+        }
 
         if(Yii::$app->request->isAjax) {
-
-            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
-
-                foreach ($answers as $answer) $answer->save(false);
-
-                if ($model->load(Yii::$app->request->post())) {
-
-                    if ($model->updateInterview()) {
-
-                        $response = ['interview_id' => $interview->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+            if ($model->load(Yii::$app->request->post())) {
+                if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+                    foreach ($answers as $answer)
+                        $answer->save(false);
+                }
+                if ($model->updateInterview()) {
+                    $response = ['interview_id' => $interview->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
     /**

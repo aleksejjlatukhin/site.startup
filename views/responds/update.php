@@ -7,12 +7,12 @@ use yii\helpers\Html;
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) :?>
+<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) :?>
 
 
     <?php $form = ActiveForm::begin([
         'id' => 'formUpdateRespond',
-        'action' => "/respond/update?id=$model->id",
+        'action' => '/responds/update?stage='.$confirm->stage.'&id='.$model->id,
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -69,7 +69,7 @@ use yii\helpers\Html;
             <?= \kartik\date\DatePicker::widget([
                 'type' => 2,
                 'removeButton' => false,
-                'name' => 'UpdateRespondForm[date_plan]',
+                'name' => basename(get_class($model)).'[date_plan]',
                 'value' => $model->date_plan == null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
                 'readonly' => true,
                 'pluginOptions' => [

@@ -69,11 +69,8 @@ use app\models\User;
             <div class="mini_header_desc_block">Сфера деятельности:</div>
             <?= $segment->field_of_activity; ?>
 
-            <div class="mini_header_desc_block">Вид деятельности:</div>
+            <div class="mini_header_desc_block">Вид / специализация деятельности:</div>
             <?= $segment->sort_of_activity; ?>
-
-            <div class="mini_header_desc_block">Специализация вида деятельности:</div>
-            <?= $segment->specialization_of_activity; ?>
 
         </div>
 

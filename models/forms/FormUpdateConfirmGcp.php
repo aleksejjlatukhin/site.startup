@@ -3,16 +3,46 @@
 
 namespace app\models\forms;
 
-use yii\base\Model;
 use app\models\ConfirmGcp;
+use app\models\EditorCountResponds;
+use Throwable;
+use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
-class FormUpdateConfirmGcp extends Model
+class FormUpdateConfirmGcp extends FormUpdateConfirm
 {
-    public $id;
-    public $gcp_id;
-    public $count_respond;
-    public $count_positive;
+
+
+    /**
+     * FormUpdateConfirmGcp constructor.
+     * @param $confirmId
+     * @param array $config
+     */
+    public function __construct($confirmId, $config = [])
+    {
+        $confirm = ConfirmGcp::findOne($confirmId);
+        $this->_editorCountRespond = new EditorCountResponds();
+
+        $this->setParams([
+            'id' => $confirmId,
+            'count_respond' => $confirm->count_respond,
+            'count_positive' => $confirm->count_positive,
+        ]);
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param array $params
+     * @return mixed|void
+     */
+    protected function setParams(array $params)
+    {
+        $this->id = $params['id'];
+        $this->count_respond = $params['count_respond'];
+        $this->count_positive = $params['count_positive'];
+    }
 
 
     /**
@@ -21,12 +51,11 @@ class FormUpdateConfirmGcp extends Model
     public function rules()
     {
         return [
-            [['gcp_id', 'count_respond', 'count_positive'], 'required'],
-            [['gcp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -34,41 +63,30 @@ class FormUpdateConfirmGcp extends Model
     public function attributeLabels()
     {
         return [
-            'count_respond' => 'Количество респондентов, подтвердивших проблему',
-            'count_positive' => 'Необходимое количество респондентов, подтверждающих ценностное предложение',
+            'count_respond' => 'Количество респондентов',
+            'count_positive' => 'Количество респондентов, соответствующих ценностному предложению',
         ];
     }
 
-    /**
-     * FormUpdateConfirmGcp constructor.
-     * @param $id
-     * @param array $config
-     */
-    public function __construct($id, $config = [])
-    {
-        $confirm_gcp = ConfirmGcp::findOne($id);
-
-        $this->id = $id;
-        $this->gcp_id = $confirm_gcp->gcp_id;
-        $this->count_respond = $confirm_gcp->count_respond;
-        $this->count_positive = $confirm_gcp->count_positive;
-
-        parent::__construct($config);
-    }
 
     /**
      * @return ConfirmGcp|bool|null
      * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function update()
     {
         if ($this->validate()) {
 
-            $confirm_gcp = ConfirmGcp::findOne($this->id);
-            $confirm_gcp->count_respond = $this->count_respond;
-            $confirm_gcp->count_positive = $this->count_positive;
+            $confirm = ConfirmGcp::findOne($this->id);
+            $confirm->setCountRespond($this->count_respond);
+            $confirm->setCountPositive($this->count_positive);
 
-            if ($confirm_gcp->save()) return $confirm_gcp;
+            if ($confirm->save()) {
+                $this->_editorCountRespond->edit($confirm);
+                return $confirm;
+            }
             throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;

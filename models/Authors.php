@@ -2,19 +2,12 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
-/**
- * This is the model class for table "authors".
- *
- * @property string $id
- * @property int $project_id
- * @property string $fio
- * @property string $role
- * @property string $experience
- */
-class Authors extends \yii\db\ActiveRecord
+class Authors extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
@@ -24,10 +17,15 @@ class Authors extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить объект проекта
+     * @return ActiveQuery
+     */
     public function getProject()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
+
 
     /**
      * {@inheritdoc}
@@ -42,6 +40,7 @@ class Authors extends \yii\db\ActiveRecord
             [['fio', 'role', 'experience'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

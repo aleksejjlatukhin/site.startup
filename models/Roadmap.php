@@ -7,6 +7,10 @@ namespace app\models;
 class Roadmap extends PropertyContainer
 {
 
+    /**
+     * Roadmap constructor.
+     * @param $id
+     */
     public function __construct($id)
     {
         $segment = Segment::findOne($id);

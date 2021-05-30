@@ -44,12 +44,12 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
         ) ;?>
 
         <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/interview/view', 'id' => $interview->id],
+            ['/interview/view', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
         <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
-            ['/generation-problem/index', 'id' => $interview->id],
+            ['/generation-problem/index', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -96,7 +96,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                 $segment_name = mb_substr($segment_name, 0, 15) . '...';
             }
 
-            $problem_description = $generationProblem->description;
+            $problem_description = $problem->description;
             if (mb_strlen($problem_description) > 50){
                 $problem_description = mb_substr($problem_description, 0, 50) . '...';
             }
@@ -105,7 +105,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
             <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
 
             <?php
-            $problem_description = $generationProblem->description;
+            $problem_description = $problem->description;
             if (mb_strlen($problem_description) > 100){
                 $problem_description = mb_substr($problem_description, 0, 100) . '...';
             }
@@ -130,7 +130,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
         <div>Наименование сегмента:</div>
         <div><?= $segment->name;?></div>
         <div>Формулировка проблемы:</div>
-        <div><?= $generationProblem->description;?></div>
+        <div><?= $problem->description;?></div>
     </div>
 
 
@@ -182,32 +182,32 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                     <div class="row">
                         <div class="col-md-12">Приветствие в начале встречи</div>
-                        <div class="col-md-12"><?= $interview->greeting_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->greeting_interview; ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Информация о вас для респондентов</div>
-                        <div class="col-md-12"><?= $interview->view_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->view_interview; ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                        <div class="col-md-12"><?= $interview->reason_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->reason_interview; ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-                        <div class="col-md-12"><?= $generationProblem->description;?></div>
+                        <div class="col-md-12"><?= $problem->description;?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Действие для проверки</div>
-                        <div class="col-md-12"><?= $generationProblem->action_to_check;?></div>
+                        <div class="col-md-12"><?= $problem->action_to_check;?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Метрика результата</div>
-                        <div class="col-md-12"><?= $generationProblem->result_metric;?></div>
+                        <div class="col-md-12"><?= $problem->result_metric;?></div>
                     </div>
 
                 </div>
@@ -216,7 +216,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 $form = ActiveForm::begin([
                     'id' => 'new_confirm_problem',
-                    'action' => Url::to(['/confirm-problem/save-confirm-problem', 'id' => $generationProblem->id]),
+                    'action' => Url::to(['/confirm-problem/save-confirm-problem', 'id' => $problem->id]),
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
@@ -244,7 +244,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                     <?= $form->field($model, 'count_respond', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div>Количество респондентов (представителей сегмента)</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
+                    ])->label('<div style="padding-top: 5px;">Количество респондентов (представителей сегмента)</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,
@@ -257,11 +257,43 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 </div>
 
+                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+
+                    <?php $btnContent = '<div class="changeBtnContent">Добавить новых респондентов</div><div style="font-weight: 400;font-size: 13px;">(Общее количечество респондентов - от 1 до 100)</div>'; ?>
+
+                    <?= $form->field($model, 'add_count_respond', [
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label(Html::button($btnContent, [
+                                 'id' => 'switch_add_count_respond',
+                                 'class' => 'btn btn-default',
+                                 'style' => [
+                                     'font-weight' => '700',
+                                     'line-height' => '18px',
+                                     'margin-top' => '-10px',
+                                     'background' => '#E0E0E0',
+                                     'padding' => '0 7px',
+                                     'width' => '300px',
+                                     'height' => '50px',
+                                     'font-size' => '16px',
+                                     'border-radius' => '8px',
+                                 ]
+                             ])
+                    )->textInput([
+                            'type' => 'number',
+                            'readonly' => true,
+                            'class' => 'style_form_field_respond form-control',
+                            'id' => 'confirm_add_count_respond',
+                            'autocomplete' => 'off'
+                        ]);
+                    ?>
+
+                </div>
+
                 <div class="row">
 
                     <?= $form->field($model, 'count_positive', [
                         'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('Необходимое количество респондентов, подтверждающих проблему')
+                    ])->label('<div style="padding-top: 5px;">Необходимое количество респондентов, подтверждающих проблему</div>')
                         ->textInput([
                             'type' => 'number',
                             'required' => true,

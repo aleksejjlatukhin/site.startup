@@ -2,9 +2,14 @@
 
 namespace app\models;
 
+use Throwable;
 use Yii;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
@@ -13,6 +18,8 @@ class Projects extends ActiveRecord
 {
 
     public $present_files;
+
+
     /**
      * {@inheritdoc}
      */
@@ -21,46 +28,94 @@ class Projects extends ActiveRecord
         return 'projects';
     }
 
+
+    /**
+     * Получить объект пользователя
+     * @return ActiveQuery
+     */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+
+    /**
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+
+    /**
+     * Получить всех авторов проекта
+     * @return ActiveQuery
+     */
     public function getAuthors()
     {
         return $this->hasMany(Authors::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить все сегменты проекта
+     * @return ActiveQuery
+     */
     public function getSegments()
     {
         return $this->hasMany(Segment::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить все проблемы проекта
+     * @return ActiveQuery
+     */
     public function getProblems ()
     {
         return $this->hasMany(GenerationProblem::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить все ценностные предложения проекта
+     * @return ActiveQuery
+     */
     public function getGcps ()
     {
         return $this->hasMany(Gcp::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить все Mvp проекта
+     * @return ActiveQuery
+     */
     public function getMvps ()
     {
         return $this->hasMany(Mvp::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить все бизнес-модели проекта
+     * @return ActiveQuery
+     */
     public function getBusinessModels ()
     {
         return $this->hasMany(BusinessModel::class, ['project_id' => 'id']);
     }
 
+
+    /**
+     * Получить прикрепленные файлы
+     * @return ActiveQuery
+     */
     public function getPreFiles()
     {
         return $this->hasMany(PreFiles::class, ['project_id' => 'id']);
     }
-
 
 
     /**
@@ -135,7 +190,9 @@ class Projects extends ActiveRecord
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -143,6 +200,11 @@ class Projects extends ActiveRecord
         ];
     }
 
+
+    /**
+     * Показать авторов проекта
+     * @return string
+     */
     public function showListAuthors()
     {
         $string = '';
@@ -164,7 +226,7 @@ class Projects extends ActiveRecord
      * Загрузка презентационных файлов
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     private function uploadPresentFiles(){
 
@@ -228,8 +290,8 @@ class Projects extends ActiveRecord
     /**
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
+     * @throws ErrorException
+     * @throws Exception
      */
     public function create(){
 
@@ -258,7 +320,7 @@ class Projects extends ActiveRecord
     /**
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function updateProject(){
 
@@ -342,9 +404,9 @@ class Projects extends ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function deleteStage ()
     {

@@ -9,11 +9,17 @@ use app\models\Projects;
 use app\models\RespondsGcp;
 use app\models\Segment;
 use app\models\User;
+use Throwable;
 use Yii;
 use app\models\DescInterviewGcp;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\base\Model;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class DescInterviewGcpController extends AppUserPartController
@@ -22,7 +28,7 @@ class DescInterviewGcpController extends AppUserPartController
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
     public function beforeAction($action)
     {
@@ -44,7 +50,7 @@ class DescInterviewGcpController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
@@ -63,7 +69,7 @@ class DescInterviewGcpController extends AppUserPartController
                 return parent::beforeAction($action);
 
             }else{
-                throw new \yii\web\HttpException(200, 'У Вас нет доступа по данному адресу.');
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }else{
@@ -75,7 +81,7 @@ class DescInterviewGcpController extends AppUserPartController
 
     /**
      * @param $id
-     * @return \yii\console\Response|\yii\web\Response
+     * @return \yii\console\Response|Response
      * @throws NotFoundHttpException
      */
     public function actionDownload($id)
@@ -94,7 +100,7 @@ class DescInterviewGcpController extends AppUserPartController
         $file = $path . $model->server_file;
 
         if (file_exists($file)) {
-            return \Yii::$app->response->sendFile($file, $model->interview_file);
+            return Yii::$app->response->sendFile($file, $model->interview_file);
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
@@ -102,9 +108,9 @@ class DescInterviewGcpController extends AppUserPartController
     /**
      * @param $id
      * @return bool|string
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function actionDeleteFile($id)
     {
@@ -152,6 +158,10 @@ class DescInterviewGcpController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function actionGetDataCreateForm($id)
     {
         $respond = RespondsGcp::findOne($id);
@@ -170,8 +180,7 @@ class DescInterviewGcpController extends AppUserPartController
                 '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$respond->id.'/';
             $cache_form_creation = $cache->get('formCreateInterviewCache');
 
-            if ($cache_form_creation) { //Если существует кэш
-
+            if ($cache_form_creation['AnswersQuestionsConfirmGcp']) { //Если существует кэш для ответов на вопросы
                 foreach ($cache_form_creation['AnswersQuestionsConfirmGcp'] as $answerCache) {
                     foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmGcp
                         if ($answer['question_id'] == $answerCache['question_id']) {
@@ -179,25 +188,29 @@ class DescInterviewGcpController extends AppUserPartController
                         }
                     }
                 }
+            }
+
+            if ($cache_form_creation['DescInterviewGcp']) { //Если существует кэш для DescInterviewGcp
                 foreach ($cache_form_creation['DescInterviewGcp'] as $key => $value) { //Добавляем данные для полей модели DescInterviewGcp
                     $model[$key] = $value;
                 }
             }
 
             $response = ['renderAjax' => $this->renderAjax('create', ['respond' => $respond, 'model' => $model])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
+     * @throws ErrorException
+     * @throws Exception
      * @throws NotFoundHttpException
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
      */
     public function actionCreate($id)
     {
@@ -208,29 +221,26 @@ class DescInterviewGcpController extends AppUserPartController
         $answers = $respond->answers;
 
         if(Yii::$app->request->isAjax) {
-
-            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
-
-                foreach ($answers as $answer) $answer->save(false);
-
-                if ($model->load(Yii::$app->request->post())) {
-
-                    if ($model->create()) {
-
-                        $response = ['confirm_gcp_id' => $confirmGcp->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+            if ($model->load(Yii::$app->request->post())) {
+                if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+                    foreach ($answers as $answer)
+                        $answer->save(false);
+                }
+                if ($model->create()) {
+                    $response = ['confirm_gcp_id' => $confirmGcp->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
      * @throws NotFoundHttpException
      */
     public function actionGetDataUpdateForm($id)
@@ -243,18 +253,19 @@ class DescInterviewGcpController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'gcp' => $gcp])];
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            \Yii::$app->response->data = $response;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
             return $response;
         }
+        return false;
     }
 
 
     /**
      * @param $id
-     * @return array
+     * @return array|bool
+     * @throws Exception
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
      */
     public function actionUpdate($id)
     {
@@ -264,26 +275,25 @@ class DescInterviewGcpController extends AppUserPartController
         $answers = $respond->answers;
 
         //Если ранее был загружен файл
-        if ($model->interview_file !== null) $model->loadFile = $model->interview_file;
+        if ($model->interview_file !== null) {
+            $model->loadFile = $model->interview_file;
+        }
 
         if(Yii::$app->request->isAjax) {
-
-            if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
-
-                foreach ($answers as $answer) $answer->save(false);
-
-                if ($model->load(Yii::$app->request->post())) {
-
-                    if ($model->updateInterview()) {
-
-                        $response = ['confirm_gcp_id' => $confirmGcp->id];
-                        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                        \Yii::$app->response->data = $response;
-                        return $response;
-                    }
+            if ($model->load(Yii::$app->request->post())) {
+                if (Model::loadMultiple($answers, Yii::$app->request->post()) && Model::validateMultiple($answers)) {
+                    foreach ($answers as $answer)
+                        $answer->save(false);
+                }
+                if ($model->updateInterview()) {
+                    $response = ['confirm_gcp_id' => $confirmGcp->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
     /**

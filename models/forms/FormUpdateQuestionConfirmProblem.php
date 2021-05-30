@@ -14,6 +14,11 @@ class FormUpdateQuestionConfirmProblem extends Model
     public $title;
 
 
+    /**
+     * FormUpdateQuestionConfirmProblem constructor.
+     * @param $id
+     * @param array $config
+     */
     public function __construct($id, $config = [])
     {
         $question = QuestionsConfirmProblem::findOne($id);
@@ -24,12 +29,16 @@ class FormUpdateQuestionConfirmProblem extends Model
     }
 
 
+    /**
+     * @return QuestionsConfirmProblem|null
+     */
     public function update()
     {
         $question = QuestionsConfirmProblem::findOne($this->id);
         $question->title = $this->title;
         return $question->save() ? $question : null;
     }
+
 
     /**
      * {@inheritdoc}
@@ -43,6 +52,7 @@ class FormUpdateQuestionConfirmProblem extends Model
             [['title'], 'trim'],
         ];
     }
+
 
     /**
      * {@inheritdoc}

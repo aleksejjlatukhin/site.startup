@@ -2,11 +2,15 @@
 
 namespace app\models;
 
+use Throwable;
+use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
-class Segment extends \yii\db\ActiveRecord
+class Segment extends ActiveRecord
 {
 
     const TYPE_B2C = 100;
@@ -24,6 +28,7 @@ class Segment extends \yii\db\ActiveRecord
     const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
+
 
     /**
      * {@inheritdoc}
@@ -46,35 +51,72 @@ class Segment extends \yii\db\ActiveRecord
     }
 
 
-
+    /**
+     * Получить объект проектв
+     * @return ActiveQuery
+     */
     public function getProject()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
+
+    /**
+     * Получить объект подтверждения
+     * @return ActiveQuery
+     */
     public function getInterview()
     {
         return $this->hasOne(Interview::class, ['segment_id' => 'id']);
     }
 
+
+    /**
+     * Получить все проблемы сегмента
+     * @return ActiveQuery
+     */
     public function getProblems ()
     {
         return $this->hasMany(GenerationProblem::class, ['segment_id' => 'id']);
     }
 
+
+    /**
+     * Получить все ЦП сегмента
+     * @return ActiveQuery
+     */
     public function getGcps ()
     {
         return $this->hasMany(Gcp::class, ['segment_id' => 'id']);
     }
 
+
+    /**
+     * Получить все Mv[ сегмента
+     * @return ActiveQuery
+     */
     public function getMvps ()
     {
         return $this->hasMany(Mvp::class, ['segment_id' => 'id']);
     }
 
+
+    /**
+     * Получить все бизнес-модели сегмента
+     * @return ActiveQuery
+     */
     public function getBusinessModels ()
     {
         return $this->hasMany(BusinessModel::class, ['segment_id' => 'id']);
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
     }
     
 
@@ -86,7 +128,7 @@ class Segment extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['created_at', 'updated_at', 'time_confirm'], 'integer'],
-            [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'description', 'specialization_of_activity'], 'trim'],
+            [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'description'], 'trim'],
             [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm'], 'integer'],
             [['age_from', 'age_to'], 'integer'],
             [['income_from', 'income_to'], 'integer'],
@@ -95,7 +137,7 @@ class Segment extends \yii\db\ActiveRecord
             [['add_info'], 'string'],
             [['name',], 'string', 'min' => 2, 'max' => 65],
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
-            [['field_of_activity', 'sort_of_activity', 'specialization_of_activity'], 'string', 'max' => 255],
+            [['field_of_activity', 'sort_of_activity'], 'string', 'max' => 255],
         ];
     }
 
@@ -112,8 +154,7 @@ class Segment extends \yii\db\ActiveRecord
             'description' => 'Краткое описание сегмента',
             'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
             'field_of_activity' => 'Сфера деятельности потребителя',
-            'sort_of_activity' => 'Вид деятельности потребителя',
-            'specialization_of_activity' => 'Специализация вида деятельности потребителя',
+            'sort_of_activity' => 'Вид / специализация деятельности потребителя',
             'age_from' => 'Возраст потребителя',
             'gender_consumer' => 'Пол потребителя',
             'education_of_consumer' => 'Образование потребителя',
@@ -127,7 +168,9 @@ class Segment extends \yii\db\ActiveRecord
     }
 
 
-    /* Поведения */
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return [
@@ -162,9 +205,9 @@ class Segment extends \yii\db\ActiveRecord
     }
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     public function deleteStage ()
     {

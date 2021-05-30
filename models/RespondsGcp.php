@@ -2,13 +2,17 @@
 
 namespace app\models;
 
-use Yii;
+use app\models\interfaces\RespondsInterface;
+use Throwable;
+use yii\base\ErrorException;
+use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
+use yii\db\ActiveRecord;
 
-class RespondsGcp extends \yii\db\ActiveRecord
+class RespondsGcp extends ActiveRecord implements RespondsInterface
 {
 
-    const LIMIT_COUNT = 100;
 
     /**
      * {@inheritdoc}
@@ -19,20 +23,99 @@ class RespondsGcp extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * Получить интевью респондента
+     * @return mixed|ActiveQuery
+     */
     public function getDescInterview()
     {
         return $this->hasOne(DescInterviewGcp::class, ['responds_gcp_id' => 'id']);
     }
 
+
+    /**
+     * Получить модель подтверждения
+     * @return mixed|ActiveQuery
+     */
     public function getConfirm()
     {
         return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
     }
 
+
+    /**
+     * Получить ответы респондента на вопросы
+     * @return mixed|ActiveQuery
+     */
     public function getAnswers()
     {
         return $this->hasMany(AnswersQuestionsConfirmGcp::class, ['respond_id' => 'id']);
     }
+
+
+    /**
+     * Установить id подтверждения
+     * @param $confirmId
+     * @return mixed
+     */
+    public function setConfirmId($confirmId)
+    {
+        return $this->confirm_gcp_id = $confirmId;
+    }
+
+
+    /**
+     * Получить id подтверждения
+     * @return mixed
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_gcp_id;
+    }
+
+
+    /**
+     * Установить имя респондента
+     * @param $name
+     * @return mixed
+     */
+    public function setName($name)
+    {
+        return $this->name = $name;
+    }
+
+
+    /**
+     * Получить имя респондента
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param array $params
+     * @return mixed|void
+     */
+    public function setParams(array $params)
+    {
+        $this->info_respond = $params['info_respond'];
+        $this->place_interview = $params['place_interview'];
+        $this->email = $params['email'];
+    }
+
+
+    /**
+     * Установить плановую дату интервью
+     * @param $datePlan
+     */
+    public function setDatePlan($datePlan)
+    {
+        $this->date_plan = $datePlan;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -50,6 +133,7 @@ class RespondsGcp extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -62,20 +146,6 @@ class RespondsGcp extends \yii\db\ActiveRecord
             'date_plan' => 'Плановая дата интервью',
             'place_interview' => 'Место проведения интервью',
         ];
-    }
-
-
-    public function addAnswersForNewRespond()
-    {
-        $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $this->confirm_gcp_id])->all();
-
-        foreach ($questions as $question){
-
-            $answer = new AnswersQuestionsConfirmGcp();
-            $answer->question_id = $question->id;
-            $answer->respond_id = $this->id;
-            $answer->save();
-        }
     }
 
 
@@ -106,20 +176,22 @@ class RespondsGcp extends \yii\db\ActiveRecord
 
 
     /**
-     * @throws \Throwable
-     * @throws \yii\base\ErrorException
-     * @throws \yii\db\StaleObjectException
+     * Удаление связанных данных
+     * по событию EVENT_BEFORE_DELETE
+     * @throws Throwable
+     * @throws ErrorException
+     * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
         $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $this->id])->one();
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $this->id])->all();
-        $confirmGcp = ConfirmGcp::findOne($this->confirm_gcp_id);
-        $gcp = Gcp::find()->where(['id' => $confirmGcp->gcp_id])->one();
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $confirm = ConfirmGcp::findOne($this->confirmId);
+        $gcp = Gcp::findOne($confirm->gcpId);
+        $problem = GenerationProblem::findOne($gcp->problemId);
+        $segment = Segment::findOne($gcp->segmentId);
+        $project = Projects::findOne($gcp->projectId);
+        $user = User::findOne($project->userId);
 
         //Удаление интервью респондента
         if ($descInterview) $descInterview->delete();
@@ -133,9 +205,6 @@ class RespondsGcp extends \yii\db\ActiveRecord
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
             '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/interviews/respond-'.$this->id;
         if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-        //Обновление данных подтверждения
-        $confirmGcp->count_respond = $confirmGcp->count_respond - 1;
-        $confirmGcp->save();
     }
 
 }
