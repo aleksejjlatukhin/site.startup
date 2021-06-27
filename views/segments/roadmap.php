@@ -113,7 +113,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
 
     <div class="roadmap_row_header">
 
-        <div class="roadmap_block_stage" style="display: none;">Сегменты</div>
+        <div class="roadmap_block_stage">Сегмент</div>
 
         <div class="roadmap_block_stage text-center">
             <div>Генерация ГЦС</div>
@@ -181,7 +181,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
 
     <div class="roadmap_row_dates" style="width: 1120px;">
 
-        <div class="roadmap_block_name_segment" style="display: none;">
+        <div class="roadmap_block_name_segment">
             <?= $segment_name; ?>
         </div>
 
@@ -276,5 +276,3 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
     </div>
 
 </div>
-
-

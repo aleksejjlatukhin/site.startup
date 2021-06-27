@@ -95,10 +95,10 @@ foreach ($roadmaps as $roadmap) {
 
         if ($roadmap->getProperty('fact_gps') <= $roadmap->getProperty('plan_gps')){
 
-            $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_success']);
+            $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/problems/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_success']);
         }else {
 
-            $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/generation-problem/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_danger']);
+            $fact_gps = Html::a(date('d.m.y',$roadmap->getProperty('fact_gps')), ['/problems/index', 'id' => $roadmap->getProperty('id_page_last_problem')], ['class' => 'roadmap_block_date_link_danger']);
         }
     }else {
         $fact_gps = '_ _ _ _ _ _';
@@ -123,10 +123,10 @@ foreach ($roadmaps as $roadmap) {
 
         if ($roadmap->getProperty('fact_gcp') <= $roadmap->getProperty('plan_gcp')){
 
-            $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_success']);
+            $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcps/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_success']);
         }else {
 
-            $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcp/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_danger']);
+            $fact_gcp = Html::a(date('d.m.y',$roadmap->getProperty('fact_gcp')), ['/gcps/index', 'id' => $roadmap->getProperty('id_page_last_gcp')], ['class' => 'roadmap_block_date_link_danger']);
         }
     }else {
         $fact_gcp = '_ _ _ _ _ _';
@@ -151,10 +151,10 @@ foreach ($roadmaps as $roadmap) {
 
         if ($roadmap->getProperty('fact_mvp') <= $roadmap->getProperty('plan_mvp')){
 
-            $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_success']);
+            $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvps/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_success']);
         }else {
 
-            $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvp/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_danger']);
+            $fact_mvp = Html::a(date('d.m.y',$roadmap->getProperty('fact_mvp')), ['/mvps/index', 'id' => $roadmap->getProperty('id_page_last_mvp')], ['class' => 'roadmap_block_date_link_danger']);
         }
     }else {
         $fact_mvp = '_ _ _ _ _ _';
