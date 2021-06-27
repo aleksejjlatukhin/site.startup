@@ -3,10 +3,8 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
-use Throwable;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\StaleObjectException;
 
 class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 {
@@ -45,12 +43,12 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Получить объект текущего Gcp
+     * Получить объект текущего Gcps
      * @return ActiveQuery
      */
     public function getGcp()
     {
-        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+        return $this->hasOne(Gcps::class, ['id' => 'gcp_id']);
     }
 
 
@@ -60,17 +58,17 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
      */
     public function getResponds()
     {
-        return $this->hasMany(RespondsGcp::class, ['confirm_gcp_id' => 'id']);
+        return $this->hasMany(RespondsGcp::class, ['confirm_id' => 'id']);
     }
 
 
     /**
-     * Получить все объекты Mvp данного подтверждения
+     * Получить все объекты Mvps данного подтверждения
      * @return ActiveQuery
      */
     public function getMvps()
     {
-        return $this->hasMany(Mvp::class, ['confirm_gcp_id' => 'id']);
+        return $this->hasMany(Mvps::class, ['basic_confirm_id' => 'id']);
     }
 
 
@@ -80,7 +78,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
      */
     public function getQuestions()
     {
-        return $this->hasMany(QuestionsConfirmGcp::class, ['confirm_gcp_id' => 'id']);
+        return $this->hasMany(QuestionsConfirmGcp::class, ['confirm_id' => 'id']);
     }
 
 
@@ -128,7 +126,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
      */
     public function getHypothesis()
     {
-        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+        return $this->hasOne(Gcps::class, ['id' => 'gcp_id']);
     }
 
 
@@ -152,8 +150,6 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'gcp_id' => 'Gcp ID',
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Необходимое количество позитивных ответов',
         ];
@@ -174,64 +170,6 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         });
 
         parent::init();
-    }
-
-
-    /**
-     * Добавляем вопрос в общую базу,
-     * если у данного пользователя его там ещё нет
-     * @param $title
-     */
-    public function addQuestionToGeneralList($title)
-    {
-        $user = $this->gcp->project->user;
-        $baseQuestions = AllQuestionsConfirmGcp::find()->where(['user_id' => $user->id])->select('title')->all();
-        $existQuestions = 0;
-
-        foreach ($baseQuestions as $baseQuestion){
-            if ($baseQuestion->title == $title){
-                $existQuestions++;
-            }
-        }
-
-        if ($existQuestions == 0){
-            $general_question = new AllQuestionsConfirmGcp();
-            $general_question->title = $title;
-            $general_question->user_id = $user->id;
-            $general_question->save();
-        }
-    }
-
-
-    /**
-     * Создание пустого ответа для нового вопроса для каждого респондента
-     * @param $question_id
-     */
-    public function addAnswerConfirmGcp ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = new AnswersQuestionsConfirmGcp();
-            $answer->question_id = $question_id;
-            $answer->respond_id = $respond->id;
-            $answer->save();
-
-        }
-    }
-
-
-    /**
-     * Удаление ответов по данному вопросу
-     * у всех респондентов данного подтверждения
-     * @param $question_id
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
-    public function deleteAnswerConfirmGcp ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = AnswersQuestionsConfirmGcp::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
-            $answer->delete();
-        }
     }
 
 
@@ -282,15 +220,15 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
      */
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+        $count_interview = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
-        $count_positive = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $this->id, 'desc_interview_gcp.status' => '1'])->count();
+        $count_positive = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_gcp.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->mvps))) {
+        if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->mvps))) {
             return true;
         }else {
             return false;
@@ -304,7 +242,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsGcp::find()->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsGcp::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -317,9 +255,9 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
-        $count = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $this->id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+        $count = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         return $count;
     }
@@ -331,11 +269,30 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function getCountConfirmMembers()
     {
         // Кол-во подтвердивших ЦП
-        $count = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $this->id, 'desc_interview_gcp.status' => '1'])->count();
+        $count = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_gcp.status' => '1'])->count();
 
         return $count;
+    }
+
+
+    /**
+     * Путь к папке всего
+     * кэша данного подтверждения
+     * @return string
+     */
+    public function getCachePath()
+    {
+        $gcp = $this->gcp;
+        $problem = $gcp->problem;
+        $segment = $gcp->segment;
+        $project = $gcp->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
+
+        return $cachePath;
     }
 
 }

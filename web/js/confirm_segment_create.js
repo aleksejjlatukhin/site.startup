@@ -17,7 +17,7 @@ $('#new_confirm_segment').on('beforeSubmit', function(e){
 
             if (response.success) {
 
-                window.location.href = '/interview/add-questions?id=' + response.id;
+                window.location.href = '/confirm-segment/add-questions?id=' + response.id;
             }
         },
         error: function(){
@@ -106,7 +106,7 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 //Отслеживаем изменения в форме создания подтверждения и записываем их в кэш
 $(body).on('change', 'form#new_confirm_segment', function(){
 
-    var url = '/interview/save-cache-creation-form?id=' + id_page;
+    var url = '/confirm-segment/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
     $.ajax({
         url: url,

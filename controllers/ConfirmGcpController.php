@@ -3,18 +3,19 @@
 namespace app\controllers;
 
 use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
+use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmGcp;
 use app\models\forms\FormCreateMvp;
+use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmGcp;
-use app\models\forms\FormUpdateQuestionConfirmGcp;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
+use app\models\Gcps;
+use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmGcp;
-use app\models\RespondsConfirm;
+use app\models\RespondsProblem;
 use app\models\RespondsGcp;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
@@ -28,7 +29,6 @@ use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
-use yii\helpers\FileHelper;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -47,12 +47,12 @@ class ConfirmGcpController extends AppUserPartController
 
         if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
 
-            $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-            $project = Projects::findOne(['id' => $gcp->project->id]);
+            $confirm = ConfirmGcp::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -63,12 +63,12 @@ class ConfirmGcpController extends AppUserPartController
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
-            $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-            $project = Projects::findOne(['id' => $gcp->project->id]);
+            $confirm = ConfirmGcp::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -81,11 +81,11 @@ class ConfirmGcpController extends AppUserPartController
 
         }elseif (in_array($action->id, ['create'])){
 
-            $gcp = Gcp::findOne(Yii::$app->request->get());
-            $project = Projects::findOne(['id' => $gcp->project->id]);
+            $hypothesis = Gcps::findOne(Yii::$app->request->get());
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -95,11 +95,11 @@ class ConfirmGcpController extends AppUserPartController
 
         }elseif (in_array($action->id, ['save-confirm-gcp'])){
 
-            $gcp = Gcp::findOne(Yii::$app->request->get());
-            $project = Projects::findOne(['id' => $gcp->project->id]);
+            $hypothesis = Gcps::findOne(Yii::$app->request->get());
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -112,12 +112,12 @@ class ConfirmGcpController extends AppUserPartController
 
         }elseif (in_array($action->id, ['add-questions'])){
 
-            $model = ConfirmGcp::findOne(Yii::$app->request->get());
-            $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-            $project = Projects::findOne(['id' => $gcp->project->id]);
+            $confirm = ConfirmGcp::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
@@ -129,29 +129,168 @@ class ConfirmGcpController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif (in_array($action->id, ['delete-question'])){
-
-            $question = QuestionsConfirmGcp::findOne(Yii::$app->request->get());
-            $confirm_gcp = ConfirmGcp::findOne(['id' => $question->confirm_gcp_id]);
-            $gcp = Gcp::findOne(['id' => $confirm_gcp->gcp_id]);
-            $project = Projects::findOne(['id' => $gcp->project->id]);
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                // ОТКЛЮЧАЕМ CSRF
-                $this->enableCsrfValidation = false;
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }else{
+        } else{
             return parent::beforeAction($action);
         }
 
+    }
+
+
+    /**
+     * @param $id
+     */
+    public function actionSaveCacheCreationForm($id)
+    {
+        $gcp = Gcps::findOne($id);
+        $cachePath = FormCreateConfirmGcp::getCachePath($gcp);
+        $cacheName = 'formCreateConfirmCache';
+
+        if(Yii::$app->request->isAjax) {
+
+            $cache = new CacheForm();
+            $cache->setCache($cachePath, $cacheName);
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return string|Response
+     */
+    public function actionCreate($id)
+    {
+        $gcp = Gcps::findOne($id);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
+        $problem = Problems::findOne($confirmProblem->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($confirmSegment->segmentId);
+        $project = Projects::findOne($segment->projectId);
+        $model = new FormCreateConfirmGcp($gcp);
+
+        //кол-во респондентов, подтвердивших текущую проблему
+        $count_represent_problem = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $confirmProblem->id, 'interview_confirm_problem.status' => '1'])->count();
+
+        $model->setCountRespond($count_represent_problem);
+
+
+        if ($gcp->confirm){
+            //Если у ГЦП создана программа подтверждения, то перейти на страницу подтверждения
+            return $this->redirect(['view', 'id' => $gcp->confirm->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'gcp' => $gcp,
+            'confirmProblem' => $confirmProblem,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws ErrorException
+     */
+    public function actionSaveConfirm($id)
+    {
+        $gcp = Gcps::findOne($id);
+        $model = new FormCreateConfirmGcp($gcp);
+        $model->setHypothesisId($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->create()) {
+
+                    $response =  ['success' => true, 'id' => $model->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Страница со списком вопросов
+     * @param $id
+     * @return string
+     */
+    public function actionAddQuestions($id)
+    {
+        $model = ConfirmGcp::findOne($id);
+        $formUpdateConfirmGcp = new FormUpdateConfirmGcp($id);
+        $gcp = Gcps::findOne($model->gcpId);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
+        $problem = Problems::findOne($confirmProblem->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $questions = QuestionsConfirmGcp::findAll(['confirm_id' => $id]);
+        $newQuestion = new FormCreateQuestion();
+
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $model->queryQuestionsGeneralList();
+        $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
+
+        return $this->render('add-questions', [
+            'questions' => $questions,
+            'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
+            'newQuestion' => $newQuestion,
+            'queryQuestions' => $queryQuestions,
+            'model' => $model,
+            'gcp' => $gcp,
+            'confirmProblem' => $confirmProblem,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionUpdate ($id)
+    {
+        $model = new FormUpdateConfirmGcp($id);
+        $gcp = Gcps::findOne($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()){
+
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
+                            'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id),
+                            'model' => $model,  'gcp' => $gcp
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -164,14 +303,14 @@ class ConfirmGcpController extends AppUserPartController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmGcp = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $questions = QuestionsConfirmGcp::findAll(['confirm_gcp_id' => $id]);
-        $newQuestion = new QuestionsConfirmGcp();
+        $gcp = Gcps::findOne($model->gcpId);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
+        $problem = Problems::findOne($confirmProblem->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($confirmSegment->segmentId);
+        $project = Projects::findOne($segment->projectId);
+        $questions = QuestionsConfirmGcp::findAll(['confirm_id' => $id]);
+        $newQuestion = new FormCreateQuestion();
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -182,8 +321,8 @@ class ConfirmGcpController extends AppUserPartController
             'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
             'gcp' => $gcp,
             'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
             'questions' => $questions,
@@ -246,39 +385,23 @@ class ConfirmGcpController extends AppUserPartController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmGcp::findOne($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $problem = GenerationProblem::find()->where(['id' => $gcp->problem_id])->one();
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $formCreateMvp = new FormCreateMvp();
-        $cache = Yii::$app->cache;
+        $formCreateMvp = new FormCreateMvp($model->hypothesis);
 
-        $count_descInterview = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+        $count_descInterview = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
-        $count_positive = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $id, 'desc_interview_gcp.status' => '1'])->count();
+        $count_positive = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $id, 'interview_confirm_gcp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
+
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1) || (!empty($model->mvps)  && $model->count_positive <= $count_positive && $model->gcp->exist_confirm == 1)) {
-
-                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                    '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/formCreate/';
-                $cache_form_creation = $cache->get('formCreateMvpCache');
-
-                if ($cache_form_creation) {
-                    //Заполнение полей модели FormCreateMvp данными из кэша
-                    foreach ($cache_form_creation['FormCreateMvp'] as $key => $value) {
-                        $formCreateMvp[$key] = $value;
-                    }
-                }
 
                 $response =  [
                     'success' => true,
-                    'renderAjax' => $this->renderAjax('/mvp/create', [
+                    'renderAjax' => $this->renderAjax('/mvps/create', [
                         'confirmGcp' => $model,
                         'model' => $formCreateMvp,
                     ]),
@@ -309,13 +432,13 @@ class ConfirmGcpController extends AppUserPartController
         $model = ConfirmGcp::findOne($id);
         $gcp = $model->gcp;
 
-        $count_descInterview = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+        $count_descInterview = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
-        $count_positive = RespondsGcp::find()->with('descInterview')
-            ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-            ->where(['confirm_gcp_id' => $id, 'desc_interview_gcp.status' => '1'])->count();
+        $count_positive = RespondsGcp::find()->with('interview')
+            ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+            ->where(['confirm_id' => $id, 'interview_confirm_gcp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -356,16 +479,14 @@ class ConfirmGcpController extends AppUserPartController
     public function actionNotExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $gcp = Gcps::findOne($model->gcpId);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
 
         if ($gcp->exist_confirm === 0) {
 
-            return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
+            return $this->redirect(['/gcps/index', 'id' => $confirmProblem->id]);
         } else {
 
             $gcp->exist_confirm = 0;
@@ -373,13 +494,9 @@ class ConfirmGcpController extends AppUserPartController
 
             if ($gcp->save()){
 
-                // Удаление дирректории для кэша подтверждения
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                    '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
-                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
-                $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['/gcp/index', 'id' => $confirmProblem->id]);
+                $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+                $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['/gcps/index', 'id' => $confirmProblem->id]);
             }
         }
         return false;
@@ -395,360 +512,22 @@ class ConfirmGcpController extends AppUserPartController
     public function actionExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
+        $gcp = Gcps::findOne($model->gcpId);
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
 
         $gcp->exist_confirm = 1;
         $gcp->time_confirm = time();
 
         if ($gcp->save()){
 
-            // Удаление дирректории для кэша подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
-            $gcp->trigger(Gcp::EVENT_CLICK_BUTTON_CONFIRM);
-            return $this->redirect(['/mvp/index', 'id' => $model->id]);
+            $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+            $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/mvps/index', 'id' => $model->id]);
         }
         return false;
     }
 
-
-    public function actionSaveCacheCreationForm($id)
-    {
-        $gcp = Gcp::findOne($id);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problem_id]);
-        $segment = Segment::findOne(['id' => $gcp->segment_id]);
-        $project = Projects::findOne(['id' => $gcp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
-
-        if(Yii::$app->request->isAjax) {
-
-            $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
-            $key = 'formCreateConfirmGcpCache'; //Формируем ключ
-            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
-        }
-    }
-
-
-    /**
-     * @param $id
-     * @return string|Response
-     */
-    public function actionCreate($id)
-    {
-        $model = new FormCreateConfirmGcp();
-        $gcp = Gcp::findOne($id);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache;
-
-        //кол-во респондентов, подтвердивших текущую проблему
-        $count_represent_problem = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $confirmProblem->id, 'desc_interview_confirm.status' => '1'])->count();
-
-        $model->count_respond = $count_represent_problem;
-
-        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-            '/segments/segment-'.$segment->id.'/problems/problem-'.$generationProblem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm/';
-        $cache_form_creation = $cache->get('formCreateConfirmGcpCache');
-
-        if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmGcp
-            foreach ($cache_form_creation['FormCreateConfirmGcp'] as $key => $value) {
-                $model[$key] = $value;
-            }
-        }
-
-        if ($gcp->confirm){
-            //Если у ГЦП создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $gcp->confirm->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     * @throws ErrorException
-     */
-    public function actionSaveConfirmGcp($id)
-    {
-        $model = new FormCreateConfirmGcp();
-        $model->setHypothesisId($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->create()) {
-
-                    $response =  ['success' => true, 'id' => $model->id];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function actionUpdate ($id)
-    {
-        $model = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::findOne($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()){
-
-                    $response = [
-                        'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
-                            'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id),
-                            'model' => $model,  'gcp' => $gcp
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Страница со списком вопросов
-     * @param $id
-     * @return string
-     */
-    public function actionAddQuestions($id)
-    {
-        $model = ConfirmGcp::findOne($id);
-        $formUpdateConfirmGcp = new FormUpdateConfirmGcp($id);
-        $gcp = Gcp::findOne(['id' => $model->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $problem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $problem->interview_id]);
-        $segment = Segment::findOne(['id' => $problem->segment_id]);
-        $project = Projects::findOne(['id' => $problem->project_id]);
-        $questions = QuestionsConfirmGcp::findAll(['confirm_gcp_id' => $id]);
-        $newQuestion = new QuestionsConfirmGcp();
-
-        //Список вопросов для добавления к списку программы
-        $queryQuestions = $model->queryQuestionsGeneralList();
-        $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
-
-        return $this->render('add-questions', [
-            'questions' => $questions,
-            'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
-            'newQuestion' => $newQuestion,
-            'queryQuestions' => $queryQuestions,
-            'model' => $model,
-            'gcp' => $gcp,
-            'confirmProblem' => $confirmProblem,
-            'problem' => $problem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-
-    /**
-     * Метод для добавления новых вопросов
-     * @param $id
-     * @return array|bool
-     */
-    public function actionAddQuestion($id)
-    {
-        $model = new QuestionsConfirmGcp();
-        $model->confirm_gcp_id = $id;
-
-        if ($model->load(Yii::$app->request->post())){
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model->save()){
-
-                    $confirmGcpNew = ConfirmGcp::findOne($id);
-                    $questions = $confirmGcpNew->questions;
-
-                    //Создание пустого ответа для нового вопроса для каждого респондента
-                    $confirmGcpNew->addAnswerConfirmGcp($model->id);
-                    //Добавляем вопрос в общую базу вопросов
-                    $confirmGcpNew->addQuestionToGeneralList($model->title);
-                    //Передаем обновленный список вопросов для добавления в программу
-                    $queryQuestions = $confirmGcpNew->queryQuestionsGeneralList();
-
-                    $response = [
-                        'model' => $model,
-                        'questions' => $questions,
-                        'queryQuestions' => $queryQuestions,
-                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionGetQueryQuestions ($id)
-    {
-        $confirmGcp = $this->findModel($id);
-        $questions = $confirmGcp->questions;
-
-        if(Yii::$app->request->isAjax) {
-            $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionGetQuestionUpdateForm ($id)
-    {
-        $model = new FormUpdateQuestionConfirmGcp($id);
-        $confirmGcp = $this->findModel($model->confirm_gcp_id);
-        $questions = $confirmGcp->questions;
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
-            ];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionUpdateQuestion ($id)
-    {
-        $model = new FormUpdateQuestionConfirmGcp($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if (Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()) {
-
-                    $confirmGcp = $this->findModel($model->confirm_gcp_id);
-                    $questions = $confirmGcp->questions;
-
-                    //Добавляем вопрос в общую базу вопросов
-                    $confirmGcp->addQuestionToGeneralList($model->title);
-                    //Передаем обновленный список вопросов для добавления в программу
-                    $queryQuestions = $confirmGcp->queryQuestionsGeneralList();
-
-                    $response = [
-                        'model' => $model,
-                        'questions' => $questions,
-                        'queryQuestions' => $queryQuestions,
-                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
-    public function actionDeleteQuestion($id)
-    {
-        $model = QuestionsConfirmGcp::findOne($id);
-
-        if(Yii::$app->request->isAjax) {
-
-            if ($model->delete()){
-
-                $confirmGcpNew = ConfirmGcp::findOne(['id' => $model->confirm_gcp_id]);
-                $questions = $confirmGcpNew->questions;
-
-                //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
-                $confirmGcpNew->deleteAnswerConfirmGcp($id);
-
-                //Передаем обновленный список вопросов для добавления в программу
-                $queryQuestions = $confirmGcpNew->queryQuestionsGeneralList();
-
-                $response = [
-                    'model' => $model,
-                    'questions' => $questions,
-                    'queryQuestions' => $queryQuestions,
-                    'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
-        }
-        return false;
-    }
 
     /**
      * @param $id

@@ -45,12 +45,12 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Получить объект текущего Mvp
+     * Получить объект текущего Mvps
      * @return ActiveQuery
      */
     public function getMvp()
     {
-        return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
+        return $this->hasOne(Mvps::class, ['id' => 'mvp_id']);
     }
 
 
@@ -60,7 +60,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getResponds()
     {
-        return $this->hasMany(RespondsMvp::class, ['confirm_mvp_id' => 'id']);
+        return $this->hasMany(RespondsMvp::class, ['confirm_id' => 'id']);
     }
 
 
@@ -70,7 +70,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getBusiness()
     {
-        return $this->hasOne(BusinessModel::class, ['confirm_mvp_id' => 'id']);
+        return $this->hasOne(BusinessModel::class, ['basic_confirm_id' => 'id']);
     }
 
 
@@ -80,7 +80,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getQuestions()
     {
-        return $this->hasMany(QuestionsConfirmMvp::class, ['confirm_mvp_id' => 'id']);
+        return $this->hasMany(QuestionsConfirmMvp::class, ['confirm_id' => 'id']);
     }
 
 
@@ -127,7 +127,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getHypothesis()
     {
-        return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
+        return $this->hasOne(Mvps::class, ['id' => 'mvp_id']);
     }
 
 
@@ -150,8 +150,6 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'mvp_id' => 'Mvp ID',
             'count_respond' => 'Количество респондентов',
             'count_positive' => 'Необходимое количество позитивных ответов',
         ];
@@ -176,64 +174,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Добавляем вопрос в общую базу,
-     * если у данного пользователя его там ещё нет
-     * @param $title
-     */
-    public function addQuestionToGeneralList($title)
-    {
-        $user = $this->mvp->project->user;
-        $baseQuestions = AllQuestionsConfirmMvp::find()->where(['user_id' => $user->id])->select('title')->all();
-        $existQuestions = 0;
-
-        foreach ($baseQuestions as $baseQuestion){
-            if ($baseQuestion->title == $title){
-                $existQuestions++;
-            }
-        }
-
-        if ($existQuestions == 0){
-            $general_question = new AllQuestionsConfirmMvp();
-            $general_question->title = $title;
-            $general_question->user_id = $user->id;
-            $general_question->save();
-        }
-    }
-
-
-    /**
-     * Создание пустого ответа для нового вопроса для каждого респондента
-     * @param $question_id
-     */
-    public function addAnswerConfirmMvp ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = new AnswersQuestionsConfirmMvp();
-            $answer->question_id = $question_id;
-            $answer->respond_id = $respond->id;
-            $answer->save();
-
-        }
-    }
-
-
-    /**
-     * Удаление ответов по данному вопросу
-     * у всех респондентов данного подтверждения
-     * @param $question_id
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
-    public function deleteAnswerConfirmMvp ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = AnswersQuestionsConfirmMvp::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
-            $answer->delete();
-        }
-    }
-
-
-    /**
+     * Список вопросов, который будет показан для добавления нового вопроса
      * @return array
      */
     public function queryQuestionsGeneralList()
@@ -279,15 +220,15 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getButtonMovingNextStage()
     {
-        $count_descInterview = RespondsMvp::find()->with('descInterview')
-            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
-            ->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
+        $count_interview = RespondsMvp::find()->with('interview')
+            ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
-        $count_positive = RespondsMvp::find()->with('descInterview')
-            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
-            ->where(['confirm_mvp_id' => $this->id, 'desc_interview_mvp.status' => '1'])->count();
+        $count_positive = RespondsMvp::find()->with('interview')
+            ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_mvp.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->business))) {
+        if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->business))) {
             return true;
         }else {
             return false;
@@ -301,7 +242,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsMvp::find()->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsMvp::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -314,9 +255,9 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
-        $count = RespondsMvp::find()->with('descInterview')
-            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
-            ->where(['confirm_mvp_id' => $this->id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
+        $count = RespondsMvp::find()->with('interview')
+            ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         return $count;
     }
@@ -328,10 +269,31 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountConfirmMembers()
     {
         // Кол-во подтвердивших MVP
-        $count = RespondsMvp::find()->with('descInterview')
-            ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
-            ->where(['confirm_mvp_id' => $this->id, 'desc_interview_mvp.status' => '1'])->count();
+        $count = RespondsMvp::find()->with('interview')
+            ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_mvp.status' => '1'])->count();
 
         return $count;
     }
+
+
+    /**
+     * Путь к папке всего
+     * кэша данного подтверждения
+     * @return string
+     */
+    public function getCachePath()
+    {
+        $mvp = $this->mvp;
+        $gcp = $mvp->gcp;
+        $problem = $mvp->problem;
+        $segment = $mvp->segment;
+        $project = $mvp->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm';
+
+        return $cachePath;
+    }
+
 }

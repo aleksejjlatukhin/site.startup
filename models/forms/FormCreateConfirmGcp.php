@@ -6,13 +6,8 @@ namespace app\models\forms;
 use app\models\ConfirmGcp;
 use app\models\CreatorNewRespondsOnConfirmFirstStep;
 use app\models\CreatorRespondsFromAgentsOnConfirmFirstStep;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\Gcps;
 use yii\base\ErrorException;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateConfirmGcp extends FormCreateConfirm
@@ -20,14 +15,39 @@ class FormCreateConfirmGcp extends FormCreateConfirm
 
     /**
      * FormCreateConfirmGcp constructor.
+     * @param Gcps $hypothesis
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(Gcps $hypothesis, $config = [])
     {
         $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
         $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($hypothesis);
+        $cacheName = 'formCreateConfirmCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
 
         parent::__construct($config);
+    }
+
+
+    /**
+     * @param Gcps $hypothesis
+     * @return string
+     */
+    public static function getCachePath(Gcps $hypothesis)
+    {
+        $problem = $hypothesis->problem;
+        $segment = $hypothesis->segment;
+        $project = $hypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id
+            .'/problems/problem-'.$problem->id.'/gcps/gcp-'.$hypothesis->id.'/confirm/formCreateConfirm/';
+
+        return $cachePath;
     }
 
 
@@ -80,6 +100,7 @@ class FormCreateConfirmGcp extends FormCreateConfirm
     {
         return [
             'count_respond' => 'Количество респондентов, подтвердивших проблему',
+            'add_count_respond' => 'Добавить новых респондентов',
             'count_positive' => 'Необходимое количество респондентов, подтверждающих ценностное предложение',
         ];
     }
@@ -92,12 +113,6 @@ class FormCreateConfirmGcp extends FormCreateConfirm
      */
     public function create()
     {
-        $gcp = Gcp::findOne($this->hypothesisId);
-        $problem = GenerationProblem::findOne($gcp->problemId);
-        $segment = Segment::findOne($gcp->segmentId);
-        $project = Projects::findOne($gcp->projectId);
-        $user = User::findOne($project->userId);
-
         $model = new ConfirmGcp();
         $model->setGcpId($this->hypothesisId);
         $model->setCountRespond(array_sum([$this->count_respond, $this->add_count_respond]));
@@ -109,9 +124,7 @@ class FormCreateConfirmGcp extends FormCreateConfirm
             // Добавление новых респондентов для программы подтверждения ГЦП
             if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
             //Удаление кэша формы создания подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/confirm/formCreateConfirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }

@@ -124,7 +124,6 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
             if (response.success) {
                 $('.hypothesis_create_modal').modal('hide');
                 location.href = '/business-model/index?id=' + id;
-                //$('.container-business_model').html(response.renderAjax);
             }
         },
         error: function(){

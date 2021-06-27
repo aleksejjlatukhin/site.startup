@@ -27,9 +27,9 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
      * Получить интевью респондента
      * @return mixed|ActiveQuery
      */
-    public function getDescInterview()
+    public function getInterview()
     {
-        return $this->hasOne(DescInterviewMvp::class, ['responds_mvp_id' => 'id']);
+        return $this->hasOne(InterviewConfirmMvp::class, ['respond_id' => 'id']);
     }
 
 
@@ -39,7 +39,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
      */
     public function getConfirm()
     {
-        return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
+        return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_id']);
     }
 
 
@@ -60,7 +60,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
      */
     public function setConfirmId($confirmId)
     {
-        return $this->confirm_mvp_id = $confirmId;
+        return $this->confirm_id = $confirmId;
     }
 
 
@@ -70,7 +70,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
      */
     public function getConfirmId()
     {
-        return $this->confirm_mvp_id;
+        return $this->confirm_id;
     }
 
 
@@ -123,8 +123,8 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     public function rules()
     {
         return [
-            [['confirm_mvp_id', 'name'], 'required'],
-            [['confirm_mvp_id'], 'integer'],
+            [['confirm_id', 'name'], 'required'],
+            [['confirm_id'], 'integer'],
             [['date_plan'], 'integer'],
             [['name', 'info_respond', 'email', 'place_interview'], 'trim'],
             [['name'], 'string', 'max' => 100],
@@ -165,9 +165,6 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->confirm->mvp->project->touch('updated_at');
             $this->confirm->mvp->project->user->touch('updated_at');
-        });
-
-        $this->on(self::EVENT_BEFORE_DELETE, function (){
             $this->deleteDataRespond();
         });
 
@@ -177,20 +174,20 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
 
     /**
      * Удаление связанных данных
-     * по событию EVENT_BEFORE_DELETE
+     * по событию EVENT_AFTER_DELETE
      * @throws Throwable
      * @throws ErrorException
      * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
-        $descInterview = DescInterviewMvp::findOne(['responds_mvp_id' => $this->id]);
+        $descInterview = InterviewConfirmMvp::findOne(['respond_id' => $this->id]);
         $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->id]);
         $confirm = ConfirmMvp::findOne($this->confirmId);
-        $mvp = Mvp::findOne($confirm->mvpId);
-        $gcp = Gcp::findOne($mvp->gcpId);
-        $problem = GenerationProblem::findOne($mvp->problemId);
-        $segment = Segment::findOne($mvp->segmentId);
+        $mvp = Mvps::findOne($confirm->mvpId);
+        $gcp = Gcps::findOne($mvp->gcpId);
+        $problem = Problems::findOne($mvp->problemId);
+        $segment = Segments::findOne($mvp->segmentId);
         $project = Projects::findOne($mvp->projectId);
         $user = User::findOne($project->userId);
 

@@ -12,7 +12,7 @@ use yii\helpers\Html;
     $gridColumns = [
 
         [
-            'attribute' => 'segment',
+            'attribute' => 'segments',
             'label' => 'Сегмент',
             'header' => 'Наименование',
             'headerOptions' => ['style' => ['text-align' => 'center', 'font-size' => '12px', 'font-weight' => 'normal']],

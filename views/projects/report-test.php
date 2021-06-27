@@ -1,15 +1,10 @@
 <?php
 
 use kartik\grid\GridView;
-use yii\widgets\Pjax;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\helpers\ArrayHelper;
-use app\models\Segment;
-use app\models\GenerationProblem;
-use app\models\Gcp;
-use app\models\Mvp;
-use app\models\BusinessModel;
+use app\models\Problems;
+use app\models\Gcps;
+use app\models\Mvps;
 
 ?>
 
@@ -37,21 +32,21 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['class' => ''],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
                     if ($model->description) {
 
                         return '<div class="table-kartik-link">' . $model->description . '</div>';
                     }
                 }
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
                     if ($model->description) {
 
                         return '<div class="table-kartik-link">' . $model->description . '</div>';
                     }
                 }
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
                     if ($model->description) {
 
                         return '<div class="table-kartik-link">' . $model->description . '</div>';
@@ -77,7 +72,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -86,7 +81,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status == 1) {
+                                if ($respond->interview->status == 1) {
                                     $exist++;
                                 }
                             }
@@ -100,7 +95,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -109,7 +104,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status == 1) {
+                                if ($respond->interview->status == 1) {
                                     $exist++;
                                 }
                             }
@@ -123,7 +118,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -132,10 +127,10 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status === 1) {
+                                if ($respond->interview->status === 1) {
                                     $exist++;
                                 }
-                                if ($respond->descInterview->status === 2) {
+                                if ($respond->interview->status === 2) {
                                     $exist++;
                                 }
                             }
@@ -164,7 +159,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -173,7 +168,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status == '0') {
+                                if ($respond->interview->status == '0') {
                                     $exist++;
                                 }
                             }
@@ -187,7 +182,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -196,7 +191,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status == '0') {
+                                if ($respond->interview->status == '0') {
                                     $exist++;
                                 }
                             }
@@ -210,7 +205,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -219,7 +214,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                             $exist = 0;
                             foreach ($responds as $respond) {
 
-                                if ($respond->descInterview->status === 0) {
+                                if ($respond->interview->status === 0) {
                                     $exist++;
                                 }
                             }
@@ -249,7 +244,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -257,7 +252,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
 
                         $sumPositive = 0;
                         foreach ($responds as $respond){
-                            if ($respond->descInterview->status == 1){
+                            if ($respond->interview->status == 1){
                                 $sumPositive++;
                             }
                         }
@@ -279,7 +274,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -287,7 +282,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
 
                         $sumPositive = 0;
                         foreach ($responds as $respond){
-                            if ($respond->descInterview->status == 1){
+                            if ($respond->interview->status == 1){
                                 $sumPositive++;
                             }
                         }
@@ -309,7 +304,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -317,7 +312,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
 
                         $sumPositive = 0;
                         foreach ($responds as $respond){
-                            if ($respond->descInterview->status > 0){
+                            if ($respond->interview->status > 0){
                                 $sumPositive++;
                             }
                         }
@@ -354,7 +349,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -368,7 +363,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -382,7 +377,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -412,7 +407,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             'hAlign' => GridView::ALIGN_CENTER,
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -433,7 +428,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -454,7 +449,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                 }
 
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if (!empty($model->confirm)) {
 
@@ -491,7 +486,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             'hAlign' => GridView::ALIGN_CENTER,
             'value' => function ($model) {
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     if ($model->businessModel) {
                         return Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]);
@@ -512,7 +507,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
             //'options' => ['colspan' => 1],
             'value' => function ($model) {
 
-                if (($model instanceof GenerationProblem) === true) {
+                if (($model instanceof Problems) === true) {
 
                     if (empty($model->id)) {
 
@@ -531,7 +526,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                     }
                 }
 
-                if (($model instanceof Gcp) === true) {
+                if (($model instanceof Gcps) === true) {
 
                     $arrS = explode('.', $model->description);
                     $arrNumberSegment = explode('ГЦП ',$arrS[0]);
@@ -540,7 +535,7 @@ $this->title = 'Протокол проекта "' . mb_strtolower($project->pro
                     return '<div class="table-kartik-link">Сегмент ' . $numberSegment . ': ' . $model->segment->name . '</div>';
                 }
 
-                if (($model instanceof Mvp) === true) {
+                if (($model instanceof Mvps) === true) {
 
                     $arrS = explode('.', $model->description);
                     $arrNumberSegment = explode('ГMVP ',$arrS[0]);

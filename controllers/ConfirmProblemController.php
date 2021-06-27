@@ -2,17 +2,18 @@
 
 namespace app\controllers;
 
+use app\models\ConfirmSegment;
+use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
+use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmProblem;
-use app\models\forms\FormUpdateQuestionConfirmProblem;
-use app\models\GenerationProblem;
-use app\models\Interview;
+use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmProblem;
-use app\models\Respond;
-use app\models\RespondsConfirm;
-use app\models\Segment;
+use app\models\RespondsSegment;
+use app\models\RespondsProblem;
+use app\models\Segments;
 use app\models\User;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
@@ -26,7 +27,6 @@ use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
-use yii\helpers\FileHelper;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -45,12 +45,12 @@ class ConfirmProblemController extends AppUserPartController
 
         if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
 
-            $model = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-            $project = Projects::findOne(['id' => $problem->project->id]);
+            $confirm = ConfirmProblem::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -61,12 +61,12 @@ class ConfirmProblemController extends AppUserPartController
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
-            $model = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::findOne(['id' => $model->gps_id]);
-            $project = Projects::findOne(['id' => $problem->project->id]);
+            $confirm = ConfirmProblem::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -79,13 +79,11 @@ class ConfirmProblemController extends AppUserPartController
 
         }elseif (in_array($action->id, ['create'])){
 
-            $problem = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::findOne(['id' => $problem->interview_id]);
-            $segment = Segment::findOne(['id' => $interview->segment_id]);
-            $project = Projects::findOne(['id' => $segment->project_id]);
+            $hypothesis = Problems::findOne(Yii::$app->request->get());
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
 
@@ -93,15 +91,13 @@ class ConfirmProblemController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['save-confirm-problem'])){
+        }elseif (in_array($action->id, ['save-confirm'])){
 
-            $problem = GenerationProblem::findOne(Yii::$app->request->get());
-            $interview = Interview::findOne(['id' => $problem->interview_id]);
-            $segment = Segment::findOne(['id' => $interview->segment_id]);
-            $project = Projects::findOne(['id' => $segment->project_id]);
+            $hypothesis = Problems::findOne(Yii::$app->request->get());
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -114,12 +110,12 @@ class ConfirmProblemController extends AppUserPartController
 
         } elseif (in_array($action->id, ['add-questions'])){
 
-            $model = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = GenerationProblem::find()->where(['id' => $model->gps_id])->one();
-            $project = Projects::find()->where(['id' => $problem->project->id])->one();
+            $confirm = ConfirmProblem::findOne(Yii::$app->request->get());
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
@@ -131,29 +127,158 @@ class ConfirmProblemController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif (in_array($action->id, ['delete-question'])){
-
-            $question = QuestionsConfirmProblem::findOne(Yii::$app->request->get());
-            $confirm_problem = ConfirmProblem::findOne(['id' => $question->confirm_problem_id]);
-            $problem = GenerationProblem::findOne(['id' => $confirm_problem->gps_id]);
-            $project = Projects::findOne(['id' => $problem->project->id]);
-
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
-
-                // ОТКЛЮЧАЕМ CSRF
-                $this->enableCsrfValidation = false;
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }else{
+        } else{
             return parent::beforeAction($action);
         }
 
+    }
+
+
+    /**
+     * @param $id
+     */
+    public function actionSaveCacheCreationForm($id)
+    {
+        $problem = Problems::findOne($id);
+        $cachePath = FormCreateConfirmProblem::getCachePath($problem);
+        $cacheName = 'formCreateConfirmCache';
+
+        if(Yii::$app->request->isAjax) {
+
+            $cache = new CacheForm();
+            $cache->setCache($cachePath, $cacheName);
+        }
+    }
+
+
+    /**
+     * @param $id
+     * @return string|Response
+     */
+    public function actionCreate($id)
+    {
+        $problem = Problems::findOne($id);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($confirmSegment->segmentId);
+        $project = Projects::findOne($segment->projectId);
+        $model = new FormCreateConfirmProblem($problem);
+
+        //кол-во представителей сегмента
+        $count_represent_segment = RespondsSegment::find()->with('interview')
+            ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
+            ->where(['confirm_id' => $confirmSegment->id, 'interview_confirm_segment.status' => '1'])->count();
+
+        $model->setCountRespond($count_represent_segment);
+
+        if ($problem->confirm){ //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
+            return $this->redirect(['view', 'id' => $problem->confirm->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws ErrorException
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveConfirm($id)
+    {
+        $problem = Problems::findOne($id);
+        $model = new FormCreateConfirmProblem($problem);
+        $model->setHypothesisId($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->create()){
+
+                    $response =  ['success' => true, 'id' => $model->id];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Страница со списком вопросов
+     * @param $id
+     * @return string
+     */
+    public function actionAddQuestions($id)
+    {
+        $model = ConfirmProblem::findOne($id);
+        $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
+        $problem = Problems::findOne($model->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
+        $questions = QuestionsConfirmProblem::findAll(['confirm_id' => $id]);
+        $newQuestion = new FormCreateQuestion();
+
+        //Список вопросов для добавления к списку программы
+        $queryQuestions = $model->queryQuestionsGeneralList();
+        $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
+
+        return $this->render('add-questions', [
+            'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
+            'questions' => $questions,
+            'newQuestion' => $newQuestion,
+            'queryQuestions' => $queryQuestions,
+            'model' => $model,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+        ]);
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionUpdate ($id)
+    {
+        $model = new FormUpdateConfirmProblem($id);
+        $problem = Problems::findOne($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                if ($model = $model->update()){
+
+                    $response = [
+                        'success' => true,
+                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
+                            'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id),
+                            'model' => $model, 'problem' => $problem
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -166,12 +291,12 @@ class ConfirmProblemController extends AppUserPartController
     {
         $model = $this->findModel($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne($model->problemId);
-        $interview = Interview::findOne($problem->confirmSegmentId);
-        $segment = Segment::findOne($interview->segmentId);
+        $problem = Problems::findOne($model->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($confirmSegment->segmentId);
         $project = Projects::findOne($segment->projectId);
-        $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
-        $newQuestion = new QuestionsConfirmProblem();
+        $questions = QuestionsConfirmProblem::findAll(['confirm_id' => $id]);
+        $newQuestion = new FormCreateQuestion();
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -181,7 +306,7 @@ class ConfirmProblemController extends AppUserPartController
             'model' => $model,
             'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
             'problem' => $problem,
-            'interview' => $interview,
+            'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
             'questions' => $questions,
@@ -244,40 +369,24 @@ class ConfirmProblemController extends AppUserPartController
     public function actionDataAvailabilityForNextStep($id)
     {
         $model = ConfirmProblem::findOne($id);
-        $problem = GenerationProblem::findOne($model->problemId);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $user = User::findOne($project->userId);
-        $formCreateGcp = new FormCreateGcp();
-        $cache = Yii::$app->cache;
+        $formCreateGcp = new FormCreateGcp($model->hypothesis);
 
-        $count_descInterview = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
+        $count_descInterview = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $id, 'desc_interview_confirm.status' => '1'])->count();
+        $count_positive = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 
 
         if (Yii::$app->request->isAjax) {
 
             if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1) || (!empty($model->gcps)  && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1)) {
 
-                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                    '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/formCreate/';
-                $cache_form_creation = $cache->get('formCreateGcpCache');
-
-                if ($cache_form_creation) {
-                    //Заполнение полей модели FormCreateGcp данными из кэша
-                    foreach ($cache_form_creation['FormCreateGcp'] as $key => $value) {
-                        $formCreateGcp[$key] = $value;
-                    }
-                }
-
                 $response =  [
                     'success' => true,
-                    'renderAjax' => $this->renderAjax('/gcp/create', [
+                    'renderAjax' => $this->renderAjax('/gcps/create', [
                         'confirmProblem' => $model,
                         'model' => $formCreateGcp,
                         'segment' => $model->problem->segment,
@@ -309,13 +418,13 @@ class ConfirmProblemController extends AppUserPartController
         $model = ConfirmProblem::findOne($id);
         $problem = $model->problem;
 
-        $count_descInterview = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
+        $count_descInterview = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $id, 'desc_interview_confirm.status' => '1'])->count();
+        $count_positive = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -357,15 +466,14 @@ class ConfirmProblemController extends AppUserPartController
     public function actionNotExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $problem = GenerationProblem::findOne($model->problemId);
-        $interview = Interview::findOne($problem->confirmSegmentId);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $user = User::findOne($project->userId);
+        $problem = Problems::findOne($model->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
 
-        if ($problem->exist_confirm === 0) {
+        if ($problem->exist_confirm === 0) { // Создать класс StatusConfirm для обозначения статусов !!!
+            return $this->redirect(['/problems/index', 'id' => $confirmSegment->id]);
 
-            return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
         }else {
 
             $problem->exist_confirm = 0;
@@ -373,13 +481,9 @@ class ConfirmProblemController extends AppUserPartController
 
             if ($problem->save()){
 
-                // Удаление дирректории для кэша подтверждения
-                $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                    '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
-                if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
-                $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['/generation-problem/index', 'id' => $interview->id]);
+                $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+                $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
+                return $this->redirect(['/problems/index', 'id' => $confirmSegment->id]);
             }
         }
         return false;
@@ -395,349 +499,18 @@ class ConfirmProblemController extends AppUserPartController
     public function actionExistConfirm($id)
     {
         $model = $this->findModel($id);
-        $problem = GenerationProblem::findOne($model->problemId);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $user = User::findOne($project->userId);
+        $problem = Problems::findOne($model->problemId);
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
 
         $problem->exist_confirm = 1;
         $problem->time_confirm = time();
 
         if ($problem->save()){
 
-            // Удаление дирректории для кэша подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
-            $problem->trigger(GenerationProblem::EVENT_CLICK_BUTTON_CONFIRM);
-            return $this->redirect(['/gcp/index', 'id' => $model->id]);
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     */
-    public function actionSaveCacheCreationForm($id)
-    {
-        $problem = GenerationProblem::findOne($id);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $user = User::findOne($project->userId);
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
-
-        if(Yii::$app->request->isAjax) {
-
-            $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateConfirm/';
-            $key = 'formCreateConfirmProblemCache'; //Формируем ключ
-            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
-        }
-    }
-
-
-    /**
-     * @param $id
-     * @return string|Response
-     */
-    public function actionCreate($id)
-    {
-        $model = new FormCreateConfirmProblem();
-        $problem = GenerationProblem::findOne($id);
-        $confirmSegment = Interview::findOne($problem->confirmSegmentId);
-        $segment = Segment::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
-        $user = User::findOne($project->userId);
-        $cache = Yii::$app->cache;
-
-        //кол-во представителей сегмента
-        $count_represent_segment = Respond::find()->with('descInterview')
-            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-            ->where(['interview_id' => $confirmSegment->id, 'desc_interview.status' => '1'])->count();
-
-        $model->setCountRespond($count_represent_segment);
-
-        $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-            '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateConfirm/';
-        $cache_form_creation = $cache->get('formCreateConfirmProblemCache');
-
-        if ($cache_form_creation) { //Если существует кэш, то добавляем его к полям модели FormCreateConfirmProblem
-            foreach ($cache_form_creation['FormCreateConfirmProblem'] as $key => $value) {
-                $model[$key] = $value;
-            }
-        }
-
-        if ($problem->confirm){
-            //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $problem->confirm->id]);
-        }
-
-
-        return $this->render('create', [
-            'model' => $model,
-            'problem' => $problem,
-            'confirmSegment' => $confirmSegment,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws ErrorException
-     * @throws NotFoundHttpException
-     */
-    public function actionSaveConfirmProblem($id)
-    {
-        $model = new FormCreateConfirmProblem();
-        $model->setHypothesisId($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->create()){
-
-                    $response =  ['success' => true, 'id' => $model->id];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function actionUpdate ($id)
-    {
-        $model = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()){
-
-                    $response = [
-                        'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
-                            'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id),
-                            'model' => $model, 'problem' => $problem
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Страница со списком вопросов
-     * @param $id
-     * @return string
-     */
-    public function actionAddQuestions($id)
-    {
-        $model = ConfirmProblem::findOne($id);
-        $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = GenerationProblem::findOne($model->gps_id);
-        $interview = Interview::findOne($problem->confirmSegmentId);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $questions = QuestionsConfirmProblem::findAll(['confirm_problem_id' => $id]);
-        $newQuestion = new QuestionsConfirmProblem();
-
-        //Список вопросов для добавления к списку программы
-        $queryQuestions = $model->queryQuestionsGeneralList();
-        $queryQuestions = ArrayHelper::map($queryQuestions,'title','title');
-
-        return $this->render('add-questions', [
-            'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
-            'questions' => $questions,
-            'newQuestion' => $newQuestion,
-            'queryQuestions' => $queryQuestions,
-            'model' => $model,
-            'problem' => $problem,
-            'interview' => $interview,
-            'segment' => $segment,
-            'project' => $project,
-        ]);
-    }
-
-    /**
-     * @param $id
-     * @return array|bool
-     */
-    public function actionAddQuestion($id)
-    {
-        $model = new QuestionsConfirmProblem();
-        $model->confirm_problem_id = $id;
-
-        if ($model->load(Yii::$app->request->post())){
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model->save()){
-
-                    $confirmProblemNew = ConfirmProblem::findOne($id);
-                    $questions = $confirmProblemNew->questions;
-
-                    //Создание пустого ответа для нового вопроса для каждого респондента
-                    $confirmProblemNew->addAnswerConfirmProblem($model->id);
-                    //Добавляем вопрос в общую базу вопросов
-                    $confirmProblemNew->addQuestionToGeneralList($model->title);
-                    //Передаем обновленный список вопросов для добавления в программу
-                    $queryQuestions = $confirmProblemNew->queryQuestionsGeneralList();
-
-                    $response = [
-                        'model' => $model,
-                        'questions' => $questions,
-                        'queryQuestions' => $queryQuestions,
-                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionGetQueryQuestions ($id)
-    {
-        $confirmProblem = $this->findModel($id);
-        $questions = $confirmProblem->questions;
-
-        if(Yii::$app->request->isAjax) {
-            $response = ['ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions])];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionGetQuestionUpdateForm ($id)
-    {
-        $model = new FormUpdateQuestionConfirmProblem($id);
-        $confirmProblem = $this->findModel($model->confirm_problem_id);
-        $questions = $confirmProblem->questions;
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                'renderAjax' => $this->renderAjax('ajax_form_update_question', ['model' => $model]),
-            ];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
-     */
-    public function actionUpdateQuestion ($id)
-    {
-        $model = new FormUpdateQuestionConfirmProblem($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if (Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()) {
-
-                    $confirmProblem = $this->findModel($model->confirm_problem_id);
-                    $questions = $confirmProblem->questions;
-
-                    //Добавляем вопрос в общую базу вопросов
-                    $confirmProblem->addQuestionToGeneralList($model->title);
-                    //Передаем обновленный список вопросов для добавления в программу
-                    $queryQuestions = $confirmProblem->queryQuestionsGeneralList();
-
-                    $response = [
-                        'model' => $model,
-                        'questions' => $questions,
-                        'queryQuestions' => $queryQuestions,
-                        'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
-    public function actionDeleteQuestion($id)
-    {
-        $model = QuestionsConfirmProblem::findOne($id);
-
-        if(Yii::$app->request->isAjax) {
-
-            if ($model->delete()){
-
-                $confirmProblemNew = ConfirmProblem::findOne(['id' => $model->confirm_problem_id]);
-                $questions = $confirmProblemNew->questions;
-
-                //Удаление ответов по данному вопросу у всех респондентов данного подтверждения
-                $confirmProblemNew->deleteAnswerConfirmProblem($id);
-
-                //Передаем обновленный список вопросов для добавления в программу
-                $queryQuestions = $confirmProblemNew->queryQuestionsGeneralList();
-
-                $response = [
-                    'model' => $model,
-                    'questions' => $questions,
-                    'queryQuestions' => $queryQuestions,
-                    'ajax_questions_confirm' => $this->renderAjax('ajax_questions_confirm', ['questions' => $questions]),
-                ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
+            $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+            $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/gcps/index', 'id' => $model->id]);
         }
         return false;
     }

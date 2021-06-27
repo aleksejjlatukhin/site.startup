@@ -63,7 +63,7 @@ $(document).ready(function() {
     */
     var url_pathname = location.pathname;
     var array_search_results = [
-        '/interview/add-questions', '/interview/view', '/confirm-problem/add-questions', '/confirm-problem/view',
+        '/confirm-segment/add-questions', '/confirm-segment/view', '/confirm-problem/add-questions', '/confirm-problem/view',
         '/confirm-gcp/add-questions', '/confirm-gcp/view', '/confirm-mvp/add-questions', '/confirm-mvp/view',
     ];
     if (url_pathname !== '/') {

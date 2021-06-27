@@ -3,7 +3,7 @@
 
 namespace app\models\forms;
 
-use app\models\Segment;
+use app\models\Segments;
 use yii\web\NotFoundHttpException;
 
 class FormUpdateSegment extends FormSegment
@@ -19,7 +19,7 @@ class FormUpdateSegment extends FormSegment
      */
     public function __construct($id, $config = [])
     {
-        $model = Segment::findOne($id);
+        $model = Segments::findOne($id);
         $this->id = $id;
         $this->project_id = $model->project_id;
         $this->name = $model->name;
@@ -27,7 +27,7 @@ class FormUpdateSegment extends FormSegment
         $this->add_info = $model->add_info;
         $this->type_of_interaction_between_subjects = $model->type_of_interaction_between_subjects;
 
-        if ($model->type_of_interaction_between_subjects == Segment::TYPE_B2C){
+        if ($model->type_of_interaction_between_subjects == Segments::TYPE_B2C){
 
             $this->field_of_activity_b2c = $model->field_of_activity;
             $this->sort_of_activity_b2c = $model->sort_of_activity;
@@ -41,7 +41,7 @@ class FormUpdateSegment extends FormSegment
             $this->quantity_to = $model->quantity_to;
             $this->market_volume_b2c = $model->market_volume;
 
-        }elseif ($model->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+        }elseif ($model->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
 
             $this->field_of_activity_b2b = $model->field_of_activity;
             $this->sort_of_activity_b2b = $model->sort_of_activity;
@@ -64,7 +64,7 @@ class FormUpdateSegment extends FormSegment
      */
     public function checkFillingFields () {
 
-        if ($this->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+        if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
                 && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
@@ -76,7 +76,7 @@ class FormUpdateSegment extends FormSegment
             } else {
                 return false;
             }
-        } elseif ($this->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+        } elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
                 && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
@@ -93,17 +93,17 @@ class FormUpdateSegment extends FormSegment
 
 
     /**
-     * @return Segment|null
+     * @return Segments|null
      * @throws NotFoundHttpException
      */
     public function update()
     {
-        $segment = Segment::findOne($this->id);
+        $segment = Segments::findOne($this->id);
         $segment->name = $this->name;
         $segment->description = $this->description;
         $segment->add_info = $this->add_info;
 
-        if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C){
+        if ($segment->type_of_interaction_between_subjects == Segments::TYPE_B2C){
 
             $segment->field_of_activity = $this->field_of_activity_b2c;
             $segment->sort_of_activity = $this->sort_of_activity_b2c;
@@ -120,7 +120,7 @@ class FormUpdateSegment extends FormSegment
             if ($segment->save()) return $segment;
             throw new NotFoundHttpException('Неудалось сохранить сегмент');
 
-        }elseif ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+        }elseif ($segment->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
 
             $segment->field_of_activity = $this->field_of_activity_b2b;
             $segment->sort_of_activity = $this->sort_of_activity_b2b;
@@ -143,7 +143,7 @@ class FormUpdateSegment extends FormSegment
      */
     public function uniqueName($attr)
     {
-        $models = Segment::findAll(['project_id' => $this->project_id]);
+        $models = Segments::findAll(['project_id' => $this->project_id]);
 
         foreach ($models as $item){
 

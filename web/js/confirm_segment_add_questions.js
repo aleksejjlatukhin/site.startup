@@ -235,7 +235,7 @@ $(body).on('beforeSubmit', '#updateQuestionForm', function(e){
 
 
 //Удаление вопроса для интервью (Шаг 2)
-$(body).on('click', '.delete-question-confirm-segment', function(e){
+$(body).on('click', '.delete-question-confirm-hypothesis', function(e){
 
     var url = $(this).attr('href');
 

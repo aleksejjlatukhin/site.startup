@@ -7,7 +7,7 @@ use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
 use app\models\Projects;
 use app\models\Roadmap;
-use app\models\Segment;
+use app\models\Segments;
 use Throwable;
 use Yii;
 use app\models\User;
@@ -434,7 +434,7 @@ class ProfileController extends AppUserPartController
     public function actionGetReportProject ($id)
     {
         $project = Projects::findOne($id);
-        $segments = Segment::findAll(['project_id' => $id]);
+        $segments = Segments::findAll(['project_id' => $id]);
 
         foreach ($segments as $s => $segment) {
 

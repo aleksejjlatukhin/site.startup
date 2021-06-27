@@ -14,6 +14,8 @@ abstract class FormCreateConfirm extends Model
     public $add_count_respond;
     protected $_creatorResponds;
     protected $_creatorNewResponds;
+    public $_cacheManager;
+    public $cachePath;
 
 
     /**

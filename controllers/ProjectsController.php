@@ -4,13 +4,14 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
+use app\models\forms\CacheForm;
+use app\models\Gcps;
+use app\models\Problems;
+use app\models\Mvps;
 use app\models\PreFiles;
 use app\models\ProjectSort;
 use app\models\Roadmap;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\SortForm;
 use app\models\User;
 use kartik\mpdf\Pdf;
@@ -46,7 +47,7 @@ class ProjectsController extends AppUserPartController
             $model = Projects::findOne(Yii::$app->request->get());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($model->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($model->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -61,7 +62,7 @@ class ProjectsController extends AppUserPartController
             $model = $businessModel->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($model->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($model->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -116,7 +117,7 @@ class ProjectsController extends AppUserPartController
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
             $project = Projects::findOne(Yii::$app->request->get());
-            $user = User::findOne(['id' => $project->user_id]);
+            $user = User::findOne($project->userId);
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($user->id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
@@ -158,6 +159,9 @@ class ProjectsController extends AppUserPartController
      */
     public function actionInstruction ($id)
     {
+        $models = Projects::findAll(['user_id' => $id]);
+        if ($models) return $this->redirect(['/projects/index', 'id' => $id]);
+
         return $this->render('index_first', [
             'user' => User::findOne($id),
             'new_author' => new Authors(),
@@ -185,14 +189,13 @@ class ProjectsController extends AppUserPartController
     public function actionSaveCacheCreationForm($id)
     {
         $user = User::findOne($id);
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+        $cachePath = Projects::getCachePath($user);
+        $cacheName = 'formCreateProjectCache';
 
         if(Yii::$app->request->isAjax) {
 
-            $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
-            $key = 'formCreateProjectCache'; //Формируем ключ
-            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+            $cache = new CacheForm();
+            $cache->setCache($cachePath, $cacheName);
         }
     }
 
@@ -206,17 +209,16 @@ class ProjectsController extends AppUserPartController
         $user = User::findOne($id);
         $model = new Projects();
         $author = new Authors();
-        $cache = Yii::$app->cache;
 
         if(Yii::$app->request->isAjax) {
 
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
-            $cache_form_creation = $cache->get('formCreateProjectCache');
+            $cachePath = $model::getCachePath($user);
+            $cacheName = 'formCreateProjectCache';
 
-            if ($cache_form_creation) {
+            if ($cache = $model->_cacheManager->getCache($cachePath, $cacheName)) {
 
                 //Заполнение полей модели Projects данными из кэша
-                foreach ($cache_form_creation['Projects'] as $key => $value) {
+                foreach ($cache['Projects'] as $key => $value) {
                     $model[$key] = $value;
                 }
 
@@ -226,7 +228,7 @@ class ProjectsController extends AppUserPartController
                         'model' => $model,
                         'author' => $author
                     ]),
-                    'cache_form_creation' => $cache_form_creation,
+                    'cache' => $cache,
                 ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
@@ -244,6 +246,76 @@ class ProjectsController extends AppUserPartController
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     * @throws ErrorException
+     * @throws Exception
+     */
+    public function actionCreate($id)
+    {
+        $model = new Projects();
+        $model->user_id = $id;
+        $user = User::findOne($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if(Yii::$app->request->isAjax) {
+
+                //Проверка на совпадение по названию проекта у данного пользователя
+                if ($model->validate(['project_name'])) {
+
+                    if ($model->create()){
+
+                        // Удаление кэша формы создания
+                        $cachePath = $model::getCachePath($user);
+                        $model->_cacheManager->deleteCache(mb_substr($cachePath, 0, -1));
+
+                        //Проверка наличия сортировки
+                        $type_sort_id = $_POST['type_sort_id'];
+
+                        if ($type_sort_id != '') {
+
+                            $sort = new ProjectSort();
+
+                            $response =  [
+                                'success' => true, 'count' => Projects::find()->where(['user_id' => $user->id])->count(),
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => $sort->fetchModels($user->id, $type_sort_id),
+                                ]),
+                            ];
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
+                            return $response;
+
+                        } else {
+
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => Projects::findAll(['user_id' => $user->id]),
+                                ]),
+                            ];
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
+                            return $response;
+                        }
+                    }
+                }else{
+
+                    //Проект с таким именем уже существует
+                    $response =  ['project_already_exists' => true];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
             }
         }
         return false;
@@ -382,78 +454,12 @@ class ProjectsController extends AppUserPartController
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
-     * @throws ErrorException
-     * @throws Exception
-     */
-    public function actionCreate($id)
-    {
-        $model = new Projects();
-        $model->user_id = $id;
-        $user = User::findOne($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                //Проверка на совпадение по названию проекта у данного пользователя
-                if ($model->validate(['project_name'])) {
-
-                    if ($model->create()){
-
-                        //Проверка наличия сортировки
-                        $type_sort_id = $_POST['type_sort_id'];
-
-                        if ($type_sort_id != '') {
-
-                            $sort = new ProjectSort();
-
-                            $response =  [
-                                'success' => true, 'count' => Projects::find()->where(['user_id' => $user->id])->count(),
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => $sort->fetchModels($user->id, $type_sort_id),
-                                ]),
-                            ];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-
-                        } else {
-
-                            $response =  [
-                                'success' => true,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => Projects::findAll(['user_id' => $user->id]),
-                                ]),
-                            ];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-                        }
-                    }
-                }else{
-
-                    //Проект с таким именем уже существует
-                    $response =  ['project_already_exists' => true];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
      * @throws Exception
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $user = User::find()->where(['id' => $model->user_id])->one();
+        $user = User::findOne($model->userId);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -564,7 +570,7 @@ class ProjectsController extends AppUserPartController
     public function actionResult ($id)
     {
         $project = Projects::findOne($id);
-        $segments = Segment::find()->where(['project_id' => $id])->all();
+        $segments = Segments::find()->where(['project_id' => $id])->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -587,7 +593,7 @@ class ProjectsController extends AppUserPartController
     public function actionReport ($id)
     {
         $project = Projects::findOne($id);
-        $segments = Segment::findAll(['project_id' => $id]);
+        $segments = Segments::findAll(['project_id' => $id]);
 
         foreach ($segments as $s => $segment) {
 
@@ -630,31 +636,31 @@ class ProjectsController extends AppUserPartController
     public function actionResultExport($id)
     {
 
-        $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
+        $segments = Segments::find()->where(['project_id' => $id])->with(['confirm', 'problems'])->all();
 
         $businessModels = [];
 
         foreach ($segments as $i => $segment) {
 
-            if ($segment->interview && $segment->problems) {
+            if ($segment->confirm && $segment->problems) {
 
-                $problems = GenerationProblem::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
+                $problems = Problems::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
 
                 foreach ($problems as $problem) {
 
-                    if ($segment->interview && $segment->problems && $problem->gcps) {
+                    if ($segment->confirm && $segment->problems && $problem->gcps) {
 
-                        $gcps = Gcp::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
+                        $gcps = Gcps::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
 
                         foreach ($gcps as $gcp) {
 
-                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps) {
+                            if ($segment->confirm && $segment->problems && $problem->gcps && $gcp->mvps) {
 
-                                $mvps = Mvp::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
+                                $mvps = Mvps::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
 
                                 foreach ($mvps as $mvp) {
 
-                                    if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps && $mvp->businessModel) {
+                                    if ($segment->confirm && $segment->problems && $problem->gcps && $gcp->mvps && $mvp->businessModel) {
 
                                         $businessModels[] = $mvp->businessModel;
                                     }
@@ -693,8 +699,8 @@ class ProjectsController extends AppUserPartController
                 }
 
             }
-            if ((empty($segment->interview) || empty($segment->problems))
-                || (empty($segment->interview) && empty($segment->problems))) {
+            if ((empty($segment->confirm) || empty($segment->problems))
+                || (empty($segment->confirm) && empty($segment->problems))) {
 
                 $businessModel = new BusinessModel();
                 $businessModel->segment_id = $segment->id;
@@ -805,7 +811,7 @@ class ProjectsController extends AppUserPartController
      */
     /*public function actionReportTest ($id) {
 
-        $segments = Segment::find()->where(['project_id' => $id])->with(['interview', 'problems'])->all();
+        $segments = Segments::find()->where(['project_id' => $id])->with(['confirm', 'problems'])->all();
 
         $statModels = [];
 
@@ -813,16 +819,16 @@ class ProjectsController extends AppUserPartController
 
             if (empty($segment->problems)) {
 
-                $newProblem = new GenerationProblem();
+                $newProblem = new Problems();
                 $newProblem->segment_id = $segment->id;
                 $newProblem->project_id = $id;
                 $newProblem->description = 'У данного сегмента отсутствуют дальнейшие этапы';
                 $statModels[] = $newProblem;
             }
 
-            if ($segment->interview && $segment->problems) {
+            if ($segment->confirm && $segment->problems) {
 
-                $problems = GenerationProblem::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
+                $problems = Problems::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
 
                 foreach ($problems as $p => $problem) {
 
@@ -830,9 +836,9 @@ class ProjectsController extends AppUserPartController
 
                     $statModels[] = $problem;
 
-                    if ($segment->interview && $segment->problems && $problem->gcps) {
+                    if ($segment->confirm && $segment->problems && $problem->gcps) {
 
-                        $gcps = Gcp::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
+                        $gcps = Gcps::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
 
                         foreach ($gcps as $g => $gcp) {
 
@@ -840,9 +846,9 @@ class ProjectsController extends AppUserPartController
 
                             $statModels[] = $gcp;
 
-                            if ($segment->interview && $segment->problems && $problem->gcps && $gcp->mvps){
+                            if ($segment->confirm && $segment->problems && $problem->gcps && $gcp->mvps){
 
-                                $mvps = Mvp::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
+                                $mvps = Mvps::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
 
                                 foreach ($mvps as $m => $mvp) {
 

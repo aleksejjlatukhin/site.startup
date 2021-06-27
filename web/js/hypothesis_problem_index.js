@@ -59,7 +59,7 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 //Отслеживаем изменения в форме создания проблемы и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
-    var url = '/generation-problem/save-cache-creation-form?id=' + id_page;
+    var url = '/problems/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -123,7 +123,7 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
             if (response.count === '1') {
                 $('.hypothesis_create_modal').modal('hide');
-                location.href = '/generation-problem/index?id=' + id;
+                location.href = '/problems/index?id=' + id;
             } else {
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);

@@ -308,7 +308,7 @@ $(body).on('beforeSubmit', '#updateQuestionForm', function(e){
 
 
 //Удаление вопроса для интервью (Шаг 2)
-$(body).on('click', '.delete-question-confirm-problem', function(e){
+$(body).on('click', '.delete-question-confirm-hypothesis', function(e){
 
     var url = $(this).attr('href');
 
@@ -537,7 +537,7 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
                     //Загружаем данные респондентов (Шаг 3)
                     $.ajax({
 
-                        url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + response.page,
+                        url: '/responds/get-query-responds?stage=4&id=' + response.confirm_id + '&page=' + response.page,
                         method: 'POST',
                         cache: false,
                         success: function(response){
@@ -699,7 +699,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 $(body).on('change', 'form#formCreateDescInterview', function(){
 
     var respond_id = $(this).attr('action').split('id=')[1];
-    var url = '/desc-interview-confirm/save-cache-creation-form?id=' + respond_id;
+    var url = '/interviews/save-cache-creation-form?stage=4&id=' + respond_id;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -718,7 +718,7 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
 
     var url_1 = $(this).attr('href');
     var id = $(this).attr('id').split('-')[1];
-    var url_2 = '/desc-interview-confirm/get-data-create-form?id=' + id;
+    var url_2 = '/interviews/get-data-create-form?stage=4&id=' + id;
     var error_respond_modal = $('#error_respond_modal');
     $(body).append($(error_respond_modal).first());
     var create_descInterview_modal = $('#create_descInterview_modal');
@@ -794,7 +794,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
+                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -823,7 +823,7 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/desc-interview-confirm/get-data-update-form?id=' + id;
+    var url = '/interviews/get-data-update-form?stage=4&id=' + id;
     var update_descInterview_modal = $('#update_descInterview_modal');
     $(body).append($(update_descInterview_modal).first());
 
@@ -893,7 +893,7 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
             //Загружаем данные респондентов (Шаг 3)
             $.ajax({
 
-                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
+                url: '/responds/get-query-responds?stage=4&id=' + response.confirm_id + '&page=' + page,
                 method: 'POST',
                 cache: false,
                 success: function(response){
@@ -1022,7 +1022,7 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
                 //Загружаем данные респондентов (Шаг 3)
                 $.ajax({
 
-                    url: '/responds/get-query-responds?stage=4&id=' + response.confirm_problem_id + '&page=' + page,
+                    url: '/responds/get-query-responds?stage=4&id=' + response.confirm_id + '&page=' + page,
                     method: 'POST',
                     cache: false,
                     success: function(response){
@@ -1085,7 +1085,7 @@ $(body).on('click', '#button_MovingNextStage', function(e){
                 if (!response.not_completed_descInterviews) {
 
                     if (response.exist_confirm === 1) {
-                        window.location.href = '/gcp/index?id=' + id;
+                        window.location.href = '/gcps/index?id=' + id;
                     }
                     else if (response.exist_confirm === null) {
                         window.location.href = '/confirm-problem/exist-confirm?id=' + id;

@@ -5,13 +5,13 @@ namespace app\models\forms;
 
 use app\models\ConfirmMvp;
 use app\models\CreatorAnswersForNewRespond;
-use app\models\Gcp;
-use app\models\GenerationProblem;
+use app\models\Gcps;
+use app\models\Problems;
 use app\models\interfaces\ConfirmationInterface;
-use app\models\Mvp;
+use app\models\Mvps;
 use app\models\Projects;
 use app\models\RespondsMvp;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\User;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
@@ -85,10 +85,10 @@ class CreateRespondMvpForm extends FormCreateRespondent
      */
     public static function getCachePath(ConfirmationInterface $confirm)
     {
-        $mvp = Mvp::findOne($confirm->mvpId);
-        $gcp = Gcp::findOne($mvp->gcpId);
-        $problem = GenerationProblem::findOne($mvp->problemId);
-        $segment = Segment::findOne($mvp->segmentId);
+        $mvp = Mvps::findOne($confirm->mvpId);
+        $gcp = Gcps::findOne($mvp->gcpId);
+        $problem = Problems::findOne($mvp->problemId);
+        $segment = Segments::findOne($mvp->segmentId);
         $project = Projects::findOne($mvp->projectId);
         $user = User::findOne($project->userId);
         $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
@@ -125,7 +125,7 @@ class CreateRespondMvpForm extends FormCreateRespondent
      */
     public function uniqueName($attr)
     {
-        $models = RespondsMvp::findAll(['confirm_mvp_id' => $this->confirmId]);
+        $models = RespondsMvp::findAll(['confirm_id' => $this->confirmId]);
 
         foreach ($models as $item){
 

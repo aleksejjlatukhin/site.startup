@@ -6,12 +6,8 @@ namespace app\models\forms;
 use app\models\ConfirmProblem;
 use app\models\CreatorNewRespondsOnConfirmFirstStep;
 use app\models\CreatorRespondsFromAgentsOnConfirmFirstStep;
-use app\models\GenerationProblem;
-use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\Problems;
 use yii\base\ErrorException;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateConfirmProblem extends FormCreateConfirm
@@ -22,14 +18,38 @@ class FormCreateConfirmProblem extends FormCreateConfirm
 
     /**
      * FormCreateConfirmProblem constructor.
+     * @param Problems $hypothesis
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(Problems $hypothesis, $config = [])
     {
         $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
         $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($hypothesis);
+        $cacheName = 'formCreateConfirmCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
 
         parent::__construct($config);
+    }
+
+
+    /**
+     * Получить путь к кэшу формы
+     * @param Problems $hypothesis
+     * @return string
+     */
+    public static function getCachePath(Problems $hypothesis)
+    {
+        $segment = $hypothesis->segment;
+        $project = $hypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+            '/segments/segment-'.$segment->id.'/problems/problem-'.$hypothesis->id.'/confirm/formCreateConfirm/';
+        return $cachePath;
     }
 
 
@@ -98,11 +118,6 @@ class FormCreateConfirmProblem extends FormCreateConfirm
      */
     public function create()
     {
-        $problem = GenerationProblem::findOne($this->hypothesisId);
-        $segment = Segment::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
-        $user = User::findOne($project->userId);
-
         $model = new ConfirmProblem();
         $model->setProblemId($this->hypothesisId);
         $model->setNeedConsumer($this->need_consumer);
@@ -115,9 +130,7 @@ class FormCreateConfirmProblem extends FormCreateConfirm
             // Добавление новых респондентов для программы подтверждения ГПС
             if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
             // Удаление кэша формы создания подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/formCreateConfirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }

@@ -34,7 +34,7 @@ class BusinessModel extends ActiveRecord
      */
     public function getSegment ()
     {
-        return $this->hasOne(Segment::class, ['id' => 'segment_id']);
+        return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
 
 
@@ -44,37 +44,46 @@ class BusinessModel extends ActiveRecord
      */
     public function getProblem ()
     {
-        return $this->hasOne(GenerationProblem::class, ['id' => 'problem_id']);
+        return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
 
 
     /**
-     * Получить объект Gcp
+     * Получить объект Gcps
      * @return ActiveQuery
      */
     public function getGcp ()
     {
-        return $this->hasOne(Gcp::class, ['id' => 'gcp_id']);
+        return $this->hasOne(Gcps::class, ['id' => 'gcp_id']);
     }
 
 
     /**
-     * Получить объект Mvp
+     * Получить объект Mvps
      * @return ActiveQuery
      */
     public function getMvp ()
     {
-        return $this->hasOne(Mvp::class, ['id' => 'mvp_id']);
+        return $this->hasOne(Mvps::class, ['id' => 'mvp_id']);
     }
 
 
     /**
-     * Получить объект подтверждения Mvp
+     * Получить объект подтверждения Mvps
      * @return ActiveQuery
      */
     public function getConfirmMvp()
     {
-        return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_mvp_id']);
+        return $this->hasOne(ConfirmMvp::class, ['id' => 'basic_confirm_id']);
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmMvpId()
+    {
+        return $this->basic_confirm_id;
     }
 
 
@@ -84,8 +93,8 @@ class BusinessModel extends ActiveRecord
     public function rules()
     {
         return [
-            [['confirm_mvp_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
-            [['confirm_mvp_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id', 'created_at', 'updated_at'], 'integer'],
+            [['basic_confirm_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
+            [['basic_confirm_id', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'mvp_id', 'created_at', 'updated_at'], 'integer'],
             [['relations', 'distribution_of_sales', 'resources'], 'string', 'max' => 255],
             [['partners', 'cost', 'revenue'], 'string', 'max' => 1000],
             [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'trim'],
@@ -100,7 +109,7 @@ class BusinessModel extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'confirm_mvp_id' => 'Confirm Mvp ID',
+            'confirm_mvp_id' => 'Confirm Mvps ID',
             'relations' => 'Взаимоотношения с клиентами',
             'partners' => 'Ключевые партнеры',
             'distribution_of_sales' => 'Каналы коммуникации и сбыта',

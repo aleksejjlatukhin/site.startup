@@ -6,12 +6,10 @@ namespace app\models\forms;
 use app\models\ConfirmProblem;
 use yii\base\ErrorException;
 use yii\base\Model;
-use app\models\User;
 use app\models\Projects;
-use app\models\Segment;
-use app\models\GenerationProblem;
-use app\models\Gcp;
-use yii\helpers\FileHelper;
+use app\models\Segments;
+use app\models\Problems;
+use app\models\Gcps;
 use yii\web\NotFoundHttpException;
 
 class FormCreateGcp extends Model
@@ -20,7 +18,44 @@ class FormCreateGcp extends Model
     public $good;
     public $benefit;
     public $contrast;
-    public $confirm_problem_id;
+    public $basic_confirm_id;
+    public $_cacheManager;
+    public $cachePath;
+
+
+    /**
+     * FormCreateGcp constructor.
+     * @param Problems $preliminaryHypothesis
+     * @param array $config
+     */
+    public function __construct(Problems $preliminaryHypothesis, $config = [])
+    {
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($preliminaryHypothesis);
+        $cacheName = 'formCreateHypothesisCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param Problems $preliminaryHypothesis
+     * @return string
+     */
+    public static function getCachePath(Problems $preliminaryHypothesis)
+    {
+        $segment = $preliminaryHypothesis->segment;
+        $project = $preliminaryHypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id
+            .'/problems/problem-'.$preliminaryHypothesis->id.'/gcps/formCreate/';
+
+        return $cachePath;
+    }
 
 
     /**
@@ -32,6 +67,7 @@ class FormCreateGcp extends Model
             [['good', 'benefit', 'contrast'], 'trim'],
             [['good', 'contrast'], 'string', 'max' => 255],
             [['benefit'], 'string', 'max' => 500],
+            [['basic_confirm_id'], 'integer'],
         ];
     }
 
@@ -50,24 +86,23 @@ class FormCreateGcp extends Model
 
 
     /**
-     * @return Gcp
+     * @return Gcps
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
     public function create()
     {
-        $last_model = Gcp::find()->where(['confirm_problem_id' => $this->confirm_problem_id])->orderBy(['id' => SORT_DESC])->one();
-        $confirmProblem = ConfirmProblem::findOne($this->confirm_problem_id);
-        $problem = GenerationProblem::findOne($confirmProblem->gps_id);
-        $segment = Segment::findOne($problem->segment_id);
-        $project = Projects::findOne($problem->project_id);
-        $user = User::findOne($project->user_id);
+        $last_model = Gcps::find()->where(['basic_confirm_id' => $this->basic_confirm_id])->orderBy(['id' => SORT_DESC])->one();
+        $confirmProblem = ConfirmProblem::findOne($this->basic_confirm_id);
+        $problem = Problems::findOne($confirmProblem->problemId);
+        $segment = Segments::findOne($problem->segmentId);
+        $project = Projects::findOne($problem->projectId);
 
-        $gcp = new Gcp();
+        $gcp = new Gcps();
         $gcp->project_id = $project->id;
         $gcp->segment_id = $segment->id;
         $gcp->problem_id = $problem->id;
-        $gcp->confirm_problem_id = $this->confirm_problem_id;
+        $gcp->basic_confirm_id = $this->basic_confirm_id;
         $last_model_number = explode(' ',$last_model->title)[1];
         $gcp->title = 'ГЦП ' . ($last_model_number + 1);
 
@@ -78,12 +113,7 @@ class FormCreateGcp extends Model
         $gcp->description .= 'в отличии от ' . mb_strtolower($this->contrast) . '.';
 
         if ($gcp->save()){
-
-            //Удаление кэша формы создания ГЦП
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-                '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/gcps/formCreate';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
+            $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
             return $gcp;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить новое ценностное предложение');

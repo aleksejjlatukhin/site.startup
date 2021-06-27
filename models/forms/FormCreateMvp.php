@@ -4,22 +4,58 @@
 namespace app\models\forms;
 
 use app\models\ConfirmGcp;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
+use app\models\Gcps;
+use app\models\Problems;
+use app\models\Mvps;
 use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\Segments;
 use yii\base\ErrorException;
 use yii\base\Model;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateMvp extends Model
 {
 
     public $description;
-    public $confirm_gcp_id;
+    public $basic_confirm_id;
+    public $_cacheManager;
+    public $cachePath;
+
+
+    /**
+     * FormCreateMvp constructor.
+     * @param Gcps $preliminaryHypothesis
+     * @param array $config
+     */
+    public function __construct(Gcps $preliminaryHypothesis, $config = [])
+    {
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($preliminaryHypothesis);
+        $cacheName = 'formCreateHypothesisCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param Gcps $preliminaryHypothesis
+     * @return string
+     */
+    public static function getCachePath(Gcps $preliminaryHypothesis)
+    {
+        $problem = $preliminaryHypothesis->problem;
+        $segment = $preliminaryHypothesis->segment;
+        $project = $preliminaryHypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$preliminaryHypothesis->id.'/mvps/formCreate/';
+
+        return $cachePath;
+    }
 
 
     /**
@@ -30,42 +66,37 @@ class FormCreateMvp extends Model
         return [
             [['description'], 'trim'],
             [['description'], 'string', 'max' => 2000],
+            [['basic_confirm_id'], 'integer'],
         ];
     }
 
 
     /**
-     * @return Mvp
+     * @return Mvps
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
     public function create()
     {
-        $last_model = Mvp::find()->where(['confirm_gcp_id' => $this->confirm_gcp_id])->orderBy(['id' => SORT_DESC])->one();
-        $confirmGcp = ConfirmGcp::findOne($this->confirm_gcp_id);
-        $gcp = Gcp::findOne($confirmGcp->gcp_id);
-        $problem = GenerationProblem::findOne($gcp->problem_id);
-        $segment = Segment::findOne($gcp->segment_id);
-        $project = Projects::findOne($gcp->project_id);
-        $user = User::findOne(['id' => $project->user_id]);
+        $last_model = Mvps::find()->where(['basic_confirm_id' => $this->basic_confirm_id])->orderBy(['id' => SORT_DESC])->one();
+        $confirmGcp = ConfirmGcp::findOne($this->basic_confirm_id);
+        $gcp = Gcps::findOne($confirmGcp->gcpId);
+        $problem = Problems::findOne($gcp->problemId);
+        $segment = Segments::findOne($gcp->segmentId);
+        $project = Projects::findOne($gcp->projectId);
 
-        $mvp = new Mvp();
+        $mvp = new Mvps();
         $mvp->project_id = $project->id;
         $mvp->segment_id = $segment->id;
         $mvp->problem_id = $problem->id;
         $mvp->gcp_id = $gcp->id;
-        $mvp->confirm_gcp_id = $this->confirm_gcp_id;
+        $mvp->basic_confirm_id = $this->basic_confirm_id;
         $mvp->description = $this->description;
         $last_model_number = explode(' ',$last_model->title)[1];
         $mvp->title = 'MVP ' . ($last_model_number + 1);
 
         if ($mvp->save()){
-
-            //Удаление кэша формы создания MVP
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/formCreate';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
+            $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
             return $mvp;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить новый продукт (MVP)');

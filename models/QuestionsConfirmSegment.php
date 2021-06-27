@@ -5,11 +5,26 @@ namespace app\models;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 class QuestionsConfirmSegment extends ActiveRecord
 {
 
-    public $list_questions;
+    private $_manager_answers;
+    private $_creator_question_to_general_list;
+
+
+    /**
+     * QuestionsConfirmSegment constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->_manager_answers = new ManagerForAnswersAtQuestion();
+        $this->_creator_question_to_general_list = new CreatorQuestionToGeneralList();
+
+        parent::__construct($config);
+    }
 
 
     /**
@@ -27,7 +42,7 @@ class QuestionsConfirmSegment extends ActiveRecord
      */
     public function getConfirm()
     {
-        return $this->hasOne(Interview::class, ['id' => 'interview_id']);
+        return $this->hasOne(ConfirmSegment::class, ['id' => 'confirm_id']);
     }
 
 
@@ -44,14 +59,24 @@ class QuestionsConfirmSegment extends ActiveRecord
 
 
     /**
+     * @param array $params
+     */
+    public function setParams(array $params)
+    {
+        $this->confirm_id = $params['confirm_id'];
+        $this->title = $params['title'];
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['interview_id', 'title'], 'required'],
-            [['interview_id', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'list_questions'], 'string', 'max' => 255],
+            [['confirm_id', 'title'], 'required'],
+            [['confirm_id', 'created_at', 'updated_at'], 'integer'],
+            [['title'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
     }
@@ -81,20 +106,44 @@ class QuestionsConfirmSegment extends ActiveRecord
     {
 
         $this->on(self::EVENT_AFTER_INSERT, function (){
-            $this->confirm->segment->project->touch('updated_at');
-            $this->confirm->segment->project->user->touch('updated_at');
+            $this->confirm->hypothesis->project->touch('updated_at');
+            $this->confirm->hypothesis->project->user->touch('updated_at');
+            $this->_manager_answers->create($this->confirm, $this->id);
+            $this->_creator_question_to_general_list->create($this->confirm, $this->title);
         });
 
         $this->on(self::EVENT_AFTER_UPDATE, function (){
-            $this->confirm->segment->project->touch('updated_at');
-            $this->confirm->segment->project->user->touch('updated_at');
+            $this->confirm->hypothesis->project->touch('updated_at');
+            $this->confirm->hypothesis->project->user->touch('updated_at');
+            $this->_creator_question_to_general_list->create($this->confirm, $this->title);
         });
 
         $this->on(self::EVENT_AFTER_DELETE, function (){
-            $this->confirm->segment->project->touch('updated_at');
-            $this->confirm->segment->project->user->touch('updated_at');
+            $this->confirm->hypothesis->project->touch('updated_at');
+            $this->confirm->hypothesis->project->user->touch('updated_at');
+            $this->_manager_answers->delete($this->confirm, $this->id);
         });
 
         parent::init();
+    }
+
+
+    /**
+     * @return array|bool
+     * @throws \Throwable
+     * @throws StaleObjectException
+     */
+    public function deleteAndGetData()
+    {
+        // Получить список вопросов без удаленного вопроса
+        $questions = self::find()->where(['confirm_id' => $this->confirm->id])->andWhere(['!=', 'id', $this->id])->all();
+        //Передаем обновленный список вопросов для добавления в программу
+        $queryQuestions = $this->confirm->queryQuestionsGeneralList();
+        array_push($queryQuestions, $this);
+
+        if ($this->delete()) {
+            return ['questions' => $questions, 'queryQuestions' => $queryQuestions];
+        }
+        return false;
     }
 }

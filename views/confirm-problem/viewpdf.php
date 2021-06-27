@@ -55,13 +55,13 @@ use yii\helpers\Html;
 
                 <td colspan="1" style="width: 50px; text-align: center;">
                     <?php
-                    if ($respond->descInterview->status == 1) {
+                    if ($respond->interview->status == 1) {
                         echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                     }
-                    elseif ($respond->descInterview->status === null) {
+                    elseif ($respond->interview->status === null) {
                         echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                     }
-                    elseif ($respond->descInterview->status == 0) {
+                    elseif ($respond->interview->status == 0) {
                         echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                     }
                     else {
@@ -93,8 +93,8 @@ use yii\helpers\Html;
                 </td>
 
                 <td colspan="1" style="width: 100px; padding: 15px 5px; text-align: center; color: #FFFFFF; font-size: 15px;">
-                    <?php if ($respond->descInterview->updated_at) : ?>
-                        <?= date("d.m.y", $respond->descInterview->updated_at); ?>
+                    <?php if ($respond->interview->updated_at) : ?>
+                        <?= date("d.m.y", $respond->interview->updated_at); ?>
                     <?php endif; ?>
                 </td>
 

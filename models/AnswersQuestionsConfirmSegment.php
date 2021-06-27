@@ -34,7 +34,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
      */
     public function getRespond ()
     {
-        return $this->hasOne(Respond::class, ['id' => 'respond_id']);
+        return $this->hasOne(RespondsSegment::class, ['id' => 'respond_id']);
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\interfaces\ConfirmationInterface;
 use app\models\interfaces\RespondsInterface;
 use yii\base\Model;
 
@@ -14,52 +15,33 @@ class CreatorAnswersForNewRespond extends Model
      */
     public function create(RespondsInterface $respond)
     {
+        $confirm = $respond->confirm;
+        $questions = $confirm->questions;
 
-        switch (get_class($respond)) {
-
-            case 'app\models\Respond':
-
-                $questions = QuestionsConfirmSegment::find()->where(['interview_id' => $respond->confirmId])->all();
-                foreach ($questions as $question){
-                    $answer = new AnswersQuestionsConfirmSegment();
-                    $answer->question_id = $question->id;
-                    $answer->respond_id = $respond->id;
-                    $answer->save();
-                }
-                break;
-
-            case 'app\models\RespondsConfirm':
-
-                $questions = QuestionsConfirmProblem::find()->where(['confirm_problem_id' => $respond->confirmId])->all();
-                foreach ($questions as $question){
-                    $answer = new AnswersQuestionsConfirmProblem();
-                    $answer->question_id = $question->id;
-                    $answer->respond_id = $respond->id;
-                    $answer->save();
-                }
-                break;
-
-            case 'app\models\RespondsGcp':
-
-                $questions = QuestionsConfirmGcp::find()->where(['confirm_gcp_id' => $respond->confirmId])->all();
-                foreach ($questions as $question){
-                    $answer = new AnswersQuestionsConfirmGcp();
-                    $answer->question_id = $question->id;
-                    $answer->respond_id = $respond->id;
-                    $answer->save();
-                }
-                break;
-
-            case 'app\models\RespondsMvp':
-
-                $questions = QuestionsConfirmMvp::find()->where(['confirm_mvp_id' => $respond->confirmId])->all();
-                foreach ($questions as $question){
-                    $answer = new AnswersQuestionsConfirmMvp();
-                    $answer->question_id = $question->id;
-                    $answer->respond_id = $respond->id;
-                    $answer->save();
-                }
-                break;
+        foreach ($questions as $question){
+            $answer = self::getCreateModel($confirm);
+            $answer->question_id = $question->id;
+            $answer->respond_id = $respond->id;
+            $answer->save();
         }
+    }
+
+
+    /**
+     * @param ConfirmationInterface $confirm
+     * @return AnswersQuestionsConfirmGcp|AnswersQuestionsConfirmMvp|AnswersQuestionsConfirmProblem|AnswersQuestionsConfirmSegment|bool
+     */
+    private static function getCreateModel(ConfirmationInterface $confirm)
+    {
+        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+            return new AnswersQuestionsConfirmSegment();
+        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+            return new AnswersQuestionsConfirmProblem();
+        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+            return new AnswersQuestionsConfirmGcp();
+        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+            return new AnswersQuestionsConfirmMvp();
+        }
+        return false;
     }
 }

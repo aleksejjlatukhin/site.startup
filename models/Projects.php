@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\forms\CacheForm;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -18,6 +19,19 @@ class Projects extends ActiveRecord
 {
 
     public $present_files;
+    public $_cacheManager;
+
+
+    /**
+     * Projects constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->_cacheManager = new CacheForm();
+
+        parent::__construct($config);
+    }
 
 
     /**
@@ -26,6 +40,16 @@ class Projects extends ActiveRecord
     public static function tableName()
     {
         return 'projects';
+    }
+
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    public static function getCachePath(User $user)
+    {
+        return '../runtime/cache/forms/user-'.$user->id. '/projects/formCreate/';
     }
 
 
@@ -64,7 +88,7 @@ class Projects extends ActiveRecord
      */
     public function getSegments()
     {
-        return $this->hasMany(Segment::class, ['project_id' => 'id']);
+        return $this->hasMany(Segments::class, ['project_id' => 'id']);
     }
 
 
@@ -74,7 +98,7 @@ class Projects extends ActiveRecord
      */
     public function getProblems ()
     {
-        return $this->hasMany(GenerationProblem::class, ['project_id' => 'id']);
+        return $this->hasMany(Problems::class, ['project_id' => 'id']);
     }
 
 
@@ -84,7 +108,7 @@ class Projects extends ActiveRecord
      */
     public function getGcps ()
     {
-        return $this->hasMany(Gcp::class, ['project_id' => 'id']);
+        return $this->hasMany(Gcps::class, ['project_id' => 'id']);
     }
 
 
@@ -94,7 +118,7 @@ class Projects extends ActiveRecord
      */
     public function getMvps ()
     {
-        return $this->hasMany(Mvp::class, ['project_id' => 'id']);
+        return $this->hasMany(Mvps::class, ['project_id' => 'id']);
     }
 
 
@@ -307,9 +331,6 @@ class Projects extends ActiveRecord
             //Загрузка презентационных файлов
             $this->present_files = UploadedFile::getInstances($this, 'present_files');
             if ($this->present_files) $this->uploadPresentFiles();
-            //Удаление кэша формы создания проекта
-            $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->id. '/projects/formCreate';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
 
             return true;
         }

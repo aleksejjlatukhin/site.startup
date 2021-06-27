@@ -11,8 +11,6 @@ use yii\web\NotFoundHttpException;
 class UpdateRespondGcpForm extends UpdateFormRespond
 {
 
-    public $confirm_gcp_id;
-
 
     /**
      * UpdateRespondGcpForm constructor.
@@ -36,7 +34,7 @@ class UpdateRespondGcpForm extends UpdateFormRespond
      */
     public function getConfirm()
     {
-        return ConfirmGcp::findOne($this->confirm_gcp_id);
+        return ConfirmGcp::findOne($this->confirm_id);
     }
 
 
@@ -60,7 +58,7 @@ class UpdateRespondGcpForm extends UpdateFormRespond
      */
     public function uniqueName($attr)
     {
-        $models = RespondsGcp::findAll(['confirm_gcp_id' => $this->confirm_gcp_id]);
+        $models = RespondsGcp::findAll(['confirm_id' => $this->confirm_id]);
 
         foreach ($models as $item){
 

@@ -3,18 +3,15 @@
 
 namespace app\models\forms;
 
-
 use app\models\BusinessModel;
 use app\models\ConfirmMvp;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
+use app\models\Gcps;
+use app\models\Problems;
+use app\models\Mvps;
 use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\Segments;
 use yii\base\ErrorException;
 use yii\base\Model;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateBusinessModel extends Model
@@ -26,7 +23,47 @@ class FormCreateBusinessModel extends Model
     public $distribution_of_sales;
     public $cost;
     public $revenue;
-    public $confirm_mvp_id;
+    public $basic_confirm_id;
+    public $_cacheManager;
+    public $cachePath;
+
+
+    /**
+     * FormCreateBusinessModel constructor.
+     * @param Mvps $preliminaryHypothesis
+     * @param array $config
+     */
+    public function __construct(Mvps $preliminaryHypothesis, $config = [])
+    {
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($preliminaryHypothesis);
+        $cacheName = 'formCreateHypothesisCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param Mvps $preliminaryHypothesis
+     * @return string
+     */
+    public static function getCachePath(Mvps $preliminaryHypothesis)
+    {
+        $gcp = $preliminaryHypothesis->gcp;
+        $problem = $preliminaryHypothesis->problem;
+        $segment = $preliminaryHypothesis->segment;
+        $project = $preliminaryHypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$preliminaryHypothesis->id.'/business-model/formCreate/';
+
+        return $cachePath;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -64,16 +101,15 @@ class FormCreateBusinessModel extends Model
      */
     public function create (){
 
-        $confirmMvp = ConfirmMvp::findOne($this->confirm_mvp_id);
-        $mvp = Mvp::findOne($confirmMvp->mvp_id);
-        $gcp = Gcp::findOne($mvp->gcp_id);
-        $problem = GenerationProblem::findOne($mvp->problem_id);
-        $segment = Segment::findOne($mvp->segment_id);
+        $confirmMvp = ConfirmMvp::findOne($this->basic_confirm_id);
+        $mvp = Mvps::findOne($confirmMvp->mvpId);
+        $gcp = Gcps::findOne($mvp->gcpId);
+        $problem = Problems::findOne($mvp->problem_id);
+        $segment = Segments::findOne($mvp->segment_id);
         $project = Projects::findOne($mvp->project_id);
-        $user = User::findOne($project->user_id);
 
         $model = new BusinessModel();
-        $model->confirm_mvp_id = $this->confirm_mvp_id;
+        $model->basic_confirm_id = $this->basic_confirm_id;
         $model->mvp_id = $mvp->id;
         $model->gcp_id = $gcp->id;
         $model->problem_id = $problem->id;
@@ -87,12 +123,7 @@ class FormCreateBusinessModel extends Model
         $model->revenue = $this->revenue;
 
         if ($model->save()){
-
-            //Удаление кэша формы создания бизнес-модели
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
+            $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить бизнес-модель');

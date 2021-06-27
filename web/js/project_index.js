@@ -91,10 +91,10 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
 
             //Заполнение полей формы данными из кэша
-            if (response.cache_form_creation) {
+            if (response.cache) {
 
                 // Данные из кэша к полям модели Authors
-                var formAuthors = response.cache_form_creation.Authors;
+                var formAuthors = response.cache.Authors;
 
                 // Добавляем формы для авторов, если их больше одного
                 var countOfAdditionalForms = formAuthors.length - 1;

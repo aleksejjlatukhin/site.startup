@@ -3,14 +3,50 @@
 
 namespace app\models\forms;
 
-use app\models\Segment;
+use app\models\Projects;
+use app\models\Segments;
 use yii\base\ErrorException;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 
 class FormCreateSegment extends FormSegment
 {
+
+    public $_cacheManager;
+    public $cachePath;
+
+
+    /**
+     * FormCreateSegment constructor.
+     * @param Projects $project
+     * @param array $config
+     */
+    public function __construct(Projects $project, $config = [])
+    {
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($project);
+        $cacheName = 'formCreateHypothesisCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
+
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param Projects $project
+     * @return string
+     */
+    public static function getCachePath(Projects $project)
+    {
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
+
+        return $cachePath;
+    }
+
 
     /**
      * Проверка заполнения полей формы
@@ -18,7 +54,7 @@ class FormCreateSegment extends FormSegment
      */
     public function checkFillingFields ()
     {
-        if ($this->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+        if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
                 && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
@@ -30,7 +66,7 @@ class FormCreateSegment extends FormSegment
             } else {
                 return false;
             }
-        } elseif ($this->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+        } elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
                 && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
@@ -47,7 +83,7 @@ class FormCreateSegment extends FormSegment
 
 
     /**
-     * @return Segment|bool
+     * @return Segments|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
@@ -55,14 +91,14 @@ class FormCreateSegment extends FormSegment
     {
         if ($this->validate()){
 
-            $segment = new Segment();
+            $segment = new Segments();
             $segment->name = $this->name;
             $segment->description = $this->description;
             $segment->project_id = $this->project_id;
             $segment->type_of_interaction_between_subjects = $this->type_of_interaction_between_subjects;
             $segment->add_info = $this->add_info;
 
-            if ($this->type_of_interaction_between_subjects == Segment::TYPE_B2C){
+            if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C){
 
                 $segment->field_of_activity = $this->field_of_activity_b2c;
                 $segment->sort_of_activity = $this->sort_of_activity_b2c;
@@ -77,16 +113,12 @@ class FormCreateSegment extends FormSegment
                 $segment->market_volume = $this->market_volume_b2c;
 
                 if ($segment->save()) {
-
-                    //Удаление кэша формы создания сегмента
-                    $cachePathDelete = '../runtime/cache/forms/user-'.$segment->project->user->id. '/projects/project-'.$segment->project->id.'/segments/formCreate';
-                    if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
+                    $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
                     return $segment;
                 }
                 throw new NotFoundHttpException('Ошибка. Неудалось сохранить сегмент');
 
-            }elseif ($this->type_of_interaction_between_subjects == Segment::TYPE_B2B) {
+            }elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
 
                 $segment->field_of_activity = $this->field_of_activity_b2b;
                 $segment->sort_of_activity = $this->sort_of_activity_b2b;
@@ -99,11 +131,7 @@ class FormCreateSegment extends FormSegment
                 $segment->market_volume = $this->market_volume_b2b;
 
                 if ($segment->save()) {
-
-                    //Удаление кэша формы создания сегмента
-                    $cachePathDelete = '../runtime/cache/forms/user-'.$segment->project->user->id. '/projects/project-'.$segment->project->id.'/segments/formCreate';
-                    if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
+                    $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
                     return $segment;
                 }
                 throw new NotFoundHttpException('Неудалось сохранить сегмент');
@@ -120,7 +148,7 @@ class FormCreateSegment extends FormSegment
      */
     public function uniqueName($attr)
     {
-        $models = Segment::findAll(['project_id' => $this->project_id]);
+        $models = Segments::findAll(['project_id' => $this->project_id]);
 
         foreach ($models as $item){
 

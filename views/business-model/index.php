@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\User;
 
 $this->title = 'Генерация бизнес-модели';
@@ -41,17 +41,17 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
     <div class="row navigation_blocks">
 
         <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segment/index', 'id' => $project->id],
+            ['/segments/index', 'id' => $project->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
         <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/interview/view', 'id' => $interview->id],
+            ['/confirm-segment/view', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
         <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
-            ['/generation-problem/index', 'id' => $interview->id],
+            ['/problems/index', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -61,7 +61,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
         ) ;?>
 
         <?= Html::a('<div class="stage_number">5</div><div>Разработка гипотез ценностных предложений</div>',
-            ['/gcp/index', 'id' => $confirmProblem->id],
+            ['/gcps/index', 'id' => $confirmProblem->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -71,7 +71,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
         ) ;?>
 
         <?= Html::a('<div class="stage_number">7</div><div>Разработка MVP</div>',
-            ['/mvp/index', 'id' => $confirmGcp->id],
+            ['/mvps/index', 'id' => $confirmGcp->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -98,7 +98,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
                 $segment_name = mb_substr($segment_name, 0, 12) . '...';
             }
 
-            $problem_description = $generationProblem->description;
+            $problem_description = $problem->description;
             if (mb_strlen($problem_description) > 12){
                 $problem_description = mb_substr($problem_description, 0, 12) . '...';
             }
@@ -127,11 +127,11 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
         </div>
 
-        <?= Html::a('Данные сегмента', ['/segment/show-all-information', 'id' => $segment->id], [
+        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['/segment/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Дорожная карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
@@ -142,7 +142,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
         <div>Наименование сегмента:</div>
         <div><?= $segment->name;?></div>
         <div>Формулировка проблемы:</div>
-        <div><?= $generationProblem->description;?></div>
+        <div><?= $problem->description;?></div>
         <div>Формулировка ценностного предложения:</div>
         <div><?= $gcp->description;?></div>
         <div>Формулировка минимально жизнеспособного продукта:</div>
@@ -204,7 +204,7 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
                         <div class="mini_header_desc_block">Тип взаимодейстивия с рынком:</div>
                         <?php
-                        if ($segment->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+                        if ($segment->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
                             echo 'В2С (бизнес-клиент)';
                         } else {
                             echo 'B2B (бизнес-бизнес)';

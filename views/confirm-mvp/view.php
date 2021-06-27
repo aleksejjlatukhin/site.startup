@@ -42,17 +42,17 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
     <div class="row navigation_blocks">
 
         <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segment/index', 'id' => $project->id],
+            ['/segments/index', 'id' => $project->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
         <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/interview/view', 'id' => $interview->id],
+            ['/confirm-segment/view', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
         <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
-            ['/generation-problem/index', 'id' => $interview->id],
+            ['/problems/index', 'id' => $confirmSegment->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -62,7 +62,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
         ) ;?>
 
         <?= Html::a('<div class="stage_number">5</div><div>Разработка гипотез ценностных предложений</div>',
-            ['/gcp/index', 'id' => $confirmProblem->id],
+            ['/gcps/index', 'id' => $confirmProblem->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -72,7 +72,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
         ) ;?>
 
         <?= Html::a('<div class="stage_number">7</div><div>Разработка MVP</div>',
-            ['/mvp/index', 'id' => $confirmGcp->id],
+            ['/mvps/index', 'id' => $confirmGcp->id],
             ['class' => 'passive_navigation_block navigation_block']
         ) ;?>
 
@@ -99,7 +99,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
                 $segment_name = mb_substr($segment_name, 0, 12) . '...';
             }
 
-            $problem_description = $generationProblem->description;
+            $problem_description = $problem->description;
             if (mb_strlen($problem_description) > 12){
                 $problem_description = mb_substr($problem_description, 0, 12) . '...';
             }
@@ -128,11 +128,11 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
 
         </div>
 
-        <?= Html::a('Данные сегмента', ['/segment/show-all-information', 'id' => $segment->id], [
+        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['/segment/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Дорожная карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
@@ -143,7 +143,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
         <div>Наименование сегмента:</div>
         <div><?= $segment->name;?></div>
         <div>Формулировка проблемы:</div>
-        <div><?= $generationProblem->description;?></div>
+        <div><?= $problem->description;?></div>
         <div>Формулировка ценностного предложения:</div>
         <div><?= $gcp->description;?></div>
         <div>Формулировка минимально жизнеспособного продукта:</div>
@@ -227,17 +227,17 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
 
                 <div class="row">
                     <div class="col-md-12">Приветствие в начале встречи</div>
-                    <div class="col-md-12"><?= $interview->greeting_interview; ?></div>
+                    <div class="col-md-12"><?= $confirmSegment->greeting_interview; ?></div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-12">Информация о вас для респондентов</div>
-                    <div class="col-md-12"><?= $interview->view_interview; ?></div>
+                    <div class="col-md-12"><?= $confirmSegment->view_interview; ?></div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                    <div class="col-md-12"><?= $interview->reason_interview; ?></div>
+                    <div class="col-md-12"><?= $confirmSegment->reason_interview; ?></div>
                 </div>
 
                 <div class="row">
@@ -324,17 +324,17 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
 
                     <div class="row">
                         <div class="col-md-12">Приветствие в начале встречи</div>
-                        <div class="col-md-12"><?= $interview->greeting_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->greeting_interview; ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Информация о вас для респондентов</div>
-                        <div class="col-md-12"><?= $interview->view_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->view_interview; ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                        <div class="col-md-12"><?= $interview->reason_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->reason_interview; ?></div>
                     </div>
 
                     <div class="row">
@@ -441,14 +441,14 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
                                 <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $mvp->exist_confirm === null) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]), [
-                                        Url::to(['/confirm-mvp/delete-question', 'id' => $question->id])],[
+                                        Url::to(['/questions/delete', 'stage' => $model->stage, 'id' => $question->id])],[
                                         'title' => Yii::t('yii', 'Delete'),
-                                        'class' => 'delete-question-confirm-mvp pull-right',
+                                        'class' => 'delete-question-confirm-hypothesis pull-right',
                                         'id' => 'delete_question-'.$question->id,
                                     ]); ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px', 'margin-top' => '3px', ]]), [
-                                        Url::to(['/confirm-mvp/get-question-update-form', 'id' => $question->id])], [
+                                        Url::to(['/questions/get-form-update', 'stage' => $model->stage, 'id' => $question->id])], [
                                         'class' => 'showQuestionUpdateForm pull-right',
                                         'title' => 'Редактировать вопрос',
                                     ]); ?>
@@ -471,7 +471,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
 
                     <? $form = ActiveForm::begin([
                         'id' => 'addNewQuestion',
-                        'action' => Url::to(['/confirm-mvp/add-question', 'id' => $model->id]),
+                        'action' => Url::to(['/questions/create', 'stage' => $model->stage, 'id' => $model->id]),
                         'options' => ['class' => 'g-py-15'],
                         'errorCssClass' => 'u-has-error-v1',
                         'successCssClass' => 'u-has-success-v1-1',

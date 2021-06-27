@@ -6,29 +6,50 @@ namespace app\models\forms;
 use app\models\ConfirmMvp;
 use app\models\CreatorNewRespondsOnConfirmFirstStep;
 use app\models\CreatorRespondsFromAgentsOnConfirmFirstStep;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Mvp;
-use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\Mvps;
 use yii\base\ErrorException;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateConfirmMvp extends FormCreateConfirm
 {
 
+
     /**
      * FormCreateConfirmMvp constructor.
+     * @param Mvps $hypothesis
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(Mvps $hypothesis, $config = [])
     {
         $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
         $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($hypothesis);
+        $cacheName = 'formCreateConfirmCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
 
         parent::__construct($config);
+    }
+
+
+    /**
+     * @param Mvps $hypothesis
+     * @return string
+     */
+    public static function getCachePath(Mvps $hypothesis)
+    {
+        $gcp = $hypothesis->gcp;
+        $problem = $hypothesis->problem;
+        $segment = $hypothesis->segment;
+        $project = $hypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
+            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$hypothesis->id.'/confirm/formCreateConfirm/';
+
+        return $cachePath;
     }
 
 
@@ -94,13 +115,6 @@ class FormCreateConfirmMvp extends FormCreateConfirm
      */
     public function create()
     {
-        $mvp = Mvp::findOne($this->hypothesisId);
-        $gcp = Gcp::findOne($mvp->gcpId);
-        $problem = GenerationProblem::findOne($mvp->problemId);
-        $segment = Segment::findOne($mvp->segmentId);
-        $project = Projects::findOne($mvp->projectId);
-        $user = User::findOne($project->userId);
-
         $model = new ConfirmMvp();
         $model->setMvpId($this->hypothesis_id);
         $model->setCountRespond(array_sum([$this->count_respond, $this->add_count_respond]));
@@ -112,9 +126,7 @@ class FormCreateConfirmMvp extends FormCreateConfirm
             // Добавление новых респондентов для программы подтверждения MVP
             if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
             //Удаление кэша формы создания подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/formCreateConfirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }

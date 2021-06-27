@@ -106,7 +106,7 @@ use yii\helpers\Html;
                         <!--Наименования сегментов-->
                         <div class="column_segment_name">
                             <?= Html::a('<span>Сегмент ' . ($number_segment+1) . ': </span>' . $segment->name,
-                                ['/segment/index', 'id' => $segment->project_id], ['class' => 'link_in_column_result_table']); ?>
+                                ['/segments/index', 'id' => $segment->project_id], ['class' => 'link_in_column_result_table']); ?>
                         </div>
 
                         <!--Статусы сегментов-->
@@ -114,7 +114,7 @@ use yii\helpers\Html;
 
                             <div class="text-center regular_column">
                                 <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/interview/view', 'id' => $segment->interview->id], ['title'=> 'Посмотреть подтверждение сегмента']);
+                                    ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title'=> 'Посмотреть подтверждение сегмента']);
                                 ?>
                             </div>
 
@@ -122,7 +122,7 @@ use yii\helpers\Html;
 
                             <div class="text-center regular_column">
                                 <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/interview/view', 'id' => $segment->interview->id], ['title'=> 'Посмотреть подтверждение сегмента']);
+                                    ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title'=> 'Посмотреть подтверждение сегмента']);
                                 ?>
                             </div>
 
@@ -130,7 +130,7 @@ use yii\helpers\Html;
 
                             <div class="text-center regular_column">
                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                    ['/interview/create', 'id' => $segment->id], ['title'=> 'Подтвердить сегмент']);
+                                    ['/confirm-segment/create', 'id' => $segment->id], ['title'=> 'Подтвердить сегмент']);
                                 ?>
                             </div>
 
@@ -158,7 +158,7 @@ use yii\helpers\Html;
 
                                         <div class="text-center first_regular_column_of_stage">
                                             <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                ['/generation-problem/index', 'id' => $segment->interview->id], ['title'=> 'Создать ГПС']);
+                                                ['/problems/index', 'id' => $segment->confirm->id], ['title'=> 'Создать ГПС']);
                                             ?>
                                         </div>
 
@@ -195,7 +195,7 @@ use yii\helpers\Html;
                                     <!--Наименования проблем-->
                                     <?php $problem_title = 'ГПС ' . ($number_segment+1) . '.' . explode(' ',$problem->title)[1]; ?>
                                     <div class="text-center first_regular_column_of_stage">
-                                        <?= Html::a($problem_title, ['/generation-problem/index', 'id' => $problem->interview_id],
+                                        <?= Html::a($problem_title, ['/problems/index', 'id' => $problem->confirmSegmentId],
                                             ['class' => 'link_in_column_result_table', 'title' => $problem->description]); ?>
                                     </div>
 
@@ -244,7 +244,7 @@ use yii\helpers\Html;
 
                                                     <div class="text-center first_regular_column_of_stage">
                                                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                            ['/gcp/index', 'id' => $problem->confirm->id], ['title'=> 'Создать ГЦП']);
+                                                            ['/gcps/index', 'id' => $problem->confirm->id], ['title'=> 'Создать ГЦП']);
                                                         ?>
                                                     </div>
 
@@ -275,7 +275,7 @@ use yii\helpers\Html;
                                                 <!--Наименования ценностных предложений-->
                                                 <?php $gcp_title = 'ГЦП ' . ($number_segment+1) . '.' . explode(' ',$problem->title)[1] . '.' . explode(' ',$gcp->title)[1]; ?>
                                                 <div class="text-center first_regular_column_of_stage">
-                                                    <?= Html::a($gcp_title, ['/gcp/index', 'id' => $gcp->confirm_problem_id],
+                                                    <?= Html::a($gcp_title, ['/gcps/index', 'id' => $gcp->confirmProblemId],
                                                         ['class' => 'link_in_column_result_table', 'title' => $gcp->description]); ?>
                                                 </div>
 
@@ -324,7 +324,7 @@ use yii\helpers\Html;
 
                                                                 <div class="text-center first_regular_column_of_stage">
                                                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                        ['/mvp/index', 'id' => $gcp->confirm->id], ['title'=> 'Создать MVP']);
+                                                                        ['/mvps/index', 'id' => $gcp->confirm->id], ['title'=> 'Создать MVP']);
                                                                     ?>
                                                                 </div>
 
@@ -353,7 +353,7 @@ use yii\helpers\Html;
                                                                 . '.' . explode(' ',$gcp->title)[1] . '.' . explode(' ',$mvp->title)[1];
                                                             ?>
                                                             <div class="text-center first_regular_column_of_stage">
-                                                                <?= Html::a($mvp_title, ['/mvp/index', 'id' => $mvp->confirm_gcp_id],
+                                                                <?= Html::a($mvp_title, ['/mvps/index', 'id' => $mvp->confirmGcpId],
                                                                     ['class' => 'link_in_column_result_table', 'title' => $mvp->description]); ?>
                                                             </div>
 

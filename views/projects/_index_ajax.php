@@ -58,7 +58,7 @@ use app\models\User;
 
             <div class="row" style="display:flex; align-items: center; justify-content: space-between; padding-right: 15px;">
 
-                <?= Html::a('Далее', Url::to(['/segment/index', 'id' => $model->id]), [
+                <?= Html::a('Далее', Url::to(['/segments/index', 'id' => $model->id]), [
                     'class' => 'btn btn-default',
                     'style' => [
                         'display' => 'flex',

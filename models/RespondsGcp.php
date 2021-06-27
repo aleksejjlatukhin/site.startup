@@ -27,9 +27,9 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
      * Получить интевью респондента
      * @return mixed|ActiveQuery
      */
-    public function getDescInterview()
+    public function getInterview()
     {
-        return $this->hasOne(DescInterviewGcp::class, ['responds_gcp_id' => 'id']);
+        return $this->hasOne(InterviewConfirmGcp::class, ['respond_id' => 'id']);
     }
 
 
@@ -39,7 +39,7 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
      */
     public function getConfirm()
     {
-        return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_gcp_id']);
+        return $this->hasOne(ConfirmGcp::class, ['id' => 'confirm_id']);
     }
 
 
@@ -60,7 +60,7 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
      */
     public function setConfirmId($confirmId)
     {
-        return $this->confirm_gcp_id = $confirmId;
+        return $this->confirm_id = $confirmId;
     }
 
 
@@ -70,7 +70,7 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
      */
     public function getConfirmId()
     {
-        return $this->confirm_gcp_id;
+        return $this->confirm_id;
     }
 
 
@@ -123,8 +123,8 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
     public function rules()
     {
         return [
-            [['confirm_gcp_id', 'name',], 'required'],
-            [['confirm_gcp_id'], 'integer'],
+            [['confirm_id', 'name',], 'required'],
+            [['confirm_id'], 'integer'],
             [['date_plan'], 'integer'],
             [['name', 'info_respond', 'email', 'place_interview'], 'trim'],
             [['name'], 'string', 'max' => 100],
@@ -165,9 +165,6 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->confirm->gcp->project->touch('updated_at');
             $this->confirm->gcp->project->user->touch('updated_at');
-        });
-
-        $this->on(self::EVENT_BEFORE_DELETE, function (){
             $this->deleteDataRespond();
         });
 
@@ -177,24 +174,24 @@ class RespondsGcp extends ActiveRecord implements RespondsInterface
 
     /**
      * Удаление связанных данных
-     * по событию EVENT_BEFORE_DELETE
+     * по событию EVENT_AFTER_DELETE
      * @throws Throwable
      * @throws ErrorException
      * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
-        $descInterview = DescInterviewGcp::find()->where(['responds_gcp_id' => $this->id])->one();
+        $interview = InterviewConfirmGcp::find()->where(['respond_id' => $this->id])->one();
         $answers = AnswersQuestionsConfirmGcp::find()->where(['respond_id' => $this->id])->all();
         $confirm = ConfirmGcp::findOne($this->confirmId);
-        $gcp = Gcp::findOne($confirm->gcpId);
-        $problem = GenerationProblem::findOne($gcp->problemId);
-        $segment = Segment::findOne($gcp->segmentId);
+        $gcp = Gcps::findOne($confirm->gcpId);
+        $problem = Problems::findOne($gcp->problemId);
+        $segment = Segments::findOne($gcp->segmentId);
         $project = Projects::findOne($gcp->projectId);
         $user = User::findOne($project->userId);
 
         //Удаление интервью респондента
-        if ($descInterview) $descInterview->delete();
+        if ($interview) $interview->delete();
         //Удаление ответов респондента на вопросы интервью
         foreach ($answers as $answer) $answer->delete();
         //Удаление дирректории респондента

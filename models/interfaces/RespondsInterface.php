@@ -18,7 +18,7 @@ interface RespondsInterface
      * Получить интевью респондента
      * @return mixed|ActiveQuery
      */
-    public function getDescInterview();
+    public function getInterview();
 
 
     /**

@@ -18,39 +18,39 @@ class CreatorNewRespondsOnConfirmFirstStep extends Model implements CreateRespon
      */
     public function create(ConfirmationInterface $confirm, FormCreateConfirm $form)
     {
-        switch (get_class($confirm)) {
-            case 'app\models\Interview':
-                for ($i = 1; $i <= $form->count_respond; $i++ ) {
-                    $newRespond[$i] = new Respond();
-                    $newRespond[$i]->setConfirmId($confirm->id);
-                    $newRespond[$i]->setName('Респондент ' . $i);
-                    $newRespond[$i]->save();
-                }
-                break;
-            case 'app\models\ConfirmProblem':
-                for ($i = ++$form->count_respond; $i < array_sum([$form->count_respond, $form->add_count_respond]); $i++ ) {
-                    $newRespond[$i] = new RespondsConfirm();
-                    $newRespond[$i]->setConfirmId($confirm->id);
-                    $newRespond[$i]->setName('Респондент ' . $i);
-                    $newRespond[$i]->save();
-                }
-                break;
-            case 'app\models\ConfirmGcp':
-                for ($i = ++$form->count_respond; $i < array_sum([$form->count_respond, $form->add_count_respond]); $i++ ) {
-                    $newRespond[$i] = new RespondsGcp();
-                    $newRespond[$i]->setConfirmId($confirm->id);
-                    $newRespond[$i]->setName('Респондент ' . $i);
-                    $newRespond[$i]->save();
-                }
-                break;
-            case 'app\models\ConfirmMvp':
-                for ($i = ++$form->count_respond; $i < array_sum([$form->count_respond, $form->add_count_respond]); $i++ ) {
-                    $newRespond[$i] = new RespondsMvp();
-                    $newRespond[$i]->setConfirmId($confirm->id);
-                    $newRespond[$i]->setName('Респондент ' . $i);
-                    $newRespond[$i]->save();
-                }
-                break;
+        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+            for ($i = 1; $i <= $form->count_respond; $i++) {
+                $newRespond[$i] = self::getCreateModel($confirm);
+                $newRespond[$i]->setConfirmId($confirm->id);
+                $newRespond[$i]->setName('Респондент ' . $i);
+                $newRespond[$i]->save();
+            }
+        } else {
+            for ($i = ++$form->count_respond; $i < array_sum([$form->count_respond, $form->add_count_respond]); $i++ ) {
+                $newRespond[$i] = self::getCreateModel($confirm);
+                $newRespond[$i]->setConfirmId($confirm->id);
+                $newRespond[$i]->setName('Респондент ' . $i);
+                $newRespond[$i]->save();
+            }
         }
+    }
+
+
+    /**
+     * @param ConfirmationInterface $confirm
+     * @return RespondsProblem|RespondsGcp|RespondsMvp|RespondsSegment|bool
+     */
+    private static function getCreateModel(ConfirmationInterface $confirm)
+    {
+        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+            return new RespondsSegment();
+        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+            return new RespondsProblem();
+        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+            return new RespondsGcp();
+        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+            return new RespondsMvp();
+        }
+        return false;
     }
 }

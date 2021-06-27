@@ -4,12 +4,9 @@
 namespace app\models\forms;
 
 use app\models\CreatorNewRespondsOnConfirmFirstStep;
-use app\models\Interview;
-use app\models\Projects;
-use app\models\Segment;
-use app\models\User;
+use app\models\ConfirmSegment;
+use app\models\Segments;
 use yii\base\ErrorException;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 class FormCreateConfirmSegment extends FormCreateConfirm
@@ -22,13 +19,35 @@ class FormCreateConfirmSegment extends FormCreateConfirm
 
     /**
      * FormCreateConfirmSegment constructor.
+     * @param Segments $hypothesis
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(Segments $hypothesis, $config = [])
     {
         $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
+        $this->_cacheManager = new CacheForm();
+        $this->cachePath = self::getCachePath($hypothesis);
+        $cacheName = 'formCreateConfirmCache';
+        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+            $className = explode('\\', self::class)[3];
+            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+        }
 
         parent::__construct($config);
+    }
+
+
+    /**
+     * Получить путь к кэшу формы
+     * @param Segments $hypothesis
+     * @return string
+     */
+    public static function getCachePath(Segments $hypothesis)
+    {
+        $project = $hypothesis->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$hypothesis->id.'/confirm/formCreateConfirm/';
+        return $cachePath;
     }
 
 
@@ -93,17 +112,13 @@ class FormCreateConfirmSegment extends FormCreateConfirm
 
 
     /**
-     * @return Interview
+     * @return ConfirmSegment
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
     public function create ()
     {
-        $segment = Segment::findOne($this->hypothesisId);
-        $project = Projects::findOne($segment->projectId);
-        $user = User::findOne($project->userId);
-
-        $model = new Interview();
+        $model = new ConfirmSegment();
         $model->setSegmentId($this->hypothesisId);
         $model->setCountRespond($this->count_respond);
         $model->setCountPositive($this->count_positive);
@@ -116,9 +131,8 @@ class FormCreateConfirmSegment extends FormCreateConfirm
         if ($model->save()) {
             //Создание респондентов по заданному значению count_respond
             $this->_creatorNewResponds->create($model, $this);
-            //Удаление кэша формы создания подтверждения
-            $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm/formCreateConfirm';
-            if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+            // Удаление кэша формы создания
+            $this->_cacheManager->deleteCache($this->cachePath);
 
             return $model;
         }

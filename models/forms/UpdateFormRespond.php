@@ -15,6 +15,7 @@ abstract class UpdateFormRespond extends Model
     public $place_interview;
     public $email;
     public $date_plan;
+    public $confirm_id;
 
 
     /**

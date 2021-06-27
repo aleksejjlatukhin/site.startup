@@ -51,17 +51,17 @@ use app\models\User;
 
         <div class="row">
             <div class="col-md-12">Приветствие в начале встречи</div>
-            <div class="col-md-12"><?= $mvp->segment->interview->greeting_interview; ?></div>
+            <div class="col-md-12"><?= $mvp->segment->confirm->greeting_interview; ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Информация о вас для респондентов</div>
-            <div class="col-md-12"><?= $mvp->segment->interview->view_interview; ?></div>
+            <div class="col-md-12"><?= $mvp->segment->confirm->view_interview; ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-            <div class="col-md-12"><?= $mvp->segment->interview->reason_interview; ?></div>
+            <div class="col-md-12"><?= $mvp->segment->confirm->reason_interview; ?></div>
         </div>
 
         <div class="row">
@@ -148,17 +148,17 @@ use app\models\User;
 
             <div class="row">
                 <div class="col-md-12">Приветствие в начале встречи</div>
-                <div class="col-md-12"><?= $mvp->segment->interview->greeting_interview; ?></div>
+                <div class="col-md-12"><?= $mvp->segment->confirm->greeting_interview; ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Информация о вас для респондентов</div>
-                <div class="col-md-12"><?= $mvp->segment->interview->view_interview; ?></div>
+                <div class="col-md-12"><?= $mvp->segment->confirm->view_interview; ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                <div class="col-md-12"><?= $mvp->segment->interview->reason_interview; ?></div>
+                <div class="col-md-12"><?= $mvp->segment->confirm->reason_interview; ?></div>
             </div>
 
             <div class="row">

@@ -4,7 +4,7 @@
 namespace app\models\forms;
 
 use app\models\EditorCountResponds;
-use app\models\Interview;
+use app\models\ConfirmSegment;
 use Throwable;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -24,7 +24,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
      */
     public function __construct($confirmId, $config = [])
     {
-        $confirm = Interview::findOne($confirmId);
+        $confirm = ConfirmSegment::findOne($confirmId);
         $this->_editorCountRespond = new EditorCountResponds();
 
         $this->setParams([
@@ -85,7 +85,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
 
 
     /**
-     * @return Interview|bool|null
+     * @return ConfirmSegment|bool|null
      * @throws NotFoundHttpException
      * @throws StaleObjectException
      * @throws Throwable
@@ -94,7 +94,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     {
         if ($this->validate()) {
 
-            $confirm = Interview::findOne($this->id);
+            $confirm = ConfirmSegment::findOne($this->id);
             $confirm->setCountRespond($this->count_respond);
             $confirm->setCountPositive($this->count_positive);
             $confirm->setParams([

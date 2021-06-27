@@ -58,7 +58,7 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 //Отслеживаем изменения в форме создания MVP и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
-    var url = '/mvp/save-cache-creation-form?id=' + id_page;
+    var url = '/mvps/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -123,7 +123,7 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
             if (response.count === '1') {
                 $('.hypothesis_create_modal').modal('hide');
-                location.href = '/mvp/index?id=' + id;
+                location.href = '/mvps/index?id=' + id;
             } else {
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);

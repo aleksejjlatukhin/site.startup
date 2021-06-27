@@ -34,7 +34,7 @@ class AnswersQuestionsConfirmProblem extends ActiveRecord
      */
     public function getRespond ()
     {
-        return $this->hasOne(RespondsConfirm::class, ['id' => 'respond_id']);
+        return $this->hasOne(RespondsProblem::class, ['id' => 'respond_id']);
     }
 
 

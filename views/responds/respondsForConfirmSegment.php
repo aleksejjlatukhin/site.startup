@@ -17,13 +17,13 @@ use app\models\User;
                 <div style="padding-right: 10px; padding-bottom: 3px;">
 
                     <?php
-                    if ($respond->descInterview->status == 1) {
+                    if ($respond->interview->status == 1) {
                         echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
                     }
-                    elseif ($respond->descInterview->status === null) {
+                    elseif ($respond->interview->status === null) {
                         echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);
                     }
-                    elseif ($respond->descInterview->status == 0) {
+                    elseif ($respond->interview->status == 0) {
                         echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
                     }
                     else {
@@ -79,13 +79,13 @@ use app\models\User;
             <div class="col-md-1">
 
                 <?php
-                if (!empty($respond->descInterview)){
+                if (!empty($respond->interview)){
 
-                    $date_fact = date("d.m.y", $respond->descInterview->updated_at);
+                    $date_fact = date("d.m.y", $respond->interview->updated_at);
                     echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
                 }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan)
-                    && empty($respond->descInterview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
+                    && empty($respond->interview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                     echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
@@ -99,9 +99,9 @@ use app\models\User;
 
             </div>
 
-            <?php if ($respond->descInterview) : ?>
-                <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->descInterview->result; ?>">
-                    <?= $respond->descInterview->result; ?>
+            <?php if ($respond->interview) : ?>
+                <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->interview->result; ?>">
+                    <?= $respond->interview->result; ?>
                 </div>
             <?php else : ?>
                 <div class="col-md-2"></div>
@@ -112,10 +112,10 @@ use app\models\User;
                 <div class="col-md-1" style="text-align: right;">
 
                     <?php
-                    if ($respond->descInterview) {
+                    if ($respond->interview) {
 
                         echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
-                            'id' => 'descInterview_form-' . $respond->descInterview->id,
+                            'id' => 'descInterview_form-' . $respond->interview->id,
                             'class' => 'showDescInterviewUpdateForm',
                             'title' => 'Редактировать результаты интервью',
                         ]);
@@ -136,10 +136,10 @@ use app\models\User;
                 <div class="col-md-1" style="text-align: center;">
 
                     <?php
-                    if ($respond->descInterview) {
+                    if ($respond->interview) {
 
                         echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
-                            'id' => 'descInterview_form-' . $respond->descInterview->id,
+                            'id' => 'descInterview_form-' . $respond->interview->id,
                             'class' => 'showDescInterviewUpdateForm',
                             'title' => 'Результаты опроса',
                         ]);
@@ -199,7 +199,7 @@ use app\models\User;
 
                 <?php if ($confirm->buttonMovingNextStage === true) : ?>
 
-                    <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
+                    <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
                     'style' => [
                         'display' => 'flex',
                         'align-items' => 'center',
@@ -218,7 +218,7 @@ use app\models\User;
 
                     <?php if (($confirm->count_respond - $confirm->countDescInterviewsOfModel) == '0') : ?>
 
-                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
+                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -236,7 +236,7 @@ use app\models\User;
 
                     <?php else : ?>
 
-                        <?= Html::a( 'Далее', ['/interview/moving-next-stage', 'id' => $confirm->id],[
+                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -260,7 +260,7 @@ use app\models\User;
 
                 <?php if ($confirm->hypothesis->exist_confirm == 1) : ?>
 
-                    <?= Html::a( 'Далее', ['/generation-problem/index', 'id' => $confirm->id],[
+                    <?= Html::a( 'Далее', ['/problems/index', 'id' => $confirm->id],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',

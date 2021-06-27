@@ -5,13 +5,14 @@ namespace app\controllers;
 use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
+use app\models\forms\CacheForm;
 use app\models\forms\FormCreateBusinessModel;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
-use app\models\Mvp;
+use app\models\Gcps;
+use app\models\Problems;
+use app\models\Mvps;
 use app\models\Projects;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\User;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -41,11 +42,11 @@ class BusinessModelController extends AppUserPartController
         if (in_array($action->id, ['index'])){
 
             $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get());
-            $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
+            $mvp = Mvps::findOne($confirmMvp->mvpId);
             $project = $mvp->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -60,7 +61,7 @@ class BusinessModelController extends AppUserPartController
             $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -77,7 +78,7 @@ class BusinessModelController extends AppUserPartController
             $project = $confirmMvp->mvp->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -94,7 +95,7 @@ class BusinessModelController extends AppUserPartController
             $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
+            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
                 || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
 
                 return parent::beforeAction($action);
@@ -116,18 +117,18 @@ class BusinessModelController extends AppUserPartController
      */
     public function actionIndex ($id)
     {
-        $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
+        $model = BusinessModel::findOne(['basic_confirm_id' => $id]);
         if (!$model) return $this->redirect(['/business-model/instruction', 'id' => $id]);
 
         $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $confirmGcp = ConfirmGcp::findOne(['id' => $mvp->confirm_gcp_id]);
-        $gcp = Gcp::findOne(['id' => $confirmGcp->gcp_id]);
-        $confirmProblem = ConfirmProblem::findOne(['id' => $gcp->confirm_problem_id]);
-        $generationProblem = GenerationProblem::findOne(['id' => $confirmProblem->gps_id]);
-        $interview = Interview::findOne(['id' => $generationProblem->interview_id]);
-        $segment = Segment::findOne(['id' => $interview->segment_id]);
-        $project = Projects::findOne(['id' => $segment->project_id]);
+        $mvp = Mvps::findOne($confirmMvp->mvpId);
+        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
+        $gcp = Gcps::findOne($confirmGcp->gcpId);
+        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
+        $problem = Problems::findOne($confirmProblem->problemId);
+        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $segment = Segments::findOne($confirmSegment->segmentId);
+        $project = Projects::findOne($segment->projectId);
 
         return $this->render('index', [
             'model' => $model,
@@ -136,8 +137,8 @@ class BusinessModelController extends AppUserPartController
             'confirmGcp' => $confirmGcp,
             'gcp' => $gcp,
             'confirmProblem' => $confirmProblem,
-            'generationProblem' => $generationProblem,
-            'interview' => $interview,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
         ]);
@@ -150,7 +151,7 @@ class BusinessModelController extends AppUserPartController
      */
     public function actionInstruction ($id)
     {
-        $model = BusinessModel::findOne(['confirm_mvp_id' => $id]);
+        $model = BusinessModel::findOne(['basic_confirm_id' => $id]);
         if ($model) return $this->redirect(['/business-model/index', 'id' => $id]);
 
         return $this->render('index_first', [
@@ -181,21 +182,13 @@ class BusinessModelController extends AppUserPartController
     public function actionSaveCacheCreationForm($id)
     {
         $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::findOne(['id' => $confirmMvp->mvp_id]);
-        $gcp = Gcp::findOne(['id' => $mvp->gcp_id]);
-        $problem = GenerationProblem::find()->where(['id' => $mvp->problem_id])->one();
-        $segment = Segment::findOne(['id' => $mvp->segment_id]);
-        $project = Projects::findOne(['id' => $mvp->project_id]);
-        $user = User::findOne(['id' => $project->user_id]);
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+        $cachePath = FormCreateBusinessModel::getCachePath($confirmMvp->hypothesis);
+        $cacheName = 'formCreateHypothesisCache';
 
         if(Yii::$app->request->isAjax) {
 
-            $data = $_POST; //Массив, который будем записывать в кэш
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-                '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/business-model/formCreate/';
-            $key = 'formCreateBusinessModelCache'; //Формируем ключ
-            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+            $cache = new CacheForm();
+            $cache->setCache($cachePath, $cacheName);
         }
         return false;
     }
@@ -209,12 +202,13 @@ class BusinessModelController extends AppUserPartController
      */
     public function actionCreate($id)
     {
-        $model = new FormCreateBusinessModel();
-        $model->confirm_mvp_id = $id;
         $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvp::find()->where(['id' => $confirmMvp->mvp_id])->one();
-        $gcp = Gcp::findOne($mvp->gcp_id);
-        $segment = Segment::findOne($mvp->segment_id);
+        $model = new FormCreateBusinessModel($confirmMvp->hypothesis);
+        $model->basic_confirm_id = $id;
+
+        $mvp = Mvps::findOne($confirmMvp->mvpId);
+        $gcp = Gcps::findOne($mvp->gcpId);
+        $segment = Segments::findOne($mvp->segmentId);
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -268,7 +262,7 @@ class BusinessModelController extends AppUserPartController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::find()->where(['id' => $model->confirm_mvp_id])->one();
+        $confirmMvp = ConfirmMvp::findOne($model->confirmMvpId);
         $gcp = $model->gcp;
         $segment = $model->segment;
 
@@ -280,7 +274,7 @@ class BusinessModelController extends AppUserPartController
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'model' => BusinessModel::findOne(['confirm_mvp_id' => $confirmMvp->id]),
+                            'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->id]),
                             'segment' => $segment,
                             'gcp' => $gcp,
                         ]),

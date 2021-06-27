@@ -6,29 +6,29 @@ namespace app\controllers;
 use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
 use app\models\forms\CacheForm;
-use app\models\forms\CreateRespondConfirmForm;
-use app\models\forms\CreateRespondForm;
 use app\models\forms\CreateRespondGcpForm;
 use app\models\forms\CreateRespondMvpForm;
+use app\models\forms\CreateRespondProblemForm;
+use app\models\forms\CreateRespondSegmentForm;
 use app\models\forms\FormUpdateConfirmGcp;
 use app\models\forms\FormUpdateConfirmMvp;
 use app\models\forms\FormUpdateConfirmProblem;
 use app\models\forms\FormUpdateConfirmSegment;
-use app\models\forms\UpdateRespondConfirmForm;
-use app\models\forms\UpdateRespondForm;
+use app\models\forms\UpdateRespondProblemForm;
 use app\models\forms\UpdateRespondGcpForm;
 use app\models\forms\UpdateRespondMvpForm;
-use app\models\Gcp;
-use app\models\GenerationProblem;
-use app\models\Interview;
-use app\models\Mvp;
+use app\models\forms\UpdateRespondSegmentForm;
+use app\models\Gcps;
+use app\models\Mvps;
+use app\models\Problems;
 use app\models\Projects;
-use app\models\Respond;
-use app\models\RespondsConfirm;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
-use app\models\Segment;
+use app\models\RespondsProblem;
+use app\models\RespondsSegment;
+use app\models\Segments;
 use app\models\StageConfirm;
 use app\models\User;
 use Throwable;
@@ -36,6 +36,7 @@ use yii\base\ErrorException;
 use yii\data\Pagination;
 use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
+use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -48,7 +49,7 @@ class RespondsController extends AppUserPartController
      * @param $action
      * @return bool
      * @throws HttpException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     public function beforeAction($action)
     {
@@ -113,51 +114,52 @@ class RespondsController extends AppUserPartController
 
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
 
-            $count_models = Respond::find()->where(['interview_id' => $id])->count();
+            $count_models = RespondsSegment::find()->where(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = Respond::find()->where(['interview_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsSegment::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-            $count_exist_data_descInterview = Respond::find()->with('descInterview')
-                ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds`.`id`')
-                ->where(['interview_id' => $id])->andWhere(['not', ['desc_interview.id' => null]])->count();
+            $count_exist_data_descInterview = RespondsSegment::find()->with('interview')
+                ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
+                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
         } elseif ($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
 
-            $count_models = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->count();
+            $count_models = RespondsProblem::find()->where(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsConfirm::find()->where(['confirm_problem_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsProblem::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-            $count_exist_data_descInterview = RespondsConfirm::find()->with('descInterview')
-                ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-                ->where(['confirm_problem_id' => $id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
+            $count_exist_data_descInterview = RespondsProblem::find()->with('interview')
+                ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         } elseif ($stage == StageConfirm::STAGE_CONFIRM_GCP) {
 
-            $count_models = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->count();
+            $count_models = RespondsGcp::find()->where(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsGcp::find()->where(['confirm_gcp_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsGcp::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-            $count_exist_data_descInterview = RespondsGcp::find()->with('descInterview')
-                ->leftJoin('desc_interview_gcp', '`desc_interview_gcp`.`responds_gcp_id` = `responds_gcp`.`id`')
-                ->where(['confirm_gcp_id' => $id])->andWhere(['not', ['desc_interview_gcp.id' => null]])->count();
+            $count_exist_data_descInterview = RespondsGcp::find()->with('interview')
+                ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         } elseif ($stage == StageConfirm::STAGE_CONFIRM_MVP) {
 
-            $count_models = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->count();
+            $count_models = RespondsMvp::find()->where(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsMvp::find()->where(['confirm_mvp_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsMvp::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
-            $count_exist_data_descInterview = RespondsMvp::find()->with('descInterview')
-                ->leftJoin('desc_interview_mvp', '`desc_interview_mvp`.`responds_mvp_id` = `responds_mvp`.`id`')
-                ->where(['confirm_mvp_id' => $id])->andWhere(['not', ['desc_interview_mvp.id' => null]])->count();
+            $count_exist_data_descInterview = RespondsMvp::find()->with('interview')
+                ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
         }
 
 
         if(Yii::$app->request->isAjax) {
+
             if (($count_exist_data_respond == $count_models) || ($count_exist_data_descInterview > 0)) {
 
                 $response =  ['success' => true];
@@ -252,43 +254,43 @@ class RespondsController extends AppUserPartController
                             $response = array();
 
                             if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-                                $segment = Segment::findOne($confirm->segmentId);
+                                $segment = Segments::findOne($confirm->segmentId);
                                 $project = Projects::findOne($segment->projectId);
                                 $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
                                     'page' => $page,
-                                    'interview_id' => $id,
-                                    'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', ['model' => Interview::findOne($id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id), 'project' => $project]),
+                                    'confirm_id' => $id,
+                                    'ajax_data_confirm' => $this->renderAjax('/confirm-segment/ajax_data_confirm', ['model' => ConfirmSegment::findOne($id), 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id), 'project' => $project]),
                                 ];
 
                             } elseif ($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-                                $problem = GenerationProblem::findOne($confirm->problemId);
+                                $problem = Problems::findOne($confirm->problemId);
                                 $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
                                     'page' => $page,
-                                    'confirm_problem_id' => $id,
+                                    'confirm_id' => $id,
                                     'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', ['model' => ConfirmProblem::findOne($id), 'problem' => $problem, 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id)]),
                                 ];
 
                             } elseif ($stage == StageConfirm::STAGE_CONFIRM_GCP) {
-                                $gcp = Gcp::findOne($confirm->gcpId);
+                                $gcp = Gcps::findOne($confirm->gcpId);
                                 $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
                                     'page' => $page,
-                                    'confirm_gcp_id' => $id,
+                                    'confirm_id' => $id,
                                     'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', ['model' => ConfirmGcp::findOne($id), 'gcp' => $gcp, 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id)]),
                                 ];
 
                             } elseif ($stage == StageConfirm::STAGE_CONFIRM_MVP) {
-                                $mvp = Mvp::findOne($confirm->mvpId);
+                                $mvp = Mvps::findOne($confirm->mvpId);
                                 $response =  [
                                     'newRespond' => $newRespond,
                                     'responds' => $responds,
                                     'page' => $page,
-                                    'confirm_mvp_id' => $id,
+                                    'confirm_id' => $id,
                                     'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', ['model' => ConfirmMvp::findOne($id), 'mvp' => $mvp, 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($id)]),
                                 ];
                             }
@@ -376,7 +378,7 @@ class RespondsController extends AppUserPartController
     /**
      * @param $stage
      * @param $id
-     * @return Respond|RespondsConfirm|RespondsGcp|RespondsMvp|bool|null
+     * @return RespondsProblem|RespondsGcp|RespondsMvp|RespondsSegment|bool|null
      * @throws NotFoundHttpException
      */
     public function actionGetDataModel($stage, $id)
@@ -482,15 +484,15 @@ class RespondsController extends AppUserPartController
 
                     if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
                         $response = [
-                            'success' => true, 'interview_id' => $model->confirmId,
-                            'ajax_data_confirm' => $this->renderAjax('/interview/ajax_data_confirm', [
-                                'model' => Interview::findOne($model->confirmId), 'project' => $project,
+                            'success' => true, 'confirm_id' => $model->confirmId,
+                            'ajax_data_confirm' => $this->renderAjax('/confirm-segment/ajax_data_confirm', [
+                                'model' => ConfirmSegment::findOne($model->confirmId), 'project' => $project,
                                 'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->confirmId)]),
                         ];
 
                     } elseif ($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
                         $response = [
-                            'success' => true, 'confirm_problem_id' => $model->confirmId,
+                            'success' => true, 'confirm_id' => $model->confirmId,
                             'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', [
                                 'model' => ConfirmProblem::findOne($model->confirmId), 'problem' => $hypothesis,
                                 'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->confirmId)]),
@@ -498,7 +500,7 @@ class RespondsController extends AppUserPartController
 
                     } elseif ($stage == StageConfirm::STAGE_CONFIRM_GCP) {
                         $response = [
-                            'success' => true, 'confirm_gcp_id' => $model->confirmId,
+                            'success' => true, 'confirm_id' => $model->confirmId,
                             'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', [
                                 'model' => ConfirmGcp::findOne($model->confirmId), 'gcp' => $hypothesis,
                                 'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->confirmId)]),
@@ -506,7 +508,7 @@ class RespondsController extends AppUserPartController
 
                     } elseif ($stage == StageConfirm::STAGE_CONFIRM_MVP) {
                         $response = [
-                            'success' => true, 'confirm_mvp_id' => $model->confirmId,
+                            'success' => true, 'confirm_id' => $model->confirmId,
                             'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', [
                                 'model' => ConfirmMvp::findOne($model->confirmId), 'mvp' => $hypothesis,
                                 'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->confirmId)]),
@@ -529,16 +531,16 @@ class RespondsController extends AppUserPartController
      * @param $id
      * @return bool|ActiveQuery
      */
-    public static function getQueryModels($stage, $id)
+    private static function getQueryModels($stage, $id)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return Respond::find()->where(['interview_id' => $id]);
+            return RespondsSegment::find()->where(['confirm_id' => $id]);
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return RespondsConfirm::find()->where(['confirm_problem_id' => $id]);
+            return RespondsProblem::find()->where(['confirm_id' => $id]);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
-            return RespondsGcp::find()->where(['confirm_gcp_id' => $id]);
+            return RespondsGcp::find()->where(['confirm_id' => $id]);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
-            return RespondsMvp::find()->where(['confirm_mvp_id' => $id]);
+            return RespondsMvp::find()->where(['confirm_id' => $id]);
         }
         return false;
     }
@@ -547,15 +549,15 @@ class RespondsController extends AppUserPartController
     /**
      * @param $stage
      * @param $id
-     * @return Respond|RespondsConfirm|RespondsGcp|RespondsMvp|null
+     * @return RespondsProblem|RespondsGcp|RespondsMvp|RespondsSegment|null
      * @throws NotFoundHttpException
      */
     private static function findModel($stage, $id)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return Respond::findOne($id);
+            return RespondsSegment::findOne($id);
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return RespondsConfirm::findOne($id);
+            return RespondsProblem::findOne($id);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
             return RespondsGcp::findOne($id);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
@@ -572,9 +574,9 @@ class RespondsController extends AppUserPartController
     private static function getClassModel($stage)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return Respond::class;
+            return RespondsSegment::class;
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return RespondsConfirm::class;
+            return RespondsProblem::class;
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
             return RespondsGcp::class;
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
@@ -587,12 +589,12 @@ class RespondsController extends AppUserPartController
     /**
      * @param $stage
      * @param $id
-     * @return ConfirmGcp|ConfirmMvp|ConfirmProblem|Interview|bool|null
+     * @return ConfirmGcp|ConfirmMvp|ConfirmProblem|ConfirmSegment|bool|null
      */
     private static function getConfirm($stage, $id)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return Interview::findOne($id);
+            return ConfirmSegment::findOne($id);
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return ConfirmProblem::findOne($id);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
@@ -607,14 +609,14 @@ class RespondsController extends AppUserPartController
     /**
      * @param $stage
      * @param $confirm
-     * @return CreateRespondConfirmForm|CreateRespondForm|CreateRespondGcpForm|CreateRespondMvpForm|bool
+     * @return CreateRespondSegmentForm|CreateRespondProblemForm|CreateRespondGcpForm|CreateRespondMvpForm|bool
      */
     private static function getCreateModel($stage, $confirm)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return new CreateRespondForm($confirm);
+            return new CreateRespondSegmentForm($confirm);
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return new CreateRespondConfirmForm($confirm);
+            return new CreateRespondProblemForm($confirm);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
             return new CreateRespondGcpForm($confirm);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
@@ -631,9 +633,9 @@ class RespondsController extends AppUserPartController
     private static function getClassCreateModel($stage)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return CreateRespondForm::class;
+            return CreateRespondSegmentForm::class;
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return CreateRespondConfirmForm::class;
+            return CreateRespondProblemForm::class;
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
             return CreateRespondGcpForm::class;
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
@@ -646,14 +648,14 @@ class RespondsController extends AppUserPartController
     /**
      * @param $stage
      * @param $id
-     * @return UpdateRespondConfirmForm|UpdateRespondForm|UpdateRespondGcpForm|UpdateRespondMvpForm|bool
+     * @return UpdateRespondProblemForm|UpdateRespondGcpForm|UpdateRespondMvpForm|UpdateRespondSegmentForm|bool
      */
     private static function getUpdateModel($stage, $id)
     {
         if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return new UpdateRespondForm($id);
+            return new UpdateRespondSegmentForm($id);
         } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return new UpdateRespondConfirmForm($id);
+            return new UpdateRespondProblemForm($id);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
             return new UpdateRespondGcpForm($id);
         }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {

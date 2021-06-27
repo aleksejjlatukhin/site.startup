@@ -11,8 +11,6 @@ use yii\web\NotFoundHttpException;
 class UpdateRespondMvpForm extends UpdateFormRespond
 {
 
-    public $confirm_mvp_id;
-
 
     /**
      * UpdateRespondMvpForm constructor.
@@ -36,7 +34,7 @@ class UpdateRespondMvpForm extends UpdateFormRespond
      */
     public function getConfirm()
     {
-        return ConfirmMvp::findOne($this->confirm_mvp_id);
+        return ConfirmMvp::findOne($this->confirm_id);
     }
 
 
@@ -60,7 +58,7 @@ class UpdateRespondMvpForm extends UpdateFormRespond
      */
     public function uniqueName($attr)
     {
-        $models = RespondsMvp::findAll(['confirm_mvp_id' => $this->confirm_mvp_id]);
+        $models = RespondsMvp::findAll(['confirm_id' => $this->confirm_id]);
 
         foreach ($models as $item){
 

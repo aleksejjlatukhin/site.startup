@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Segment;
+use app\models\Segments;
 
 $this->title = 'Бизнес-модель';
 
@@ -22,7 +22,7 @@ $this->title = 'Бизнес-модель';
 
                 <div class="export_business_model_mini_header">Тип взаимодейстивия с рынком:</div>
                 <?php
-                if ($model->segment->type_of_interaction_between_subjects == Segment::TYPE_B2C) {
+                if ($model->segment->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
                     echo 'В2С (бизнес-клиент)';
                 } else {
                     echo 'B2B (бизнес-бизнес)';

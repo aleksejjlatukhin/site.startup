@@ -3,10 +3,8 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
-use Throwable;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\StaleObjectException;
 
 class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 {
@@ -50,7 +48,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function getProblem()
     {
-        return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
+        return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
 
 
@@ -60,12 +58,12 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function getResponds()
     {
-        return $this->hasMany(RespondsConfirm::class, ['confirm_problem_id' => 'id']);
+        return $this->hasMany(RespondsProblem::class, ['confirm_id' => 'id']);
     }
 
     public function getGcps()
     {
-        return $this->hasMany(Gcp::class, ['confirm_problem_id' => 'id']);
+        return $this->hasMany(Gcps::class, ['basic_confirm_id' => 'id']);
     }
 
 
@@ -75,7 +73,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function getQuestions()
     {
-        return $this->hasMany(QuestionsConfirmProblem::class, ['confirm_problem_id' => 'id']);
+        return $this->hasMany(QuestionsConfirmProblem::class, ['confirm_id' => 'id']);
     }
 
 
@@ -96,7 +94,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function setProblemId($id)
     {
-        return $this->gps_id = $id;
+        return $this->problem_id = $id;
     }
 
 
@@ -127,7 +125,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function getProblemId()
     {
-        return $this->gps_id;
+        return $this->problem_id;
     }
 
 
@@ -137,7 +135,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
      */
     public function getHypothesis()
     {
-        return $this->hasOne(GenerationProblem::class, ['id' => 'gps_id']);
+        return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
 
 
@@ -147,8 +145,8 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function rules()
     {
         return [
-            [['gps_id', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
-            [['gps_id'], 'integer'],
+            [['problem_id', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
+            [['problem_id'], 'integer'],
             ['need_consumer', 'trim'],
             ['need_consumer', 'string', 'max' => 255],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
@@ -187,71 +185,13 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Добавляем вопрос в общую базу,
-     * если у данного пользователя его там ещё нет
-     * @param $title
-     */
-    public function addQuestionToGeneralList($title)
-    {
-        $user = $this->problem->project->user;
-        $baseQuestions = AllQuestionsConfirmProblem::find()->where(['user_id' => $user->id])->select('title')->all();
-        $existQuestions = 0;
-
-        foreach ($baseQuestions as $baseQuestion){
-            if ($baseQuestion->title == $title){
-                $existQuestions++;
-            }
-        }
-
-        if ($existQuestions == 0){
-            $general_question = new AllQuestionsConfirmProblem();
-            $general_question->title = $title;
-            $general_question->user_id = $user->id;
-            $general_question->save();
-        }
-    }
-
-
-    /**
-     * Создание пустого ответа для нового вопроса для каждого респондента
-     * @param $question_id
-     */
-    public function addAnswerConfirmProblem ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = new AnswersQuestionsConfirmProblem();
-            $answer->question_id = $question_id;
-            $answer->respond_id = $respond->id;
-            $answer->save();
-
-        }
-    }
-
-
-    /**
-     * Удаление ответов по данному вопросу
-     * у всех респондентов данного подтверждения
-     * @param $question_id
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
-    public function deleteAnswerConfirmProblem ($question_id)
-    {
-        foreach ($this->responds as $respond) {
-            $answer = AnswersQuestionsConfirmProblem::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
-            $answer->delete();
-        }
-    }
-
-
-    /**
      * Список вопросов, который будет показан для добавления нового вопроса
      * @return array
      */
     public function queryQuestionsGeneralList()
     {
         $user = $this->problem->project->user;
-        $questions = []; //Добавляем в массив вопросы уже привязанные к данной программе
+        $questions = array(); //Добавляем в массив вопросы уже привязанные к данной программе
         foreach ($this->questions as $question) $questions[] = $question['title'];
 
         // Вопросы, предлагаемые по-умолчанию на данном этапе
@@ -292,15 +232,15 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getButtonMovingNextStage()
     {
 
-        $count_descInterview = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
+        $count_interview = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $this->id, 'desc_interview_confirm.status' => '1'])->count();
+        $count_positive = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_problem.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_descInterview && $this->count_positive <= $count_positive) || (!empty($this->gcps))) {
+        if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->gcps))) {
             return true;
         }else {
             return false;
@@ -314,7 +254,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsConfirm::find()->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsProblem::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -327,9 +267,9 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
-        $count = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $this->id])->andWhere(['not', ['desc_interview_confirm.id' => null]])->count();
+        $count = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         return $count;
     }
@@ -341,11 +281,28 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getCountConfirmMembers()
     {
         //Кол-во респондентов, кот-е подтвердили проблему
-        $count = RespondsConfirm::find()->with('descInterview')
-            ->leftJoin('desc_interview_confirm', '`desc_interview_confirm`.`responds_confirm_id` = `responds_confirm`.`id`')
-            ->where(['confirm_problem_id' => $this->id, 'desc_interview_confirm.status' => '1'])->count();
+        $count = RespondsProblem::find()->with('interview')
+            ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+            ->where(['confirm_id' => $this->id, 'interview_confirm_problem.status' => '1'])->count();
 
         return $count;
+    }
+
+
+    /**
+     * Путь к папке всего
+     * кэша данного подтверждения
+     * @return string
+     */
+    public function getCachePath()
+    {
+        $problem = $this->problem;
+        $segment = $problem->segment;
+        $project = $problem->project;
+        $user = $project->user;
+        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
+            '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
+        return $cachePath;
     }
 
 }

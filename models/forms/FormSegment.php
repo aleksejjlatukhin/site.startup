@@ -3,7 +3,7 @@
 
 namespace app\models\forms;
 
-use app\models\Segment;
+use app\models\Segments;
 use yii\base\Model;
 
 abstract class FormSegment extends Model
@@ -69,8 +69,8 @@ abstract class FormSegment extends Model
             [['market_volume_b2c', 'market_volume_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
             [['project_id', 'gender_consumer', 'education_of_consumer'], 'integer'],
             ['type_of_interaction_between_subjects', 'in', 'range' => [
-                Segment::TYPE_B2C,
-                Segment::TYPE_B2B,
+                Segments::TYPE_B2C,
+                Segments::TYPE_B2B,
             ]],
         ];
     }

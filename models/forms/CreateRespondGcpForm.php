@@ -5,12 +5,12 @@ namespace app\models\forms;
 
 use app\models\ConfirmGcp;
 use app\models\CreatorAnswersForNewRespond;
-use app\models\Gcp;
-use app\models\GenerationProblem;
+use app\models\Gcps;
+use app\models\Problems;
 use app\models\interfaces\ConfirmationInterface;
 use app\models\Projects;
 use app\models\RespondsGcp;
-use app\models\Segment;
+use app\models\Segments;
 use app\models\User;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
@@ -84,9 +84,9 @@ class CreateRespondGcpForm extends FormCreateRespondent
      */
     public static function getCachePath(ConfirmationInterface $confirm)
     {
-        $gcp = Gcp::findOne($confirm->gcpId);
-        $problem = GenerationProblem::findOne(['id' => $gcp->problemId]);
-        $segment = Segment::findOne($gcp->segmentId);
+        $gcp = Gcps::findOne($confirm->gcpId);
+        $problem = Problems::findOne($gcp->problemId);
+        $segment = Segments::findOne($gcp->segmentId);
         $project = Projects::findOne($gcp->projectId);
         $user = User::findOne($project->userId);
         $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
@@ -123,7 +123,7 @@ class CreateRespondGcpForm extends FormCreateRespondent
      */
     public function uniqueName($attr)
     {
-        $models = RespondsGcp::findAll(['confirm_gcp_id' => $this->confirmId]);
+        $models = RespondsGcp::findAll(['confirm_id' => $this->confirmId]);
 
         foreach ($models as $item){
 
