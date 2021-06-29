@@ -172,6 +172,30 @@ class QuestionsController extends AppUserPartController
     /**
      * @param $stage
      * @param $id
+     * @return bool
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionChangeStatus($stage, $id)
+    {
+        $model = self::getModel($stage, $id);
+        $model->changeStatus();
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->update()){
+                $response = true;
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $stage
+     * @param $id
      * @return array|bool
      * @throws StaleObjectException
      * @throws Throwable

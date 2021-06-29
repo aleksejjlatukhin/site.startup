@@ -112,7 +112,6 @@ $(document).on('click', 'body .openAllInformationProject', function(e) {
     var container = $(modal).find('.modal-body');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -138,7 +137,6 @@ $(document).on('click', 'body .openAllInformationSegment', function(e) {
     var container = $(modal).find('.modal-body');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -165,7 +163,6 @@ $(document).on('click', 'body .openRoadmapProject', function(e) {
     var header = $(modal).find('.modal-header').find('h2');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -193,7 +190,6 @@ $(document).on('click', 'body .openRoadmapSegment', function(e) {
     var header = $(modal).find('.modal-header').find('.roadmap_segment_modal_header_title_h2');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -249,7 +245,6 @@ $(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
     var model_id = url.split('id=')[1];
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -278,7 +273,6 @@ $(document).on('click', 'body .openResultTableProject', function(e) {
     var container = $(modal).find('.modal-body');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -305,7 +299,6 @@ $(document).on('click', 'body .openReportProject', function(e) {
     var header = $(modal).find('.modal-header').find('h2');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
@@ -315,6 +308,32 @@ $(document).on('click', 'body .openReportProject', function(e) {
             $(container).html(response.renderAjax);
             $(header).html('Протокол проекта «' + response.project.project_name + '»');
         }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+/*
+Отслеживаем клик по звездочке в списке вопросов
+*/
+$(document).on('click', 'a.star-link', function (e) {
+
+    var url = $(this).attr('href');
+    var star = $(this).find('.star');
+
+    if ($(star).hasClass('active')) {
+        $(star).removeClass('active');
+    } else {
+        $(star).addClass('active');
+    }
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        error: function(){alert('Ошибка')},
     });
 
     e.preventDefault();

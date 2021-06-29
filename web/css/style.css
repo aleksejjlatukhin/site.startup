@@ -1336,6 +1336,66 @@ input[type="checkbox"]:checked + label:before {
 ---Конец---
 */
 
+/*
+Стили для звездочек,
+обозначающие важность вопроса
+---Начало---
+*/
+.star {
+    display: inline-block;
+    vertical-align: top;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(to bottom, rgba(197, 196, 196, 1) 0%, rgba(180, 179, 178, 1) 100%);
+    position: relative;
+}
+.star-link {
+    position: relative;
+    margin-right: 20px;
+    float: right;
+}
+.star-passive {
+    float: right;
+}
+
+@media screen and (max-width: 470px) {
+    .star-link {
+        position: center;
+        margin: 0;
+    }
+}
+
+.star:before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    bottom: 3px;
+    right: 3px;
+    background: linear-gradient(to bottom, rgba(221, 220, 219, 1) 0%, rgba(209, 208, 206, 1) 100%);
+    z-index: 1;
+}
+
+.star,
+.star:before {
+    -webkit-clip-path: polygon(50% 0%, 66% 27%, 98% 35%, 76% 57%, 79% 91%, 50% 78%, 21% 91%, 24% 57%, 2% 35%, 32% 27%);
+    clip-path: polygon(50% 0%, 66% 27%, 98% 35%, 76% 57%, 79% 91%, 50% 78%, 21% 91%, 24% 57%, 2% 35%, 32% 27%);
+}
+
+.star-link > .star:hover, .star.active {
+    background: linear-gradient(to bottom, rgba(224, 194, 75, 1) 0%, rgba(207, 125, 0, 1) 100%);
+}
+
+.star-link > .star:hover:before, .star.active:before {
+    background: linear-gradient(to bottom, rgba(243, 212, 85, 1) 0%, rgba(238, 164, 0, 1) 100%);
+}
+
+/*
+Стили для звездочек,
+обозначающие важность вопроса
+---Конец---
+*/
+
 /*Стили для страницы About
 ---Начало---
 */

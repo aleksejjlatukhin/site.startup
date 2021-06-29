@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use app\models\StageConfirm;
+use app\models\QuestionStatus;
+
 ?>
 
 <div class="row" style="margin-bottom: 15px; margin-top: 15px; color: #4F4F4F;">
@@ -18,7 +20,13 @@ use app\models\StageConfirm;
     <?php foreach ($respond->answers as $index => $answer) : ?>
 
         <div class="col-md-12" style="padding: 0 20px; margin-top: 10px;">
-            <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+
+            <?php if ($answer->question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+                <div style="font-weight: 700; color: #52be7f;"><?= $answer->question->title; ?></div>
+            <?php elseif($answer->question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+                <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+
+            <?php endif; ?>
             <div><?= $answer->answer; ?></div>
         </div>
 

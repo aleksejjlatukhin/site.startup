@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use kartik\select2\Select2;
 use app\models\StageConfirm;
 use yii\helpers\Url;
+use app\models\QuestionStatus;
 
 ?>
 
@@ -20,13 +21,27 @@ use yii\helpers\Url;
 <?php if ($respond->answers) : ?>
     <?php foreach ($respond->answers as $index => $answer) : ?>
 
-        <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
-        ->textarea([
-            'row' => 2,
-            'maxlength' => true,
-            'required' => true,
-            'class' => 'style_form_field_respond form-control',
-        ]); ?>
+        <?php if ($answer->question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+
+            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px; color: #52be7f;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+            ->textarea([
+                'row' => 2,
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+            ]); ?>
+
+        <?php elseif($answer->question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+
+            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+                ->textarea([
+                    'row' => 2,
+                    'maxlength' => true,
+                    'required' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]); ?>
+
+        <?php endif; ?>
 
         <?= $form->field($answer, "[$index]question_id")->label(false)->hiddenInput(); ?>
 

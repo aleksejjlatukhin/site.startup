@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use yii\helpers\Url;
+use app\models\QuestionStatus;
 
 ?>
 
@@ -23,13 +24,27 @@ use yii\helpers\Url;
     <?php if ($respond->answers) : ?>
         <?php foreach ($respond->answers as $index => $answer) : ?>
 
-            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
-            ->textarea([
-                'row' => 2,
-                'maxlength' => true,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            <?php if ($answer->question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+
+                <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px; color: #52be7f;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+                    ->textarea([
+                        'row' => 2,
+                        'maxlength' => true,
+                        'required' => true,
+                        'class' => 'style_form_field_respond form-control',
+                    ]); ?>
+
+            <?php elseif($answer->question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+
+                <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+                ->textarea([
+                    'row' => 2,
+                    'maxlength' => true,
+                    'required' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]); ?>
+
+            <?php endif; ?>
 
         <?php endforeach; ?>
     <?php endif; ?>
@@ -284,8 +299,15 @@ use yii\helpers\Url;
         <?php foreach ($respond->answers as $index => $answer) : ?>
 
             <div class="col-md-12" style="padding: 0 20px; margin-top: 10px;">
-                <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+
+                <?php if ($answer->question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+                    <div style="font-weight: 700; color: #52be7f;"><?= $answer->question->title; ?></div>
+                <?php elseif($answer->question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+                    <div style="font-weight: 700;"><?= $answer->question->title; ?></div>
+                <?php endif; ?>
+
                 <div><?= $answer->answer; ?></div>
+
             </div>
 
         <?php endforeach; ?>

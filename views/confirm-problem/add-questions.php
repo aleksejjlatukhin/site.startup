@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use kartik\select2\Select2;
 use app\models\User;
+use app\models\QuestionStatus;
 
 $this->title = 'Подтверждение гипотезы проблемы сегмента';
 $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
@@ -470,11 +471,34 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
                                         'id' => 'delete_question-'.$question->id,
                                     ]); ?>
 
-                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px', 'margin-top' => '3px', ]]), [
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-top' => '3px', ]]), [
                                         Url::to(['/questions/get-form-update', 'stage' => $model->stage, 'id' => $question->id])], [
                                         'class' => 'showQuestionUpdateForm pull-right',
+                                        'style' => ['margin-right' => '20px'],
                                         'title' => 'Редактировать вопрос',
                                     ]); ?>
+
+                                    <?php if ($question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+                                        <?= Html::a('<div class="star"></div>', Url::to(['/questions/change-status', 'stage' => $model->stage, 'id' => $question->id]), [
+                                            'class' => 'star-link', 'title' => 'Значимость вопроса'
+                                        ]); ?>
+                                    <?php elseif ($question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+                                        <?= Html::a('<div class="star active"></div>', Url::to(['/questions/change-status', 'stage' => $model->stage, 'id' => $question->id]), [
+                                            'class' => 'star-link', 'title' => 'Значимость вопроса'
+                                        ]); ?>
+                                    <?php endif; ?>
+
+                                <?php else : ?>
+
+                                    <?php if ($question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+                                        <div class="star-passive" title="Значимость вопроса">
+                                            <div class="star"></div>
+                                        </div>
+                                    <?php elseif ($question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+                                        <div class="star-passive" title="Значимость вопроса">
+                                            <div class="star active"></div>
+                                        </div>
+                                    <?php endif; ?>
 
                                 <?php endif; ?>
 

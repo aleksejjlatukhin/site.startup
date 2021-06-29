@@ -69,6 +69,28 @@ class QuestionsConfirmSegment extends ActiveRecord
 
 
     /**
+     * Изменение статуса вопроса
+     */
+    public function changeStatus()
+    {
+        if ($this->status === QuestionStatus::STATUS_NOT_STAR){
+            $this->status = QuestionStatus::STATUS_ONE_STAR;
+        } else {
+            $this->status = QuestionStatus::STATUS_NOT_STAR;
+        }
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -76,6 +98,11 @@ class QuestionsConfirmSegment extends ActiveRecord
         return [
             [['confirm_id', 'title'], 'required'],
             [['confirm_id', 'created_at', 'updated_at'], 'integer'],
+            ['status', 'default', 'value' => QuestionStatus::STATUS_NOT_STAR],
+            ['status', 'in', 'range' => [
+                QuestionStatus::STATUS_NOT_STAR,
+                QuestionStatus::STATUS_ONE_STAR
+            ]],
             [['title'], 'string', 'max' => 255],
             [['title'], 'trim'],
         ];
