@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use app\models\User;
+use yii\widgets\ActiveForm;
 
 $this->title = 'Генерация гипотез проблем сегмента';
 $this->registerCssFile('@web/css/problem-index-style.css');
@@ -138,11 +139,12 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
             </div>
 
-            <div class="col-md-3" style="padding-left: 10px;">Описание гипотезы проблемы сегмента</div>
-
-            <div class="col-md-2">Действие для проверки</div>
-
-            <div class="col-md-2">Метрика результата</div>
+            <div class="col-md-7" style="padding-left: 10px;">
+                <div class="row headers_data_hypothesis">
+                    <div class="col-md-8">Описание гипотезы проблемы сегмента</div>
+                    <div class="col-md-4 text-center">Показатель положительного прохождения теста</div>
+                </div>
+            </div>
 
             <div class="col-md-1 text-center"><div>Дата создания</div></div>
 
@@ -199,22 +201,15 @@ $this->registerCssFile('@web/css/problem-index-style.css');
                         </div>
                     </div>
 
-                    <div class="col-md-3 text_field_problem" title="<?= $model->description; ?>">
-
-                        <?= $model->description; ?>
-
-                    </div>
-
-                    <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
-
-                        <?= $model->action_to_check; ?>
-
-                    </div>
-
-                    <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
-
-                        <?= $model->result_metric; ?>
-
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-md-8 text_field_problem" title="<?= $model->description; ?>">
+                                <?= $model->description; ?>
+                            </div>
+                            <div class="col-md-4 text_field_problem text-center">
+                                К = <?= $model->indicator_positive_passage; ?> %
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-md-1 text-center">
@@ -365,6 +360,67 @@ $this->registerCssFile('@web/css/problem-index-style.css');
         </div>
 
     <?php endif; ?>
+
+
+    <div class="formExpectedResults" style="display: none;">
+
+        <?php
+        $form = ActiveForm::begin([
+            'id' => 'formExpectedResults'
+        ]); ?>
+
+        <div class="formExpectedResults_inputs">
+
+            <div class="row container-fluid rowExpectedResults rowExpectedResults-" style="margin-bottom: 15px;">
+
+                <div class="col-md-6 field-EXR">
+
+                    <?= $form->field($formModel, "_expectedResultsInterview[0][question]", ['template' => '{input}'])->textarea([
+                        'rows' => 2,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => 'Напишите вопрос',
+                        'id' => '_expectedResults_question-',
+                        'class' => 'style_form_field_respond form-control',
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-6 field-EXR">
+
+                    <?= $form->field($formModel, "_expectedResultsInterview[0][answer]", ['template' => '{input}'])->textarea([
+                        'rows' => 2,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => 'Напишите ответ',
+                        'id' => '_expectedResults_answer-',
+                        'class' => 'style_form_field_respond form-control',
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <?= Html::button('Удалить вопрос/ответ', [
+                        'id' => 'remove-expectedResults-',
+                        'class' => "remove-expectedResults btn btn-default",
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'width' => '170px',
+                            'height' => '40px',
+                            'font-size' => '16px',
+                            'border-radius' => '8px',
+                        ]
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+        <?php
+        ActiveForm::end();
+        ?>
+    </div>
 
 
     <!--Модальные окна-->

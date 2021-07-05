@@ -94,7 +94,14 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
             if (response.cache) {
 
                 // Данные из кэша к полям модели Authors
-                var formAuthors = response.cache.Authors;
+                var form = response.cache.Authors;
+                // Перезаписать ключи массива,
+                // т.к. некоторые элементы могут быть удалены
+                // и идти не порядку и в этом случае не будут показаны
+                var formAuthors = [];
+                $.each(form, function(index, val) {
+                    formAuthors.push( val );
+                });
 
                 // Добавляем формы для авторов, если их больше одного
                 var countOfAdditionalForms = formAuthors.length - 1;

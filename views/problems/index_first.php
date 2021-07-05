@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use app\models\User;
+use yii\widgets\ActiveForm;
 
 $this->title = 'Генерация гипотез проблем сегмента';
 $this->registerCssFile('@web/css/problem-index-style.css');
@@ -100,6 +101,66 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         </div>
 
+    </div>
+
+    <div class="formExpectedResults" style="display: none;">
+
+        <?php
+        $form = ActiveForm::begin([
+            'id' => 'formExpectedResults'
+        ]); ?>
+
+        <div class="formExpectedResults_inputs">
+
+            <div class="row container-fluid rowExpectedResults rowExpectedResults-" style="margin-bottom: 15px;">
+
+                <div class="col-md-6 field-EXR">
+
+                    <?= $form->field($formModel, "_expectedResultsInterview[0][question]", ['template' => '{input}'])->textarea([
+                        'rows' => 2,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => 'Напишите вопрос',
+                        'id' => '_expectedResults_question-',
+                        'class' => 'style_form_field_respond form-control',
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-6 field-EXR">
+
+                    <?= $form->field($formModel, "_expectedResultsInterview[0][answer]", ['template' => '{input}'])->textarea([
+                        'rows' => 2,
+                        'maxlength' => true,
+                        'required' => true,
+                        'placeholder' => 'Напишите ответ',
+                        'id' => '_expectedResults_answer-',
+                        'class' => 'style_form_field_respond form-control',
+                    ]); ?>
+
+                </div>
+
+                <div class="col-md-12">
+
+                    <?= Html::button('Удалить вопрос/ответ', [
+                        'id' => 'remove-expectedResults-',
+                        'class' => "remove-expectedResults btn btn-default",
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'width' => '170px',
+                            'height' => '40px',
+                            'font-size' => '16px',
+                            'border-radius' => '8px',
+                        ]
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+        <?php
+        ActiveForm::end();
+        ?>
     </div>
 
     <!--Модальные окна-->

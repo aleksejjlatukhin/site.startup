@@ -159,6 +159,62 @@ class Problems extends ActiveRecord
 
 
     /**
+     * Вопросы для проверки и ответы на них
+     * создаются на этапе генерации проблем сегмента
+     * @return ActiveQuery
+     */
+    public function getExpectedResults()
+    {
+        return $this->hasMany(ExpectedResultsInterviewConfirmProblem::class, ['problem_id' => 'id']);
+    }
+
+
+    /**
+     * Список вопросов для проверки и ответов на них
+     * @return string
+     */
+    public function getListExpectedResultsInterview()
+    {
+        $str = ''; $n = 1;
+        foreach ($this->expectedResults as $expectedResult) {
+            $str .= '<b>' . $n . '.</b> ' . $expectedResult->question . ' (' . $expectedResult->answer . ') </br>';
+            $n++;
+        }
+        return $str;
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function getValuesForSelectIndicatorPositivePassage()
+    {
+        return [
+            '5' => 'Показатель положительного прохождения теста - 5%',
+            '10' => 'Показатель положительного прохождения теста - 10%',
+            '15' => 'Показатель положительного прохождения теста - 15%',
+            '20' => 'Показатель положительного прохождения теста - 20%',
+            '25' => 'Показатель положительного прохождения теста - 25%',
+            '30' => 'Показатель положительного прохождения теста - 30%',
+            '35' => 'Показатель положительного прохождения теста - 35%',
+            '40' => 'Показатель положительного прохождения теста - 40%',
+            '45' => 'Показатель положительного прохождения теста - 45%',
+            '50' => 'Показатель положительного прохождения теста - 50%',
+            '55' => 'Показатель положительного прохождения теста - 55%',
+            '60' => 'Показатель положительного прохождения теста - 60%',
+            '65' => 'Показатель положительного прохождения теста - 65%',
+            '70' => 'Показатель положительного прохождения теста - 70%',
+            '75' => 'Показатель положительного прохождения теста - 75%',
+            '80' => 'Показатель положительного прохождения теста - 80%',
+            '85' => 'Показатель положительного прохождения теста - 85%',
+            '90' => 'Показатель положительного прохождения теста - 90%',
+            '95' => 'Показатель положительного прохождения теста - 95%',
+            '100' => 'Показатель положительного прохождения теста - 100%',
+        ];
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -166,9 +222,9 @@ class Problems extends ActiveRecord
         return [
             [['basic_confirm_id', 'title'], 'required'],
             [['title'], 'string', 'max' => 255],
-            [['description', 'action_to_check', 'result_metric'], 'string', 'max' => 2000],
-            [['title', 'description', 'action_to_check', 'result_metric'], 'trim'],
-            [['time_confirm', 'basic_confirm_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
+            [['description'], 'string', 'max' => 2000],
+            [['title', 'description'], 'trim'],
+            [['indicator_positive_passage', 'time_confirm', 'basic_confirm_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
         ];
     }
 
@@ -180,8 +236,7 @@ class Problems extends ActiveRecord
         return [
             'title' => 'Название ГПС',
             'description' => 'Описание гипотезы проблемы сегмента',
-            'action_to_check' => 'Действие для проверки',
-            'result_metric' => 'Метрика результата',
+            'indicator_positive_passage' => 'Показатель положительного прохождения теста',
             'date_confirm' => 'Дата подтверждения'
         ];
     }
@@ -219,6 +274,7 @@ class Problems extends ActiveRecord
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->project->touch('updated_at');
             $this->project->user->touch('updated_at');
+            ExpectedResultsInterviewConfirmProblem::deleteAll(['problem_id' => $this->id]);
         });
 
         parent::init();

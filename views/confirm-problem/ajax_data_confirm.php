@@ -71,13 +71,13 @@ use yii\helpers\Url;
         </div>
 
         <div class="row">
-            <div class="col-md-12">Действие для проверки</div>
-            <div class="col-md-12"><?= $problem->action_to_check;?></div>
+            <div class="col-md-12">Показатель положительного прохождения теста</div>
+            <div class="col-md-12">К = <?= $model->problem->indicator_positive_passage; ?> %</div>
         </div>
 
         <div class="row">
-            <div class="col-md-12">Метрика результата</div>
-            <div class="col-md-12"><?= $problem->result_metric;?></div>
+            <div class="col-md-12">Вопросы для проверки гипотезы проблемы и ответы на них:</div>
+            <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview(); ?></div>
         </div>
 
         <div class="row">
@@ -179,17 +179,17 @@ use yii\helpers\Url;
 
             <div class="row">
                 <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-                <div class="col-md-12"><?= $problem->description;?></div>
+                <div class="col-md-12"><?= $problem->description; ?></div>
             </div>
 
             <div class="row">
-                <div class="col-md-12">Действие для проверки</div>
-                <div class="col-md-12"><?= $problem->action_to_check;?></div>
+                <div class="col-md-12">Показатель положительного прохождения теста</div>
+                <div class="col-md-12">К = <?= $model->problem->indicator_positive_passage; ?> %</div>
             </div>
 
             <div class="row">
-                <div class="col-md-12">Метрика результата</div>
-                <div class="col-md-12"><?= $problem->result_metric;?></div>
+                <div class="col-md-12">Вопросы для проверки гипотезы проблемы и ответы на них:</div>
+                <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview(); ?></div>
             </div>
 
         </div>

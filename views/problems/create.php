@@ -3,7 +3,26 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use kartik\select2\Select2;
+use app\models\Problems;
+
 ?>
+
+
+<style>
+    .select2-container--krajee .select2-selection {
+        font-size: 16px;
+        height: 40px;
+        padding-left: 15px;
+        padding-top: 8px;
+        padding-bottom: 15px;
+        border-radius: 12px;
+    }
+    .select2-container--krajee .select2-selection--single .select2-selection__arrow {
+        height: 39px;
+    }
+</style>
+
 
 <div class="form-create-problem">
 
@@ -97,32 +116,74 @@ use yii\helpers\Url;
 
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-xs-12">
 
-                    <? $placeholder = 'Что нужно сделать, чтобы проверить гипотезу? Какие следует задать вопросы, чтобы проверить гипотезу. Например: каким инструментом пользуются сейчас и какие инструменты пробовали, по каким критериям подбирали инструмент, как проходит процесс учета финансов, какую информацию анализируют.' ?>
-
-                    <?= $form->field($model, 'action_to_check', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
-                        'rows' => 3,
-                        'maxlength' => true,
-                        'required' => true,
-                        'placeholder' => $placeholder,
-                        'class' => 'style_form_field_respond form-control',
-                    ]) ?>
+                    <?= $form->field($model, 'indicator_positive_passage', [
+                        'template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>',
+                    ])->widget(Select2::class, [
+                        'data' => Problems::getValuesForSelectIndicatorPositivePassage(),
+                        'options' => ['id' => 'indicator_positive_passage'],
+                        'disabled' => false,  //Сделать поле неактивным
+                        'hideSearch' => true, //Скрытие поиска
+                    ]);
+                    ?>
 
                 </div>
 
+                <h4 class="col-md-12 text-center bolder" style="margin-bottom: 20px;">Вопросы для проверки гипотезы проблемы и ответы на них:</h4>
+
+                <div class="container-expectedResults">
+                    <div class="row container-fluid item-expectedResults item-expectedResults-form-create">
+                        <div class="rowExpectedResults row-expectedResults-form-create-0">
+
+                            <div class="col-md-6 field-EXR">
+
+                                <?= $form->field($model, "_expectedResultsInterview[0][question]", ['template' => '{input}'])->textarea([
+                                    'rows' => 2,
+                                    'maxlength' => true,
+                                    'required' => true,
+                                    'placeholder' => 'Напишите вопрос',
+                                    'id' => '_expectedResults_question-0',
+                                    'class' => 'style_form_field_respond form-control',
+                                ]); ?>
+
+                            </div>
+
+                            <div class="col-md-6 field-EXR">
+
+                                <?= $form->field($model, "_expectedResultsInterview[0][answer]", ['template' => '{input}'])->textarea([
+                                    'rows' => 2,
+                                    'maxlength' => true,
+                                    'required' => true,
+                                    'placeholder' => 'Напишите ответ',
+                                    'id' => '_expectedResults_answer-0',
+                                    'class' => 'style_form_field_respond form-control',
+                                ]); ?>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-12">
-
-                    <? $placeholder = 'Какой результат покажет, что гипотеза верна? Например: Больше 80% опрошенных ответят, что гибкость настройки для них является ключевым фактором выбора инструмента.' ?>
-
-                    <?= $form->field($model, 'result_metric', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
-                        'rows' => 3,
-                        'maxlength' => true,
-                        'required' => true,
-                        'placeholder' => $placeholder,
-                        'class' => 'style_form_field_respond form-control',
-                    ]) ?>
-
+                    <?= Html::button('Добавить вопрос/ответ', [
+                        'id' => 'add_expectedResults_create_form',
+                        'class' => "btn btn-default add_expectedResults_create_form",
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'color' => '#FFFFFF',
+                            'justify-content' => 'center',
+                            'background' => '#707F99',
+                            'width' => '170px',
+                            'height' => '40px',
+                            'text-align' => 'left',
+                            'font-size' => '16px',
+                            'border-radius' => '8px',
+                            'margin-right' => '5px',
+                        ]
+                    ]);?>
                 </div>
 
             </div>

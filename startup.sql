@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июн 27 2021 г., 15:38
+-- Время создания: Июл 06 2021 г., 00:57
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -43,7 +43,10 @@ INSERT INTO `all_questions_confirm_gcp` (`id`, `title`, `user_id`, `created_at`)
 (2, 'Чем вы занимаетесь в настоящее время?!', 1, 1620597848),
 (3, 'Что понравилось в решении и что нет?', 1, 1620597857),
 (4, 'Новый вопрос для подтверждения ГЦП', 1, 1620597914),
-(5, 'Чем вы занимаетесь сейчас?', 1, 1624559584);
+(5, 'Чем вы занимаетесь сейчас?', 1, 1624559584),
+(6, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 1, 1624999684),
+(7, 'Какая цена решения должна быть по вашему мнению?', 1, 1624999704),
+(8, 'Во сколько обходится решение этой проблемы?', 1, 1624999755);
 
 -- --------------------------------------------------------
 
@@ -69,7 +72,8 @@ INSERT INTO `all_questions_confirm_mvp` (`id`, `title`, `user_id`, `created_at`)
 (4, 'Чем вы занимаетесь в настоящее время?!!!', 1, 1623786958),
 (5, 'Чем вы занимаетесь в настоящее время, т.е. сейчас ?', 1, 1624734147),
 (6, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 1, 1624743996),
-(7, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать??', 1, 1624744009);
+(7, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать??', 1, 1624744009),
+(8, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 1, 1624999810);
 
 -- --------------------------------------------------------
 
@@ -95,7 +99,10 @@ INSERT INTO `all_questions_confirm_problem` (`id`, `title`, `user_id`, `created_
 (4, 'Случалось ли вам столкнуться с …?', 1, 1620596848),
 (5, 'Как на вашу жизнь влияет ..?', 1, 1624392862),
 (6, 'Как на вашу жизнь влияет ..?!', 1, 1624392914),
-(7, 'Случалось ли вам столкнуться с какой-то проблемой?', 1, 1624395096);
+(7, 'Случалось ли вам столкнуться с какой-то проблемой?', 1, 1624395096),
+(8, 'Когда вы последний раз оказывались в ситуации ..?', 1, 1624999437),
+(9, 'Какие трудности у вас вызывает это решение?', 1, 1624999471),
+(10, 'Как часто с вами происходит ..?', 1, 1625519015);
 
 -- --------------------------------------------------------
 
@@ -123,7 +130,8 @@ INSERT INTO `all_questions_confirm_segment` (`id`, `title`, `user_id`, `created_
 (21, 'Что получается и что не получается в вашем проекте?', 1, 1623267454),
 (22, 'Чем вы занимаетесь в настоящее время?!!', 1, 1624131590),
 (23, 'Чем вы занимаетесь?', 1, 1624132716),
-(24, 'Как вы определяете цели, задачи и последовательность действий?', 1, 1624393444);
+(24, 'Как вы определяете цели, задачи и последовательность действий?', 1, 1624393444),
+(25, 'Что пытались сделать, чтобы определить верные последовательные действия?', 1, 1624914429);
 
 -- --------------------------------------------------------
 
@@ -154,7 +162,11 @@ INSERT INTO `answers_questions_confirm_gcp` (`id`, `question_id`, `respond_id`, 
 (29, 11, 29, 'Ответ'),
 (32, 11, 33, 'Ответ 3'),
 (36, 13, 36, 'Ответ 1'),
-(37, 13, 37, 'Ответ 2');
+(37, 13, 37, 'Ответ 2'),
+(38, 14, 38, 'Ответ 1'),
+(39, 14, 39, 'Ответ 11'),
+(40, 15, 38, 'Ответ 2'),
+(41, 15, 39, 'Ответ 22');
 
 -- --------------------------------------------------------
 
@@ -184,7 +196,11 @@ INSERT INTO `answers_questions_confirm_mvp` (`id`, `question_id`, `respond_id`, 
 (29, 9, 27, 'Ответ'),
 (30, 9, 28, 'Ответ'),
 (35, 11, 29, 'Ответ 1'),
-(36, 11, 30, 'Ответ 2');
+(36, 11, 30, 'Ответ 2'),
+(37, 12, 31, 'Ответ 1'),
+(38, 12, 32, 'Ответ 11'),
+(39, 13, 31, 'Ответ 2'),
+(40, 13, 32, 'Ответ 22');
 
 -- --------------------------------------------------------
 
@@ -220,7 +236,15 @@ INSERT INTO `answers_questions_confirm_problem` (`id`, `question_id`, `respond_i
 (50, 28, 36, ''),
 (56, 28, 42, 'Ответ 2'),
 (71, 36, 48, 'Ответ 1'),
-(72, 36, 49, 'Ответ 2');
+(72, 36, 49, 'Ответ 2'),
+(73, 37, 50, 'Ответ 1'),
+(74, 37, 51, 'Ответ 11'),
+(77, 39, 50, 'Ответ 2'),
+(78, 39, 51, 'Ответ 22'),
+(79, 40, 52, ''),
+(80, 40, 53, ''),
+(81, 40, 54, ''),
+(82, 40, 55, '');
 
 -- --------------------------------------------------------
 
@@ -255,8 +279,12 @@ INSERT INTO `answers_questions_confirm_segment` (`id`, `question_id`, `respond_i
 (82, 23, 61, 'Ответ 1'),
 (201, 44, 60, 'Ответ 2'),
 (202, 44, 61, 'Ответ 2'),
-(217, 52, 62, 'Ответ'),
-(218, 52, 63, '');
+(221, 54, 62, 'Ответ 11'),
+(222, 54, 63, 'Ответ 1'),
+(223, 55, 62, 'Ответ 22'),
+(224, 55, 63, 'Ответ 2'),
+(225, 56, 62, 'Ответ 33'),
+(226, 56, 63, 'Ответ 3');
 
 -- --------------------------------------------------------
 
@@ -331,10 +359,10 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1624797477),
-(2, 28, 1624791462),
-(4, 9, 1620151491),
-(6, 21, 1619459318),
+(1, 1, 1625522266),
+(2, 28, 1625166875),
+(4, 9, 1625166938),
+(6, 21, 1625166797),
 (7, 22, 1619251221),
 (8, 16, 1620151442);
 
@@ -361,7 +389,8 @@ INSERT INTO `confirm_gcp` (`id`, `gcp_id`, `count_respond`, `count_positive`) VA
 (8, 8, 3, 2),
 (9, 9, 2, 2),
 (10, 11, 2, 2),
-(11, 12, 2, 2);
+(11, 12, 2, 2),
+(12, 14, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -385,7 +414,8 @@ INSERT INTO `confirm_mvp` (`id`, `mvp_id`, `count_respond`, `count_positive`) VA
 (2, 2, 3, 3),
 (8, 8, 3, 2),
 (9, 9, 2, 2),
-(10, 12, 2, 2);
+(10, 12, 2, 2),
+(11, 13, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -413,7 +443,9 @@ INSERT INTO `confirm_problem` (`id`, `problem_id`, `count_respond`, `count_posit
 (11, 12, 3, 3, 'Какую потребность потребителя сегмента проверяем'),
 (12, 13, 2, 2, 'Какую потребность потребителя сегмента проверяем'),
 (13, 15, 2, 2, 'Какую потребность потребителя сегмента проверяем'),
-(15, 17, 2, 2, 'Какую потребность потребителя сегмента проверяем');
+(15, 17, 2, 2, 'Какую потребность потребителя сегмента проверяем'),
+(16, 18, 2, 1, 'Какую потребность потребителя сегмента проверяем'),
+(17, 28, 4, 3, 'Какую потребность потребителя сегмента проверяем');
 
 -- --------------------------------------------------------
 
@@ -511,6 +543,38 @@ INSERT INTO `conversation_main_admin` (`id`, `main_admin_id`, `admin_id`, `updat
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `expected_results_interview_confirm_problem`
+--
+
+CREATE TABLE `expected_results_interview_confirm_problem` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `problem_id` int(11) NOT NULL,
+  `question` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `answer` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `expected_results_interview_confirm_problem`
+--
+
+INSERT INTO `expected_results_interview_confirm_problem` (`id`, `problem_id`, `question`, `answer`) VALUES
+(9, 13, 'Вопрос 1', 'Ответ 1'),
+(10, 13, 'Вопрос 2', 'Ответ 2'),
+(11, 13, 'Вопрос 3', 'Ответ 3'),
+(12, 15, 'Вопрос 1', 'Ответ 1'),
+(13, 15, 'Вопрос 2', 'Ответ 2'),
+(14, 25, 'Вопрос 1', 'Ответ 1'),
+(15, 26, 'Вопрос 1', 'Ответ 1'),
+(16, 26, 'Вопрос 2', 'Ответ 2'),
+(19, 28, 'Вопрос 1', 'Ответ 1'),
+(21, 28, 'Вопрос 2', 'Ответ 2'),
+(22, 29, 'Вопрос 1', 'Ответ 1'),
+(23, 29, 'Вопрос 2', 'Ответ 2'),
+(24, 29, 'Вопрос 3', 'Ответ 3');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `gcps`
 --
 
@@ -574,7 +638,9 @@ INSERT INTO `interview_confirm_gcp` (`id`, `respond_id`, `interview_file`, `serv
 (10, 34, NULL, NULL, '1', 1623359171, 1623359171),
 (11, 35, NULL, NULL, '1', 1623359175, 1623359175),
 (12, 36, NULL, NULL, '1', 1624563109, 1624563260),
-(13, 37, NULL, NULL, '1', 1624563296, 1624563296);
+(13, 37, NULL, NULL, '1', 1624563296, 1624563296),
+(14, 38, NULL, NULL, '1', 1625003696, 1625003696),
+(15, 39, NULL, NULL, '1', 1625003709, 1625003709);
 
 -- --------------------------------------------------------
 
@@ -605,7 +671,9 @@ INSERT INTO `interview_confirm_mvp` (`id`, `respond_id`, `interview_file`, `serv
 (6, 27, NULL, NULL, '1', 1623787544, 1623787544),
 (7, 28, NULL, NULL, '1', 1623787567, 1623787606),
 (8, 29, NULL, NULL, '1', 1624745676, 1624745696),
-(11, 30, NULL, NULL, '1', 1624746143, 1624746143);
+(11, 30, NULL, NULL, '1', 1624746143, 1624746143),
+(12, 31, NULL, NULL, '1', 1625003940, 1625003940),
+(13, 32, NULL, NULL, '1', 1625003966, 1625003966);
 
 -- --------------------------------------------------------
 
@@ -638,7 +706,9 @@ INSERT INTO `interview_confirm_problem` (`id`, `respond_id`, `interview_file`, `
 (8, 43, NULL, NULL, '1', 1623274670, 1623274670),
 (9, 44, NULL, NULL, '1', 1623274674, 1623274674),
 (10, 48, '270521_Комментарии к платформе.docx', '-3-aLqDGC9Ksldx.docx', '1', 1624472572, 1624473466),
-(11, 49, NULL, NULL, '1', 1624473473, 1624473473);
+(11, 49, NULL, NULL, '1', 1624473473, 1624473473),
+(12, 50, NULL, NULL, '1', 1625003440, 1625003440),
+(13, 51, NULL, NULL, '1', 1625003454, 1625003454);
 
 -- --------------------------------------------------------
 
@@ -671,7 +741,8 @@ INSERT INTO `interview_confirm_segment` (`id`, `respond_id`, `interview_file`, `
 (7, 20, NULL, NULL, 'Варианты проблем', '1', 1620656540, 1620656540),
 (13, 60, '290421 корректировки спакселя в части вопросов и в сегменте.docx', 'NiSTbatxy73yi3T.docx', 'Варианты проблем...', '1', 1623267532, 1623267574),
 (14, 61, NULL, NULL, 'Варианты проблем', '1', 1623267596, 1623267596),
-(15, 62, '270521_Комментарии к платформе.docx', 'EUEWKfg-kP5TbtF.docx', 'Варианты проблем', '1', 1624470924, 1624470957);
+(15, 62, '270521_Комментарии к платформе.docx', 'EUEWKfg-kP5TbtF.docx', 'Варианты проблем', '1', 1624470924, 1624470957),
+(16, 63, '290421 корректировки спакселя в части вопросов и в сегменте.docx', 'SpjNmH12QaRHGZe.docx', 'Варианты проблем', '1', 1625001091, 1625001144);
 
 -- --------------------------------------------------------
 
@@ -1334,8 +1405,7 @@ CREATE TABLE `problems` (
   `project_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `action_to_check` text NOT NULL,
-  `result_metric` text NOT NULL,
+  `indicator_positive_passage` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
   `time_confirm` int(11) DEFAULT NULL,
@@ -1346,17 +1416,21 @@ CREATE TABLE `problems` (
 -- Дамп данных таблицы `problems`
 --
 
-INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `title`, `description`, `action_to_check`, `result_metric`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`) VALUES
-(1, 1, 16, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 'Действие для проверки 1', 'Метрика результата 1', 1620592901, 1620596943, 1620596943, 1),
-(2, 1, 16, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 'Действие для проверки 2', 'Метрика результата 2', 1620652673, 1620652673, NULL, NULL),
-(3, 2, 17, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 'Действие для проверки 1', 'Метрика результата 1', 1620655158, 1620655158, NULL, NULL),
-(4, 2, 17, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 'Действие для проверки 2', 'Метрика результата 2', 1620656140, 1620656140, NULL, NULL),
-(5, 11, 26, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 'Действие для проверки 1', 'Метрика результата 1', 1620656570, 1620656964, 1620656964, 1),
-(12, 11, 26, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 'Действие для проверки 2', 'Метрика результата 2', 1621705166, 1621705166, NULL, NULL),
-(13, 17, 32, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 'Действие для проверки 1', 'Метрика результата 1', 1623268991, 1623274609, 1623274609, 0),
-(15, 17, 32, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 'Действие для проверки 2', 'Метрика результата 2', 1623274632, 1623274676, 1623274676, 1),
-(17, 17, 32, 1, 'ГПС 3', 'Описание гипотезы проблемы 3', 'Действие для проверки 3', 'Метрика результата 3', 1624388310, 1624473511, 1624473511, 1),
-(18, 17, 32, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 'Действие для проверки 4', 'Метрика результата 4', 1624647703, 1624647703, NULL, NULL);
+INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `title`, `description`, `indicator_positive_passage`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`) VALUES
+(1, 1, 16, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620592901, 1620596943, 1620596943, 1),
+(2, 1, 16, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1620652673, 1620652673, NULL, NULL),
+(3, 2, 17, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620655158, 1620655158, NULL, NULL),
+(4, 2, 17, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1620656140, 1620656140, NULL, NULL),
+(5, 11, 26, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620656570, 1620656964, 1620656964, 1),
+(12, 11, 26, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1621705166, 1621705166, NULL, NULL),
+(13, 17, 32, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1623268991, 1623274609, 1623274609, 0),
+(15, 17, 32, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1623274632, 1623274676, 1623274676, 1),
+(17, 17, 32, 1, 'ГПС 3', 'Описание гипотезы проблемы 3', 0, 1624388310, 1624473511, 1624473511, 1),
+(18, 17, 32, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 0, 1624647703, 1624647703, NULL, NULL),
+(25, 17, 32, 1, 'ГПС 5', 'Описание гипотезы проблемы 5', 10, 1625430570, 1625430570, NULL, NULL),
+(26, 17, 32, 1, 'ГПС 6', 'Описание гипотезы проблемы 6', 25, 1625431156, 1625431368, NULL, NULL),
+(28, 18, 33, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 70, 1625516729, 1625518503, NULL, NULL),
+(29, 18, 33, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 25, 1625520335, 1625520335, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1395,7 +1469,7 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fullname`, `project_name`, `description`, `purpose_project`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`) VALUES
-(1, 1, 1620473372, 1624747789, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые');
+(1, 1, 1620473372, 1625521976, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые');
 
 -- --------------------------------------------------------
 
@@ -1407,6 +1481,7 @@ CREATE TABLE `questions_confirm_gcp` (
   `id` int(11) UNSIGNED NOT NULL,
   `confirm_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1415,13 +1490,15 @@ CREATE TABLE `questions_confirm_gcp` (
 -- Дамп данных таблицы `questions_confirm_gcp`
 --
 
-INSERT INTO `questions_confirm_gcp` (`id`, `confirm_id`, `title`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Чем вы занимаетесь в настоящее время?', 1620597835, 1620597879),
-(3, 1, 'Что понравилось в решении и что нет?', 1620597891, 1620597891),
-(4, 2, 'Чем вы занимаетесь в настоящее время?', 1620659862, 1620659862),
-(9, 8, 'Чем вы занимаетесь в настоящее время?', 1621705666, 1621705666),
-(11, 9, 'Чем вы занимаетесь в настоящее время?', 1623358253, 1623358253),
-(13, 11, 'Что понравилось в решении и что нет?', 1624559607, 1624559607);
+INSERT INTO `questions_confirm_gcp` (`id`, `confirm_id`, `title`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Чем вы занимаетесь в настоящее время?', 0, 1620597835, 1620597879),
+(3, 1, 'Что понравилось в решении и что нет?', 0, 1620597891, 1620597891),
+(4, 2, 'Чем вы занимаетесь в настоящее время?', 0, 1620659862, 1620659862),
+(9, 8, 'Чем вы занимаетесь в настоящее время?', 0, 1621705666, 1621705666),
+(11, 9, 'Чем вы занимаетесь в настоящее время?', 0, 1623358253, 1623358253),
+(13, 11, 'Что понравилось в решении и что нет?', 0, 1624559607, 1624559607),
+(14, 12, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 1, 1624999684, 1624999740),
+(15, 12, 'Какая цена решения должна быть по вашему мнению?', 0, 1624999703, 1624999740);
 
 -- --------------------------------------------------------
 
@@ -1433,6 +1510,7 @@ CREATE TABLE `questions_confirm_mvp` (
   `id` int(11) UNSIGNED NOT NULL,
   `confirm_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1441,12 +1519,14 @@ CREATE TABLE `questions_confirm_mvp` (
 -- Дамп данных таблицы `questions_confirm_mvp`
 --
 
-INSERT INTO `questions_confirm_mvp` (`id`, `confirm_id`, `title`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Чем вы занимаетесь в настоящее время?', 1620598467, 1620598533),
-(2, 2, 'Что понравилось в решении и что нет?', 1620661499, 1620661499),
-(7, 8, 'Чем вы занимаетесь в настоящее время?', 1621705809, 1621705809),
-(9, 9, 'Чем вы занимаетесь в настоящее время?', 1623786986, 1623786986),
-(11, 10, 'Чем вы занимаетесь в настоящее время, т.е. сейчас ?', 1624734169, 1624734169);
+INSERT INTO `questions_confirm_mvp` (`id`, `confirm_id`, `title`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Чем вы занимаетесь в настоящее время?', 0, 1620598467, 1620598533),
+(2, 2, 'Что понравилось в решении и что нет?', 0, 1620661499, 1620661499),
+(7, 8, 'Чем вы занимаетесь в настоящее время?', 0, 1621705809, 1621705809),
+(9, 9, 'Чем вы занимаетесь в настоящее время?', 0, 1623786986, 1623786986),
+(11, 10, 'Чем вы занимаетесь в настоящее время, т.е. сейчас ?', 0, 1624734169, 1624734169),
+(12, 11, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 1, 1624999787, 1624999790),
+(13, 11, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 0, 1624999809, 1624999809);
 
 -- --------------------------------------------------------
 
@@ -1458,6 +1538,7 @@ CREATE TABLE `questions_confirm_problem` (
   `id` int(11) UNSIGNED NOT NULL,
   `confirm_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1466,17 +1547,20 @@ CREATE TABLE `questions_confirm_problem` (
 -- Дамп данных таблицы `questions_confirm_problem`
 --
 
-INSERT INTO `questions_confirm_problem` (`id`, `confirm_id`, `title`, `created_at`, `updated_at`) VALUES
-(13, 1, 'Чем вы занимаетесь в настоящее время?', 1620596768, 1620596818),
-(15, 1, 'Случалось ли вам столкнуться с …?', 1620596847, 1620596847),
-(16, 4, 'Чем вы занимаетесь в настоящее время?', 1620656938, 1620656938),
-(17, 2, 'Чем вы занимаетесь в настоящее время?', 1620767606, 1620767606),
-(18, 2, 'На каком этапе проекта вы находитесь?', 1620767611, 1620767611),
-(19, 3, 'Чем вы занимаетесь в настоящее время?', 1621279046, 1621279046),
-(20, 3, 'На каком этапе проекта вы находитесь?', 1621279049, 1621279049),
-(26, 11, 'Чем вы занимаетесь в настоящее время?', 1621705187, 1621705187),
-(28, 12, 'Чем вы занимаетесь в настоящее время?', 1623273233, 1623273233),
-(36, 15, 'Чем вы занимаетесь в настоящее время?', 1624394378, 1624394378);
+INSERT INTO `questions_confirm_problem` (`id`, `confirm_id`, `title`, `status`, `created_at`, `updated_at`) VALUES
+(13, 1, 'Чем вы занимаетесь в настоящее время?', 0, 1620596768, 1620596818),
+(15, 1, 'Случалось ли вам столкнуться с …?', 0, 1620596847, 1620596847),
+(16, 4, 'Чем вы занимаетесь в настоящее время?', 0, 1620656938, 1620656938),
+(17, 2, 'Чем вы занимаетесь в настоящее время?', 0, 1620767606, 1620767606),
+(18, 2, 'На каком этапе проекта вы находитесь?', 0, 1620767611, 1620767611),
+(19, 3, 'Чем вы занимаетесь в настоящее время?', 0, 1621279046, 1621279046),
+(20, 3, 'На каком этапе проекта вы находитесь?', 0, 1621279049, 1621279049),
+(26, 11, 'Чем вы занимаетесь в настоящее время?', 0, 1621705187, 1621705187),
+(28, 12, 'Чем вы занимаетесь в настоящее время?', 0, 1623273233, 1623273233),
+(36, 15, 'Чем вы занимаетесь в настоящее время?', 0, 1624394378, 1624394378),
+(37, 16, 'Случалось ли вам столкнуться с …?', 1, 1624999409, 1624999476),
+(39, 16, 'Какие трудности у вас вызывает это решение?', 0, 1624999471, 1624999477),
+(40, 17, 'Как часто с вами происходит ..?', 1, 1625519014, 1625519017);
 
 -- --------------------------------------------------------
 
@@ -1488,6 +1572,7 @@ CREATE TABLE `questions_confirm_segment` (
   `id` int(11) UNSIGNED NOT NULL,
   `confirm_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1496,15 +1581,17 @@ CREATE TABLE `questions_confirm_segment` (
 -- Дамп данных таблицы `questions_confirm_segment`
 --
 
-INSERT INTO `questions_confirm_segment` (`id`, `confirm_id`, `title`, `created_at`, `updated_at`) VALUES
-(7, 1, 'Как вы определяете цели, задачи и последовательность действий?', 1620580614, 1620580675),
-(12, 2, 'Как вы добиваетесь достижения поставленной цели?', 1620582094, 1620582094),
-(13, 1, 'Чем вы занимаетесь в настоящее время?', 1620592823, 1620592823),
-(14, 2, 'Чем вы занимаетесь в настоящее время?', 1620594637, 1620594637),
-(16, 11, 'Чем вы занимаетесь в настоящее время?', 1620656435, 1620656435),
-(23, 17, 'Чем вы занимаетесь в настоящее время?', 1621703269, 1621703269),
-(44, 17, 'Что получается и что не получается в вашем проекте?', 1623267444, 1623267453),
-(52, 18, 'Что получается и что не получается в вашем проекте? Приведите примеры.', 1624394341, 1624394341);
+INSERT INTO `questions_confirm_segment` (`id`, `confirm_id`, `title`, `status`, `created_at`, `updated_at`) VALUES
+(7, 1, 'Как вы определяете цели, задачи и последовательность действий?', 0, 1620580614, 1620580675),
+(12, 2, 'Как вы добиваетесь достижения поставленной цели?', 0, 1620582094, 1620582094),
+(13, 1, 'Чем вы занимаетесь в настоящее время?', 0, 1620592823, 1620592823),
+(14, 2, 'Чем вы занимаетесь в настоящее время?', 0, 1620594637, 1620594637),
+(16, 11, 'Чем вы занимаетесь в настоящее время?', 0, 1620656435, 1620656435),
+(23, 17, 'Чем вы занимаетесь в настоящее время?', 0, 1621703269, 1621703269),
+(44, 17, 'Что получается и что не получается в вашем проекте?', 0, 1623267444, 1623267453),
+(54, 18, 'Что пытались сделать, чтобы определить верные последовательные действия?', 1, 1624914429, 1624998654),
+(55, 18, 'Чем вы занимаетесь в настоящее время?', 0, 1624995837, 1624999198),
+(56, 18, 'На каком этапе проекта вы находитесь?', 0, 1624998978, 1624999150);
 
 -- --------------------------------------------------------
 
@@ -1539,7 +1626,9 @@ INSERT INTO `responds_gcp` (`id`, `confirm_id`, `name`, `info_respond`, `email`,
 (34, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623358800, 'Место проведения интервью'),
 (35, 10, 'Респондент 2', 'Данные респондента!', '', 1623358800, 'Место проведения интервью'),
 (36, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624482000, 'Место проведения интервью'),
-(37, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1624482000, 'Место проведения интервью');
+(37, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1624482000, 'Место проведения интервью'),
+(38, 12, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью'),
+(39, 12, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью');
 
 -- --------------------------------------------------------
 
@@ -1572,7 +1661,9 @@ INSERT INTO `responds_mvp` (`id`, `confirm_id`, `name`, `info_respond`, `email`,
 (27, 9, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623704400, 'Место проведения интервью'),
 (28, 9, 'Петров Петр Петрович', 'Данные респондента!', '', 1623704400, 'Место проведения интервью'),
 (29, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624741200, 'Место проведения интервью'),
-(30, 10, 'Петров Петр Петрович', 'Данные респондента!', '', 1624741200, 'Место проведения интервью');
+(30, 10, 'Петров Петр Петрович', 'Данные респондента!', '', 1624741200, 'Место проведения интервью'),
+(31, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью'),
+(32, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью');
 
 -- --------------------------------------------------------
 
@@ -1609,7 +1700,13 @@ INSERT INTO `responds_problem` (`id`, `confirm_id`, `name`, `info_respond`, `ema
 (43, 13, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью'),
 (44, 13, 'Респондент 2', 'Данные респондента!', '', 1623272400, 'Место проведения интервью'),
 (48, 15, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624309200, 'Место проведения интервью'),
-(49, 15, 'Петров Петр Петрович', 'Данные респондента!', '', 1624309200, 'Место проведения интервью');
+(49, 15, 'Петров Петр Петрович', 'Данные респондента!', '', 1624309200, 'Место проведения интервью'),
+(50, 16, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью'),
+(51, 16, 'Респондент 2', 'Данные респондента!', '', 1625000400, 'Место проведения интервью'),
+(52, 17, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью'),
+(53, 17, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью'),
+(54, 17, 'Респондент 3', '', '', NULL, ''),
+(55, 17, 'Респондент 4', '', '', NULL, '');
 
 -- --------------------------------------------------------
 
@@ -1685,7 +1782,7 @@ INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_inte
 (17, 1, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Предпринимательство', 'Поликлинические услуги', NULL, NULL, NULL, NULL, 7, 8, 5, 6, 11, 'Краткое описание сегмента', 'Краткое описание сегмента', '', 1620512969, 1620937093, 1620655139, 1),
 (26, 1, 'Сегмент 3', 'Краткое описание сегмента', 100, 'Образование', 'Репетиторство', 3, 4, 60, 50, 5000, 5000, 5, 6, 7, NULL, NULL, '', 1620656418, 1620936585, 1620656543, 1),
 (32, 1, 'Сегмент 4', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 4, 5, 70, 50, 5000, 5000, 3, 9, 5, NULL, NULL, '', 1621703242, 1623267598, 1623267598, 1),
-(33, 1, 'Сегмент 5', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 6, 7, 4, 5, 8, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1624393383, 1624393383, NULL, NULL);
+(33, 1, 'Сегмент 5', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 6, 7, 4, 5, 8, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1624393383, 1625001207, 1625001207, 1);
 
 -- --------------------------------------------------------
 
@@ -1719,7 +1816,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone`, `email`, `username`, `password_hash`, `avatar_max_image`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
-(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1624796297),
+(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1625521976),
 (9, 'Карпов', 'Антон', 'Петрович', '+7(999)99-99-99', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1620151486),
 (16, 'Порошин', 'Виктор', 'Николаевич', '+7(999)99-99-99', 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1620151428),
 (21, 'Дибров', 'Дмитрий', 'Владимирович', '+7(999)999-99-99', 'dibrov@mail.ru', 'Dibrov', '$2y$13$8qmD5Jj5YMbUl4HlyU9OqODvek.tgm1GU/zhmk6iM8lBeJh1hWhjK', '7AzQAtxQm1c.jpg', 'avatar_90tLDTmZ_min.png', 'wd9PcB_fY8b_L_W9Rjdp3hxteBd0OQyy', NULL, 20, 10, 20, NULL, 1586614816, 1615097315),
@@ -1838,6 +1935,12 @@ ALTER TABLE `conversation_development`
 -- Индексы таблицы `conversation_main_admin`
 --
 ALTER TABLE `conversation_main_admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `expected_results_interview_confirm_problem`
+--
+ALTER TABLE `expected_results_interview_confirm_problem`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -1987,55 +2090,55 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_gcp`
 --
 ALTER TABLE `all_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_mvp`
 --
 ALTER TABLE `all_questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_problem`
 --
 ALTER TABLE `all_questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_segment`
 --
 ALTER TABLE `all_questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_gcp`
 --
 ALTER TABLE `answers_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_mvp`
 --
 ALTER TABLE `answers_questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_problem`
 --
 ALTER TABLE `answers_questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_segment`
 --
 ALTER TABLE `answers_questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
@@ -2053,19 +2156,19 @@ ALTER TABLE `checking_online_user`
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
 --
 ALTER TABLE `confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_problem`
 --
 ALTER TABLE `confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_segment`
@@ -2092,6 +2195,12 @@ ALTER TABLE `conversation_main_admin`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT для таблицы `expected_results_interview_confirm_problem`
+--
+ALTER TABLE `expected_results_interview_confirm_problem`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
 -- AUTO_INCREMENT для таблицы `gcps`
 --
 ALTER TABLE `gcps`
@@ -2101,25 +2210,25 @@ ALTER TABLE `gcps`
 -- AUTO_INCREMENT для таблицы `interview_confirm_gcp`
 --
 ALTER TABLE `interview_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_mvp`
 --
 ALTER TABLE `interview_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_problem`
 --
 ALTER TABLE `interview_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_segment`
 --
 ALTER TABLE `interview_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT для таблицы `message_admin`
@@ -2155,61 +2264,61 @@ ALTER TABLE `mvps`
 -- AUTO_INCREMENT для таблицы `pre_files`
 --
 ALTER TABLE `pre_files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `problems`
 --
 ALTER TABLE `problems`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_gcp`
 --
 ALTER TABLE `questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_mvp`
 --
 ALTER TABLE `questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_problem`
 --
 ALTER TABLE `questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_segment`
 --
 ALTER TABLE `questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_gcp`
 --
 ALTER TABLE `responds_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_mvp`
 --
 ALTER TABLE `responds_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_problem`
 --
 ALTER TABLE `responds_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_segment`

@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\models\ConfirmSegment;
+use app\models\ExpectedResultsInterviewConfirmProblem;
 use app\models\forms\CacheForm;
+use app\models\forms\FormUpdateProblem;
 use app\models\InterviewConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\Projects;
@@ -103,6 +105,7 @@ class ProblemsController extends AppUserPartController
         $segment = Segments::findOne($confirmSegment->segmentId);
         $project = Projects::findOne($segment->projectId);
         $models = Problems::findAll(['basic_confirm_id' => $id]);
+        $formModel = new FormCreateProblem($segment);
 
         if (!$models) return $this->redirect(['/problems/instruction', 'id' => $id]);
 
@@ -111,6 +114,7 @@ class ProblemsController extends AppUserPartController
             'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
+            'formModel' => $formModel
         ]);
     }
 
@@ -124,8 +128,12 @@ class ProblemsController extends AppUserPartController
         $models = Problems::findAll(['basic_confirm_id' => $id]);
         if ($models) return $this->redirect(['/problems/index', 'id' => $id]);
 
+        $confirmSegment = ConfirmSegment::findOne($id);
+        $formModel = new FormCreateProblem($confirmSegment->hypothesis);
+
         return $this->render('index_first', [
-            'confirmSegment' => ConfirmSegment::findOne($id),
+            'confirmSegment' => $confirmSegment,
+            'formModel' => $formModel
         ]);
     }
 
@@ -200,16 +208,45 @@ class ProblemsController extends AppUserPartController
      * @return array|bool
      * @throws NotFoundHttpException
      */
+    public function actionGetHypothesisToUpdate ($id)
+    {
+        $model = $this->findModel($id);
+        $formUpdate = new FormUpdateProblem($model);
+
+        //Выбор респондентов, которые являются представителями сегмента
+        $responds = RespondsSegment::find()->with('interview')
+            ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
+            ->where(['confirm_id' => $model->confirmSegmentId, 'interview_confirm_segment.status' => '1'])->all();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'model' => $model,
+                'renderAjax' => $this->renderAjax('update', [
+                    'model' => $model,
+                    'responds' => $responds,
+                    'formUpdate' => $formUpdate
+                ]),
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
         $confirmSegment = ConfirmSegment::findOne($model->confirmSegmentId);
+        $form = new FormUpdateProblem($model);
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($form->load(Yii::$app->request->post())) {
 
             if (Yii::$app->request->isAjax) {
 
-                if ($model->save()) {
+                if ($form->update()) {
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
@@ -228,32 +265,15 @@ class ProblemsController extends AppUserPartController
 
     /**
      * @param $id
-     * @return array|bool
-     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
-    public function actionGetHypothesisToUpdate ($id)
+    public function actionDeleteExpectedResultsInterview($id)
     {
-        $model = $this->findModel($id);
-
-        //Выбор респондентов, которые являются представителями сегмента
-        $responds = RespondsSegment::find()->with('descInterview')
-            ->leftJoin('desc_interview', '`desc_interview`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $model->confirmSegmentId, 'desc_interview.status' => '1'])->all();
-
-        if(Yii::$app->request->isAjax) {
-
-            $response = [
-                'model' => $model,
-                'renderAjax' => $this->renderAjax('update', [
-                    'model' => $model,
-                    'responds' => $responds
-                ]),
-            ];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
+        $model = ExpectedResultsInterviewConfirmProblem::findOne($id);
+        if ($model){
+            $model->delete();
         }
-        return false;
     }
 
 

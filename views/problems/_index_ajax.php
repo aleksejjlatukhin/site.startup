@@ -46,22 +46,15 @@ use app\models\User;
             </div>
         </div>
 
-        <div class="col-md-3 text_field_problem" title="<?= $model->description; ?>">
-
-            <?= $model->description; ?>
-
-        </div>
-
-        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
-
-            <?= $model->action_to_check; ?>
-
-        </div>
-
-        <div class="col-md-2 text_field_problem" title="<?= $model->description; ?>">
-
-            <?= $model->result_metric; ?>
-
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-8 text_field_problem" title="<?= $model->description; ?>">
+                    <?= $model->description; ?>
+                </div>
+                <div class="col-md-4 text_field_problem text-center">
+                    К = <?= $model->indicator_positive_passage; ?> %
+                </div>
+            </div>
         </div>
 
         <div class="col-md-1 text-center">

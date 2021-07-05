@@ -364,6 +364,7 @@ class ConfirmSegmentController extends AppUserPartController
 
                 $response =  [
                     'success' => true,
+                    'cacheExpectedResultsInterview' => $formCreateProblem->_cacheManager->getCache($formCreateProblem->cachePath, 'formCreateHypothesisCache')['FormCreateProblem']['_expectedResultsInterview'],
                     'renderAjax' => $this->renderAjax('/problems/create', [
                         'confirmSegment' => $model,
                         'model' => $formCreateProblem,

@@ -93,6 +93,33 @@ $(body).on('click', '#checking_the_possibility', function(){
             if(response.success){
                 $(hypothesis_create_modal).modal('show');
                 $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+                // Если есть кэш по вопросам для проверки гипотезы проблемы и ответам на них
+                if (response.cacheExpectedResultsInterview) {
+
+                    // Данные из кэша к полям модели формы
+                    var cacheExpectedResults = response.cacheExpectedResultsInterview;
+                    // Перезаписать ключи массива,
+                    // т.к. некоторые элементы могут быть удалены
+                    // и идти не порядку и в этом случае не будут показаны
+                    var cacheExpectedResultsInterview = [];
+                    $.each(cacheExpectedResults, function(index, val) {
+                        cacheExpectedResultsInterview.push( val );
+                    });
+
+                    // Добавляем формы для вопросов и ответов
+                    var countExpectedResultsForms = cacheExpectedResultsInterview.length - 1;
+                    if (countExpectedResultsForms > 0) {
+                        for (var i = 0; i < countExpectedResultsForms; i++) {
+                            $('.add_expectedResults_create_form').trigger('click');
+                        }
+                    }
+
+                    // Добаляем данные из кэша к полям модели формы
+                    cacheExpectedResultsInterview.forEach(function(item, i) {
+                        $(document.getElementsByName('FormCreateProblem[_expectedResultsInterview]['+i+'][question]')).val(item.question);
+                        $(document.getElementsByName('FormCreateProblem[_expectedResultsInterview]['+i+'][answer]')).val(item.answer);
+                    });
+                }
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }
@@ -244,4 +271,141 @@ $(body).on('click', '.get_interview_respond',  function(e){
 
     e.preventDefault();
     return false;
+});
+
+
+//Добавление формы вопрос/ответ для проверки гипотезы проблемы
+$(body).on('click', '.add_expectedResults_create_form', function(){
+
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    var numberName = $('.item-expectedResults').children('.rowExpectedResults').last();
+    numberName = $(numberName).children('div.field-EXR').last();
+    numberName = $(numberName).children('.form-group').last();
+    numberName = $(numberName).find('textarea');
+    numberName = $(numberName).attr('id');
+    var lastNumberItem = numberName.toString().slice(-1);
+    lastNumberItem = Number.parseInt(lastNumberItem);
+    var id = lastNumberItem + 1;
+
+    var question_id = '_expectedResults_question_create-' + id;
+    var expectedResultsInterview_question = $('#_expectedResults_question-');
+    $(expectedResultsInterview_question).attr('name', 'FormCreateProblem[_expectedResultsInterview]['+id+'][question]');
+    $(expectedResultsInterview_question).attr('id', question_id);
+
+    var answer_id = '_expectedResults_answer_create-' + id;
+    var expectedResultsInterview_answer = $('#_expectedResults_answer-');
+    $(expectedResultsInterview_answer).attr('name', 'FormCreateProblem[_expectedResultsInterview]['+id+'][answer]');
+    $(expectedResultsInterview_answer).attr('id', answer_id);
+
+    var buttonRemoveId = 'remove-expectedResults-form-create-' + id;
+    var remove_EXR = $('#remove-expectedResults-');
+    $(remove_EXR).addClass('remove_expectedResults_for_create');
+    $(remove_EXR).attr('id', buttonRemoveId);
+
+    var formExpectedResults = $('#formExpectedResults');
+    $(formExpectedResults).find('#' + question_id).html('');
+    $(formExpectedResults).find('#' + answer_id).html('');
+
+    $(formExpectedResults).find('.formExpectedResults_inputs').find('.rowExpectedResults').toggleClass('rowExpectedResults-').toggleClass('row-expectedResults-form-create-' + id);
+    var str = $(formExpectedResults).find('.formExpectedResults_inputs').html();
+    $(str).find('.rowExpectedResults').toggleClass('rowExpectedResults-').toggleClass('row-expectedResults-form-create-' + id);
+    $(hypothesis_create_modal).find('.item-expectedResults').append(str);
+
+    $(formExpectedResults).find('.formExpectedResults_inputs').find('.rowExpectedResults').toggleClass('row-expectedResults-form-create-' + id).toggleClass('rowExpectedResults-');
+    $(formExpectedResults).find('#_expectedResults_question_create-' + id).attr('name', 'FormCreateProblem[_expectedResultsInterview][0][question]');
+    $(formExpectedResults).find('#_expectedResults_answer_create-' + id).attr('name', 'FormCreateProblem[_expectedResultsInterview][0][answer]');
+
+    $(formExpectedResults).find('#_expectedResults_question_create-' + id).attr('id', '_expectedResults_question-');
+    $(formExpectedResults).find('#_expectedResults_answer_create-' + id).attr('id', '_expectedResults_answer-');
+
+    $(formExpectedResults).find('#remove-expectedResults-form-create-' + id).removeClass('remove_expectedResults_for_create');
+    $(formExpectedResults).find('#remove-expectedResults-form-create-' + id).attr('id', 'remove-expectedResults-');
+
+});
+
+
+//Добавление формы вопрос/ответ для проверки гипотезы проблемы в редактировании
+$(body).on('click', '.add_expectedResults', function(){
+
+    var hypothesis_update_modal = $('.hypothesis_update_modal');
+    var clickId = $(this).attr('id');
+    var arrId = clickId.split('-');
+    var numberId = arrId[1];
+
+    var item_expectedResults = $('.item-expectedResults-' + numberId);
+    var numberName = $(item_expectedResults).children('.rowExpectedResults').last();
+    numberName = $(numberName).children('div.field-EXR').last();
+    numberName = $(numberName).children('.form-group').last();
+    numberName = $(numberName).find('textarea');
+    numberName = $(numberName).attr('id');
+    var lastNumberItem = numberName.toString().slice(-1);
+    lastNumberItem = Number.parseInt(lastNumberItem);
+    var id = lastNumberItem + 1;
+
+    var question_id = '_expectedResults_question-' + id;
+    var expectedResultsInterview_question = $('#_expectedResults_question-');
+    $(expectedResultsInterview_question).attr('name', 'FormUpdateProblem[_expectedResultsInterview]['+id+'][question]');
+    $(expectedResultsInterview_question).attr('id', question_id);
+
+    var answer_id = '_expectedResults_answer-' + id;
+    var expectedResultsInterview_answer = $('#_expectedResults_answer-');
+    $(expectedResultsInterview_answer).attr('name', 'FormUpdateProblem[_expectedResultsInterview]['+id+'][answer]');
+    $(expectedResultsInterview_answer).attr('id', answer_id);
+
+    var buttonRemoveId = 'remove-expectedResults-' + numberId + '_' + id;
+    $('#remove-expectedResults-').attr('id', buttonRemoveId);
+
+    var formExpectedResults = $('#formExpectedResults');
+    $(formExpectedResults).find('.rowExpectedResults').toggleClass('rowExpectedResults-').toggleClass('row-expectedResults-' + numberId + '_' + id);
+    var str = $(formExpectedResults).find('.formExpectedResults_inputs').html();
+    $(hypothesis_update_modal).find('.item-expectedResults-' + numberId).append(str);
+
+    $(formExpectedResults).find('#_expectedResults_question-' + id).attr('name', 'FormCreateProblem[_expectedResultsInterview][0][question]');
+    $(formExpectedResults).find('#_expectedResults_answer-' + id).attr('name', 'FormCreateProblem[_expectedResultsInterview][0][answer]');
+
+    $(formExpectedResults).find('#_expectedResults_question-' + id).attr('id', '_expectedResults_question-');
+    $(formExpectedResults).find('#_expectedResults_answer-' + id).attr('id', '_expectedResults_answer-');
+
+    $(formExpectedResults).find('#remove-expectedResults-' + numberId + '_' + id).attr('id', 'remove-expectedResults-');
+    $(formExpectedResults).find('.rowExpectedResults').toggleClass('row-expectedResults-' + numberId + '_' + id).toggleClass('rowExpectedResults-');
+});
+
+
+//Удаление формы вопрос/ответ для проверки гипотезы проблемы
+$(body).on('click', '.remove_expectedResults_for_create', function(){
+
+    var clickId = $(this).attr('id');
+    var arrId = clickId.split('-');
+    var numberId = arrId[4];
+
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    $(hypothesis_create_modal).find('.row-expectedResults-form-create-' + numberId).remove();
+    $('form#hypothesisCreateForm').trigger('change');
+});
+
+
+//Удаление формы автора проекта в редактировании
+$(body).on('click', '.remove-expectedResults', function(){
+
+    var clickId = $(this).attr('id');
+    var arrId = clickId.split('-');
+    var numberId = arrId[2];
+
+    if(arrId[3]) {
+
+        var expectedResultId = arrId[3];
+        var url = '/problems/delete-expected-results-interview?id=' + expectedResultId;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            error: function(){
+                alert('Ошибка');
+            }
+        });
+    }
+
+    var hypothesis_update_modal = $('.hypothesis_update_modal');
+    $(hypothesis_update_modal).find('.row-expectedResults-' + numberId).remove();
 });

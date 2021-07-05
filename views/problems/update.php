@@ -3,7 +3,26 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use kartik\select2\Select2;
+use app\models\Problems;
+
 ?>
+
+
+<style>
+    .select2-container--krajee .select2-selection {
+        font-size: 16px;
+        height: 40px;
+        padding-left: 15px;
+        padding-top: 8px;
+        padding-bottom: 15px;
+        border-radius: 12px;
+    }
+    .select2-container--krajee .select2-selection--single .select2-selection__arrow {
+        height: 39px;
+    }
+</style>
+
 
 <div class="form-update-problem">
 
@@ -54,12 +73,12 @@ use yii\helpers\Url;
                     <div class="col-md-8 block_respond_problem_column">
 
                         <?php
-                        $descInterview_result = $respond->descInterview->result;
+                        $descInterview_result = $respond->interview->result;
                         if (mb_strlen($descInterview_result) > 70) {
                             $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
                         }
                         ?>
-                        <?= '<div title="'.$respond->descInterview->result.'">' . $descInterview_result . '</div>'; ?>
+                        <?= '<div title="'.$respond->interview->result.'">' . $descInterview_result . '</div>'; ?>
 
                     </div>
 
@@ -73,7 +92,7 @@ use yii\helpers\Url;
 
             <?php $form = ActiveForm::begin([
                 'id' => 'hypothesisUpdateForm',
-                'action' => Url::to(['/problems/update', 'id' => $model->id]),
+                'action' => Url::to(['/problems/update', 'id' => $formUpdate->id]),
                 'options' => ['class' => 'g-py-15 hypothesisUpdateForm'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -87,7 +106,7 @@ use yii\helpers\Url;
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
-                    <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
+                    <?= $form->field($formUpdate, 'description', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
                         'rows' => 3,
                         'maxlength' => true,
                         'required' => true,
@@ -97,32 +116,139 @@ use yii\helpers\Url;
 
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-xs-12">
 
-                    <? $placeholder = 'Что нужно сделать, чтобы проверить гипотезу? Какие следует задать вопросы, чтобы проверить гипотезу. Например: каким инструментом пользуются сейчас и какие инструменты пробовали, по каким критериям подбирали инструмент, как проходит процесс учета финансов, какую информацию анализируют.' ?>
-
-                    <?= $form->field($model, 'action_to_check', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
-                        'rows' => 3,
-                        'maxlength' => true,
-                        'required' => true,
-                        'placeholder' => $placeholder,
-                        'class' => 'style_form_field_respond form-control',
-                    ]) ?>
+                    <?= $form->field($formUpdate, 'indicator_positive_passage', [
+                        'template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>',
+                    ])->widget(Select2::class, [
+                        'data' => Problems::getValuesForSelectIndicatorPositivePassage(),
+                        'options' => ['id' => 'indicator_positive_passage-'.$formUpdate->id],
+                        'disabled' => false,  //Сделать поле неактивным
+                        'hideSearch' => true, //Скрытие поиска
+                    ]);
+                    ?>
 
                 </div>
 
+                <h4 class="col-md-12 text-center bolder" style="margin-bottom: 20px;">Вопросы для проверки гипотезы проблемы и ответы на них:</h4>
+
+                <div class="container-expectedResults">
+                    <div class="row container-fluid item-expectedResults item-expectedResults-<?= $formUpdate->id; ?>">
+
+                        <?php if ($formUpdate->_expectedResultsInterview) : ?>
+
+                            <?php foreach ($formUpdate->_expectedResultsInterview as $i => $expectedResult): ?>
+
+                                <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->id . '_' . $i; ?>">
+
+                                    <div class="col-md-6 field-EXR">
+
+                                        <?= $form->field($formUpdate, "_expectedResultsInterview[$i][question]", ['template' => '{input}'])->textarea([
+                                            'rows' => 2,
+                                            'maxlength' => true,
+                                            'required' => true,
+                                            'placeholder' => 'Напишите вопрос',
+                                            'id' => '_expectedResults_question-' . $i,
+                                            'class' => 'style_form_field_respond form-control',
+                                        ]); ?>
+
+                                    </div>
+
+                                    <div class="col-md-6 field-EXR">
+
+                                        <?= $form->field($formUpdate, "_expectedResultsInterview[$i][answer]", ['template' => '{input}'])->textarea([
+                                            'rows' => 2,
+                                            'maxlength' => true,
+                                            'required' => true,
+                                            'placeholder' => 'Напишите ответ',
+                                            'id' => '_expectedResults_answer-' . $i,
+                                            'class' => 'style_form_field_respond form-control',
+                                        ]); ?>
+
+                                    </div>
+
+                                    <?php if ($i != 0) : ?>
+
+                                        <div class="col-md-12" style="margin-bottom: 15px;">
+
+                                            <?= Html::button('Удалить вопрос/ответ', [
+                                                'id' => 'remove-expectedResults-' . $formUpdate->id . '_' . $i . '-' . $expectedResult->id,
+                                                'class' => "remove-expectedResults btn btn-default",
+                                                'style' => [
+                                                    'display' => 'flex',
+                                                    'align-items' => 'center',
+                                                    'justify-content' => 'center',
+                                                    'width' => '170px',
+                                                    'height' => '40px',
+                                                    'font-size' => '16px',
+                                                    'border-radius' => '8px',
+                                                ]
+                                            ]); ?>
+                                        </div>
+
+                                    <?php endif; ?>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        <?php else : ?>
+
+                            <?php $i = 0; ?>
+
+                            <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->id . '_' . $i; ?>">
+
+                                <div class="col-md-6 field-EXR">
+
+                                    <?= $form->field($formUpdate, "_expectedResultsInterview[$i][question]", ['template' => '{input}'])->textarea([
+                                        'rows' => 2,
+                                        'maxlength' => true,
+                                        'required' => true,
+                                        'placeholder' => 'Напишите вопрос',
+                                        'id' => '_expectedResults_question-' . $i,
+                                        'class' => 'style_form_field_respond form-control',
+                                    ]); ?>
+
+                                </div>
+
+                                <div class="col-md-6 field-EXR">
+
+                                    <?= $form->field($formUpdate, "_expectedResultsInterview[$i][answer]", ['template' => '{input}'])->textarea([
+                                        'rows' => 2,
+                                        'maxlength' => true,
+                                        'required' => true,
+                                        'placeholder' => 'Напишите ответ',
+                                        'id' => '_expectedResults_answer-' . $i,
+                                        'class' => 'style_form_field_respond form-control',
+                                    ]); ?>
+
+                                </div>
+
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+                </div>
+
                 <div class="col-md-12">
-
-                    <? $placeholder = 'Какой результат покажет, что гипотеза верна? Например: Больше 80% опрошенных ответят, что гибкость настройки для них является ключевым фактором выбора инструмента.' ?>
-
-                    <?= $form->field($model, 'result_metric', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textarea([
-                        'rows' => 3,
-                        'maxlength' => true,
-                        'required' => true,
-                        'placeholder' => $placeholder,
-                        'class' => 'style_form_field_respond form-control',
-                    ]) ?>
-
+                    <?= Html::button('Добавить вопрос/ответ', [
+                        'id' => 'add_expectedResults-' . $formUpdate->id,
+                        'class' => "btn btn-default add_expectedResults",
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'color' => '#FFFFFF',
+                            'justify-content' => 'center',
+                            'background' => '#707F99',
+                            'width' => '170px',
+                            'height' => '40px',
+                            'text-align' => 'left',
+                            'font-size' => '16px',
+                            'border-radius' => '8px',
+                            'margin-right' => '5px',
+                        ]
+                    ]);?>
                 </div>
 
             </div>

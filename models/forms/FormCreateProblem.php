@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmSegment;
+use app\models\ExpectedResultsInterviewConfirmProblem;
 use app\models\Problems;
 use app\models\Segments;
 use yii\base\ErrorException;
@@ -13,9 +14,9 @@ use yii\web\NotFoundHttpException;
 class FormCreateProblem extends Model
 {
 
+    public $_expectedResultsInterview;
     public $description;
-    public $action_to_check;
-    public $result_metric;
+    public $indicator_positive_passage;
     public $basic_confirm_id;
     public $_cacheManager;
     public $cachePath;
@@ -28,12 +29,15 @@ class FormCreateProblem extends Model
      */
     public function __construct(Segments $preliminaryHypothesis, $config = [])
     {
+        $this->_expectedResultsInterview = new ExpectedResultsInterviewConfirmProblem();
         $this->_cacheManager = new CacheForm();
         $this->cachePath = self::getCachePath($preliminaryHypothesis);
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -60,9 +64,9 @@ class FormCreateProblem extends Model
     public function rules()
     {
         return [
-            [['description', 'action_to_check', 'result_metric'], 'trim'],
-            [['description', 'action_to_check', 'result_metric'], 'string', 'max' => 2000],
-            [['basic_confirm_id'], 'integer'],
+            [['description'], 'trim'],
+            [['description'], 'string', 'max' => 2000],
+            [['basic_confirm_id', 'indicator_positive_passage'], 'integer'],
         ];
     }
 
@@ -74,8 +78,7 @@ class FormCreateProblem extends Model
     {
         return [
             'description' => 'Описание гипотезы проблемы сегмента',
-            'action_to_check' => 'Действие для проверки',
-            'result_metric' => 'Метрика результата',
+            'indicator_positive_passage' => 'Показатель положительного прохождения теста',
         ];
     }
 
@@ -95,16 +98,35 @@ class FormCreateProblem extends Model
         $problem->segment_id = $confirmSegment->segmentId;
         $problem->basic_confirm_id = $this->basic_confirm_id;
         $problem->description = $this->description;
-        $problem->action_to_check = $this->action_to_check;
-        $problem->result_metric = $this->result_metric;
+        $problem->indicator_positive_passage = $this->indicator_positive_passage;
         $last_model_number = explode(' ',$last_model->title)[1];
         $problem->title = 'ГПС ' . ($last_model_number + 1);
 
+        $className = explode('\\', self::class)[3];
+        $expectedResults = $_POST[$className]['_expectedResultsInterview'];
+
         if ($problem->save()) {
+            $this->saveExpectedResultsInterview($expectedResults, $problem->id);
             $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
             return $problem;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить новую проблему');
+    }
+
+
+    /**
+     * @param $query
+     * @param $problemId
+     */
+    private function saveExpectedResultsInterview($query, $problemId)
+    {
+        foreach ($query as $k => $q) {
+            $newExpectedResultsInterview[$k] = new ExpectedResultsInterviewConfirmProblem();
+            $newExpectedResultsInterview[$k]->question = $q['question'];
+            $newExpectedResultsInterview[$k]->answer = $q['answer'];
+            $newExpectedResultsInterview[$k]->setProblemId($problemId);
+            $newExpectedResultsInterview[$k]->save();
+        }
     }
 
 }
