@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июл 06 2021 г., 00:57
+-- Время создания: Июл 13 2021 г., 23:33
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -359,7 +359,7 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1625522266),
+(1, 1, 1626005275),
 (2, 28, 1625166875),
 (4, 9, 1625166938),
 (6, 21, 1625166797),
@@ -571,6 +571,24 @@ INSERT INTO `expected_results_interview_confirm_problem` (`id`, `problem_id`, `q
 (22, 29, 'Вопрос 1', 'Ответ 1'),
 (23, 29, 'Вопрос 2', 'Ответ 2'),
 (24, 29, 'Вопрос 3', 'Ответ 3');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `expert_info`
+--
+
+CREATE TABLE `expert_info` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `education` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `academic_degree` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `position` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_professional_competence` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `publications` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `implemented_projects` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_in_implemented_projects` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1944,6 +1962,12 @@ ALTER TABLE `expected_results_interview_confirm_problem`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `expert_info`
+--
+ALTER TABLE `expert_info`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `gcps`
 --
 ALTER TABLE `gcps`
@@ -2201,6 +2225,12 @@ ALTER TABLE `expected_results_interview_confirm_problem`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
+-- AUTO_INCREMENT для таблицы `expert_info`
+--
+ALTER TABLE `expert_info`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT для таблицы `gcps`
 --
 ALTER TABLE `gcps`
@@ -2336,7 +2366,7 @@ ALTER TABLE `segments`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
