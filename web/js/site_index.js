@@ -2,7 +2,8 @@ var body = $('body');
 
 $(document).ready(function() {
 
-    //Если администратор не активировал пользователя показать сообщение в модальном окне
+    // Если администратор не активировал пользователя
+    // показать сообщение в модальном окне
     $('#user_status').modal('show');
 
 });
@@ -48,13 +49,6 @@ $(body).on('click', '#go_password_recovery_for_email', function(){
 $(body).on('click', '#go_back_password_recovery_for_email', function(){
     $('.style_answer_for_password_recovery').hide();
     $('.style_go_password_recovery_for_email').show();
-});
-
-//Переход к регистрации пользователя
-$(body).on('click', '#go_user_singup', function(){
-    $('.style_form_login').hide();
-    $('.content_main_page_block_text').hide();
-    $('.style_form_singup').show();
 });
 
 
@@ -135,71 +129,6 @@ $(body).on('beforeSubmit', '#form_send_email', function(e){
                 $(style_answer_for_password_recovery).find('.text').html(response.message.text);
                 $(style_answer_for_password_recovery).find('.link_back').find('a').attr('id', 'go_back_password_recovery_for_email');
                 $(style_answer_for_password_recovery).show();
-            }
-        },
-        error: function(){
-            alert('Ошибка');
-        }
-    });
-
-    e.preventDefault();
-    return false;
-});
-
-
-
-//Отправка формы регистрации пользователя
-$(body).on('beforeSubmit', '#form_user_singup', function(e){
-
-    var data = $(this).serialize();
-    var url = $(this).attr('action');
-
-    var error_user_singup_modal = $('#error_user_singup').find('.modal-body');
-    error_user_singup_modal.html('');
-
-    $.ajax({
-
-        url: url,
-        method: 'POST',
-        data: data,
-        cache: false,
-        success: function(response){
-
-            if(response.error_uniq_email) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - почтовый адрес уже зарегистрирован;<\/h4>');
-            }
-
-            if(response.error_uniq_username) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин уже зарегистрирован;<\/h4>');
-            }
-
-            if(response.error_match_username) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин должен содержать только латинские символы и цыфры, не допускается использование пробелов;<\/h4>');
-            }
-
-            if(response.error_exist_agree) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - необходимо согласие с настоящей Политикой конфиденциальности и условиями обработки персональных данных;<\/h4>');
-            }
-
-            if(response.error_uniq_email || response.error_uniq_username || response.error_exist_agree || response.error_match_username) {
-                $('#error_user_singup').modal('show');
-            }
-
-            var result_singup = $('#result_singup');
-
-            if(response.success_singup){
-                $('.style_form_singup').hide();
-                $('.content_main_page_block_text').show();
-                $('.style_form_login').show();
-                $(result_singup).find('.modal-body').find('h4').html('');
-                $(result_singup).find('.modal-body').find('h4').html(response.message);
-                $(result_singup).modal('show');
-            }
-
-            if(response.error_singup_send_email){
-                $(result_singup).find('.modal-body').find('h4').html('');
-                $(result_singup).find('.modal-body').find('h4').html(response.message);
-                $(result_singup).modal('show');
             }
         },
         error: function(){

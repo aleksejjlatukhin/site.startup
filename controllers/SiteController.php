@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\forms\FormUserRole;
+use app\models\forms\SingupExpertForm;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -65,6 +67,55 @@ class SiteController extends AppUserPartController
     }
 
 
+    public function actionRegistration()
+    {
+        $user = Yii::$app->user->identity;
+
+        if (Yii::$app->user->isGuest) {
+            $formUserRole = new FormUserRole();
+            return $this->render('registration', compact('user', 'formUserRole'));
+        } else {
+            return $this->redirect('/');
+        }
+    }
+
+
+    public function actionGetFormRegistration()
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $role = $_POST['FormUserRole']['role'];
+            $formRegistration = new SingupForm();
+            $formRegistration->role = $role;
+
+            if ($role == User::ROLE_EXPERT) {
+
+                $formRegistration = new SingupExpertForm();
+                $formRegistration->role = $role;
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('singup-expert', [
+                        'formRegistration' => $formRegistration
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+            }
+
+            $response = [
+                'renderAjax' => $this->renderAjax('singup', [
+                    'formRegistration' => $formRegistration
+                ]),
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
     /**
      * @return array|bool
      * @throws StaleObjectException
@@ -77,6 +128,9 @@ class SiteController extends AppUserPartController
 
             $emailActivation = Yii::$app->params['emailActivation'];
             $model = $emailActivation ? new SingupForm(['scenario' => 'emailActivation']) : new SingupForm();
+            if ($_POST['SingupExpertForm']) {
+                $model = $emailActivation ? new SingupExpertForm(['scenario' => 'emailActivation']) : new SingupExpertForm();
+            }
 
             if ($model->load(Yii::$app->request->post())) {
 
@@ -93,7 +147,7 @@ class SiteController extends AppUserPartController
                                     //Письмо с подтверждение отправлено
                                     $response = [
                                         'success_singup' => true,
-                                        'message' => 'Письмо с подтверждением регистрации отправлено на указанный email.',
+                                        'message' => 'Спасибо за регистрацию. Письмо с подтверждением регистрации отправлено на указанный email.',
                                     ];
                                     Yii::$app->response->format = Response::FORMAT_JSON;
                                     Yii::$app->response->data = $response;

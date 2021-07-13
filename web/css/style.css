@@ -1141,20 +1141,6 @@ div.style_form_field_questions {
     margin-top: 10px;
 }
 
-.style_form_singup {
-    display: none;
-    background: #707F99;
-    /*width: 900px;*/
-    min-width: 280px;
-    color: #ffffff;
-    height: 100%;
-    border-radius: 16px;
-    padding: 20px 5px 20px 5px;
-    margin-left: 60px;
-    margin-right: 60px;
-    margin-top: 10px;
-}
-
 .style_error_not_user {
     display: none;
     background: #707F99;

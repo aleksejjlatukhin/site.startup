@@ -17,6 +17,11 @@ $config = [
             'layout' => 'main',
         ],
 
+        'expert' => [
+            'class' => 'app\modules\expert\Module',
+            'layout' => 'main',
+        ],
+
         //Поключение kartik yii2-grid
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
@@ -97,6 +102,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'registration' => 'site/registration',
                 'about' => 'site/about',
                 'send-email' => 'site/send-email',
                 'confidentiality-policy' => 'site/confidentiality-policy',

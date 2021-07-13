@@ -3,6 +3,7 @@
 
 namespace app\models\forms;
 
+use yii\base\Exception;
 use yii\base\Model;
 use app\models\User;
 use Yii;
@@ -42,20 +43,20 @@ class SingupForm extends Model
             ['email', 'uniqEmail'],
 
             ['confirm', 'default', 'value' => User::NOT_CONFIRM, 'on' => 'emailActivation'],
-            ['confirm', 'in', 'range' =>[
+            ['confirm', 'in', 'range' => [
                 User::CONFIRM,
                 User::NOT_CONFIRM,
             ]],
 
             ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE,],
-            ['status', 'in', 'range' =>[
+            ['status', 'in', 'range' => [
                 User::STATUS_NOT_ACTIVE,
                 User::STATUS_ACTIVE,
                 User::STATUS_DELETED,
             ]],
 
             ['role', 'default', 'value' => User::ROLE_USER],
-            ['role', 'in', 'range' =>[
+            ['role', 'in', 'range' => [
                 User::ROLE_USER,
                 User::ROLE_ADMIN,
             ]],
@@ -152,6 +153,7 @@ class SingupForm extends Model
 
     /**
      * @return User|bool|null
+     * @throws Exception
      */
     public function singup()
     {

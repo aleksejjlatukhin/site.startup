@@ -1,10 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use app\models\User;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
-use kartik\select2\Select2;
 
 $this->title = 'Главная';
 
@@ -89,10 +87,8 @@ $this->title = 'Главная';
                     <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
 
                     <div class="col-md-12 text-center">
-                        <?= Html::a('Зарегистрироваться',['/'], [
-                            'onclick' => 'return false',
+                        <?= Html::a('Зарегистрироваться',['/site/registration'], [
                             'class' => 'link_singup',
-                            'id' => 'go_user_singup',
                         ]);?>
                     </div>
 
@@ -218,194 +214,6 @@ $this->title = 'Главная';
                             'id' => 'go4_to_back_login_form',
                         ]);?>
                     </div>
-
-                </div>
-
-
-                <div class="row style_form_singup">
-
-                    <?php $form = ActiveForm::begin([
-                        'id' => 'form_user_singup',
-                        'action' => Url::to(['/site/singup']),
-                        'options' => ['class' => 'g-py-15'],
-                        'errorCssClass' => 'u-has-error-v1',
-                        'successCssClass' => 'u-has-success-v1-1',
-                    ]); ?>
-
-
-                    <div class="col-md-12 text-center" style="font-size: 20px; margin: 10px 0 20px 0; font-weight: 700; text-transform: uppercase;">Регистрация</div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'role', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя</div><div>{input}</div>'
-                        ])->widget(Select2::class, [
-                            'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Администратор'],
-                            'options' => ['id' => 'type-interaction',],
-                            'disabled' => false,  //Сделать поле неактивным
-                            'hideSearch' => true, //Скрытие поиска
-                        ]);
-                        ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'email', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email</div><div>{input}</div>'
-                        ])->textInput([
-                            'type' => 'email',
-                            'required' => true,
-                            'maxlength' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
-                            'autocomplete' => 'off'
-                        ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'telephone', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Телефон</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => 50,
-                            'minlength' => 6,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
-                            'autocomplete' => 'off'
-                        ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'second_name', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Фамилия</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => 50,
-                            'minlength' => 2,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
-                            'autocomplete' => 'off'
-                            ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'first_name', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Имя</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => 50,
-                            'minlength' => 2,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
-                            'autocomplete' => 'off'
-                        ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'middle_name', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Отчество</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => 50,
-                            'minlength' => 2,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => '',
-                            'autocomplete' => 'off'
-                        ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'username', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Логин</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => 32,
-                            'minlength' => 3,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => 'Введите от 3 до 32 символов',
-                            'autocomplete' => 'off'
-                            ]) ?>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <?= $form->field($model_signup, 'password', [
-                            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль</div><div>{input}</div>'
-                        ])->passwordInput([
-                            'maxlength' => 32,
-                            'minlength' => 6,
-                            'required' => true,
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => 'Введите от 6 до 32 символов',
-                            'autocomplete' => 'off'
-                        ]) ?>
-
-                    </div>
-
-                    <div class="col-md-12">
-
-                        <div class="row">
-
-                            <div class="col-md-4" style="display: flex; align-items: center;">
-
-                                <?= $form->field($model_signup, 'exist_agree', ['template' => '{input}{label}'
-                                ])->checkbox(['value' => 1, 'checked ' => true], false) ?>
-
-                                <?= Html::a('Я согласен с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
-                                    ['/site/confidentiality-policy'], [
-                                        'target' => '_blank',
-                                        'title' => 'Ознакомиться с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
-                                        'style' => ['color' => '#FFFFFF', 'line-height' => '18px']
-                                    ]
-                                ); ?>
-
-                            </div>
-
-                            <div class="col-md-4 text-center">
-
-                                <?= Html::submitButton('Зарегистрировать меня', [
-                                    'class' => 'btn btn-default',
-                                    'name' => 'singup-button',
-                                    'style' => [
-                                        'margin-top' => '10px',
-                                        'background' => '#E0E0E0',
-                                        'color' => '4F4F4F',
-                                        'border-radius' => '8px',
-                                        'width' => '220px',
-                                        'height' => '40px',
-                                        'font-size' => '16px',
-                                        'font-weight' => '700'
-                                    ]
-                                ]) ?>
-
-                            </div>
-
-                            <div class="col-md-4 text-center" style="margin-top: 15px;">
-
-                                <?= Html::a('Вернуться назад',['#'], [
-                                    'onclick' => 'return false',
-                                    'class' => 'link_singup',
-                                    'id' => 'go3_to_back_login_form',
-                                    ]);?>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <?php ActiveForm::end(); ?>
 
                 </div>
 
