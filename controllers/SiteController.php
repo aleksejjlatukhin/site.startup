@@ -315,6 +315,14 @@ class SiteController extends AppUserPartController
                                 return $response;
                             }
 
+                            if (User::isUserExpert(Yii::$app->user->identity['username'])) {
+
+                                $response = ['expert_success' => true];
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
+                                return $response;
+                            }
+
                             if (User::isUserSimple(Yii::$app->user->identity['username'])) {
 
                                 $response = ['user_success' => true];

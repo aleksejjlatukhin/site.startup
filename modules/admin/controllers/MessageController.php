@@ -13,6 +13,7 @@ use app\modules\admin\models\form\FormCreateMessageMainAdmin;
 use app\modules\admin\models\form\SearchForm;
 use app\modules\admin\models\MessageMainAdmin;
 use app\models\ConversationAdmin;
+use app\modules\expert\models\ConversationExpert;
 use Yii;
 use yii\base\ErrorException;
 use yii\base\Exception;
@@ -39,7 +40,7 @@ class MessageController extends AppAdminController
 
            $conversation = ConversationMainAdmin::findOne(Yii::$app->request->get());
            $admin = User::findOne(['id' => $conversation->admin_id]);
-            /*Ограничение доступа к проэктам пользователя*/
+            // Ограничение доступа
             if (($admin->id == Yii::$app->user->id) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -56,7 +57,7 @@ class MessageController extends AppAdminController
             $user = $conversation->user;
             $development = $conversation->development;
 
-            /*Ограничение доступа к проэктам пользователя*/
+            // Ограничение доступа
             if (($user->id == Yii::$app->user->id) || ($development->id == Yii::$app->user->id)){
 
                 // ОТКЛЮЧАЕМ CSRF
@@ -75,7 +76,7 @@ class MessageController extends AppAdminController
             $mainAdmin = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_MAIN_ADMIN]);
             $development = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_DEV]);
 
-            /*Ограничение доступа к проэктам пользователя*/
+            // Ограничение доступа
             if ($admin->id == Yii::$app->user->id || $mainAdmin->id == Yii::$app->user->id || $development->id == Yii::$app->user->id){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -105,7 +106,12 @@ class MessageController extends AppAdminController
             $searchForm = new SearchForm();
             // Беседа главного админа с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
-            // Все беседы главного админа с админами
+            // Беседы главного админа с экспертами
+            $expertConversations = ConversationExpert::find()
+                ->where(['role' => User::ROLE_MAIN_ADMIN])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+            // Все беседы главного админа с трекерами
             $allConversations = ConversationMainAdmin::find()->joinWith('admin')
                 ->andWhere(['main_admin_id' => $id])
                 ->orderBy(['updated_at' => SORT_DESC])
@@ -115,6 +121,7 @@ class MessageController extends AppAdminController
                 'main_admin' => $main_admin,
                 'searchForm' => $searchForm,
                 'conversation_development' => $conversation_development,
+                'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
             ]);
         }
@@ -124,16 +131,19 @@ class MessageController extends AppAdminController
             $admin = User::findOne($id);
             // Форма поиска
             $searchForm = new SearchForm();
-            // Беседа админа с главным админом
+            // Беседа трекера с главным админом
             $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
-            // Беседа админа с техподдержкой
+            // Беседа трекера с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
-            // Все беседы админа с проектантами
+            // Все беседы трекера с проектантами
             $allConversations = ConversationAdmin::find()->joinWith('user')
                 ->andWhere(['user.id_admin' => $id])
                 ->andWhere(['admin_id' => $id])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
+            // Все беседы трекера с экспертами
+            $conversationsExpert = ConversationExpert::find()->where(['user_id' => $id])
+                ->orderBy(['updated_at' => SORT_DESC])->all();
 
             return $this->render('index-admin', [
                 'admin' => $admin,
@@ -141,6 +151,7 @@ class MessageController extends AppAdminController
                 'conversationAdminMain' => $conversationAdminMain,
                 'conversation_development' => $conversation_development,
                 'allConversations' => $allConversations,
+                'conversationsExpert' => $conversationsExpert,
             ]);
         }
 
@@ -196,6 +207,10 @@ class MessageController extends AppAdminController
                                 ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
+                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
+                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
@@ -219,6 +234,10 @@ class MessageController extends AppAdminController
                         'conversationsUserForAdminAjax' => $this->renderAjax('update_conversations_user_for_admin', [
                             'allConversations' => ConversationAdmin::find()->joinWith('user')
                                 ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
+                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
+                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
@@ -246,6 +265,10 @@ class MessageController extends AppAdminController
                                 ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
+                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
+                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
@@ -268,6 +291,10 @@ class MessageController extends AppAdminController
                             'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
+                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
+                            'expertConversations' => ConversationExpert::find()->andWhere(['role' => User::ROLE_MAIN_ADMIN])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
@@ -288,6 +315,10 @@ class MessageController extends AppAdminController
                             'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
+                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
+                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->id])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
@@ -305,6 +336,10 @@ class MessageController extends AppAdminController
                         ]),
                         'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
                             'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->id])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
+                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
+                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->id])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
@@ -440,9 +475,14 @@ class MessageController extends AppAdminController
 
             // Беседа админа с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->id]);
-            // Все беседы главного админа с админами
+            // Все беседы главного админа с трекерами
             $allConversations = ConversationMainAdmin::find()
                 ->andWhere(['main_admin_id' => $main_admin->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+            // Все беседы главного админа с экспертами
+            $expertConversations = ConversationExpert::find()
+                ->andWhere(['user_id' => $main_admin->id])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
@@ -462,16 +502,22 @@ class MessageController extends AppAdminController
                 'pagesMessages' => $pagesMessages,
                 'conversation_development' => $conversation_development,
                 'allConversations' => $allConversations,
+                'expertConversations' => $expertConversations,
             ]);
         }
 
         if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
-            // Беседа админа с главным админом
+            // Беседа трекера с главным админом
             $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
-            // Беседа админа с техподдержкой
+            // Беседа трекера с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->id]);
-            // Все беседы админа с проектантами
+            // Все беседы трекера с экспертами
+            $expertConversations = ConversationExpert::find()
+                ->andWhere(['user_id' => $admin->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+            // Все беседы трекера с проектантами
             $allConversations = ConversationAdmin::find()->joinWith('user')
                 ->andWhere(['user.id_admin' => $admin->id])
                 ->andWhere(['admin_id' => $admin->id])
@@ -494,6 +540,7 @@ class MessageController extends AppAdminController
                 'pagesMessages' => $pagesMessages,
                 'conversationAdminMain' => $conversationAdminMain,
                 'conversation_development' => $conversation_development,
+                'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
             ]);
         }
@@ -676,7 +723,22 @@ class MessageController extends AppAdminController
                     ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
                 ])->all();
 
-            $response = ['renderAjax' => $this->renderAjax('admin_conversations_query', ['conversations_query' => $conversations_query])];
+            $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
+                ->andWhere(['user_id' => $id])
+                ->andWhere(['or',
+                    ['like', 'user.second_name', $query],
+                    ['like', 'user.first_name', $query],
+                    ['like', 'user.middle_name', $query],
+                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
+                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
+                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
+                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
+                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
+                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                ])->all();
+
+            $response = ['renderAjax' => $this->renderAjax('admin_conversations_query', [
+                'conversations_query' => $conversations_query, 'expert_conversations_query' => $expert_conversations_query])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -709,7 +771,22 @@ class MessageController extends AppAdminController
                     ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
                 ])->all();
 
-            $response = ['renderAjax' => $this->renderAjax('conversations_query', ['conversations_query' => $conversations_query])];
+            $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
+                ->andWhere(['user_id' => $id])
+                ->andWhere(['or',
+                    ['like', 'user.second_name', $query],
+                    ['like', 'user.first_name', $query],
+                    ['like', 'user.middle_name', $query],
+                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
+                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
+                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
+                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
+                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
+                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                ])->all();
+
+            $response = ['renderAjax' => $this->renderAjax('conversations_query', [
+                'conversations_query' => $conversations_query, 'expert_conversations_query' => $expert_conversations_query])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -741,7 +818,7 @@ class MessageController extends AppAdminController
                     ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
                 ])->all();
 
-            $response = ['renderAjax' => $this->renderAjax('conversations_query', ['conversations_query' => $conversations_query])];
+            $response = ['renderAjax' => $this->renderAjax('conversations_query_development', ['conversations_query' => $conversations_query])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -826,9 +903,15 @@ class MessageController extends AppAdminController
 
         if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-            // Все беседы главного админа с админами
+            // Все беседы главного админа с трекерами
             $allConversations = ConversationMainAdmin::find()->joinWith('admin')
                 ->andWhere(['main_admin_id' => $user->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+
+            // Все беседы главного админа с экспертами
+            $expertConversations = ConversationExpert::find()
+                ->where(['user_id' => $user->id])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
@@ -847,15 +930,21 @@ class MessageController extends AppAdminController
                 'countMessages' => $countMessages,
                 'pagesMessages' => $pagesMessages,
                 'allConversations' => $allConversations,
+                'expertConversations' => $expertConversations,
             ]);
         }
 
         elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
-            // Беседа админа с главным админом
+            // Беседа трекера с главным админом
             $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $user->id]);
             $main_admin = $conversationAdminMain->mainAdmin;
-            // Все беседы админа с проектантами
+            // Все беседы трекера с экспертами
+            $expertConversations = ConversationExpert::find()
+                ->where(['user_id' => $user->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+            // Все беседы трекера с проектантами
             $allConversations = ConversationAdmin::find()->joinWith('user')
                 ->andWhere(['user.id_admin' => $user->id])
                 ->andWhere(['admin_id' => $user->id])
@@ -878,6 +967,7 @@ class MessageController extends AppAdminController
                 'countMessages' => $countMessages,
                 'pagesMessages' => $pagesMessages,
                 'conversationAdminMain' => $conversationAdminMain,
+                'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
             ]);
         }

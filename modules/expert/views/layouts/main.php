@@ -35,9 +35,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                 <?php
                 NavBar::begin([
-                    'id' => 'main_menu_admin',
-                    'brandLabel' => Yii::$app->name = 'Spaccel <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">admin-panel</span>',
-                    'brandUrl' => ['/admin/default/index'],
+                    'id' => 'main_menu_expert',
+                    'brandLabel' => Yii::$app->name = 'Spaccel <span style="font-size: 13px;font-weight: 700;border-bottom: 1px solid #c0c0c0;">expert-panel</span>',
+                    'brandUrl' => ['/expert/default/index'],
                     'brandOptions' => ['class' => 'font_nav_menu_brand'],
                     'options' => [
                         'class' => 'navbar-inverse navbar-fixed-top',
@@ -45,64 +45,36 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'renderInnerContainer' => false,
                 ]);
 
+                echo Nav::widget([
+                    'id' => 'main_navbar_right',
+                    'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
+                    'items' => [
 
-                if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])) :
+                        !Yii::$app->user->isGuest ? (
+                        ['label' => Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/site/notifications', 'id' => Yii::$app->user->id]]) : '',
 
-                    echo Nav::widget([
-                        'id' => 'main_navbar_right',
-                        'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
-                        'items' => [
+                        ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messanger', 'title' => 'Экспертизы']), 'url' => ['/expert/expertise/index']],
 
-                            ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
-                            ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
-
-                            [
-                                'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
-                                    : Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_user_avatar_default user_profile_picture']),
-                                'items' => [
-                                    ['label' => 'Мой профиль', 'url' => Url::to(['/admin/profile/index', 'id' => Yii::$app->user->id])],
-                                    ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
-                                ],
+                        [
+                            'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
+                                : Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_user_avatar_default user_profile_picture']),
+                            'items' => [
+                                ['label' => 'Мой профиль', 'url' => Url::to(['/expert/profile/index', 'id' => Yii::$app->user->id])],
+                                ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
                             ],
-
-                            ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
-                                : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
                         ],
-                        'encodeLabels' => false,
-                    ]);
 
-                elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) :
+                        ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
+                            : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/expert/message/index', 'id' => Yii::$app->user->id]],
 
-                    echo Nav::widget([
-                        'id' => 'main_navbar_right',
-                        'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
-                        'items' => [
-
-                            ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
-                            ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
-
-                            [
-                                'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
-                                    : Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_user_avatar_default user_profile_picture']),
-                                'items' => [
-                                    ['label' => 'Мой профиль', 'url' => Url::to(['/admin/profile/index', 'id' => Yii::$app->user->id])],
-                                    ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
-                                ],
-                            ],
-
-                            ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
-                                : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
-                        ],
-                        'encodeLabels' => false,
-                    ]);
-
-                endif;
-
+                        !Yii::$app->user->isGuest ? (
+                        ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messanger', 'title' => 'Методическое руководство']), 'url' => ['/site/methodological-guide']]) : '',
+                    ],
+                    'encodeLabels' => false,
+                ]);
 
                 NavBar::end();
                 ?>
-
-
 
             </div>
 

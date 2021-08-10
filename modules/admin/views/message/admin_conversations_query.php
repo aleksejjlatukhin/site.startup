@@ -4,7 +4,11 @@ use yii\helpers\Html;
 
 ?>
 
-<?php if ($conversations_query) : ?>
+<?php if (!$conversations_query && !$expert_conversations_query) : ?>
+
+    <div class="block_no_search_result">По вашему запросу не найдено ни одного пользователя...</div>
+
+<?php else : ?>
 
     <?php foreach ($conversations_query as $conversation) : ?>
 
@@ -21,8 +25,19 @@ use yii\helpers\Html;
 
     <?php endforeach; ?>
 
-<?php else : ?>
+    <?php foreach ($expert_conversations_query as $conversation) : ?>
 
-    <div class="block_no_search_result">По вашему запросу не найдено ни одного администратора...</div>
+        <div class="conversation-link" id="expertConversation-<?= $conversation->id; ?>">
 
-<?php endif;
+            <?php if ($conversation->expert->avatar_image) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation->expert->id.'/avatar/'.$conversation->expert->avatar_image, ['class' => 'user_picture_search']); ?>
+            <?php else : ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
+            <?php endif; ?>
+
+            <?= $conversation->expert->second_name . ' ' . $conversation->expert->first_name . ' ' . $conversation->expert->middle_name; ?>
+        </div>
+
+    <?php endforeach; ?>
+
+<?php endif; ?>

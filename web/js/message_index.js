@@ -38,6 +38,9 @@ $(body).on('click', '.container-user_messages', function () {
     else if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
         window.location.href = '/message/technical-support?id='+id;
     }
+    else if ($(this).attr('id').split('-')[0] === 'expertConversation') {
+        window.location.href = '/message/expert?id='+id;
+    }
 });
 
 // Открытие и закрытие меню профиля на малых экранах
@@ -59,10 +62,11 @@ setInterval(function(){
 
             var blockConversationAdmin = $(body).find('#conversation-list-menu').find(response.blockConversationAdmin);
             var blockConversationDevelopment = $(body).find('#conversation-list-menu').find(response.blockConversationDevelopment);
+            var blockExpertConversations = $(body).find('.containerExpertConversations');
 
             $(blockConversationAdmin).html(response.conversationAdminForUserAjax);
             $(blockConversationDevelopment).html(response.conversationDevelopmentForUserAjax);
-
+            $(blockExpertConversations).html(response.conversationsExpertForUser);
         }
     });
 

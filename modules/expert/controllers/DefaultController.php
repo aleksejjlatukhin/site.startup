@@ -7,7 +7,7 @@ use yii\web\Controller;
 /**
  * Default controller for the `expert` module
  */
-class DefaultController extends Controller
+class DefaultController extends AppExpertController
 {
     /**
      * Renders the index view for the module

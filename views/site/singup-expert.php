@@ -3,7 +3,26 @@
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
+use kartik\select2\Select2;
+use app\models\ExpertType;
 
+?>
+
+<style>
+    .select2-container--krajee
+    .select2-selection--multiple
+    .select2-search--inline
+    .select2-search__field {
+        height: 38px;
+    }
+    .select2-container
+    .select2-search--inline
+    .select2-search__field {
+        font-size: 16px;
+    }
+</style>
+
+<?php
 
 $form = ActiveForm::begin([
     'id' => 'form_user_singup',
@@ -133,17 +152,36 @@ $form = ActiveForm::begin([
     ]);
 
 
-    echo $form->field($formRegistration, 'scope_professional_competence', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Сфера профессиональной компетенции</div><div>{input}</div>'
-    ])->textarea([
-        'row' => 2,
-        'maxlength' => true,
-        'minlength' => 2,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => 'Область(и) ваших знаний для оказания экспертных услуг',
-        'autocomplete' => 'off'
+    echo $form->field($formRegistration, 'type', [
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Тип экпертной деятельности</div><div>{input}</div>'
+    ])->widget(Select2::class, [
+        'data' => ExpertType::getListTypes(),
+        'options' => [
+            'id' => 'type-expert',
+            'placeholder' => 'Выберите тип экпертной деятельности',
+            'multiple' => true,
+            'required' => true
+        ],
+        'toggleAllSettings' => [
+            'selectLabel' => '<i class="fas fa-check-circle"></i> Выбрать все',
+            'unselectLabel' => '<i class="fas fa-times-circle"></i> Убрать все',
+            'selectOptions' => ['class' => 'text-success'],
+            'unselectOptions' => ['class' => 'text-danger'],
+        ],
     ]);
+
+
+    echo $form->field($formRegistration, 'scope_professional_competence', [
+            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Сфера профессиональной компетенции</div><div>{input}</div>'
+        ])->textarea([
+            'row' => 2,
+            'maxlength' => true,
+            'minlength' => 2,
+            'required' => true,
+            'class' => 'style_form_field_respond form-control',
+            'placeholder' => 'Область(и) ваших знаний для оказания экспертных услуг',
+            'autocomplete' => 'off'
+        ]);
 
 
     echo $form->field($formRegistration, 'publications', [

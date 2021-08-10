@@ -35,6 +35,20 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'width' => '180px',
                 'height' => '40px',
                 'font-size' => '24px',
+                'border-radius' => '0',
+            ],
+            'class' => 'btn btn-lg btn-default',
+        ]);?>
+
+        <?= Html::a( 'Эксперты', Url::to(['/admin/users/experts']),[
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#E0E0E0',
+                'width' => '180px',
+                'height' => '40px',
+                'font-size' => '24px',
                 'border-radius' => '0 8px 8px 0',
             ],
             'class' => 'btn btn-lg btn-default',

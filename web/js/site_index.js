@@ -87,6 +87,10 @@ $(body).on('beforeSubmit', '#login_user_form', function(e){
                 window.location.href = '/admin';
             }
 
+            if(response.expert_success) {
+                window.location.href = '/expert';
+            }
+
         },
         error: function(){
             alert('Ошибка');

@@ -134,6 +134,9 @@ $(body).on('click', '.conversation-link', function () {
     if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
     }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
+    }
 });
 
 
@@ -150,6 +153,9 @@ $(body).on('click', '.container-user_messages', function () {
     }
     else if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
     }
 });
 
@@ -302,7 +308,7 @@ setInterval(function(){
         },100);
     }
 
-    // Обновляем беседы админа
+    // Обновляем беседы трекера
     $.ajax({
         url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
         method: 'POST',
@@ -318,6 +324,7 @@ setInterval(function(){
             $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsUserForAdminAjax);
             if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
 
+            $(conversation_list_menu).find('.containerForExpertConversations').html(response.conversationsExpertForAdminAjax);
         }
     });
 

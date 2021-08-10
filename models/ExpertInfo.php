@@ -23,11 +23,11 @@ class ExpertInfo extends ActiveRecord
     public function rules()
     {
         return [
-            [['education', 'academic_degree', 'position', 'scope_professional_competence',
+            [['education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects'], 'required'],
             [['education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects'], 'trim'],
-            [['education', 'academic_degree', 'position'], 'string', 'max' => 255],
+            [['education', 'academic_degree', 'position', 'type'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects'], 'string', 'max' => 2000],
         ];
     }
@@ -42,6 +42,7 @@ class ExpertInfo extends ActiveRecord
             'education' => 'Образование',
             'academic_degree' => 'Ученая степень',
             'position' => 'Должность',
+            'type' => 'Тип',
             'scope_professional_competence' => 'Сфера профессиональной компетенции',
             'publications' => 'Научные публикации',
             'implemented_projects' => 'Реализованные проекты',

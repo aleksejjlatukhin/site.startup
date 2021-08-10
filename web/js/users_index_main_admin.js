@@ -10,6 +10,7 @@ $(body).on('click', '.column-user-fio', function () {
     if (page === 'index') location.href = '/profile/index?id=' + id;
     else if (page === 'group') location.href = '/profile/index?id=' + id;
     else if (page === 'admins') location.href = '/admin/profile/index?id=' + id;
+    else if (page === 'experts') location.href = '/expert/profile/index?id=' + id;
 });
 
 
@@ -160,6 +161,7 @@ $(body).on('beforeSubmit', '#formStatusUpdate', function (e) {
         if (page === 'index') $(modal_confirm).find('.modal-body').find('h4').html('Вы действительно хотите удалить пользователя «' + user_fio + '» и все его данные.');
         else if (page === 'group') $(modal_confirm).find('.modal-body').find('h4').html('Вы действительно хотите удалить пользователя «' + user_fio + '» и все его данные.');
         else if (page === 'admins') $(modal_confirm).find('.modal-body').find('h4').html('Вы действительно хотите удалить трекера «' + user_fio + '» и все его данные.');
+        else if (page === 'experts') $(modal_confirm).find('.modal-body').find('h4').html('Вы действительно хотите удалить эксперта «' + user_fio + '» и все его данные.');
 
         $(modal_confirm).find('.modal-footer').find('.button_confirm_user_delete').attr('id', 'button_confirm_user_delete-' + id_user);
         // Закрытие модального окна изменения статуса

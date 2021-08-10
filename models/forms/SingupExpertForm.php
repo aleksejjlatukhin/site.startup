@@ -30,6 +30,12 @@ class SingupExpertForm extends SingupForm
     public $position;
 
     /**
+     * Тип эксперта
+     * @var array
+     */
+    public $type;
+
+    /**
      * Сфера профессиональной компетенции
      * @var string
      */
@@ -63,7 +69,7 @@ class SingupExpertForm extends SingupForm
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password',
-                'education', 'academic_degree', 'position', 'scope_professional_competence',
+                'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects'], 'required'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
@@ -114,6 +120,7 @@ class SingupExpertForm extends SingupForm
             'education' => 'Образование',
             'academic_degree' => 'Ученая степень',
             'position' => 'Должность',
+            'type' => 'Тип',
             'scope_professional_competence' => 'Сфера профессиональной компетенции',
             'publications' => 'Научные публикации',
             'implemented_projects' => 'Реализованные проекты',
@@ -154,6 +161,7 @@ class SingupExpertForm extends SingupForm
                 $expertInfo->education = $this->education;
                 $expertInfo->academic_degree = $this->academic_degree;
                 $expertInfo->position = $this->position;
+                $expertInfo->type = implode('|', $this->type);
                 $expertInfo->scope_professional_competence = $this->scope_professional_competence;
                 $expertInfo->publications = $this->publications;
                 $expertInfo->implemented_projects = $this->implemented_projects;

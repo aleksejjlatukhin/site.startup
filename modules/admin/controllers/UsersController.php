@@ -38,7 +38,7 @@ class UsersController extends AppAdminController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'admins') {
+        }elseif ($action->id == 'admins' || $action->id == 'experts') {
 
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
@@ -180,6 +180,24 @@ class UsersController extends AppAdminController
 
 
     /**
+     * @return string
+     */
+    public function actionExperts()
+    {
+        $countUsersOnPage = 20;
+        $query = User::find()->where(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])->orderBy(['updated_at' => SORT_DESC]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
+
+        return $this->render('experts',[
+            'users' => $users,
+            'pages' => $pages,
+        ]);
+    }
+
+
+    /**
      * @param $id
      * @return array|bool
      */
@@ -197,9 +215,14 @@ class UsersController extends AppAdminController
                         //Создание беседы между админом и главным админом
                         $model->createConversationMainAdmin();
 
+                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_EXPERT)) {
+                        //Создание беседы между экспертом и главным админом
+                        User::createConversationExpert($model->mainAdmin, $model);
+
                     } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
                         //Создание беседы между админом и проектантом
                         $model->createConversationAdmin($model);
+
                     }
 
                     if (($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {
@@ -332,7 +355,7 @@ class UsersController extends AppAdminController
                         return $response;
                     }
                     else {
-                        $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
+                        $response = ['error' => true, 'message' => 'При удалении трекера произошла ошибка, обратитесь в техподдержку'];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;
@@ -349,7 +372,23 @@ class UsersController extends AppAdminController
                     return $response;
                 }
                 else {
-                    $response = ['error' => true, 'message' => 'При удалении пользователя произошла ошибка, обратитесь в техподдержку'];
+                    $response = ['error' => true, 'message' => 'При удалении проектанта произошла ошибка, обратитесь в техподдержку'];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+            elseif ($user->role === User::ROLE_EXPERT) {
+
+                if ($user->removeAllDataUser()) {
+
+                    $response = ['success' => true];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+                else {
+                    $response = ['error' => true, 'message' => 'При удалении эксперта произошла ошибка, обратитесь в техподдержку'];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;

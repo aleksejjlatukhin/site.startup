@@ -1,46 +1,43 @@
 <?php
 
 use yii\helpers\Html;
-use app\models\User;
 
 ?>
 
-<?php if ($conversations_query) : ?>
+<?php if (!$conversations_query && !$expert_conversations_query) : ?>
 
-    <?php foreach ($conversations_query as $conversation) : ?>
-
-        <?php if (User::isUserSimple($conversation->user->username)) : ?>
-
-            <div class="conversation-link" id="conversation-<?= $conversation->id; ?>">
-
-                <?php if ($conversation->user->avatar_image) : ?>
-                    <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture_search']); ?>
-                <?php else : ?>
-                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
-                <?php endif; ?>
-
-                <?= $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name; ?>
-            </div>
-
-        <?php elseif (User::isUserMainAdmin($conversation->user->username) || User::isUserAdmin($conversation->user->username)) : ?>
-
-            <div class="conversation-link" id="adminConversation-<?= $conversation->id; ?>">
-
-                <?php if ($conversation->user->avatar_image) : ?>
-                    <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture_search']); ?>
-                <?php else : ?>
-                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
-                <?php endif; ?>
-
-                <?= $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name; ?>
-            </div>
-
-        <?php endif; ?>
-
-    <?php endforeach; ?>
+    <div class="block_no_search_result">По вашему запросу не найдено ни одного пользователя...</div>
 
 <?php else : ?>
 
-    <div class="block_no_search_result">По вашему запросу не найдено ни одного пользователя...</div>
+    <?php foreach ($conversations_query as $conversation) : ?>
+
+        <div class="conversation-link" id="conversation-<?= $conversation->id; ?>">
+
+            <?php if ($conversation->user->avatar_image) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture_search']); ?>
+            <?php else : ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
+            <?php endif; ?>
+
+            <?= $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name; ?>
+        </div>
+
+    <?php endforeach; ?>
+
+    <?php foreach ($expert_conversations_query as $conversation) : ?>
+
+        <div class="conversation-link" id="expertConversation-<?= $conversation->id; ?>">
+
+            <?php if ($conversation->expert->avatar_image) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation->expert->id.'/avatar/'.$conversation->expert->avatar_image, ['class' => 'user_picture_search']); ?>
+            <?php else : ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
+            <?php endif; ?>
+
+            <?= $conversation->expert->second_name . ' ' . $conversation->expert->first_name . ' ' . $conversation->expert->middle_name; ?>
+        </div>
+
+    <?php endforeach; ?>
 
 <?php endif;

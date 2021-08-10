@@ -119,6 +119,9 @@ $(body).on('click', '.conversation-link', function () {
     if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
     }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
+    }
 });
 
 
@@ -136,6 +139,9 @@ $(body).on('click', '.container-user_messages', function () {
     else if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
     }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
+    }
 });
 
 
@@ -152,7 +158,8 @@ setInterval(function(){
             var conversation_list_menu = $('#conversation-list-menu');
             $(conversation_list_menu).find(response.blockConversationAdminMain).html(response.conversationAdminMainForAdminAjax);
             $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminAjax);
-            $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsUserForAdminAjax);
+            $(conversation_list_menu).find('.containerForAllUserConversations').html(response.conversationsUserForAdminAjax);
+            $(conversation_list_menu).find('.containerForAllExpertConversations').html(response.conversationsExpertForAdminAjax)
         }
     });
 

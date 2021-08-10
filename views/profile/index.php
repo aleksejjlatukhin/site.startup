@@ -11,29 +11,33 @@ $this->registerCssFile('@web/css/profile-style.css');
 
 <div class="user-index">
 
-    <div class="row profile_menu">
+    <?php if (User::isActiveStatus(Yii::$app->user->identity['username'])) : ?>
 
-        <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+        <div class="row profile_menu">
 
-        <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->id], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->id], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->id], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->id], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->id], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-    </div>
+            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->id], [
+                'class' => 'link_in_the_header',
+            ]) ?>
+
+        </div>
+
+    <?php endif; ?>
 
 
     <div class="data_user_content">

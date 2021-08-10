@@ -30,7 +30,7 @@ use yii\helpers\Html;
 
     <div class="row block_top">
 
-        <div class="col-xs-8">Администратор</div>
+        <div class="col-xs-8">Трекер</div>
 
         <div class="col-xs-4 text-right">
             <?php if ($conversation_admin->lastMessage) : ?>

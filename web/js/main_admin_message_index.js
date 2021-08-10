@@ -119,6 +119,9 @@ $(body).on('click', '.conversation-link', function () {
     if (($(this).attr('id').split('-')[0] === 'adminConversation')) {
         window.location.href = '/admin/message/view?id='+id;
     }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
+    }
 });
 
 
@@ -132,6 +135,9 @@ $(body).on('click', '.container-user_messages', function () {
     }
     else if ($(this).attr('id').split('-')[0] === 'adminConversation') {
         window.location.href = '/admin/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
+        window.location.href = '/expert/message/view?id='+id;
     }
 });
 
@@ -149,6 +155,7 @@ setInterval(function(){
             var conversation_list_menu = $('#conversation-list-menu');
             $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminMainAjax);
             $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsAdminForAdminMainAjax);
+            $(conversation_list_menu).find('.containerForExpertConversations').html(response.conversationsExpertForAdminMainAjax);
         }
     });
 

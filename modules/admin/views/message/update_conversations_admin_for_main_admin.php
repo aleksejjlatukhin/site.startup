@@ -5,7 +5,7 @@ use yii\helpers\Html;
 ?>
 
 <div class="title_block_conversation">
-    <div class="title">Администраторы</div>
+    <div class="title">Трекеры</div>
 </div>
 
 <?php if ($allConversations) : ?>
@@ -21,7 +21,7 @@ use yii\helpers\Html;
                 <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
             <?php endif; ?>
 
-            <!--Кол-во непрочитанных сообщений от администратора-->
+            <!--Кол-во непрочитанных сообщений от трекера-->
             <?php if ($conversation->admin->countUnreadMessagesMainAdminFromAdmin) : ?>
                 <div class="countUnreadMessagesSender active"><?= $conversation->admin->countUnreadMessagesMainAdminFromAdmin; ?></div>
             <?php else : ?>
@@ -76,6 +76,6 @@ use yii\helpers\Html;
 
 <?php else : ?>
 
-    <div class="text-center block_not_conversations">Нет администраторов</div>
+    <div class="text-center block_not_conversations">Нет трекеров</div>
 
 <?php endif; ?>

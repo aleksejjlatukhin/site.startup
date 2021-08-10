@@ -113,6 +113,7 @@ $config = [
                 'change-password' => 'profile/change-password',
                 'profile' => 'profile/index',
                 'admin' => 'admin/default/index',
+                'expert' => 'expert/default/index',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],
