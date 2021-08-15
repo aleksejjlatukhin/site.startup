@@ -838,17 +838,40 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         if ($this->role === self::ROLE_USER) {
-            // Удаление беседы и сообщений с админом
+            // Удаление беседы проектанта и трекера
             if ($conversation_admin = ConversationAdmin::findOne(['user_id' => $this->id])) {
                 MessageAdmin::deleteAll(['conversation_id' => $conversation_admin->id]);
                 $conversation_admin->delete();
             }
+            // Удаление бесед проектанта с экспертами
+            if ($conversations_expert = ConversationExpert::findAll(['user_id' => $this->id])) {
+                foreach ($conversations_expert as $conversation) {
+                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
+                    $conversation->delete();
+                }
+            }
         }
         elseif ($this->role === self::ROLE_ADMIN) {
-            // Удаление беседы и сообщений с главным админом
+            // Удаление беседы трекера с главным админом
             if ($conversations_main_admin = ConversationMainAdmin::findOne(['admin_id' => $this->id])) {
                 MessageMainAdmin::deleteAll(['conversation_id' => $conversations_main_admin->id]);
                 $conversations_main_admin->delete();
+            }
+            // Удаление бесед трекера с экспертами
+            if ($conversations_expert = ConversationExpert::findAll(['user_id' => $this->id])) {
+                foreach ($conversations_expert as $conversation) {
+                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
+                    $conversation->delete();
+                }
+            }
+        }
+        elseif ($this->role === self::ROLE_EXPERT) {
+            // Удаление бесед эксперта
+            if ($conversations_expert = ConversationExpert::findAll(['expert_id' => $this->id])) {
+                foreach ($conversations_expert as $conversation) {
+                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
+                    $conversation->delete();
+                }
             }
         }
 
