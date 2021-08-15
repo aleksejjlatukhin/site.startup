@@ -36,4 +36,14 @@ abstract class ExpertType
     {
         return self::$listTypes;
     }
+
+    /**
+     * @param string $types
+     * @return array
+     */
+    public static function getValue($types)
+    {
+        $array = explode('|', $types);
+        return $array;
+    }
 }

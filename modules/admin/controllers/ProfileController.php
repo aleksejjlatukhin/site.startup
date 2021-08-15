@@ -177,6 +177,7 @@ class ProfileController extends AppAdminController
     /**
      * @param $id
      * @return array
+     * @throws Exception
      */
     public function actionChangePassword($id)
     {
@@ -279,6 +280,11 @@ class ProfileController extends AppAdminController
         return false;
     }
 
+
+    /**
+     * @param $id
+     * @return bool
+     */
     public function actionDeleteUnusedImage ($id)
     {
         $avatarForm = new AvatarForm($id);
@@ -292,6 +298,7 @@ class ProfileController extends AppAdminController
         }
         return false;
     }
+
 
     /**
      * @param $id

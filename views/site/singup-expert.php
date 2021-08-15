@@ -220,6 +220,18 @@ $form = ActiveForm::begin([
         'class' => 'style_form_field_respond form-control',
         'placeholder' => 'Комментарий о вашей роли в реализованных проектах',
         'autocomplete' => 'off'
+    ]);
+
+
+    echo $form->field($formRegistration, 'keywords', [
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Ключевые слова</div><div>{input}</div>'
+    ])->textarea([
+        'row' => 2,
+        'maxlength' => true,
+        'required' => true,
+        'class' => 'style_form_field_respond form-control',
+        'placeholder' => 'Укажите ключевые слова или словосочетания, отражающие Ваши научные интересы. Желательно указывать ключевые слова как на русском, так и на английском языке',
+        'autocomplete' => 'off'
     ]); ?>
 
 

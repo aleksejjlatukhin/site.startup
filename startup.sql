@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Авг 10 2021 г., 23:49
+-- Время создания: Авг 15 2021 г., 16:18
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -360,13 +360,14 @@ CREATE TABLE `checking_online_user` (
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
 (1, 1, 1628627392),
-(2, 28, 1628628588),
+(2, 28, 1629032611),
 (4, 9, 1625166938),
-(6, 21, 1628627195),
+(6, 21, 1628801774),
 (7, 22, 1628627138),
 (8, 16, 1620151442),
 (10, 42, 1626979816),
-(12, 31, 1628628123);
+(12, 31, 1629032546),
+(13, 37, 1629033501);
 
 -- --------------------------------------------------------
 
@@ -521,7 +522,8 @@ INSERT INTO `conversation_development` (`id`, `dev_id`, `user_id`, `updated_at`)
 (4, 22, 16, NULL),
 (7, 22, 21, 1617353412),
 (8, 22, 28, 1628455853),
-(9, 22, 31, 1628622592);
+(9, 22, 31, 1628622592),
+(10, 22, 37, 1628795228);
 
 -- --------------------------------------------------------
 
@@ -544,7 +546,8 @@ CREATE TABLE `conversation_expert` (
 INSERT INTO `conversation_expert` (`id`, `expert_id`, `user_id`, `role`, `updated_at`) VALUES
 (1, 31, 28, 30, 1628622560),
 (2, 31, 21, 20, 1628622527),
-(3, 31, 1, 10, 1628622976);
+(3, 31, 1, 10, 1628622976),
+(4, 37, 28, 30, 1628795228);
 
 -- --------------------------------------------------------
 
@@ -622,7 +625,8 @@ CREATE TABLE `expert_info` (
 --
 
 INSERT INTO `expert_info` (`id`, `user_id`, `education`, `academic_degree`, `position`, `type`, `scope_professional_competence`, `publications`, `implemented_projects`, `role_in_implemented_projects`) VALUES
-(2, 31, 'Образование', 'Ученая степень, звание', 'Должность', '1|2|3|4|5|6', 'Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах');
+(2, 31, 'Образование', 'Ученая степень, звание', 'Должность', '1|2|3|4|5|6', 'Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах'),
+(8, 37, 'МГУ', 'Кандидат наук', 'Заведующий кафедрой', '1|2|3', 'Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах');
 
 -- --------------------------------------------------------
 
@@ -795,6 +799,26 @@ INSERT INTO `interview_confirm_segment` (`id`, `respond_id`, `interview_file`, `
 (14, 61, NULL, NULL, 'Варианты проблем', '1', 1623267596, 1623267596),
 (15, 62, '270521_Комментарии к платформе.docx', 'EUEWKfg-kP5TbtF.docx', 'Варианты проблем', '1', 1624470924, 1624470957),
 (16, 63, '290421 корректировки спакселя в части вопросов и в сегменте.docx', 'SpjNmH12QaRHGZe.docx', 'Варианты проблем', '1', 1625001091, 1625001144);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `keywords_expert`
+--
+
+CREATE TABLE `keywords_expert` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `expert_id` int(11) NOT NULL,
+  `description` text CHARACTER SET utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `keywords_expert`
+--
+
+INSERT INTO `keywords_expert` (`id`, `expert_id`, `description`) VALUES
+(5, 37, 'Профессор доцент наука'),
+(6, 31, 'Обучение');
 
 -- --------------------------------------------------------
 
@@ -2003,7 +2027,8 @@ INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone
 (22, 'Техническая', 'поддержка', 'StartPool', '+7(999)999-99-99', 'dev@mail.com', 'dev', '$2y$13$KAt3g3ocWpm5cow7dsZOKOqRhaYZM1Qq27QTApSf/UYdRJPjU4Uji', 'technical-support-services.png', 'avatar_-6gVzcWi_min.png', 'hPQR4GvMfRsUnepawhOYlHhy80y--6ki', NULL, 100, 10, 20, NULL, 1586957787, 1617049090),
 (28, 'Главный', 'Админ', 'Сайта', '+7(999)999-99-99', 'alex.latukhin@mail.ru', 'MainAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', 'background_for_main_page.png', 'avatar_dy9VW45c_min.png', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 30, 10, 20, NULL, 1587560218, 1615307246),
 (29, 'Хрущев', 'Никита', 'Сергеевич', '+79999999999', 'alex.latukhin2015@yandex.ru', 'hrust', '$2y$13$VqFILzTszNEYP3vKNvTo/OR0qrfIKFYP1/ZSnvJExP13w4y.oDVW.', '', '', 'CA4mobzRtKA2LLSohPZIWTHT-XkdBd3d', NULL, 10, 1, 20, NULL, 1613504385, 1618948078),
-(31, 'Экспертов', 'Петр', 'Иванович', '7890000000', 'aleksejj.latukhin@mail.ru', 'expertov', '$2y$13$CoDvU0pYkxcW9.Ksz8ynBOZnasD1jxvxThXH3izeHwN9eNt5SAs3m', '', '', 'ZE5naj0yFMRZhC0sffb-gH06bqyZsnHD', NULL, 40, 10, 20, NULL, 1627149710, 1627327320);
+(31, 'Экспертов', 'Петр', 'Иванович', '7890000000', 'aleksejj.latukhin@mail.ru', 'expertov', '$2y$13$CoDvU0pYkxcW9.Ksz8ynBOZnasD1jxvxThXH3izeHwN9eNt5SAs3m', 'shutterstock_235978021.jpg', 'avatar_64T4qnrK_min.png', 'ZE5naj0yFMRZhC0sffb-gH06bqyZsnHD', NULL, 40, 10, 20, NULL, 1627149710, 1629032476),
+(37, 'Суриков', 'Иван', 'Федорович', '7899999999', 'aleksejj.latukhin@rambler.ru', 'SurikoV', '$2y$13$UAhxmjmY0BU7zoppdsZeJ.B0fo9a/5kS2olqixpkUb1tlfAU7sBMS', 'iStock_000040123844_small.jpg', 'avatar_-3zHF6rV_min.png', 'kWUWoylcl_KEaW5Ps86EFzk4lVBOJl-6', NULL, 40, 10, 20, NULL, 1628794951, 1629030988);
 
 --
 -- Индексы сохранённых таблиц
@@ -2164,6 +2189,12 @@ ALTER TABLE `interview_confirm_problem`
 -- Индексы таблицы `interview_confirm_segment`
 --
 ALTER TABLE `interview_confirm_segment`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `keywords_expert`
+--
+ALTER TABLE `keywords_expert`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2349,7 +2380,7 @@ ALTER TABLE `business_model`
 -- AUTO_INCREMENT для таблицы `checking_online_user`
 --
 ALTER TABLE `checking_online_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
@@ -2385,13 +2416,13 @@ ALTER TABLE `conversation_admin`
 -- AUTO_INCREMENT для таблицы `conversation_development`
 --
 ALTER TABLE `conversation_development`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_expert`
 --
 ALTER TABLE `conversation_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_main_admin`
@@ -2409,7 +2440,7 @@ ALTER TABLE `expected_results_interview_confirm_problem`
 -- AUTO_INCREMENT для таблицы `expert_info`
 --
 ALTER TABLE `expert_info`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `gcps`
@@ -2440,6 +2471,12 @@ ALTER TABLE `interview_confirm_problem`
 --
 ALTER TABLE `interview_confirm_segment`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT для таблицы `keywords_expert`
+--
+ALTER TABLE `keywords_expert`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `message_admin`
@@ -2553,7 +2590,7 @@ ALTER TABLE `segments`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

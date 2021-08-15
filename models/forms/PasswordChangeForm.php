@@ -3,6 +3,7 @@
 
 namespace app\models\forms;
 
+use yii\base\Exception;
 use yii\base\Model;
 use app\models\User;
 
@@ -86,6 +87,7 @@ class PasswordChangeForm extends Model
 
     /**
      * @return boolean
+     * @throws Exception
      */
     public function changePassword()
     {

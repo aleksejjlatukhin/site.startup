@@ -97,6 +97,9 @@ class User extends ActiveRecord implements IdentityInterface
             if ($expertInfo = $this->expertInfo){
                 $expertInfo->delete();
             }
+            if ($keywords = $this->keywords) {
+                $keywords->delete();
+            }
         });
 
         parent::init();
@@ -132,6 +135,17 @@ class User extends ActiveRecord implements IdentityInterface
     public function getExpertInfo()
     {
         return $this->hasOne(ExpertInfo::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * Получить ключевые слова
+     * о деятельности эксперта
+     * @return ActiveQuery
+     */
+    public function getKeywords()
+    {
+        return $this->hasOne(KeywordsExpert::class, ['expert_id' => 'id']);
     }
 
 

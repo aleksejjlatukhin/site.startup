@@ -5,6 +5,7 @@ namespace app\models\forms;
 
 
 use app\models\ExpertInfo;
+use app\models\KeywordsExpert;
 use app\models\User;
 use yii\base\Exception;
 
@@ -59,6 +60,12 @@ class SingupExpertForm extends SingupForm
      */
     public $role_in_implemented_projects;
 
+    /**
+     * Ключевые слова
+     * @var string
+     */
+    public $keywords;
+
 
     /**
      * @return array
@@ -70,13 +77,13 @@ class SingupExpertForm extends SingupForm
             ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
-                'publications', 'implemented_projects', 'role_in_implemented_projects'], 'required'],
+                'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
-                'publications', 'implemented_projects', 'role_in_implemented_projects'], 'trim'],
+                'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
             [['second_name', 'first_name', 'middle_name', 'email', 'telephone',
                 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
-            [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects'], 'string', 'max' => 2000],
+            [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -124,7 +131,8 @@ class SingupExpertForm extends SingupForm
             'scope_professional_competence' => 'Сфера профессиональной компетенции',
             'publications' => 'Научные публикации',
             'implemented_projects' => 'Реализованные проекты',
-            'role_in_implemented_projects' => 'Роль в реализованных проектах'
+            'role_in_implemented_projects' => 'Роль в реализованных проектах',
+            'keywords' => 'Ключевые слова'
         ];
     }
 
@@ -156,6 +164,10 @@ class SingupExpertForm extends SingupForm
 
             if ($user->save()) {
 
+                // Сохраняем ключевые слова
+                KeywordsExpert::create($user->id, $this->keywords);
+
+                // Сохраняем информацию о эксперте
                 $expertInfo = new ExpertInfo();
                 $expertInfo->user_id = $user->id;
                 $expertInfo->education = $this->education;
@@ -166,6 +178,7 @@ class SingupExpertForm extends SingupForm
                 $expertInfo->publications = $this->publications;
                 $expertInfo->implemented_projects = $this->implemented_projects;
                 $expertInfo->role_in_implemented_projects = $this->role_in_implemented_projects;
+
                 if ($expertInfo->save()) {
                     return $user;
                 }
