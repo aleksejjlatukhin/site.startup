@@ -77,7 +77,7 @@ body .wrap {
 
 @media screen and (min-width: 1140px) {
     .profile_menu {
-        justify-content: right;
+        justify-content: flex-end;
     }
     .profile_menu .link_open_and_close_menu_profile {
         display: none;

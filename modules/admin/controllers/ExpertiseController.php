@@ -1,0 +1,258 @@
+<?php
+
+
+namespace app\modules\admin\controllers;
+
+use app\models\Projects;
+use app\models\User;
+use app\modules\admin\models\form\SearchForm;
+use app\modules\admin\models\form\SearchFormExperts;
+use yii\data\Pagination;
+use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
+use yii\web\Response;
+use Yii;
+
+class ExpertiseController extends AppAdminController
+{
+
+    /**
+     * Количество заданий
+     * на экспертизу на странице
+     */
+    const TASKS_PAGE_SIZE = 20;
+
+    public $layout = '@app/modules/admin/views/layouts/users';
+
+
+    /**
+     * @param $action
+     * @return bool
+     * @throws BadRequestHttpException
+     * @throws HttpException
+     */
+    public function beforeAction($action)
+    {
+
+        if ($action->id == 'index' || $action->id == 'tasks') {
+
+            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+
+                return parent::beforeAction($action);
+
+            }else{
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            }
+
+        } else{
+            return parent::beforeAction($action);
+        }
+
+    }
+
+
+    /**
+     * @return string
+     */
+    public function actionIndex()
+    {
+        return $this->render('index');
+    }
+
+
+    /**
+     * Страница проектов
+     * на экспертизу
+     *
+     * @param int $page
+     * @return array|string
+     */
+    public function actionTasks($page = 1)
+    {
+        $searchForm = new SearchForm();
+        $pageSize = self::TASKS_PAGE_SIZE;
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+        $cache->cachePath = '../runtime/cache/forms/user-'.Yii::$app->user->id.'/searchFormExpertiseTasks/';
+        $cache_form_search_tasks = $cache->get('searchFormExpertiseTasks');
+        if ($cache_form_search_tasks) $searchForm->search = trim($cache_form_search_tasks['SearchForm']['search']);
+
+        if(Yii::$app->request->isAjax) {
+
+            $query = $searchForm->search;
+            if (5 <= mb_strlen($query)) {
+
+                $query_projects = Projects::find()->joinWith('user')
+                    ->andWhere(['or',
+                        ['like', 'project_name', $query],
+                        ['like', 'user.second_name', $query],
+                        ['like', 'user.first_name', $query],
+                        ['like', 'user.middle_name', $query],
+                        ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
+                        ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
+                        ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
+                        ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
+                        ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
+                        ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                    ])->orderBy(['id' => SORT_DESC]);
+
+                $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
+                $pages->pageSizeParam = false; //убираем параметр $per-page
+                $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
+
+            } else {
+
+                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
+                $pages->pageSizeParam = false; //убираем параметр $per-page
+                $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
+            }
+
+            $response = ['renderAjax' => $this->renderAjax('ajax_search_tasks', [
+                'projects' => $projects, 'pages' => $pages]), 'projects' => $projects];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+
+        } else {
+
+            $query = $searchForm->search;
+            if (5 <= mb_strlen($query)) {
+
+                $query_projects = Projects::find()->joinWith('user')
+                    ->andWhere(['or',
+                        ['like', 'project_name', $query],
+                        ['like', 'user.second_name', $query],
+                        ['like', 'user.first_name', $query],
+                        ['like', 'user.middle_name', $query],
+                        ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
+                        ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
+                        ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
+                        ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
+                        ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
+                        ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                    ])->orderBy(['id' => SORT_DESC]);
+
+                $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
+                $pages->pageSizeParam = false; //убираем параметр $per-page
+                $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
+
+            } else {
+
+                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
+                $pages->pageSizeParam = false; //убираем параметр $per-page
+                $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
+            }
+
+            return $this->render('tasks', [
+                'projects' => $projects,
+                'pages' => $pages,
+                'searchForm' => $searchForm,
+            ]);
+        }
+    }
+
+
+    /**
+     * Сохранение кэша поиска
+     * проекта на экспертизу
+     */
+    public function actionSaveCacheSearchForm ()
+    {
+        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+        $data = $_POST; //Массив, который будем записывать в кэш
+
+        if(Yii::$app->request->isAjax) {
+
+            $cache->cachePath = '../runtime/cache/forms/user-'.Yii::$app->user->id.'/searchFormExpertiseTasks/';
+            $key = 'searchFormExpertiseTasks'; //Формируем ключ
+            $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
+        }
+    }
+
+
+    /**
+     * Получить сводную
+     * таблицу проекта
+     *
+     * @param $id
+     * @return array|bool
+     */
+    public function actionGetProjectSummaryTable($id)
+    {
+        $project = Projects::findOne($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('ajax_project_summary_table', [
+                'project' => $project]), 'project_id' => $project->id];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * Получить форму
+     * поиска экспертов
+     *
+     * @param $id
+     * @return array|bool
+     */
+    public function actionGetSearchFormExperts($id)
+    {
+        $project = Projects::findOne($id);
+        $searchFormExperts = new SearchFormExperts();
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('ajax_get_search_form_expert', [
+                'project' => $project, 'searchFormExperts' => $searchFormExperts]), 'project_id' => $project->id];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * Вывести результат
+     * поиска экспертов
+     *
+     * @param $project_id
+     * @return array|bool
+     */
+    public function actionSearchExperts($project_id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $experts = SearchFormExperts::search($project_id);
+
+            $response = ['renderAjax' => $this->renderAjax('result_search_experts_ajax', ['experts' => $experts, 'project_id' => $project_id])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|bool
+     */
+    public function actionGetExpertiseByProject($id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('ajax_get_expertise_by_project', ['project_id' => $id]), 'project_id' => $id];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+}

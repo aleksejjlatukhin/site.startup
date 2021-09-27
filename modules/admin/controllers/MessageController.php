@@ -1347,4 +1347,30 @@ class MessageController extends AppAdminController
         return false;
     }
 
+
+    /**
+     * Создание новой беседы
+     *
+     * @param int $user_id
+     * @param int $expert_id
+     * @return array|bool
+     */
+    public function actionCreateExpertConversation($user_id, $expert_id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $user = User::findOne($user_id);
+            $expert = User::findOne($expert_id);
+            $conversation = User::createConversationExpert($user, $expert);
+
+            if ($conversation) {
+                $response = ['success' => true];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+        return false;
+    }
+
 }

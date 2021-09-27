@@ -53,10 +53,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
 
-                        !Yii::$app->user->isGuest ? (
-                        ['label' => 'Проекты', 'url' => ['/projects/index', 'id' => Yii::$app->user->id]]) : (''),
+                        !Yii::$app->user->isGuest ? ([
+                            'label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления'])
+                                : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/communications/notifications', 'id' => Yii::$app->user->id]
+                        ]) : (''),
 
-                        ['label' => 'О сервисе', 'url' => ['/about']],
+                        !Yii::$app->user->isGuest ? (
+                        ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messanger', 'title' => 'Проекты']), 'url' => ['/projects/index', 'id' => Yii::$app->user->id]]) : (''),
 
                         !Yii::$app->user->isGuest ? ([
                             'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
@@ -70,6 +73,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                         !Yii::$app->user->isGuest ? (
                         ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
                             : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/message/index', 'id' => Yii::$app->user->id]]) : '',
+
+                        !Yii::$app->user->isGuest ? (['label' => Html::img('/images/icons/about-service.png', ['class' => 'icon_messanger', 'title' => 'О сервисе']), 'url' => ['/about']]) : (['label' => 'О сервисе', 'url' => ['/about']]),
 
                         !Yii::$app->user->isGuest ? (
                         ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messanger', 'title' => 'Методическое руководство']), 'url' => ['/site/methodological-guide']]) : '',

@@ -51,7 +51,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'items' => [
 
                         !Yii::$app->user->isGuest ? (
-                        ['label' => Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/site/notifications', 'id' => Yii::$app->user->id]]) : '',
+                        ['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления'])
+                            : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/expert/communications/notifications', 'id' => Yii::$app->user->id]]) : '',
 
                         ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messanger', 'title' => 'Экспертизы']), 'url' => ['/expert/expertise/index']],
 

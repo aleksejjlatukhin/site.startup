@@ -132,4 +132,23 @@ class ConversationExpert extends ActiveRecord
 
         return $count_new_messages;
     }
+
+
+    /**
+     * Проверить существует ли беседа
+     * между пользователем и экспертом
+     *
+     * @param int $expert_id
+     * @param int $user_id
+     * @return bool
+     */
+    public static function isExist($expert_id, $user_id)
+    {
+        $conversation = self::findOne([
+            'expert_id' => $expert_id,
+            'user_id' => $user_id
+        ]);
+
+        return $conversation ? true : false;
+    }
 }

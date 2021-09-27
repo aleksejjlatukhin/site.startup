@@ -14,6 +14,11 @@ $form = ActiveForm::begin([
 ]);
 
 
+    echo $form->field($formRegistration, 'role')
+        ->hiddenInput()
+        ->label(false);
+
+
     echo $form->field($formRegistration, 'second_name', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Фамилия</div><div>{input}</div>'
     ])->textInput([

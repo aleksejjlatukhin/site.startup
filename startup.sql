@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Авг 15 2021 г., 16:18
+-- Время создания: Сен 28 2021 г., 00:38
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -306,7 +306,12 @@ CREATE TABLE `authors` (
 
 INSERT INTO `authors` (`id`, `project_id`, `fio`, `role`, `experience`) VALUES
 (1, 1, 'Иванов Иван Иванович', 'Директор', '10 лет'),
-(2, 1, 'Петров Петр Петрович', 'Заместитель директора', '5 лет');
+(2, 1, 'Петров Петр Петрович', 'Заместитель директора', '5 лет'),
+(3, 2, 'Карпов', 'директор', '4 года'),
+(4, 2, 'Неклюдов', 'Зам.директора', '2 года'),
+(5, 3, 'Карпов', 'проектант', '1 год'),
+(6, 4, 'Порошин', 'президент', '30 лет'),
+(7, 5, 'Иванов', 'работник', '5 лет');
 
 -- --------------------------------------------------------
 
@@ -359,15 +364,73 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1628627392),
-(2, 28, 1629032611),
-(4, 9, 1625166938),
-(6, 21, 1628801774),
-(7, 22, 1628627138),
-(8, 16, 1620151442),
-(10, 42, 1626979816),
-(12, 31, 1629032546),
-(13, 37, 1629033501);
+(1, 1, 1632775691),
+(2, 28, 1632775893),
+(4, 9, 1629311673),
+(6, 21, 1632774391),
+(7, 22, 1632745964),
+(8, 16, 1629311867),
+(12, 31, 1632775895),
+(13, 37, 1632676570);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `communication_patterns`
+--
+
+CREATE TABLE `communication_patterns` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `communication_type` int(11) NOT NULL,
+  `initiator` int(11) NOT NULL,
+  `is_active` int(11) NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `project_access_period` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL,
+  `is_remote` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `communication_patterns`
+--
+
+INSERT INTO `communication_patterns` (`id`, `communication_type`, `initiator`, `is_active`, `description`, `project_access_period`, `created_at`, `updated_at`, `is_remote`) VALUES
+(1, 100, 28, 123, 'Готовы ли вы провести экспертизу по проекту {{наименование проекта, ссылка на проект}} ? И сколько времени на это уйдет. Необходимо срочно дать ответ. У вас открыт доступ к данному проекту на 3 дня.', 1, 1631126503, 1631126503, 0),
+(2, 100, 28, 321, 'Описание шаблона коммуникации 2', 1, 1631126509, 1631126509, 0),
+(3, 150, 28, 321, 'Описание шаблона коммуникации 1', NULL, 1631127238, 1631127238, 1),
+(4, 150, 28, 321, 'Описание шаблона коммуникации 2', NULL, 1631127244, 1631127244, 1),
+(5, 150, 28, 321, 'Описание шаблона коммуникации 3', NULL, 1631127250, 1631127250, 0),
+(6, 300, 28, 321, 'Описание шаблона коммуникации 1', NULL, 1631127816, 1631127816, 0),
+(7, 300, 28, 321, 'Описание шаблона коммуникации 2', NULL, 1631127821, 1631127821, 0),
+(8, 300, 28, 321, 'Описание шаблона коммуникации 3', NULL, 1631127825, 1631127825, 1),
+(9, 350, 28, 321, 'Описание шаблона коммуникации 1', NULL, 1631128077, 1631128077, 0),
+(10, 350, 28, 321, 'Описание шаблона коммуникации 2', NULL, 1631128090, 1631128090, 0),
+(11, 350, 28, 321, 'Описание шаблона коммуникации 3', NULL, 1631128098, 1631128098, 0),
+(12, 400, 28, 321, 'Описание шаблона коммуникации 1', NULL, 1631128304, 1631128304, 0),
+(13, 400, 28, 321, 'Описание шаблона коммуникации 2', NULL, 1631128310, 1631128310, 0),
+(14, 400, 28, 321, 'Описание шаблона коммуникации 3', NULL, 1631128315, 1631128315, 1),
+(15, 100, 28, 321, 'Описание шаблона коммуникации 4', 5, 1631128545, 1631128545, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `communication_response`
+--
+
+CREATE TABLE `communication_response` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `communication_id` int(11) NOT NULL,
+  `answer` int(11) NOT NULL,
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `communication_response`
+--
+
+INSERT INTO `communication_response` (`id`, `communication_id`, `answer`, `comment`) VALUES
+(41, 132, 543, '');
 
 -- --------------------------------------------------------
 
@@ -547,7 +610,8 @@ INSERT INTO `conversation_expert` (`id`, `expert_id`, `user_id`, `role`, `update
 (1, 31, 28, 30, 1628622560),
 (2, 31, 21, 20, 1628622527),
 (3, 31, 1, 10, 1628622976),
-(4, 37, 28, 30, 1628795228);
+(4, 37, 28, 30, 1628795228),
+(5, 37, 1, 10, 1632414079);
 
 -- --------------------------------------------------------
 
@@ -568,6 +632,32 @@ CREATE TABLE `conversation_main_admin` (
 
 INSERT INTO `conversation_main_admin` (`id`, `main_admin_id`, `admin_id`, `updated_at`) VALUES
 (4, 28, 21, 1617297612);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `duplicate_communications`
+--
+
+CREATE TABLE `duplicate_communications` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `type` int(11) NOT NULL,
+  `source_id` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `adressee_id` int(11) NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `status` int(11) NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `duplicate_communications`
+--
+
+INSERT INTO `duplicate_communications` (`id`, `type`, `source_id`, `sender_id`, `adressee_id`, `description`, `status`, `created_at`, `updated_at`) VALUES
+(49, 333, 133, 28, 1, 'На ваш проект «Перспективы города» назначен эксперт Экспертов Петр Иванович. В сообщениях создана беседа с экспертом.', 3579, 1632775813, 1632775813),
+(50, 333, 133, 28, 21, 'На проект «<a href=\"/projects/index?id=1\">Перспективы города</a>» (проектант: <a href=\"/profile?id=1\">Иванов Иван Иванович</a>) назначен эксперт Экспертов Петр Иванович.', 3579, 1632775813, 1632775813);
 
 -- --------------------------------------------------------
 
@@ -625,7 +715,7 @@ CREATE TABLE `expert_info` (
 --
 
 INSERT INTO `expert_info` (`id`, `user_id`, `education`, `academic_degree`, `position`, `type`, `scope_professional_competence`, `publications`, `implemented_projects`, `role_in_implemented_projects`) VALUES
-(2, 31, 'Образование', 'Ученая степень, звание', 'Должность', '1|2|3|4|5|6', 'Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах'),
+(2, 31, 'Образование', 'Ученая степень, звание', 'Должность', '4|5|6', 'Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах'),
 (8, 37, 'МГУ', 'Кандидат наук', 'Заведующий кафедрой', '1|2|3', 'Сфера профессиональной компетенции', 'Научные публикации', 'Реализованные проекты', 'Роль в реализованных проектах');
 
 -- --------------------------------------------------------
@@ -653,7 +743,7 @@ CREATE TABLE `gcps` (
 --
 
 INSERT INTO `gcps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `problem_id`, `title`, `description`, `time_confirm`, `exist_confirm`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 16, 1, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1620598011, 1, 1620597126, 1620598011),
+(1, 1, 1, 16, 1, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2. Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1620598011, 1, 1620597126, 1630229131),
 (2, 4, 1, 26, 5, 'ГЦП 1', 'Наш продукт проблема 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от проблема 2.', 1620661464, 1, 1620656987, 1620661464),
 (8, 4, 1, 26, 5, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', NULL, NULL, 1621705573, 1621705573),
 (9, 13, 1, 32, 15, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 2, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1623359145, 0, 1623353835, 1623359145),
@@ -818,7 +908,7 @@ CREATE TABLE `keywords_expert` (
 
 INSERT INTO `keywords_expert` (`id`, `expert_id`, `description`) VALUES
 (5, 37, 'Профессор доцент наука'),
-(6, 31, 'Обучение');
+(6, 31, 'Обучение Курсы программирования интересная работа подготовка кадров инструкции новые технологии трансфер технологий и другое');
 
 -- --------------------------------------------------------
 
@@ -1673,7 +1763,40 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fullname`, `project_name`, `description`, `purpose_project`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`) VALUES
-(1, 1, 1620473372, 1625521976, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые');
+(1, 1, 1620473372, 1630229131, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые'),
+(2, 9, 1629311577, 1629311577, 'Проект 1 (Карпов)', 'Проект 1 (Карпов)', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1627938000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1629406800, 'Адрес сайта', 'Инвестор', 1628197200, 50000, 1628542800, 'Мероприятие, на котором проект анонсирован впервые'),
+(3, 9, 1629311661, 1629311661, 'Проект 2 (Карпов)', 'Проект 2 (Карпов)', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629406800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, ''),
+(4, 16, 1629311842, 1629311842, 'Сокращение расходов населения', 'Сокращение расходов населения', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629925200, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, ''),
+(5, 1, 1629312867, 1629312867, 'Перспективы города', 'Перспективы города', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629234000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `project_communications`
+--
+
+CREATE TABLE `project_communications` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `adressee_id` int(11) NOT NULL,
+  `type` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `pattern_id` int(11) DEFAULT NULL,
+  `triggered_communication_id` int(11) DEFAULT NULL,
+  `cancel` int(11) NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `project_communications`
+--
+
+INSERT INTO `project_communications` (`id`, `sender_id`, `adressee_id`, `type`, `project_id`, `status`, `pattern_id`, `triggered_communication_id`, `cancel`, `created_at`, `updated_at`) VALUES
+(131, 28, 31, 100, 5, 1000, 1, NULL, 2222, 1632775584, 1632775709),
+(132, 31, 28, 200, 5, 1000, NULL, 131, 2222, 1632775709, 1632775812),
+(133, 28, 31, 300, 5, 1000, NULL, 132, 2222, 1632775811, 1632775862);
 
 -- --------------------------------------------------------
 
@@ -2020,15 +2143,41 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone`, `email`, `username`, `password_hash`, `avatar_max_image`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
-(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1625521976),
-(9, 'Карпов', 'Антон', 'Петрович', '+7(999)99-99-99', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1620151486),
-(16, 'Порошин', 'Виктор', 'Николаевич', '+7(999)99-99-99', 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1620151428),
+(1, 'Иванов', 'Иван', 'Иванович', '+7(999)999-99-99', 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 21, 1582408272, 1630229132),
+(9, 'Карпов', 'Антон', 'Петрович', '+7(999)99-99-99', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1629311661),
+(16, 'Порошин', 'Виктор', 'Николаевич', '+7(999)99-99-99', 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1629311842),
 (21, 'Дибров', 'Дмитрий', 'Владимирович', '+7(999)999-99-99', 'dibrov@mail.ru', 'Dibrov', '$2y$13$8qmD5Jj5YMbUl4HlyU9OqODvek.tgm1GU/zhmk6iM8lBeJh1hWhjK', '7AzQAtxQm1c.jpg', 'avatar_9Vc9GrGT_min.png', 'wd9PcB_fY8b_L_W9Rjdp3hxteBd0OQyy', NULL, 20, 10, 20, NULL, 1586614816, 1627203712),
 (22, 'Техническая', 'поддержка', 'StartPool', '+7(999)999-99-99', 'dev@mail.com', 'dev', '$2y$13$KAt3g3ocWpm5cow7dsZOKOqRhaYZM1Qq27QTApSf/UYdRJPjU4Uji', 'technical-support-services.png', 'avatar_-6gVzcWi_min.png', 'hPQR4GvMfRsUnepawhOYlHhy80y--6ki', NULL, 100, 10, 20, NULL, 1586957787, 1617049090),
 (28, 'Главный', 'Админ', 'Сайта', '+7(999)999-99-99', 'alex.latukhin@mail.ru', 'MainAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', 'background_for_main_page.png', 'avatar_dy9VW45c_min.png', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 30, 10, 20, NULL, 1587560218, 1615307246),
-(29, 'Хрущев', 'Никита', 'Сергеевич', '+79999999999', 'alex.latukhin2015@yandex.ru', 'hrust', '$2y$13$VqFILzTszNEYP3vKNvTo/OR0qrfIKFYP1/ZSnvJExP13w4y.oDVW.', '', '', 'CA4mobzRtKA2LLSohPZIWTHT-XkdBd3d', NULL, 10, 1, 20, NULL, 1613504385, 1618948078),
+(29, 'Хрущев', 'Никита', 'Сергеевич', '+79999999999', 'alex.latukhin2015@yandex.ru', 'hrust', '$2y$13$VqFILzTszNEYP3vKNvTo/OR0qrfIKFYP1/ZSnvJExP13w4y.oDVW.', '', '', 'CA4mobzRtKA2LLSohPZIWTHT-XkdBd3d', NULL, 10, 0, 20, 21, 1613504385, 1630236539),
 (31, 'Экспертов', 'Петр', 'Иванович', '7890000000', 'aleksejj.latukhin@mail.ru', 'expertov', '$2y$13$CoDvU0pYkxcW9.Ksz8ynBOZnasD1jxvxThXH3izeHwN9eNt5SAs3m', 'shutterstock_235978021.jpg', 'avatar_64T4qnrK_min.png', 'ZE5naj0yFMRZhC0sffb-gH06bqyZsnHD', NULL, 40, 10, 20, NULL, 1627149710, 1629032476),
 (37, 'Суриков', 'Иван', 'Федорович', '7899999999', 'aleksejj.latukhin@rambler.ru', 'SurikoV', '$2y$13$UAhxmjmY0BU7zoppdsZeJ.B0fo9a/5kS2olqixpkUb1tlfAU7sBMS', 'iStock_000040123844_small.jpg', 'avatar_-3zHF6rV_min.png', 'kWUWoylcl_KEaW5Ps86EFzk4lVBOJl-6', NULL, 40, 10, 20, NULL, 1628794951, 1629030988);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `user_access_to_projects`
+--
+
+CREATE TABLE `user_access_to_projects` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `communication_id` int(11) NOT NULL,
+  `communication_type` int(11) NOT NULL,
+  `cancel` int(11) NOT NULL,
+  `date_stop` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `user_access_to_projects`
+--
+
+INSERT INTO `user_access_to_projects` (`id`, `user_id`, `project_id`, `communication_id`, `communication_type`, `cancel`, `date_stop`, `created_at`, `updated_at`) VALUES
+(90, 31, 5, 131, 100, 222, 1632861984, 1632775584, 1632775584),
+(91, 31, 5, 133, 300, 222, NULL, 1632775811, 1632775811);
 
 --
 -- Индексы сохранённых таблиц
@@ -2102,6 +2251,18 @@ ALTER TABLE `checking_online_user`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `communication_patterns`
+--
+ALTER TABLE `communication_patterns`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `communication_response`
+--
+ALTER TABLE `communication_response`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
@@ -2147,6 +2308,12 @@ ALTER TABLE `conversation_expert`
 -- Индексы таблицы `conversation_main_admin`
 --
 ALTER TABLE `conversation_main_admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `duplicate_communications`
+--
+ALTER TABLE `duplicate_communications`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2252,6 +2419,12 @@ ALTER TABLE `projects`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `project_communications`
+--
+ALTER TABLE `project_communications`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `questions_confirm_gcp`
 --
 ALTER TABLE `questions_confirm_gcp`
@@ -2313,6 +2486,12 @@ ALTER TABLE `user`
   ADD UNIQUE KEY `username` (`username`);
 
 --
+-- Индексы таблицы `user_access_to_projects`
+--
+ALTER TABLE `user_access_to_projects`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
 
@@ -2368,7 +2547,7 @@ ALTER TABLE `answers_questions_confirm_segment`
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
@@ -2381,6 +2560,18 @@ ALTER TABLE `business_model`
 --
 ALTER TABLE `checking_online_user`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT для таблицы `communication_patterns`
+--
+ALTER TABLE `communication_patterns`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT для таблицы `communication_response`
+--
+ALTER TABLE `communication_response`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
@@ -2422,13 +2613,19 @@ ALTER TABLE `conversation_development`
 -- AUTO_INCREMENT для таблицы `conversation_expert`
 --
 ALTER TABLE `conversation_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_main_admin`
 --
 ALTER TABLE `conversation_main_admin`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT для таблицы `duplicate_communications`
+--
+ALTER TABLE `duplicate_communications`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT для таблицы `expected_results_interview_confirm_problem`
@@ -2530,7 +2727,13 @@ ALTER TABLE `problems`
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT для таблицы `project_communications`
+--
+ALTER TABLE `project_communications`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_gcp`
@@ -2591,6 +2794,12 @@ ALTER TABLE `segments`
 --
 ALTER TABLE `user`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT для таблицы `user_access_to_projects`
+--
+ALTER TABLE `user_access_to_projects`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

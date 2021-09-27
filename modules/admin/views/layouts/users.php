@@ -53,8 +53,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
 
-                        ['label' => 'Проекты', 'url' => ['/admin/projects/index']],
-                        ['label' => 'Пользователи', 'url' => ['/admin/users/index']],
+                        ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messanger', 'title' => 'Проекты']), 'url' => ['/admin/projects/index']],
+                        ['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messanger', 'title' => 'Пользователи']), 'url' => ['/admin/users/index']],
+                        ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messanger', 'title' => 'Экспертизы']), 'url' => ['/admin/expertise/index']],
 
                         [
                             'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
@@ -67,6 +68,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                         ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
                             : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+
+                        ['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления'])
+                            : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/admin/communications/notifications', 'id' => Yii::$app->user->id]],
                     ],
                     'encodeLabels' => false,
                 ]);
@@ -78,8 +82,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
 
-                        ['label' => 'Проекты', 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
-                        ['label' => 'Пользователи', 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
+                        ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messanger', 'title' => 'Проекты']), 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
+                        ['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messanger', 'title' => 'Пользователи']), 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
 
                         [
                             'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
@@ -92,6 +96,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                         ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения'])
                             : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messanger', 'title' => 'Сообщения']), 'url' => ['/admin/message/index', 'id' => Yii::$app->user->id]],
+
+                        ['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления'])
+                            : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messanger', 'title' => 'Уведомления']), 'url' => ['/admin/communications/notifications', 'id' => Yii::$app->user->id]],
                     ],
                     'encodeLabels' => false,
                 ]);

@@ -3,6 +3,7 @@
 
 namespace app\models\forms;
 
+use yii\base\Exception;
 use yii\base\Model;
 use app\models\User;
 use Yii;
@@ -38,6 +39,7 @@ class SendEmailForm extends Model
 
     /**
      * @return bool
+     * @throws Exception
      */
     public function sendEmail()
     {

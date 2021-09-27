@@ -1,9 +1,13 @@
 <?php
 
+
 namespace app\controllers;
+
 
 use app\models\Authors;
 use app\models\BusinessModel;
+use app\models\CommunicationResponse;
+use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
 use app\models\Gcps;
 use app\models\Problems;
@@ -31,6 +35,7 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+
 class ProjectsController extends AppUserPartController
 {
 
@@ -52,7 +57,51 @@ class ProjectsController extends AppUserPartController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+
+                $expert = User::findOne(Yii::$app->user->id);
+
+                $userAccessToProject = $expert->findUserAccessToProject($model->id);
+
+                if ($userAccessToProject) {
+
+                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+
+                        $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
+
+                        if ($responsiveCommunication) {
+
+                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+
+                        } else {
+
+                            if (time() < $userAccessToProject->date_stop) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+                        }
+
+                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+
+                        return parent::beforeAction($action);
+
+                    } else {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                } else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
@@ -102,7 +151,7 @@ class ProjectsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index'])){
 
-            $user = User::findOne(Yii::$app->request->get());
+            $user = User::findOne(Yii::$app->request->get('id'));
 
             /*Ограничение доступа к проэктам пользователя*/
             if (($user->id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
@@ -110,7 +159,55 @@ class ProjectsController extends AppUserPartController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+
+                $expert = User::findOne(Yii::$app->user->id);
+
+                if (Yii::$app->request->get('project_id')) {
+
+                    $userAccessToProject = $expert->findUserAccessToProject(Yii::$app->request->get('project_id'));
+
+                    if ($userAccessToProject) {
+
+                        if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+
+                            $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
+
+                            if ($responsiveCommunication) {
+
+                                if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+
+                                    return parent::beforeAction($action);
+
+                                } else {
+                                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                                }
+
+                            } else {
+
+                                if (time() < $userAccessToProject->date_stop) {
+
+                                    return parent::beforeAction($action);
+
+                                } else {
+                                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                                }
+                            }
+
+                        } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+
+                            return parent::beforeAction($action);
+
+                        } else {
+                            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        }
+                    } else{
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                } else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
@@ -135,13 +232,15 @@ class ProjectsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
+     * @param null|int $project_id
      * @return string
      */
-    public function actionIndex($id)
+    public function actionIndex($id, $project_id = null)
     {
         $user = User::findOne($id);
-        $models = Projects::findAll(['user_id' => $id]);
+        $condition = $project_id ? ['user_id' => $id, 'id' => $project_id] : ['user_id' => $id];
+        $models = Projects::findAll($condition);
 
         if (!$models) return $this->redirect(['/projects/instruction', 'id' => $id]);
 

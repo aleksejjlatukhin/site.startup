@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\CommunicationResponse;
+use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateSegment;
 use app\models\forms\FormUpdateSegment;
@@ -64,7 +66,51 @@ class SegmentsController extends AppUserPartController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+
+                $expert = User::findOne(Yii::$app->user->id);
+
+                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+
+                if ($userAccessToProject) {
+
+                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+
+                        $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
+
+                        if ($responsiveCommunication) {
+
+                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+
+                        } else {
+
+                            if (time() < $userAccessToProject->date_stop) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+                        }
+
+                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+
+                        return parent::beforeAction($action);
+
+                    } else {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                } else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
@@ -78,7 +124,51 @@ class SegmentsController extends AppUserPartController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+
+                $expert = User::findOne(Yii::$app->user->id);
+
+                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+
+                if ($userAccessToProject) {
+
+                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+
+                        $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
+
+                        if ($responsiveCommunication) {
+
+                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+
+                        } else {
+
+                            if (time() < $userAccessToProject->date_stop) {
+
+                                return parent::beforeAction($action);
+
+                            } else {
+                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                            }
+                        }
+
+                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+
+                        return parent::beforeAction($action);
+
+                    } else {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                } else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 

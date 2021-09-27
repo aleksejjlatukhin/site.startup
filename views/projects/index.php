@@ -19,66 +19,70 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
         <div class="row row_header_data_generation" style="margin-top: 10px;">
 
-            <?php
-            $form = ActiveForm::begin([
-                'id' => 'sorting_projects',
-                'options' => ['class' => 'g-py-15'],
-                'errorCssClass' => 'u-has-error-v1',
-                'successCssClass' => 'u-has-success-v1-1',
-            ]); ?>
-
-            <?php
-            $listFields = ProjectSort::getListFields();
-            $listFields = ArrayHelper::map($listFields,'id', 'name');
-            ?>
-
             <div class="col-md-3" style="padding: 2px 0;">
                 <?= Html::a('Проекты' . Html::img('/images/icons/icon_report_next.png'), ['/projects/get-instruction'],[
                     'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                 ]); ?>
             </div>
 
-            <div class="col-md-3">
+            <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                <?= $form->field($sortModel, 'field',
-                    ['template' => '<div>{input}</div>'])
-                    ->widget(Select2::class, [
-                        'data' => $listFields,
-                        'options' => [
-                            'id' => 'listFields',
-                            'placeholder' => 'Выберите данные для сортировки'
-                        ],
-                        'hideSearch' => true, //Скрытие поиска
-                    ]);
+                <?php
+                $form = ActiveForm::begin([
+                    'id' => 'sorting_projects',
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]); ?>
+
+                <?php
+                $listFields = ProjectSort::getListFields();
+                $listFields = ArrayHelper::map($listFields,'id', 'name');
                 ?>
 
-            </div>
 
-            <div class="col-md-3">
 
-                <?= $form->field($sortModel, 'type',
-                    ['template' => '<div>{input}</div>'])
-                    ->widget(DepDrop::class, [
-                        'type' => DepDrop::TYPE_SELECT2,
-                        'select2Options' => [
-                            'pluginOptions' => ['allowClear' => false],
-                            'hideSearch' => true,
-                        ],
-                        'options' => ['id' => 'listType', 'placeholder' => 'Выберите тип сортировки'],
-                        'pluginOptions' => [
-                            'placeholder' => false,
-                            'hideSearch' => true,
-                            'depends' => ['listFields'],
-                            'nameParam' => 'name',
-                            'url' => Url::to(['/projects/list-type-sort'])
-                        ]
-                    ]);
-                ?>
-            </div>
+                <div class="col-md-3">
 
-            <?php
-            ActiveForm::end();
-            ?>
+                    <?= $form->field($sortModel, 'field',
+                        ['template' => '<div>{input}</div>'])
+                        ->widget(Select2::class, [
+                            'data' => $listFields,
+                            'options' => [
+                                'id' => 'listFields',
+                                'placeholder' => 'Выберите данные для сортировки'
+                            ],
+                            'hideSearch' => true, //Скрытие поиска
+                        ]);
+                    ?>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <?= $form->field($sortModel, 'type',
+                        ['template' => '<div>{input}</div>'])
+                        ->widget(DepDrop::class, [
+                            'type' => DepDrop::TYPE_SELECT2,
+                            'select2Options' => [
+                                'pluginOptions' => ['allowClear' => false],
+                                'hideSearch' => true,
+                            ],
+                            'options' => ['id' => 'listType', 'placeholder' => 'Выберите тип сортировки'],
+                            'pluginOptions' => [
+                                'placeholder' => false,
+                                'hideSearch' => true,
+                                'depends' => ['listFields'],
+                                'nameParam' => 'name',
+                                'url' => Url::to(['/projects/list-type-sort'])
+                            ]
+                        ]);
+                    ?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
+
+            <?php endif; ?>
 
             <div class="col-md-3" style="padding: 0;">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>

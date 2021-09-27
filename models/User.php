@@ -150,6 +150,37 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
+     * Получить объекты доступа класса UserAccessToProjects
+     * стороннего пользователя к проектам
+     *
+     * @return ActiveQuery
+     */
+    public function getUserAccessToProject()
+    {
+        return $this->hasOne(UserAccessToProjects::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * Получить объект доступа класса UserAccessToProjects
+     * стороннего пользователя к конкретному проекту
+     *
+     * @param $id
+     * @return array|ActiveRecord|null
+     */
+    public function findUserAccessToProject($id)
+    {
+        $access = UserAccessToProjects::find()
+            ->where(['user_id' => $this->id])
+            ->andWhere(['project_id' => $id])
+            ->orderBy('id DESC')
+            ->one();
+
+        return $access;
+    }
+
+
+    /**
      * Аутентификация пользователей
      * @param int|string $id
      * @return User|IdentityInterface|null
@@ -480,8 +511,9 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Создание беседы главного админа и
+     * Создание беседы любого пользователя (только не эксперта) и
      * эксперта при активации его статуса
+     *
      * @param $user
      * @param $expert
      * @return ConversationExpert|null
@@ -527,8 +559,10 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
+     * Общее кол-во непрочитанных
+     * сообщений пользователя
+     *
      * @return bool|int|string
-     * Общее кол-во непрочитанных сообщений пользователя
      */
     public function getCountUnreadMessages()
     {
@@ -565,6 +599,80 @@ class User extends ActiveRecord implements IdentityInterface
             $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesExpert + $countUnreadMessagesDev);
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Общее кол-во непрочитанных
+     * уведомлений пользователя
+     *
+     * @return bool|int|string
+     */
+    public function getCountUnreadCommunications()
+    {
+        $count = 0;
+
+        if (self::isUserExpert($this->username)) {
+
+            $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
+            $count += $countUnreadProjectCommunications;
+        }
+        elseif (self::isUserMainAdmin($this->username)) {
+
+            $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
+            $count += $countUnreadProjectCommunications;
+        }
+        elseif (self::isUserAdmin($this->username)) {
+
+            $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
+            $count += $countDuplicateCommunications;
+        }
+        elseif (self::isUserSimple($this->username)) {
+
+            $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
+            $count += $countDuplicateCommunications;
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Количество непрочитанных
+     * уведомлений пользователя
+     * по проекту
+     *
+     * @param int $id
+     * @return bool|int|string
+     */
+    public function getCountUnreadCommunicationsByProject($id)
+    {
+        $count = 0;
+
+        if (self::isUserExpert($this->username)) {
+
+            $countUnreadProjectCommunications = ProjectCommunications::find()
+                ->where([
+                    'adressee_id' => $this->getId(),
+                    'status' => ProjectCommunications::NO_READ,
+                    'project_id' => $id
+                ])->count();
+
+            $count += $countUnreadProjectCommunications;
+        }
+        elseif (self::isUserMainAdmin($this->username)) {
+
+            $countUnreadProjectCommunications = ProjectCommunications::find()
+                ->where([
+                    'adressee_id' => $this->getId(),
+                    'status' => ProjectCommunications::NO_READ,
+                    'project_id' => $id
+                ])->count();
+
+            $count += $countUnreadProjectCommunications;
         }
 
         return ($count > 0) ? $count : false;
