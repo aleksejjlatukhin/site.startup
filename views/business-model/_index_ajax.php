@@ -9,24 +9,21 @@ use app\models\User;
 
 <div class="row" style="margin: 0;">
 
-    <div class="col-md-9 text_update_page" style="margin-bottom: 15px;">
-
-        <?php echo Html::a( 'Бизнес-модель' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]), ['/business-model/mpdf-business-model', 'id' => $model->id], [
-            'class' => 'export_link',
-            'target' => '_blank',
-            'title' => 'Скачать в pdf',
-        ]);?>
+    <div class="col-md-8" style="padding-top: 17px; padding-bottom: 17px;">
+        <?= Html::a('Бизнес-модель' . Html::img('/images/icons/icon_report_next.png'), ['/business-model/get-instruction'],[
+            'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
+        ]); ?>
     </div>
 
-    <div class="button-update col-md-3">
+    <div class="col-md-4" style="padding-top: 17px; padding-bottom: 17px;">
 
         <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
             <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
-                'class' => 'btn btn-default update-hypothesis',
+                'class' => 'btn btn-default update-hypothesis pull-right',
                 'style' => [
                     'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
+                    'background' => '#669999',
                     'padding' => '0 7px',
                     'width' => '190px',
                     'height' => '40px',
@@ -37,7 +34,22 @@ use app\models\User;
 
         <?php endif; ?>
 
+        <?= Html::a('Скачать', ['/business-model/mpdf-business-model', 'id' => $model->id],[
+            'class' => 'btn btn-default pull-right',
+            'target' => '_blank',
+            'style' => [
+                'color' => '#FFFFFF',
+                'background' => '#52BE7F',
+                'padding' => '0 7px',
+                'width' => '190px',
+                'height' => '40px',
+                'font-size' => '24px',
+                'border-radius' => '8px',
+            ],
+        ]); ?>
+
     </div>
+
 </div>
 
 <div class="blocks_business_model">
