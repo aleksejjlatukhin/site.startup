@@ -114,22 +114,18 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
     <div class="block-link-create-interview row tab">
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
-            'class' => 'tablinks link_create_interview col-xs-12 col-md-6 col-lg-3',
+            'class' => 'tablinks link_create_interview col-xs-12 col-lg-4',
             'onclick' => "openCity(event, 'step_one')"
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 2</div><div class="link_create_interview-text_right">Сформировать список вопросов</div></div>', [
-            'class' => 'tablinks link_create_interview col-xs-12 col-md-6 col-lg-3',
+            'class' => 'tablinks link_create_interview col-xs-12 col-lg-4',
             'onclick' => "openCity(event, 'step_two')",
             'id' => "defaultOpen",
         ]); ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3 show_modal_next_step_error',
-        ]); ?>
-
-        <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 4</div><div class="link_create_interview-text_right">Получить отзывы экспертов</div></div>', [
-            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-md-6 col-lg-3 show_modal_next_step_error',
+            'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-lg-4 show_modal_next_step_error',
         ]); ?>
 
     </div>
