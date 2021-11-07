@@ -129,6 +129,29 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
 
 
     /**
+     * Получить объект содержащий
+     * типы экспертиз назначенных
+     * эксперту по данной коммуникации
+     * @return ActiveQuery
+     */
+    public function getTypesAccessToExpertise()
+    {
+        return $this->hasOne(TypesAccessToExpertise::class, ['communication_id' => 'id']);
+    }
+
+    /**
+     * Найти объект содержащий
+     * типы экспертиз назначенных
+     * эксперту по данной коммуникации
+     * @return TypesAccessToExpertise|null
+     */
+    public function findTypesAccessToExpertise()
+    {
+        return TypesAccessToExpertise::findOne(['communication_id' => $this->getId()]);
+    }
+
+
+    /**
      * Получить описание
      * шаблона коммуникации
      *
@@ -153,7 +176,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
                 return str_replace($projectName_search, $projectName_replace, $description);
             } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
-                return str_replace($linkProjectName_search, $linkProjectName_replace, $description);
+                $typesAccessToExpertise_search = '{{список типов деятельности эксперта}}';
+                $typesAccessToExpertise_replace = ExpertType::getContent($this->findTypesAccessToExpertise()->types);
+                return str_replace($linkProjectName_search, $linkProjectName_replace, str_replace($typesAccessToExpertise_search, $typesAccessToExpertise_replace, $description));
             } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
                 return str_replace($projectName_search, $projectName_replace, $description);
             } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
@@ -189,8 +214,10 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE;
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
         } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+            $typesAccessToExpertise_search = '{{список типов деятельности эксперта}}';
+            $typesAccessToExpertise_replace = ExpertType::getContent($this->findTypesAccessToExpertise()->types);
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT;
-            return str_replace($linkProjectName_search, $linkProjectName_replace, $defaultPattern);
+            return str_replace($linkProjectName_search, $linkProjectName_replace, str_replace($typesAccessToExpertise_search, $typesAccessToExpertise_replace, $defaultPattern));
         } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT;
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
@@ -367,7 +394,13 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public function isNeedReadButton()
     {
-        if (!in_array($this->type, [CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE, CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE])) {
+        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($this->status == self::NO_READ and time() > $this->userAccessToProject->date_stop) {
+                return true;
+            } elseif ($this->status == self::NO_READ and $this->cancel == self::CANCEL_TRUE) {
+                return true;
+            }
+        } elseif (!in_array($this->type, [CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE, CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE])) {
             if ($this->status == self::NO_READ) {
                 return true;
             }

@@ -56,7 +56,7 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
         return [
             [['source_id', 'sender_id', 'adressee_id', 'type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['source_id', 'sender_id', 'adressee_id', 'type', 'description'], 'required'],
-            ['description', 'string', 'max' => 255],
+            ['description', 'string', 'max' => 1000],
             ['type', 'in', 'range' => TypesDuplicateCommunication::getTypes()],
             ['status', 'default', 'value' => self::NO_READ],
             ['status', 'in', 'range' => [

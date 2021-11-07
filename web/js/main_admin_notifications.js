@@ -2,9 +2,67 @@
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 var body = $('body');
+var containerAppointsExpertProject;
 
 
-// Отправка коммуникации
+// Получить форму выбора типов эксперта при назначении на проект
+$(body).on('click', '.get-form-types-expert', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#expert_types_modal');
+    var container = $(modal).find('.modal-body');
+    containerAppointsExpertProject = $(this).parents('.response-action-to-communication');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function (response) {
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Назначение эксперта на проект и сохранение формы выбора типов эксперта
+$(body).on('beforeSubmit', '#form_types_expert', function (e) {
+
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+    var modal = $('#expert_types_modal');
+
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        success: function (response) {
+
+            if (response.success) {
+
+                // Меняем в шапке сайта в иконке количество непрочитанных коммуникаций
+                var blockCountUnreadCommunications = $(body).find('.countUnreadCommunications');
+                var newQuantityAfterRead = response.countUnreadCommunications;
+                $(blockCountUnreadCommunications).html(newQuantityAfterRead);
+                if (newQuantityAfterRead < 1) $(blockCountUnreadCommunications).removeClass('active');
+
+                $(containerAppointsExpertProject).html('<div class="text-success">Назначен(-а) на проект</div>')
+                $(modal).modal('hide');
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Отказ в назначении на проект
 $(body).on('click', '.send-communication', function (e) {
 
     var url = $(this).attr('href');
@@ -21,15 +79,7 @@ $(body).on('click', '.send-communication', function (e) {
             var newQuantityAfterRead = response.countUnreadCommunications;
             $(blockCountUnreadCommunications).html(newQuantityAfterRead);
             if (newQuantityAfterRead < 1) $(blockCountUnreadCommunications).removeClass('active');
-
-            if (response.type == 300) {
-
-                $(container).html('<div class="text-success">Назначен(-а) на проект</div>')
-
-            } else if (response.type == 350) {
-
-                $(container).html('<div class="text-danger">Отказано</div>')
-            }
+            if (response.type == 350) $(container).html('<div class="text-danger">Отказано</div>')
         }
     });
 

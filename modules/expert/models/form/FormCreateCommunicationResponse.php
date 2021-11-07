@@ -20,6 +20,7 @@ class FormCreateCommunicationResponse extends Model
 
     public $communication_id;
     public $answer;
+    public $expert_types;
     public $comment;
     public $_model;
 
@@ -42,6 +43,7 @@ class FormCreateCommunicationResponse extends Model
         return [
             [['answer', 'communication_id'], 'integer'],
             [['answer', 'communication_id'], 'required'],
+            ['expert_types', 'safe'],
             [['comment'], 'string', 'max' => 255],
             ['answer', 'in', 'range' => [
                 CommunicationResponse::POSITIVE_RESPONSE,
@@ -55,6 +57,7 @@ class FormCreateCommunicationResponse extends Model
     {
         return [
             'answer' => 'Дайте ответ на вопрос',
+            'expert_types' => 'Укажите типы экпертной деятельности, по которым будут сделаны экспертизы',
             'comment' => 'Напишите комментарий'
         ];
     }
@@ -95,7 +98,7 @@ class FormCreateCommunicationResponse extends Model
      */
     public function create()
     {
-        $this->_model->setParams($this->answer, $this->comment, $this->communication_id);
+        $this->_model->setParams($this->answer, $this->comment, $this->communication_id, $this->expert_types);
         if ($this->_model->save()) return true;
         throw new NotFoundHttpException('Неудалось сохранить сегмент');
     }

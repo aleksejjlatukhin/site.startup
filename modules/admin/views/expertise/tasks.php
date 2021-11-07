@@ -9,6 +9,22 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
 ?>
 
 
+<style>
+    .select2-container--krajee .select2-selection--multiple {
+        font-size: 16px;
+        border-radius: 12px;
+        border: 1px solid #828282;
+        height: 100%;
+        padding-bottom: 2px;
+        padding-top: 2px;
+    }
+    .select2-container--krajee .select2-selection--multiple .select2-selection__choice,
+    .select2-container--krajee .select2-selection {
+        font-size: 16px;
+    }
+</style>
+
+
 <div class="row expertise-tasks">
 
     <div class="col-md-7" style="margin-bottom: 15px; padding-left: 40px;">

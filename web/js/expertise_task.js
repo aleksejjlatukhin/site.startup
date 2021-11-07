@@ -192,6 +192,70 @@ $(body).on('click', '.send-communication', function (e) {
 });
 
 
+// Получить форму выбора типов эксперта при назначении на проект
+$(body).on('click', '.get-form-types-expert', function (e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#expert_types_modal');
+    var container = $(modal).find('.modal-body');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function (response) {
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Назначение эксперта на проект и сохранение формы выбора типов эксперта
+$(body).on('beforeSubmit', '#form_types_expert', function (e) {
+
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+    var modal = $('#expert_types_modal');
+
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        success: function (response) {
+
+            if (response.success) {
+
+                $.ajax({
+                    url: '/admin/communications/get-communications?id=' + response.project_id,
+                    method: 'POST',
+                    cache: false,
+                    success: function (response) {
+
+                        $('#expertise_task-' + response.project_id).find('.hereAddDataOfProject > .block-tasks-content').html(response.renderAjax);
+                        $(modal).modal('hide');
+                    }
+                });
+
+                // Меняем в шапке сайта в иконке количество непрочитанных коммуникаций
+                var blockCountUnreadCommunications = $(body).find('.countUnreadCommunications');
+                var newQuantityAfterRead = response.countUnreadCommunications;
+                $(blockCountUnreadCommunications).html(newQuantityAfterRead);
+                if (newQuantityAfterRead < 1) $(blockCountUnreadCommunications).removeClass('active');
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 // Ссылка на профиль эксперта
 $(body).on('click', '.column-user-fio', function () {
     var id = $(this).attr('id').split('-')[1];

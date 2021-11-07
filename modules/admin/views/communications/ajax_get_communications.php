@@ -5,8 +5,10 @@ use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use yii\helpers\Url;
 use app\models\CommunicationResponse;
+use app\models\ExpertType;
 
 ?>
+
 
 <?php if ($admittedExperts) : ?>
 
@@ -94,10 +96,24 @@ use app\models\CommunicationResponse;
 
                             <div class="col-md-3">
 
-                                <div><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer];?></div>
+                                <?php if ($communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
 
-                                <?php if ($communicationResponse->comment) : ?>
-                                    <div><b>Комментарий: </b><?= $communicationResponse->comment; ?></div>
+                                    <div><b>Ответ: </b><span class="text-success"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer];?></span></div>
+
+                                    <div><b>Типы деятельности: </b><?= ExpertType::getContent($communicationResponse->expert_types)?></div>
+
+                                    <?php if ($communicationResponse->comment) : ?>
+                                        <div><b>Комментарий: </b><?= $communicationResponse->comment; ?></div>
+                                    <?php endif; ?>
+
+                                <?php elseif ($communicationResponse->answer == CommunicationResponse::NEGATIVE_RESPONSE) : ?>
+
+                                    <div><b>Ответ: </b><span class="text-danger"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer];?></span></div>
+
+                                    <?php if ($communicationResponse->comment) : ?>
+                                        <div><b>Комментарий: </b><?= $communicationResponse->comment; ?></div>
+                                    <?php endif; ?>
+
                                 <?php endif; ?>
 
                             </div>
@@ -121,6 +137,7 @@ use app\models\CommunicationResponse;
 
                                             <div class="col-md-2">
                                                 <div class="text-success">Назначен(-а) на проект</div>
+                                                <div><b>Типы деятельности: </b><?= ExpertType::getContent($responsiveCommunication->typesAccessToExpertise->types);?></div>
                                                 <div>
                                                     <?= Html::a('Отозвать эксперта', Url::to([
                                                         '/admin/communications/send',
@@ -157,14 +174,10 @@ use app\models\CommunicationResponse;
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <?= Html::a('Назначить', Url::to([
-                                                    '/admin/communications/send',
-                                                    'adressee_id' => $communicationExpert->sender_id,
-                                                    'project_id' => $communicationExpert->project_id,
-                                                    'type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
-                                                    'triggered_communication_id' => $communicationExpert->id
+                                                    '/admin/communications/get-form-types-expert',
+                                                    'id' => $communicationExpert->id,
                                                 ]), [
-                                                    'class' => 'btn btn-success send-communication',
-                                                    'id' => 'appoints_expert_project-'.$communicationExpert->id,
+                                                    'class' => 'btn btn-success get-form-types-expert',
                                                     'style' => [
                                                         'background' => '#52BE7F',
                                                         'width' => '140px',

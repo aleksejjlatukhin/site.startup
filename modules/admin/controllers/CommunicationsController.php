@@ -8,8 +8,10 @@ use app\models\CommunicationPatterns;
 use app\models\CommunicationTypes;
 use app\models\DuplicateCommunications;
 use app\models\ProjectCommunications;
+use app\models\TypesAccessToExpertise;
 use app\models\User;
 use app\models\UserAccessToProjects;
+use app\modules\admin\models\form\FormExpertTypes;
 use app\modules\admin\models\form\FormUpdateCommunicationPattern;
 use Throwable;
 use Yii;
@@ -412,6 +414,9 @@ class CommunicationsController extends AppAdminController
     {
         if(Yii::$app->request->isAjax) {
 
+            // Данные из формы выбора типов деятельности эксперта при назначении на проект
+            $postExpertTypes = $_POST['FormExpertTypes']['expert_types'] ?: null;
+
             $communication = new ProjectCommunications();
             $communication->setParams($adressee_id, $project_id, $type);
             $communication->setTriggeredCommunicationId($triggered_communication_id);
@@ -450,6 +455,10 @@ class CommunicationsController extends AppAdminController
 
                         // Тип коммуникации "назначение эксперта на проект"
 
+                        // Типы доступных экспертиз по проекту
+                        $typesAccessToExpertise = new TypesAccessToExpertise();
+                        $typesAccessToExpertise->create($adressee_id, $project_id, $communication->getId(), $postExpertTypes);
+
                         // Прочтение коммуникации на которое поступил ответ
                         $result_ReadCommunication = $this->responseForReadCommunication($triggered_communication_id);
 
@@ -484,6 +493,28 @@ class CommunicationsController extends AppAdminController
                     return $response;
                 }
             }
+        }
+        return false;
+    }
+
+
+    /**
+     * Получить форму выбора типов
+     * эксперта при назначении на проект
+     *
+     * @param $id
+     * @return array|bool
+     */
+    public function actionGetFormTypesExpert($id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $response = ['renderAjax' => $this->renderAjax('get_form_types_expert', [
+                'communicationExpert' => ProjectCommunications::findOne($id),
+                'formExpertTypes' => new FormExpertTypes()])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }

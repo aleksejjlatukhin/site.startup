@@ -122,8 +122,31 @@ $(body).on('click', '.cancel-create-response-communication', function (e) {
 });
 
 
+// Отслеживаем выбор значения в поле "Ответ на вопрос"
+// в запросе о готовности провести экспертизу
+$(body).on('change', '.communication-response-answer', function (e) {
+
+    var positiveAnswer = '543';
+    if ($(this).val() != positiveAnswer) {
+        $(this).parents('.form-create-response-communication').find('.communication-response-expert-types-block').hide();
+    } else {
+        $(this).parents('.form-create-response-communication').find('.communication-response-expert-types-block').show();
+    }
+})
+
+
 // Сохранение формы ответа на коммуникацию
 $(body).on('beforeSubmit', '#formCreateResponseCommunication', function (e) {
+
+    // Если ответ на запрос о готовности провести экспертизу положительный,
+    // то проверяем, что поле "типы деятельности" заполнено
+    var answer = $(this).find('.communication-response-answer').val(),
+        expertTypes = $(this).find('.communication-response-expert-types').val(),
+        positiveAnswer = '543';
+    if (answer == positiveAnswer && expertTypes == '') {
+        e.preventDefault();
+        return false;
+    }
 
     var block_data = $(this).parents('.hereAddProjectCommunications'),
         url = $(this).attr('action'),

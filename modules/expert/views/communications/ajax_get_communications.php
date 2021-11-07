@@ -5,6 +5,8 @@ use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use app\models\CommunicationTypes;
 use app\modules\expert\models\ConversationExpert;
 use yii\helpers\Url;
+use app\models\ExpertType;
+use app\models\CommunicationResponse;
 
 ?>
 
@@ -54,6 +56,12 @@ use yii\helpers\Url;
                         <b>Ответ: </b>
                         <?= FormCreateCommunicationResponse::getAnswers()[$responsive->communicationResponse->answer]; ?>
                     </div>
+                    <?php if ($responsive->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
+                        <div>
+                            <b>Указанные типы экпертной деятельности: </b>
+                            <?= ExpertType::getContent($responsive->communicationResponse->expert_types); ?>
+                        </div>
+                    <?php endif; ?>
                     <div>
                         <b>Комментарий: </b>
                         <?= $responsive->communicationResponse->comment; ?>

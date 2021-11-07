@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+
 /**
  * Типы экспертов
  * Class ExpertType
@@ -33,10 +34,34 @@ abstract class ExpertType
 
 
     /**
+     * @param User|null $expert
+     * @param string|null $strKeys
      * @return array
      */
-    public static function getListTypes()
+    public static function getListTypes($expert = null, $strKeys = null)
     {
+
+        $list = array();
+
+        if ($expert && !$strKeys) {
+
+            $keys = self::getValue($expert->expertInfo->type);
+            foreach ($keys as $key) {
+                $list[$key] = self::$listTypes[$key];
+            }
+
+            return $list;
+
+        } elseif (!$expert && $strKeys) {
+
+            $keys = self::getValue($strKeys);
+            foreach ($keys as $key) {
+                $list[$key] = self::$listTypes[$key];
+            }
+
+            return $list;
+        }
+
         return self::$listTypes;
     }
 
@@ -52,7 +77,7 @@ abstract class ExpertType
 
 
     /**
-     * @param $types
+     * @param string $types
      * @return string
      */
     public static function getContent($types)

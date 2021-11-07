@@ -82,13 +82,25 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
                 <?php ActiveForm::end(); ?>
 
+            <?php else : ?>
+
+                <div class="col-md-6"></div>
+
             <?php endif; ?>
 
             <div class="col-md-3" style="padding: 0;">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
                     <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->id],
                         ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
                     ); ?>
+
+                <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить экспертизу</div></div>', ['/expert/expertise/get-project-expertise-form', 'id' => $_GET['project_id']],
+                        ['id' => 'showProjectExpertiseForm', 'class' => 'new_hypothesis_link_plus pull-right']
+                    ); ?>
+
                 <?php endif; ?>
             </div>
         </div>

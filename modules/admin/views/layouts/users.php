@@ -129,6 +129,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
 <!--Модальные окна страницы админка/пользователи-->
 <?= $this->render('../users/index_users_modal'); ?>
+<!--Модальные окна страниц уведомления, назначение эксперта на проект и др.-->
+<?= $this->render('../communications/communications_modal'); ?>
 
 <?php $this->endBody() ?>
 </body>

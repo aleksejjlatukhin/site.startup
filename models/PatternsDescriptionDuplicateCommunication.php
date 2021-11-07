@@ -43,14 +43,16 @@ class PatternsDescriptionDuplicateCommunication
             if (User::isUserSimple($adressee->username)) {
 
                 $this->description = 'На ваш проект «' . $source->project->project_name.'» назначен эксперт ' . $source->expert->second_name
-                    . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '. В сообщениях создана беседа с экспертом.';
+                    . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
+                    . ExpertType::getContent($source->findTypesAccessToExpertise()->types) . '. В сообщениях создана беседа с экспертом.';
 
             } elseif (User::isUserAdmin($adressee->username)) {
 
                 $this->description = 'На проект «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id])
                     . '» (проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' .
                     $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . ') назначен эксперт ' .
-                    $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '.';
+                    $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
+                    . ExpertType::getContent($source->findTypesAccessToExpertise()->types) . '.';
             }
 
         } elseif ($source->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {

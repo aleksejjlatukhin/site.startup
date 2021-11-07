@@ -67,13 +67,10 @@ $this->registerCssFile('@web/css/notifications-style.css');
                                 <div class="row">
                                     <div class="col-md-6">
                                         <?= Html::a('Назначить', Url::to([
-                                            '/admin/communications/send',
-                                            'adressee_id' => $communication->sender_id,
-                                            'project_id' => $communication->project_id,
-                                            'type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
-                                            'triggered_communication_id' => $communication->id
+                                            '/admin/communications/get-form-types-expert',
+                                            'id' => $communication->id,
                                         ]), [
-                                            'class' => 'btn btn-success send-communication',
+                                            'class' => 'btn btn-success get-form-types-expert',
                                             'id' => 'appoints_expert_project-'.$communication->id,
                                             'style' => [
                                                 'background' => '#52BE7F',
