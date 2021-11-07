@@ -427,9 +427,6 @@ class CommunicationsController extends AppAdminController
 
                     $result_ReadCommunication = [];
 
-                    // Отправка письма эксперту на почту
-                    $this->sendCommunicationToEmail($communication);
-
                     if ($type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         // Тип коммуникации "отмена запроса о готовности провести экспертизу"
@@ -484,6 +481,9 @@ class CommunicationsController extends AppAdminController
                         DuplicateCommunications::create($communication, $communication->project->user);
                         DuplicateCommunications::create($communication, $communication->project->user->admin);
                     }
+
+                    // Отправка письма эксперту на почту
+                    $this->sendCommunicationToEmail($communication);
 
                     $result_SendCommunication = ['success' => true, 'type' => $type, 'project_id' => $project_id];
 
