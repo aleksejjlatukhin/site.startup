@@ -482,6 +482,53 @@ class SegmentsController extends AppUserPartController
 
 
     /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     */
+    public function actionEnableExpertise($id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $segment = Segments::findOne($id);
+            $segment->setEnableExpertise();
+            if ($segment->save()) {
+
+                //Проверка наличия сортировки
+                $type_sort_id = $_POST['type_sort_id'];
+
+                if ($type_sort_id != '') {
+
+                    $sort = new SegmentSort();
+
+                    $response = [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => $sort->fetchModels($segment->getProjectId(), $type_sort_id),
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+
+                } else {
+                    $response = [
+                        'success' => true,
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Segments::findAll(['project_id' => $segment->getProjectId()]),
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * @return array
      */
     public function actionListTypeSort()

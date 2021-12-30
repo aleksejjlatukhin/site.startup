@@ -6,6 +6,14 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, который хранит объекты бизнес-моделей в бд
+ * Class BusinessModel
+ * @package app\models
+ *
+ * @property mixed $enable_expertise
+ * @property int $basic_confirm_id
+ */
 class BusinessModel extends ActiveRecord
 {
 
@@ -88,6 +96,25 @@ class BusinessModel extends ActiveRecord
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -98,6 +125,11 @@ class BusinessModel extends ActiveRecord
             [['relations', 'distribution_of_sales', 'resources'], 'string', 'max' => 255],
             [['partners', 'cost', 'revenue'], 'string', 'max' => 1000],
             [['relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'trim'],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

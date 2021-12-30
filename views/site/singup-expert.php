@@ -238,7 +238,7 @@ $form = ActiveForm::begin([
     <div class="block-exist-agree">
 
         <?= $form->field($formRegistration, 'exist_agree', ['template' => '{input}{label}'])
-            ->checkbox(['value' => 1, 'checked ' => true], false); ?>
+            ->checkbox(['value' => 1, 'checked ' => true, 'class' => 'custom-checkbox'], false); ?>
 
         <?= Html::a('Я согласен с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
             ['/site/confidentiality-policy'], [

@@ -1304,9 +1304,9 @@ div.style_form_field_questions {
 /*Стилизация Чекбоксов
 ---Начало---
 */
-input[type="checkbox"] { display: none; }
+input[type="checkbox"].custom-checkbox { display: none; }
 
-input[type="checkbox"] + label {
+input[type="checkbox"].custom-checkbox + label {
     margin-left: 15px;
     display: block;
     position: relative;
@@ -1321,9 +1321,9 @@ input[type="checkbox"] + label {
     -ms-user-select: none;
 }
 
-input[type="checkbox"] + label:last-child { margin-bottom: 0; }
+input[type="checkbox"].custom-checkbox + label:last-child { margin-bottom: 0; }
 
-input[type="checkbox"] + label:before {
+input[type="checkbox"].custom-checkbox + label:before {
     content: '';
     display: block;
     width: 20px;
@@ -1337,7 +1337,7 @@ input[type="checkbox"] + label:before {
     transition: all .12s, border-color .08s;
 }
 
-input[type="checkbox"]:checked + label:before {
+input[type="checkbox"].custom-checkbox:checked + label:before {
     width: 10px;
     top: -3px;
     left: 5px;
@@ -1714,6 +1714,7 @@ input[type="checkbox"]:checked + label:before {
 ---Конец---
 */
 
+
 /* Стилизация модального окна для удаления гипотезы
 ---Начало---
 */
@@ -1733,6 +1734,28 @@ input[type="checkbox"]:checked + label:before {
 /* Стилизация модального окна для удаления гипотезы
 ---Конец---
 */
+
+
+/* Стилизация модального окна для подтверждения разрешения на экспертизу
+---Начало---
+*/
+#confirm_enable_expertise_modal .modal-header {
+    background-color: #707F99;
+    color: #ffffff;
+    border-radius: 5px 5px 0 0;
+}
+#confirm_enable_expertise_modal .modal-body {
+    background-color: #F2F2F2;
+    color: #4F4F4F;
+}
+#confirm_enable_expertise_modal .modal-footer {
+    background-color: #707F99;
+    border-radius: 0 0 5px 5px;
+}
+/* Стилизация модального окна для подтверждения разрешения на экспертизу
+---Конец---
+*/
+
 
 /* Стилизация сводной таблицы проекта
 ---Начало---
@@ -2661,6 +2684,20 @@ body .not_exist_confirm_modal .modal-body { /*Модальные окно выб
     color: #4F4F4F;
 }
 body .not_exist_confirm_modal .modal-footer { /*Модальные окно выбора завершения подтверждения - footer*/
+    background-color: #707F99;
+    border-radius: 0 0 5px 5px;
+}
+
+body .exist_confirm_modal .modal-header { /*Модальные окно выбора завершения подтверждения - header*/
+    background-color: #707F99;
+    color: #ffffff;
+    border-radius: 5px 5px 0 0;
+}
+body .exist_confirm_modal .modal-body { /*Модальные окно выбора завершения подтверждения - body*/
+    background-color: #F2F2F2;
+    color: #4F4F4F;
+}
+body .exist_confirm_modal .modal-footer { /*Модальные окно выбора завершения подтверждения - footer*/
     background-color: #707F99;
     border-radius: 0 0 5px 5px;
 }

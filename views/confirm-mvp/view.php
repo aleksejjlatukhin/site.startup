@@ -655,4 +655,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
 <!--Модальные окна-->
 <?= $this->render('view_modal', ['model' => $model]); ?>
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/confirm_mvp_view.js'); ?>
+<?php
+$this->registerJsFile('@web/js/confirm_mvp_view.js');
+$this->registerJsFile('@web/js/main_expertise.js');
+?>

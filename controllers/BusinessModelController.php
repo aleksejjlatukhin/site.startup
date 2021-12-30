@@ -352,7 +352,7 @@ class BusinessModelController extends AppUserPartController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::findOne($model->confirmMvpId);
+        $confirmMvp = ConfirmMvp::findOne($model->getConfirmMvpId());
         $gcp = $model->gcp;
         $segment = $model->segment;
 
@@ -373,6 +373,39 @@ class BusinessModelController extends AppUserPartController
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     */
+    public function actionEnableExpertise($id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $model = $this->findModel($id);
+            $model->setEnableExpertise();
+            $confirmMvp = ConfirmMvp::findOne($model->getConfirmMvpId());
+            $gcp = $model->gcp;
+            $segment = $model->segment;
+
+            if ($model->save()) {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->id]),
+                        'segment' => $segment,
+                        'gcp' => $gcp,
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;

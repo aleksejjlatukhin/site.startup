@@ -6,6 +6,14 @@ use app\models\interfaces\ConfirmationInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, который хранит подтверждения проблем сегментов в бд
+ * Class ConfirmProblem
+ * @package app\models
+ *
+ * @property int $id
+ * @property mixed $enable_expertise
+ */
 class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 {
 
@@ -130,6 +138,25 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * Получить гипотезу подтверждения
      * @return ActiveQuery
      */
@@ -151,6 +178,11 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
             ['need_consumer', 'string', 'max' => 255],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

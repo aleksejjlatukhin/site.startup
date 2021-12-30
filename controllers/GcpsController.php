@@ -253,7 +253,7 @@ class GcpsController extends AppUserPartController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmProblem = ConfirmProblem::findOne($model->confirmProblemId);
+        $confirmProblem = ConfirmProblem::findOne($model->getConfirmProblemId());
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -270,6 +270,35 @@ class GcpsController extends AppUserPartController
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     */
+    public function actionEnableExpertise($id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $gcp = Gcps::findOne($id);
+            $gcp->setEnableExpertise();
+            $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
+
+            if ($gcp->save()) {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'models' => Gcps::find()->where(['basic_confirm_id' => $confirmProblem->id])->all(),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;

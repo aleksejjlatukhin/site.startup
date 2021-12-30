@@ -12,8 +12,7 @@ use yii\helpers\Html;
         <tr>
             <td class="block_problem_title" colspan="2">Обознач.</td>
             <td class="block_problem_description">Описание гипотезы проблемы сегмента</td>
-            <td class="block_problem_params">Действие для проверки</td>
-            <td class="block_problem_params">Метрика результата</td>
+            <td class="block_problem_params">Показатель положительного прохождения теста</td>
             <td class="block_problem_date">Дата создания</td>
             <td class="block_problem_date">Дата подтв.</td>
         </tr>
@@ -50,8 +49,7 @@ use yii\helpers\Html;
 
             <td class="block_problem_title"><?= $model->title; ?></td>
             <td class="block_problem_description"><?= $model->description; ?></td>
-            <td class="block_problem_params"><?= $model->action_to_check; ?></td>
-            <td class="block_problem_params"><?= $model->result_metric; ?></td>
+            <td class="block_problem_params"><?= 'K = ' . $model->indicator_positive_passage . ' %'; ?></td>
             <td class="block_problem_date"><?= date("d.m.y", $model->created_at); ?></td>
 
             <td class="block_problem_date">

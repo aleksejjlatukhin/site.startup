@@ -531,8 +531,10 @@ class ConfirmSegmentController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionNotExistConfirm($id)
     {
@@ -542,15 +544,16 @@ class ConfirmSegmentController extends AppUserPartController
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($segment->exist_confirm === 0) { // Создать класс StatusConfirm для обозначения статусов !!!
+        if ($segment->exist_confirm === 0) { // TODO:Создать класс StatusConfirm для обозначения статусов
             return $this->redirect(['/segments/index', 'id' => $project->id]);
 
         }else {
 
             $segment->exist_confirm = 0;
             $segment->time_confirm = time();
+            $model->setEnableExpertise();
 
-            if ($segment->save()){
+            if ($segment->update() && $model->update()){
 
                 $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
                 $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);
@@ -563,8 +566,10 @@ class ConfirmSegmentController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionExistConfirm($id)
     {
@@ -575,8 +580,9 @@ class ConfirmSegmentController extends AppUserPartController
 
         $segment->exist_confirm = 1;
         $segment->time_confirm = time();
+        $model->setEnableExpertise();
 
-        if ($segment->save()){
+        if ($segment->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);

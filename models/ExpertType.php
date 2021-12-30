@@ -67,6 +67,16 @@ abstract class ExpertType
 
 
     /**
+     * @param $value string
+     * @return false|int|string
+     */
+    public static function getKey($value)
+    {
+        return array_search($value, self::$listTypes);
+    }
+
+
+    /**
      * @param string $types
      * @return array
      */

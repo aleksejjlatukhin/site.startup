@@ -248,6 +248,25 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 });
 
 
+// Подтвердить в модальном окне разрешение на экспертизу
+$(body).on('click', '#confirm_enable_expertise', function (e) {
+
+    $.ajax({
+        url: $(this).attr('href'),
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+            $('#confirm_enable_expertise_modal').modal('hide');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //При попытке посмотреть данные интервью представителя сегмента
 $(body).on('click', '.get_interview_respond',  function(e){
 

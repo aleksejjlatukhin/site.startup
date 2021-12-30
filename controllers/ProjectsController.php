@@ -18,6 +18,7 @@ use app\models\Roadmap;
 use app\models\Segments;
 use app\models\SortForm;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -36,6 +37,10 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 
+/**
+ * Class ProjectsController
+ * @package app\controllers
+ */
 class ProjectsController extends AppUserPartController
 {
 
@@ -603,6 +608,57 @@ class ProjectsController extends AppUserPartController
 
                     //Проект с таким именем уже существует
                     $response =  ['project_already_exists' => true];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionEnableExpertise($id)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $project = Projects::findOne($id);
+            $project->setEnableExpertise();
+            if ($project->update()) {
+
+                // ToDo: Если на проект назначены эксперты отправить им уведомление о том,
+                // ToDo: что проектант разрешил экспертизу по этапу проекта, а так же уведомление трекеру
+
+                //Проверка наличия сортировки
+                $type_sort_id = $_POST['type_sort_id'];
+
+                if ($type_sort_id != '') {
+
+                    $sort = new ProjectSort();
+
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => $sort->fetchModels($project->getUserId(), $type_sort_id),
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+
+                } else {
+
+                    $response = [
+                        'renderAjax' => $this->renderAjax('_index_ajax', [
+                            'models' => Projects::findAll(['user_id' => $project->getUserId()]),
+                        ]),
+                    ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;

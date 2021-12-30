@@ -563,8 +563,10 @@ class ConfirmGcpController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionNotExistConfirm($id)
     {
@@ -574,15 +576,16 @@ class ConfirmGcpController extends AppUserPartController
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($gcp->exist_confirm === 0) {
-
+        if ($gcp->exist_confirm === 0) { // ToDo:Создать класс StatusConfirm для обозначения статусов
             return $this->redirect(['/gcps/index', 'id' => $confirmProblem->id]);
+
         } else {
 
             $gcp->exist_confirm = 0;
             $gcp->time_confirm = time();
+            $model->setEnableExpertise();
 
-            if ($gcp->save()){
+            if ($gcp->update() && $model->update()){
 
                 $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
                 $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);
@@ -596,8 +599,10 @@ class ConfirmGcpController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionExistConfirm($id)
     {
@@ -608,8 +613,9 @@ class ConfirmGcpController extends AppUserPartController
 
         $gcp->exist_confirm = 1;
         $gcp->time_confirm = time();
+        $model->setEnableExpertise();
 
-        if ($gcp->save()){
+        if ($gcp->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);

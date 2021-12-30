@@ -643,4 +643,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
 <!--Модальные окна-->
 <?= $this->render('view_modal', ['model' => $model]); ?>
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/confirm_segment_view.js'); ?>
+<?php
+$this->registerJsFile('@web/js/confirm_segment_view.js');
+$this->registerJsFile('@web/js/main_expertise.js');
+?>

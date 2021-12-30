@@ -43,9 +43,6 @@ class SearchFormExperts extends Model
     }
 
 
-    // СДЕЛАТЬ ФИЛЬТР ПО ПРОЕКТАМ,
-    // ВЫВОДИТЬ ТОЛЬКО ТЕХ ЭКСПЕРТОВ,
-    // КОТОРЫЕ ЕЩЁ НЕ НАЗНАЧЕНЫ НА ДАННЫЙ ПРОЕКТ !!!!!!!!
     /**
      * Поиск экспертов
      * @param $project_id
@@ -64,7 +61,7 @@ class SearchFormExperts extends Model
         }
 
         $experts = User::find()->joinWith(['expertInfo', 'keywords'])
-            ->where(['role' => User::ROLE_EXPERT])
+            ->where(['role' => User::ROLE_EXPERT, 'status' => User::STATUS_ACTIVE])
             ->andWhere(['REGEXP', 'expert_info.type', $type])
             ->andWhere(['or',
                 ['like', 'second_name', $name],

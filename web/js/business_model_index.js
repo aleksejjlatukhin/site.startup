@@ -189,7 +189,7 @@ $(body).on('click', '#button_confirm_closing_modal', function (e) {
 });
 
 
-//Редактирование гипотезы ценностного предложения
+//Редактирование Бизнес-модели
 $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 
     var url = $(this).attr('action');
@@ -209,6 +209,25 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
         },
         error: function(){
             alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Подтвердить в модальном окне разрешение на экспертизу
+$(body).on('click', '#confirm_enable_expertise', function (e) {
+
+    $.ajax({
+        url: $(this).attr('href'),
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.container-business_model').html(response.renderAjax);
+            $('#confirm_enable_expertise_modal').modal('hide');
         }
     });
 

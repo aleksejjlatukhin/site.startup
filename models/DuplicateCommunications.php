@@ -39,8 +39,12 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      */
     public function getSource()
     {
-        if ($this->type == TypesDuplicateCommunication::PROJECT_COMMUNICATIONS) {
-
+        if (in_array($this->type, [
+            TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT,
+            TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE,
+            TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE
+        ]))
+        {
             return ProjectCommunications::findOne($this->source_id);
         }
 
@@ -83,13 +87,15 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      *
      * @param CommunicationsInterface $source
      * @param User $adressee
+     * @param int $type
+     * @param false|Expertise $expertise
      * @return DuplicateCommunications|null
      */
-    public static function create($source, $adressee)
+    public static function create($source, $adressee, $type, $expertise = false)
     {
         $model = new self();
 
-        if ($model->setParams($source, $adressee)) {
+        if ($model->setParams($source, $adressee, $type, $expertise)) {
 
             return $model->save() ? $model : null;
         }
@@ -103,17 +109,19 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      *
      * @param CommunicationsInterface $source
      * @param User $adressee
+     * @param int $type
+     * @param false|Expertise $expertise
      * @return bool
      */
-    private function setParams($source, $adressee)
+    private function setParams($source, $adressee, $type, $expertise)
     {
         if (is_a($source, ProjectCommunications::class)) {
 
-            $this->type = TypesDuplicateCommunication::PROJECT_COMMUNICATIONS;
+            $this->type = $type;
             $this->source_id = $source->getId();
             $this->sender_id = $source->getSenderId();
             $this->adressee_id = $adressee->getId();
-            $this->description = PatternsDescriptionDuplicateCommunication::getValue($source, $adressee);
+            $this->description = PatternsDescriptionDuplicateCommunication::getValue($source, $adressee, $type, $expertise);
 
             return true;
         }

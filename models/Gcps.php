@@ -10,6 +10,15 @@ use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, который хранит объекты ценностных предложений в бд
+ * Class Gcps
+ * @package app\models
+ *
+ * @property mixed $enable_expertise
+ * @property string $title
+ * @property int $basic_confirm_id
+ */
 class Gcps extends ActiveRecord
 {
 
@@ -136,6 +145,25 @@ class Gcps extends ActiveRecord
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * Получить респондентов, которые
      * подтвердтлт текущую проблему
      * @return array|ActiveRecord[]
@@ -158,6 +186,11 @@ class Gcps extends ActiveRecord
             [['time_confirm', 'basic_confirm_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string', 'max' => 1500],
             [['title'], 'string', 'max' => 255],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

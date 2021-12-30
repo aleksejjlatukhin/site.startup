@@ -10,6 +10,15 @@ use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
+/**
+ * Класс, который хранит объекты проблем сегментов в бд
+ * Class Problems
+ * @package app\models
+ *
+ * @property int enable_expertise
+ * @property string $title
+ * @property int $basic_confirm_id
+ */
 class Problems extends ActiveRecord
 {
 
@@ -147,6 +156,25 @@ class Problems extends ActiveRecord
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * Получить представителей сегмента
      * @return array|ActiveRecord[]
      */
@@ -225,6 +253,11 @@ class Problems extends ActiveRecord
             [['description'], 'string', 'max' => 2000],
             [['title', 'description'], 'trim'],
             [['indicator_positive_passage', 'time_confirm', 'basic_confirm_id', 'exist_confirm', 'segment_id', 'project_id', 'created_at', 'updated_at'], 'integer'],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

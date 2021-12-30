@@ -576,8 +576,10 @@ class ConfirmMvpController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionNotExistConfirm($id)
     {
@@ -587,15 +589,16 @@ class ConfirmMvpController extends AppUserPartController
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($mvp->exist_confirm === 0) {
-
+        if ($mvp->exist_confirm === 0) { // ToDo:Создать класс StatusConfirm для обозначения статусов
             return $this->redirect(['mvps/index', 'id' => $confirmGcp->id]);
+
         }else {
 
             $mvp->exist_confirm = 0;
             $mvp->time_confirm = time();
+            $model->setEnableExpertise();
 
-            if ($mvp->save()){
+            if ($mvp->update() && $model->update()){
 
                 $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
                 $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);
@@ -609,8 +612,10 @@ class ConfirmMvpController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionExistConfirm($id)
     {
@@ -621,8 +626,9 @@ class ConfirmMvpController extends AppUserPartController
 
         $mvp->exist_confirm = 1;
         $mvp->time_confirm = time();
+        $model->setEnableExpertise();
 
-        if ($mvp->save()){
+        if ($mvp->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);

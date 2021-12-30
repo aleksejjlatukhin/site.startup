@@ -3,6 +3,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\EnableExpertise;
 use app\models\Projects;
 use app\models\User;
 use app\modules\admin\models\form\SearchForm;
@@ -82,6 +83,7 @@ class ExpertiseController extends AppAdminController
             if (5 <= mb_strlen($query)) {
 
                 $query_projects = Projects::find()->joinWith('user')
+                    ->where(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -101,7 +103,7 @@ class ExpertiseController extends AppAdminController
 
             } else {
 
-                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $query_projects = Projects::find()->where(['enable_expertise' => (string)EnableExpertise::ON])->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page
                 $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
@@ -119,6 +121,7 @@ class ExpertiseController extends AppAdminController
             if (5 <= mb_strlen($query)) {
 
                 $query_projects = Projects::find()->joinWith('user')
+                    ->where(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -138,7 +141,7 @@ class ExpertiseController extends AppAdminController
 
             } else {
 
-                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $query_projects = Projects::find()->where(['enable_expertise' => (string)EnableExpertise::ON])->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page
                 $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
