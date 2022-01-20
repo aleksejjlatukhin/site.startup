@@ -47,7 +47,7 @@ class BehaviorsUserPartController extends AppController
                     [
                         'allow' => true,
                         'controllers' => ['site'],
-                        'actions' => ['get-form-registration', 'registration', 'singup', 'error', 'login', 'index', 'about', 'send-email', 'reset-password', 'activate-account', 'confidentiality-policy'],
+                        'actions' => ['get-form-registration', 'registration', 'singup', 'error', 'login', 'index', 'about', 'send-email', 'reset-password', 'activate-account', 'confidentiality-policy', 'download-presentation'],
                         'verbs' => ['GET', 'POST'],
                         'roles' => ['?']
                     ],

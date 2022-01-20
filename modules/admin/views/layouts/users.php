@@ -120,7 +120,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
     <footer class="footer">
         <div class="container-fluid">
-            <p class="pull-left">&copy; СТАРТПУЛ, <?= date('Y') ?></p>
+            <div class="row">
+                <div class="col-xs-7 col-sm-9 col-lg-10">&copy; СТАРТПУЛ, <?= date('Y') ?></div>
+                <div class="col-xs-5 col-sm-3 col-lg-2">
+                    <div>тел: +79519042363</div>
+                    <div>e-mail: spaccel@mail.ru</div>
+                </div>
+            </div>
         </div>
     </footer>
 

@@ -82,11 +82,20 @@ body {
     border-top: 1px solid #4F4F4F;
     color: #FFFFFF;
 }
-.footer > .container-fluid > p {
+.footer > .container-fluid > .row {
+    margin-left: 10px;
+    margin-right: 20px;
+}
+.footer > .container-fluid > .row > div:first-child {
     padding-top: 18px;
-    margin-left: 35px;
     font-size: 20px;
     text-transform: uppercase;
+}
+.footer > .container-fluid > .row > div:nth-child(2) {
+    padding-top: 8px;
+}
+.footer > .container-fluid > .row > div:nth-child(2) > div {
+    text-align: right;
 }
 
 .jumbotron {

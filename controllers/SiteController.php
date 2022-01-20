@@ -7,6 +7,7 @@ use app\models\forms\SingupExpertForm;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use app\models\LoginForm;
 use app\models\forms\SingupForm;
@@ -468,6 +469,21 @@ class SiteController extends AppUserPartController
         }
 
         return $this->render('about', compact('user'));
+    }
+
+
+    /**
+     * @return \yii\console\Response|Response
+     * @throws NotFoundHttpException
+     */
+    public function actionDownloadPresentation()
+    {
+        $file = DOCUMENTS_WEB . 'presentation/presentation_spaccel.pptx';
+
+        if (file_exists($file)) {
+            return Yii::$app->response->sendFile($file, 'presentation_spaccel.pptx');
+        }
+        throw new NotFoundHttpException('Данный файл не найден');
     }
 
 
