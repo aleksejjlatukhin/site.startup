@@ -52,7 +52,7 @@ use app\models\ExpertType;
             ?>
 
             <?= $form->field($searchFormExperts, 'type', [
-                'template' => '<label>Тип экпертной деятельности</label><div>{input}</div>'
+                'template' => '<label>Тип экспертной деятельности</label><div>{input}</div>'
             ])->widget(Select2::class, [
                 'value' => [],
                 'data' => ExpertType::getListTypes(),

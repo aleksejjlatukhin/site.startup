@@ -365,6 +365,18 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
+     * Поиск записи в таблице client_user
+     * по данному пользователю
+     *
+     * @return ActiveQuery
+     */
+    public function getClientUser()
+    {
+        return $this->hasOne(ClientUser::class, ['user_id' => 'id']);
+    }
+
+
+    /**
      * Получить объект проверки статуса онлайн
      * @return ActiveQuery
      */

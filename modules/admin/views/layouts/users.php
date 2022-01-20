@@ -53,6 +53,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                     'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                     'items' => [
 
+                        ['label' => Html::img('/images/icons/icon_clients_page.png', ['class' => 'icon_messanger', 'title' => 'Организации']), 'url' => ['/admin/clients/index']],
                         ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messanger', 'title' => 'Проекты']), 'url' => ['/admin/projects/index']],
                         ['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messanger', 'title' => 'Пользователи']), 'url' => ['/admin/users/index']],
                         ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messanger', 'title' => 'Экспертизы']), 'url' => ['/admin/expertise/index']],
