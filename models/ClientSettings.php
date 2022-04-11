@@ -43,6 +43,36 @@ class ClientSettings extends ActiveRecord
 
 
     /**
+     * @return Client|null
+     */
+    public function findClient()
+    {
+        return Client::findOne($this->client_id);
+    }
+
+
+    /**
+     * Получить объект админа
+     * организации (клиента)
+     *
+     * @return ActiveQuery
+     */
+    public function getAdmin()
+    {
+        return $this->hasOne(User::class, ['id' => 'admin_id']);
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function findAdmin()
+    {
+        return User::findOne($this->admin_id);
+    }
+
+
+    /**
      * @return int
      */
     public function getId()
@@ -134,6 +164,21 @@ class ClientSettings extends ActiveRecord
             [['client_id', 'admin_id'], 'unique'],
             [['avatar_max_image', 'avatar_image'], 'string', 'max' => 255]
         ];
+    }
+
+
+    /**
+     * @param array $params
+     * @return bool
+     */
+    public static function createRecord($params)
+    {
+        $settings = new self();
+        $settings->setAttributes($params);
+        if (!self::findOne(['client_id' => $settings->getClientId()])) {
+            return $settings->save();
+        }
+        return false;
     }
 
 }

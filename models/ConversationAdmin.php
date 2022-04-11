@@ -8,6 +8,17 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
+/**
+ * Класс, который хранит беседы между трекерами и проетантами
+ *
+ * Class ConversationAdmin
+ * @package app\models
+ *
+ * @property int $id                    идентификатор беседы
+ * @property int $admin_id               идентификатор трекера
+ * @property int $user_id                идентификатор проектанта
+ * @property int $updated_at             дата обновления
+ */
 class ConversationAdmin extends ActiveRecord
 {
 
@@ -50,7 +61,8 @@ class ConversationAdmin extends ActiveRecord
 
 
     /**
-     * Получить объект Админа
+     * Получить объект Трекера
+     *
      * @return ActiveQuery
      */
     public function getAdmin ()
@@ -60,7 +72,8 @@ class ConversationAdmin extends ActiveRecord
 
 
     /**
-     * Получить объект пользователя
+     * Получить объект проектанта
+     *
      * @return ActiveQuery
      */
     public function getUser ()
@@ -71,6 +84,7 @@ class ConversationAdmin extends ActiveRecord
 
     /**
      * Получить все сообщения беседы
+     *
      * @return ActiveQuery
      */
     public function getMessages ()
@@ -81,6 +95,7 @@ class ConversationAdmin extends ActiveRecord
 
     /**
      * Получить последнее сообщение беседы
+     *
      * @return ActiveQuery
      */
     public function getLastMessage ()
@@ -92,6 +107,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * Получить кол-во непрочитанных
      * сообщений беседы
+     *
      * @return int|string
      */
     public function getCountNewMessages ()
@@ -100,5 +116,59 @@ class ConversationAdmin extends ActiveRecord
             ->where(['conversation_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
 
         return $count_new_messages;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAdminId()
+    {
+        return $this->admin_id;
+    }
+
+
+    /**
+     * @param int $admin_id
+     */
+    public function setAdminId($admin_id)
+    {
+        $this->admin_id = $admin_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 }

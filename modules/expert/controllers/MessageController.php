@@ -105,7 +105,7 @@ class MessageController extends AppExpertController
         // Беседа эксерта с техподдержкой
         $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
         // Беседа эксперта с главным админом
-        $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $id, 'role' => User::ROLE_MAIN_ADMIN]);
+        $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $id, 'role' => User::ROLE_ADMIN_COMPANY]);
         // Беседы эксперта и трекеров
         $adminConversations = ConversationExpert::find()
             ->where(['expert_id' => $id, 'role' => User::ROLE_ADMIN])
@@ -128,6 +128,12 @@ class MessageController extends AppExpertController
     }
 
 
+    /**
+     * Страница просмотра беседы
+     *
+     * @param $id
+     * @return string|false
+     */
     public function actionView($id)
     {
         $conversation = ConversationExpert::findOne($id);
@@ -148,7 +154,7 @@ class MessageController extends AppExpertController
             // Беседа эксперта с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->id]);
             // Беседа эксперта с гл. админом
-            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_MAIN_ADMIN]);
+            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_ADMIN_COMPANY]);
             // Все беседы эксперта с трекерами
             $adminConversations = ConversationExpert::find()
                 ->andWhere(['expert_id' => $expert->id])
@@ -275,6 +281,7 @@ class MessageController extends AppExpertController
                 'allConversations' => $allConversations,
             ]);
         }
+        return false;
     }
 
 

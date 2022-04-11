@@ -79,16 +79,8 @@ $(body).on('beforeSubmit', '#login_user_form', function(e){
                 $(style_error_not_confirm_singup).show();
             }
 
-            if(response.user_success) {
-                location.reload();
-            }
-
-            if(response.admin_success) {
-                window.location.href = '/admin';
-            }
-
-            if(response.expert_success) {
-                window.location.href = '/expert';
+            if(response.url) {
+                window.location.href = response.url;
             }
 
         },

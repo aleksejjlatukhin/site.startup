@@ -27,7 +27,7 @@ $this->title = 'О сервисе';
                     <p>- Вы ментор, инвестируете в стартапы или оказываете им консультационную поддержку и хотите помочь им наладить более эффективное общение с клиентами?</p>
                     <p style="padding-bottom: 15px;">- Вам нравится новая бизнес-идея и вы хотите понять – есть ли у нее будущее, перед тем как сжечь мосты и бросить предыдущую работу, да и вообще, плотно заняться ею.</p>
                     <div style="float: left;">
-                        <iframe style="padding: 0px 15px 0px 0;" src="https://www.youtube.com/embed/F66NhTNOlMA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe style="padding: 0px 15px 0px 0;" src="https://www.youtube.com/embed/ML8-APvnv0A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         <div class="text-center">
                             <?= Html::a('Скачать презентацию', ['/site/download-presentation']); ?>
                         </div>

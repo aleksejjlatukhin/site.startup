@@ -8,6 +8,17 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
+/**
+ * Класс, хранит беседы между техподдержкой и всеми остальными пользователями
+ *
+ * Class ConversationDevelopment
+ * @package app\models
+ *
+ * @property int $id                        идентификатор беседы
+ * @property int $dev_id                    идентификатор техподдержки
+ * @property int $user_id                   идентификатор пользователя
+ * @property int $updated_at                дата обновления
+ */
 class ConversationDevelopment extends ActiveRecord
 {
 
@@ -100,5 +111,59 @@ class ConversationDevelopment extends ActiveRecord
             ->where(['conversation_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
 
         return $count_new_messages;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getDevId()
+    {
+        return $this->dev_id;
+    }
+
+
+    /**
+     * @param int $dev_id
+     */
+    public function setDevId($dev_id)
+    {
+        $this->dev_id = $dev_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 }

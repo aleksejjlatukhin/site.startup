@@ -2,6 +2,9 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\Client;
+use app\models\ClientSettings;
+use app\models\ClientUser;
 use app\models\Projects;
 use app\models\SortForm;
 use app\models\User;
@@ -35,12 +38,19 @@ class ProjectsController extends AppAdminController
         }elseif ($action->id == 'group') {
 
             $user = User::findOne(Yii::$app->request->get());
+            /** @var ClientUser $clientUser */
+            $clientUser = $user->clientUser;
+            $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
 
-            if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if ($clientSettings->getAdminId() == Yii::$app->user->getId()) {
+                if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
+                    || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                return parent::beforeAction($action);
+                    return parent::beforeAction($action);
 
+                }else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
             }else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
@@ -52,6 +62,12 @@ class ProjectsController extends AppAdminController
 
     }
 
+    /**
+     * Страница сводной таблицы по проетам,
+     * которые относятся к организации
+     *
+     * @return string
+     */
     public function actionIndex ()
     {
         $sortModel = new SortForm();
@@ -64,6 +80,13 @@ class ProjectsController extends AppAdminController
     }
 
 
+    /**
+     * Страница сводной таблицы по проектам,
+     * которые курирует трекер
+     *
+     * @param $id
+     * @return string
+     */
     public function actionGroup ($id)
     {
         $sortModel = new SortForm();
@@ -76,14 +99,33 @@ class ProjectsController extends AppAdminController
     }
 
 
+    /**
+     * Получение сводной таблицы по проектам
+     *
+     * @param $id
+     * @param $page
+     * @param $per_page
+     * @return array|bool
+     */
     public function actionGetResultProjects ($id, $page, $per_page)
     {
         if ($id == 'all_projects') {
-            //все проекты для главного админа
-            $query = Projects::find()->orderBy(['id' => SORT_DESC]);
+            // вывести все проекты организации
+            $user = User::findOne(Yii::$app->user->getId());
+            /**
+             * @var ClientUser $clientUser
+             * @var Client $client
+             */
+            $clientUser = $user->clientUser;
+            $client = $clientUser->client;
+            $query = Projects::find()->with('user')
+                ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                ->where(['client_user.client_id' => $client->getId()])
+                ->orderBy(['id' => SORT_DESC]);
 
         } else {
-            //проекты, пользователей, которых курирует линейный админ
+            // вывести проекты, которые курирует трекер
             $query = Projects::find()
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                 ->where(['user.id_admin' => $id])->orderBy(['id' => SORT_DESC]);

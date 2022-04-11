@@ -4,6 +4,8 @@
 namespace app\modules\admin\controllers;
 
 use app\controllers\AppController;
+use app\models\ClientSettings;
+use app\models\ClientUser;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -28,7 +30,12 @@ class BehaviorsAdminPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserAdmin(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
+                            $admin = User::findOne($clientSettings->getAdminId());
+                            return User::isUserAdmin($user->getUsername()) && User::isUserMainAdmin($admin->getUsername());
                         }
                     ],
 
@@ -45,6 +52,14 @@ class BehaviorsAdminPartController extends AppController
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
                             return User::isUserDev(Yii::$app->user->identity['username']);
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserManager(Yii::$app->user->identity['username']);
                         }
                     ],
                 ]

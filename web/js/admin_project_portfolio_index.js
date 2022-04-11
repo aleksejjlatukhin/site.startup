@@ -1,6 +1,11 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
+
+var body = $('body');
+var module = (window.location.pathname).split('/')[1];
+
+
 var id = (window.location.search).split('?id=')[1];
 if (typeof id === 'undefined') {
     id = 'all_projects';
@@ -14,7 +19,7 @@ $(document).ready(function() {
     //Загружаем сводные таблицы проектов на страницу
     $.ajax({
 
-        url: '/admin/projects/get-result-projects?id=' + id + '&page=1&per_page=' + count_projects,
+        url: '/' + module + '/projects/get-result-projects?id=' + id + '&page=1&per_page=' + count_projects,
         method: 'POST',
         cache: false,
         success: function(response){
@@ -28,7 +33,6 @@ $(document).ready(function() {
 
 });
 
-var body = $('body');
 
 //Указание кол-ва проектов на странице
 $(body).change('#field_count_projects', function(){
@@ -37,7 +41,7 @@ $(body).change('#field_count_projects', function(){
 
     $.ajax({
 
-        url: '/admin/projects/get-result-projects?id=' + id + '&page=1&per_page=' + count_projects,
+        url: '/' + module + '/projects/get-result-projects?id=' + id + '&page=1&per_page=' + count_projects,
         method: 'POST',
         cache: false,
         success: function(response){

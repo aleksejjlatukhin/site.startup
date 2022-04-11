@@ -1,8 +1,6 @@
 <?php
 
-use app\models\User;
 use yii\widgets\ActiveForm;
-use yii\helpers\Url;
 use kartik\select2\Select2;
 
 $this->title = 'Регистрация';
@@ -21,18 +19,21 @@ $this->registerCssFile('@web/css/registration.css');
         <div class="block-form-user-role">
 
             <?php $form = ActiveForm::begin([
-                'id' => 'form_user_role',
-                'action' => Url::to(['/site/get-form-registration']),
+                'id' => 'form_client_and_role',
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
 
-                <?= $form->field($formUserRole, 'role', [
-                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя</div><div>{input}</div>'
+                <?= $form->field($formClientAndRole, 'clientId', [
+                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт</div><div>{input}</div>'
                 ])->widget(Select2::class, [
-                    'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт'],
-                    'options' => ['id' => 'type-interaction', 'placeholder' => 'Выберите проектную роль пользователя'],
+                    'data' => $dataClients,
+                    'options' => [
+                        'autocomplete' => 'off',
+                        'id' => 'formClientAndRole_clientId',
+                        'placeholder' => 'Выберите организацию, к которой будет привязан Ваш аккаунт',
+                    ],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
                 ]); ?>

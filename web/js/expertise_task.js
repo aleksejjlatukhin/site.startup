@@ -2,6 +2,7 @@
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 var body = $('body');
+var module = (window.location.pathname).split('/')[1];
 var page = window.location.search.split('=')[1];
 if (typeof(page) === 'undefined') page = 1;
 
@@ -99,10 +100,10 @@ $(body).on('input', 'form#search_expertise_tasks', function(e) {
     var url = $(this).attr('action');
 
     // Записываем строку поиска в кэш
-    $.ajax({url: '/admin/expertise/save-cache-search-form', method: 'POST', data: data});
+    $.ajax({url: '/' + module + '/expertise/save-cache-search-form', method: 'POST', data: data});
 
     // Смена URL без перезагрузки страницы
-    history.pushState(null, null, '/admin/expertise/tasks');
+    history.pushState(null, null, '/' + module + '/expertise/tasks');
 
     $.ajax({
         url: url,
@@ -164,7 +165,7 @@ $(body).on('click', '.send-communication', function (e) {
                 else {
 
                     $.ajax({
-                        url: '/admin/communications/get-communications?id=' + response.project_id,
+                        url: '/' + module + '/communications/get-communications?id=' + response.project_id,
                         method: 'POST',
                         cache: false,
                         success: function (response) {
@@ -232,7 +233,7 @@ $(body).on('beforeSubmit', '#form_types_expert', function (e) {
             if (response.success) {
 
                 $.ajax({
-                    url: '/admin/communications/get-communications?id=' + response.project_id,
+                    url: '/' + module + '/communications/get-communications?id=' + response.project_id,
                     method: 'POST',
                     cache: false,
                     success: function (response) {

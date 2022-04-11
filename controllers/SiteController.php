@@ -2,11 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\forms\FormUserRole;
+use app\models\Client;
+use app\models\ClientUser;
+use app\models\forms\FormClientAndRole;
 use app\models\forms\SingupExpertForm;
 use Throwable;
 use Yii;
+use yii\base\Exception;
 use yii\db\StaleObjectException;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use app\models\LoginForm;
@@ -47,12 +51,6 @@ class SiteController extends AppUserPartController
     {
         $user = Yii::$app->user->identity;
 
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username'])|| User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
-        }
-
         if (Yii::$app->user->isGuest) {
 
             $model_login = new LoginForm();
@@ -68,52 +66,89 @@ class SiteController extends AppUserPartController
     }
 
 
+    /**
+     * Страница регистрации пользователя
+     *
+     * @return array|string|Response
+     */
     public function actionRegistration()
     {
         $user = Yii::$app->user->identity;
 
         if (Yii::$app->user->isGuest) {
-            $formUserRole = new FormUserRole();
-            return $this->render('registration', compact('user', 'formUserRole'));
+
+            $formClientAndRole = new FormClientAndRole();
+            $clients = Client::findAllActiveClients();
+            $dataClients = ArrayHelper::map($clients, 'id', 'fullname');
+
+            if (Yii::$app->request->isAjax) {
+
+                if ($_POST['FormClientAndRole']['clientId']) {
+
+                    $formClientAndRole->clientId = $_POST['FormClientAndRole']['clientId'];
+                    $client = Client::findById($formClientAndRole->clientId);
+                    $admin = $client->findSettings()->findAdmin();
+                    if (User::isUserMainAdmin($admin->username)) {
+
+                        $response = ['renderAjax' => $this->renderAjax('form_registration_spaccel', [
+                            'user' => $user,
+                            'formClientAndRole' => $formClientAndRole,
+                            'dataClients' => $dataClients,
+                        ])
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+
+                    } else {
+
+                        $response = ['renderAjax' => $this->renderAjax('form_registration', [
+                            'user' => $user,
+                            'formClientAndRole' => $formClientAndRole,
+                            'dataClients' => $dataClients,
+                        ])
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
+                } elseif ($_POST['FormClientAndRole']['role']) {
+
+                    $role = $_POST['FormClientAndRole']['role'];
+                    $formRegistration = new SingupForm();
+                    $formRegistration->role = $role;
+
+                    if ($role == User::ROLE_EXPERT) {
+
+                        $formRegistration = new SingupExpertForm();
+                        $formRegistration->role = $role;
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('singup-expert', [
+                                'formRegistration' => $formRegistration
+                            ]),
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
+                    $response = [
+                        'renderAjax' => $this->renderAjax('singup', [
+                            'formRegistration' => $formRegistration
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+            }
+
+            return $this->render('registration', compact('user', 'formClientAndRole', 'dataClients'));
         } else {
             return $this->redirect('/');
         }
-    }
-
-
-    public function actionGetFormRegistration()
-    {
-        if (Yii::$app->request->isAjax) {
-
-            $role = $_POST['FormUserRole']['role'];
-            $formRegistration = new SingupForm();
-            $formRegistration->role = $role;
-
-            if ($role == User::ROLE_EXPERT) {
-
-                $formRegistration = new SingupExpertForm();
-                $formRegistration->role = $role;
-
-                $response = [
-                    'renderAjax' => $this->renderAjax('singup-expert', [
-                        'formRegistration' => $formRegistration
-                    ]),
-                ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
-
-            $response = [
-                'renderAjax' => $this->renderAjax('singup', [
-                    'formRegistration' => $formRegistration
-                ]),
-            ];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-        }
-        return false;
     }
 
 
@@ -141,31 +176,34 @@ class SiteController extends AppUserPartController
 
                         if ($user = $model->singup()) {
 
-                            if ($user->confirm == User::NOT_CONFIRM) {
+                            if (ClientUser::createRecord($_POST['FormClientAndRole']['clientId'], $user->getId())) {
 
-                                if ($model->sendActivationEmail($user)) {
+                                if ($user->confirm == User::NOT_CONFIRM) {
 
-                                    //Письмо с подтверждение отправлено
-                                    $response = [
-                                        'success_singup' => true,
-                                        'message' => 'Спасибо за регистрацию. Письмо с подтверждением регистрации отправлено на указанный email.',
-                                    ];
-                                    Yii::$app->response->format = Response::FORMAT_JSON;
-                                    Yii::$app->response->data = $response;
-                                    return $response;
+                                    if ($model->sendActivationEmail($user)) {
 
-                                } else {
+                                        //Письмо с подтверждение отправлено
+                                        $response = [
+                                            'success_singup' => true,
+                                            'message' => 'Спасибо за регистрацию. Письмо с подтверждением регистрации отправлено на указанный email.',
+                                        ];
+                                        Yii::$app->response->format = Response::FORMAT_JSON;
+                                        Yii::$app->response->data = $response;
+                                        return $response;
 
-                                    $user->delete();
+                                    } else {
 
-                                    //Письмо с подтверждение не отправлено
-                                    $response = [
-                                        'error_singup_send_email' => true,
-                                        'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
-                                    ];
-                                    Yii::$app->response->format = Response::FORMAT_JSON;
-                                    Yii::$app->response->data = $response;
-                                    return $response;
+                                        $user->delete();
+
+                                        //Письмо с подтверждение не отправлено
+                                        $response = [
+                                            'error_singup_send_email' => true,
+                                            'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
+                                        ];
+                                        Yii::$app->response->format = Response::FORMAT_JSON;
+                                        Yii::$app->response->data = $response;
+                                        return $response;
+                                    }
                                 }
                             }
                         }
@@ -307,26 +345,48 @@ class SiteController extends AppUserPartController
 
                         if ($model->login()) {
 
-                            if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                                || User::isUserDev(Yii::$app->user->identity['username'])) {
+                            if (User::isUserMainAdmin($user->getUsername()) || User::isUserDev($user->getUsername()) || User::isUserManager($user->getUsername())) {
 
-                                $response = ['admin_success' => true];
+                                $response = ['url' => Url::to('/admin')];
                                 Yii::$app->response->format = Response::FORMAT_JSON;
                                 Yii::$app->response->data = $response;
                                 return $response;
                             }
 
-                            if (User::isUserExpert(Yii::$app->user->identity['username'])) {
+                            if (User::isUserAdminCompany($user->getUsername())) {
 
-                                $response = ['expert_success' => true];
+                                $response = ['url' => Url::to('/client')];
                                 Yii::$app->response->format = Response::FORMAT_JSON;
                                 Yii::$app->response->data = $response;
                                 return $response;
                             }
 
-                            if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                            if (User::isUserAdmin($user->getUsername())) {
 
-                                $response = ['user_success' => true];
+                                /** @var $clientUser ClientUser */
+                                $clientUser = $user->clientUser;
+                                $client = Client::findById($clientUser->getClientId());
+                                if (User::isUserMainAdmin($client->findSettings()->findAdmin()->username)) {
+                                    $response = ['url' => Url::to('/admin')];
+                                } else {
+                                    $response = ['url' => Url::to('/client')];
+                                }
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
+                                return $response;
+                            }
+
+                            if (User::isUserExpert($user->getUsername())) {
+
+                                $response = ['url' => Url::to('/expert')];
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
+                                return $response;
+                            }
+
+                            if (User::isUserSimple($user->getUsername())) {
+
+                                $response = ['url' => Url::to('/')];
                                 Yii::$app->response->format = Response::FORMAT_JSON;
                                 Yii::$app->response->data = $response;
                                 return $response;
@@ -334,7 +394,7 @@ class SiteController extends AppUserPartController
 
                             if (($user->confirm == User::CONFIRM) && ($user->status == User::STATUS_NOT_ACTIVE || $user->status == User::STATUS_DELETED)) {
 
-                                $response = ['user_success' => true];
+                                $response = ['url' => Url::to('/')];
                                 Yii::$app->response->format = Response::FORMAT_JSON;
                                 Yii::$app->response->data = $response;
                                 return $response;
@@ -370,6 +430,7 @@ class SiteController extends AppUserPartController
 
     /**
      * @return array|bool
+     * @throws Exception
      */
     public function actionSendEmail()
     {
@@ -478,10 +539,10 @@ class SiteController extends AppUserPartController
      */
     public function actionDownloadPresentation()
     {
-        $file = DOCUMENTS_WEB . 'presentation/presentation_spaccel.pptx';
+        $file = DOCUMENTS_WEB . 'presentation/presentation_spaccel.pdf';
 
         if (file_exists($file)) {
-            return Yii::$app->response->sendFile($file, 'presentation_spaccel.pptx');
+            return Yii::$app->response->sendFile($file, 'presentation_spaccel.pdf');
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }

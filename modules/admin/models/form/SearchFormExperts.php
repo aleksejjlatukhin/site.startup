@@ -3,8 +3,10 @@
 
 namespace app\modules\admin\models\form;
 
+use app\models\ClientUser;
 use app\models\ExpertType;
 use app\models\User;
+use Yii;
 use yii\base\Model;
 use yii\db\ActiveRecord;
 
@@ -43,16 +45,15 @@ class SearchFormExperts extends Model
     }
 
 
-    // СДЕЛАТЬ ФИЛЬТР ПО ПРОЕКТАМ,
-    // ВЫВОДИТЬ ТОЛЬКО ТЕХ ЭКСПЕРТОВ,
-    // КОТОРЫЕ ЕЩЁ НЕ НАЗНАЧЕНЫ НА ДАННЫЙ ПРОЕКТ !!!!!!!!
     /**
      * Поиск экспертов
-     * @param $project_id
+     *
      * @return array|ActiveRecord[]
      */
-    public static function search($project_id)
+    public static function search()
     {
+        $clientUser = ClientUser::findOne(['user_id' => Yii::$app->user->getId()]);
+        $client = $clientUser->client;
         $filter = $_POST['SearchFormExperts'];
         $name = trim($filter['name']);
         $keywords = explode(' ', trim($filter['keywords']));
@@ -64,7 +65,8 @@ class SearchFormExperts extends Model
         }
 
         $experts = User::find()->joinWith(['expertInfo', 'keywords'])
-            ->where(['role' => User::ROLE_EXPERT])
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['role' => User::ROLE_EXPERT, 'client_user.client_id' => $client->getId()])
             ->andWhere(['REGEXP', 'expert_info.type', $type])
             ->andWhere(['or',
                 ['like', 'second_name', $name],

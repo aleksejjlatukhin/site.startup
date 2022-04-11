@@ -29,7 +29,9 @@ body {
     background-color: #4F4F4F;
     border-color: #4F4F4F;
 }
-#main_menu_admin, #main_menu_expert {
+#main_menu_admin,
+#main_menu_expert,
+#main_menu_client {
     background-color: #4F4F4F;
     border-color: #4F4F4F;
 }

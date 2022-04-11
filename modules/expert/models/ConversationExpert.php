@@ -8,7 +8,18 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
-
+/**
+ * Класс, который хранит беседы экспертов со всеми доступными пользователями, кроме техподдержки
+ *
+ * Class ConversationExpert
+ * @package app\modules\expert\models
+ *
+ * @property int $id                        идентификатор беседы
+ * @property int $expert_id                 идентификатор эксперта
+ * @property int $user_id                   идентификатор пользователя
+ * @property int $role                      роль пользователя
+ * @property int $updated_at                дата обновления
+ */
 class ConversationExpert extends ActiveRecord
 {
 
@@ -32,7 +43,9 @@ class ConversationExpert extends ActiveRecord
             ['role', 'in', 'range' => [
                 User::ROLE_USER,
                 User::ROLE_ADMIN,
-                User::ROLE_MAIN_ADMIN
+                User::ROLE_MAIN_ADMIN,
+                User::ROLE_ADMIN_COMPANY,
+                User::ROLE_MANAGER
             ]],
         ];
     }
@@ -150,5 +163,59 @@ class ConversationExpert extends ActiveRecord
         ]);
 
         return $conversation ? true : false;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int $expert_id
+     */
+    public function setExpertId($expert_id)
+    {
+        $this->expert_id = $expert_id;
+    }
+
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+
+    /**
+     * @param int $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 }

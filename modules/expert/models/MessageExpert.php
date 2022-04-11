@@ -8,7 +8,21 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
-
+/**
+ * Класс, который хранит сообщения из бесед экспертов со всеми доступными пользователями, кроме техподдержки
+ *
+ * Class MessageExpert
+ * @package app\modules\expert\models
+ *
+ * @property int $id                            идентификатор сообщения
+ * @property int $conversation_id               идентификатор беседы
+ * @property int $sender_id                     идентификатор отправителя
+ * @property int $adressee_id                   идентификатор получателя
+ * @property string $description                текст сообщения
+ * @property int $status                        статус сообщения
+ * @property int $created_at                    дата создания
+ * @property int $updated_at                    дата обновления
+ */
 class MessageExpert extends ActiveRecord
 {
 
@@ -174,5 +188,122 @@ class MessageExpert extends ActiveRecord
             return ( date('d', $this->created_at) . ' ' . $monthes[(date('n', $this->created_at))]
                 . ' ' . date(' Y', $this->created_at));
         }
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getConversationId()
+    {
+        return $this->conversation_id;
+    }
+
+
+    /**
+     * @param int $conversation_id
+     */
+    public function setConversationId($conversation_id)
+    {
+        $this->conversation_id = $conversation_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSenderId()
+    {
+        return $this->sender_id;
+    }
+
+
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId($sender_id)
+    {
+        $this->sender_id = $sender_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAdresseeId()
+    {
+        return $this->adressee_id;
+    }
+
+
+    /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId($adressee_id)
+    {
+        $this->adressee_id = $adressee_id;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 }

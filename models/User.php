@@ -17,6 +17,32 @@ use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
 use Yii;
 
+/**
+ * Класс, который хранит информацию о пользователях
+ *
+ * Class User
+ * @package app\models
+ *
+ * @property int $id                                Идентификатор пользователя
+ * @property string $second_name                    Фамилия пользователя
+ * @property string $first_name                     Имя пользователя
+ * @property string $middle_name                    Отчетство пользователя
+ * @property string $telephone                      Номер телефона пользователя
+ * @property string $email                          Адрес эл. почты пользователя
+ * @property string $username                       Логин пользователя
+ * @property string $password_hash                  Хэшированный пароль пользователя хранится в бд
+ * @property string $password                       Пароль пользователя не хранится в бд
+ * @property string $avatar_max_image               Название загруженного файла с аватаром пользователя
+ * @property string $avatar_image                   Название сформированного файла с аватаром пользователя
+ * @property string $auth_key                       Ключ авторизации пользователя (пока не используется)
+ * @property string $secret_key                     Секретный ключ для подтверждения регистрации (ограничен по времени действия)
+ * @property int $role                              Проектная роль пользователя
+ * @property int $status                            Статус пользователя
+ * @property int $confirm                           Подтверждена ли регистрация пользователя
+ * @property int $id_admin                          Поле для привязки проектанта к трекеру
+ * @property int $created_at                        Дата регистрации пользователя
+ * @property int $updated_at                        Дата обновления пользователя (его данных)
+ */
 class User extends ActiveRecord implements IdentityInterface
 {
 
@@ -24,12 +50,17 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_NOT_ACTIVE = 1;
     const STATUS_ACTIVE = 10;
     const STATUS_REMOVE = 200;
+    //TODO: необходимо оставлять пользователей в базе данных, после удаления.
+    // Просто устанавливать статус STATUS_REMOVE и переопределить метод self::find(),
+    // чтобы показывать записи, где статус отличный от STATUS_REMOVE
 
-    const ROLE_USER = 10;
-    const ROLE_ADMIN = 20;
-    const ROLE_MAIN_ADMIN = 30;
-    const ROLE_EXPERT = 40;
-    const ROLE_DEV = 100;
+    const ROLE_USER = 10;           // Роль проектанта
+    const ROLE_ADMIN = 20;          // Роль трекера
+    const ROLE_ADMIN_COMPANY = 25;  // Роль администратора организации
+    const ROLE_MAIN_ADMIN = 30;     // Роль гл.администратора платформы
+    const ROLE_EXPERT = 40;         // Роль эксперта
+    const ROLE_MANAGER = 50;        // Роль менеждера по клиентам (организациям) от платформы
+    const ROLE_DEV = 100;           // Роль тех.поддержки
 
     const CONFIRM = 20;
     const NOT_CONFIRM = 10;
@@ -84,7 +115,6 @@ class User extends ActiveRecord implements IdentityInterface
             'password' => 'Password',
             'status' => 'Статус',
             'role' => 'Проектная роль',
-            'auth_key' => 'Auth Key',
             'created_at' => 'Дата регистрации',
             'updated_at' => 'Последнее изменение',
         ];
@@ -377,6 +407,60 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
+     * @return ActiveQuery
+     */
+    public function getCustomerManagersByUserId()
+    {
+        return $this->hasMany(CustomerManager::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @return CustomerManager|null
+     */
+    public function findCustomerManagersByUserId()
+    {
+        return CustomerManager::findOne(['user_id' => $this->id]);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCustomerTrackersByUserId()
+    {
+        return $this->hasMany(CustomerTracker::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @return CustomerTracker|null
+     */
+    public function findCustomerTrackersByUserId()
+    {
+        return CustomerTracker::findOne(['user_id' => $this->id, 'status' => CustomerTracker::ACTIVE]);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCustomerExpertsByUserId()
+    {
+        return $this->hasMany(CustomerExpert::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @return CustomerExpert|null
+     */
+    public function findCustomerExpertsByUserId()
+    {
+        return CustomerExpert::findOne(['user_id' => $this->id, 'status' => CustomerExpert::ACTIVE]);
+    }
+
+
+    /**
      * Получить объект проверки статуса онлайн
      * @return ActiveQuery
      */
@@ -388,6 +472,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Получить статус пользователя онлайн или время посл.активности
+     *
      * @return bool
      */
     public function getCheckOnline()
@@ -398,17 +483,29 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Получить объект главного Админа
+     * Получить объект главного админа или админа организации
+     *
      * @return User|null
      */
     public function getMainAdmin ()
     {
-        return User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+        if ($this->role !== self::ROLE_ADMIN_COMPANY) {
+            /** @var ClientUser $clientUser */
+            $clientUser = $this->clientUser;
+            $mainAdminId = ClientSettings::find()
+                ->select('admin_id')
+                ->where(['client_id' => $clientUser->getClientId()])
+                ->one();
+
+            return self::findOne($mainAdminId);
+        }
+        return self::findOne(['role' => self::ROLE_MAIN_ADMIN]);
     }
 
 
     /**
-     * Получить объект Админа
+     * Получить объект трекера
+     *
      * @return bool|ActiveQuery
      */
     public function getAdmin ()
@@ -422,6 +519,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Получить объект техподдержки
+     *
      * @return User|null
      */
     public function getDevelopment ()
@@ -432,6 +530,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Отправка письма на почту пользователю при изменении его статуса
+     *
      * @return bool
      */
     public function sendEmailUserStatus()
@@ -440,85 +539,78 @@ class User extends ActiveRecord implements IdentityInterface
         $user = User::findOne(['email' => $this->email]);
 
         if($user){
-
             return Yii::$app->mailer->compose('change-status', ['user' => $user])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                 ->setTo($this->email)
                 ->setSubject('Изменение Вашего статуса на сайте Spaccel.ru')
                 ->send();
         }
-
         return false;
     }
 
 
     /**
      * Создание беседы техподдержки и пользователя при активации его статуса
+     *
      * @return ConversationDevelopment|null
      */
     public function createConversationDevelopment ()
     {
-        $convers = ConversationDevelopment::findOne(['user_id' => $this->id]);
+        $con = ConversationDevelopment::findOne(['user_id' => $this->id]);
 
-        if (!($convers)) {
-
+        if (!$con) {
             $conversation = new ConversationDevelopment();
-            $conversation->user_id = $this->id;
-            $conversation->dev_id = $this->development->id;
+            $conversation->setUserId($this->id);
+            $conversation->setDevId($this->getDevelopment()->id);
             return $conversation->save() ? $conversation : null;
-
         }else{
-
-            return $convers;
+            return $con;
         }
-
     }
 
 
     /**
-     * Создание беседы главного админа и админа при активации его статуса
+     * Создание беседы админа организации и трекера
+     *
      * @return ConversationMainAdmin|null
      */
     public function createConversationMainAdmin ()
     {
-        $convers = ConversationMainAdmin::findOne(['admin_id' => $this->id]);
+        $mainAdmin = $this->getMainAdmin();
+        $con = ConversationMainAdmin::findOne([
+            'main_admin_id' => $mainAdmin->id,
+            'admin_id' => $this->id
+        ]);
 
-        if (!($convers)) {
-
+        if (!$con) {
             $conversation = new ConversationMainAdmin();
-            $conversation->admin_id = $this->id;
-            $conversation->main_admin_id = $this->mainAdmin->id;
+            $conversation->setAdminId($this->id);
+            $conversation->setMainAdminId($mainAdmin->getId());
             return $conversation->save() ? $conversation : null;
-
         }else{
-
-            return $convers;
+            return $con;
         }
-
     }
 
 
     /**
-     * Создание беседы админа и проектанта при активации его статуса
-     * @param $user
+     * Создание беседы трекером и проектанта
+     *
+     * @param User $user
      * @return ConversationAdmin|null
      */
     public function createConversationAdmin ($user)
     {
-        $convers = ConversationAdmin::findOne(['user_id' => $user->id]);
+        $con = ConversationAdmin::findOne(['user_id' => $user->id]);
 
-        if (!($convers)) {
-
+        if (!$con) {
             $conversation = new ConversationAdmin();
-            $conversation->user_id = $user->id;
-            $conversation->admin_id = $user->id_admin;
+            $conversation->setUserId($user->getId());
+            $conversation->setAdminId($user->getIdAdmin());
             return $conversation->save() ? $conversation : null;
-
         }else{
-
-            return $convers;
+            return $con;
         }
-
     }
 
 
@@ -526,46 +618,46 @@ class User extends ActiveRecord implements IdentityInterface
      * Создание беседы любого пользователя (только не эксперта) и
      * эксперта при активации его статуса
      *
-     * @param $user
-     * @param $expert
+     * @param User $user
+     * @param User $expert
      * @return ConversationExpert|null
      */
     public static function createConversationExpert ($user, $expert)
     {
-        $convers = ConversationExpert::findOne(['user_id' => $user->id, 'expert_id' => $expert->id]);
+        $con = ConversationExpert::findOne(['user_id' => $user->id, 'expert_id' => $expert->id]);
 
-        if (!($convers)) {
-
+        if (!$con) {
             $conversation = new ConversationExpert();
-            $conversation->user_id = $user->id;
-            $conversation->expert_id = $expert->id;
-            $conversation->role = $user->role;
+            $conversation->setUserId($user->getId());
+            $conversation->setExpertId($expert->getId());
+            $conversation->setRole($user->getRole());
             return $conversation->save() ? $conversation : null;
-
         }else{
-
-            return $convers;
+            return $con;
         }
 
     }
 
 
     /**
-     * Отправка письма админу
-     * @param $user
+     * Отправка письма админу организации
+     *
+     * @param User $user
      * @return bool
      */
     public function sendEmailAdmin($user)
     {
         if($user) {
 
+            /** @var User $admin*/
+            $admin = $user->getMainAdmin();
+
             return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-                ->setTo([Yii::$app->params['adminEmail']])
+                ->setTo([$admin->email])
                 ->setSubject('Регистрация нового пользователя на сайте Spaccel.ru')
                 ->send();
         }
-
         return false;
     }
 
@@ -693,7 +785,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * @return bool|int|string
-     * Кол-во непрочитанных сообщений от Админа
+     * Кол-во непрочитанных сообщений от трекера
      */
     public function getCountUnreadMessagesFromAdmin ()
     {
@@ -783,7 +875,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * @return bool|int|string
-     * Кол-во непрочитанных сообщений алдминистратора,
+     * Кол-во непрочитанных сообщений гл.алдминистратора,
      * где он является отправителем
      */
     public function getCountUnreadMessagesMainAdminFromAdmin ()
@@ -864,7 +956,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Проверка на Админа
+     * Проверка на трекера
      * @param $username
      * @return bool
      */
@@ -919,6 +1011,38 @@ class User extends ActiveRecord implements IdentityInterface
     public static function isUserDev($username)
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_DEV, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Проверка на менеджера по клиентам
+     * @param $username
+     * @return bool
+     */
+    public static function isUserManager($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_MANAGER, 'status' => self::STATUS_ACTIVE]))
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Проверка на администратора организации
+     * @param $username
+     * @return bool
+     */
+    public static function isUserAdminCompany($username)
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN_COMPANY, 'status' => self::STATUS_ACTIVE]))
         {
             return true;
         } else {
@@ -1017,5 +1141,213 @@ class User extends ActiveRecord implements IdentityInterface
         $this->delete();
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondName()
+    {
+        return $this->second_name;
+    }
+
+    /**
+     * @param string $second_name
+     */
+    public function setSecondName($second_name)
+    {
+        $this->second_name = $second_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->first_name;
+    }
+
+    /**
+     * @param string $first_name
+     */
+    public function setFirstName($first_name)
+    {
+        $this->first_name = $first_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMiddleName()
+    {
+        return $this->middle_name;
+    }
+
+    /**
+     * @param string $middle_name
+     */
+    public function setMiddleName($middle_name)
+    {
+        $this->middle_name = $middle_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTelephone()
+    {
+        return $this->telephone;
+    }
+
+    /**
+     * @param string $telephone
+     */
+    public function setTelephone($telephone)
+    {
+        $this->telephone = $telephone;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAvatarMaxImage()
+    {
+        return $this->avatar_max_image;
+    }
+
+    /**
+     * @param string $avatar_max_image
+     */
+    public function setAvatarMaxImage($avatar_max_image)
+    {
+        $this->avatar_max_image = $avatar_max_image;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAvatarImage()
+    {
+        return $this->avatar_image;
+    }
+
+    /**
+     * @param string $avatar_image
+     */
+    public function setAvatarImage($avatar_image)
+    {
+        $this->avatar_image = $avatar_image;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param int $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfirm()
+    {
+        return $this->confirm;
+    }
+
+    /**
+     * @param int $confirm
+     */
+    public function setConfirm($confirm)
+    {
+        $this->confirm = $confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIdAdmin()
+    {
+        return $this->id_admin;
+    }
+
+    /**
+     * @param int $id_admin
+     */
+    public function setIdAdmin($id_admin)
+    {
+        $this->id_admin = $id_admin;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 }

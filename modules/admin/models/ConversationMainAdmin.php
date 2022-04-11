@@ -8,7 +8,17 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
-
+/**
+ * Класс, который хранит записи о беседах админов организаций с трекерами этих организаций
+ *
+ * Class ConversationMainAdmin
+ * @package app\modules\admin\models
+ *
+ * @property int $id                    идентификатор беседы
+ * @property int $main_admin_id         идентификатор админа организации
+ * @property int $admin_id              идентификатор трекера организации
+ * @property int $updated_at            дата обновления
+ */
 class ConversationMainAdmin extends ActiveRecord
 {
 
@@ -39,7 +49,6 @@ class ConversationMainAdmin extends ActiveRecord
     public function behaviors()
     {
         return [
-            //Использование поведения TimestampBehavior ActiveRecord
             'timestamp' => [
                 'class' => TimestampBehavior::class,
                 'attributes' => [
@@ -53,7 +62,8 @@ class ConversationMainAdmin extends ActiveRecord
 
 
     /**
-     * Получить объект админа
+     * Получить объект трекера
+     *
      * @return ActiveQuery
      */
     public function getAdmin ()
@@ -63,7 +73,8 @@ class ConversationMainAdmin extends ActiveRecord
 
 
     /**
-     * Получить объект главного админа
+     * Получить объект админа организации
+     *
      * @return ActiveQuery
      */
     public function getMainAdmin ()
@@ -74,6 +85,7 @@ class ConversationMainAdmin extends ActiveRecord
 
     /**
      * Получить все сообщения беседы
+     *
      * @return ActiveQuery
      */
     public function getMessages ()
@@ -84,6 +96,7 @@ class ConversationMainAdmin extends ActiveRecord
 
     /**
      * Получить последнее сообщение беседы
+     *
      * @return ActiveQuery
      */
     public function getLastMessage ()
@@ -94,6 +107,7 @@ class ConversationMainAdmin extends ActiveRecord
 
     /**
      * Получить кол-во непрочитанных сообщений беседы
+     *
      * @return int|string
      */
     public function getCountNewMessages ()
@@ -103,4 +117,58 @@ class ConversationMainAdmin extends ActiveRecord
 
         return $count_new_messages;
     }
- }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMainAdminId()
+    {
+        return $this->main_admin_id;
+    }
+
+
+    /**
+     * @param int $main_admin_id
+     */
+    public function setMainAdminId($main_admin_id)
+    {
+        $this->main_admin_id = $main_admin_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAdminId()
+    {
+        return $this->admin_id;
+    }
+
+
+    /**
+     * @param int $admin_id
+     */
+    public function setAdminId($admin_id)
+    {
+        $this->admin_id = $admin_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+}

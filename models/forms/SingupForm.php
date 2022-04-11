@@ -59,6 +59,7 @@ class SingupForm extends Model
             ['role', 'in', 'range' => [
                 User::ROLE_USER,
                 User::ROLE_ADMIN,
+                User::ROLE_MANAGER
             ]],
 
         ];
@@ -135,7 +136,7 @@ class SingupForm extends Model
 
     /**
      * Собственное правило для поля email
-     * Переводим все логины в нижний регистр и сравниваем их с тем, что в форме
+     * Переводим все email в нижний регистр и сравниваем их с тем, что в форме
      * @param $attr
      */
     public function uniqEmail($attr)

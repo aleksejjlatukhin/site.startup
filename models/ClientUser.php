@@ -122,4 +122,20 @@ class ClientUser extends ActiveRecord
             [['user_id'], 'unique'],
         ];
     }
+
+
+    /**
+     * Создание новой записи
+     *
+     * @param $client_id
+     * @param $user_id
+     * @return bool
+     */
+    public static function createRecord($client_id, $user_id)
+    {
+        $model = new self();
+        $model->client_id = $client_id;
+        $model->user_id = $user_id;
+        return $model->save();
+    }
 }

@@ -108,7 +108,7 @@ class ClientActivation extends ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'status'], 'required'],
+            [['client_id'], 'required'],
             [['created_at', 'client_id', 'status'], 'integer'],
             ['status', 'default', 'value' => function () {
                 return self::NO_ACTIVE;

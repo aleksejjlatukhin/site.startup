@@ -3,6 +3,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\ClientUser;
 use app\models\Projects;
 use app\models\User;
 use app\modules\admin\models\form\SearchForm;
@@ -69,6 +70,8 @@ class ExpertiseController extends AppAdminController
      */
     public function actionTasks($page = 1)
     {
+        $clientUser = ClientUser::findOne(['user_id' => Yii::$app->user->getId()]);
+        $client = $clientUser->client;
         $searchForm = new SearchForm();
         $pageSize = self::TASKS_PAGE_SIZE;
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
@@ -81,7 +84,10 @@ class ExpertiseController extends AppAdminController
             $query = $searchForm->search;
             if (5 <= mb_strlen($query)) {
 
-                $query_projects = Projects::find()->joinWith('user')
+                $query_projects = Projects::find()
+                    ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -101,7 +107,11 @@ class ExpertiseController extends AppAdminController
 
             } else {
 
-                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $query_projects = Projects::find()
+                    ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
+                    ->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page
                 $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
@@ -118,7 +128,10 @@ class ExpertiseController extends AppAdminController
             $query = $searchForm->search;
             if (5 <= mb_strlen($query)) {
 
-                $query_projects = Projects::find()->joinWith('user')
+                $query_projects = Projects::find()
+                    ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -138,7 +151,11 @@ class ExpertiseController extends AppAdminController
 
             } else {
 
-                $query_projects = Projects::find()->orderBy(['id' => SORT_DESC]);
+                $query_projects = Projects::find()
+                    ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
+                    ->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page
                 $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
@@ -229,7 +246,7 @@ class ExpertiseController extends AppAdminController
     {
         if(Yii::$app->request->isAjax) {
 
-            $experts = SearchFormExperts::search($project_id);
+            $experts = SearchFormExperts::search();
 
             $response = ['renderAjax' => $this->renderAjax('result_search_experts_ajax', ['experts' => $experts, 'project_id' => $project_id])];
             Yii::$app->response->format = Response::FORMAT_JSON;

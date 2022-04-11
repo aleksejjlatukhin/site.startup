@@ -11,18 +11,18 @@ $config = [
     'defaultRoute' => 'site/index',
 
     'modules' => [
-        //Подключение модуля админки
         'admin' => [
             'class' => 'app\modules\admin\Module',
             'layout' => 'main',
         ],
-
         'expert' => [
             'class' => 'app\modules\expert\Module',
             'layout' => 'main',
         ],
-
-        //Поключение kartik yii2-grid
+        'client' => [
+            'class' => 'app\modules\client\Module',
+            'layout' => 'main',
+        ],
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
             'downloadAction' => 'gridview/export/download',
@@ -114,6 +114,7 @@ $config = [
                 'profile' => 'profile/index',
                 'admin' => 'admin/default/index',
                 'expert' => 'expert/default/index',
+                'client' => 'client/default/index',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],

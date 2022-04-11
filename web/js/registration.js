@@ -3,8 +3,37 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 
 var body = $('body');
 
+
 //Отслеживаем изменения в форме роли пользователя
-$(body).on('change', 'form#form_user_role', function(){
+$(body).on('change', '#formClientAndRole_clientId', function(){
+
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            if ($(window).width() > 1000 && $(window).width() < 1700) {
+                $('.wrap').css('margin-bottom', '0');
+            } else {
+                $('.wrap').css('margin-bottom', '20px');
+            }
+
+            $('.block-form-registration').html('');
+            $('.block-form-user-role').html(response.renderAjax);
+
+        }, error: function(){
+            alert('Ошибка');
+        }
+    });
+});
+
+
+//Отслеживаем изменения в форме роли пользователя
+$(body).on('change', '#formClientAndRole_role', function(){
 
     var url = $(this).attr('action');
     var data = $(this).serialize();
@@ -32,7 +61,7 @@ $(body).on('change', 'form#form_user_role', function(){
 //Отправка формы регистрации пользователя
 $(body).on('beforeSubmit', '#form_user_singup', function(e){
 
-    var data = $(this).serialize();
+    var data = $(this).serialize() + '&&' + $('#formClientAndRole_clientId').serialize();
     var url = $(this).attr('action');
 
     var error_user_singup_modal = $('#error_user_singup').find('.modal-body');

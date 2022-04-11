@@ -47,13 +47,91 @@ class Client extends ActiveRecord
 
 
     /**
+     * Найти последнюю (актуальную) запись по клиенту
+     * в таблице client_activation
+     *
+     * @return array|ActiveRecord|null
+     */
+    public function findClientActivation()
+    {
+        return ClientActivation::find()
+            ->where(['client_id' => $this->id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
+    }
+
+
+    /**
+     * Найти всех активированных клиентов
+     *
+     * @return array
+     */
+    public static function findAllActiveClients()
+    {
+        $clients = self::find()->all();
+        $result = array();
+
+        foreach ($clients as $client) {
+            if ($client->findClientActivation()->status == ClientActivation::ACTIVE) {
+                $result[] = $client;
+            }
+        }
+        return $result;
+    }
+
+
+    /**
      * Получить настройки клиента
      *
      * @return ActiveQuery
      */
     public function getSettings()
     {
-        return $this->hasMany(ClientSettings::class, ['client_id' => 'id']);
+        return $this->hasOne(ClientSettings::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * @return ClientSettings|null
+     */
+    public function findSettings()
+    {
+        return ClientSettings::findOne(['client_id' => $this->id]);
+    }
+
+
+    /**
+     * Получить все тарифы на которые
+     * когда либо была подписана организация (клиент)
+     *
+     * @return ActiveQuery
+     */
+    public function getClientRatesPlans()
+    {
+        return $this->hasMany(ClientRatesPlan::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * @return ClientRatesPlan[]
+     */
+    public function findClientRatesPlans()
+    {
+        return ClientRatesPlan::findAll(['client_id' => $this->id]);
+    }
+
+
+    /**
+     * Получить последний установленный тариф для организации(клиента)
+     *
+     * @return array|ActiveRecord|null
+     */
+    public function findLastClientRatesPlan()
+    {
+        return ClientRatesPlan::find()
+            ->where(['client_id' => $this->id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
     }
 
 
@@ -70,6 +148,122 @@ class Client extends ActiveRecord
 
 
     /**
+     * @return ActiveQuery
+     */
+    public function getCustomerManagers()
+    {
+        return $this->hasMany(CustomerManager::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * @return ActiveRecord|array|null
+     */
+    public function findCustomerManager()
+    {
+        return CustomerManager::find()->where(['client_id' => $this->id])->orderBy(['created_at' => SORT_DESC])->one();
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCustomerTrackers()
+    {
+        return $this->hasMany(CustomerTracker::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * @return CustomerTracker|null
+     */
+    public function findCustomerTrackers()
+    {
+        return CustomerTracker::findOne(['client_id' => $this->id, 'status' => CustomerTracker::ACTIVE]);
+    }
+
+
+    /**
+     * Получить количество трекеров,
+     * зарегистрированных в данной организации
+     *
+     * @return int|string
+     */
+    public function getCountTrackers()
+    {
+        return User::find()->with('clientUser')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_ADMIN])->count();
+    }
+
+
+    /**
+     * Получить количество экспертов,
+     * зарегистрированных в данной организации
+     *
+     * @return int|string
+     */
+    public function getCountExperts()
+    {
+        return User::find()->with('clientUser')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_EXPERT])->count();
+    }
+
+
+    /**
+     * Получить количество проектантов,
+     * зарегистрированных в данной организации
+     *
+     * @return int|string
+     */
+    public function getCountUsers()
+    {
+        return User::find()->with('clientUser')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_USER])->count();
+    }
+
+
+    /**
+     * Получить количество проектов,
+     * зарегистрированных в данной организации
+     *
+     * @return int
+     */
+    public function getCountProjects()
+    {
+        $users = User::find()->with('clientUser')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_USER])->all();
+
+        $arrayCountProjects = array();
+        foreach ($users as $user) {
+            $arrayCountProjects[] = Projects::find()->where(['user_id' => $user->id])->count();
+        }
+        return array_sum($arrayCountProjects);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCustomerExperts()
+    {
+        return $this->hasMany(CustomerExpert::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * @return CustomerExpert|null
+     */
+    public function findCustomerExperts()
+    {
+        return CustomerExpert::findOne(['client_id' => $this->id, 'status' => CustomerExpert::ACTIVE]);
+    }
+
+
+    /**
      * Найти пользователей зарегистрированных
      * на платформе в организации клиента
      *
@@ -80,6 +274,32 @@ class Client extends ActiveRecord
         return User::find()->with('clientUsers')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
             ->where(['client_user.client_id' => $this->id])->all();
+    }
+
+
+    /**
+     * Проверка готовности организации к активации
+     *
+     * @return bool
+     */
+    public function checkingReadinessActivation()
+    {
+        if ($this->findCustomerManager() && $this->findLastClientRatesPlan()) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Поиск организации по id
+     *
+     * @param int $id
+     * @return Client|null
+     */
+    public static function findById($id)
+    {
+        return self::findOne($id);
     }
 
 
@@ -203,6 +423,27 @@ class Client extends ActiveRecord
             'created_at' => 'Дата регистрации',
             'updated_at' => 'Дата обновления'
         ];
+    }
+
+
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_INSERT, function (){
+            $this->createClientActivationDefault();
+        });
+
+        parent::init();
+    }
+
+
+    /**
+     * @return bool
+     */
+    private function createClientActivationDefault()
+    {
+        $clientActivation = new ClientActivation();
+        $clientActivation->setClientId($this->id);
+        return $clientActivation->save();
     }
 
 }
