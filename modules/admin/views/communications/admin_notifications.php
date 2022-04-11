@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use app\models\CommunicationTypes;
 use app\modules\expert\models\ConversationExpert;
 use yii\helpers\Url;
+use app\models\TypesDuplicateCommunication;
 
 $this->title = 'Уведомления';
 $this->registerCssFile('@web/css/notifications-style.css');
@@ -45,7 +46,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
                         <?php $source = $communication->source; ?>
 
-                        <?php if ($source->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
+                        <?php if ($source->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT && $communication->type == TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT) : ?>
 
                             <div class="conversation-exist">
 

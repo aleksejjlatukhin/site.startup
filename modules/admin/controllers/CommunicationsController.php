@@ -9,6 +9,7 @@ use app\models\CommunicationTypes;
 use app\models\DuplicateCommunications;
 use app\models\ProjectCommunications;
 use app\models\TypesAccessToExpertise;
+use app\models\TypesDuplicateCommunication;
 use app\models\User;
 use app\models\UserAccessToProjects;
 use app\modules\admin\models\form\FormExpertTypes;
@@ -463,8 +464,8 @@ class CommunicationsController extends AppAdminController
                         User::createConversationExpert($communication->project->user, $communication->expert);
 
                         // Отправка уведомления проектанту и трекеру
-                        DuplicateCommunications::create($communication, $communication->project->user);
-                        DuplicateCommunications::create($communication, $communication->project->user->admin);
+                        DuplicateCommunications::create($communication, $communication->project->user, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
+                        DuplicateCommunications::create($communication, $communication->project->user->admin, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
 
                     } elseif ($type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
 
@@ -478,8 +479,8 @@ class CommunicationsController extends AppAdminController
                         // Тип коммуникации "отозвать эксперта с проекта"
 
                         // Отправка уведомления проектанту и трекеру
-                        DuplicateCommunications::create($communication, $communication->project->user);
-                        DuplicateCommunications::create($communication, $communication->project->user->admin);
+                        DuplicateCommunications::create($communication, $communication->project->user, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
+                        DuplicateCommunications::create($communication, $communication->project->user->admin, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
                     }
 
                     // Отправка письма эксперту на почту

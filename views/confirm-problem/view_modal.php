@@ -110,7 +110,7 @@ Modal::begin([
 // Сообщение о том, что в подтверждении недостаточно респондентов, подтвердивших проблему
 //и необходимо выбрать (вернуться или продолжить)
 Modal::begin([
-    'options' => ['id' => "not_exist-confirm-modal", 'class' => 'not_exist_confirm_modal'],
+    'options' => ['id' => 'not_exist-confirm-modal', 'class' => 'not_exist_confirm_modal'],
     'size' => 'modal-md',
     'header' => '<h3 class="text-center">Выберите действие</h3>',
     'footer' => '<div class="text-center">'.
@@ -118,19 +118,55 @@ Modal::begin([
         Html::a('Отмена', ['#'],[
             'class' => 'btn btn-default',
             'style' => ['width' => '120px'],
-            'id' => "cancel-not_exist-confirm",
+            'id' => 'cancel-not_exist-confirm',
         ]).
 
         Html::a('Ок', ['/confirm-problem/not-exist-confirm', 'id' => $model->id],[
             'class' => 'btn btn-default',
             'style' => ['width' => '120px'],
-            'id' => "not_exist-confirm",
+            'id' => 'not_exist-confirm',
         ]).
 
         '</div>'
 ]); ?>
 
-<h4 class="text-center">Вы не набрали достаточное количество респондентов, которые подтвердили проблему. Следующий этап будет не доступен. Завершить данное подтверждение?</h4>
+<h4 class="text-center">
+    Вы не набрали достаточное количество респондентов, которые подтвердили проблему. Следующий этап будет не доступен.
+    После завершения подтверждения проблемы сегмента будет разрешена экспертиза и запрещено редактирование данной сущности.
+    Завершить подтверждение проблемы сегмента и вернуться к генерации гипотез проблем сегмента?
+</h4>
+
+<?php Modal::end(); ?>
+
+
+<?php
+
+// Модальное окно с подтверждением завершения подтверждения гипотезы и перехода на следующий этап
+Modal::begin([
+    'options' => ['id' => 'exist-confirm-modal', 'class' => 'exist_confirm_modal'],
+    'size' => 'modal-md',
+    'header' => '<h3 class="text-center">Выберите действие</h3>',
+    'footer' => '<div class="text-center">'.
+
+        Html::a('Отмена', ['#'],[
+            'onclick' => '$(\'#exist-confirm-modal\').modal(\'hide\'); return false;',
+            'class' => 'btn btn-default',
+            'style' => ['width' => '120px'],
+        ]).
+
+        Html::a('Ок', ['/confirm-problem/exist-confirm', 'id' => $model->id],[
+            'class' => 'btn btn-default',
+            'style' => ['width' => '120px'],
+            'id' => 'exist-confirm',
+        ]).
+
+        '</div>'
+]); ?>
+
+<h4 class="text-center">
+    После завершения подтверждения проблемы сегмента будет разрешена экспертиза и запрещено редактирование данной сущности.
+    Завершить подтверждение проблемы сегмента и перейти к генерации гипотез ценностных предложений?
+</h4>
 
 <?php Modal::end(); ?>
 

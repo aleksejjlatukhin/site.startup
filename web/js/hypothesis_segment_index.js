@@ -253,6 +253,30 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 });
 
 
+// Подтвердить в модальном окне разрешение на экспертизу
+$(body).on('click', '#confirm_enable_expertise', function (e) {
+
+    var formData = new FormData();
+    formData.append('type_sort_id', $('#listType').val());
+
+    $.ajax({
+        url: $(this).attr('href'),
+        method: 'POST',
+        processData: false,
+        contentType: false,
+        data:  formData,
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+            $('#confirm_enable_expertise_modal').modal('hide');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
 
 //Сортировка сегментов
 $(body).on('change', '#listType', function(){

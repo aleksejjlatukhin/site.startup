@@ -63,7 +63,7 @@ $this->title = 'Главная';
 
                         <?= $form->field($model_login, 'rememberMe', [
                             'template' => "{input}{label}"
-                        ])->checkbox(['checked' => true],false)->label('Запомнить меня');
+                        ])->checkbox(['checked' => true, 'class' => 'custom-checkbox'],false)->label('Запомнить меня');
                         ?>
 
                     </div>

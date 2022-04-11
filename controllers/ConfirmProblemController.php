@@ -550,8 +550,10 @@ class ConfirmProblemController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionNotExistConfirm($id)
     {
@@ -561,15 +563,16 @@ class ConfirmProblemController extends AppUserPartController
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($problem->exist_confirm === 0) { // Создать класс StatusConfirm для обозначения статусов !!!
+        if ($problem->exist_confirm === 0) { // ToDo:Создать класс StatusConfirm для обозначения статусов
             return $this->redirect(['/problems/index', 'id' => $confirmSegment->id]);
 
         }else {
 
             $problem->exist_confirm = 0;
             $problem->time_confirm = time();
+            $model->setEnableExpertise();
 
-            if ($problem->save()){
+            if ($problem->update() && $model->update()){
 
                 $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
                 $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
@@ -583,8 +586,10 @@ class ConfirmProblemController extends AppUserPartController
     /**
      * @param $id
      * @return bool|Response
-     * @throws NotFoundHttpException
      * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionExistConfirm($id)
     {
@@ -595,8 +600,9 @@ class ConfirmProblemController extends AppUserPartController
 
         $problem->exist_confirm = 1;
         $problem->time_confirm = time();
+        $model->setEnableExpertise();
 
-        if ($problem->save()){
+        if ($problem->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);

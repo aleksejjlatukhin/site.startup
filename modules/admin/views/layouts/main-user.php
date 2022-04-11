@@ -260,6 +260,22 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
     <!--Report Project end-->
 
+
+    <!--View Expertise begin-->
+
+    <?php // Модальное окно - просмотр экспертизы по одному из этапов проекта
+    Modal::begin([
+        'options' => ['id' => 'showListExpertise', 'class' => 'showListExpertise'],
+        'size' => 'modal-lg',
+        'header' => Html::a('<span class="text-link"></span>' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+            'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page_expertise', 'title' => 'Инструкция', 'onclick' => 'return false']),
+        'headerOptions' => ['style' => ['text-align' => 'center']]
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--View Expertise end-->
+
 <?php $this->endBody() ?>
 </body>
 </html>

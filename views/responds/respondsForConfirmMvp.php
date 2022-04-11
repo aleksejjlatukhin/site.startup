@@ -1,5 +1,7 @@
 <?php
 
+use app\models\EnableExpertise;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
 
@@ -185,7 +187,51 @@ use app\models\User;
             Не опрошены: <?= ($confirm->count_respond - $confirm->countDescInterviewsOfModel);?>
         </div>
 
-        <div class="" style="padding: 0;">
+        <div style="display:flex; align-items:center; padding: 0;">
+
+            <?php if ($confirm->getEnableExpertise() == EnableExpertise::ON) : ?>
+
+                <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                    <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_MVP], 'stageId' => $confirm->id], [
+                        'class' => 'link-get-list-expertise btn btn-lg btn-default',
+                        'title' => 'Экспертиза',
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#707F99',
+                            'color' => '#FFFFFF',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                            'margin-right' => '10px',
+                        ],
+                    ]); ?>
+
+                <?php else : ?>
+
+                    <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_MVP], 'stageId' => $confirm->id], [
+                        'class' => 'link-get-list-expertise btn btn-lg btn-default',
+                        'title' => 'Смотреть экспертизу',
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'background' => '#707F99',
+                            'color' => '#FFFFFF',
+                            'width' => '140px',
+                            'height' => '40px',
+                            'font-size' => '24px',
+                            'border-radius' => '8px',
+                            'margin-right' => '10px',
+                        ],
+                    ]); ?>
+
+                <?php endif; ?>
+
+            <?php endif; ?>
 
             <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
 

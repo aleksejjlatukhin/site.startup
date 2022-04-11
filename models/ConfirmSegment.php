@@ -6,6 +6,14 @@ use app\models\interfaces\ConfirmationInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, который хранит объекты подтверждения сегментов в бд
+ * Class ConfirmSegment
+ * @package app\models
+ *
+ * @property int $id
+ * @property mixed $enable_expertise
+ */
 class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 {
 
@@ -131,6 +139,25 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * Получить гипотезу подтверждения
      * @return ActiveQuery
      */
@@ -152,6 +179,11 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'string', 'max' => '2000'],
             [['greeting_interview', 'view_interview', 'reason_interview'], 'trim'],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

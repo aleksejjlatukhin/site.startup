@@ -4,6 +4,7 @@
 namespace app\modules\admin\controllers;
 
 use app\models\ClientUser;
+use app\models\EnableExpertise;
 use app\models\Projects;
 use app\models\User;
 use app\modules\admin\models\form\SearchForm;
@@ -88,6 +89,7 @@ class ExpertiseController extends AppAdminController
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
                     ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -111,6 +113,7 @@ class ExpertiseController extends AppAdminController
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
                     ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page
@@ -132,6 +135,7 @@ class ExpertiseController extends AppAdminController
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
                     ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
                         ['like', 'user.second_name', $query],
@@ -155,6 +159,7 @@ class ExpertiseController extends AppAdminController
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
                     ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->orderBy(['id' => SORT_DESC]);
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
                 $pages->pageSizeParam = false; //убираем параметр $per-page

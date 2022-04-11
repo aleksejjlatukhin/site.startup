@@ -10,6 +10,15 @@ use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
+/**
+ * Класс, который хранит объекты сегментов в бд
+ * Class Segments
+ * @package app\models
+ *
+ * @property mixed $enable_expertise
+ * @property string $name
+ * @property int $project_id
+ */
 class Segments extends ActiveRecord
 {
 
@@ -118,6 +127,25 @@ class Segments extends ActiveRecord
     {
         return $this->project_id;
     }
+
+
+    /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
     
 
     /**
@@ -138,6 +166,11 @@ class Segments extends ActiveRecord
             [['name',], 'string', 'min' => 2, 'max' => 65],
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
             [['field_of_activity', 'sort_of_activity'], 'string', 'max' => 255],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

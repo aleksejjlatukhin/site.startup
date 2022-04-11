@@ -1072,6 +1072,8 @@ $(body).on('click', '#button_MovingNextStage', function(e){
     $(body).append($(error_respond_modal).first());
     var not_exist_confirm_modal = $('#not_exist-confirm-modal');
     $(body).append($(not_exist_confirm_modal).first());
+    var exist_confirm_modal = $('#exist-confirm-modal');
+    $(body).append($(exist_confirm_modal).first());
 
     $.ajax({
 
@@ -1088,11 +1090,8 @@ $(body).on('click', '#button_MovingNextStage', function(e){
                     if (response.exist_confirm === 1) {
                         window.location.href = '/problems/index?id=' + id;
                     }
-                    else if (response.exist_confirm === null) {
-                        window.location.href = '/confirm-segment/exist-confirm?id=' + id;
-                    }
-                    else if (response.exist_confirm === 0) {
-                        window.location.href = '/confirm-segment/exist-confirm?id=' + id;
+                    else if (response.exist_confirm === null || response.exist_confirm === 0) {
+                        $(exist_confirm_modal).modal('show');
                     }
 
                 } else {

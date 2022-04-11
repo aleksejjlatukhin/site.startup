@@ -8,6 +8,14 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 
+/**
+ * Класс, который хранит объекты подтверждений mvp-продуктов в бд
+ * Class ConfirmMvp
+ * @package app\models
+ *
+ * @property int $id
+ * @property mixed $enable_expertise
+ */
 class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 {
 
@@ -122,6 +130,25 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * Получить гипотезу подтверждения
      * @return ActiveQuery
      */
@@ -141,6 +168,11 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
             [['mvp_id'], 'integer'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

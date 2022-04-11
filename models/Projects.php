@@ -15,6 +15,14 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
+/**
+ * Класс, который хранит объекты описания проектов в бд
+ * Class Projects
+ * @package app\models
+ *
+ * @property string $project_name
+ * @property int $enable_expertise
+ */
 class Projects extends ActiveRecord
 {
 
@@ -143,6 +151,25 @@ class Projects extends ActiveRecord
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -158,6 +185,11 @@ class Projects extends ActiveRecord
             [['project_fullname', 'rid', 'patent_name', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event',], 'string', 'max' => 255],
             [['project_fullname', 'project_name', 'rid', 'patent_number', 'technology', 'register_name', 'site', 'invest_name', 'announcement_event', 'description', 'patent_name', 'core_rid', 'layout_technology', 'purpose_project'], 'trim'],
             [['present_files'], 'file', 'extensions' => 'png, jpg, odt, xlsx, txt, doc, docx, pdf, otf, odp, pps, ppsx, ppt, pptx, opf, csv, xls', 'maxFiles' => 10],
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 
@@ -313,9 +345,8 @@ class Projects extends ActiveRecord
 
     /**
      * @return bool
-     * @throws NotFoundHttpException
-     * @throws ErrorException
      * @throws Exception
+     * @throws NotFoundHttpException
      */
     public function create(){
 

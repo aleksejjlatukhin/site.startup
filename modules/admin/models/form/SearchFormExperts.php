@@ -66,7 +66,7 @@ class SearchFormExperts extends Model
 
         $experts = User::find()->joinWith(['expertInfo', 'keywords'])
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_EXPERT, 'client_user.client_id' => $client->getId()])
+            ->where(['role' => User::ROLE_EXPERT, 'status' => User::STATUS_ACTIVE, 'client_user.client_id' => $client->getId()])
             ->andWhere(['REGEXP', 'expert_info.type', $type])
             ->andWhere(['or',
                 ['like', 'second_name', $name],

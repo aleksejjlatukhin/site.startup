@@ -678,4 +678,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
 <!--Модальные окна-->
 <?= $this->render('view_modal', ['model' => $model]); ?>
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/confirm_problem_view.js'); ?>
+<?php
+$this->registerJsFile('@web/js/confirm_problem_view.js');
+$this->registerJsFile('@web/js/main_expertise.js');
+?>

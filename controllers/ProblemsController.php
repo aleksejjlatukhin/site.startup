@@ -282,10 +282,15 @@ class ProblemsController extends AppUserPartController
     }
 
 
+    /**
+     * @param $id
+     * @return array|bool
+     * @throws NotFoundHttpException
+     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $confirmSegment = ConfirmSegment::findOne($model->confirmSegmentId);
+        $confirmSegment = ConfirmSegment::findOne($model->getConfirmSegmentId());
         $form = new FormUpdateProblem($model);
 
         if ($form->load(Yii::$app->request->post())) {
@@ -303,6 +308,35 @@ class ProblemsController extends AppUserPartController
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     */
+    public function actionEnableExpertise($id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $problem = Problems::findOne($id);
+            $problem->setEnableExpertise();
+            $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+
+            if ($problem->save()) {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'models' => Problems::findAll(['basic_confirm_id' => $confirmSegment->id]),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;

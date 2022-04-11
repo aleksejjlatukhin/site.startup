@@ -10,6 +10,15 @@ use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, который хранит объекты mvp-продуктов в бд
+ * Class Mvps
+ * @package app\models
+ *
+ * @property mixed $enable_expertise
+ * @property string $title
+ * @property int $basic_confirm_id
+ */
 class Mvps extends ActiveRecord
 {
 
@@ -158,6 +167,25 @@ class Mvps extends ActiveRecord
 
 
     /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -168,7 +196,11 @@ class Mvps extends ActiveRecord
             [['title'], 'string', 'max' => 255],
             [['description'], 'string', 'max' => 2000],
             [['time_confirm', 'basic_confirm_id', 'exist_confirm', 'project_id', 'segment_id', 'problem_id', 'gcp_id', 'created_at', 'updated_at'], 'integer'],
-
+            ['enable_expertise', 'default', 'value' => EnableExpertise::OFF],
+            ['enable_expertise', 'in', 'range' => [
+                EnableExpertise::OFF,
+                EnableExpertise::ON,
+            ]],
         ];
     }
 

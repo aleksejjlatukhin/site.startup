@@ -281,6 +281,35 @@ class MvpsController extends AppUserPartController
 
 
     /**
+     * Включить разрешение на экспертизу
+     * @param $id
+     * @return array|bool
+     */
+    public function actionEnableExpertise($id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $mvp = Mvps::findOne($id);
+            $mvp->setEnableExpertise();
+            $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
+
+            if ($mvp->save()) {
+
+                $response = [
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'models' => Mvps::findAll(['basic_confirm_id' => $confirmGcp->id]),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * @param $id
      * @return array|bool
      * @throws NotFoundHttpException
