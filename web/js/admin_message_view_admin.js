@@ -5,6 +5,8 @@ const simpleBarDataChatAdmin = new SimpleBar(document.getElementById('data-chat'
 // Получаем id беседы пользователя с админом
 var conversation_id = window.location.search.split('=')[1];
 
+var module = (window.location.pathname).split('/')[1];
+
 
 var body = $('body');
 var id_page = window.location.search.split('=')[1];
@@ -146,10 +148,10 @@ $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
 
     if ($(this).attr('id').split('-')[0] === 'adminMainConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
-        window.location.href = '/admin/message/technical-support?id='+id;
+        window.location.href = '/' + module + '/message/technical-support?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
@@ -193,7 +195,7 @@ $(document).ready(function () {
             $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -236,7 +238,7 @@ $(document).ready(function () {
                 if (posTop + ($(item).height() / 2) <= $(chat).height() || scrollTop + $(item).height() > scrollHeight - $(chat).height()) {
 
                     var message_id = $(item).attr('id').split('-')[1];
-                    var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                    var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                     $.ajax({
                         url: url,
@@ -282,7 +284,7 @@ setInterval(function(){
             $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -310,7 +312,7 @@ setInterval(function(){
 
     // Обновляем беседы трекера
     $.ajax({
-        url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
+        url: '/' + module + '/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
         method: 'POST',
         cache: false,
         success: function(response){
@@ -333,7 +335,7 @@ setInterval(function(){
     $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
 
         var message_id = $(item).attr('id').split('-')[1];
-        var url = '/admin/message/checking-unread-message-main-admin?id=' + message_id;
+        var url = '/' + module + '/message/checking-unread-message-main-admin?id=' + message_id;
 
         $.ajax({
             url: url,

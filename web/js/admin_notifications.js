@@ -2,13 +2,14 @@
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 
 var body = $('body');
+var module = (window.location.pathname).split('/')[1];
 
 
 // Прочтение уведомления
 $(body).on('click', '.link-read-duplicate-notification', function (e) {
 
     var communication_id = $(this).attr('id').split('-')[1],
-        url = '/admin/communications/read-duplicate-communication?id=' + communication_id,
+        url = '/' + module + '/communications/read-duplicate-communication?id=' + communication_id,
         container = $(this).parent();
 
     $.ajax({

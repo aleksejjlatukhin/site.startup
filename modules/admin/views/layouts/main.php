@@ -113,11 +113,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                         'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                         'items' => [
 
-                            ['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления'])
-                                : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления']), 'url' => ['/admin/communications/notifications', 'id' => Yii::$app->user->id]],
+                            //['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления'])
+                            //    : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления']), 'url' => ['/admin/communications/notifications', 'id' => Yii::$app->user->id]],
 
-                            ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messager', 'title' => 'Проекты']), 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
-                            ['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messager', 'title' => 'Пользователи']), 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
+                            //['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messager', 'title' => 'Проекты']), 'url' => ['/admin/projects/group', 'id' => Yii::$app->user->id]],
+                            //['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messager', 'title' => 'Пользователи']), 'url' => ['/admin/users/group', 'id' => Yii::$app->user->id]],
 
                             [
                                 'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])

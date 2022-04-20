@@ -16,10 +16,12 @@
     text-decoration: none;
 }
 
-.data_user_content {
+.data_user_content,
+.data_client_content {
     padding: 40px 35px 40px 10px;
 }
-.col-md-8.info_user_content {
+.col-md-8.info_user_content,
+.col-md-8.info_client_content {
     padding-right: 0;
     min-width: 320px;
 }
@@ -33,14 +35,16 @@
     color: #808080;
 }
 
-.view_user_form, .update_user_form {
+.view_user_form, .update_user_form,
+.view_client_form, .update_client_form {
     padding: 50px 0 0 0;
 }
 .change_password_content_data_user {
     min-height: 73px;
     padding-bottom: 20px;
 }
-.update_user_form, .change_password_content {
+.update_user_form, .change_password_content,
+.update_client_form {
     display: none;
 }
 
@@ -112,16 +116,19 @@
 }
 
 @media screen and (min-width: 768px) {
-    .col-md-8.info_user_content {
+    .col-md-8.info_user_content,
+    .col-md-8.info_client_content {
         padding-left: 40px;
     }
 }
 
 @media screen and (max-width: 768px) {
-    .data_user_content {
+    .data_user_content,
+    .data_client_content {
         flex-wrap: wrap;
     }
-    .info_user_content {
+    .info_user_content,
+    .info_client_content {
         padding-top: 30px;
     }
 }

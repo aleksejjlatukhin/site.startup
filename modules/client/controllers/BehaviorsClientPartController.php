@@ -46,6 +46,22 @@ class BehaviorsClientPartController extends AppController
                             return User::isUserAdminCompany(Yii::$app->user->identity['username']);
                         }
                     ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserDev(Yii::$app->user->identity['username']);
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return User::isUserManager(Yii::$app->user->identity['username']);
+                        }
+                    ],
                 ]
 
             ]

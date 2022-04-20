@@ -8,16 +8,21 @@ use yii\helpers\Url;
 
 <div class="row container-one_client client_container_number-<?=$client->id;?>">
 
-    <div class="col-md-3 column-client-name" id="link_client_page-<?= $client->id;?>" title="Перейти на страницу организации">
+    <div class="col-md-3 column-client-name" id="link_client_page-<?= $client->id;?>">
 
         <?php if ($client->settings->getAvatarImage()) : ?>
-            <?= Html::img('/web/upload/clients/client-'.$client->getId().'/avatar/'.$client->settings->getAvatarImage(), ['class' => 'user_picture']); ?>
+            <?= Html::img('/web/upload/company-'.$client->getId().'/avatar/'.$client->settings->getAvatarImage(), ['class' => 'user_picture']); ?>
         <?php else : ?>
             <?= Html::img('/images/avatar/client_default.png', ['class' => 'user_picture_default']); ?>
         <?php endif; ?>
 
         <div class="block-name-and-fullname">
-            <div class="block-name"><?= $client->name; ?></div>
+            <div class="block-name">
+                <?= Html::a($client->name, ['/admin/clients/view', 'id' => $client->id], [
+                    'class' => 'block_name_link',
+                    'title' => 'Перейти на страницу организации'
+                ]); ?>
+            </div>
             <div class="block-fullname"><?= $client->fullname; ?></div>
             <div class="block-admin-profile-link">
                 <div class="bolder">Администратор</div>

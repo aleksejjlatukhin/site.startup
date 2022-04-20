@@ -26,14 +26,6 @@ use yii\base\Model;
 class FormCreateAdminCompany extends Model
 {
 
-    //TODO: Необходимо здесь создать админа (User ClientUser),
-    // кроме этого необходимо будет создать беседы с Тех поддержкой,
-    // а в дальнейшем и с другими пользователями, при этом это должны
-    // быть беседы conversation_main_admin (с трекерами) и т.д.
-    // После этого так же создать объект ClientSettings.
-    // После заполнения необходимых форм передать их в класс Создатель,
-    // который вызовет все необходимые методы и запишет данные в бд.
-
     public $second_name;
     public $first_name;
     public $middle_name;
@@ -144,6 +136,10 @@ class FormCreateAdminCompany extends Model
         $user->attributes = $this->attributes;
         $user->setPassword($this->username); // Пароль такой же как и логин, чтобы не забыть (в дальнейшем клиент должен его поменять самостоятельно)
         $user->generateAuthKey();
-        return $user->save() ? $user : null;
+        if ($user->save()) {
+            $user->createConversationDevelopment();
+            return $user;
+        }
+        return null;
     }
 }

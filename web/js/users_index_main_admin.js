@@ -207,8 +207,6 @@ $(body).on('click', '.button_confirm_user_delete', function (e) {
 
 
 // Обновляем колонку пользователей
-//TODO: Раскомментировать после интеграции с модулем клиента
-/*
 setInterval(function(){
 
     $(body).find('.column-user-fio').each(function (index, item) {
@@ -227,4 +225,4 @@ setInterval(function(){
 
     });
 
-}, 30000);*/
+}, 30000);

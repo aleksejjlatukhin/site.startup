@@ -96,6 +96,15 @@ class BusinessModel extends ActiveRecord
 
 
     /**
+     * @return mixed
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+
+    /**
      * Параметр разрешения экспертизы
      * @return int
      */

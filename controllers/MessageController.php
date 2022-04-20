@@ -313,19 +313,20 @@ class MessageController extends AppUserPartController
                 if ($pathname === 'expert') {
 
                     $conversation = ConversationExpert::findOne($id);
+                    /** @var User $expert */
                     $expert = $conversation->expert;
                     // Беседа эксерта с техподдержкой
-                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->id]);
+                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->getId()]);
                     // Беседа эксперта с главным админом
-                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_MAIN_ADMIN]);
+                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->getId(), 'user_id' => $expert->mainAdmin->getId()]);
                     // Беседы эксперта и трекеров
                     $adminConversations = ConversationExpert::find()
-                        ->where(['expert_id' => $expert->id, 'role' => User::ROLE_ADMIN])
+                        ->where(['expert_id' => $expert->getId(), 'role' => User::ROLE_ADMIN])
                         ->orderBy(['updated_at' => SORT_DESC])
                         ->all();
                     // Беседы эксперта и проектантов
                     $userConversations = ConversationExpert::find()
-                        ->where(['expert_id' => $expert->id, 'role' => User::ROLE_USER])
+                        ->where(['expert_id' => $expert->getId(), 'role' => User::ROLE_USER])
                         ->orderBy(['updated_at' => SORT_DESC])
                         ->all();
 
@@ -484,6 +485,8 @@ class MessageController extends AppUserPartController
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
+            User::isUserMainAdmin($admin->mainAdmin->getUsername()) ? $module = 'admin' : $module = 'client';
+
             // Если есть кэш, добавляем его в форму сообщения
             $cache->cachePath = '../runtime/cache/forms/user-'.$admin->id.'/messages/category_admin/conversation-'.$conversation->id.'/';
             $cache_form_message = $cache->get('formCreateMessageAdminCache');
@@ -502,6 +505,7 @@ class MessageController extends AppUserPartController
                 'conversation_development' => $conversation_development,
                 'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
+                'module' => $module,
             ]);
         }
 
@@ -1096,9 +1100,9 @@ class MessageController extends AppUserPartController
         if (User::isUserExpert(Yii::$app->user->identity['username'])) {
 
             // Беседа эксперта с техподдержкой
-            $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->id]);
-            // Беседа эксперта с гл. админом
-            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_MAIN_ADMIN]);
+            $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->getId()]);
+            // Беседа эксперта с админом организации
+            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->getId(), 'user_id' => $expert->mainAdmin->getId()]);
             // Все беседы эксперта с трекерами
             $adminConversations = ConversationExpert::find()
                 ->andWhere(['expert_id' => $expert->id])

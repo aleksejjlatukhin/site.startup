@@ -231,7 +231,7 @@ class CommunicationsController extends AppExpertController
                     // Делаем коммуникацию прочитанной (отвеченной)
                     $result_ReadCommunication = $this->responseForReadCommunication($communicationAnswered->id);
 
-                    // Отправка письма гл.админу на почту
+                    // Отправка письма админу организации на почту
                     $this->sendCommunicationToEmail($communication);
 
                     // Получить обновленные коммуникации

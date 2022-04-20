@@ -34,7 +34,7 @@ use app\modules\expert\models\MessageExpert;
                 <div class="sender_data">
                     <div class="sender_info">
 
-                        <?php if (User::isUserMainAdmin($user->username)) : ?>
+                        <?php if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) : ?>
 
                             <div>Главный администратор</div>
                             <div>
@@ -88,7 +88,7 @@ use app\modules\expert\models\MessageExpert;
                 <div class="sender_data">
                     <div class="sender_info">
 
-                        <?php if (User::isUserMainAdmin($user->username)) : ?>
+                        <?php if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) : ?>
 
                             <div>Главный администратор</div>
                             <div>
@@ -135,7 +135,7 @@ use app\modules\expert\models\MessageExpert;
 
         <?php if ($message->status == MessageExpert::NO_READ_MESSAGE) : ?>
 
-            <?php if (User::isUserMainAdmin($user->username)) : ?>
+            <?php if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) : ?>
 
                 <div class="message addressee-main_admin unreadmessage" id="message_id-<?= $message->id;?>">
 
@@ -219,7 +219,7 @@ use app\modules\expert\models\MessageExpert;
 
         <?php else : ?>
 
-            <?php if (User::isUserMainAdmin($user->username)) : ?>
+            <?php if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) : ?>
 
                 <div class="message addressee-main_admin" id="message_id-<?= $message->id;?>">
 

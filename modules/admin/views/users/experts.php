@@ -50,9 +50,23 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'width' => '180px',
                 'height' => '40px',
                 'font-size' => '24px',
-                'border-radius' => '0 8px 8px 0',
+                'border-radius' => '0',
             ],
             'class' => 'btn btn-lg btn-success',
+        ]);?>
+
+        <?= Html::a( 'Менеджеры', Url::to(['/admin/users/managers']),[
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#E0E0E0',
+                'width' => '180px',
+                'height' => '40px',
+                'font-size' => '24px',
+                'border-radius' => '0 8px 8px 0',
+            ],
+            'class' => 'btn btn-lg btn-default',
         ]);?>
 
     </div>
@@ -122,7 +136,8 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-3 column-tracker">
 
-                        <?= Html::a( 'Статистика', Url::to(['/admin/users/group', 'id' => $user->id]), [
+                        <?= Html::a( 'Статистика', Url::to(['#']), [
+                            'onclick' => 'return false;',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -136,13 +151,8 @@ $this->registerCssFile('@web/css/users-index-style.css');
                             'class' => 'btn btn-lg btn-default',
                         ]);?>
 
-                        <?php
-                        $countProjects = Projects::find()->with('user')
-                            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                            ->where(['user.id_admin' => $user->id])->count();
-                        ?>
-
-                        <?= Html::a( 'Проекты - '.$countProjects, Url::to(['/admin/projects/group', 'id' => $user->id]), [
+                        <?= Html::a( 'Проекты - #', Url::to(['#']), [
+                            'onclick' => 'return false;',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',

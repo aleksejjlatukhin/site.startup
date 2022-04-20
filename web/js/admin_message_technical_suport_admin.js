@@ -5,6 +5,8 @@ const simpleBarDataChatAdmin = new SimpleBar(document.getElementById('data-chat'
 // Получаем id беседы техподдержки с админом
 var conversation_id = window.location.search.split('=')[1];
 
+var module = (window.location.pathname).split('/')[1];
+
 
 var body = $('body');
 
@@ -136,6 +138,9 @@ $(body).on('click', '.conversation-link', function () {
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
     }
+    else if (($(this).attr('id').split('-')[0] === 'clientAdminConversation')) {
+        window.location.href = '/client/message/technical-support?id='+id;
+    }
 });
 
 
@@ -145,16 +150,19 @@ $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
 
     if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
-        window.location.href = '/admin/message/technical-support?id='+id;
+        window.location.href = '/' + module + '/message/technical-support?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'adminMainConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'conversation') {
         window.location.href = '/message/view?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'clientAdminConversation')) {
+        window.location.href = '/client/message/technical-support?id='+id;
     }
 });
 
@@ -192,7 +200,7 @@ $(document).ready(function () {
             $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-development?id=' + message_id;
+                var url = '/' + module + '/message/read-message-development?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -234,7 +242,7 @@ $(document).ready(function () {
                 if (posTop + ($(item).height() / 2) <= $(chat).height() || scrollTop + $(item).height() > scrollHeight - $(chat).height()) {
 
                     var message_id = $(item).attr('id').split('-')[1];
-                    var url = '/admin/message/read-message-development?id=' + message_id;
+                    var url = '/' + module + '/message/read-message-development?id=' + message_id;
 
                     $.ajax({
                         url: url,
@@ -282,7 +290,7 @@ setInterval(function(){
             $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-development?id=' + message_id;
+                var url = '/' + module + '/message/read-message-development?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -308,9 +316,9 @@ setInterval(function(){
         },100);
     }
 
-    // Обновляем беседы админа
+    // Обновляем беседы трекера
     $.ajax({
-        url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=technical-support',
+        url: '/' + module + '/message/get-list-update-conversations?id=' + conversation_id + '&pathname=technical-support',
         method: 'POST',
         cache: false,
         success: function(response){
@@ -333,7 +341,7 @@ setInterval(function(){
     $(chat).find('.addressee-development.unreadmessage').each(function (index, item) {
 
         var message_id = $(item).attr('id').split('-')[1];
-        var url = '/admin/message/checking-unread-message-development?id=' + message_id;
+        var url = '/' + module + '/message/checking-unread-message-development?id=' + message_id;
 
         $.ajax({
             url: url,

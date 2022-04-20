@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmProblem;
@@ -27,7 +28,10 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-
+/**
+ * Class GcpsController
+ * @package app\controllers
+ */
 class GcpsController extends AppUserPartController
 {
 
@@ -38,14 +42,18 @@ class GcpsController extends AppUserPartController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
-            $model = Gcps::findOne(Yii::$app->request->get());
-            $project = Projects::findOne($model->projectId);
+            $model = Gcps::findOne(Yii::$app->request->get('id'));
+            $project = Projects::findOne($model->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if ($project->getUserId() == $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -58,12 +66,13 @@ class GcpsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['create'])){
 
-            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = Problems::findOne($confirmProblem->problemId);
-            $project = Projects::findOne($problem->projectId);
+            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get('id'));
+            $problem = Problems::findOne($confirmProblem->getProblemId());
+            $project = Projects::findOne($problem->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if ($project->getUserId() == $currentUser->getId()){
 
                 return parent::beforeAction($action);
 
@@ -73,17 +82,32 @@ class GcpsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index']) || in_array($action->id, ['mpdf-table-gcps'])){
 
-            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get());
-            $problem = Problems::findOne($confirmProblem->problemId);
-            $project = Projects::findOne($problem->projectId);
+            $confirmProblem = ConfirmProblem::findOne(Yii::$app->request->get('id'));
+            $problem = Problems::findOne($confirmProblem->getProblemId());
+            $project = Projects::findOne($problem->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if (($project->getUserId() == $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+
+            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $project->user->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } elseif (User::isUserExpert($currentUser->getUsername())) {
 
                 $expert = User::findOne(Yii::$app->user->id);
 

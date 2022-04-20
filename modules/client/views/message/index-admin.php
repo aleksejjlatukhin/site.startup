@@ -28,7 +28,7 @@ $this->registerCssFile('@web/css/admin-message-index.css');
 
             <?php $form = ActiveForm::begin([
                 'id' => 'search_user_conversation',
-                'action' => Url::to(['/admin/message/get-conversation-query', 'id' => $admin->id]),
+                'action' => Url::to(['/client/message/get-conversation-query', 'id' => $admin->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',

@@ -3,6 +3,8 @@ const simpleBarConversations = new SimpleBar(document.getElementById('conversati
 // Получаем id пользователя
 var user_id = window.location.search.split('=')[1];
 
+var module = (window.location.pathname).split('/')[1];
+
 
 // Установка прелоадера
 $(function () {
@@ -131,10 +133,10 @@ $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
 
     if ($(this).attr('id').split('-')[0] === 'adminMainConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
-        window.location.href = '/admin/message/technical-support?id='+id;
+        window.location.href = '/' + module + '/message/technical-support?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'conversation')) {
         window.location.href = '/message/view?id='+id;
@@ -148,9 +150,9 @@ $(body).on('click', '.container-user_messages', function () {
 // Обновляем данные на странице
 setInterval(function(){
 
-    // Обновляем беседы админа
+    // Обновляем беседы трекера
     $.ajax({
-        url: '/admin/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
+        url: '/' + module + '/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
         method: 'POST',
         cache: false,
         success: function(response){

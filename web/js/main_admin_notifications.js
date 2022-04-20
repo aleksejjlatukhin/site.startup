@@ -3,6 +3,7 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 
 var body = $('body');
 var containerAppointsExpertProject;
+var module = (window.location.pathname).split('/')[1];
 
 
 // Получить форму выбора типов эксперта при назначении на проект
@@ -92,7 +93,7 @@ $(body).on('click', '.send-communication', function (e) {
 $(body).on('click', '.link-read-notification', function (e) {
 
     var communication_id = $(this).attr('id').split('-')[1],
-        url = '/admin/communications/read-communication?id=' + communication_id,
+        url = '/' + module + '/communications/read-communication?id=' + communication_id,
         container = $(this).parent();
 
     $.ajax({

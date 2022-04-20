@@ -38,20 +38,13 @@ class ProjectsController extends AppAdminController
         }elseif ($action->id == 'group') {
 
             $user = User::findOne(Yii::$app->request->get());
-            /** @var ClientUser $clientUser */
-            $clientUser = $user->clientUser;
-            $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
 
-            if ($clientSettings->getAdminId() == Yii::$app->user->getId()) {
-                if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                    || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
+                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                    return parent::beforeAction($action);
+                return parent::beforeAction($action);
 
-                }else{
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                }
-            }else{
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 

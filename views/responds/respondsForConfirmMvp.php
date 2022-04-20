@@ -1,6 +1,7 @@
 <?php
 
 use app\models\EnableExpertise;
+use app\models\ProjectCommunications;
 use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
@@ -193,22 +194,26 @@ use app\models\User;
 
                 <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                    <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_MVP], 'stageId' => $confirm->id], [
-                        'class' => 'link-get-list-expertise btn btn-lg btn-default',
-                        'title' => 'Экспертиза',
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#707F99',
-                            'color' => '#FFFFFF',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                            'margin-right' => '10px',
-                        ],
-                    ]); ?>
+                    <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->projectId)) : ?>
+
+                        <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_MVP], 'stageId' => $confirm->id], [
+                            'class' => 'link-get-list-expertise btn btn-lg btn-default',
+                            'title' => 'Экспертиза',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#707F99',
+                                'color' => '#FFFFFF',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                                'margin-right' => '10px',
+                            ],
+                        ]); ?>
+
+                    <?php endif; ?>
 
                 <?php else : ?>
 

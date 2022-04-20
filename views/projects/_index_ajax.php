@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ProjectCommunications;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
@@ -138,12 +139,20 @@ use app\models\StageExpertise;
                                 'title' => 'Экспертиза не разрешена',
                             ]); ?>
 
-                        <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
+                        <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->id)) : ?>
 
                             <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->id], [
                                 'class' => 'link-get-list-expertise',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Экспертиза',
+                            ]); ?>
+
+                        <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->id)) : ?>
+
+                            <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['#'], [
+                                'onclick' => 'return false;',
+                                'style' => ['margin-left' => '30px'],
+                                'title' => 'Экспертиза не доступна',
                             ]); ?>
 
                         <?php endif; ?>

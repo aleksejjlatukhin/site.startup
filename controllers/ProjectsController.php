@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
+use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
@@ -18,7 +19,6 @@ use app\models\Roadmap;
 use app\models\Segments;
 use app\models\SortForm;
 use app\models\User;
-use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -51,20 +51,38 @@ class ProjectsController extends AppUserPartController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['result']) || in_array($action->id, ['result-export']) || in_array($action->id, ['report']) || in_array($action->id, ['upshot']) || in_array($action->id, ['mpdf-project'])){
 
-            $model = Projects::findOne(Yii::$app->request->get());
+            $model = Projects::findOne(Yii::$app->request->get('id'));
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($model->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if (($model->getUserId() == $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $model->user->getIdAdmin() == $currentUser->getId()) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                return parent::beforeAction($action);
+
+            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $model->user->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } elseif (User::isUserExpert($currentUser->getUsername())) {
+
+                $expert = User::findOne(Yii::$app->user->getId());
 
                 $userAccessToProject = $expert->findUserAccessToProject($model->id);
 
@@ -113,58 +131,70 @@ class ProjectsController extends AppUserPartController
         }elseif (in_array($action->id, ['mpdf-business-model'])){
 
             $businessModel = BusinessModel::findOne(Yii::$app->request->get());
+            /** @var Projects $model */
             $model = $businessModel->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($model->userId == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if (($model->getUserId() == $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $model->user->getIdAdmin() == $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+
+            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $model->user->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
         }elseif (in_array($action->id, ['create'])){
 
+            /*Ограничение доступа к проэктам пользователя*/
 
-            if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
+            if (User::isUserSimple($currentUser->getUsername()) && $currentUser->getId() == Yii::$app->request->get('id')) {
+                return parent::beforeAction($action);
+            } else {
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-
-            }else {
-
-                $user = User::findOne(Yii::$app->request->get());
-
-                /*Ограничение доступа к проэктам пользователя*/
-                if ($user->id == Yii::$app->user->id){
-
-                    return parent::beforeAction($action);
-
-                }else{
-
-                    if (User::isUserDev(Yii::$app->user->identity['username'])){
-
-                        return parent::beforeAction($action);
-
-                    }else {
-
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                    }
-                }
             }
 
         }elseif (in_array($action->id, ['index'])){
 
-            $user = User::findOne(Yii::$app->request->get('id'));
+            $model = User::findOne(Yii::$app->request->get('id'));
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($user->id == Yii::$app->user->id) || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if (($model->getId() == $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $model->getIdAdmin() == $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+
+            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $model->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } elseif (User::isUserExpert($currentUser->getUsername())) {
 
                 $expert = User::findOne(Yii::$app->user->id);
 
@@ -218,11 +248,12 @@ class ProjectsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
 
-            $project = Projects::findOne(Yii::$app->request->get());
-            $user = User::findOne($project->userId);
+            $project = Projects::findOne(Yii::$app->request->get('id'));
+            $user = User::findOne($project->getUserId());
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($user->id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+
+            if (($user->getId() == $currentUser->getId())){
 
                 return parent::beforeAction($action);
 

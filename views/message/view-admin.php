@@ -27,9 +27,10 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
         <div class="col-sm-6 col-lg-4 search-block">
 
-            <?php $form = ActiveForm::begin([
+            <?php /** @var string $module */
+            $form = ActiveForm::begin([
                 'id' => 'search_user_conversation',
-                'action' => Url::to(['/admin/message/get-conversation-query', 'id' => $admin->id]),
+                'action' => Url::to(['/' . $module . '/message/get-conversation-query', 'id' => $admin->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -729,5 +730,10 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 </div>
 
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/message_view_admin.js'); ?>
+<?php if ($module == 'admin') : ?>
+    <?php $this->registerJsFile('@web/js/message_view_admin.js'); ?>
+<?php else : ?>
+    <?php $this->registerJsFile('@web/js/message_view_client_admin.js'); ?>
+<?php endif; ?>
+
 <?php $this->registerJsFile('@web/js/form_message_admin.js'); ?>

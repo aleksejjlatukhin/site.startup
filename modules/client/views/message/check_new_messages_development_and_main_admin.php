@@ -49,7 +49,7 @@ use app\models\MessageDevelopment;
                             <div class="message-description-files">
                                 <?php foreach ($message->files as $file) : ?>
                                     <div>
-                                        <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                        <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -89,7 +89,7 @@ use app\models\MessageDevelopment;
                             <div class="message-description-files">
                                 <?php foreach ($message->files as $file) : ?>
                                     <div>
-                                        <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                        <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -133,7 +133,7 @@ use app\models\MessageDevelopment;
                             <div class="message-description-files">
                                 <?php foreach ($message->files as $file) : ?>
                                     <div>
-                                        <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                        <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -173,7 +173,7 @@ use app\models\MessageDevelopment;
                             <div class="message-description-files">
                                 <?php foreach ($message->files as $file) : ?>
                                     <div>
-                                        <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                        <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>

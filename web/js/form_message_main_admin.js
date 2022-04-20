@@ -3,6 +3,8 @@ var chat = $(body).find('#data-chat');
 // Автоматическое обновление блока сообшений
 var autoUpdateDataChat = true;
 
+var module = (window.location.pathname).split('/')[1];
+
 
 // Передаем событие клика по кнопке сохранить сообщение
 $(body).on('click', '.send_message_button', function () {
@@ -113,7 +115,7 @@ $(body).on('input', 'textarea#input_send_message', function () {
 
     // Сохраняем данные в кэш
     var conversation_id = window.location.search.split('=')[1];
-    var url = '/admin/message/save-cache-message-main-admin-form?id=' + conversation_id;
+    var url = '/' + module + '/message/save-cache-message-main-admin-form?id=' + conversation_id;
     var data = $(this).serialize();
     $.ajax({url: url, data: data, method: 'POST'});
 
@@ -172,7 +174,7 @@ $(body).on('click', '.pagination-messages .messages-pagination-list li.next a', 
     var number_active_page = $(pagination_active_page).html();
     var next_page = Number.parseInt(number_active_page);
     var idFirstMessagePreviosPage = $('.message:first').attr('id').split('-')[1];
-    var url = '/admin/message/get-page-message?id=' + conversation_id + '&page=' + next_page + '&final=' + idFirstMessagePreviosPage;
+    var url = '/' + module + '/message/get-page-message?id=' + conversation_id + '&page=' + next_page + '&final=' + idFirstMessagePreviosPage;
 
     $.ajax({
 
@@ -224,7 +226,7 @@ setInterval(function(){
     if ($(lastMessage).length) idLastMessage = $(lastMessage).attr('id').split('-')[1];
     else idLastMessage = 0;
 
-    var url = '/admin/message/check-new-messages-main-admin?id=' + conversation_id + '&idLastMessageOnPage=' + idLastMessage;
+    var url = '/' + module + '/message/check-new-messages-main-admin?id=' + conversation_id + '&idLastMessageOnPage=' + idLastMessage;
 
     if (autoUpdateDataChat === true) {
 

@@ -91,6 +91,29 @@ class ConversationManager extends ActiveRecord
 
 
     /**
+     * Создать беседу менеджера Spaccel с гл.админом Spaccel
+     *
+     * @param int $managerId
+     * @param User $user
+     *
+     * @return ConversationManager|null
+     */
+    public static function createRecordWithMainAdmin($managerId, $user)
+    {
+        $record = self::findOne(['manager_id' => $managerId, 'role' => User::ROLE_MAIN_ADMIN]);
+
+        if (!$record) {
+            $record = new self();
+            $record->manager_id = $managerId;
+            $record->user_id = $user->getId();
+            $record->role = $user->getRole();
+            return $record->save() ? $record : null;
+        }
+        return $record;
+    }
+
+
+    /**
      * Получить объект менеджера
      * @return ActiveQuery
      */

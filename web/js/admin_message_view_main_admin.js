@@ -5,6 +5,8 @@ const simpleBarDataChatMainAdmin = new SimpleBar(document.getElementById('data-c
 // Получаем id беседы главного админа с админом
 var conversation_id = window.location.search.split('=')[1];
 
+var module = (window.location.pathname).split('/')[1];
+
 
 var body = $('body');
 var id_page = window.location.search.split('=')[1];
@@ -135,10 +137,13 @@ $(body).keydown('form#search_user_conversation', function(e) {
 $(body).on('click', '.conversation-link', function () {
     var id = $(this).attr('id').split('-')[1];
     if (($(this).attr('id').split('-')[0] === 'adminConversation')) {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'managerConversation')) {
+        window.location.href = '/' + module + '/message/view?id=' + id + '&type=manager';
     }
 });
 
@@ -147,13 +152,16 @@ $(body).on('click', '.conversation-link', function () {
 $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
     if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
-        window.location.href = '/admin/message/technical-support?id='+id;
+        window.location.href = '/' + module + '/message/technical-support?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'adminConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'managerConversation')) {
+        window.location.href = '/' + module + '/message/view?id=' + id + '&type=manager';
     }
 });
 
@@ -191,7 +199,7 @@ $(document).ready(function () {
             $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -234,7 +242,7 @@ $(document).ready(function () {
                 if (posTop + ($(item).height() / 2) <= $(chat).height() || scrollTop + $(item).height() > scrollHeight - $(chat).height()) {
 
                     var message_id = $(item).attr('id').split('-')[1];
-                    var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                    var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                     $.ajax({
                         url: url,
@@ -281,7 +289,7 @@ setInterval(function(){
             $(chat).find('.addressee-main_admin.unreadmessage').each(function (index, item) {
 
                 var message_id = $(item).attr('id').split('-')[1];
-                var url = '/admin/message/read-message-main-admin?id=' + message_id;
+                var url = '/' + module + '/message/read-message-main-admin?id=' + message_id;
 
                 $.ajax({
                     url: url,
@@ -310,7 +318,7 @@ setInterval(function(){
 
     // Обновляем беседы главного админа
     $.ajax({
-        url: '/admin/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
+        url: '/' + module + '/message/get-list-update-conversations?id=' + conversation_id + '&pathname=view',
         method: 'POST',
         cache: false,
         success: function(response){
@@ -324,6 +332,7 @@ setInterval(function(){
             if (!$(conversation_list_menu).find(conversation_id).hasClass('active-message')) $(conversation_list_menu).find(conversation_id).addClass('active-message');
 
             $(conversation_list_menu).find('.containerForExpertConversations').html(response.conversationsExpertForAdminMainAjax);
+            $(conversation_list_menu).find('.containerForManagerConversations').html(response.conversationsManagerForAdminMainAjax);
         }
     });
 
@@ -332,7 +341,7 @@ setInterval(function(){
     $(chat).find('.addressee-admin.unreadmessage').each(function (index, item) {
 
         var message_id = $(item).attr('id').split('-')[1];
-        var url = '/admin/message/checking-unread-message-main-admin?id=' + message_id;
+        var url = '/' + module + '/message/checking-unread-message-main-admin?id=' + message_id;
 
         $.ajax({
             url: url,

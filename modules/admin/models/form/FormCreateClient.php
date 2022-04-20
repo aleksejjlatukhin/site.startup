@@ -39,7 +39,8 @@ class FormCreateClient extends Model
             ['name', 'string', 'min' => 3, 'max' => 32],
             [['fullname', 'city'], 'string', 'max' => 255],
             ['description', 'string', 'max' => 2000],
-            ['adminCompany', 'string']
+            ['adminCompany', 'string'],
+            [['name', 'fullname', 'city', 'description'], 'trim']
         ];
     }
 
@@ -71,10 +72,4 @@ class FormCreateClient extends Model
         return $client->save() ? $client : null;
     }
 
-    // Вероятнее всего необходимо несколько форм отправлять одной кнопкой!!!
-    //TODO: Необходимо здесь так же создать админа (User ClientUser),
-    // кроме этого необходимо будет создать беседы с Тех поддержкой,
-    // а в дальнейшем и с другими пользователями, при этом это должны
-    // быть беседы conversation_main_admin (с трекерами) и т.д.
-    // После этого так же создать объект ClientSettings
 }

@@ -32,7 +32,7 @@ use app\modules\expert\models\MessageExpert;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div>Главный администратор</div>
+                        <div class="interlocutor"><?= $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -72,7 +72,7 @@ use app\modules\expert\models\MessageExpert;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div>Главный администратор</div>
+                        <div class="interlocutor"><?= $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>

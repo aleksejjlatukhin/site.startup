@@ -370,6 +370,33 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
 
 
     /**
+     * Проверка доступа к проведению экспертизы
+     *
+     * @param $expert_id
+     * @param $project_id
+     * @return bool
+     */
+    public static function checkOfAccessToCarryingExpertise($expert_id, $project_id)
+    {
+        $communications = self::find()->where(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
+        $existCommunications = $communications->all();
+
+        if (!$existCommunications) {
+            // Если у эксперта ещё не было
+            // коммуникаций по данному проекту
+            return false;
+
+        } else {
+            $lastCommunication = $communications->orderBy('id DESC')->one();
+            if ($lastCommunication->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+
+    /**
      * Показывать ли эксперту кнопку
      * ответа на коммуникацию
      *

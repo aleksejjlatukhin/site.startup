@@ -3,6 +3,8 @@ const simpleBarConversations = new SimpleBar(document.getElementById('conversati
 // Получаем id пользователя
 var user_id = window.location.search.split('=')[1];
 
+var module = (window.location.pathname).split('/')[1];
+
 
 // Установка прелоадера
 $(function () {
@@ -117,10 +119,13 @@ $(body).keydown('form#search_user_conversation', function(e) {
 $(body).on('click', '.conversation-link', function () {
     var id = $(this).attr('id').split('-')[1];
     if (($(this).attr('id').split('-')[0] === 'adminConversation')) {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'managerConversation')) {
+        window.location.href = '/' + module + '/message/view?id=' + id + '&type=manager';
     }
 });
 
@@ -131,13 +136,16 @@ $(body).on('click', '.container-user_messages', function () {
     var id = $(this).attr('id').split('-')[1];
 
     if ($(this).attr('id').split('-')[0] === 'conversationTechnicalSupport') {
-        window.location.href = '/admin/message/technical-support?id='+id;
+        window.location.href = '/' + module + '/message/technical-support?id='+id;
     }
     else if ($(this).attr('id').split('-')[0] === 'adminConversation') {
-        window.location.href = '/admin/message/view?id='+id;
+        window.location.href = '/' + module + '/message/view?id='+id;
     }
     else if (($(this).attr('id').split('-')[0] === 'expertConversation')) {
         window.location.href = '/expert/message/view?id='+id;
+    }
+    else if (($(this).attr('id').split('-')[0] === 'managerConversation')) {
+        window.location.href = '/' + module + '/message/view?id=' + id + '&type=manager';
     }
 });
 
@@ -147,7 +155,7 @@ setInterval(function(){
 
     // Обновляем беседы админа
     $.ajax({
-        url: '/admin/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
+        url: '/' + module + '/message/get-list-update-conversations?id=' + user_id + '&pathname=index',
         method: 'POST',
         cache: false,
         success: function(response){
@@ -156,6 +164,7 @@ setInterval(function(){
             $(conversation_list_menu).find(response.blockConversationDevelopment).html(response.conversationDevelopmentForAdminMainAjax);
             $(conversation_list_menu).find('.containerForAllConversations').html(response.conversationsAdminForAdminMainAjax);
             $(conversation_list_menu).find('.containerForExpertConversations').html(response.conversationsExpertForAdminMainAjax);
+            $(conversation_list_menu).find('.containerForManagerConversations').html(response.conversationsManagerForAdminMainAjax);
         }
     });
 

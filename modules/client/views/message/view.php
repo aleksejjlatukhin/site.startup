@@ -29,7 +29,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
             <?php $form = ActiveForm::begin([
                 'id' => 'search_user_conversation',
-                'action' => Url::to(['/admin/message/get-admin-conversation-query', 'id' => $main_admin->id]),
+                'action' => Url::to(['/client/message/get-admin-conversation-query', 'id' => $main_admin->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -127,6 +127,87 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                         </div>
                     </div>
+                </div>
+
+                <!--Блок для бесед с менеджерами-->
+                <div class="containerForManagerConversations">
+
+                    <div class="title_block_conversation">
+                        <div class="title">Менеджеры</div>
+                    </div>
+
+                    <?php if ($managerConversations) : ?>
+
+                        <?php foreach ($managerConversations as $conversation) : ?>
+
+                            <div class="container-user_messages" id="managerConversation-<?= $conversation->id;?>">
+
+                                <!--Проверка существования аватарки-->
+                                <?php if ($conversation->manager->avatar_image) : ?>
+                                    <?= Html::img('/web/upload/user-'.$conversation->manager->id.'/avatar/'.$conversation->manager->avatar_image, ['class' => 'user_picture']); ?>
+                                <?php else : ?>
+                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                <?php endif; ?>
+
+                                <!--Кол-во непрочитанных сообщений от менеджера-->
+                                <?php if ($conversation->manager->getCountUnreadMessagesFromManager($conversation->user->getId())) : ?>
+                                    <div class="countUnreadMessagesSender active"><?= $conversation->manager->getCountUnreadMessagesFromManager($conversation->user->getId()); ?></div>
+                                <?php else : ?>
+                                    <div class="countUnreadMessagesSender"></div>
+                                <?php endif; ?>
+
+                                <!--Проверка онлайн статуса-->
+                                <?php if ($conversation->manager->checkOnline === true) : ?>
+                                    <div class="checkStatusOnlineUser active"></div>
+                                <?php else : ?>
+                                    <div class="checkStatusOnlineUser"></div>
+                                <?php endif; ?>
+
+                                <div class="container_user_messages_text_content">
+
+                                    <div class="row block_top">
+
+                                        <div class="col-xs-8"><?= $conversation->manager->second_name.' '.$conversation->manager->first_name.' '.$conversation->manager->middle_name; ?></div>
+
+                                        <div class="col-xs-4 text-right">
+                                            <?php if ($conversation->lastMessage) : ?>
+                                                <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <?php if ($conversation->lastMessage) : ?>
+                                        <div class="block_bottom_exist_message">
+
+                                            <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
+                                                <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                            <?php else : ?>
+                                                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                            <?php endif; ?>
+
+                                            <div>
+                                                <?php if ($conversation->lastMessage->description) : ?>
+                                                    <?= $conversation->lastMessage->description; ?>
+                                                <?php else : ?>
+                                                    ...
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php else : ?>
+                                        <div class="block_bottom_not_exist_message">Нет сообщений</div>
+                                    <?php endif; ?>
+
+                                </div>
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    <?php else : ?>
+
+                        <div class="text-center block_not_conversations">Нет менеджеров</div>
+
+                    <?php endif; ?>
+
                 </div>
 
                 <!--Блок для бесед с трекерами-->
@@ -429,7 +510,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -469,7 +550,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -513,7 +594,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -553,7 +634,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -577,7 +658,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-main-admin',
-                            'action' => Url::to(['/admin/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/client/message/send-message', 'id' => \Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',
@@ -626,7 +707,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-main-admin',
-                            'action' => Url::to(['/admin/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/client/message/send-message', 'id' => \Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',

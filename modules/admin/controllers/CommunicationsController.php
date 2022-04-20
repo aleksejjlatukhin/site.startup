@@ -57,8 +57,8 @@ class CommunicationsController extends AppAdminController
 
         }elseif ($action->id == 'notifications') {
 
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                || (User::isUserAdmin(Yii::$app->user->identity['username']) && (Yii::$app->user->getId() == Yii::$app->request->get('id')))) {
+            if ((User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+                || User::isUserAdmin(Yii::$app->user->identity['username'])) && (Yii::$app->user->getId() == Yii::$app->request->get('id'))) {
 
                 return parent::beforeAction($action);
 

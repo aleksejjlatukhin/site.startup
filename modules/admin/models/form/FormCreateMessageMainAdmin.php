@@ -11,6 +11,21 @@ use yii\web\NotFoundHttpException;
 use Yii;
 use yii\web\UploadedFile;
 
+/**
+ * Форма создания сообщения с гл.админом и админом организации
+ *
+ * Class FormCreateMessageMainAdmin
+ * @package app\modules\admin\models\form
+ *
+ * @property $description                   Текст сообщения
+ * @property $conversation_id               Идентификатор беседы
+ * @property $sender_id                     Идентификатор отправителя
+ * @property $adressee_id                   Идентификатор получателя
+ * @property $message_files                 Файлы прикрепленные к сообщению
+ * @property $category                      Категория сообщений, указывается для сохранения файлов в нужной дирректории
+ * @property $message_id                    Идентификатор сообщения
+ * @property $server_file                   Сгенерированное имя прикрепленного файла и сохраненного на сервере и записанного в таблицу message_files
+ */
 class FormCreateMessageMainAdmin extends Model
 {
     public $description;

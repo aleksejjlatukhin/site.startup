@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\modules\admin\models\ConversationMainAdmin;
 use app\modules\admin\models\MessageMainAdmin;
+use app\modules\admin\models\MessageManager;
 use app\modules\expert\models\ConversationExpert;
 use app\modules\expert\models\MessageExpert;
 use Throwable;
@@ -687,12 +688,13 @@ class User extends ActiveRecord implements IdentityInterface
             $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesAdmin + $countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
         }
-        elseif (self::isUserMainAdmin($this->username)) {
+        elseif (self::isUserMainAdmin($this->username) || self::isUserAdminCompany($this->username)) {
 
             $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
             $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-            $count = ($countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
+            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $count = ($countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert + $countUnreadMessagesManager);
         }
         elseif (self::isUserDev($this->username)) {
 
@@ -703,6 +705,12 @@ class User extends ActiveRecord implements IdentityInterface
             $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesExpert + $countUnreadMessagesDev);
+        }
+        elseif (self::isUserManager($this->username)) {
+
+            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = ($countUnreadMessagesManager + $countUnreadMessagesDev);
         }
 
         return ($count > 0) ? $count : false;
@@ -724,7 +732,7 @@ class User extends ActiveRecord implements IdentityInterface
             $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
         }
-        elseif (self::isUserMainAdmin($this->username)) {
+        elseif (self::isUserMainAdmin($this->username) || self::isUserAdminCompany($this->username)) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
@@ -824,6 +832,11 @@ class User extends ActiveRecord implements IdentityInterface
             $count = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
         }
 
+        elseif (self::isUserManager($this->username)) {
+
+            $count = MessageManager::find()->where(['sender_id' => $this->mainAdmin->id, 'adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
         return ($count > 0) ? $count : false;
     }
 
@@ -893,8 +906,9 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * @return bool|int|string
+     *
      * Кол-во непрочитанных сообщений эксперта,
-     * где он является отправителем для гл.админа
+     * где он является отправителем для админа организации
      */
     public function getCountUnreadMessagesMainAdminFromExpert ()
     {
@@ -910,8 +924,48 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
+     * @return bool|int|string
+     *
+     * Кол-во непрочитанных сообщений менеджера,
+     * где он является отправителем для админа Spaccel
+     */
+    public function getCountUnreadMessagesMainAdminFromManager ()
+    {
+        $count = 0;
+
+        if (self::isUserManager($this->username)) {
+
+            $count = MessageManager::find()->where(['adressee_id' => $this->mainAdmin->id, 'sender_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений от менеджера
+     * для пользователя, у которого id => $userId
+     *
+     * @param int $userId
+     * @return bool|int|string
+     */
+    public function getCountUnreadMessagesFromManager($userId)
+    {
+        $count = 0;
+
+        if (self::isUserManager($this->username)) {
+
+            $count = MessageManager::find()->where(['adressee_id' => $userId, 'sender_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
      * Кол-во непрочитанных сообщений
      * от пользователя для эксперта
+     *
      * @param $id
      * @return bool|int|string
      */
@@ -927,6 +981,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Кол-во непрочитанных сообщений
      * от эксперта для пользователя
+     *
      * @param $id
      * @return bool|int|string
      */
@@ -934,6 +989,22 @@ class User extends ActiveRecord implements IdentityInterface
     {
 
         $count = MessageExpert::find()->where(['adressee_id' => $this->id, 'sender_id' => $id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Количество непрочитанных сообщений у менеджера от пользователя
+     * (админа организации, трекера или админа Spaccel)
+     *
+     * @param $id
+     * @return bool|int|string
+     */
+    public function getCountUnreadMessagesManager($id)
+    {
+
+        $count = MessageManager::find()->where(['adressee_id' => $this->id, 'sender_id' => $id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -989,6 +1060,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Проверка на Эксперта
+     *
      * @param $username
      * @return bool
      */
@@ -1004,7 +1076,8 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Проверка на Разработчика
+     * Проверка на Техподдержку
+     *
      * @param $username
      * @return bool
      */

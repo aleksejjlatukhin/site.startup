@@ -8,6 +8,7 @@ use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationAdmin;
 use app\models\User;
+use app\modules\admin\models\ConversationManager;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -256,6 +257,37 @@ class UsersController extends AppAdminController
 
 
     /**
+     * Список экспертов организации
+     *
+     * @return string
+     */
+    public function actionManagers()
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+        /**
+         * @var ClientUser $clientUser
+         * @var Client $client
+         */
+        $clientUser = $user->clientUser;
+        $client = $clientUser->client;
+        $countUsersOnPage = 20;
+        $query = User::find()->with('clientUser')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['role' => User::ROLE_MANAGER, 'confirm' => User::CONFIRM])
+            ->andWhere(['client_user.client_id' => $client->getId()])
+            ->orderBy(['updated_at' => SORT_DESC]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
+
+        return $this->render('managers',[
+            'users' => $users,
+            'pages' => $pages,
+        ]);
+    }
+
+
+    /**
      * Изменение статуса пользователя
      *
      * @param $id
@@ -282,6 +314,10 @@ class UsersController extends AppAdminController
                     } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
                         //Создание беседы между трекером и проектантом
                         $model->createConversationAdmin($model);
+
+                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_MANAGER)) {
+                        //Создание беседы между главным алмином и менедром по клиентам
+                        ConversationManager::createRecordWithMainAdmin($model->getId(), $model->mainAdmin);
                     }
 
                     if (($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {

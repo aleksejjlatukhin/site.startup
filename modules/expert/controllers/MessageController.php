@@ -10,6 +10,7 @@ use app\models\MessageDevelopment;
 use app\models\MessageFiles;
 use app\models\User;
 use app\modules\admin\models\ConversationMainAdmin;
+use app\modules\admin\models\ConversationManager;
 use app\modules\expert\models\form\SearchForm;
 use app\modules\expert\models\ConversationExpert;
 use app\modules\expert\models\form\FormCreateMessageExpert;
@@ -105,7 +106,7 @@ class MessageController extends AppExpertController
         // Беседа эксерта с техподдержкой
         $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
         // Беседа эксперта с главным админом
-        $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $id, 'role' => User::ROLE_ADMIN_COMPANY]);
+        $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->getId(), 'user_id' => $expert->mainAdmin->getId()]);
         // Беседы эксперта и трекеров
         $adminConversations = ConversationExpert::find()
             ->where(['expert_id' => $id, 'role' => User::ROLE_ADMIN])
@@ -154,7 +155,7 @@ class MessageController extends AppExpertController
             // Беседа эксперта с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->id]);
             // Беседа эксперта с гл. админом
-            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_ADMIN_COMPANY]);
+            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->getId(), 'user_id' => $expert->mainAdmin->getId()]);
             // Все беседы эксперта с трекерами
             $adminConversations = ConversationExpert::find()
                 ->andWhere(['expert_id' => $expert->id])
@@ -173,7 +174,7 @@ class MessageController extends AppExpertController
             $cache_form_message = $cache->get('formCreateMessageExpertCache');
             if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageExpert']['description'];
 
-            if (User::isUserMainAdmin($user->username)) {
+            if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) {
 
                 return $this->render('view', [
                     'conversation' => $conversation,
@@ -208,10 +209,15 @@ class MessageController extends AppExpertController
                 ]);
             }
 
-        } elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+        } elseif (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
 
             // Беседа админа с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $user->id]);
+            // Все беседы главного админа с менеджерами
+            $managerConversations = ConversationManager::find()
+                ->andWhere(['user_id' => $user->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
             // Все беседы главного админа с трекерами
             $allConversations = ConversationMainAdmin::find()
                 ->andWhere(['main_admin_id' => $user->id])
@@ -222,6 +228,8 @@ class MessageController extends AppExpertController
                 ->andWhere(['user_id' => $user->id])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
+
+            User::isUserMainAdmin(Yii::$app->user->identity['username']) ? $module = 'admin' : $module = 'client';
 
             // Если есть кэш, добавляем его в форму сообщения
             $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_expert/conversation-'.$conversation->id.'/';
@@ -238,8 +246,10 @@ class MessageController extends AppExpertController
                 'countMessages' => $countMessages,
                 'pagesMessages' => $pagesMessages,
                 'conversation_development' => $conversation_development,
+                'managerConversations' => $managerConversations,
                 'allConversations' => $allConversations,
                 'expertConversations' => $expertConversations,
+                'module' => $module,
             ]);
         }
 
@@ -261,6 +271,8 @@ class MessageController extends AppExpertController
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
+            User::isUserMainAdmin($user->mainAdmin->getUsername()) ? $module = 'admin' : $module = 'client';
+
             // Если есть кэш, добавляем его в форму сообщения
             $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_expert/conversation-'.$conversation->id.'/';
             $cache_form_message = $cache->get('formCreateMessageExpertCache');
@@ -279,6 +291,7 @@ class MessageController extends AppExpertController
                 'conversation_development' => $conversation_development,
                 'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
+                'module' => $module,
             ]);
         }
         return false;
@@ -302,7 +315,7 @@ class MessageController extends AppExpertController
                     // Беседа эксерта с техподдержкой
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
                     // Беседа эксперта с главным админом
-                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $id, 'role' => User::ROLE_MAIN_ADMIN]);
+                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $id, 'user_id' => $expert->mainAdmin->getId()]);
                     // Беседы эксперта и трекеров
                     $adminConversations = ConversationExpert::find()
                         ->where(['expert_id' => $id, 'role' => User::ROLE_ADMIN])
@@ -341,7 +354,7 @@ class MessageController extends AppExpertController
                     // Беседа эксерта с техподдержкой
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $expert->id]);
                     // Беседа эксперта с главным админом
-                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_MAIN_ADMIN]);
+                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'user_id' => $expert->mainAdmin->getId()]);
                     // Беседы эксперта и трекеров
                     $adminConversations = ConversationExpert::find()
                         ->where(['expert_id' => $expert->id, 'role' => User::ROLE_ADMIN])
@@ -379,7 +392,7 @@ class MessageController extends AppExpertController
                     $conversation_development = ConversationDevelopment::findOne($id);
                     $expert = $conversation_development->user;
                     // Беседа эксперта с главным админом
-                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'role' => User::ROLE_MAIN_ADMIN]);
+                    $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->id, 'user_id' => $expert->mainAdmin->getId()]);
                     // Беседы эксперта и трекеров
                     $adminConversations = ConversationExpert::find()
                         ->where(['expert_id' => $expert->id, 'role' => User::ROLE_ADMIN])
@@ -445,7 +458,7 @@ class MessageController extends AppExpertController
                     return $response;
                 }
             }
-            elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            elseif (User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
 
                 if ($pathname === 'view') {
 
@@ -459,11 +472,15 @@ class MessageController extends AppExpertController
                             'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
                         ]),
                         'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->id])
+                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                         'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
-                            'expertConversations' => ConversationExpert::find()->andWhere(['role' => User::ROLE_MAIN_ADMIN])
+                            'expertConversations' => ConversationExpert::find()->andWhere(['user_id' => $main_admin->getId()])
+                                ->orderBy(['updated_at' => SORT_DESC])->all(),
+                        ]),
+                        'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
+                            'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
@@ -578,6 +595,19 @@ class MessageController extends AppExpertController
                                 ]),
                             ];
 
+                        } elseif (User::isUserAdminCompany($user->username)) {
+                            $response =  [
+                                'sender' => 'expert',
+                                'countUnreadMessages' => $expert->countUnreadMessages,
+                                'blockConversationAdminMain' => '#adminMainConversation-' . $id,
+                                'conversationAdminMainForExpertAjax' => $this->renderAjax('update_conversation_main_admin_for_expert', [
+                                    'conversationAdminMain' => ConversationExpert::findOne($id), 'expert' => $expert,
+                                ]),
+                                'addNewMessagesAjax' => $this->renderAjax('check_new_messages_expert_main_admin', [
+                                    'messages' => $messages, 'main_admin' => $user, 'expert' => $expert, 'lastMessageOnPage' => $lastMessageOnPage,
+                                ]),
+                            ];
+
                         } elseif (User::isUserAdmin($user->username)) {
                             $response =  [
                                 'sender' => 'expert',
@@ -617,6 +647,38 @@ class MessageController extends AppExpertController
                             'countUnreadMessages' => $user->countUnreadMessages,
                             'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
                                 'expertConversations' => ConversationExpert::find()->andWhere(['role' => User::ROLE_MAIN_ADMIN])
+                                    ->orderBy(['updated_at' => SORT_DESC])->all(),
+                            ]),
+                            'addNewMessagesAjax' => $this->renderAjax('check_new_messages_expert_main_admin', [
+                                'messages' => $messages, 'main_admin' => $user, 'expert' => $expert, 'lastMessageOnPage' => $lastMessageOnPage,
+                            ]),
+                        ];
+
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                }
+
+                elseif (User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
+
+                    $formMessage->conversation_id = $id;
+                    $formMessage->sender_id = $user->id;
+                    $formMessage->adressee_id = $expert->id;
+                    if ($formMessage->create()) {
+
+                        //Удаление кэша формы создания сообщения
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/messages/category_expert/conversation-'.$conversation->id;
+                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+
+                        // Сообщения, которых ещё нет на странице
+                        $messages = MessageExpert::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+
+                        $response =  [
+                            'sender' => 'main_admin',
+                            'countUnreadMessages' => $user->countUnreadMessages,
+                            'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
+                                'expertConversations' => ConversationExpert::find()->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
                                     ->orderBy(['updated_at' => SORT_DESC])->all(),
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_expert_main_admin', [
@@ -781,10 +843,10 @@ class MessageController extends AppExpertController
                 $user = User::findOne($model->adressee_id);
                 $countUnreadMessagesForConversation = MessageExpert::find()->where(['adressee_id' => $model->adressee_id, 'sender_id' => $model->sender_id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
                 // Передаем id блока беседы
-                if (User::isUserMainAdmin($user->username)) $blockConversation = '#expertConversation-' . $model->conversation_id;
+                if (User::isUserMainAdmin($user->username) || User::isUserAdminCompany($user->username)) $blockConversation = '#expertConversation-' . $model->conversation_id;
                 elseif (User::isUserAdmin($user->username)) $blockConversation = '#expertConversation-' . $model->conversation_id;
                 elseif (User::isUserExpert($user->username)) {
-                    if (User::isUserMainAdmin($model->sender->username))
+                    if (User::isUserMainAdmin($model->sender->username) || User::isUserAdminCompany($model->sender->username))
                         $blockConversation = '#adminMainConversation-' . $model->conversation_id;
                     if (User::isUserAdmin($model->sender->username))
                         $blockConversation = '#adminConversation-' . $model->conversation_id;
@@ -875,12 +937,12 @@ class MessageController extends AppExpertController
         if (User::isUserExpert(Yii::$app->user->identity['username'])) {
 
             // Беседа эксперта с главным админом
-            $conversationAdminMain = ConversationExpert::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+            $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $user->getId(), 'user_id' => $user->mainAdmin->id]);
             $main_admin = $conversationAdminMain->user;
             // Все беседы эксперта с трекерами
             $adminConversations = ConversationExpert::find()
                 ->where(['expert_id' => $user->id])
-                ->where(['role' => User::ROLE_ADMIN])
+                ->andWhere(['role' => User::ROLE_ADMIN])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
             // Все беседы эксперта с проектантами

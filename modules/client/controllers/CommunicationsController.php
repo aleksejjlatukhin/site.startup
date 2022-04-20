@@ -4,11 +4,13 @@
 namespace app\modules\client\controllers;
 
 
+use app\models\ClientUser;
 use app\models\CommunicationPatterns;
 use app\models\CommunicationTypes;
 use app\models\DuplicateCommunications;
 use app\models\ProjectCommunications;
 use app\models\TypesAccessToExpertise;
+use app\models\TypesDuplicateCommunication;
 use app\models\User;
 use app\models\UserAccessToProjects;
 use app\modules\admin\models\form\FormExpertTypes;
@@ -43,7 +45,6 @@ class CommunicationsController extends AppClientController
      */
     public function beforeAction($action)
     {
-        //TODO: Исправить правила доступа и методы в контроллере, создать неоьходимые формы и модели
 
         if ($action->id == 'settings') {
 
@@ -57,7 +58,7 @@ class CommunicationsController extends AppClientController
 
         }elseif ($action->id == 'notifications') {
 
-            if (User::isUserAdminCompany(Yii::$app->user->identity['username']) || (User::isUserAdmin(Yii::$app->user->identity['username']) && (Yii::$app->user->getId() == Yii::$app->request->get('id')))) {
+            if ((User::isUserAdminCompany(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username'])) && (Yii::$app->user->getId() == Yii::$app->request->get('id'))) {
 
                 return parent::beforeAction($action);
 
@@ -145,7 +146,6 @@ class CommunicationsController extends AppClientController
 
     /**
      * Создание нового шаблона коммуникации
-     *
      * @param $communicationType
      * @return array|bool
      */
@@ -197,7 +197,6 @@ class CommunicationsController extends AppClientController
     /**
      * Получить представление
      * одного шалона
-     *
      * @param $id
      * @return array|bool
      */
@@ -232,7 +231,6 @@ class CommunicationsController extends AppClientController
     /**
      * Отмена редактирования
      * шаблона коммуникации
-     *
      * @param $id
      * @return array|bool
      */
@@ -245,7 +243,6 @@ class CommunicationsController extends AppClientController
     /**
      * Получить форму редактирования
      * шаблона коммуникации
-     *
      * @param $id
      * @param $communicationType
      * @return array|bool
@@ -280,7 +277,6 @@ class CommunicationsController extends AppClientController
     /**
      * Редактирование
      * шаблона коммуникации
-     *
      * @param $id
      * @param $communicationType
      * @return array|bool
@@ -468,8 +464,8 @@ class CommunicationsController extends AppClientController
                         User::createConversationExpert($communication->project->user, $communication->expert);
 
                         // Отправка уведомления проектанту и трекеру
-                        DuplicateCommunications::create($communication, $communication->project->user);
-                        DuplicateCommunications::create($communication, $communication->project->user->admin);
+                        DuplicateCommunications::create($communication, $communication->project->user, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
+                        DuplicateCommunications::create($communication, $communication->project->user->admin, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
 
                     } elseif ($type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
 
@@ -483,8 +479,8 @@ class CommunicationsController extends AppClientController
                         // Тип коммуникации "отозвать эксперта с проекта"
 
                         // Отправка уведомления проектанту и трекеру
-                        DuplicateCommunications::create($communication, $communication->project->user);
-                        DuplicateCommunications::create($communication, $communication->project->user->admin);
+                        DuplicateCommunications::create($communication, $communication->project->user, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
+                        DuplicateCommunications::create($communication, $communication->project->user->admin, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
                     }
 
                     // Отправка письма эксперту на почту
@@ -606,7 +602,7 @@ class CommunicationsController extends AppClientController
                 'pages' => $pages,
             ]);
 
-        } elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+        } elseif (User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
 
             $query_communications = ProjectCommunications::find()
                 ->where(['adressee_id' => $id])

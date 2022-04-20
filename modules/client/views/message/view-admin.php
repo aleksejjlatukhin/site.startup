@@ -29,7 +29,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
             <?php $form = ActiveForm::begin([
                 'id' => 'search_user_conversation',
-                'action' => Url::to(['/admin/message/get-conversation-query', 'id' => $admin->id]),
+                'action' => Url::to(['/client/message/get-conversation-query', 'id' => $admin->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -423,7 +423,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -463,7 +463,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -507,7 +507,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -547,7 +547,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->file_name, ['/client/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -571,7 +571,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-main-admin',
-                            'action' => Url::to(['/admin/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/client/message/send-message', 'id' => \Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',
@@ -620,7 +620,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-main-admin',
-                            'action' => Url::to(['/admin/message/send-message', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/client/message/send-message', 'id' => \Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',

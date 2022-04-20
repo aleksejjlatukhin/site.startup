@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ProjectCommunications;
 use yii\helpers\Html;
 use app\models\Segments;
 use app\models\User;
@@ -105,7 +106,7 @@ use app\models\StageExpertise;
                     ]
                 ]); ?>
 
-            <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
+            <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->projectId)) : ?>
 
                 <?=  Html::a( 'Экспертиза',
                     ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->id], [
