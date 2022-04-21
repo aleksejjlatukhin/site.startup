@@ -18,6 +18,10 @@ use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
 
+/**
+ * Class UsersController
+ * @package app\modules\admin\controllers
+ */
 class UsersController extends AppAdminController
 {
 
@@ -31,30 +35,37 @@ class UsersController extends AppAdminController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
-        if ($action->id == 'index') {
+        if (in_array($action->id, ['index', 'admins', 'experts'])) {
 
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
+
+                if (Yii::$app->request->get('id')) {
+
+                    $client = Client::findOne(Yii::$app->request->get('id'));
+
+                    if ($currentClientUser->getClientId() == $client->getId()) {
+
+                        return parent::beforeAction($action);
+
+                    } else {
+
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    }
+                }
 
                 return parent::beforeAction($action);
 
-            }else{
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'admins' || $action->id == 'experts') {
+        } elseif ($action->id == 'status-update') {
 
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif ($action->id == 'status-update') {
-
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
                 if ($action->id == 'status-update') {
                     // ОТКЛЮЧАЕМ CSRF
@@ -63,13 +74,13 @@ class UsersController extends AppAdminController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'add-admin') {
+        } elseif ($action->id == 'add-admin') {
 
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
                 if ($action->id == 'add-admin') {
                     // ОТКЛЮЧАЕМ CSRF
@@ -78,11 +89,11 @@ class UsersController extends AppAdminController
 
                 return parent::beforeAction($action);
 
-            }else{
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'group') {
+        } elseif ($action->id == 'group') {
 
             $user = User::findOne(Yii::$app->request->get('id'));
             /** @var ClientUser $clientUser */
@@ -91,19 +102,19 @@ class UsersController extends AppAdminController
             $admin = User::findOne($clientSettings->getAdminId());
 
             if (User::isUserMainAdmin($admin->getUsername())) {
-                if ($user->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                    || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+                if ($user->getId() == $currentUser->getId() || User::isUserDev($currentUser->getUsername())
+                    || User::isUserMainAdmin($currentUser->getUsername())) {
 
                     return parent::beforeAction($action);
 
-                }else{
+                } else{
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
-            }else{
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }else{
+        } else{
             return parent::beforeAction($action);
         }
 
@@ -114,17 +125,23 @@ class UsersController extends AppAdminController
     /**
      * Список проектантов организации
      *
+     * @param null|int $id
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex($id = null)
     {
-        $user = User::findOne(Yii::$app->user->getId());
-        /**
-         * @var ClientUser $clientUser
-         * @var Client $client
-         */
-        $clientUser = $user->clientUser;
-        $client = $clientUser->client;
+        if ($id) {
+            $client = Client::findOne($id);
+        } else {
+            $user = User::findOne(Yii::$app->user->getId());
+            /**
+             * @var ClientUser $clientUser
+             * @var Client $client
+             */
+            $clientUser = $user->clientUser;
+            $client = $clientUser->client;
+        }
+
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
@@ -195,17 +212,23 @@ class UsersController extends AppAdminController
     /**
      * Список трекеров организации
      *
+     * @param null|int $id
      * @return string
      */
-    public function actionAdmins()
+    public function actionAdmins($id = null)
     {
-        $user = User::findOne(Yii::$app->user->getId());
-        /**
-         * @var ClientUser $clientUser
-         * @var Client $client
-         */
-        $clientUser = $user->clientUser;
-        $client = $clientUser->client;
+        if ($id) {
+            $client = Client::findOne($id);
+        } else {
+            $user = User::findOne(Yii::$app->user->getId());
+            /**
+             * @var ClientUser $clientUser
+             * @var Client $client
+             */
+            $clientUser = $user->clientUser;
+            $client = $clientUser->client;
+        }
+
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
@@ -228,17 +251,23 @@ class UsersController extends AppAdminController
     /**
      * Список экспертов организации
      *
+     * @param null|int $id
      * @return string
      */
-    public function actionExperts()
+    public function actionExperts($id = null)
     {
-        $user = User::findOne(Yii::$app->user->getId());
-        /**
-         * @var ClientUser $clientUser
-         * @var Client $client
-         */
-        $clientUser = $user->clientUser;
-        $client = $clientUser->client;
+        if ($id) {
+            $client = Client::findOne($id);
+        } else {
+            $user = User::findOne(Yii::$app->user->getId());
+            /**
+             * @var ClientUser $clientUser
+             * @var Client $client
+             */
+            $clientUser = $user->clientUser;
+            $client = $clientUser->client;
+        }
+
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
