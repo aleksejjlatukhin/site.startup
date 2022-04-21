@@ -123,7 +123,7 @@ use yii\helpers\Url;
         'title' => 'Проектанты',
     ]);?>
 
-    <?= Html::a( 'Проекты - '.$client->countProjects, Url::to(['/admin/projects/index', 'id' => $client->id]), [
+    <?= Html::a( 'Проекты - '.$client->countProjects, Url::to(['/admin/projects/client', 'id' => $client->id]), [
         'style' => [
             'display' => 'flex',
             'align-items' => 'center',

@@ -126,6 +126,8 @@ $this->title = 'Портфель проектов';
 
 
 <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/admin_project_portfolio_index.js'); ?>
-
-
+<?php if (!$pageClientProjects) : ?>
+    <?php $this->registerJsFile('@web/js/admin_project_portfolio_index.js'); ?>
+<?php else : ?>
+    <?php $this->registerJsFile('@web/js/admin_client_project_portfolio_index.js'); ?>
+<?php endif; ?>

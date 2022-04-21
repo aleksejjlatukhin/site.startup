@@ -4,6 +4,7 @@
 namespace app\modules\expert\controllers;
 
 
+use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\User;
@@ -16,6 +17,10 @@ use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+/**
+ * Class ProfileController
+ * @package app\modules\expert\controllers
+ */
 class ProfileController extends AppExpertController
 {
 
@@ -26,17 +31,34 @@ class ProfileController extends AppExpertController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['index'])) {
 
             $expert = User::findOne(Yii::$app->request->get('id'));
 
-            if ($expert->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])|| User::isUserAdmin(Yii::$app->user->identity['username'])) {
+            if ($expert->getId() == $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
-            }else{
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $expert->getIdAdmin() == $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+
+            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $expert->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{

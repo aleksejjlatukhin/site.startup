@@ -31,8 +31,7 @@ class ProfileController extends AppClientController
 
             $admin = User::findOne(Yii::$app->request->get('id'));
 
-            if ($admin->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            if ($admin->id == Yii::$app->user->id || User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
 
                 return parent::beforeAction($action);
 

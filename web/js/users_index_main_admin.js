@@ -10,7 +10,7 @@ $(body).on('click', '.column-user-fio', function () {
     var page = window.location.pathname.split('/')[3];
     if (page === 'index') location.href = '/profile/index?id=' + id;
     else if (page === 'group') location.href = '/profile/index?id=' + id;
-    else if (page === 'admins') location.href = '/admin/profile/index?id=' + id;
+    else if (page === 'admins') location.href = '/' + module + '/profile/index?id=' + id;
     else if (page === 'experts') location.href = '/expert/profile/index?id=' + id;
 });
 
@@ -178,7 +178,7 @@ $(body).on('beforeSubmit', '#formStatusUpdate', function (e) {
 $(body).on('click', '.button_confirm_user_delete', function (e) {
 
     var id_user = $(this).attr('id').split('button_confirm_user_delete-')[1];
-    var url = '/admin/users/user-delete?id=' + id_user;
+    var url = '/' + module + '/users/user-delete?id=' + id_user;
 
     $.ajax({
         url: url,
@@ -214,7 +214,7 @@ setInterval(function(){
         var id_user = $(item).attr('id').split('link_user_profile-')[1];
 
         $.ajax({
-            url: '/admin/users/update-data-column-user?id=' + id_user,
+            url: '/' + module + '/users/update-data-column-user?id=' + id_user,
             method: 'POST',
             cache: false,
             success: function(response){

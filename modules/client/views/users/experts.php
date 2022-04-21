@@ -123,7 +123,8 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-3 column-tracker">
 
-                        <?= Html::a( 'Статистика', Url::to(['/client/users/group', 'id' => $user->id]), [
+                        <?= Html::a( 'Статистика', Url::to(['#']), [
+                            'onclick' => 'return false;',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -137,13 +138,8 @@ $this->registerCssFile('@web/css/users-index-style.css');
                             'class' => 'btn btn-lg btn-default',
                         ]);?>
 
-                        <?php
-                        $countProjects = Projects::find()->with('user')
-                            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                            ->where(['user.id_admin' => $user->id])->count();
-                        ?>
-
-                        <?= Html::a( 'Проекты - '.$countProjects, Url::to(['/client/projects/group', 'id' => $user->id]), [
+                        <?= Html::a( 'Проекты - #', Url::to(['#']), [
+                            'onclick' => 'return false;',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',

@@ -18,7 +18,10 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-
+/**
+ * Class CommunicationsController
+ * @package app\modules\expert\controllers
+ */
 class CommunicationsController extends AppExpertController
 {
 
@@ -33,11 +36,11 @@ class CommunicationsController extends AppExpertController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
 
         if ($action->id == 'notifications') {
 
-            if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                || (User::isUserExpert(Yii::$app->user->identity['username']) && (Yii::$app->user->getId() == Yii::$app->request->get('id')))) {
+            if (User::isUserExpert($currentUser->getUsername()) && $currentUser->getId() == Yii::$app->request->get('id')) {
 
                 return parent::beforeAction($action);
 

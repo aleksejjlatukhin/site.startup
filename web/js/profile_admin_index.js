@@ -6,6 +6,8 @@ var body = $('body');
 var user_id = window.location.search.split('=')[1];
 var delete_unused_image = true; // Проверка на необходимость удалить неиспользованное загруженное фото
 
+var module = (window.location.pathname).split('/')[1];
+
 // Скрыть просмотр профиля и показать форму редактирования профиля
 $(body).on('click', '#show_form_update_data', function () {
     $('.view_user_form').hide();
@@ -125,7 +127,7 @@ $(body).on('click', '.add_image', function () {
 // Сохраниние миниатюры аватарки
 $(body).on('click', '#save_avatar_image', function () {
 
-    var url = '/admin/profile/load-avatar-image?id=' + user_id;
+    var url = '/' + module + '/profile/load-avatar-image?id=' + user_id;
 
     basic.croppie('result','base64').then(function(html) {
         $.ajax({
@@ -160,7 +162,7 @@ $(body).on('change', '#loadImageAvatar', function (e) {
 
     var data = new FormData();
     data.append('file', $(this)[0].files[0]);
-    var url = '/admin/profile/load-avatar-image?id=' + user_id;
+    var url = '/' + module + '/profile/load-avatar-image?id=' + user_id;
 
     $.ajax({
 
@@ -211,7 +213,7 @@ $(body).on('hide.bs.modal', '.profile-modal-photo', function () {
     if (delete_unused_image) {
 
         $.ajax({
-            url: '/admin/profile/delete-unused-image?id=' + user_id,
+            url: '/' + module + '/profile/delete-unused-image?id=' + user_id,
             method: 'POST',
             data: 'imageMax=' + $('input[name="AvatarForm[imageMax]"]').val(),
             error: function() {alert('Ошибка');}
@@ -224,7 +226,7 @@ $(body).on('hide.bs.modal', '.profile-modal-photo', function () {
 // Редактирование аватарки
 $(body).on('click', '.update_image', function (e) {
 
-    var url = '/admin/profile/get-data-avatar?id=' + user_id;
+    var url = '/' + module + '/profile/get-data-avatar?id=' + user_id;
 
     $.ajax({
 
@@ -292,7 +294,7 @@ setInterval(function(){
 
     if ($(body).find('.user_is_online').length > 0) {
 
-        var url = '/admin/profile/get-user-is-online?id='+user_id;
+        var url = '/' + module + '/profile/get-user-is-online?id='+user_id;
 
         $.ajax({
             url: url,

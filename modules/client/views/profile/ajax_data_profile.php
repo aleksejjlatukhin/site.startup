@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
 
                 <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image',]);?></div>
 
-                <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/admin/profile/delete-avatar', 'id' => $avatarForm->userId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
+                <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/client/profile/delete-avatar', 'id' => $avatarForm->userId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
 
             </div>
 
@@ -199,7 +199,7 @@ use yii\widgets\ActiveForm;
 
                 <div class="col-md-4">
                     <?= Html::a('<div class="text-center">Пользователи - ' . $count_users . '</div>',
-                        Url::to(['/admin/users/group', 'id' => $user['id']]), [
+                        Url::to(['/client/users/group', 'id' => $user['id']]), [
                             'class' => 'btn btn-default',
                             'style' => [
                                 'color' => '#FFFFFF',
@@ -216,7 +216,7 @@ use yii\widgets\ActiveForm;
 
                 <div class="col-md-4">
                     <?= Html::a( '<div class="text-center">Проекты - ' . $countProjects . '</div>',
-                        Url::to(['/admin/projects/group', 'id' => $user['id']]), [
+                        Url::to(['/client/projects/group', 'id' => $user['id']]), [
                             'class' => 'btn btn-default',
                             'style' => [
                                 'color' => '#FFFFFF',
@@ -242,7 +242,7 @@ use yii\widgets\ActiveForm;
 
         <?php $form = ActiveForm::begin([
             'id' => 'update_data_profile',
-            'action' => Url::to(['/admin/profile/update-profile', 'id' => $profile->id]),
+            'action' => Url::to(['/client/profile/update-profile', 'id' => $profile->id]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -371,7 +371,7 @@ use yii\widgets\ActiveForm;
 
             <?php $form = ActiveForm::begin([
                 'id' => 'form_change_password_user',
-                'action' => Url::to(['/admin/profile/change-password', 'id' => $user->id]),
+                'action' => Url::to(['/client/profile/change-password', 'id' => $user->id]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
@@ -17,7 +18,10 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-
+/**
+ * Class ProfileController
+ * @package app\controllers
+ */
 class ProfileController extends AppUserPartController
 {
     public $layout = 'profile';
@@ -30,17 +34,36 @@ class ProfileController extends AppUserPartController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['index']) || in_array($action->id, ['result']) || in_array($action->id, ['roadmap'])
             || in_array($action->id, ['report']) || in_array($action->id,['presentation'])) {
 
-            $user = User::findOne(Yii::$app->request->get());
-            if ((Yii::$app->user->id == $user->id) || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+            $user = User::findOne(Yii::$app->request->get('id'));
+
+            if ($currentUser->getId() == $user->getId()) {
 
                 return parent::beforeAction($action);
+            }
+            elseif (User::isUserAdmin($currentUser->getUsername()) && $user->getIdAdmin() == $currentUser->getId()) {
 
-            }else {
+                return parent::beforeAction($action);
+            }
+            elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
+                /** @var ClientUser $modelClientUser */
+                $modelClientUser = $user->clientUser;
+
+                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+
+            }
+            else {
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{
