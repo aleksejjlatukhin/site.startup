@@ -170,7 +170,7 @@ $(document).on('click', 'body .openRoadmapProject', function(e) {
 
             $(modal).modal('show');
             $(container).html(response.renderAjax);
-            $(header).html('Дорожная карта проекта «' + response.project.project_name + '»');
+            $(header).html('Трэкшн карта проекта «' + response.project.project_name + '»');
         }
     });
 
@@ -197,7 +197,7 @@ $(document).on('click', 'body .openRoadmapSegment', function(e) {
 
             $(modal).modal('show');
             $(container).html(response.renderAjax);
-            $(header).html('Дорожная карта сегмента «' + response.segment.name + '»');
+            $(header).html('Трэкшн карта сегмента «' + response.segment.name + '»');
         }
     });
 

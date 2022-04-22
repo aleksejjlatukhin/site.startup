@@ -31,7 +31,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openReportProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Дорожная карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
         ]) ?>
 
@@ -130,7 +130,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожная карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 

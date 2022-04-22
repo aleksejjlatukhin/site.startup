@@ -143,7 +143,7 @@ Modal::begin([
 
 <!--Roadmap Project begin-->
 
-<?php // Модальное окно - дорожная карта проекта
+<?php // Модальное окно - Трэкшн карта проекта
 Modal::begin([
     'options' => ['id' => 'showRoadmapProject', 'class' => 'showRoadmapProject'],
     'size' => 'modal-lg',
@@ -157,7 +157,7 @@ Modal::begin([
 
 <!--Roadmap Segment begin-->
 
-<?php // Модальное окно - дорожная карта сегмента
+<?php // Модальное окно - Трэкшн карта сегмента
 Modal::begin([
     'options' => ['id' => 'showRoadmapSegment', 'class' => 'showRoadmapSegment'],
     'size' => 'modal-lg',
