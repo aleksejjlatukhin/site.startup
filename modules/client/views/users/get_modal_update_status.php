@@ -134,7 +134,7 @@ use yii\helpers\Html;
                 <?= $form->field($model, 'status', [
                     'template' => '{input}',
                 ])->widget(Select2::class, [
-                    'data' => [User::STATUS_ACTIVE => 'Активировать пользователя', User::STATUS_REMOVE => 'Удалить пользователя'],
+                    'data' => [User::STATUS_ACTIVE => 'Активировать пользователя'],
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
@@ -273,7 +273,7 @@ use yii\helpers\Html;
                     <?= $form->field($model, 'status', [
                         'template' => '{input}',
                     ])->widget(Select2::class, [
-                        'data' => [User::STATUS_ACTIVE => 'Активировать трекера', User::STATUS_REMOVE => 'Удалить трекера'],
+                        'data' => [User::STATUS_ACTIVE => 'Активировать трекера'],
                         'options' => ['id' => 'selectStatusUpdate'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
@@ -408,7 +408,7 @@ use yii\helpers\Html;
                 <?= $form->field($model, 'status', [
                     'template' => '{input}',
                 ])->widget(Select2::class, [
-                    'data' => [User::STATUS_ACTIVE => 'Активировать эксперта', User::STATUS_REMOVE => 'Удалить эксперта'],
+                    'data' => [User::STATUS_ACTIVE => 'Активировать эксперта'],
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска

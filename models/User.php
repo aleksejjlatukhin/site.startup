@@ -7,13 +7,9 @@ use app\modules\admin\models\MessageMainAdmin;
 use app\modules\admin\models\MessageManager;
 use app\modules\expert\models\ConversationExpert;
 use app\modules\expert\models\MessageExpert;
-use Throwable;
-use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\StaleObjectException;
-use yii\helpers\FileHelper;
 use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
 use Yii;
@@ -47,13 +43,9 @@ use Yii;
 class User extends ActiveRecord implements IdentityInterface
 {
 
-    const STATUS_DELETED = 0;
-    const STATUS_NOT_ACTIVE = 1;
-    const STATUS_ACTIVE = 10;
-    const STATUS_REMOVE = 200;
-    //TODO: необходимо оставлять пользователей в базе данных, после удаления.
-    // Просто устанавливать статус STATUS_REMOVE и переопределить метод self::find(),
-    // чтобы показывать записи, где статус отличный от STATUS_REMOVE
+    const STATUS_DELETED = 0; // Заблокирован
+    const STATUS_NOT_ACTIVE = 1; // Не активирован
+    const STATUS_ACTIVE = 10; // Активирован
 
     const ROLE_USER = 10;           // Роль проектанта
     const ROLE_ADMIN = 20;          // Роль трекера
@@ -63,8 +55,8 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_MANAGER = 50;        // Роль менеждера по клиентам (организациям) от платформы
     const ROLE_DEV = 100;           // Роль тех.поддержки
 
-    const CONFIRM = 20;
-    const NOT_CONFIRM = 10;
+    const CONFIRM = 20; // Регистрация подтверждена
+    const NOT_CONFIRM = 10; // Регистрация не подтверждена
 
     public $password;
 
@@ -1139,82 +1131,6 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-
-    /**
-     * @throws Throwable
-     * @throws ErrorException
-     * @throws StaleObjectException
-     */
-    public function removeAllDataUser ()
-    {
-        // Удаление проектов
-        if ($projects = $this->projects){
-            foreach ($projects as $project) {
-                $project->deleteStage();
-            }
-        }
-
-        if ($this->role === self::ROLE_USER) {
-            // Удаление беседы проектанта и трекера
-            if ($conversation_admin = ConversationAdmin::findOne(['user_id' => $this->id])) {
-                MessageAdmin::deleteAll(['conversation_id' => $conversation_admin->id]);
-                $conversation_admin->delete();
-            }
-            // Удаление бесед проектанта с экспертами
-            if ($conversations_expert = ConversationExpert::findAll(['user_id' => $this->id])) {
-                foreach ($conversations_expert as $conversation) {
-                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
-                    $conversation->delete();
-                }
-            }
-        }
-        elseif ($this->role === self::ROLE_ADMIN) {
-            // Удаление беседы трекера с главным админом
-            if ($conversations_main_admin = ConversationMainAdmin::findOne(['admin_id' => $this->id])) {
-                MessageMainAdmin::deleteAll(['conversation_id' => $conversations_main_admin->id]);
-                $conversations_main_admin->delete();
-            }
-            // Удаление бесед трекера с экспертами
-            if ($conversations_expert = ConversationExpert::findAll(['user_id' => $this->id])) {
-                foreach ($conversations_expert as $conversation) {
-                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
-                    $conversation->delete();
-                }
-            }
-        }
-        elseif ($this->role === self::ROLE_EXPERT) {
-            // Удаление бесед эксперта
-            if ($conversations_expert = ConversationExpert::findAll(['expert_id' => $this->id])) {
-                foreach ($conversations_expert as $conversation) {
-                    MessageExpert::deleteAll(['conversation_id' => $conversation->id]);
-                    $conversation->delete();
-                }
-            }
-        }
-
-        // Удаление беседы и сообщений с тех.поддержкой
-        if ($conversation_dev = ConversationDevelopment::findOne(['user_id' => $this->id])) {
-            MessageDevelopment::deleteAll(['conversation_id' => $conversation_dev->id]);
-            $conversation_dev->delete();
-        }
-
-        // Удаление проверки на онлайн
-        $checkingOnline = $this->checkingOnline;
-        if ($checkingOnline) $checkingOnline->delete();
-
-        // Удаление директории пользователя
-        $projectPathDelete = UPLOAD.'/user-'.$this->id;
-        if (file_exists($projectPathDelete)) FileHelper::removeDirectory($projectPathDelete);
-
-        // Удаление кэша для форм пользователя
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->id;
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
-
-        // Удаление пользователя
-        $this->delete();
-
-        return true;
-    }
 
     /**
      * @return string
