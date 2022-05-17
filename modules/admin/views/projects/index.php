@@ -1,11 +1,13 @@
 <?php
+
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 ?>
 
 <?php
 
-$this->title = 'Портфель проектов';
+$this->title ? $this->title : $this->title = 'Портфель проектов';
 
 ?>
 
@@ -21,7 +23,14 @@ $this->title = 'Портфель проектов';
     ?>
 
     <div class="row" style="display:flex; align-items: center;">
-        <div class="col-md-10" style="font-size: 32px; text-transform: uppercase;"><?= $this->title; ?></div>
+
+        <div class="col-md-10" style=" padding-left: 25px;">
+            <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+                'class' => 'link_to_instruction_page open_modal_instruction_page',
+                'title' => 'Инструкция', 'onclick' => 'return false'
+            ]); ?>
+        </div>
+
         <div class="col-md-2">
             <div class="row pull-right select_count_projects">
 

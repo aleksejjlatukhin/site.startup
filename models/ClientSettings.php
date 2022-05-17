@@ -18,9 +18,13 @@ use yii\db\ActiveRecord;
  * @property int $admin_id                  идентификатор гл.админа организации (клиента)
  * @property string $avatar_max_image       оригинальное загруженное фото аватара клиента
  * @property string $avatar_image           урезанное (которое все видят) фото аватара клиента
+ * @property int $access_admin              доступ из Spaccel к данным организации
  */
 class ClientSettings extends ActiveRecord
 {
+
+    const ACCESS_ADMIN_TRUE = 83996983;
+    const ACCESS_ADMIN_FALSE = 1243234;
 
     /**
      * @return string
@@ -160,9 +164,14 @@ class ClientSettings extends ActiveRecord
     {
         return [
             [['client_id', 'admin_id'], 'required'],
-            [['client_id', 'admin_id'], 'integer'],
+            [['client_id', 'admin_id', 'access_admin'], 'integer'],
             [['client_id', 'admin_id'], 'unique'],
-            [['avatar_max_image', 'avatar_image'], 'string', 'max' => 255]
+            [['avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
+            ['access_admin', 'default', 'value' => self::ACCESS_ADMIN_FALSE],
+            ['access_admin', 'in', 'range' => [
+                self::ACCESS_ADMIN_FALSE,
+                self::ACCESS_ADMIN_TRUE,
+            ]],
         ];
     }
 
@@ -179,6 +188,22 @@ class ClientSettings extends ActiveRecord
             return $settings->save();
         }
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAccessAdmin()
+    {
+        return $this->access_admin;
+    }
+
+    /**
+     * @param int $access_admin
+     */
+    public function setAccessAdmin($access_admin)
+    {
+        $this->access_admin = $access_admin;
     }
 
 }

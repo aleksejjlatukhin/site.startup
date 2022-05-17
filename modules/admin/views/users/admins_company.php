@@ -1,73 +1,21 @@
 <?php
 
+use app\models\Projects;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
 
-$this->title = 'Эксперты';
+$this->title = 'Трекеры «' . $client->getName() . '»';
 $this->registerCssFile('@web/css/users-index-style.css');
 ?>
 
 <div class="users-admins">
 
-    <div class="switches-between-users" style="display: flex; margin: 30px 0 0 0;">
-
-        <?= Html::a( 'Проектанты', Url::to(['/admin/users/index']), [
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#E0E0E0',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px 0 0 8px',
-            ],
-            'class' => 'btn btn-lg btn-default',
-        ]);?>
-
-        <?= Html::a( 'Трекеры', Url::to(['/admin/users/admins']),[
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#E0E0E0',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '0',
-            ],
-            'class' => 'btn btn-lg btn-default',
-        ]);?>
-
-        <?= Html::button( 'Эксперты',[
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#52BE7F',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '0',
-            ],
-            'class' => 'btn btn-lg btn-success',
-        ]);?>
-
-        <?= Html::a( 'Менеджеры', Url::to(['/admin/users/managers']),[
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#E0E0E0',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '0 8px 8px 0',
-            ],
-            'class' => 'btn btn-lg btn-default',
-        ]);?>
-
+    <div class="col-md-12" style="margin-top: 35px; padding-left: 25px;">
+        <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+            'class' => 'link_to_instruction_page open_modal_instruction_page',
+            'title' => 'Инструкция', 'onclick' => 'return false'
+        ]); ?>
     </div>
 
     <div class="container-fluid">
@@ -79,7 +27,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
             </div>
 
             <div class="col-md-3 text-center">
-                Статистика, проекты
+                Пользователи, проекты
             </div>
 
             <div class="col-md-2 text-center">
@@ -135,14 +83,15 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-3 column-tracker">
 
-                        <?= Html::a( 'Статистика', Url::to(['#']), [
-                            'onclick' => 'return false;',
+                        <?php $count_users = User::find()->where(['id_admin' => $user->id])->count();?>
+
+                        <?= Html::a( '<span class="glyphicon glyphicon-user" style="font-size: 16px;"></span><span style="margin-left: 5px;"> - '.$count_users.'</span>', Url::to(['/admin/users/group', 'id' => $user->id]), [
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'justify-content' => 'center',
                                 'background' => '#E0E0E0',
-                                'width' => '120px',
+                                'width' => '80px',
                                 'height' => '40px',
                                 'font-size' => '18px',
                                 'border-radius' => '8px 0 0 8px',
@@ -150,8 +99,13 @@ $this->registerCssFile('@web/css/users-index-style.css');
                             'class' => 'btn btn-lg btn-default',
                         ]);?>
 
-                        <?= Html::a( 'Проекты - #', Url::to(['#']), [
-                            'onclick' => 'return false;',
+                        <?php
+                        $countProjects = Projects::find()->with('user')
+                            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                            ->where(['user.id_admin' => $user->id])->count();
+                        ?>
+
+                        <?= Html::a( 'Проекты - '.$countProjects, Url::to(['/admin/projects/group', 'id' => $user->id]), [
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -170,56 +124,11 @@ $this->registerCssFile('@web/css/users-index-style.css');
                     <div class="col-md-2 column-user-status">
 
                         <?php if ($user->status === User::STATUS_DELETED) : ?>
-
-                            <?= Html::submitButton('Заблокирован', [
-                                'class' => 'btn btn-lg btn-danger open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
-                                'style' => [
-                                    'display' => 'flex',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'background' => '#d9534f',
-                                    'width' => '180px',
-                                    'height' => '40px',
-                                    'font-size' => '18px',
-                                    'border-radius' => '8px',
-                                ],
-                            ]);?>
-
+                            <span class="text-danger">Заблокирован</span>
                         <?php elseif ($user->status === User::STATUS_NOT_ACTIVE) : ?>
-
-                            <?= Html::submitButton('Не активирован', [
-                                'class' => 'btn btn-lg btn-default open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
-                                'style' => [
-                                    'display' => 'flex',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'background' => '#FFFFFF',
-                                    'width' => '180px',
-                                    'height' => '40px',
-                                    'font-size' => '18px',
-                                    'border-radius' => '8px',
-                                ],
-                            ]);?>
-
+                            <span>Не активирован</span>
                         <?php elseif ($user->status === User::STATUS_ACTIVE) : ?>
-
-                            <?= Html::submitButton('Активирован', [
-                                'class' => 'btn btn-lg btn-success open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
-                                'style' => [
-                                    'display' => 'flex',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'background' => '#52BE7F',
-                                    'width' => '180px',
-                                    'height' => '40px',
-                                    'font-size' => '18px',
-                                    'border-radius' => '8px',
-                                ],
-                            ]);?>
-
+                            <span class="text-success">Активирован</span>
                         <?php endif; ?>
 
                     </div>

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
@@ -35,6 +36,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
+ * Контроллер с методами для создания, редактирования
+ * и получения информации по этапу подтверждения проблемы сегмента
+ *
  * Class ConfirmProblemController
  * @package app\controllers
  */
@@ -78,6 +82,8 @@ class ConfirmProblemController extends AppUserPartController
                 $modelClientUser = $project->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
@@ -215,6 +221,8 @@ class ConfirmProblemController extends AppUserPartController
                 $modelClientUser = $project->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');

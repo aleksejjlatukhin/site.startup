@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
@@ -29,6 +30,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
+ * Контроллер с методами для создания, редактирования
+ * и получения информации по ценностным предложениям
+ *
  * Class GcpsController
  * @package app\controllers
  */
@@ -52,12 +56,9 @@ class GcpsController extends AppUserPartController
             $project = Projects::findOne($model->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-
             if ($project->getUserId() == $currentUser->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
 
             }else{
@@ -71,11 +72,8 @@ class GcpsController extends AppUserPartController
             $project = Projects::findOne($problem->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-
             if ($project->getUserId() == $currentUser->getId()){
-
                 return parent::beforeAction($action);
-
             }else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
@@ -102,6 +100,8 @@ class GcpsController extends AppUserPartController
                 $modelClientUser = $project->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');

@@ -10,12 +10,10 @@ use app\models\ClientUser;
 use app\models\ConversationDevelopment;
 use app\models\CustomerManager;
 use app\models\User;
-use app\modules\admin\models\form\AvatarCompanyForm;
 use app\modules\admin\models\form\FormCreateAdminCompany;
 use app\modules\admin\models\form\FormCreateClient;
-use app\modules\admin\models\form\FormUpdateClient;
 use yii\base\Exception;
-use yii\db\StaleObjectException;
+use yii\data\Pagination;
 use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
@@ -34,7 +32,7 @@ class ClientsController extends AppAdminController
     //TODO: Написать консольную команду,
     // которая будет блокировать клиента (изменять его статус),
     // если время тарифа закончилось. Команда должна запускаться по крону.
-    // Пока это не реализвано изменять в ручную в интерфейсе админки.
+    // Пока это не реализвано, изменять нужно в ручную в интерфейсе админки.
 
     /**
      * @param $action
@@ -58,20 +56,20 @@ class ClientsController extends AppAdminController
      */
     public function actionIndex()
     {
+        $clientSpaccel = Client::find()
+            ->leftJoin('client_user', '`client_user`.`client_id` = `client`.`id`')
+            ->leftJoin('user', '`user`.`id` = `client_user`.`user_id`')
+            ->where(['user.role' => User::ROLE_MAIN_ADMIN])
+            ->one();
 
-        // TODO: Добавить пагинацию для этой страницы!!!
-
-        $allClients = Client::find()->all();
-        $clientSpaccel = null; $clients = array();
-        foreach ($allClients as $client) {
-            if (User::isUserMainAdmin($client->findSettings()->findAdmin()->username)) {
-                $clientSpaccel = $client;
-            } else {
-                $clients[] = $client;
-            }
-        }
+        $countUsersOnPage = 20;
+        $query = Client::find()->where(['!=', 'id', $clientSpaccel->getId()]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $clients = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
         return $this->render('index', [
+            'pages' => $pages,
             'clients' => $clients,
             'clientSpaccel' => $clientSpaccel
         ]);
@@ -250,168 +248,12 @@ class ClientsController extends AppAdminController
     public function actionView($id)
     {
         $client = Client::findById($id);
-        $model = new FormUpdateClient($client);
         $clientSettings = ClientSettings::findOne(['client_id' => $id]);
-        $avatarForm = new AvatarCompanyForm($id);
 
         return $this->render('view', [
             'client' => $client,
-            'model' => $model,
             'clientSettings' => $clientSettings,
-            'avatarForm' => $avatarForm
         ]);
-    }
-
-
-    /**
-     * @param int $id
-     * @return array|bool
-     * @throws Exception
-     * @throws StaleObjectException
-     * @throws \Throwable
-     */
-    public function actionLoadAvatarImage ($id)
-    {
-        $avatarForm = new AvatarCompanyForm($id);
-
-        if (Yii::$app->request->isAjax) {
-
-            if (isset($_POST['imageMin'])) {
-
-                if ($avatarForm->loadMinImage()) {
-
-                    $client = Client::findOne($id);
-
-                    $response = [
-                        'success' => true, 'client' => $client,
-                        'renderAjax' => $this->renderAjax('ajax_view', [
-                            'client' => $client, 'model' => new FormUpdateClient($client),
-                            'avatarForm' => new AvatarCompanyForm($id),
-                            'clientSettings' => ClientSettings::findOne(['client_id' => $id]),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-
-            } else {
-
-                if ($result = $avatarForm->loadMaxImage()) {
-
-                    $response = $result;
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                return false;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     */
-    public function actionGetDataAvatar ($id)
-    {
-        $clientSettings = ClientSettings::findOne(['client_id' => $id]);
-
-        if (Yii::$app->request->isAjax) {
-
-            $response = ['path_max' => '/web/upload/company-' . $id . '/avatar/' . $clientSettings->getAvatarMaxImage()];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::$app->response->data = $response;
-            return $response;
-
-        }
-        return false;
-    }
-
-    /**
-     * @param $id
-     * @return bool
-     */
-    public function actionDeleteUnusedImage ($id)
-    {
-        $avatarForm = new AvatarCompanyForm($id);
-
-        if (Yii::$app->request->isAjax) {
-            if (isset($_POST['imageMax'])) {
-                if ($avatarForm->deleteUnusedImage()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param int $id
-     * @return array|bool
-     * @throws StaleObjectException
-     * @throws \Throwable
-     */
-    public function actionDeleteAvatar ($id)
-    {
-        $avatarForm = new AvatarCompanyForm($id);
-
-        if (Yii::$app->request->isAjax) {
-
-            if ($avatarForm->deleteOldAvatarImages()) {
-
-                $client = Client::findOne($id);
-
-                $response = [
-                    'success' => true, 'client' => $client,
-                    'renderAjax' => $this->renderAjax('ajax_view', [
-                        'client' => $client, 'model' => new FormUpdateClient($client),
-                        'avatarForm' => new AvatarCompanyForm($id),
-                        'clientSettings' => ClientSettings::findOne(['client_id' => $id]),
-                    ]),
-                ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $id
-     * @return array|bool
-     * @throws StaleObjectException
-     * @throws \Throwable
-     */
-    public function actionUpdateProfile($id)
-    {
-        if (Yii::$app->request->isAjax) {
-
-            $client = Client::findOne($id);
-            $model = new FormUpdateClient($client);
-
-            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-                if ($model->update()) {
-
-                    $response = [
-                        'success' => true, 'client' => $client,
-                        'renderAjax' => $this->renderAjax('ajax_view', [
-                            'client' => $client, 'model' => $model,
-                            'avatarForm' => new AvatarCompanyForm($id),
-                            'clientSettings' => ClientSettings::findOne(['client_id' => $id]),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-            }
-        }
-        return false;
     }
 
 }

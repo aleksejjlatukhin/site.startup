@@ -30,7 +30,6 @@ use app\models\RespondsProblem;
 use app\models\RespondsSegment;
 use app\models\Segments;
 use app\models\StageConfirm;
-use app\models\User;
 use Throwable;
 use yii\base\ErrorException;
 use yii\data\Pagination;
@@ -42,6 +41,13 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use Yii;
 
+/**
+ * Контроллер с методами создания, редактирования и получения информации
+ * о респондентах, которые проходят интервью при подтверждении гипотезы
+ *
+ * Class RespondsController
+ * @package app\controllers
+ */
 class RespondsController extends AppUserPartController
 {
 
@@ -62,13 +68,10 @@ class RespondsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
-
+            if ($project->userId == Yii::$app->user->id){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
             }else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
@@ -80,14 +83,10 @@ class RespondsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->userId == Yii::$app->user->id || User::isUserAdmin(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserDev(Yii::$app->user->identity['username'])){
-
+            if ($project->userId == Yii::$app->user->id){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
             }else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }

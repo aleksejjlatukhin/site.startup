@@ -3,7 +3,6 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 
 var basic;
 var body = $('body');
-var client_id = window.location.search.split('=')[1];
 var delete_unused_image = true; // Проверка на необходимость удалить неиспользованное загруженное фото
 
 // Скрыть просмотр профиля и показать форму редактирования профиля
@@ -54,7 +53,7 @@ $(body).on('click', '.add_image', function () {
 // Сохраниние миниатюры аватарки
 $(body).on('click', '#save_avatar_image', function () {
 
-    var url = '/admin/clients/load-avatar-image?id=' + client_id;
+    var url = '/client/client-profile/load-avatar-image';
 
     basic.croppie('result','base64').then(function(html) {
         $.ajax({
@@ -85,7 +84,7 @@ $(body).on('change', '#loadImageAvatar', function (e) {
 
     var data = new FormData();
     data.append('file', $(this)[0].files[0]);
-    var url = '/admin/clients/load-avatar-image?id=' + client_id;
+    var url = '/client/client-profile/load-avatar-image';
 
     $.ajax({
 
@@ -136,7 +135,7 @@ $(body).on('hide.bs.modal', '.profile-modal-photo', function () {
     if (delete_unused_image) {
 
         $.ajax({
-            url: '/admin/profile/delete-unused-image?id=' + client_id,
+            url: '/client/client-profile/delete-unused-image',
             method: 'POST',
             data: 'imageMax=' + $('input[name="AvatarCompanyForm[imageMax]"]').val(),
             error: function() {alert('Ошибка');}
@@ -149,7 +148,7 @@ $(body).on('hide.bs.modal', '.profile-modal-photo', function () {
 // Редактирование аватарки
 $(body).on('click', '.update_image', function (e) {
 
-    var url = '/admin/clients/get-data-avatar?id=' + client_id;
+    var url = '/client/client-profile/get-data-avatar';
 
     $.ajax({
 

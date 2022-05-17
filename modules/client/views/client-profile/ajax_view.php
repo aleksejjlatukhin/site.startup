@@ -1,6 +1,8 @@
 <?php
 
 use app\models\ClientActivation;
+use app\models\ClientSettings;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -19,7 +21,7 @@ use yii\widgets\ActiveForm;
 
             <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image',]);?></div>
 
-            <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/admin/clients/delete-avatar', 'id' => $avatarForm->clientId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
+            <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/client/client-profile/delete-avatar', 'id' => $avatarForm->clientId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
 
         </div>
 
@@ -55,19 +57,9 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
 
-        <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации в Spaccel:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $client->created_at); ?></span></div>
+        <div class="col-lg-12"><label style="padding-left: 10px;">Дата регистрации в Spaccel:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $client->created_at); ?></span></div>
 
-        <div class="col-lg-4">
-            <label style="padding-left: 10px;">Тариф:</label>
-            <span style="padding-left: 10px;">
-                        <?php if ($client->findLastClientRatesPlan()) : ?>
-                            <?= $client->findLastClientRatesPlan()->findRatesPlan()->getName(); ?>
-                        <?php else : ?>
-                            Не установлен
-                        <?php endif; ?>
-                    </span></div>
-
-        <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
+        <div class="col-lg-12"><label style="padding-left: 10px;">Статус:</label>
 
             <?php if ($client->findClientActivation()->getStatus() == ClientActivation::ACTIVE) : ?>
                 <span style="padding-left: 10px;">Активирована</span>
@@ -76,6 +68,25 @@ use yii\widgets\ActiveForm;
             <?php endif; ?>
 
         </div>
+
+        <?php if ($client->findLastClientRatesPlan()) : ?>
+            <div class="col-lg-12">
+                <label style="padding-left: 10px;">Сведения о тарифе:</label>
+                <div style="padding-left: 10px;">Наименование: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getName(); ?></u></div>
+                <div style="padding-left: 10px;">Описание: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getDescription(); ?></u></div>
+                <div style="padding-left: 10px;">Максимальное количество проектантов: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getMaxCountProjectUser(); ?></u></div>
+                <div style="padding-left: 10px;">Максимальное количество трекеров: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getMaxCountTracker(); ?></u></div>
+                <div style="padding-left: 10px;">Начало действия тарифа: <u><?= date('d.m.Y', $client->findLastClientRatesPlan()->getDateStart()); ?></u></div>
+                <div style="padding-left: 10px;">Окончание действия тарифа: <u><?= date('d.m.Y', $client->findLastClientRatesPlan()->getDateEnd()); ?></u></div>
+            </div>
+        <?php else : ?>
+            <div class="col-lg-12">
+                <label style="padding-left: 10px;">Сведения о тарифе:</label>
+                <div style="padding-left: 10px;">
+                    Тариф не установлен
+                </div>
+            </div>
+        <?php endif; ?>
 
     </div>
 
@@ -129,6 +140,22 @@ use yii\widgets\ActiveForm;
             ]); ?>
         </div>
 
+        <div class="col-md-12">
+            <?php
+            $selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разрешен', ClientSettings::ACCESS_ADMIN_FALSE => 'Доступ запрещен'];
+            ?>
+
+            <?= $form->field($model, 'accessAdmin', [
+                'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>',
+            ])->widget(Select2::class, [
+                'data' => $selection_list,
+                'options' => ['id' => 'selectViewAccessAdmin'],
+                'disabled' => true,  //Сделать поле неактивным
+                'hideSearch' => true, //Скрытие поиска
+            ]);
+            ?>
+        </div>
+
         <div class="col-xs-12 col-md-6">
             <?= Html::button('Редактировать', [
                 'id' => 'show_form_update_data',
@@ -154,7 +181,7 @@ use yii\widgets\ActiveForm;
 
         <?php $form = ActiveForm::begin([
             'id' => 'update_data_profile',
-            'action' => Url::to(['/admin/clients/update-profile', 'id' => $model->id]),
+            'action' => Url::to(['/client/client-profile/update-profile', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -196,6 +223,22 @@ use yii\widgets\ActiveForm;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
             ]); ?>
+        </div>
+
+        <div class="col-md-12">
+            <?php
+            $selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разрешен', ClientSettings::ACCESS_ADMIN_FALSE => 'Доступ запрещен'];
+            ?>
+
+            <?= $form->field($model, 'accessAdmin', [
+                'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>',
+            ])->widget(Select2::class, [
+                'data' => $selection_list,
+                'options' => ['id' => 'selectAccessAdmin'],
+                'disabled' => false,  //Сделать поле неактивным
+                'hideSearch' => true, //Скрытие поиска
+            ]);
+            ?>
         </div>
 
         <div class="col-md-6">

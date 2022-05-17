@@ -17,7 +17,6 @@ use app\models\RespondsMvp;
 use app\models\RespondsProblem;
 use app\models\RespondsSegment;
 use app\models\StageConfirm;
-use app\models\User;
 use Throwable;
 use yii\base\ErrorException;
 use yii\base\Exception;
@@ -29,6 +28,13 @@ use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+/**
+ * Контроллер с методами для создания, редактирования и
+ * получения информации по проведенным интервью с респондентами при подтверждении гипотезы
+ *
+ * Class InterviewsController
+ * @package app\controllers
+ */
 class InterviewsController extends AppUserPartController
 {
 
@@ -50,11 +56,9 @@ class InterviewsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->userId == Yii::$app->user->id) || User::isUserDev(Yii::$app->user->identity['username'])){
-
+            if (($project->userId == Yii::$app->user->id)){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
 
             }else{
@@ -69,11 +73,9 @@ class InterviewsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->userId == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])){
-
+            if ($project->userId == Yii::$app->user->id){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
 
             }else{

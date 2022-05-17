@@ -14,7 +14,6 @@ use app\models\QuestionsConfirmMvp;
 use app\models\QuestionsConfirmProblem;
 use app\models\QuestionsConfirmSegment;
 use app\models\StageConfirm;
-use app\models\User;
 use Throwable;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
@@ -22,6 +21,13 @@ use yii\web\HttpException;
 use yii\web\Response;
 use Yii;
 
+/**
+ * Контроллер с методами создания, редактирования и получения информации
+ * по вопросам для интервью с респондентами при подтверждении гипотезы
+ *
+ * Class QuestionsController
+ * @package app\controllers
+ */
 class QuestionsController extends AppUserPartController
 {
 
@@ -41,7 +47,7 @@ class QuestionsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+            if ($project->user_id == Yii::$app->user->id){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
@@ -60,7 +66,7 @@ class QuestionsController extends AppUserPartController
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if (($project->user_id == Yii::$app->user->id)  || User::isUserDev(Yii::$app->user->identity['username'])){
+            if ($project->user_id == Yii::$app->user->id){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;

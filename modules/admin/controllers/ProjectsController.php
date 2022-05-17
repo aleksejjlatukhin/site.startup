@@ -14,6 +14,12 @@ use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
 
+/**
+ * Контроллер с методами для получения информации о созданных проектах
+ *
+ * Class ProjectsController
+ * @package app\modules\admin\controllers
+ */
 class ProjectsController extends AppAdminController
 {
 
@@ -57,6 +63,10 @@ class ProjectsController extends AppAdminController
 
                     return parent::beforeAction($action);
 
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+
+                    return parent::beforeAction($action);
+
                 } else {
 
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
@@ -72,6 +82,10 @@ class ProjectsController extends AppAdminController
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
                 if ($currentClientUser->getClientId() == $client->getId()) {
+
+                    return parent::beforeAction($action);
+
+                } elseif ($client->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
 
                     return parent::beforeAction($action);
 
@@ -120,6 +134,10 @@ class ProjectsController extends AppAdminController
      */
     public function actionGroup ($id)
     {
+        $tracker = User::findOne($id);
+        Yii::$app->view->title = 'Портфель проектов трекера «' . $tracker->getSecondName() .
+            ' ' . mb_substr($tracker->getFirstName(), 0, 1) .
+            '.' . mb_substr($tracker->getMiddleName(), 0, 1) . '.»';
         $pageClientProjects = false;
         $sortModel = new SortForm();
         $show_count_projects = ['10' => 'по 10 проектов', '20' => 'по 20 проектов', '30' => 'по 30 проектов'];
@@ -141,6 +159,8 @@ class ProjectsController extends AppAdminController
      */
     public function actionClient ($id)
     {
+        $client = Client::findOne($id);
+        Yii::$app->view->title = 'Портфель проектов организации «' . $client->getName() . '.»';
         $pageClientProjects = true;
         $sortModel = new SortForm();
         $show_count_projects = ['10' => 'по 10 проектов', '20' => 'по 20 проектов', '30' => 'по 30 проектов'];

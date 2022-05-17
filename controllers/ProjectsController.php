@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Authors;
 use app\models\BusinessModel;
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
@@ -38,6 +39,9 @@ use yii\web\Response;
 
 
 /**
+ * Контроллер с методами создания,
+ * редактирования и получения информации по проектам
+ *
  * Class ProjectsController
  * @package app\controllers
  */
@@ -75,6 +79,8 @@ class ProjectsController extends AppUserPartController
                 $modelClientUser = $model->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
@@ -151,6 +157,8 @@ class ProjectsController extends AppUserPartController
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
@@ -189,6 +197,8 @@ class ProjectsController extends AppUserPartController
                 $modelClientUser = $model->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');

@@ -96,7 +96,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-2 column-user-status">
 
-                        <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
+                        <?php if (!User::isUserAdmin(Yii::$app->user->identity['username']) && $checkCurrentUserToClient) : ?>
 
                             <?php if ($user->status === User::STATUS_DELETED) : ?>
 

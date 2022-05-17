@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
@@ -31,6 +32,9 @@ use kartik\mpdf\Pdf;
 use yii\web\Response;
 
 /**
+ * Контроллер с методами для создания, редактирования
+ * и получения информации по бизнес-модели
+ *
  * Class BusinessModelController
  * @package app\controllers
  */
@@ -71,6 +75,8 @@ class BusinessModelController extends AppUserPartController
                 $modelClientUser = $project->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
@@ -184,6 +190,8 @@ class BusinessModelController extends AppUserPartController
                 $modelClientUser = $project->user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');

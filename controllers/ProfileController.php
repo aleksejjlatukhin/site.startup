@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
@@ -19,6 +20,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
+ * Контроллер для получения и редактирования информации из профиля проектанта
+ *
  * Class ProfileController
  * @package app\controllers
  */
@@ -57,6 +60,8 @@ class ProfileController extends AppUserPartController
                 $modelClientUser = $user->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');

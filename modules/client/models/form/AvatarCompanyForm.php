@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\modules\admin\models\form;
+namespace app\modules\client\models\form;
 
 
 use app\models\ClientSettings;
@@ -16,7 +16,7 @@ use Yii;
  * Форма загрузки и изменения аватра организации
  *
  * Class AvatarCompanyForm
- * @package app\modules\admin\models\form
+ * @package app\modules\client\models\form
  *
  * @property int $clientId
  * @property $loadImage

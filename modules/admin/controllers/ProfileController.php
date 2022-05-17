@@ -2,6 +2,8 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\ClientSettings;
+use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
@@ -26,17 +28,23 @@ class ProfileController extends AppAdminController
      */
     public function beforeAction($action)
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        /** @var ClientUser $currentClientUser */
+        $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['index'])) {
 
             $admin = User::findOne(Yii::$app->request->get('id'));
+            /** @var ClientUser $adminClientUser */
+            $adminClientUser = $admin->clientUser;
 
-            if ($admin->id == Yii::$app->user->id || User::isUserDev(Yii::$app->user->identity['username'])
-                || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
+            if (($admin->getId() == $currentUser->getId() || User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username']))
+                && $currentClientUser->getClientId() == $adminClientUser->getClientId()) {
                 return parent::beforeAction($action);
-
-            }else{
+            } elseif ($adminClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE
+                && (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()))) {
+                return parent::beforeAction($action);
+            } else{
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
         }else{

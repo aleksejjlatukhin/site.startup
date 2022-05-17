@@ -1,6 +1,7 @@
 <?php
 
 use app\models\ClientActivation;
+use app\models\ClientSettings;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -92,6 +93,14 @@ $this->registerCssFile('@web/css/clients-index-style.css');
                                 'class' => 'block_name_link',
                                 'title' => 'Перейти на страницу организации'
                             ]); ?>
+
+                            <span>
+                                <?php if ($client->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+                                    echo Html::img('/images/icons/access_open.png', ['width' => '20px']);
+                                } else {
+                                    echo Html::img('/images/icons/access_close.png', ['width' => '20px']);
+                                } ?>
+                            </span>
                         </div>
                         <div class="block-fullname"><?= $client->fullname; ?></div>
                         <div class="block-admin-profile-link">
@@ -307,6 +316,14 @@ $this->registerCssFile('@web/css/clients-index-style.css');
                 </div>
             </div>
         <?php endforeach; ?>
+
+        <div class="pagination-users">
+            <?= \yii\widgets\LinkPager::widget([
+                'pagination' => $pages,
+                'activePageCssClass' => 'pagination_active_page',
+                'options' => ['class' => 'pagination-users-list'],
+            ]); ?>
+        </div>
     </div>
 </div>
 

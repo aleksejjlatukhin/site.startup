@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 20 2022 г., 17:58
+-- Время создания: Май 17 2022 г., 21:45
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -391,8 +391,8 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1649585750),
-(2, 28, 1650466514),
+(1, 1, 1652623969),
+(2, 28, 1652812948),
 (4, 9, 1643052427),
 (6, 21, 1650462373),
 (7, 22, 1650457457),
@@ -401,10 +401,10 @@ INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
 (13, 37, 1649939796),
 (14, 39, 1650446057),
 (15, 40, 1650015102),
-(16, 44, 1650466502),
-(17, 45, 1650464194),
+(16, 44, 1652812965),
+(17, 45, 1650531910),
 (18, 46, 1647795086),
-(19, 47, 1650466733),
+(19, 47, 1652809606),
 (20, 38, 1648997508),
 (21, 48, 1650388444),
 (22, 49, 1649852809),
@@ -434,8 +434,9 @@ INSERT INTO `client` (`id`, `name`, `fullname`, `city`, `description`, `created_
 (1, 'Spaccel', 'Платформа Spaccel.ru', 'Нижний Новгород', 'Акселератор стартап проектов Spaccel.ru', 1587560218, 1587560218),
 (2, 'Тестовая организация', 'Тестовая организация для тестирования', 'Москва', 'Тестирование функционала добавления организаций и прочего', 1587560218, 1587560218),
 (5, 'Наименование организации', 'Полное наименование организации', 'Город организации', 'Описание организации', 1645973881, 1645973881),
-(6, 'Sidoroff-company', 'Супер компания \"Sidoroff-company\"', 'США, Нью-йорк', 'Супер компания \"Sidoroff-company\" занимается супер делами....', 1647083672, 1649951092),
-(7, 'Корпорация монстров', 'Корпорация монстров и Ко', 'Москва', 'Склизкий гад в сливном бачке, мохнатый зверь, похожий на чудовище из «Аленького цветочка», гигантские мокрицы под кроватью — все они существуют на самом деле. Все, что им нужно — пугать детей, потому что из детских криков они получают электричество. Полнометражный мультфильм рассказывает о кризисах в мире монстров, их жизни. Но однажды вся мирная жизнь монстров оказывается под угрозой: в их мир попадает ребенок. А с детьми столько хлопот, что они могут довести даже монстров.', 1650228260, 1650228260);
+(6, 'Sidoroff-company', 'Супер компания \"Sidoroff-company\"', 'США, Нью-йорк', 'Супер компания \"Sidoroff-company\" занимается супер делами....', 1647083672, 1652720029),
+(7, 'Корпорация монстров', 'Корпорация монстров и Ко', 'Москва', 'Склизкий гад в сливном бачке, мохнатый зверь, похожий на чудовище из «Аленького цветочка», гигантские мокрицы под кроватью — все они существуют на самом деле. Все, что им нужно — пугать детей, потому что из детских криков они получают электричество. Полнометражный мультфильм рассказывает о кризисах в мире монстров, их жизни. Но однажды вся мирная жизнь монстров оказывается под угрозой: в их мир попадает ребенок. А с детьми столько хлопот, что они могут довести даже монстров.', 1650228260, 1652694973),
+(8, 'Тестовая организация 2', 'Тестовая организация 2.1', 'Москва', 'Описание организации Тестовая организация 2.1', 1652721497, 1652721497);
 
 -- --------------------------------------------------------
 
@@ -467,7 +468,10 @@ INSERT INTO `client_activation` (`id`, `client_id`, `status`, `created_at`) VALU
 (12, 5, 987, 1646862025),
 (13, 6, 987, 1647083673),
 (14, 6, 789, 1647708263),
-(15, 7, 987, 1650228260);
+(15, 7, 987, 1650228260),
+(16, 8, 987, 1652721497),
+(17, 5, 789, 1652725722),
+(18, 5, 987, 1652725726);
 
 -- --------------------------------------------------------
 
@@ -506,7 +510,8 @@ INSERT INTO `client_rates_plan` (`id`, `client_id`, `rates_plan_id`, `date_start
 (16, 5, 1, 1646859600, 1647118800, 1646861333),
 (17, 5, 2, 1646859600, 1647118800, 1646861762),
 (18, 6, 6, 1647637200, 1648674000, 1647708223),
-(19, 6, 1, 1647637200, 1648674000, 1647708241);
+(19, 6, 1, 1647637200, 1648674000, 1647708241),
+(20, 6, 7, 1652648400, 1653944400, 1652721839);
 
 -- --------------------------------------------------------
 
@@ -519,19 +524,21 @@ CREATE TABLE `client_settings` (
   `client_id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL,
   `avatar_max_image` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `avatar_image` varchar(255) CHARACTER SET utf8 DEFAULT NULL
+  `avatar_image` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `access_admin` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Дамп данных таблицы `client_settings`
 --
 
-INSERT INTO `client_settings` (`id`, `client_id`, `admin_id`, `avatar_max_image`, `avatar_image`) VALUES
-(1, 1, 28, 'background_for_main_page.png', 'avatar_mP5DevoM_min.png'),
-(2, 2, 38, NULL, NULL),
-(3, 5, 43, NULL, NULL),
-(4, 6, 44, '1625731828_42-kartinkin-com-p-oboi-brendi-krasivie-42.jpg', 'avatar_1SsZqgro_min.png'),
-(5, 7, 50, 'unnamed.jpg', 'avatar_XBvZ1dZH_min.png');
+INSERT INTO `client_settings` (`id`, `client_id`, `admin_id`, `avatar_max_image`, `avatar_image`, `access_admin`) VALUES
+(1, 1, 28, 'background_for_main_page.png', 'avatar_mP5DevoM_min.png', 83996983),
+(2, 2, 38, NULL, NULL, 83996983),
+(3, 5, 43, NULL, NULL, 83996983),
+(4, 6, 44, 'mersedes.jpg', 'avatar_d6zySgf0_min.png', 1243234),
+(5, 7, 50, 'unnamed.jpg', 'avatar_XBvZ1dZH_min.png', 83996983),
+(6, 8, 51, NULL, NULL, 1243234);
 
 -- --------------------------------------------------------
 
@@ -569,7 +576,8 @@ INSERT INTO `client_user` (`id`, `user_id`, `client_id`) VALUES
 (18, 47, 6),
 (19, 48, 6),
 (20, 49, 1),
-(21, 50, 7);
+(21, 50, 7),
+(22, 51, 8);
 
 -- --------------------------------------------------------
 
@@ -818,7 +826,8 @@ INSERT INTO `conversation_development` (`id`, `dev_id`, `user_id`, `updated_at`)
 (18, 22, 50, 1650228263),
 (19, 22, 38, 1650228263),
 (20, 22, 43, 1650228263),
-(21, 22, 44, 1650452915);
+(21, 22, 44, 1650452915),
+(22, 22, 51, 1652721501);
 
 -- --------------------------------------------------------
 
@@ -897,8 +906,8 @@ CREATE TABLE `conversation_manager` (
 --
 
 INSERT INTO `conversation_manager` (`id`, `manager_id`, `user_id`, `role`, `updated_at`) VALUES
-(1, 39, 44, 25, 1650445637),
-(2, 40, 43, 25, 1647806394),
+(1, 39, 44, 25, 1652807249),
+(2, 40, 43, 25, 1652725745),
 (3, 40, 38, 25, 1647806404),
 (4, 40, 28, 30, 1650025293),
 (5, 39, 28, 30, 1650403428);
@@ -962,7 +971,11 @@ INSERT INTO `customer_manager` (`id`, `user_id`, `client_id`, `created_at`) VALU
 (27, 39, 2, 1647806399),
 (28, 40, 2, 1647806404),
 (29, 40, 6, 1650014936),
-(30, 39, 6, 1650014968);
+(30, 39, 6, 1650014968),
+(31, 39, 5, 1652725738),
+(32, 40, 5, 1652725744),
+(33, 40, 6, 1652807236),
+(34, 39, 6, 1652807248);
 
 -- --------------------------------------------------------
 
@@ -1076,7 +1089,7 @@ INSERT INTO `duplicate_communications` (`id`, `type`, `source_id`, `sender_id`, 
 (74, 333, 13, 44, 45, 'С проекта «<a href=\"/projects/index?id=47\">Новый проект 1</a>» (проектант: <a href=\"/profile?id=47\">Киррилов Мефодий Азбукович</a>) отозван эксперт Экспертизный Алексей Борисович.', 2468, 1649847256, 1649847386),
 (75, 333, 18, 44, 47, 'На ваш проект «Новый проект 1» назначен эксперт Экспертизный Алексей Борисович. Типы деятельности эксперта, по которым назначены экспертизы проекта: Разработчик-программист, Спецалист по коммуникациям. В сообщениях создана беседа с экспертом.', 2468, 1649848144, 1649848179),
 (76, 333, 18, 44, 45, 'На проект «<a href=\"/projects/index?id=47\">Новый проект 1</a>» (проектант: <a href=\"/profile?id=47\">Киррилов Мефодий Азбукович</a>) назначен эксперт Экспертизный Алексей Борисович. Типы деятельности эксперта, по которым назначены экспертизы проекта: Разработчик-программист, Спецалист по коммуникациям.', 2468, 1649848144, 1649848236),
-(77, 333, 19, 28, 1, 'С вашего проекта «Проект 1» отозван эксперт Суриков Иван Федорович.', 3579, 1649852865, 1649852865),
+(77, 333, 19, 28, 1, 'С вашего проекта «Проект 1» отозван эксперт Суриков Иван Федорович.', 2468, 1649852865, 1652266574),
 (78, 333, 19, 28, 46, 'С проекта «<a href=\"/projects/index?id=1\">Проект 1</a>» (проектант: <a href=\"/profile?id=1\">Иванов Иван Иванович</a>) отозван эксперт Суриков Иван Федорович.', 3579, 1649852865, 1649852865);
 
 -- --------------------------------------------------------
@@ -1088,8 +1101,8 @@ INSERT INTO `duplicate_communications` (`id`, `type`, `source_id`, `sender_id`, 
 CREATE TABLE `expected_results_interview_confirm_problem` (
   `id` int(11) UNSIGNED NOT NULL,
   `problem_id` int(11) NOT NULL,
-  `question` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `answer` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `question` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `answer` varchar(255) CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1174,14 +1187,14 @@ INSERT INTO `expertise` (`id`, `stage`, `stage_id`, `expert_id`, `user_id`, `typ
 CREATE TABLE `expert_info` (
   `id` int(11) UNSIGNED NOT NULL,
   `user_id` int(11) NOT NULL,
-  `education` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `academic_degree` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `position` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `scope_professional_competence` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publications` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `implemented_projects` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role_in_implemented_projects` text COLLATE utf8mb4_unicode_ci NOT NULL
+  `education` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `academic_degree` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `position` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `scope_professional_competence` text CHARACTER SET utf8 NOT NULL,
+  `publications` text CHARACTER SET utf8 NOT NULL,
+  `implemented_projects` text CHARACTER SET utf8 NOT NULL,
+  `role_in_implemented_projects` text CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -2654,7 +2667,8 @@ INSERT INTO `rates_plan` (`id`, `name`, `description`, `max_count_project_user`,
 (3, 'Тариф 10', 'Описание тарифного плана', 10, 3, 1645367146),
 (4, 'Тариф тест 1', 'Описание Тариф тест 1', 2, 3, 1645367260),
 (5, 'Тариф тест 2', 'Описание Тариф тест 2', 6, 2, 1645367406),
-(6, 'Тариф с таким вот зачем то длинным названием', 'Описание', 10, 2, 1646850712);
+(6, 'Тариф с таким вот зачем то длинным названием', 'Описание', 10, 2, 1646850712),
+(7, 'Тариф 1000', 'Платите 1000руб. и получаете счастье))', 2, 1, 1652721787);
 
 -- --------------------------------------------------------
 
@@ -2942,13 +2956,14 @@ INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `telephone
 (39, 'Рюрик', 'Иван', 'Васильевич', '888888888888888', 'alex.latukhin2015@yandex.ru', 'rurikov', '$2y$13$tlueVgHYVDj0LQK0lgjK6.SOA7LC8qGxUfprIHQGEiQW8Myidk8Z6', 'ivan_groza.jpg', 'avatar_JE8QjyhR_min.png', 'npphD82ecZyUDLSVZYU7xANgw2WapS_2', NULL, 50, 10, 20, NULL, 1643648083, 1650025377),
 (40, 'Романов', 'Михаил', 'Федорович', '', 'misharomanofff2@gmail.com', 'misharomanof', '$2y$13$zEGj6/jbwZu8usKl5xElfedp69U5TH8bfhwKFlaBfIZYg40E5viA2', 'michail_romanoff.jpg', 'avatar_Ccqfq0S9_min.png', '5ItOChQKfd6qdg1KF9sxC5jXQPLf493r', NULL, 50, 10, 20, NULL, 1643660239, 1650025293),
 (43, 'Фамилия', 'Имя', 'Отчество', '', 'email@mail.com', 'login', '$2y$13$54/PDqIPwQR.f5LufrUk/uPt/lHEdpsgq2G.jvUdjoJ3b7ymgDq7u', '', '', 'oF4-ysmunBMEyRJWwr-doWCA4LS-aI9C', NULL, 25, 10, 20, NULL, 1645973883, 1645973883),
-(44, 'Сидоров', 'Иван', 'Петрович', '', 'fedotovmihail831@gmail.com', 'adminsidorov', '$2y$13$1/tzdFjerHg01RuYsdnWbuDHV1avJPTUuEtACDZR4Jl2Nh7kuMuki', '1591437999_24-p-karikatura-na-stallone-34.jpg', 'avatar_jgf2Dam6_min.png', 'rDa5ZwccU-J5sPup8zV0qWRNsJVGemyN', NULL, 25, 10, 20, NULL, 1647083674, 1647088989),
-(45, 'Сергеев', 'Сергей', 'Сергеевич', '', 'site.startup@mail.ru', 'trackerCompany', '$2y$13$D6BE4IjTaBex6YdJIG4ONuMRg87JIDmMxfMgdRzEv6.kVxks65Gu6', '', '', 'ncFQbSLBMGN5s7u_d_N4CtAdB3wOxnbI', NULL, 20, 10, 20, NULL, 1647771763, 1647789429),
+(44, 'Сидоров', 'Иван', 'Петрович', '', 'fedotovmihail831@gmail.com', 'adminsidorov', '$2y$13$HfZnVRN635SSsS6jWvxTjOfra//eWsnDoUq9oOWwLUJpgpMcTtUuy', '1591437999_24-p-karikatura-na-stallone-34.jpg', 'avatar_jgf2Dam6_min.png', 'rDa5ZwccU-J5sPup8zV0qWRNsJVGemyN', NULL, 25, 10, 20, NULL, 1647083674, 1650531352),
+(45, 'Сергеев', 'Сергей', 'Сергеевич', '', 'site.startup@mail.ru', 'trackerCompany', '$2y$13$D6BE4IjTaBex6YdJIG4ONuMRg87JIDmMxfMgdRzEv6.kVxks65Gu6', '', '', 'ncFQbSLBMGN5s7u_d_N4CtAdB3wOxnbI', NULL, 20, 10, 20, NULL, 1647771763, 1650531575),
 (46, 'Денисов', 'Денис', 'Денисович', '', 'info.site.startup@mail.ru', 'denisov', '$2y$13$pHq7sGw0N3UyBGU21uDEqOs6S41bSZWEl01oONN3kMLH8XHiISmK.', '', '', 'Ygg0wE_fwoRh1QeSUCNt6x4DyDHp6WOl', NULL, 20, 10, 20, NULL, 1647794456, 1647794631),
-(47, 'Киррилов', 'Мефодий', 'Азбукович', '', 'test.user.project@mail.ru', 'SimpleUserCompany', '$2y$13$KjvtEA5EVE78Rckdarjt4OkgeLMH/X9skxGNCpQ2.XJLuVvqfEWrm', '', '', 'u9qywElEgfctFuh0MIHamdIpsqv8WpuK', NULL, 10, 10, 20, 45, 1647887269, 1650462583),
+(47, 'Киррилов', 'Мефодий', 'Азбукович', '', 'test.user.project@mail.ru', 'SimpleUserCompany', '$2y$13$KjvtEA5EVE78Rckdarjt4OkgeLMH/X9skxGNCpQ2.XJLuVvqfEWrm', '', '', 'u9qywElEgfctFuh0MIHamdIpsqv8WpuK', NULL, 10, 10, 20, 45, 1647887269, 1650529637),
 (48, 'Экспертизный', 'Алексей', 'Борисович', '', 'aleksejj.latukhin2022@yandex.ru', 'expertCompany', '$2y$13$gwC0VYPw/Ju81c/3ZGycs.QJ99Nw4FmtfGmP99YwtVgnX6/f0fsxa', '', '', 'pfZbk2iRW9CDWEJPCCFGaDKv59is_izY', NULL, 40, 10, 20, NULL, 1649591315, 1649599502),
 (49, 'Экпертный', 'Эксперт', 'Лаборантович', '', 'alex.latukhin2020@yandex.ru', 'expertSpaccel', '$2y$13$wWK1SL.qd1clQWt/cth.oOEqmu9hNHHUq05pUVIAJc7bZ35DenTRq', '', '', 'yuI_bFMjzJlTQ2YEY4B8tFML05reNiQq', NULL, 40, 10, 20, NULL, 1649597041, 1649597180),
-(50, 'Пригожин', 'Павел', 'Анатольевич', '', 'alex.latukhin2022@yandex.ru', 'adminPrig', '$2y$13$D3pAWLrpnAb6OKfAryihqeX43QoCwhXxNNtVhUH0G7ObfoJAkkFhm', '', '', '_Mrdn-hxOOYtZTvShmsiuNh-cd6_6__v', NULL, 25, 10, 20, NULL, 1650228262, 1650228262);
+(50, 'Пригожин', 'Павел', 'Анатольевич', '', 'alex.latukhin2022@yandex.ru', 'adminPrig', '$2y$13$D3pAWLrpnAb6OKfAryihqeX43QoCwhXxNNtVhUH0G7ObfoJAkkFhm', '', '', '_Mrdn-hxOOYtZTvShmsiuNh-cd6_6__v', NULL, 25, 10, 20, NULL, 1650228262, 1650228262),
+(51, 'Тестовый', 'Админ', 'Организации', '', 'alex.latukhin2023@yandex.ru', 'testAdminCompany', '$2y$13$srmtE.9mn0Mcbhbk9KxCTeSNBI84w1OzN0MDhX27YMI8p7ZFNtwV2', '', '', 'kW2t3FI2YzI8NVhnuB12h1CNbCRY23LK', NULL, 25, 10, 20, NULL, 1652721500, 1652721500);
 
 -- --------------------------------------------------------
 
@@ -3433,7 +3448,7 @@ ALTER TABLE `answers_questions_confirm_segment`
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
@@ -3451,31 +3466,31 @@ ALTER TABLE `checking_online_user`
 -- AUTO_INCREMENT для таблицы `client`
 --
 ALTER TABLE `client`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `client_activation`
 --
 ALTER TABLE `client_activation`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT для таблицы `client_rates_plan`
 --
 ALTER TABLE `client_rates_plan`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT для таблицы `client_settings`
 --
 ALTER TABLE `client_settings`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `client_user`
 --
 ALTER TABLE `client_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT для таблицы `communication_patterns`
@@ -3523,7 +3538,7 @@ ALTER TABLE `conversation_admin`
 -- AUTO_INCREMENT для таблицы `conversation_development`
 --
 ALTER TABLE `conversation_development`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_expert`
@@ -3553,7 +3568,7 @@ ALTER TABLE `customer_expert`
 -- AUTO_INCREMENT для таблицы `customer_manager`
 --
 ALTER TABLE `customer_manager`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT для таблицы `customer_tracker`
@@ -3679,7 +3694,7 @@ ALTER TABLE `problems`
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `project_communications`
@@ -3715,7 +3730,7 @@ ALTER TABLE `questions_confirm_segment`
 -- AUTO_INCREMENT для таблицы `rates_plan`
 --
 ALTER TABLE `rates_plan`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_gcp`
@@ -3757,7 +3772,7 @@ ALTER TABLE `types_access_to_expertise`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT для таблицы `user_access_to_projects`

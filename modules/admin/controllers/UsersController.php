@@ -9,16 +9,15 @@ use app\models\ClientUser;
 use app\models\ConversationAdmin;
 use app\models\User;
 use app\modules\admin\models\ConversationManager;
-use Throwable;
 use Yii;
-use yii\base\ErrorException;
 use yii\data\Pagination;
-use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
 
 /**
+ * Контроллер с методами для редактирования и получения информации по пользователям системы
+ *
  * Class UsersController
  * @package app\modules\admin\controllers
  */
@@ -48,6 +47,10 @@ class UsersController extends AppAdminController
                     $client = Client::findOne(Yii::$app->request->get('id'));
 
                     if ($currentClientUser->getClientId() == $client->getId()) {
+
+                        return parent::beforeAction($action);
+
+                    } elseif ($client->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
 
                         return parent::beforeAction($action);
 
@@ -104,10 +107,14 @@ class UsersController extends AppAdminController
             if (User::isUserMainAdmin($admin->getUsername())) {
                 if ($user->getId() == $currentUser->getId() || User::isUserDev($currentUser->getUsername())
                     || User::isUserMainAdmin($currentUser->getUsername())) {
-
                     return parent::beforeAction($action);
-
                 } else{
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                }
+            } elseif (User::isUserAdminCompany($admin->getUsername()) && $clientSettings->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+                if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
+                    return parent::beforeAction($action);
+                } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
             } else{
@@ -152,10 +159,18 @@ class UsersController extends AppAdminController
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
-        return $this->render('index',[
-            'users' => $users,
-            'pages' => $pages,
-        ]);
+        if ($id) {
+            return $this->render('index_company',[
+                'client' => $client,
+                'users' => $users,
+                'pages' => $pages,
+            ]);
+        } else {
+            return $this->render('index',[
+                'users' => $users,
+                'pages' => $pages,
+            ]);
+        }
     }
 
 
@@ -240,11 +255,20 @@ class UsersController extends AppAdminController
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
         $clientId = (ClientUser::findOne(['user_id' => Yii::$app->user->id])->getClientId());
 
-        return $this->render('admins',[
-            'users' => $users,
-            'pages' => $pages,
-            'clientId' => $clientId,
-        ]);
+        if ($id) {
+            return $this->render('admins_company',[
+                'client' => $client,
+                'users' => $users,
+                'pages' => $pages,
+                'clientId' => $clientId,
+            ]);
+        } else {
+            return $this->render('admins',[
+                'users' => $users,
+                'pages' => $pages,
+                'clientId' => $clientId,
+            ]);
+        }
     }
 
 
@@ -278,10 +302,18 @@ class UsersController extends AppAdminController
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
-        return $this->render('experts',[
-            'users' => $users,
-            'pages' => $pages,
-        ]);
+        if ($id) {
+            return $this->render('experts_company',[
+                'client' => $client,
+                'users' => $users,
+                'pages' => $pages,
+            ]);
+        } else {
+            return $this->render('experts',[
+                'users' => $users,
+                'pages' => $pages,
+            ]);
+        }
     }
 
 
@@ -424,14 +456,17 @@ class UsersController extends AppAdminController
             ->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])
             ->andWhere(['client_user.client_id' => $clientUser->getClientId()])
             ->orderBy(['updated_at' => SORT_DESC]);
-        $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $countUsersOnPage, ]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $countUsersOnPage]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        $checkCurrentUserToClient = $clientUser->getClientId() == $currentUser->clientUser->getClientId();
 
         return $this->render('group',[
             'admin' => $admin,
             'users' => $users,
             'pages' => $pages,
+            'checkCurrentUserToClient' => $checkCurrentUserToClient,
         ]);
 
     }

@@ -95,6 +95,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                                     : Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_user_avatar_default user_profile_picture']),
                                 'items' => [
                                     ['label' => 'Мой профиль', 'url' => Url::to(['/client/profile/index', 'id' => Yii::$app->user->id])],
+                                    ['label' => 'Профиль организации', 'url' => Url::to(['/client/client-profile/index'])],
                                     ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
                                 ],
                             ],

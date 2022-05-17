@@ -4,6 +4,7 @@
 namespace app\modules\expert\controllers;
 
 
+use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
@@ -53,6 +54,8 @@ class ProfileController extends AppExpertController
                 $modelClientUser = $expert->clientUser;
 
                 if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                    return parent::beforeAction($action);
+                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
                     return parent::beforeAction($action);
                 } else {
                     throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
