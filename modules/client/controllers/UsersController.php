@@ -7,6 +7,7 @@ use app\models\Client;
 use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationAdmin;
+use app\models\RatesPlan;
 use app\models\User;
 use Throwable;
 use Yii;
@@ -119,18 +120,34 @@ class UsersController extends AppClientController
         if (Yii::$app->request->isAjax){
 
             $user = User::findOne($id);
-            $admins = User::find()->with('clientUser')
+            /** @var Client $client */
+            $client = $user->findClientUser()->findClient();
+            /** @var RatesPlan $ratesPlan */
+            $ratesPlan = $client->findLastClientRatesPlan()->findRatesPlan();
+
+            $countUsersCompany = User::find()
                 ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
-                ->andWhere(['client_user.client_id' => $user->clientUser->getClientId()])
-                ->all();
-            foreach ($admins as $admin) {
-                $admin->username = $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name;
+                ->where(['client_user.client_id' => $client->getId()])
+                ->andWhere(['role' => User::ROLE_USER])
+                ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                ->count();
+
+            if ($ratesPlan->getMaxCountProjectUser() > $countUsersCompany) {
+
+                $admins = User::find()->with('clientUser')
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
+                    ->andWhere(['client_user.client_id' => $user->clientUser->getClientId()])
+                    ->all();
+                foreach ($admins as $admin) {
+                    $admin->username = $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name;
+                }
+
+                $response = ['renderAjax' => $this->renderAjax('get_modal_add_admin_to_user', ['user' => $user, 'admins' => $admins])];
+            } else {
+                $response = ['messageError' => 'Согласно тарифу Вы не можете активировать более ' . $countUsersCompany . ' проектантов'];
             }
 
-            $response = [
-                'renderAjax' => $this->renderAjax('get_modal_add_admin_to_user', ['user' => $user, 'admins' => $admins]),
-            ];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -147,9 +164,47 @@ class UsersController extends AppClientController
      */
     public function actionGetModalUpdateStatus ($id)
     {
-        $model = User::findOne($id);
         if (Yii::$app->request->isAjax){
-            $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $model])];
+
+            $user = User::findOne($id);
+
+            /** @var Client $client */
+            $client = $user->findClientUser()->findClient();
+            /** @var RatesPlan $ratesPlan */
+            $ratesPlan = $client->findLastClientRatesPlan()->findRatesPlan();
+
+            if ($user->getRole() == User::ROLE_USER) {
+
+                $countUsersCompany = User::find()
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['role' => User::ROLE_USER])
+                    ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                    ->count();
+
+                if ($ratesPlan->getMaxCountProjectUser() <= $countUsersCompany) {
+                    $response = ['messageError' => 'Согласно тарифу Вы не можете активировать более ' . $countUsersCompany . ' проектантов'];
+                } else {
+                    $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $user])];
+                }
+            } elseif ($user->getRole() == User::ROLE_ADMIN) {
+
+                $countTrackersCompany = User::find()
+                    ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                    ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
+                    ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                    ->count();
+
+                if ($ratesPlan->getMaxCountTracker() <= $countTrackersCompany) {
+                    $response = ['messageError' => 'Согласно тарифу Вы не можете активировать более ' . $countTrackersCompany . ' трекеров'];
+                } else {
+                    $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $user])];
+                }
+            } else {
+                $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $user])];
+            }
+
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;

@@ -25,7 +25,7 @@ use kartik\select2\Select2;
     <?= $form->field($formClientAndRole, 'role', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя</div><div>{input}</div>'
     ])->widget(Select2::class, [
-        'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт'],
+        'data' => $selectRoleCompany, //[User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт'],
         'options' => ['id' => 'formClientAndRole_role', 'placeholder' => 'Выберите проектную роль пользователя'],
         'disabled' => false,  //Сделать поле неактивным
         'hideSearch' => true, //Скрытие поиска

@@ -24,14 +24,18 @@ $(body).on('click', '.open_add_admin_modal', function () {
     var container = $(modal).find('.modal-body');
 
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
         success: function(response){
 
-            $(modal).modal('show');
-            $(container).html(response.renderAjax);
+            if (response.messageError) {
+                $(modal).modal('show');
+                $(container).html('<h4 class="text-center">' + response.messageError + '</h4>');
+            } else {
+                $(modal).modal('show');
+                $(container).html(response.renderAjax);
+            }
         },
         error: function(){
             alert('Ошибка');
@@ -89,8 +93,13 @@ $(body).on('click', '.open_change_status_modal', function () {
         cache: false,
         success: function(response){
 
-            $(modal).modal('show');
-            $(container).html(response.renderAjax);
+            if (response.messageError) {
+                $(modal).modal('show');
+                $(container).html('<h4 class="text-center">' + response.messageError + '</h4>');
+            } else {
+                $(modal).modal('show');
+                $(container).html(response.renderAjax);
+            }
         },
         error: function(){
             alert('Ошибка');

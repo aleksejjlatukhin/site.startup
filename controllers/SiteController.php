@@ -6,6 +6,7 @@ use app\models\Client;
 use app\models\ClientUser;
 use app\models\forms\FormClientAndRole;
 use app\models\forms\SingupExpertForm;
+use app\models\RatesPlan;
 use Throwable;
 use Yii;
 use yii\base\Exception;
@@ -102,10 +103,39 @@ class SiteController extends AppUserPartController
 
                     } else {
 
+                        /** @var RatesPlan $ratesPlan */
+                        $ratesPlan = $client->findLastClientRatesPlan()->findRatesPlan();
+
+                        $countUsersCompany = User::find()
+                            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                            ->where(['client_user.client_id' => $client->getId()])
+                            ->andWhere(['role' => User::ROLE_USER])
+                            ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                            ->count();
+
+                        $countTrackersCompany = User::find()
+                            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                            ->where(['client_user.client_id' => $client->getId()])
+                            ->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
+                            ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                            ->count();
+
+                        $selectRoleCompany = [];
+
+                        if ($ratesPlan->getMaxCountProjectUser() > $countUsersCompany) {
+                            $selectRoleCompany[User::ROLE_USER] = 'Проектант';
+                        }
+                        if ($ratesPlan->getMaxCountTracker() > $countTrackersCompany) {
+                            $selectRoleCompany[User::ROLE_ADMIN] = 'Трекер';
+                        }
+
+                        $selectRoleCompany[User::ROLE_EXPERT] = 'Эксперт';
+
                         $response = ['renderAjax' => $this->renderAjax('form_registration', [
                             'user' => $user,
                             'formClientAndRole' => $formClientAndRole,
                             'dataClients' => $dataClients,
+                            'selectRoleCompany' => $selectRoleCompany
                         ])
                         ];
                         Yii::$app->response->format = Response::FORMAT_JSON;

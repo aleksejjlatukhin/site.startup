@@ -388,7 +388,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Поиск записи в таблице client_user
+     * Получение записи в таблице client_user
      * по данному пользователю
      *
      * @return ActiveQuery
@@ -396,6 +396,18 @@ class User extends ActiveRecord implements IdentityInterface
     public function getClientUser()
     {
         return $this->hasOne(ClientUser::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * Поиск записи в таблице client_user
+     * по данному пользователю
+     *
+     * @return ClientUser|null
+     */
+    public function findClientUser()
+    {
+        return ClientUser::findOne(['user_id' => $this->getId()]);
     }
 
 
