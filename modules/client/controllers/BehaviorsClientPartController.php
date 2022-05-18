@@ -34,8 +34,9 @@ class BehaviorsClientPartController extends AppController
                             /** @var ClientUser $clientUser */
                             $clientUser = $user->clientUser;
                             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
+                            $isActiveClient = $clientUser->findClient()->isActive();
                             $admin = User::findOne($clientSettings->getAdminId());
-                            return User::isUserAdmin($user->getUsername()) && !User::isUserMainAdmin($admin->getUsername());
+                            return User::isUserAdmin($user->getUsername()) && !User::isUserMainAdmin($admin->getUsername()) && $isActiveClient;
                         }
                     ],
 
@@ -43,7 +44,11 @@ class BehaviorsClientPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserAdminCompany(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $isActiveClient = $clientUser->findClient()->isActive();
+                            return User::isUserAdminCompany($user->getUsername()) && $isActiveClient;
                         }
                     ],
 

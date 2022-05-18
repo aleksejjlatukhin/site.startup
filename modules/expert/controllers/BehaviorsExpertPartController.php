@@ -63,7 +63,11 @@ class BehaviorsExpertPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserAdmin(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $isActiveClient = $clientUser->findClient()->isActive();
+                            return User::isUserAdmin($user->getUsername()) && $isActiveClient;
                         }
                     ],
 
@@ -79,7 +83,11 @@ class BehaviorsExpertPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserAdminCompany(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $isActiveClient = $clientUser->findClient()->isActive();
+                            return User::isUserAdminCompany($user->getUsername()) && $isActiveClient;
                         }
                     ],
 
@@ -95,7 +103,11 @@ class BehaviorsExpertPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserExpert(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $isActiveClient = $clientUser->findClient()->isActive();
+                            return User::isUserExpert($user->getUsername()) && $isActiveClient;
                         }
                     ],
 
@@ -105,7 +117,11 @@ class BehaviorsExpertPartController extends AppController
                         'actions' => ['download'],
                         'verbs' => ['GET', 'POST'],
                         'matchCallback' => function ($rule, $action) {
-                            return User::isUserSimple(Yii::$app->user->identity['username']);
+                            $user = User::findOne(Yii::$app->user->id);
+                            /** @var ClientUser $clientUser */
+                            $clientUser = $user->clientUser;
+                            $isActiveClient = $clientUser->findClient()->isActive();
+                            return User::isUserSimple($user->getUsername()) && $isActiveClient;
                         }
                     ],
                 ]

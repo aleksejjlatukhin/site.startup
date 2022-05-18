@@ -62,6 +62,17 @@ class Client extends ActiveRecord
 
 
     /**
+     * Проверить активна ли в данный момент организация
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->findClientActivation()->getStatus() == ClientActivation::ACTIVE;
+    }
+
+
+    /**
      * Найти всех активированных клиентов
      *
      * @return array
