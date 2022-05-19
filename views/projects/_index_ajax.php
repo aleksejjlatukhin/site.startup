@@ -101,17 +101,6 @@ use app\models\StageExpertise;
                                 'title' => 'Разрешить экспертизу',
                             ]); ?>
 
-                            <?= Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/projects/get-hypothesis-to-update', 'id' => $model->id], [
-                                'class' => 'update-hypothesis',
-                                'style' => ['margin-left' => '10px'],
-                                'title' => 'Редактировать',
-                            ]); ?>
-
-                            <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->id], [
-                                'class' => 'delete_hypothesis',
-                                'title' => 'Удалить',
-                            ]); ?>
-
                         <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
 
                             <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->id], [
@@ -120,13 +109,18 @@ use app\models\StageExpertise;
                                 'title' => 'Смотреть экспертизу',
                             ]); ?>
 
-                            <?= Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px', 'margin-right' => '42px']]),['/projects/show-all-information', 'id' => $model->id], [
-                                'class' => 'openAllInformationProject',
-                                'style' => ['margin-left' => '8px'],
-                                'title' => 'Смотреть описание проекта',
-                            ]); ?>
-
                         <?php endif; ?>
+
+                        <?= Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/projects/get-hypothesis-to-update', 'id' => $model->id], [
+                            'class' => 'update-hypothesis',
+                            'style' => ['margin-left' => '10px'],
+                            'title' => 'Редактировать',
+                        ]); ?>
+
+                        <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->id], [
+                            'class' => 'delete_hypothesis',
+                            'title' => 'Удалить',
+                        ]); ?>
 
                     <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 

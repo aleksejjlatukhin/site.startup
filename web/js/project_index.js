@@ -274,8 +274,8 @@ $(body).on('beforeSubmit', '#project_update_form', function(e){
 });
 
 
-// Подтвердить в модальном окне разрешение на экспертизу
-$(body).on('click', '#confirm_enable_expertise', function (e) {
+// При нажатии на иконку разрешить экспертизу
+$(body).on('click', '.link-enable-expertise', function (e) {
 
     var formData = new FormData();
     formData.append('type_sort_id', $('#listType').val());
@@ -290,7 +290,6 @@ $(body).on('click', '#confirm_enable_expertise', function (e) {
         success: function(response){
 
             $('.block_all_projects_user').html(response.renderAjax);
-            $('#confirm_enable_expertise_modal').modal('hide');
         }
     });
 

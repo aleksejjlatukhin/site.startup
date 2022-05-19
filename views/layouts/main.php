@@ -240,40 +240,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
     <!--View Expertise end-->
 
 
-    <!--Modal Confirm Enable Expertise begin-->
-
-    <?php
-    // Подтверждение разрешения на экспертизу
-    Modal::begin([
-        'options' => [
-            'id' => "confirm_enable_expertise_modal",
-            'class' => 'confirm_enable_expertise_modal',
-        ],
-        'size' => 'modal-md',
-        'header' => '<h3 class="text-center header-update-modal">Выберите действие</h3>',
-        'footer' => '<div class="text-center">'.
-
-            Html::a('Отмена', ['#'],[
-                'class' => 'btn btn-default',
-                'style' => ['width' => '120px'],
-                'onclick' => "$('#confirm_enable_expertise_modal').modal('hide'); return false;"
-            ]).
-
-            Html::a('Ок', ['#'],[
-                'class' => 'btn btn-default',
-                'style' => ['width' => '120px'],
-                'id' => "confirm_enable_expertise",
-            ]).
-
-            '</div>'
-    ]); ?>
-    <h4 class="text-center">Внимание! После разрешения экспертизы редактирование данной сущности будет не доступно. Вы дествительно хотите разрешить экспертизу?</h4>
-    <!--Контент добавляется через Ajax-->
-    <?php Modal::end(); ?>
-
-    <!--Modal Confirm Enable Expertise end-->
-
-
 <?php $this->endBody() ?>
 </body>
 </html>

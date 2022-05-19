@@ -358,24 +358,24 @@ $this->registerCssFile('@web/css/mvp-index-style.css');
                                             'title' => 'Разрешить экспертизу',
                                         ]); ?>
 
-                                        <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/mvps/get-hypothesis-to-update', 'id' => $model->id], [
-                                            'class' => 'update-hypothesis',
-                                            'title' => 'Редактировать',
-                                        ]); ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/mvps/delete', 'id' => $model->id], [
-                                            'class' => 'delete_hypothesis',
-                                            'title' => 'Удалить',
-                                        ]); ?>
-
                                     <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
 
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '95px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::MVP], 'stageId' => $model->id], [
+                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::MVP], 'stageId' => $model->id], [
                                             'class' => 'link-get-list-expertise',
                                             'title' => 'Смотреть экспертизу',
                                         ]); ?>
 
                                     <?php endif; ?>
+
+                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/mvps/get-hypothesis-to-update', 'id' => $model->id], [
+                                        'class' => 'update-hypothesis',
+                                        'title' => 'Редактировать',
+                                    ]); ?>
+
+                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/mvps/delete', 'id' => $model->id], [
+                                        'class' => 'delete_hypothesis',
+                                        'title' => 'Удалить',
+                                    ]); ?>
 
                                 <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 

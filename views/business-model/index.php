@@ -185,29 +185,27 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
 
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                        <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
+                        <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
+                            'class' => 'btn btn-default update-hypothesis pull-right',
+                            'title' => 'Редактировать бизнес-модель',
+                            'style' => [
+                                'color' => '#FFFFFF',
+                                'background' => '#C2C2C2',
+                                'padding' => '0 7px',
+                                'width' => '190px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                        ]); ?>
 
-                            <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->id], [
-                                'class' => 'btn btn-default update-hypothesis pull-right',
-                                'title' => 'Редактировать бизнес-модель',
-                                'style' => [
-                                    'color' => '#FFFFFF',
-                                    'background' => '#52BE7F',
-                                    'padding' => '0 7px',
-                                    'width' => '190px',
-                                    'height' => '40px',
-                                    'font-size' => '24px',
-                                    'border-radius' => '8px',
-                                ],
-                            ]); ?>
+                        <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
 
                             <?=  Html::a( 'Экспертиза',
                                 ['/business-model/enable-expertise', 'id' => $model->id], [
-                                'class' => 'btn btn-default link-enable-expertise pull-right',
+                                'class' => 'btn btn-warning link-enable-expertise pull-right',
                                 'title' => 'Разрешить экспертизу',
                                 'style' => [
-                                    'color' => '#FFFFFF',
-                                    'background' => '#f5a4a4',
                                     'padding' => '0 7px',
                                     'width' => '190px',
                                     'height' => '40px',

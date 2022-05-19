@@ -1,16 +1,3 @@
-
-// Показать модальное окно с подтверждением разрешения на экспертизу
-$(body).on('click', '.link-enable-expertise', function (e) {
-
-    var link = $(this).attr('href');
-    $('#confirm_enable_expertise_modal').find('.modal-footer').find('#confirm_enable_expertise').attr('href', link);
-    $('#confirm_enable_expertise_modal').modal('show');
-
-    e.preventDefault();
-    return false;
-});
-
-
 // Открыть модальное окно с выбором экспертизы по типу деятельности
 // для выполнения экспертизы экспертом
 // и просмотром результатов экспертизы для других ролей

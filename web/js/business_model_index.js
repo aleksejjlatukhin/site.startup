@@ -217,8 +217,8 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 });
 
 
-// Подтвердить в модальном окне разрешение на экспертизу
-$(body).on('click', '#confirm_enable_expertise', function (e) {
+// При нажатии на иконку разрешить экспертизу
+$(body).on('click', '.link-enable-expertise', function (e) {
 
     $.ajax({
         url: $(this).attr('href'),
@@ -227,7 +227,6 @@ $(body).on('click', '#confirm_enable_expertise', function (e) {
         success: function(response){
 
             $('.container-business_model').html(response.renderAjax);
-            $('#confirm_enable_expertise_modal').modal('hide');
         }
     });
 
