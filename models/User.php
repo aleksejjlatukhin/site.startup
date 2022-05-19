@@ -1280,6 +1280,35 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->role;
     }
 
+    public function getTextRole()
+    {
+        switch ($this->getRole()) {
+            case self::ROLE_USER:
+                return 'проектант';
+                break;
+            case self::ROLE_ADMIN:
+                return 'трекер';
+                break;
+            case self::ROLE_ADMIN_COMPANY:
+                return 'адм.организации';
+                break;
+            case self::ROLE_MAIN_ADMIN:
+                return 'адм.платформы';
+                break;
+            case self::ROLE_EXPERT:
+                return 'эксперт';
+                break;
+            case self::ROLE_MANAGER:
+                return 'менеджер';
+                break;
+            case self::ROLE_DEV:
+                return 'тех.поддержка';
+                break;
+            default:
+                return '';
+        }
+    }
+
     /**
      * @param int $role
      */

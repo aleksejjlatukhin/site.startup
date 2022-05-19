@@ -74,6 +74,12 @@ body {
     color: #ffffff;
 }
 
+.navbar-header-content {
+    display:flex;
+    padding-top: 20px;
+    color: #ffffff;
+}
+
 
 .footer {
     /*position: absolute;
