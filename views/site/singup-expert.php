@@ -81,17 +81,6 @@ $form = ActiveForm::begin([
     ]);
 
 
-    echo $form->field($formRegistration, 'telephone', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Телефон</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 50,
-        'minlength' => 6,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => '',
-        'autocomplete' => 'off'
-    ]);
-
-
     echo $form->field($formRegistration, 'username', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Логин</div><div>{input}</div>'
     ])->textInput([

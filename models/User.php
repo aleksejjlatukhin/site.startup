@@ -24,7 +24,6 @@ use Yii;
  * @property string $second_name                    Фамилия пользователя
  * @property string $first_name                     Имя пользователя
  * @property string $middle_name                    Отчетство пользователя
- * @property string $telephone                      Номер телефона пользователя
  * @property string $email                          Адрес эл. почты пользователя
  * @property string $username                       Логин пользователя
  * @property string $password_hash                  Хэшированный пароль пользователя хранится в бд
@@ -76,8 +75,8 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['second_name', 'first_name', 'middle_name', 'telephone', 'username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'telephone', 'avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
+            [['second_name', 'first_name', 'middle_name', 'email', 'avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
             [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'required'],
             [['role', 'status', 'confirm', 'id_admin'], 'integer'],
             ['email', 'email'],
@@ -102,7 +101,6 @@ class User extends ActiveRecord implements IdentityInterface
             'second_name' => 'Фамилия',
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
-            'telephone' => 'Телефон',
             'username' => 'Логин',
             'email' => 'Email',
             'password' => 'Password',
@@ -1190,22 +1188,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function setMiddleName($middle_name)
     {
         $this->middle_name = $middle_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTelephone()
-    {
-        return $this->telephone;
-    }
-
-    /**
-     * @param string $telephone
-     */
-    public function setTelephone($telephone)
-    {
-        $this->telephone = $telephone;
     }
 
     /**

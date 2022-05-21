@@ -14,7 +14,6 @@ class ProfileForm extends Model
     public $second_name;
     public $first_name;
     public $middle_name;
-    public $telephone;
     public $username;
     public $email;
     public $uniq_username = true;
@@ -31,8 +30,8 @@ class ProfileForm extends Model
         return [
             [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
             [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'telephone', 'email'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'trim'],
+            [['second_name', 'first_name', 'middle_name', 'email'], 'string', 'max' => 255],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -64,7 +63,6 @@ class ProfileForm extends Model
             'second_name' => 'Фамилия',
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
-            'telephone' => 'Телефон',
             'email' => 'Email',
             'username' => 'Логин',
         ];
@@ -157,7 +155,6 @@ class ProfileForm extends Model
             $user->second_name = $this->second_name;
             $user->first_name = $this->first_name;
             $user->middle_name = $this->middle_name;
-            $user->telephone = $this->telephone;
             $user->email = $this->email;
             $user->username = $this->username;
 

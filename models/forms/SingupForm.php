@@ -14,7 +14,6 @@ class SingupForm extends Model
     public $second_name;
     public $first_name;
     public $middle_name;
-    public $telephone;
     public $email;
     public $username;
     public $uniq_username = true;
@@ -36,8 +35,8 @@ class SingupForm extends Model
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'telephone'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password'], 'trim'],
+            [['second_name', 'first_name', 'middle_name', 'email'], 'string', 'max' => 255],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -75,7 +74,6 @@ class SingupForm extends Model
             'second_name' => 'Фамилия',
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
-            'telephone' => 'Телефон',
             'email' => 'Email',
             'username' => 'Логин',
             'password' => 'Пароль',
@@ -164,7 +162,6 @@ class SingupForm extends Model
             $user->second_name = $this->second_name;
             $user->first_name = $this->first_name;
             $user->middle_name = $this->middle_name;
-            $user->telephone = $this->telephone;
             $user->username = $this->username;
             $user->email = $this->email;
             $user->status = $this->status;

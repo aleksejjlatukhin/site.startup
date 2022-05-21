@@ -78,10 +78,10 @@ class SingupExpertForm extends SingupForm
             [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone', 'password',
+            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'telephone',
+            [['second_name', 'first_name', 'middle_name', 'email',
                 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
             ['username', 'matchUsername'],
@@ -117,7 +117,6 @@ class SingupExpertForm extends SingupForm
             'second_name' => 'Фамилия',
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
-            'telephone' => 'Телефон',
             'email' => 'Email',
             'username' => 'Логин',
             'password' => 'Пароль',
@@ -149,7 +148,6 @@ class SingupExpertForm extends SingupForm
             $user->second_name = $this->second_name;
             $user->first_name = $this->first_name;
             $user->middle_name = $this->middle_name;
-            $user->telephone = $this->telephone;
             $user->username = $this->username;
             $user->email = $this->email;
             $user->status = $this->status;

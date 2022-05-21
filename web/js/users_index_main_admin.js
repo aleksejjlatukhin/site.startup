@@ -12,6 +12,7 @@ $(body).on('click', '.column-user-fio', function () {
     else if (page === 'group') location.href = '/profile/index?id=' + id;
     else if (page === 'admins') location.href = '/' + module + '/profile/index?id=' + id;
     else if (page === 'experts') location.href = '/expert/profile/index?id=' + id;
+    else if (page === 'managers') location.href = '/admin/profile/index?id=' + id;
 });
 
 

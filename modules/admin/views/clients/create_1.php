@@ -96,18 +96,6 @@ $this->title = 'Создание новой организации';
             ]); ?>
         </div>
 
-        <div class="row" style="margin-bottom: 15px;">
-            <?= $form->field($formCreateAdminCompany, 'telephone', [
-                'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->textInput([
-                'maxlength' => 50,
-                'minlength' => 6,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]); ?>
-        </div>
-
         <div class="form-group row container-fluid">
             <?= Html::submitButton('Далее', [
                 'class' => 'btn btn-success pull-right',

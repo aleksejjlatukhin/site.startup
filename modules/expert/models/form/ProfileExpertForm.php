@@ -36,12 +36,6 @@ class ProfileExpertForm extends  Model
     public $middle_name;
 
     /**
-     * Номер телефона
-     * @var string
-     */
-    public $telephone;
-
-    /**
      * Логин
      * @var string
      */
@@ -123,10 +117,10 @@ class ProfileExpertForm extends  Model
             [['second_name', 'first_name', 'middle_name', 'username', 'email',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'telephone',
+            [['second_name', 'first_name', 'middle_name', 'username', 'email',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'telephone', 'email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
+            [['second_name', 'first_name', 'middle_name', 'email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
@@ -171,7 +165,6 @@ class ProfileExpertForm extends  Model
             'second_name' => 'Фамилия',
             'first_name' => 'Имя',
             'middle_name' => 'Отчество',
-            'telephone' => 'Телефон',
             'email' => 'Email',
             'username' => 'Логин',
             'education' => 'Образование',
@@ -273,7 +266,6 @@ class ProfileExpertForm extends  Model
             $user->second_name = $this->second_name;
             $user->first_name = $this->first_name;
             $user->middle_name = $this->middle_name;
-            $user->telephone = $this->telephone;
             $user->email = $this->email;
             $user->username = $this->username;
 

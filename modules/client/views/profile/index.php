@@ -166,16 +166,6 @@ $this->registerCssFile('@web/css/profile-style.css');
                     </div>
 
                     <div class="col-md-4">
-                        <?= $form->field($user, 'telephone', [
-                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => true,
-                            'readonly' => true,
-                            'class' => 'style_form_field_respond form-control',
-                        ]); ?>
-                    </div>
-
-                    <div class="col-md-4">
                         <?= $form->field($user, 'email', [
                             'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                         ])->textInput([
@@ -266,16 +256,6 @@ $this->registerCssFile('@web/css/profile-style.css');
 
                     <div class="col-md-4">
                         <?= $form->field($user, 'middle_name', [
-                            'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                        ])->textInput([
-                            'maxlength' => true,
-                            'readonly' => true,
-                            'class' => 'style_form_field_respond form-control',
-                        ]); ?>
-                    </div>
-
-                    <div class="col-md-4">
-                        <?= $form->field($user, 'telephone', [
                             'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                         ])->textInput([
                             'maxlength' => true,
@@ -397,17 +377,6 @@ $this->registerCssFile('@web/css/profile-style.css');
                         'maxlength' => 50,
                         'minlength' => 2,
                         'required' => true,
-                        'class' => 'style_form_field_respond form-control',
-                        'autocomplete' => 'off'
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <?= $form->field($profile, 'telephone', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => 50,
-                        'minlength' => 6,
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
                     ]); ?>

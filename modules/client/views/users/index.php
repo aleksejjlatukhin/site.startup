@@ -74,7 +74,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
             </div>
 
             <div class="col-md-2 text-center">
-                E-mail, телефон
+                E-mail
             </div>
 
             <div class="col-md-1 text-center">
@@ -219,7 +219,6 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-2 text-center">
                         <div class=""><?= $user->email; ?></div>
-                        <div class=""><?= $user->telephone; ?></div>
                     </div>
 
                     <div class="col-md-1 text-center">
