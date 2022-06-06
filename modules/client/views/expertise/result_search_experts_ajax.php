@@ -14,7 +14,7 @@ use yii\helpers\Url;
     <!--Заголовки для списка экспертов-->
     <div class="row headers_data_experts">
 
-        <div class="col-md-3">Фамилия, имя, отчество</div>
+        <div class="col-md-3">Логин эксперта</div>
 
         <div class="col-md-3">Сфера профессиональной компетенции</div>
 
@@ -47,7 +47,7 @@ use yii\helpers\Url;
                 <?php endif; ?>
 
                 <div class="block-fio-and-date-last-visit">
-                    <div class="block-fio"><?= $expert->second_name.' '.$expert->first_name.' '.$expert->middle_name; ?></div>
+                    <div class="block-fio"><?= $expert->username; ?></div>
                     <div class="block-date-last-visit">
                         <?php if($expert->checkOnline !== true && $expert->checkOnline !== false) : ?>
                             Пользователь был в сети <?= $expert->checkOnline;?>

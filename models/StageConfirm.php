@@ -3,7 +3,12 @@
 
 namespace app\models;
 
-
+/**
+ * Стадии подтверждения гипотез
+ *
+ * Class StageConfirm
+ * @package app\models
+ */
 class StageConfirm
 {
     const STAGE_CONFIRM_SEGMENT = 2;

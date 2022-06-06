@@ -22,7 +22,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
             <div class="row" style="display:flex; align-items: center; padding: 30px 0 15px 0; font-weight: 700;">
 
                 <div class="col-md-3" style="padding-left: 30px;">
-                    Фамилия, имя, отчество
+                    Логин
                 </div>
 
                 <div class="col-md-3 text-center">
@@ -70,7 +70,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                             <?php endif; ?>
 
                             <div class="block-fio-and-date-last-visit">
-                                <div class="block-fio"><?= $user->second_name.' '.$user->first_name.' '.$user->middle_name; ?></div>
+                                <div class="block-fio"><?= $user->username; ?></div>
                                 <div class="block-date-last-visit">
                                     <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
                                         Пользователь был в сети <?= $user->checkOnline;?>

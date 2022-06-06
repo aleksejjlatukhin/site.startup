@@ -65,36 +65,33 @@ class PatternsDescriptionDuplicateCommunication
     private function getDescriptionDuplicateMainAdminToExpertCommunication($source, $adressee)
     {
 
-        if ($source->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+        if ($source->getType() == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
-            if (User::isUserSimple($adressee->username)) {
+            if (User::isUserSimple($adressee->getUsername())) {
 
-                $this->description = 'На ваш проект «' . $source->project->project_name.'» назначен эксперт ' . $source->expert->second_name
-                    . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
-                    . ExpertType::getContent($source->findTypesAccessToExpertise()->types) . '. В сообщениях создана беседа с экспертом.';
+                $this->description = 'На ваш проект «' . $source->findProject()->getProjectName().'» назначен эксперт ' . $source->getExpert()->getUsername()
+                    . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
+                    . ExpertType::getContent($source->findTypesAccessToExpertise()->getTypes()) . '. В сообщениях создана беседа с экспертом.';
 
-            } elseif (User::isUserAdmin($adressee->username)) {
+            } elseif (User::isUserAdmin($adressee->getUsername())) {
 
-                $this->description = 'На проект «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id])
-                    . '» (проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' .
-                    $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . ') назначен эксперт ' .
-                    $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
-                    . ExpertType::getContent($source->findTypesAccessToExpertise()->types) . '.';
+                $this->description = 'На проект «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()])
+                    . '» (проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()]) . ') назначен эксперт ' .
+                    $source->getExpert()->getUsername() . '. Типы деятельности эксперта, по которым назначены экспертизы проекта: '
+                    . ExpertType::getContent($source->findTypesAccessToExpertise()->getTypes()) . '.';
             }
 
-        } elseif ($source->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+        } elseif ($source->getType() == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
 
-            if (User::isUserSimple($adressee->username)) {
+            if (User::isUserSimple($adressee->getUsername())) {
 
-                $this->description = 'С вашего проекта «' . $source->project->project_name .'» отозван эксперт ' . $source->expert->second_name
-                    . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '.';
+                $this->description = 'С вашего проекта «' . $source->findProject()->getProjectName() .'» отозван эксперт ' . $source->getExpert()->getUsername() . '.';
 
-            } elseif (User::isUserAdmin($adressee->username)) {
+            } elseif (User::isUserAdmin($adressee->getUsername())) {
 
-                $this->description = 'С проекта «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id])
-                    . '» (проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' .
-                        $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . ') отозван эксперт ' .
-                    $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . '.';
+                $this->description = 'С проекта «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()])
+                    . '» (проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()])
+                    . ') отозван эксперт ' . $source->getExpert()->getUsername() . '.';
             }
         }
         return $this->description;
@@ -112,26 +109,26 @@ class PatternsDescriptionDuplicateCommunication
      */
     private function getDescriptionDuplicateExpertCompletedExpertiseCommunication($source, $adressee, $expertise)
     {
-        if (User::isUserSimple($adressee->username)) {
+        if (User::isUserSimple($adressee->getUsername())) {
 
             if ($expertise->getStage() == StageExpertise::PROJECT) {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
             }else {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
             }
 
-        } elseif (User::isUserAdmin($adressee->username)) {
+        } elseif (User::isUserAdmin($adressee->getUsername())) {
 
             if ($expertise->getStage() == StageExpertise::PROJECT) {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
-                    . '. Проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' . $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
+                    . '. Проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()]) . '.';
             }else {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
-                    . '. Проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' . $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', завершил экспертизу по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
+                    . '. Проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()]) . '.';
             }
         }
         return $this->description;
@@ -149,26 +146,26 @@ class PatternsDescriptionDuplicateCommunication
      */
     private function getDescriptionDuplicateExpertUpdateExpertiseCommunication($source, $adressee, $expertise)
     {
-        if (User::isUserSimple($adressee->username)) {
+        if (User::isUserSimple($adressee->getUsername())) {
 
             if ($expertise->getStage() == StageExpertise::PROJECT) {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
             }else {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()] . '.';
             }
 
-        } elseif (User::isUserAdmin($adressee->username)) {
+        } elseif (User::isUserAdmin($adressee->getUsername())) {
 
             if ($expertise->getStage() == StageExpertise::PROJECT) {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
-                    . '. Проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' . $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
+                    . '. Проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()]) . '.';
             }else {
-                $this->description = 'Эксперт, ' . $source->expert->second_name . ' ' . $source->expert->first_name . ' ' . $source->expert->middle_name . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
-                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->project->project_name, ['/projects/index', 'id' => $source->project->user_id]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
-                    . '. Проектант: ' . Html::a($source->project->user->second_name . ' ' . $source->project->user->first_name . ' ' . $source->project->user->middle_name, ['/profile/index', 'id' => $source->project->user->id]) . '.';
+                $this->description = 'Эксперт, ' . $source->getExpert()->getUsername() . ', обновил данные ранее завершенной экспертизы по этапу «' . $this->getStage($expertise->getStage())
+                    . ': ' . $this->getLinkStage($expertise) . '». Проект: «' . Html::a($source->findProject()->getProjectName(), ['/projects/index', 'id' => $source->findProject()->getUserId()]) . '». Тип деятельности эксперта: ' . ExpertType::getListTypes()[$expertise->getTypeExpert()]
+                    . '. Проектант: ' . Html::a($source->findProject()->findUser()->getUsername(), ['/profile/index', 'id' => $source->findProject()->getUserId()]) . '.';
             }
         }
         return $this->description;
@@ -183,28 +180,40 @@ class PatternsDescriptionDuplicateCommunication
      */
     private function getStage($stage)
     {
-        if ($stage == StageExpertise::PROJECT) {
-            return 'описание проекта';
-        } elseif ($stage == StageExpertise::SEGMENT) {
-            return 'генерация гипотезы целевого сегмента';
-        } elseif ($stage == StageExpertise::CONFIRM_SEGMENT) {
-            return 'подтверждение гипотезы целевого сегмента';
-        } elseif ($stage == StageExpertise::PROBLEM) {
-            return 'генерация гипотезы проблемы сегмента';
-        } elseif ($stage == StageExpertise::CONFIRM_PROBLEM) {
-            return 'подтверждение гипотезы проблемы сегмента';
-        } elseif ($stage == StageExpertise::GCP) {
-            return 'разработка гипотезы ценностного предложения';
-        } elseif ($stage == StageExpertise::CONFIRM_GCP) {
-            return 'подтверждение гипотезы ценностного предложения';
-        } elseif ($stage == StageExpertise::MVP) {
-            return 'разработка MVP';
-        } elseif ($stage == StageExpertise::CONFIRM_MVP) {
-            return 'подтверждение MVP';
-        } elseif ($stage == StageExpertise::BUSINESS_MODEL) {
-            return 'генерация бизнес-модели';
+        switch ($stage) {
+            case StageExpertise::PROJECT:
+                return 'описание проекта';
+                break;
+            case StageExpertise::SEGMENT:
+                return 'генерация гипотезы целевого сегмента';
+                break;
+            case StageExpertise::CONFIRM_SEGMENT:
+                return 'подтверждение гипотезы целевого сегмента';
+                break;
+            case StageExpertise::PROBLEM:
+                return 'генерация гипотезы проблемы сегмента';
+                break;
+            case StageExpertise::CONFIRM_PROBLEM:
+                return 'подтверждение гипотезы проблемы сегмента';
+                break;
+            case StageExpertise::GCP:
+                return 'разработка гипотезы ценностного предложения';
+                break;
+            case StageExpertise::CONFIRM_GCP:
+                return 'подтверждение гипотезы ценностного предложения';
+                break;
+            case StageExpertise::MVP:
+                return 'разработка MVP';
+                break;
+            case StageExpertise::CONFIRM_MVP:
+                return 'подтверждение MVP';
+                break;
+            case StageExpertise::BUSINESS_MODEL:
+                return 'генерация бизнес-модели';
+                break;
+            default:
+                return '';
         }
-        return '';
     }
 
 
@@ -240,23 +249,23 @@ class PatternsDescriptionDuplicateCommunication
         $stageObj = $stageClass::findOne($expertise->getStageId());
 
         if ($stageObj instanceof Segments) {
-            return Html::a($stageObj->name, ['/segments/index', 'id' => $stageObj->project_id]);
+            return Html::a($stageObj->getName(), ['/segments/index', 'id' => $stageObj->getProjectId()]);
         } elseif ($stageObj instanceof ConfirmSegment) {
-            return Html::a($stageObj->segment->name, ['/confirm-segment/view', 'id' => $stageObj->id]);
+            return Html::a($stageObj->findSegment()->getName(), ['/confirm-segment/view', 'id' => $stageObj->getId()]);
         } elseif ($stageObj instanceof Problems) {
-            return Html::a($stageObj->title, ['/problems/index', 'id' => $stageObj->getConfirmSegmentId()]);
+            return Html::a($stageObj->getTitle(), ['/problems/index', 'id' => $stageObj->getConfirmSegmentId()]);
         } elseif ($stageObj instanceof ConfirmProblem) {
-            return Html::a($stageObj->problem->title, ['/confirm-problem/view', 'id' => $stageObj->id]);
+            return Html::a($stageObj->findProblem()->getTitle(), ['/confirm-problem/view', 'id' => $stageObj->getId()]);
         } elseif ($stageObj instanceof Gcps) {
-            return Html::a($stageObj->title, ['/gcps/index', 'id' => $stageObj->getConfirmProblemId()]);
+            return Html::a($stageObj->getTitle(), ['/gcps/index', 'id' => $stageObj->getConfirmProblemId()]);
         } elseif ($stageObj instanceof ConfirmGcp) {
-            return Html::a($stageObj->gcp->title, ['/confirm-gcp/view', 'id' => $stageObj->id]);
+            return Html::a($stageObj->findGcp()->getTitle(), ['/confirm-gcp/view', 'id' => $stageObj->getId()]);
         } elseif ($stageObj instanceof Mvps) {
-            return Html::a($stageObj->title, ['/mvps/index', 'id' => $stageObj->getConfirmGcpId()]);
+            return Html::a($stageObj->getTitle(), ['/mvps/index', 'id' => $stageObj->getConfirmGcpId()]);
         } elseif ($stageObj instanceof ConfirmMvp) {
-            return Html::a($stageObj->mvp->title, ['/confirm-mvp/view', 'id' => $stageObj->id]);
+            return Html::a($stageObj->findMvp()->getTitle(), ['/confirm-mvp/view', 'id' => $stageObj->getId()]);
         } elseif ($stageObj instanceof BusinessModel) {
-            return Html::a('бизнес-модель для ' . $stageObj->mvp->title, ['/business-model/index', 'id' => $stageObj->getConfirmMvpId()]);
+            return Html::a('бизнес-модель для ' . $stageObj->findMvp()->getTitle(), ['/business-model/index', 'id' => $stageObj->getConfirmMvpId()]);
         }
         return '';
     }

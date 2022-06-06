@@ -3,12 +3,21 @@
 
 namespace app\models\forms;
 
-use app\models\CreatorNewRespondsOnConfirmFirstStep;
 use app\models\ConfirmSegment;
 use app\models\Segments;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма создания подтверждения гипотезы сегмента
+ *
+ * Class FormCreateConfirmSegment
+ * @package app\models\forms
+ *
+ * @property string $greeting_interview                 Приветствие в начале встречи
+ * @property string $view_interview                     Информация о вас для респондентов
+ * @property string $reason_interview                   Причина и тема (что побудило) для проведения исследования
+ */
 class FormCreateConfirmSegment extends FormCreateConfirm
 {
 
@@ -24,11 +33,10 @@ class FormCreateConfirmSegment extends FormCreateConfirm
      */
     public function __construct(Segments $hypothesis, $config = [])
     {
-        $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
-        $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($hypothesis);
-        $cacheName = 'formCreateConfirmCache';
-        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+        $this->setCreatorNewResponds();
+        $this->setCacheManager();
+        $this->setCachePathForm(self::getCachePath($hypothesis));
+        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
@@ -48,35 +56,6 @@ class FormCreateConfirmSegment extends FormCreateConfirm
         $user = $project->user;
         $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$hypothesis->id.'/confirm/formCreateConfirm/';
         return $cachePath;
-    }
-
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function setHypothesisId($id)
-    {
-        return $this->hypothesis_id = $id;
-    }
-
-
-    /**
-     * @param $count
-     * @return mixed
-     */
-    public function setCountRespond($count)
-    {
-        return $this->count_respond = $count;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getHypothesisId()
-    {
-        return $this->hypothesis_id;
     }
 
 
@@ -119,24 +98,48 @@ class FormCreateConfirmSegment extends FormCreateConfirm
     public function create ()
     {
         $model = new ConfirmSegment();
-        $model->setSegmentId($this->hypothesisId);
-        $model->setCountRespond($this->count_respond);
-        $model->setCountPositive($this->count_positive);
+        $model->setSegmentId($this->getHypothesisId());
+        $model->setCountRespond($this->getCountRespond());
+        $model->setCountPositive($this->getCountPositive());
         $model->setParams([
-            'greeting_interview' => $this->greeting_interview,
-            'view_interview' => $this->view_interview,
-            'reason_interview' => $this->reason_interview
+            'greeting_interview' => $this->getGreetingInterview(),
+            'view_interview' => $this->getViewInterview(),
+            'reason_interview' => $this->getReasonInterview()
         ]);
 
         if ($model->save()) {
             //Создание респондентов по заданному значению count_respond
-            $this->_creatorNewResponds->create($model, $this);
+            $this->getCreatorNewResponds()->create($model, $this);
             // Удаление кэша формы создания
-            $this->_cacheManager->deleteCache($this->cachePath);
+            $this->getCacheManager()->deleteCache($this->cachePath);
 
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Неудалось создать подтверждение сегмента');
+    }
+
+    /**
+     * @return string
+     */
+    public function getGreetingInterview()
+    {
+        return $this->greeting_interview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewInterview()
+    {
+        return $this->view_interview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReasonInterview()
+    {
+        return $this->reason_interview;
     }
 
 }

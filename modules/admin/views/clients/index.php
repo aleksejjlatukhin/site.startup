@@ -106,7 +106,7 @@ $this->registerCssFile('@web/css/clients-index-style.css');
                         <div class="block-admin-profile-link">
                             <div class="bolder">Администратор</div>
                             <?php $admin = $client->settings->admin; ?>
-                            <?= Html::a($admin->first_name.' '.$admin->middle_name.' '.$admin->second_name, ['/admin/profile/index', 'id' => $admin->id], [
+                            <?= Html::a($admin->username, ['/admin/profile/index', 'id' => $admin->id], [
                                 'class' => 'block_name_link',
                                 'title' => 'Перейти в профиль'
                             ]); ?>
@@ -119,7 +119,7 @@ $this->registerCssFile('@web/css/clients-index-style.css');
 
                     <?php $manager = $client->findCustomerManager()->user; ?>
                     <?php if ($manager) : ?>
-                        <?= Html::a($manager->second_name.' '.$manager->first_name.' '.$manager->middle_name, ['/admin/clients/get-list-managers', 'clientId' => $client->id], [
+                        <?= Html::a($manager->username, ['/admin/clients/get-list-managers', 'clientId' => $client->id], [
                             'class' => 'btn btn-lg btn-default open_change_manager_modal',
                             'style' => [
                                 'display' => 'flex',

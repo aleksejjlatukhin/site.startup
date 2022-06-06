@@ -32,7 +32,7 @@ use yii\helpers\Html;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $main_admin->second_name . ' ' . $main_admin->first_name . ' ' . $main_admin->middle_name; ?></div>
+                        <div class="interlocutor"><?= $main_admin->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -72,7 +72,7 @@ use yii\helpers\Html;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $main_admin->second_name . ' ' . $main_admin->first_name . ' ' . $main_admin->middle_name; ?></div>
+                        <div class="interlocutor"><?= $main_admin->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -116,7 +116,7 @@ use yii\helpers\Html;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $manager->second_name . ' ' . $manager->first_name . ' ' . $manager->middle_name; ?></div>
+                        <div class="interlocutor"><?= $manager->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -156,7 +156,7 @@ use yii\helpers\Html;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $manager->second_name . ' ' . $manager->first_name . ' ' . $manager->middle_name; ?></div>
+                        <div class="interlocutor"><?= $manager->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>

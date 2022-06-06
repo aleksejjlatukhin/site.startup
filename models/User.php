@@ -21,9 +21,6 @@ use Yii;
  * @package app\models
  *
  * @property int $id                                Идентификатор пользователя
- * @property string $second_name                    Фамилия пользователя
- * @property string $first_name                     Имя пользователя
- * @property string $middle_name                    Отчетство пользователя
  * @property string $email                          Адрес эл. почты пользователя
  * @property string $username                       Логин пользователя
  * @property string $password_hash                  Хэшированный пароль пользователя хранится в бд
@@ -75,9 +72,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'required'],
+            [['username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
+            [['email', 'avatar_max_image', 'avatar_image'], 'string', 'max' => 255],
+            [['username', 'email'], 'required'],
             [['role', 'status', 'confirm', 'id_admin'], 'integer'],
             ['email', 'email'],
             ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
@@ -97,10 +94,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'username' => 'Логин',
             'email' => 'Email',
             'password' => 'Password',
@@ -371,7 +364,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Поиск пользователя по email или login
      * @param $identity
-     * @return bool|mixed|ActiveRecord
+     * @return bool|User|ActiveRecord
      */
     public static function findIdentityByUsernameOrEmail($identity)
     {
@@ -1139,55 +1132,6 @@ class User extends ActiveRecord implements IdentityInterface
         } else {
             return false;
         }
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getSecondName()
-    {
-        return $this->second_name;
-    }
-
-    /**
-     * @param string $second_name
-     */
-    public function setSecondName($second_name)
-    {
-        $this->second_name = $second_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstName()
-    {
-        return $this->first_name;
-    }
-
-    /**
-     * @param string $first_name
-     */
-    public function setFirstName($first_name)
-    {
-        $this->first_name = $first_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMiddleName()
-    {
-        return $this->middle_name;
-    }
-
-    /**
-     * @param string $middle_name
-     */
-    public function setMiddleName($middle_name)
-    {
-        $this->middle_name = $middle_name;
     }
 
     /**

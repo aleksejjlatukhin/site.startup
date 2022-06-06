@@ -8,11 +8,15 @@ use app\models\interfaces\ConfirmationInterface;
 use app\models\interfaces\CreateRespondsOnConfirmFirstStepInterface;
 use yii\base\Model;
 
+/**
+ * Класс создания новых респондентов из представителей на первом шаге подтверждения
+ * Class CreatorRespondsFromAgentsOnConfirmFirstStep
+ * @package app\models
+ */
 class CreatorRespondsFromAgentsOnConfirmFirstStep extends Model implements CreateRespondsOnConfirmFirstStepInterface
 {
 
     /**
-     * Создание новых респондентов из представителей на первом шаге подтверждения
      * @param ConfirmationInterface $confirm
      * @param FormCreateConfirm $form
      */
@@ -37,11 +41,11 @@ class CreatorRespondsFromAgentsOnConfirmFirstStep extends Model implements Creat
      */
     private static function getCreateModel(ConfirmationInterface $confirm)
     {
-        if($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        if($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new RespondsProblem();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
             return new RespondsGcp();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
             return new RespondsMvp();
         }
         return false;

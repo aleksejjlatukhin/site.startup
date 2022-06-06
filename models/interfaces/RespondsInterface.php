@@ -4,15 +4,17 @@ namespace app\models\interfaces;
 
 use yii\db\ActiveQuery;
 
+/**
+ * Interface RespondsInterface
+ * @package app\models\interfaces
+ */
 interface RespondsInterface
 {
-
     /**
      * Получить модель подтверждения
      * @return mixed|ActiveQuery
      */
     public function getConfirm();
-
 
     /**
      * Получить интевью респондента
@@ -20,47 +22,83 @@ interface RespondsInterface
      */
     public function getInterview();
 
-
     /**
      * Получить ответы респондента на вопросы
      * @return mixed|ActiveQuery
      */
     public function getAnswers();
 
+    /**
+     * @return int
+     */
+    public function getId();
 
     /**
      * Установить id подтверждения
-     * @param $confirmId
-     * @return mixed
+     * @param int $confirmId
      */
     public function setConfirmId($confirmId);
 
-
     /**
      * Получить id подтверждения
-     * @return mixed
+     * @return int
      */
     public function getConfirmId();
 
-
     /**
      * Установить имя респондента
-     * @param $name
-     * @return mixed
+     * @param string $name
      */
     public function setName($name);
 
-
     /**
      * Получить имя респондента
-     * @return mixed
+     * @return string
      */
     public function getName();
 
-
     /**
      * @param array $params
-     * @return mixed
      */
     public function setParams(array $params);
+
+    /**
+     * @return string
+     */
+    public function getInfoRespond();
+
+    /**
+     * @param string $info_respond
+     */
+    public function setInfoRespond($info_respond);
+
+    /**
+     * @return string
+     */
+    public function getEmail();
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email);
+
+    /**
+     * @return int
+     */
+    public function getDatePlan();
+
+    /**
+     * @param int $datePlan
+     */
+    public function setDatePlan($datePlan);
+
+    /**
+     * @return string
+     */
+    public function getPlaceInterview();
+
+    /**
+     * @param string $place_interview
+     */
+    public function setPlaceInterview($place_interview);
 }

@@ -20,7 +20,7 @@ use yii\helpers\Html;
                 <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
             <?php endif; ?>
 
-            <?= $conversation->manager->second_name . ' ' . $conversation->manager->first_name . ' ' . $conversation->manager->middle_name; ?>
+            <?= $conversation->manager->username; ?>
         </div>
 
     <?php endforeach; ?>
@@ -35,7 +35,7 @@ use yii\helpers\Html;
                 <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
             <?php endif; ?>
 
-            <?= $conversation->admin->second_name . ' ' . $conversation->admin->first_name . ' ' . $conversation->admin->middle_name; ?>
+            <?= $conversation->admin->username; ?>
         </div>
 
     <?php endforeach; ?>
@@ -50,7 +50,7 @@ use yii\helpers\Html;
                 <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
             <?php endif; ?>
 
-            <?= $conversation->expert->second_name . ' ' . $conversation->expert->first_name . ' ' . $conversation->expert->middle_name; ?>
+            <?= $conversation->expert->username; ?>
         </div>
 
     <?php endforeach; ?>

@@ -40,7 +40,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>
@@ -102,7 +102,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>
@@ -164,7 +164,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>
@@ -241,7 +241,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>
@@ -303,7 +303,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>
@@ -365,7 +365,7 @@ use app\models\User;
 
                     <div class="row block_top">
 
-                        <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                        <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                         <div class="col-xs-4 text-right">
                             <?php if ($conversation->lastMessage) : ?>

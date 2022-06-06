@@ -3,7 +3,7 @@
 
 namespace app\models;
 
-/*
+/**
  * Класс для получения типа экспертной оценки для вывода нужной формы экспертизы
  */
 class TypesExpertAssessment

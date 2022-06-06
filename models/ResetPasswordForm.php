@@ -5,6 +5,16 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * Форма для сброса пароля
+ *
+ * Class ResetPasswordForm
+ * @package app\models
+ *
+ * @property string $password
+ * @property bool $exist
+ * @property User $_user
+ */
 class ResetPasswordForm extends Model
 {
 
@@ -12,19 +22,16 @@ class ResetPasswordForm extends Model
     public $exist = true;
     private $_user;
 
-
     /**
      * @return array
      */
     public function rules()
     {
         return [
-            //['password', 'required'],
-            ['password', 'string', /*'min' => 6, 'max' => 32*/],
+            ['password', 'string'],
             ['exist', 'boolean'],
         ];
     }
-
 
     /**
      * @return array
@@ -36,9 +43,9 @@ class ResetPasswordForm extends Model
         ];
     }
 
-
     /**
      * ResetPasswordForm constructor.
+     *
      * @param $key
      * @param array $config
      */
@@ -52,9 +59,9 @@ class ResetPasswordForm extends Model
         parent::__construct($config);
     }
 
-
     /**
      * @return bool
+     * @throws \yii\base\Exception
      */
     public function resetPassword()
     {
@@ -64,5 +71,4 @@ class ResetPasswordForm extends Model
         $user->removeSecretKey();
         return $user->save();
     }
-
 }

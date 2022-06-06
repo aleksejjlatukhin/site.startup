@@ -8,6 +8,21 @@ use app\models\interfaces\ConfirmationInterface;
 use app\models\RespondsProblem;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма редактирования информации о респонденте
+ * на этапе подтверждения гипотезы проблемы сегмента
+ *
+ * Class UpdateRespondProblemForm
+ * @package app\models\forms
+ *
+ * @property int $id                                Идентификатор респондента
+ * @property string $name                           ФИО респондента
+ * @property string $info_respond                   Другая информация о респонденте
+ * @property string $place_interview                Место проведения интервью
+ * @property string $email                          Эл.почта респондента
+ * @property $date_plan                             Плановая дата проведения интервью
+ * @property int $confirm_id                        Идентификатор подтверждения гипотезы, к которому отновится респондент
+ */
 class UpdateRespondProblemForm extends UpdateFormRespond
 {
 
@@ -34,7 +49,7 @@ class UpdateRespondProblemForm extends UpdateFormRespond
      */
     public function getConfirm()
     {
-        return ConfirmProblem::findOne($this->confirm_id);
+        return ConfirmProblem::findOne($this->getConfirmId());
     }
 
 
@@ -44,11 +59,17 @@ class UpdateRespondProblemForm extends UpdateFormRespond
      */
     public function update()
     {
-        $respond = RespondsProblem::findOne($this->id);
-        $respond->setName($this->name);
-        $respond->setParams(['info_respond' => $this->info_respond, 'place_interview' => $this->place_interview, 'email' => $this->email]);
-        $respond->setDatePlan(strtotime($this->date_plan));
-        if ($respond->save()) return $respond;
+        $respond = RespondsProblem::findOne($this->getId());
+        $respond->setName($this->getName());
+        $respond->setParams([
+            'info_respond' => $this->getInfoRespond(),
+            'place_interview' => $this->getPlaceInterview(),
+            'email' => $this->getEmail()
+        ]);
+        $respond->setDatePlan(strtotime($this->getDatePlan()));
+        if ($respond->save())
+            return $respond;
+
         throw new NotFoundHttpException('Ошибка. Неудалось обновить данные респондента');
     }
 
@@ -58,13 +79,13 @@ class UpdateRespondProblemForm extends UpdateFormRespond
      */
     public function uniqueName($attr)
     {
-        $models = RespondsProblem::findAll(['confirm_id' => $this->confirm_id]);
+        $models = RespondsProblem::findAll(['confirm_id' => $this->getConfirmId()]);
 
         foreach ($models as $item){
 
-            if ($this->id != $item->id && mb_strtolower(str_replace(' ', '', $this->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+            if ($this->getId() != $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
 
-                $this->addError($attr, 'Респондент с таким именем «'. $this->name .'» уже существует!');
+                $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }
         }
     }

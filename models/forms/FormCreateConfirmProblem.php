@@ -4,12 +4,18 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
-use app\models\CreatorNewRespondsOnConfirmFirstStep;
-use app\models\CreatorRespondsFromAgentsOnConfirmFirstStep;
 use app\models\Problems;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма создания подтверждения гипотезы проблемы сегмента
+ *
+ * Class FormCreateConfirmProblem
+ * @package app\models\forms
+ *
+ * @property string $need_consumer          Потребность потребителя сегмента
+ */
 class FormCreateConfirmProblem extends FormCreateConfirm
 {
 
@@ -23,12 +29,11 @@ class FormCreateConfirmProblem extends FormCreateConfirm
      */
     public function __construct(Problems $hypothesis, $config = [])
     {
-        $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
-        $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
-        $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($hypothesis);
-        $cacheName = 'formCreateConfirmCache';
-        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+        $this->setCreatorResponds();
+        $this->setCreatorNewResponds();
+        $this->setCacheManager();
+        $this->setCachePathForm(self::getCachePath($hypothesis));
+        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
@@ -50,35 +55,6 @@ class FormCreateConfirmProblem extends FormCreateConfirm
         $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
             '/segments/segment-'.$segment->id.'/problems/problem-'.$hypothesis->id.'/confirm/formCreateConfirm/';
         return $cachePath;
-    }
-
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function setHypothesisId($id)
-    {
-        return $this->hypothesis_id = $id;
-    }
-
-
-    /**
-     * @param $count
-     * @return mixed
-     */
-    public function setCountRespond($count)
-    {
-        return $this->count_respond = $count;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getHypothesisId()
-    {
-        return $this->hypothesis_id;
     }
 
 
@@ -119,22 +95,31 @@ class FormCreateConfirmProblem extends FormCreateConfirm
     public function create()
     {
         $model = new ConfirmProblem();
-        $model->setProblemId($this->hypothesisId);
-        $model->setNeedConsumer($this->need_consumer);
-        $model->setCountRespond(array_sum([$this->count_respond, $this->add_count_respond]));
-        $model->setCountPositive($this->count_positive);
+        $model->setProblemId($this->getHypothesisId());
+        $model->setNeedConsumer($this->getNeedConsumer());
+        $model->setCountRespond(array_sum([$this->getCountRespond(), $this->getAddCountRespond()]));
+        $model->setCountPositive($this->getCountPositive());
 
         if ($model->save()) {
             // Создание респондентов для программы подтверждения ГПС из представителей сегмента
-            $this->_creatorResponds->create($model, $this);
+            $this->getCreatorResponds()->create($model, $this);
             // Добавление новых респондентов для программы подтверждения ГПС
-            if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
+            if ($this->getAddCountRespond()) $this->getCreatorNewResponds()->create($model, $this);
             // Удаление кэша формы создания подтверждения
-            $this->_cacheManager->deleteCache($this->cachePath);
+            $this->getCacheManager()->deleteCache($this->getCachePathForm());
 
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Неудалось создать подтверждение проблемы');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getNeedConsumer()
+    {
+        return $this->need_consumer;
     }
 
 }

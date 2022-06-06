@@ -4,16 +4,20 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
-use app\models\EditorCountResponds;
-use Throwable;
-use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма обновления подтверждения гипотезы проблемы
+ *
+ * Class FormUpdateConfirmProblem
+ * @package app\models\forms
+ *
+ * @property string $need_consumer                     Потребность потребителя
+ */
 class FormUpdateConfirmProblem extends FormUpdateConfirm
 {
 
     public $need_consumer;
-
 
     /**
      * FormUpdateConfirmProblem constructor.
@@ -23,13 +27,13 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
     public function __construct($confirmId, $config = [])
     {
         $confirm = ConfirmProblem::findOne($confirmId);
-        $this->_editorCountRespond = new EditorCountResponds();
+        $this->setEditorCountRespond();
 
         $this->setParams([
             'id' => $confirmId,
-            'count_respond' => $confirm->count_respond,
-            'count_positive' => $confirm->count_positive,
-            'need_consumer' => $confirm->need_consumer,
+            'count_respond' => $confirm->getCountRespond(),
+            'count_positive' => $confirm->getCountPositive(),
+            'need_consumer' => $confirm->getNeedConsumer(),
         ]);
 
         parent::__construct($config);
@@ -42,10 +46,10 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
      */
     protected function setParams(array $params)
     {
-        $this->id = $params['id'];
-        $this->count_respond = $params['count_respond'];
-        $this->count_positive = $params['count_positive'];
-        $this->need_consumer = $params['need_consumer'];
+        $this->setId($params['id']);
+        $this->setCountRespond($params['count_respond']);
+        $this->setCountPositive($params['count_positive']);
+        $this->setNeedConsumer($params['need_consumer']);
     }
 
 
@@ -77,27 +81,41 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmProblem|bool|null
+     * @return ConfirmProblem|bool|mixed|null
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
     public function update()
     {
         if ($this->validate()) {
 
-            $confirm = ConfirmProblem::findOne($this->id);
-            $confirm->setCountRespond($this->count_respond);
-            $confirm->setCountPositive($this->count_positive);
-            $confirm->setNeedConsumer($this->need_consumer);
+            $confirm = ConfirmProblem::findOne($this->getId());
+            $confirm->setCountRespond($this->getCountRespond());
+            $confirm->setCountPositive($this->getCountPositive());
+            $confirm->setNeedConsumer($this->getNeedConsumer());
 
             if ($confirm->save()){
-                $this->_editorCountRespond->edit($confirm);
+                $this->getEditorCountRespond()->edit($confirm);
                 return $confirm;
             }
             throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNeedConsumer()
+    {
+        return $this->need_consumer;
+    }
+
+    /**
+     * @param string $need_consumer
+     */
+    public function setNeedConsumer($need_consumer)
+    {
+        $this->need_consumer = $need_consumer;
     }
 
 }

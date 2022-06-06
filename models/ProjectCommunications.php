@@ -18,6 +18,18 @@ use yii\helpers\Html;
  *
  * Class ProjectCommunications
  * @package app\models
+ *
+ * @property int $id                                Идентификатор коммуникации
+ * @property int $sender_id                         Идентификатор отправителя коммуникации из таб.User
+ * @property int $adressee_id                       Идентификатор получателя коммуникации из таб.User
+ * @property int $type                              Тип коммуникации
+ * @property int $project_id                        Идентификатор проекта, по которому отправлена коммуникация
+ * @property int $status                            Статус коммуникации
+ * @property int $pattern_id                        Идентификатор шаблона коммуникации
+ * @property int $triggered_communication_id        Идентификатор коммуникации в ответ, на которую была создана данная коммуникация
+ * @property int $cancel                            Параметр аннулирования коммуникации
+ * @property int $created_at                        Дата создания коммуникации
+ * @property int $updated_at                        Дата обновления коммуникации
  */
 class ProjectCommunications extends ActiveRecord implements CommunicationsInterface
 {
@@ -113,6 +125,17 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public function getProject()
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
+    }
+
+
+    /**
+     * Поиск проекта, по которому создана коммуникация
+     *
+     * @return Projects|null
+     */
+    public function findProject()
+    {
+        return Projects::findOne($this->project_id);
     }
 
 
@@ -446,10 +469,10 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public function setParams($adressee_id, $project_id, $type)
     {
-        $this->sender_id = Yii::$app->user->id;
-        $this->adressee_id = $adressee_id;
-        $this->project_id = $project_id;
-        $this->type = $type;
+        $this->setSenderId(Yii::$app->user->id);
+        $this->setAdresseeId($adressee_id);
+        $this->setProjectId($project_id);
+        $this->setType($type);
 
         $pattern = CommunicationPatterns::find()
             ->select(['id'])
@@ -460,7 +483,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             ->one();
 
         if ($pattern) {
-            $this->pattern_id = $pattern->id;
+            $this->setPatternId($pattern->id);
         }
     }
 
@@ -509,6 +532,15 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
 
 
     /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId($adressee_id)
+    {
+        $this->adressee_id = $adressee_id;
+    }
+
+
+    /**
      * Получить id отправителя коммуникации
      *
      * @return int
@@ -516,6 +548,15 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public function getSenderId()
     {
         return $this->sender_id;
+    }
+
+
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId($sender_id)
+    {
+        $this->sender_id = $sender_id;
     }
 
 
@@ -539,4 +580,101 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     {
         return $this->project_id;
     }
+
+
+    /**
+     * @param int $project_id
+     */
+    public function setProjectId($project_id)
+    {
+        $this->project_id = $project_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+
+    /**
+     * @param int $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getPatternId()
+    {
+        return $this->pattern_id;
+    }
+
+
+    /**
+     * @param int $pattern_id
+     */
+    public function setPatternId($pattern_id)
+    {
+        $this->pattern_id = $pattern_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTriggeredCommunicationId()
+    {
+        return $this->triggered_communication_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCancel()
+    {
+        return $this->cancel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+
 }

@@ -524,17 +524,8 @@ class MessageController extends AppExpertController
             //Беседы с трекерами и проектантами, которые попали в запрос
             $conversations_query = ConversationExpert::find()->joinWith('user')
                 ->andWhere(['expert_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $response = ['renderAjax' => $this->renderAjax('conversations_query', ['conversations_query' => $conversations_query])];
             Yii::$app->response->format = Response::FORMAT_JSON;

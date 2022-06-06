@@ -6,6 +6,14 @@ namespace app\models\forms;
 use app\models\Segments;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма редактирования сегмента
+ *
+ * Class FormUpdateSegment
+ * @package app\models\forms
+ *
+ * @property int $id            Идентификатор сегмента
+ */
 class FormUpdateSegment extends FormSegment
 {
 
@@ -14,44 +22,44 @@ class FormUpdateSegment extends FormSegment
 
     /**
      * FormUpdateSegment constructor.
-     * @param $id
+     * @param int $id
      * @param array $config
      */
     public function __construct($id, $config = [])
     {
         $model = Segments::findOne($id);
-        $this->id = $id;
-        $this->project_id = $model->project_id;
-        $this->name = $model->name;
-        $this->description = $model->description;
-        $this->add_info = $model->add_info;
-        $this->type_of_interaction_between_subjects = $model->type_of_interaction_between_subjects;
+        $this->setId($id);
+        $this->setProjectId($model->getProjectId());
+        $this->setName($model->getName());
+        $this->setDescription($model->getDescription());
+        $this->setAddInfo($model->getAddInfo());
+        $this->setTypeOfInteractionBetweenSubjects($model->getTypeOfInteractionBetweenSubjects());
 
-        if ($model->type_of_interaction_between_subjects == Segments::TYPE_B2C){
+        if ($model->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
 
-            $this->field_of_activity_b2c = $model->field_of_activity;
-            $this->sort_of_activity_b2c = $model->sort_of_activity;
-            $this->age_from = $model->age_from;
-            $this->age_to = $model->age_to;
-            $this->gender_consumer = $model->gender_consumer;
-            $this->education_of_consumer = $model->education_of_consumer;
-            $this->income_from = $model->income_from;
-            $this->income_to = $model->income_to;
-            $this->quantity_from = $model->quantity_from;
-            $this->quantity_to = $model->quantity_to;
-            $this->market_volume_b2c = $model->market_volume;
+            $this->setFieldOfActivityB2c($model->getFieldOfActivity());
+            $this->setSortOfActivityB2c($model->getSortOfActivity());
+            $this->setAgeFrom($model->getAgeFrom());
+            $this->setAgeTo($model->getAgeTo());
+            $this->setGenderConsumer($model->getGenderConsumer());
+            $this->setEducationOfConsumer($model->getEducationOfConsumer());
+            $this->setIncomeFrom($model->getIncomeFrom());
+            $this->setIncomeTo($model->getIncomeTo());
+            $this->setQuantityFrom($model->getQuantityFrom());
+            $this->setQuantityTo($model->getQuantityTo());
+            $this->setMarketVolumeB2c($model->getMarketVolume());
 
-        }elseif ($model->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
+        }elseif ($model->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
 
-            $this->field_of_activity_b2b = $model->field_of_activity;
-            $this->sort_of_activity_b2b = $model->sort_of_activity;
-            $this->company_products = $model->company_products;
-            $this->quantity_from_b2b = $model->quantity_from;
-            $this->quantity_to_b2b = $model->quantity_to;
-            $this->company_partner = $model->company_partner;
-            $this->income_company_from = $model->income_from;
-            $this->income_company_to = $model->income_to;
-            $this->market_volume_b2b = $model->market_volume;
+            $this->setFieldOfActivityB2b($model->getFieldOfActivity());
+            $this->setSortOfActivityB2b($model->getSortOfActivity());
+            $this->setCompanyProducts($model->getCompanyProducts());
+            $this->setQuantityFromB2b($model->getQuantityFrom());
+            $this->setQuantityToB2b($model->getQuantityTo());
+            $this->setCompanyPartner($model->getCompanyPartner());
+            $this->setIncomeCompanyFrom($model->getIncomeFrom());
+            $this->setIncomeCompanyTo($model->getIncomeTo());
+            $this->setMarketVolumeB2b($model->getMarketVolume());
         }
 
         parent::__construct($config);
@@ -98,43 +106,44 @@ class FormUpdateSegment extends FormSegment
      */
     public function update()
     {
-        $segment = Segments::findOne($this->id);
-        $segment->name = $this->name;
-        $segment->description = $this->description;
-        $segment->add_info = $this->add_info;
+        $segment = Segments::findOne($this->getId());
+        $segment->setName($this->getName());
+        $segment->setDescription($this->getDescription());
+        $segment->setAddInfo($this->getAddInfo());
 
-        if ($segment->type_of_interaction_between_subjects == Segments::TYPE_B2C){
+        if ($segment->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
 
-            $segment->field_of_activity = $this->field_of_activity_b2c;
-            $segment->sort_of_activity = $this->sort_of_activity_b2c;
-            $segment->age_from = $this->age_from;
-            $segment->age_to = $this->age_to;
-            $segment->gender_consumer = $this->gender_consumer;
-            $segment->education_of_consumer = $this->education_of_consumer;
-            $segment->income_from = $this->income_from;
-            $segment->income_to = $this->income_to;
-            $segment->quantity_from = $this->quantity_from;
-            $segment->quantity_to = $this->quantity_to;
-            $segment->market_volume = $this->market_volume_b2c;
+            $segment->setFieldOfActivity($this->getFieldOfActivityB2c());
+            $segment->setSortOfActivity($this->getSortOfActivityB2c());
+            $segment->setAgeFrom($this->getAgeFrom());
+            $segment->setAgeTo($this->getAgeTo());
+            $segment->setGenderConsumer($this->getGenderConsumer());
+            $segment->setEducationOfConsumer($this->getEducationOfConsumer());
+            $segment->setIncomeFrom($this->getIncomeFrom());
+            $segment->setIncomeTo($this->getIncomeTo());
+            $segment->setQuantityFrom($this->getQuantityFrom());
+            $segment->setQuantityTo($this->getQuantityTo());
+            $segment->setMarketVolume($this->getMarketVolumeB2c());
 
             if ($segment->save()) return $segment;
             throw new NotFoundHttpException('Неудалось сохранить сегмент');
 
-        }elseif ($segment->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
+        }elseif ($segment->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
 
-            $segment->field_of_activity = $this->field_of_activity_b2b;
-            $segment->sort_of_activity = $this->sort_of_activity_b2b;
-            $segment->company_products = $this->company_products;
-            $segment->quantity_from = $this->quantity_from_b2b;
-            $segment->quantity_to = $this->quantity_to_b2b;
-            $segment->company_partner = $this->company_partner;
-            $segment->income_from = $this->income_company_from;
-            $segment->income_to = $this->income_company_to;
-            $segment->market_volume = $this->market_volume_b2b;
+            $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
+            $segment->setSortOfActivity($this->getSortOfActivityB2b());
+            $segment->setCompanyProducts($this->getCompanyProducts());
+            $segment->setQuantityFrom($this->getQuantityFromB2b());
+            $segment->setQuantityTo($this->getQuantityToB2b());
+            $segment->setCompanyPartner($this->getCompanyPartner());
+            $segment->setIncomeFrom($this->getIncomeCompanyFrom());
+            $segment->setIncomeTo($this->getIncomeCompanyTo());
+            $segment->setMarketVolume($this->getMarketVolumeB2b());
 
             if ($segment->save()) return $segment;
             throw new NotFoundHttpException('Неудалось сохранить сегмент');
         }
+        return null;
     }
 
 
@@ -143,14 +152,30 @@ class FormUpdateSegment extends FormSegment
      */
     public function uniqueName($attr)
     {
-        $models = Segments::findAll(['project_id' => $this->project_id]);
+        $models = Segments::findAll(['project_id' => $this->getProjectId()]);
 
         foreach ($models as $item){
 
-            if ($this->id != $item->id && mb_strtolower(str_replace(' ', '', $this->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+            if ($this->getId() != $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
 
-                $this->addError($attr, 'Сегмент с названием «'. $this->name .'» уже существует!');
+                $this->addError($attr, 'Сегмент с названием «'. $this->getName() .'» уже существует!');
             }
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 }

@@ -18,24 +18,6 @@ class ProfileExpertForm extends  Model
     public $id;
 
     /**
-     * Фамилия
-     * @var string
-     */
-    public $second_name;
-
-    /**
-     * Имя
-     * @var string
-     */
-    public $first_name;
-
-    /**
-     * Отчество
-     * @var string
-     */
-    public $middle_name;
-
-    /**
      * Логин
      * @var string
      */
@@ -114,13 +96,12 @@ class ProfileExpertForm extends  Model
     {
         return [
             [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email',
+            [['username', 'email',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email',
-                'education', 'academic_degree', 'position', 'scope_professional_competence',
+            [['username', 'email', 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
+            [['email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
@@ -162,9 +143,6 @@ class ProfileExpertForm extends  Model
     public function attributeLabels()
     {
         return [
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'email' => 'Email',
             'username' => 'Логин',
             'education' => 'Образование',
@@ -263,9 +241,6 @@ class ProfileExpertForm extends  Model
         if ($this->sendEmail()) {
 
             $user = User::findOne($this->id);
-            $user->second_name = $this->second_name;
-            $user->first_name = $this->first_name;
-            $user->middle_name = $this->middle_name;
             $user->email = $this->email;
             $user->username = $this->username;
 

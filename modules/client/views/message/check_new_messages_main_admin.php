@@ -116,7 +116,7 @@ use app\modules\admin\models\MessageMainAdmin;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name; ?></div>
+                        <div class="interlocutor"><?= $admin->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -156,7 +156,7 @@ use app\modules\admin\models\MessageMainAdmin;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name; ?></div>
+                        <div class="interlocutor"><?= $admin->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>

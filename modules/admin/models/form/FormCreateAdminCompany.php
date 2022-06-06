@@ -13,9 +13,6 @@ use yii\base\Model;
  * Class FormCreateAdminCompany
  * @package app\modules\admin\models\form
  *
- * @property string $second_name
- * @property string $first_name
- * @property string $middle_name
  * @property string $email
  * @property string $username
  * @property int $status
@@ -25,9 +22,6 @@ use yii\base\Model;
 class FormCreateAdminCompany extends Model
 {
 
-    public $second_name;
-    public $first_name;
-    public $middle_name;
     public $email;
     public $username;
     public $status;
@@ -41,9 +35,9 @@ class FormCreateAdminCompany extends Model
     public function rules()
     {
         return [
-            [['second_name', 'first_name', 'middle_name', 'email', 'username'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email'], 'string', 'max' => 255],
+            [['email', 'username'], 'required'],
+            [['username', 'email'], 'trim'],
+            [['email'], 'string', 'max' => 255],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -67,9 +61,6 @@ class FormCreateAdminCompany extends Model
     public function attributeLabels()
     {
         return [
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'email' => 'Email',
             'username' => 'Логин',
         ];

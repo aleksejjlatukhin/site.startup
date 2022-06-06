@@ -6,6 +6,17 @@ use Yii;
 use yii\base\Model;
 use yii\db\ActiveRecord;
 
+/**
+ * Форма для авторизации на сайте
+ *
+ * Class LoginForm
+ * @package app\models
+ *
+ * @property string $identity                   Логин или email пользователя
+ * @property string $password                   Пароль пользователя
+ * @property bool $rememberMe                   Флаг "Запомнить меня"
+ * @property User|false $_user                  Объект авторизованного пользователя
+ */
 class LoginForm extends Model
 {
 
@@ -50,7 +61,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
-            if (!$user || !$user->validatePassword($this->password)) {
+            if (!$user || !$user->validatePassword($this->getPassword())) {
                 $this->addError($attribute, 'Логин/пароль введены не верно!');
             }
         }
@@ -63,11 +74,9 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            //$this->status = ($user = $this->getUser()) ? $user->status : User::STATUS_NOT_ACTIVE;
             $user = $this->getUser();
-            //if ($this->status === User::STATUS_ACTIVE) {
             if ($user) {
-                return Yii::$app->user->login($user, $this->rememberMe ? 3600 * 24 * 30 : 0);
+                return Yii::$app->user->login($user, $this->isRememberMe() ? 3600 * 24 * 30 : 0);
             }else{
                 return false;
             }
@@ -78,7 +87,7 @@ class LoginForm extends Model
 
 
     /**
-     * @return bool|mixed|ActiveRecord
+     * @return bool|User|ActiveRecord
      */
     public function getUser()
     {
@@ -101,5 +110,61 @@ class LoginForm extends Model
             ->setSubject('Регистрация на сайте StartPool')
             ->send();
 
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentity()
+    {
+        return $this->identity;
+    }
+
+    /**
+     * @param string $identity
+     */
+    public function setIdentity($identity)
+    {
+        $this->identity = $identity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRememberMe()
+    {
+        return $this->rememberMe;
+    }
+
+    /**
+     * @param bool $rememberMe
+     */
+    public function setRememberMe($rememberMe)
+    {
+        $this->rememberMe = $rememberMe;
+    }
+
+    /**
+     * @param User|false $user
+     */
+    public function setUser($user)
+    {
+        $this->_user = $user;
     }
 }

@@ -9,10 +9,22 @@ use app\models\Problems;
 use app\models\Mvps;
 use app\models\Projects;
 use app\models\Segments;
+use app\models\User;
 use yii\base\ErrorException;
 use yii\base\Model;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма создания mvp-продукта
+ *
+ * Class FormCreateMvp
+ * @package app\models\forms
+ *
+ * @property string $description                Описание mvp-продукта
+ * @property int $basic_confirm_id              Идентификатор записи в таб. confirm_gcp
+ * @property CacheForm $_cacheManager           Менеджер кэширования
+ * @property string $cachePath                  Путь к файлу кэша
+ */
 class FormCreateMvp extends Model
 {
 
@@ -29,10 +41,10 @@ class FormCreateMvp extends Model
      */
     public function __construct(Gcps $preliminaryHypothesis, $config = [])
     {
-        $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($preliminaryHypothesis);
+        $this->setCacheManager();
+        $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
         $cacheName = 'formCreateHypothesisCache';
-        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
@@ -47,12 +59,18 @@ class FormCreateMvp extends Model
      */
     public static function getCachePath(Gcps $preliminaryHypothesis)
     {
+        /**
+         * @var Problems $problem
+         * @var Segments $segment
+         * @var Projects $project
+         * @var User $user
+         */
         $problem = $preliminaryHypothesis->problem;
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$preliminaryHypothesis->id.'/mvps/formCreate/';
+        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+            '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$preliminaryHypothesis->getId().'/mvps/formCreate/';
 
         return $cachePath;
     }
@@ -78,28 +96,92 @@ class FormCreateMvp extends Model
      */
     public function create()
     {
-        $last_model = Mvps::find()->where(['basic_confirm_id' => $this->basic_confirm_id])->orderBy(['id' => SORT_DESC])->one();
-        $confirmGcp = ConfirmGcp::findOne($this->basic_confirm_id);
-        $gcp = Gcps::findOne($confirmGcp->gcpId);
-        $problem = Problems::findOne($gcp->problemId);
-        $segment = Segments::findOne($gcp->segmentId);
-        $project = Projects::findOne($gcp->projectId);
+        $last_model = Mvps::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
+        $confirmGcp = ConfirmGcp::findOne($this->getBasicConfirmId());
+        $gcp = Gcps::findOne($confirmGcp->getGcpId());
+        $problem = Problems::findOne($gcp->getProblemId());
+        $segment = Segments::findOne($gcp->getSegmentId());
+        $project = Projects::findOne($gcp->getProjectId());
 
         $mvp = new Mvps();
-        $mvp->project_id = $project->id;
-        $mvp->segment_id = $segment->id;
-        $mvp->problem_id = $problem->id;
-        $mvp->gcp_id = $gcp->id;
-        $mvp->basic_confirm_id = $this->basic_confirm_id;
-        $mvp->description = $this->description;
+        $mvp->setProjectId($project->getId());
+        $mvp->setSegmentId($segment->getId());
+        $mvp->setProblemId($problem->getId());
+        $mvp->setGcpId($gcp->getId());
+        $mvp->setBasicConfirmId($this->getBasicConfirmId());
+        $mvp->setDescription($this->getDescription());
         $last_model_number = explode(' ',$last_model->title)[1];
-        $mvp->title = 'MVP ' . ($last_model_number + 1);
+        $mvp->setTitle('MVP ' . ($last_model_number + 1));
 
         if ($mvp->save()){
-            $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
+            $this->getCacheManager()->deleteCache($this->getCachePathForm()); // Удаление кэша формы создания
             return $mvp;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить новый продукт (MVP)');
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBasicConfirmId()
+    {
+        return $this->basic_confirm_id;
+    }
+
+    /**
+     * @param int $basic_confirm_id
+     */
+    public function setBasicConfirmId($basic_confirm_id)
+    {
+        $this->basic_confirm_id = $basic_confirm_id;
+    }
+
+    /**
+     * @return CacheForm
+     */
+    public function getCacheManager()
+    {
+        return $this->_cacheManager;
+    }
+
+    /**
+     *
+     */
+    public function setCacheManager()
+    {
+        $this->_cacheManager = new CacheForm();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCachePathForm()
+    {
+        return $this->cachePath;
+    }
+
+    /**
+     * @param string $cachePath
+     */
+    public function setCachePathForm($cachePath)
+    {
+        $this->cachePath = $cachePath;
     }
 
 }

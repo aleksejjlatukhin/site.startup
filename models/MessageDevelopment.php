@@ -127,7 +127,7 @@ class MessageDevelopment extends ActiveRecord
      */
     public function getFiles ()
     {
-        return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_TECHNICAL_SUPPORT, 'message_id' => $this->id]);
+        return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_TECHNICAL_SUPPORT, 'message_id' => $this->getId()]);
     }
 
 
@@ -149,16 +149,16 @@ class MessageDevelopment extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->created_at) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) == date('d.n.Y', time())) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->created_at) == (date('d', time()) - 1)
-            && date('n.Y', $this->created_at) == date('n.Y', time())) {
+        elseif (date('d', $this->getCreatedAt()) == (date('d', time()) - 1)
+            && date('n.Y', $this->getCreatedAt()) == date('n.Y', time())) {
             return 'Вчера';
         }
         else {
-            return ( $days[(date('w', $this->created_at))] . ', ' . date('d', $this->created_at)
-                . ' ' . $monthes[(date('n', $this->created_at))] . ' ' . date(' Y', $this->created_at));
+            return ( $days[(date('w', $this->getCreatedAt()))] . ', ' . date('d', $this->getCreatedAt())
+                . ' ' . $monthes[(date('n', $this->getCreatedAt()))] . ' ' . date(' Y', $this->getCreatedAt()));
         }
     }
 
@@ -176,16 +176,16 @@ class MessageDevelopment extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->created_at) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) == date('d.n.Y', time())) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->created_at) == (date('d', time()) - 1)
-            && date('n.Y', $this->created_at) == date('n.Y', time())) {
+        elseif (date('d', $this->getCreatedAt()) == (date('d', time()) - 1)
+            && date('n.Y', $this->getCreatedAt()) == date('n.Y', time())) {
             return 'Вчера';
         }
         else {
-            return ( date('d', $this->created_at) . ' ' . $monthes[(date('n', $this->created_at))]
-                . ' ' . date(' Y', $this->created_at));
+            return ( date('d', $this->getCreatedAt()) . ' ' . $monthes[(date('n', $this->getCreatedAt()))]
+                . ' ' . date(' Y', $this->getCreatedAt()));
         }
     }
 

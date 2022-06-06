@@ -128,7 +128,7 @@ use app\models\MessageDevelopment;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                        <div class="interlocutor"><?= $user->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>
@@ -168,7 +168,7 @@ use app\models\MessageDevelopment;
 
                 <div class="sender_data">
                     <div class="sender_info">
-                        <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                        <div class="interlocutor"><?= $user->username; ?></div>
                         <div>
                             <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                             <?= date('H:i', $message['created_at']); ?>

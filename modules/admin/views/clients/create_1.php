@@ -31,45 +31,6 @@ $this->title = 'Создание новой организации';
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-        <div class="row" style="margin-bottom: 10px;">
-            <?= $form->field($formCreateAdminCompany, 'second_name', [
-                'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->textInput([
-                'maxlength' => 50,
-                'minlength' => 2,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]); ?>
-        </div>
-
-        <div class="row" style="margin-bottom: 10px;">
-            <?= $form->field($formCreateAdminCompany, 'first_name', [
-                'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->textInput([
-                'maxlength' => 50,
-                'minlength' => 2,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]); ?>
-        </div>
-
-        <div class="row" style="margin-bottom: 10px;">
-            <?= $form->field($formCreateAdminCompany, 'middle_name', [
-                'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->textInput([
-                'maxlength' => 50,
-                'minlength' => 2,
-                'required' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]); ?>
-        </div>
-
         <div class="row" style="margin-bottom: 15px;">
             <?= $form->field($formCreateAdminCompany, 'username', [
                 'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-12">{input}</div>'

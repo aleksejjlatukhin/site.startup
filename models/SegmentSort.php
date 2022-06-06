@@ -6,6 +6,12 @@ namespace app\models;
 use yii\base\Model;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс для сортивки сегментов проекта по заданным параметрам
+ *
+ * Class SegmentSort
+ * @package app\models
+ */
 class SegmentSort extends Model
 {
 

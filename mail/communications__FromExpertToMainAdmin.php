@@ -6,7 +6,7 @@ use app\modules\expert\models\form\FormCreateCommunicationResponse;
 ?>
 
 <p>
-    Данное письмо является ответом эксперта <b><?= $user->second_name . ' ' . $user->first_name; ?></b> на запрос о готовности провети экспертизу проекта <?= Html::a('«'.$communication->project->project_name.'»', Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $communication->project->user_id, 'project_id' => $communication->project->id])); ?>
+    Данное письмо является ответом эксперта <b><?= $user->getUsername(); ?></b> на запрос о готовности провети экспертизу проекта <?= Html::a('«'.$communication->project->project_name.'»', Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $communication->project->user_id, 'project_id' => $communication->project->id])); ?>
 </p>
 
 <p>

@@ -139,9 +139,6 @@ class UsersController extends AppClientController
                     ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
                     ->andWhere(['client_user.client_id' => $user->clientUser->getClientId()])
                     ->all();
-                foreach ($admins as $admin) {
-                    $admin->username = $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name;
-                }
 
                 $response = ['renderAjax' => $this->renderAjax('get_modal_add_admin_to_user', ['user' => $user, 'admins' => $admins])];
             } else {
@@ -337,7 +334,6 @@ class UsersController extends AppClientController
     {
         $model = User::findOne($id);
         $admin = User::findOne($id_admin);
-        $admin->username = $admin->second_name.' '.mb_substr($admin->first_name, 0, 1).'.'.mb_substr($admin->middle_name, 0, 1).'.';
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post()) && $model->save()) {

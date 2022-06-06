@@ -7,6 +7,17 @@ use app\models\ExpectedResultsInterviewConfirmProblem;
 use app\models\Problems;
 use yii\base\Model;
 
+/**
+ * Форма обновления гипотезы проблемы
+ *
+ * Class FormUpdateProblem
+ * @package app\models\forms
+ *
+ * @property int $id                                            Идентификатор из таб. problems
+ * @property mixed $_expectedResultsInterview                   Вопросы для проверки и ответы на них (интервью с ожидаемыми результатами)
+ * @property string $description                                Описание проблемы
+ * @property int $indicator_positive_passage                    Показатель положительного прохождения теста
+ */
 class FormUpdateProblem extends Model
 {
 
@@ -23,10 +34,10 @@ class FormUpdateProblem extends Model
      */
     public function __construct(Problems $problem, $config = [])
     {
-        $this->id = $problem->id;
-        $this->description = $problem->description;
-        $this->indicator_positive_passage = $problem->indicator_positive_passage;
-        $this->_expectedResultsInterview = ExpectedResultsInterviewConfirmProblem::findAll(['problem_id' => $this->id]);
+        $this->setId($problem->getId());
+        $this->setDescription($problem->getDescription());
+        $this->setIndicatorPositivePassage($problem->getIndicatorPositivePassage());
+        $this->setExpectedResultsInterview(ExpectedResultsInterviewConfirmProblem::findAll(['problem_id' => $this->getId()]));
 
         parent::__construct($config);
     }
@@ -63,9 +74,9 @@ class FormUpdateProblem extends Model
      */
     public function update()
     {
-        $model = Problems::findOne($this->id);
-        $model->description = $this->description;
-        $model->indicator_positive_passage = $this->indicator_positive_passage;
+        $model = Problems::findOne($this->getId());
+        $model->setDescription($this->getDescription());
+        $model->setIndicatorPositivePassage($this->getIndicatorPositivePassage());
 
         $className = explode('\\', self::class)[3];
         $query = $_POST[$className]['_expectedResultsInterview'];
@@ -90,8 +101,8 @@ class FormUpdateProblem extends Model
 
             foreach ($query as $k => $q) {
                 $newExpectedResultsInterview[$k] = new ExpectedResultsInterviewConfirmProblem();
-                $newExpectedResultsInterview[$k]->question = $q['question'];
-                $newExpectedResultsInterview[$k]->answer = $q['answer'];
+                $newExpectedResultsInterview[$k]->setQuestion($q['question']);
+                $newExpectedResultsInterview[$k]->setAnswer($q['answer']);
                 $newExpectedResultsInterview[$k]->setProblemId($problemId);
                 $newExpectedResultsInterview[$k]->save();
             }
@@ -104,13 +115,13 @@ class FormUpdateProblem extends Model
                 foreach ($query as $i => $q) {
 
                     if (($i+1) <= count($expectedResultsInterview)) {
-                        $expectedResultsInterview[$i]->question = $q['question'];
-                        $expectedResultsInterview[$i]->answer = $q['answer'];
+                        $expectedResultsInterview[$i]->setQuestion($q['question']);
+                        $expectedResultsInterview[$i]->setAnswer($q['answer']);
                         $expectedResultsInterview[$i]->save();
                     } else {
                         $expectedResultsInterview[$i] = new ExpectedResultsInterviewConfirmProblem();
-                        $expectedResultsInterview[$i]->question = $q['question'];
-                        $expectedResultsInterview[$i]->answer = $q['answer'];
+                        $expectedResultsInterview[$i]->setQuestion($q['question']);
+                        $expectedResultsInterview[$i]->setAnswer($q['answer']);
                         $expectedResultsInterview[$i]->setProblemId($problemId);
                         $expectedResultsInterview[$i]->save();
                     }
@@ -119,11 +130,75 @@ class FormUpdateProblem extends Model
             } else {
 
                 foreach ($query as $i => $q) {
-                    $expectedResultsInterview[$i]->question = $q['question'];
-                    $expectedResultsInterview[$i]->answer = $q['answer'];
+                    $expectedResultsInterview[$i]->setQuestion($q['question']);
+                    $expectedResultsInterview[$i]->setAnswer($q['answer']);
                     $expectedResultsInterview[$i]->save();
                 }
             }
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedResultsInterview()
+    {
+        return $this->_expectedResultsInterview;
+    }
+
+    /**
+     * @param mixed $expectedResultsInterview
+     */
+    public function setExpectedResultsInterview($expectedResultsInterview)
+    {
+        $this->_expectedResultsInterview = $expectedResultsInterview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIndicatorPositivePassage()
+    {
+        return $this->indicator_positive_passage;
+    }
+
+    /**
+     * @param int $indicator_positive_passage
+     */
+    public function setIndicatorPositivePassage($indicator_positive_passage)
+    {
+        $this->indicator_positive_passage = $indicator_positive_passage;
     }
 }

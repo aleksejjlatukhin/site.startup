@@ -106,7 +106,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                             <div class="row block_top">
 
-                                                <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                                <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                                 <div class="col-xs-4 text-right">
                                                     <?php if ($conversation->lastMessage) : ?>
@@ -168,7 +168,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                             <div class="row block_top">
 
-                                                <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                                <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                                 <div class="col-xs-4 text-right">
                                                     <?php if ($conversation->lastMessage) : ?>
@@ -232,7 +232,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
@@ -294,7 +294,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
@@ -371,7 +371,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
@@ -433,7 +433,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
@@ -495,7 +495,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->second_name.' '.$conversation->user->first_name.' '.$conversation->user->middle_name; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
@@ -679,7 +679,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                                                <div class="interlocutor"><?= $user->username; ?></div>
                                                 <div>
                                                     <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                                     <?= date('H:i', $message['created_at']); ?>
@@ -719,7 +719,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                                                <div class="interlocutor"><?= $user->username; ?></div>
                                                 <div>
                                                     <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                                     <?= date('H:i', $message['created_at']); ?>

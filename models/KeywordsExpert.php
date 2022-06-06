@@ -5,6 +5,16 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 
+/**
+ * Класс, содержит ключевые слова по поиску экспертов
+ *
+ * Class KeywordsExpert
+ * @package app\models
+ *
+ * @property int $id                        Идентификатор записи
+ * @property int $expert_id                 Идентификатор эксперта в таб.User
+ * @property int $description               Ключевые слова
+ */
 class KeywordsExpert extends ActiveRecord
 {
 

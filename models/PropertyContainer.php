@@ -6,6 +6,14 @@ namespace app\models;
 use yii\base\Exception;
 use app\models\interfaces\PropertyContainerInterface;
 
+/**
+ * Класс для реализации паттерна проектирования "Контейнер свойств"
+ *
+ * Class PropertyContainer
+ * @package app\models
+ *
+ * @property array $propertyContainer
+ */
 class PropertyContainer implements PropertyContainerInterface
 {
 

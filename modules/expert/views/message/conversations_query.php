@@ -23,7 +23,7 @@ use app\models\User;
                     <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
                 <?php endif; ?>
 
-                <?= $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name; ?>
+                <?= $conversation->user->username; ?>
             </div>
 
         <?php elseif (User::isUserSimple($conversation->user->username)) : ?>
@@ -36,7 +36,7 @@ use app\models\User;
                     <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
                 <?php endif; ?>
 
-                <?= $conversation->user->second_name . ' ' . $conversation->user->first_name . ' ' . $conversation->user->middle_name; ?>
+                <?= $conversation->user->username; ?>
             </div>
 
         <?php endif; ?>

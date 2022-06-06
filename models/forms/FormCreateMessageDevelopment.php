@@ -11,6 +11,22 @@ use yii\web\NotFoundHttpException;
 use Yii;
 use yii\web\UploadedFile;
 
+/**
+ * Форма создания сообщения между тех.поддержкой и другими пользователями
+ *
+ * Class FormCreateMessageDevelopment
+ * @package app\models\forms
+ *
+ * @property string $description                        Текст сообщения
+ * @property int $conversation_id                       Идентификатор беседы
+ * @property int $sender_id                             Идентификатор отправителя
+ * @property int $adressee_id                           Идентификатор получателя
+ *
+ * @property $message_files                             Прикрепленные файлы
+ * @property int $category                              Категория к которой относится беседа
+ * @property int $message_id                            Идентификатор созданного сообщения
+ * @property string $server_file                        Сгенерированное имя прикрепленного файла для хранения на сервере
+ */
 class FormCreateMessageDevelopment extends Model
 {
 
@@ -48,16 +64,16 @@ class FormCreateMessageDevelopment extends Model
     public function create()
     {
         $model = new MessageDevelopment();
-        $model->description = $this->description;
-        $model->conversation_id = $this->conversation_id;
-        $model->sender_id = $this->sender_id;
-        $model->adressee_id = $this->adressee_id;
+        $model->setDescription($this->getDescription());
+        $model->setConversationId($this->getConversationId());
+        $model->setSenderId($this->getSenderId());
+        $model->setAdresseeId($this->getAdresseeId());
         if ($model->save()) {
 
             //Загрузка презентационных файлов
-            $this->message_id = $model->id;
-            $this->message_files = UploadedFile::getInstances($this, 'message_files');
-            if ($this->message_files) $this->uploadMessageFiles();
+            $this->setMessageId($model->getId());
+            $this->setMessageFiles(UploadedFile::getInstances($this, 'message_files'));
+            if ($this->getMessageFiles()) $this->uploadMessageFiles();
 
             return $model;
         }
@@ -73,12 +89,12 @@ class FormCreateMessageDevelopment extends Model
      */
     private function uploadMessageFiles(){
 
-        $path = UPLOAD.'/user-'.$this->sender_id.'/messages/category-'.$this->category.'/message-'.$this->message_id.'/';
+        $path = UPLOAD.'/user-'.$this->getSenderId().'/messages/category-'.$this->getCategory().'/message-'.$this->getMessageId().'/';
         if (!is_dir($path)) FileHelper::createDirectory($path);
 
         if($this->validate()){
 
-            foreach($this->message_files as $file){
+            foreach($this->getMessageFiles() as $file){
 
                 $filename = Yii::$app->getSecurity()->generateRandomString(15);
 
@@ -87,10 +103,10 @@ class FormCreateMessageDevelopment extends Model
                     $file->saveAs($path . $filename . '.' . $file->extension);
 
                     $messageFile = new MessageFiles();
-                    $messageFile->file_name = $file;
-                    $messageFile->server_file = $filename . '.' . $file->extension;
-                    $messageFile->message_id = $this->message_id;
-                    $messageFile->category = $this->category;
+                    $messageFile->setFileName($file);
+                    $messageFile->setServerFile($filename . '.' . $file->extension);
+                    $messageFile->setMessageId($this->getMessageId());
+                    $messageFile->setCategory($this->getCategory());
                     $messageFile->save(false);
 
                 }catch (Exception $e){
@@ -103,5 +119,133 @@ class FormCreateMessageDevelopment extends Model
             return false;
         }
 
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConversationId()
+    {
+        return $this->conversation_id;
+    }
+
+    /**
+     * @param int $conversation_id
+     */
+    public function setConversationId($conversation_id)
+    {
+        $this->conversation_id = $conversation_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSenderId()
+    {
+        return $this->sender_id;
+    }
+
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId($sender_id)
+    {
+        $this->sender_id = $sender_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAdresseeId()
+    {
+        return $this->adressee_id;
+    }
+
+    /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId($adressee_id)
+    {
+        $this->adressee_id = $adressee_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMessageFiles()
+    {
+        return $this->message_files;
+    }
+
+    /**
+     * @param mixed $message_files
+     */
+    public function setMessageFiles($message_files)
+    {
+        $this->message_files = $message_files;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param int $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMessageId()
+    {
+        return $this->message_id;
+    }
+
+    /**
+     * @param int $message_id
+     */
+    public function setMessageId($message_id)
+    {
+        $this->message_id = $message_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerFile()
+    {
+        return $this->server_file;
+    }
+
+    /**
+     * @param string $server_file
+     */
+    public function setServerFile($server_file)
+    {
+        $this->server_file = $server_file;
     }
 }

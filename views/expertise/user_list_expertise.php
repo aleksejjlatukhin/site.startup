@@ -22,7 +22,7 @@ use app\models\ExpertType;
                             <div class="col-xs-10">Тип деятельности: <?= ExpertType::getContent($item['type']); ?></div>
                         </div>
                     </div>
-                    <div class="col-xs-4">Эксперт: <?= $item['fio_expert']; ?></div>
+                    <div class="col-xs-4">Эксперт: <?= $item['username_expert']; ?></div>
                 </div>
 
                 <!--Заголовки для списка экспертиз-->

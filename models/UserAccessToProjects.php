@@ -15,6 +15,16 @@ use yii\db\ActiveRecord;
  *
  * Class UserAccessToProjects
  * @package app\models
+ *
+ * @property int $id                            Идентификтор записи
+ * @property int $user_id                       Идентификтор эксперта
+ * @property int $project_id                    Идентификтор проекта
+ * @property int $communication_id              Идентификтор коммуникации в таб. project_communications
+ * @property int $communication_type            Тип коммуникации
+ * @property int $cancel                        Флаг, указывает на отмену коммуникации
+ * @property int $date_stop                     Дата окончания доступа к проекту
+ * @property int $created_at                    Дата создания записи
+ * @property int $updated_at                    Дата редактирования записи
  */
 class UserAccessToProjects extends ActiveRecord
 {
@@ -48,13 +58,14 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * Получить все коммуникации
      * пользователя по проекту
+     *
      * @return array|ActiveRecord[]
      */
     public function getUserCommunications()
     {
         $communications = ProjectCommunications::find()
-            ->where(['or', ['sender_id' => $this->user_id], ['adressee_id' => $this->user_id]])
-            ->andWhere(['project_id' => $this->project_id]);
+            ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
+            ->andWhere(['project_id' => $this->getProjectId()]);
          return $communications->all();
     }
 
@@ -68,8 +79,8 @@ class UserAccessToProjects extends ActiveRecord
     public function getUserCommunicationsForAdminTable()
     {
         $communications = ProjectCommunications::find()
-            ->where(['or', ['sender_id' => $this->user_id], ['adressee_id' => $this->user_id]])
-            ->andWhere(['project_id' => $this->project_id])
+            ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
+            ->andWhere(['project_id' => $this->getProjectId()])
             ->andWhere(['not in', 'type', [
                 CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
                 CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
@@ -139,16 +150,16 @@ class UserAccessToProjects extends ActiveRecord
      */
     public function setParams ($user_id, $project_id, $communication)
     {
-        $this->user_id = $user_id;
-        $this->project_id = $project_id;
-        $this->communication_id = $communication->id;
-        $this->communication_type = $communication->type;
-        if ($this->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            if ($communication->pattern_id) {
-                $pattern = CommunicationPatterns::findOne($communication->pattern_id);
-                $this->date_stop = time() + ($pattern->project_access_period * 24 * 60 * 60);
+        $this->setUserId($user_id);
+        $this->setProjectId($project_id);
+        $this->setCommunicationId($communication->getId());
+        $this->setCommunicationType($communication->getType());
+        if ($this->getCommunicationType() == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($communication->getPatternId()) {
+                $pattern = CommunicationPatterns::findOne($communication->getPatternId());
+                $this->setDateStop(time() + ($pattern->getProjectAccessPeriod() * 24 * 60 * 60));
             } else {
-                $this->date_stop = time() + (CommunicationPatterns::DEFAULT_USER_ACCESS_TO_PROJECT * 24 * 60 * 60);
+                $this->setDateStop(time() + (CommunicationPatterns::DEFAULT_USER_ACCESS_TO_PROJECT * 24 * 60 * 60));
             }
         }
     }
@@ -161,6 +172,118 @@ class UserAccessToProjects extends ActiveRecord
     public function setCancel()
     {
         $this->cancel = self::CANCEL_TRUE;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    /**
+     * @param int $project_id
+     */
+    public function setProjectId($project_id)
+    {
+        $this->project_id = $project_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommunicationId()
+    {
+        return $this->communication_id;
+    }
+
+    /**
+     * @param int $communication_id
+     */
+    public function setCommunicationId($communication_id)
+    {
+        $this->communication_id = $communication_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommunicationType()
+    {
+        return $this->communication_type;
+    }
+
+    /**
+     * @param int $communication_type
+     */
+    public function setCommunicationType($communication_type)
+    {
+        $this->communication_type = $communication_type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCancel()
+    {
+        return $this->cancel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDateStop()
+    {
+        return $this->date_stop;
+    }
+
+    /**
+     * @param int $date_stop
+     */
+    public function setDateStop($date_stop)
+    {
+        $this->date_stop = $date_stop;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 
 }

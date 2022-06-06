@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 21 2022 г., 12:42
+-- Время создания: Июн 06 2022 г., 19:20
 -- Версия сервера: 5.6.47
 -- Версия PHP: 7.4.14
 
@@ -48,7 +48,8 @@ INSERT INTO `all_questions_confirm_gcp` (`id`, `title`, `user_id`, `created_at`)
 (7, 'Какая цена решения должна быть по вашему мнению?', 1, 1624999704),
 (8, 'Во сколько обходится решение этой проблемы?', 1, 1624999755),
 (9, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1640801616),
-(10, 'Что понравилось в решении и что нет?', 47, 1650458389);
+(10, 'Что понравилось в решении и что нет?', 47, 1650458389),
+(11, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 1, 1654424312);
 
 -- --------------------------------------------------------
 
@@ -184,7 +185,8 @@ INSERT INTO `answers_questions_confirm_gcp` (`id`, `question_id`, `respond_id`, 
 (50, 19, 45, ''),
 (51, 20, 46, 'ответ'),
 (52, 21, 47, 'Ответ 1'),
-(53, 21, 48, 'Ответ 2');
+(53, 21, 48, 'Ответ 2'),
+(54, 22, 49, '');
 
 -- --------------------------------------------------------
 
@@ -317,7 +319,9 @@ INSERT INTO `answers_questions_confirm_segment` (`id`, `question_id`, `respond_i
 (230, 58, 65, 'Га конечном'),
 (231, 59, 69, 'ответ'),
 (232, 60, 70, 'Ответ'),
-(233, 60, 71, 'Ответ');
+(233, 60, 71, 'Ответ'),
+(234, 61, 74, ''),
+(235, 61, 75, '');
 
 -- --------------------------------------------------------
 
@@ -345,7 +349,10 @@ INSERT INTO `authors` (`id`, `project_id`, `fio`, `role`, `experience`) VALUES
 (5, 3, 'Карпов', 'проектант', '1 год'),
 (6, 4, 'Порошин', 'президент', '30 лет'),
 (7, 5, 'Иванов', 'работник', '5 лет'),
-(8, 6, 'Сидоров', 'Петр', 'Генадьевич');
+(8, 6, 'Сидоров', 'Петр', 'Генадьевич'),
+(9, 7, 'Иванов Иван Петрович', 'Директор', 'Опыт работы 5 лет'),
+(10, 7, 'Петров Федор Ильич', 'зам.директора', 'Опыт работы 2 года'),
+(11, 7, 'Бородов Никита Васильевич', 'просто так)', 'Никакой))');
 
 -- --------------------------------------------------------
 
@@ -401,17 +408,17 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1653123309),
-(2, 28, 1653126158),
+(1, 1, 1654531984),
+(2, 28, 1654531932),
 (4, 9, 1643052427),
-(6, 21, 1652993718),
+(6, 21, 1653129850),
 (7, 22, 1652994039),
 (8, 16, 1629311867),
 (12, 31, 1650358511),
 (13, 37, 1649939796),
 (14, 39, 1650446057),
 (15, 40, 1652994086),
-(16, 44, 1652993764),
+(16, 44, 1653128596),
 (17, 45, 1652993801),
 (18, 46, 1647795086),
 (19, 47, 1652891120),
@@ -420,7 +427,8 @@ INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
 (22, 49, 1649852809),
 (23, 50, 1650228581),
 (24, 51, 1652870276),
-(25, 52, 1652896705);
+(25, 52, 1652896705),
+(26, 53, 1653129414);
 
 -- --------------------------------------------------------
 
@@ -602,7 +610,9 @@ INSERT INTO `client_user` (`id`, `user_id`, `client_id`) VALUES
 (20, 49, 1),
 (21, 50, 7),
 (22, 51, 8),
-(23, 52, 6);
+(23, 52, 6),
+(24, 53, 1),
+(25, 54, 1);
 
 -- --------------------------------------------------------
 
@@ -699,7 +709,8 @@ INSERT INTO `confirm_gcp` (`id`, `gcp_id`, `count_respond`, `count_positive`, `e
 (14, 17, 2, 1, '1'),
 (15, 19, 3, 2, '0'),
 (16, 21, 1, 1, '1'),
-(17, 22, 2, 2, '1');
+(17, 22, 2, 2, '1'),
+(18, 18, 1, 1, '0');
 
 -- --------------------------------------------------------
 
@@ -796,7 +807,8 @@ INSERT INTO `confirm_segment` (`id`, `segment_id`, `count_respond`, `count_posit
 (20, 35, 3, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0'),
 (21, 37, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1'),
 (22, 38, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1'),
-(23, 39, 2, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0');
+(23, 39, 2, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0'),
+(24, 36, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0');
 
 -- --------------------------------------------------------
 
@@ -819,7 +831,8 @@ INSERT INTO `conversation_admin` (`id`, `admin_id`, `user_id`, `updated_at`) VAL
 (4, 46, 1, 1647794764),
 (5, 21, 9, 1619020069),
 (6, 21, 16, 1619017372),
-(7, 45, 47, 1650382353);
+(7, 45, 47, 1650382353),
+(8, 46, 53, 1653129370);
 
 -- --------------------------------------------------------
 
@@ -857,7 +870,8 @@ INSERT INTO `conversation_development` (`id`, `dev_id`, `user_id`, `updated_at`)
 (19, 22, 38, 1650228263),
 (20, 22, 43, 1650228263),
 (21, 22, 44, 1650452915),
-(22, 22, 51, 1652721501);
+(22, 22, 51, 1652721501),
+(23, 22, 53, 1653129370);
 
 -- --------------------------------------------------------
 
@@ -2464,7 +2478,7 @@ INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `t
 (31, 1, 16, 1, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 10, 1640799155, 1640799752, NULL, NULL, '1'),
 (32, 21, 37, 6, 'ГПС 1', 'Описание гипотезы проблемы сегмента', 5, 1650458231, 1650458338, 1650458338, 1, '1'),
 (33, 22, 38, 5, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1652966620, 1652968466, 1652968466, 1, '1'),
-(34, 22, 38, 5, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1652966776, 1652968289, NULL, NULL, '0');
+(34, 22, 38, 5, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1652966776, 1653410835, NULL, NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -2504,12 +2518,13 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fullname`, `project_name`, `description`, `purpose_project`, `rid`, `patent_number`, `patent_date`, `patent_name`, `core_rid`, `technology`, `layout_technology`, `register_name`, `register_date`, `site`, `invest_name`, `invest_date`, `invest_amount`, `date_of_announcement`, `announcement_event`, `enable_expertise`) VALUES
-(1, 1, 1620473372, 1652970194, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интел', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект', 'Макет базовой технологии Макет базовой технологии Макет базовой технологии Макет базовой технологии Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые', '1'),
+(1, 1, 1620473372, 1654424322, 'Полное наименование проекта', 'Проект 1', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интеллектуальной деятельности Результат интел', 'Номер патента', 1622062800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект На какой технологии основан проект', 'Макет базовой технологии Макет базовой технологии Макет базовой технологии Макет базовой технологии Макет базовой технологии', 'Зарегистрированное юр. лицо', 1619643600, 'Адрес сайта', 'Инвестор', 1622062800, 50000, 1622149200, 'Мероприятие, на котором проект анонсирован впервые', '1'),
 (2, 9, 1629311577, 1629311577, 'Проект 1 (Карпов)', 'Проект 1 (Карпов)', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1627938000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1629406800, 'Адрес сайта', 'Инвестор', 1628197200, 50000, 1628542800, 'Мероприятие, на котором проект анонсирован впервые', '0'),
 (3, 9, 1629311661, 1629311661, 'Проект 2 (Карпов)', 'Проект 2 (Карпов)', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629406800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '0'),
 (4, 16, 1629311842, 1629311842, 'Сокращение расходов населения', 'Сокращение расходов населения', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629925200, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '0'),
-(5, 1, 1629312867, 1652969883, 'Перспективы города', 'Перспективы города', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629234000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1'),
-(6, 47, 1649013301, 1650458572, 'Новый проект 1', 'Новый проект 1', 'Новый проект 1', 'Создать проект', 'Результат интеллектуальной деятельности', 'Номер патента', 1650574800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1651093200, 'Адрес сайта', 'Инвестор', 1650488400, 50000, 1651006800, 'Мероприятие, на котором проект анонсирован впервые', '1');
+(5, 1, 1629312867, 1653410835, 'Перспективы города', 'Перспективы города', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629234000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1'),
+(6, 47, 1649013301, 1650458572, 'Новый проект 1', 'Новый проект 1', 'Новый проект 1', 'Создать проект', 'Результат интеллектуальной деятельности', 'Номер патента', 1650574800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1651093200, 'Адрес сайта', 'Инвестор', 1650488400, 50000, 1651006800, 'Мероприятие, на котором проект анонсирован впервые', '1'),
+(7, 1, 1653311886, 1653314420, 'Проект 3', 'Проект 3', 'Проект 3', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1653426000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '0');
 
 -- --------------------------------------------------------
 
@@ -2588,7 +2603,8 @@ INSERT INTO `questions_confirm_gcp` (`id`, `confirm_id`, `title`, `status`, `cre
 (18, 15, 'Что понравилось в решении и что нет?', 0, 1640801611, 1640801611),
 (19, 15, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1640801615, 1640801618),
 (20, 16, 'Что понравилось в решении и что нет?', 0, 1650458388, 1650458388),
-(21, 17, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1652968843, 1652968845);
+(21, 17, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1652968843, 1652968845),
+(22, 18, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1654424311, 1654424311);
 
 -- --------------------------------------------------------
 
@@ -2690,7 +2706,8 @@ INSERT INTO `questions_confirm_segment` (`id`, `confirm_id`, `title`, `status`, 
 (57, 19, 'Чем вы занимаетесь в настоящее время?', 1, 1640511855, 1640511883),
 (58, 19, 'На каком этапе проекта вы находитесь?', 0, 1640511861, 1640511861),
 (59, 21, 'Что получается и что не получается в вашем проекте? Приведите примеры.', 0, 1650458169, 1650458169),
-(60, 22, 'Как вы добиваетесь достижения поставленной цели?', 1, 1652966185, 1652966188);
+(60, 22, 'Как вы добиваетесь достижения поставленной цели?', 1, 1652966185, 1652966188),
+(61, 24, 'Что пытались сделать, чтобы определить верные последовательные действия?', 1, 1653128742, 1653128744);
 
 -- --------------------------------------------------------
 
@@ -2764,7 +2781,8 @@ INSERT INTO `responds_gcp` (`id`, `confirm_id`, `name`, `info_respond`, `email`,
 (45, 15, 'Сидоров Николай Николаевич', 'Данные респондента', '', NULL, 'Место проведения интервью'),
 (46, 16, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью'),
 (47, 17, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью'),
-(48, 17, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью');
+(48, 17, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью'),
+(49, 18, 'Респондент 2', 'Данные респондента', '', 1654376400, 'Место проведения интервью');
 
 -- --------------------------------------------------------
 
@@ -2897,7 +2915,9 @@ INSERT INTO `responds_segment` (`id`, `confirm_id`, `name`, `info_respond`, `ema
 (70, 22, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью'),
 (71, 22, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью'),
 (72, 23, 'Респондент 1', '', '', NULL, ''),
-(73, 23, 'Респондент 2', '', '', NULL, '');
+(73, 23, 'Респондент 2', '', '', NULL, ''),
+(74, 24, 'Респондент 1', '', '', NULL, ''),
+(75, 24, 'Респондент 2', '', '', NULL, '');
 
 -- --------------------------------------------------------
 
@@ -2944,10 +2964,11 @@ INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_inte
 (33, 1, 'Сегмент 5', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 6, 7, 4, 5, 8, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1624393383, 1640109970, 1625001207, 1, '0'),
 (34, 1, 'Сегмент 6', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 77, 88, 55, 66, 1000000, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1633512488, 1640715427, 1640682103, 1, '1'),
 (35, 1, 'Сегмент 7', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 7, 8, 70, 50, 5000, 5000, 8, 9, 4, NULL, NULL, 'Дополнительная информация', 1640798226, 1640798537, NULL, NULL, '1'),
-(36, 1, 'Сегмент 8', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 8, 9, 6, 7, 4, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1640798526, 1640798526, NULL, NULL, '0'),
+(36, 1, 'Сегмент 8', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 8, 9, 6, 7, 4, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1640798526, 1653128715, NULL, NULL, '1'),
 (37, 6, 'Сегмент 1', 'Сегмент 1', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 22, 55, 70, 300, 5000, 50000, 100, 200, 400, NULL, NULL, '', 1650457898, 1650458213, 1650458213, 1, '1'),
 (38, 5, 'Сегмент 1', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 4, 56, 70, 50, 40000, 80000, 10, 100, 15, NULL, NULL, '', 1652965736, 1652966588, 1652966588, 1, '1'),
-(39, 5, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 10, 50, 1000, 20000, 999, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1652965800, 1652966646, NULL, NULL, '1');
+(39, 5, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 10, 50, 1000, 20000, 999, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1652965800, 1652966646, NULL, NULL, '1'),
+(40, 5, 'Сегмент 3', 'Сегмент 3', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 40, 80, 70, 300, 60000, 90000, 10, 20, 15, NULL, NULL, 'Дополнительная информация', 1653388328, 1653388347, NULL, NULL, '0');
 
 -- --------------------------------------------------------
 
@@ -2981,9 +3002,6 @@ INSERT INTO `types_access_to_expertise` (`id`, `communication_id`, `project_id`,
 
 CREATE TABLE `user` (
   `id` int(11) UNSIGNED NOT NULL,
-  `second_name` varchar(255) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `middle_name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
@@ -3003,29 +3021,31 @@ CREATE TABLE `user` (
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `second_name`, `first_name`, `middle_name`, `email`, `username`, `password_hash`, `avatar_max_image`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
-(1, 'Иванов', 'Иван', 'Иванович', 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 46, 1582408272, 1652970194),
-(9, 'Карпов', 'Антон', 'Петрович', 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1629311661),
-(16, 'Порошин', 'Виктор', 'Николаевич', 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1629311842),
-(21, 'Дибров', 'Дмитрий', 'Владимирович', 'dibrov@mail.ru', 'Dibrov', '$2y$13$8qmD5Jj5YMbUl4HlyU9OqODvek.tgm1GU/zhmk6iM8lBeJh1hWhjK', '7AzQAtxQm1c.jpg', 'avatar_9Vc9GrGT_min.png', 'wd9PcB_fY8b_L_W9Rjdp3hxteBd0OQyy', NULL, 20, 10, 20, NULL, 1586614816, 1627203712),
-(22, 'Техническая', 'поддержка', 'StartPool', 'dev@mail.com', 'dev', '$2y$13$KAt3g3ocWpm5cow7dsZOKOqRhaYZM1Qq27QTApSf/UYdRJPjU4Uji', 'technical-support-services.png', 'avatar_-6gVzcWi_min.png', 'hPQR4GvMfRsUnepawhOYlHhy80y--6ki', NULL, 100, 10, 20, NULL, 1586957787, 1617049090),
-(28, 'Spaccel', 'Администратор', 'компании', 'alex.latukhin@mail.ru', 'MainAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', 'background_for_main_page.png', 'avatar_dy9VW45c_min.png', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 30, 10, 20, NULL, 1587560218, 1615307246),
-(29, 'Хрущев', 'Никита', 'Сергеевич', 'hrust@yandex.ru', 'hrust', '$2y$13$VqFILzTszNEYP3vKNvTo/OR0qrfIKFYP1/ZSnvJExP13w4y.oDVW.', '', '', 'CA4mobzRtKA2LLSohPZIWTHT-XkdBd3d', NULL, 10, 0, 20, 21, 1613504385, 1630236539),
-(31, 'Экспертов', 'Петр', 'Иванович', 'aleksejj.latukhin@mail.ru', 'expertov', '$2y$13$CoDvU0pYkxcW9.Ksz8ynBOZnasD1jxvxThXH3izeHwN9eNt5SAs3m', 'shutterstock_235978021.jpg', 'avatar_64T4qnrK_min.png', 'ZE5naj0yFMRZhC0sffb-gH06bqyZsnHD', NULL, 40, 10, 20, NULL, 1627149710, 1629032476),
-(37, 'Суриков', 'Иван', 'Федорович', 'aleksejj.latukhin@rambler.ru', 'SurikoV', '$2y$13$UAhxmjmY0BU7zoppdsZeJ.B0fo9a/5kS2olqixpkUb1tlfAU7sBMS', 'iStock_000040123844_small.jpg', 'avatar_-3zHF6rV_min.png', 'kWUWoylcl_KEaW5Ps86EFzk4lVBOJl-6', NULL, 40, 10, 20, NULL, 1628794951, 1629030988),
-(38, 'Тестовая организация', 'Администратор', 'компании', 'TestAdmin@gmail.com', 'TestAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', '', '', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 25, 10, 20, NULL, 1587560218, 1615307246),
-(39, 'Рюрик', 'Иван', 'Васильевич', 'alex.latukhin2015@yandex.ru', 'rurikov', '$2y$13$tlueVgHYVDj0LQK0lgjK6.SOA7LC8qGxUfprIHQGEiQW8Myidk8Z6', 'ivan_groza.jpg', 'avatar_JE8QjyhR_min.png', 'npphD82ecZyUDLSVZYU7xANgw2WapS_2', NULL, 50, 10, 20, NULL, 1643648083, 1650025377),
-(40, 'Романов', 'Михаил', 'Федорович', 'misharomanofff2@gmail.com', 'misharomanof', '$2y$13$zEGj6/jbwZu8usKl5xElfedp69U5TH8bfhwKFlaBfIZYg40E5viA2', 'michail_romanoff.jpg', 'avatar_Ccqfq0S9_min.png', '5ItOChQKfd6qdg1KF9sxC5jXQPLf493r', NULL, 50, 10, 20, NULL, 1643660239, 1650025293),
-(43, 'Фамилия', 'Имя', 'Отчество', 'email@mail.com', 'login', '$2y$13$54/PDqIPwQR.f5LufrUk/uPt/lHEdpsgq2G.jvUdjoJ3b7ymgDq7u', '', '', 'oF4-ysmunBMEyRJWwr-doWCA4LS-aI9C', NULL, 25, 10, 20, NULL, 1645973883, 1645973883),
-(44, 'Сидоров', 'Иван', 'Петрович', 'fedotovmihail831@gmail.com', 'adminsidorov', '$2y$13$HfZnVRN635SSsS6jWvxTjOfra//eWsnDoUq9oOWwLUJpgpMcTtUuy', '1591437999_24-p-karikatura-na-stallone-34.jpg', 'avatar_jgf2Dam6_min.png', 'rDa5ZwccU-J5sPup8zV0qWRNsJVGemyN', NULL, 25, 10, 20, NULL, 1647083674, 1650531352),
-(45, 'Сергеев', 'Сергей', 'Сергеевич', 'site.startup@mail.ru', 'trackerCompany', '$2y$13$D6BE4IjTaBex6YdJIG4ONuMRg87JIDmMxfMgdRzEv6.kVxks65Gu6', '', '', 'ncFQbSLBMGN5s7u_d_N4CtAdB3wOxnbI', NULL, 20, 10, 20, NULL, 1647771763, 1650531575),
-(46, 'Денисов', 'Денис', 'Денисович', 'info.site.startup@mail.ru', 'denisov', '$2y$13$pHq7sGw0N3UyBGU21uDEqOs6S41bSZWEl01oONN3kMLH8XHiISmK.', '', '', 'Ygg0wE_fwoRh1QeSUCNt6x4DyDHp6WOl', NULL, 20, 10, 20, NULL, 1647794456, 1647794631),
-(47, 'Киррилов', 'Мефодий', 'Азбукович', 'test.user.project@mail.ru', 'SimpleUserCompany', '$2y$13$KjvtEA5EVE78Rckdarjt4OkgeLMH/X9skxGNCpQ2.XJLuVvqfEWrm', '', '', 'u9qywElEgfctFuh0MIHamdIpsqv8WpuK', NULL, 10, 10, 20, 45, 1647887269, 1650529637),
-(48, 'Экспертизный', 'Алексей', 'Борисович', 'aleksejj.latukhin2022@yandex.ru', 'expertCompany', '$2y$13$gwC0VYPw/Ju81c/3ZGycs.QJ99Nw4FmtfGmP99YwtVgnX6/f0fsxa', '', '', 'pfZbk2iRW9CDWEJPCCFGaDKv59is_izY', NULL, 40, 10, 20, NULL, 1649591315, 1649599502),
-(49, 'Экпертный', 'Эксперт', 'Лаборантович', 'alex.latukhin2020@yandex.ru', 'expertSpaccel', '$2y$13$wWK1SL.qd1clQWt/cth.oOEqmu9hNHHUq05pUVIAJc7bZ35DenTRq', '', '', 'yuI_bFMjzJlTQ2YEY4B8tFML05reNiQq', NULL, 40, 10, 20, NULL, 1649597041, 1649597180),
-(50, 'Пригожин', 'Павел', 'Анатольевич', 'alex.latukhin2022@yandex.ru', 'adminPrig', '$2y$13$D3pAWLrpnAb6OKfAryihqeX43QoCwhXxNNtVhUH0G7ObfoJAkkFhm', '', '', '_Mrdn-hxOOYtZTvShmsiuNh-cd6_6__v', NULL, 25, 10, 20, NULL, 1650228262, 1650228262),
-(51, 'Тестовый', 'Админ', 'Организации', 'alex.latukhin2023@yandex.ru', 'testAdminCompany', '$2y$13$srmtE.9mn0Mcbhbk9KxCTeSNBI84w1OzN0MDhX27YMI8p7ZFNtwV2', '', '', 'kW2t3FI2YzI8NVhnuB12h1CNbCRY23LK', NULL, 25, 10, 20, NULL, 1652721500, 1652721500),
-(52, 'Николаев', 'Борис', 'Николаевич', 'alatuhin1401@yandex.ru', '2SimpleUserCompany', '$2y$13$tzWLfz/a6Gr0F9nr4gTXTO8DxVP/BF0uXgxT2DjwNar.5QDqqtUOC', '', '', 'FXD-KLF0HYSiYEWOXG9I516sJQgg6ibV', NULL, 10, 1, 20, NULL, 1652896605, 1652896635);
+INSERT INTO `user` (`id`, `email`, `username`, `password_hash`, `avatar_max_image`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
+(1, 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_5eJwCEX2_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 46, 1582408272, 1654424322),
+(9, 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1629311661),
+(16, 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1629311842),
+(21, 'dibrov@mail.ru', 'Dibrov', '$2y$13$8qmD5Jj5YMbUl4HlyU9OqODvek.tgm1GU/zhmk6iM8lBeJh1hWhjK', '7AzQAtxQm1c.jpg', 'avatar_9Vc9GrGT_min.png', 'wd9PcB_fY8b_L_W9Rjdp3hxteBd0OQyy', NULL, 20, 10, 20, NULL, 1586614816, 1627203712),
+(22, 'dev@mail.com', 'dev', '$2y$13$KAt3g3ocWpm5cow7dsZOKOqRhaYZM1Qq27QTApSf/UYdRJPjU4Uji', 'technical-support-services.png', 'avatar_-6gVzcWi_min.png', 'hPQR4GvMfRsUnepawhOYlHhy80y--6ki', NULL, 100, 10, 20, NULL, 1586957787, 1617049090),
+(28, 'alex.latukhin@mail.ru', 'MainAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', 'background_for_main_page.png', 'avatar_dy9VW45c_min.png', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 30, 10, 20, NULL, 1587560218, 1615307246),
+(29, 'hrust@yandex.ru', 'hrust', '$2y$13$VqFILzTszNEYP3vKNvTo/OR0qrfIKFYP1/ZSnvJExP13w4y.oDVW.', '', '', 'CA4mobzRtKA2LLSohPZIWTHT-XkdBd3d', NULL, 10, 0, 20, 21, 1613504385, 1630236539),
+(31, 'aleksejj.latukhin@mail.ru', 'expertov', '$2y$13$CoDvU0pYkxcW9.Ksz8ynBOZnasD1jxvxThXH3izeHwN9eNt5SAs3m', 'shutterstock_235978021.jpg', 'avatar_64T4qnrK_min.png', 'ZE5naj0yFMRZhC0sffb-gH06bqyZsnHD', NULL, 40, 10, 20, NULL, 1627149710, 1629032476),
+(37, 'aleksejj.latukhin@rambler.ru', 'SurikoV', '$2y$13$UAhxmjmY0BU7zoppdsZeJ.B0fo9a/5kS2olqixpkUb1tlfAU7sBMS', 'iStock_000040123844_small.jpg', 'avatar_-3zHF6rV_min.png', 'kWUWoylcl_KEaW5Ps86EFzk4lVBOJl-6', NULL, 40, 10, 20, NULL, 1628794951, 1629030988),
+(38, 'TestAdmin@gmail.com', 'TestAdmin', '$2y$13$cTWHKk2IziK6WtZeN9r0xON0GsDl6G29ll46dJ7ySFfchjV/llFwm', '', '', 'HKGOWAZUrUpkLjP4knCiJGKQD7XLeBIc', NULL, 25, 10, 20, NULL, 1587560218, 1615307246),
+(39, 'alex.latukhin2015@yandex.ru', 'rurikov', '$2y$13$tlueVgHYVDj0LQK0lgjK6.SOA7LC8qGxUfprIHQGEiQW8Myidk8Z6', 'ivan_groza.jpg', 'avatar_JE8QjyhR_min.png', 'npphD82ecZyUDLSVZYU7xANgw2WapS_2', NULL, 50, 10, 20, NULL, 1643648083, 1650025377),
+(40, 'misharomanofff2@gmail.com', 'misharomanof', '$2y$13$zEGj6/jbwZu8usKl5xElfedp69U5TH8bfhwKFlaBfIZYg40E5viA2', 'michail_romanoff.jpg', 'avatar_Ccqfq0S9_min.png', '5ItOChQKfd6qdg1KF9sxC5jXQPLf493r', NULL, 50, 10, 20, NULL, 1643660239, 1650025293),
+(43, 'email@mail.com', 'login', '$2y$13$54/PDqIPwQR.f5LufrUk/uPt/lHEdpsgq2G.jvUdjoJ3b7ymgDq7u', '', '', 'oF4-ysmunBMEyRJWwr-doWCA4LS-aI9C', NULL, 25, 10, 20, NULL, 1645973883, 1645973883),
+(44, 'fedotovmihail831@gmail.com', 'adminsidorov', '$2y$13$HfZnVRN635SSsS6jWvxTjOfra//eWsnDoUq9oOWwLUJpgpMcTtUuy', '1591437999_24-p-karikatura-na-stallone-34.jpg', 'avatar_jgf2Dam6_min.png', 'rDa5ZwccU-J5sPup8zV0qWRNsJVGemyN', NULL, 25, 10, 20, NULL, 1647083674, 1650531352),
+(45, 'site.startup@mail.ru', 'trackerCompany', '$2y$13$D6BE4IjTaBex6YdJIG4ONuMRg87JIDmMxfMgdRzEv6.kVxks65Gu6', '', '', 'ncFQbSLBMGN5s7u_d_N4CtAdB3wOxnbI', NULL, 20, 10, 20, NULL, 1647771763, 1650531575),
+(46, 'info.site.startup@mail.ru', 'denisov', '$2y$13$pHq7sGw0N3UyBGU21uDEqOs6S41bSZWEl01oONN3kMLH8XHiISmK.', '', '', 'Ygg0wE_fwoRh1QeSUCNt6x4DyDHp6WOl', NULL, 20, 10, 20, NULL, 1647794456, 1647794631),
+(47, 'test.user.project@mail.ru', 'SimpleUserCompany', '$2y$13$KjvtEA5EVE78Rckdarjt4OkgeLMH/X9skxGNCpQ2.XJLuVvqfEWrm', '', '', 'u9qywElEgfctFuh0MIHamdIpsqv8WpuK', NULL, 10, 10, 20, 45, 1647887269, 1650529637),
+(48, 'aleksejj.latukhin2022@yandex.ru', 'expertCompany', '$2y$13$gwC0VYPw/Ju81c/3ZGycs.QJ99Nw4FmtfGmP99YwtVgnX6/f0fsxa', '', '', 'pfZbk2iRW9CDWEJPCCFGaDKv59is_izY', NULL, 40, 10, 20, NULL, 1649591315, 1649599502),
+(49, 'alex.latukhin2020@yandex.ru', 'expertSpaccel', '$2y$13$wWK1SL.qd1clQWt/cth.oOEqmu9hNHHUq05pUVIAJc7bZ35DenTRq', '', '', 'yuI_bFMjzJlTQ2YEY4B8tFML05reNiQq', NULL, 40, 10, 20, NULL, 1649597041, 1649597180),
+(50, 'alex.latukhin2022@yandex.ru', 'adminPrig', '$2y$13$D3pAWLrpnAb6OKfAryihqeX43QoCwhXxNNtVhUH0G7ObfoJAkkFhm', '', '', '_Mrdn-hxOOYtZTvShmsiuNh-cd6_6__v', NULL, 25, 10, 20, NULL, 1650228262, 1650228262),
+(51, 'alex.latukhin2023@yandex.ru', 'testAdminCompany', '$2y$13$srmtE.9mn0Mcbhbk9KxCTeSNBI84w1OzN0MDhX27YMI8p7ZFNtwV2', '', '', 'kW2t3FI2YzI8NVhnuB12h1CNbCRY23LK', NULL, 25, 10, 20, NULL, 1652721500, 1652721500),
+(52, 'alatuhin1401@yandex.ru', '2SimpleUserCompany', '$2y$13$tzWLfz/a6Gr0F9nr4gTXTO8DxVP/BF0uXgxT2DjwNar.5QDqqtUOC', '', '', 'FXD-KLF0HYSiYEWOXG9I516sJQgg6ibV', NULL, 10, 1, 20, NULL, 1652896605, 1652896635),
+(53, 'testUser@yandex.ru', 'testUser', '$2y$13$bncbWYRm6eBEsiEd7Fpj3OlcvsNaznvB9SdKRfQVod99bl.9/45hS', '', '', 'ZL5M3JnuIRa_O_eRIY5bD6SXUlFJ-5Wm', NULL, 10, 10, 20, 46, 1653129286, 1653129370),
+(54, 'alatuhin1428@yandex.ru', 'PetrovProjectUser', '$2y$13$ETPYGt0E0ZZynyC1.vXeYO84zsAWtW5axX5685YwMLITu7fBfTQMG', '', '', 'rzhx5Fa67SVic1VZxkMw_cEP5BfZR_8t', NULL, 10, 1, 20, NULL, 1653224322, 1653224374);
 
 -- --------------------------------------------------------
 
@@ -3462,7 +3482,7 @@ ALTER TABLE `user_access_to_projects`
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_gcp`
 --
 ALTER TABLE `all_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_mvp`
@@ -3486,7 +3506,7 @@ ALTER TABLE `all_questions_confirm_segment`
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_gcp`
 --
 ALTER TABLE `answers_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_mvp`
@@ -3504,13 +3524,13 @@ ALTER TABLE `answers_questions_confirm_problem`
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_segment`
 --
 ALTER TABLE `answers_questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=236;
 
 --
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
@@ -3522,7 +3542,7 @@ ALTER TABLE `business_model`
 -- AUTO_INCREMENT для таблицы `checking_online_user`
 --
 ALTER TABLE `checking_online_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT для таблицы `client`
@@ -3552,7 +3572,7 @@ ALTER TABLE `client_settings`
 -- AUTO_INCREMENT для таблицы `client_user`
 --
 ALTER TABLE `client_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT для таблицы `communication_patterns`
@@ -3570,7 +3590,7 @@ ALTER TABLE `communication_response`
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
@@ -3588,19 +3608,19 @@ ALTER TABLE `confirm_problem`
 -- AUTO_INCREMENT для таблицы `confirm_segment`
 --
 ALTER TABLE `confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_admin`
 --
 ALTER TABLE `conversation_admin`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_development`
 --
 ALTER TABLE `conversation_development`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_expert`
@@ -3756,7 +3776,7 @@ ALTER TABLE `problems`
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `project_communications`
@@ -3768,7 +3788,7 @@ ALTER TABLE `project_communications`
 -- AUTO_INCREMENT для таблицы `questions_confirm_gcp`
 --
 ALTER TABLE `questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_mvp`
@@ -3786,7 +3806,7 @@ ALTER TABLE `questions_confirm_problem`
 -- AUTO_INCREMENT для таблицы `questions_confirm_segment`
 --
 ALTER TABLE `questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT для таблицы `rates_plan`
@@ -3798,7 +3818,7 @@ ALTER TABLE `rates_plan`
 -- AUTO_INCREMENT для таблицы `responds_gcp`
 --
 ALTER TABLE `responds_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_mvp`
@@ -3816,13 +3836,13 @@ ALTER TABLE `responds_problem`
 -- AUTO_INCREMENT для таблицы `responds_segment`
 --
 ALTER TABLE `responds_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT для таблицы `segments`
 --
 ALTER TABLE `segments`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT для таблицы `types_access_to_expertise`
@@ -3834,7 +3854,7 @@ ALTER TABLE `types_access_to_expertise`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT для таблицы `user_access_to_projects`

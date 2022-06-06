@@ -3,9 +3,14 @@
 
 namespace app\models\interfaces;
 
-
 use yii\db\ActiveQuery;
 
+/**
+ * Интерфейс для классов, которые реализуют подтверждение гипотез
+ *
+ * Interface ConfirmationInterface
+ * @package app\models\interfaces
+ */
 interface ConfirmationInterface
 {
 
@@ -25,9 +30,14 @@ interface ConfirmationInterface
 
     /**
      * Установить кол-во респондентов
-     * @param $count
+     * @param int $count
      */
     public function setCountRespond($count);
+
+    /**
+     * @return int
+     */
+    public function getCountRespond();
 
 
     /**

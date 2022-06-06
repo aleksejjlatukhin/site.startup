@@ -14,7 +14,7 @@ class SearchFormExperts extends Model
 {
 
     /**
-     * ФИО эксперта
+     * Логин эксперта
      * @var string
      */
     public $name;
@@ -68,17 +68,7 @@ class SearchFormExperts extends Model
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
             ->where(['role' => User::ROLE_EXPERT, 'status' => User::STATUS_ACTIVE, 'client_user.client_id' => $client->getId()])
             ->andWhere(['REGEXP', 'expert_info.type', $type])
-            ->andWhere(['or',
-                ['like', 'second_name', $name],
-                ['like', 'first_name', $name],
-                ['like', 'middle_name', $name],
-                ['like', "CONCAT( second_name, ' ', first_name, ' ', middle_name)", $name],
-                ['like', "CONCAT( second_name, ' ', middle_name, ' ', first_name)", $name],
-                ['like', "CONCAT( first_name, ' ', middle_name, ' ', second_name)", $name],
-                ['like', "CONCAT( first_name, ' ', second_name, ' ', middle_name)", $name],
-                ['like', "CONCAT( middle_name, ' ', first_name, ' ', second_name)", $name],
-                ['like', "CONCAT( middle_name, ' ', second_name, ' ', first_name)", $name],
-            ]);
+            ->andWhere(['like', 'username', $name]);
 
         foreach ($keywords as $keyword) {
             $experts->orOnCondition(['like', 'keywords_expert.description', $keyword]);

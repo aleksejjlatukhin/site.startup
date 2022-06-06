@@ -35,7 +35,7 @@ use app\models\ExpertType;
 
         <div class="col-md-12">
 
-            <label for="SearchFormExperts[name]">ФИО эксперта</label>
+            <label for="SearchFormExperts[name]">Логин эксперта</label>
             <?= $form->field($searchFormExperts, 'name', ['template' => '{input}'])
                 ->textInput([
                     'class' => 'style_form_field_respond',

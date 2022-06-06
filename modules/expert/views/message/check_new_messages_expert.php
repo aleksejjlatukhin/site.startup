@@ -44,7 +44,7 @@ use app\modules\expert\models\MessageExpert;
 
                         <?php else : ?>
 
-                            <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                            <div class="interlocutor"><?= $user->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>
@@ -98,7 +98,7 @@ use app\modules\expert\models\MessageExpert;
 
                         <?php else : ?>
 
-                            <div class="interlocutor"><?= $user->second_name . ' ' . $user->first_name . ' ' . $user->middle_name; ?></div>
+                            <div class="interlocutor"><?= $user->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>
@@ -147,7 +147,7 @@ use app\modules\expert\models\MessageExpert;
 
                     <div class="sender_data">
                         <div class="sender_info">
-                            <div class="interlocutor"><?= $expert->second_name . ' ' . $expert->first_name . ' ' . $expert->middle_name; ?></div>
+                            <div class="interlocutor"><?= $expert->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>
@@ -187,7 +187,7 @@ use app\modules\expert\models\MessageExpert;
 
                     <div class="sender_data">
                         <div class="sender_info">
-                            <div class="interlocutor"><?= $expert->second_name . ' ' . $expert->first_name . ' ' . $expert->middle_name; ?></div>
+                            <div class="interlocutor"><?= $expert->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>
@@ -231,7 +231,7 @@ use app\modules\expert\models\MessageExpert;
 
                     <div class="sender_data">
                         <div class="sender_info">
-                            <div class="interlocutor"><?= $expert->second_name . ' ' . $expert->first_name . ' ' . $expert->middle_name; ?></div>
+                            <div class="interlocutor"><?= $expert->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>
@@ -271,7 +271,7 @@ use app\modules\expert\models\MessageExpert;
 
                     <div class="sender_data">
                         <div class="sender_info">
-                            <div class="interlocutor"><?= $expert->second_name . ' ' . $expert->first_name . ' ' . $expert->middle_name; ?></div>
+                            <div class="interlocutor"><?= $expert->username; ?></div>
                             <div>
                                 <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                 <?= date('H:i', $message['created_at']); ?>

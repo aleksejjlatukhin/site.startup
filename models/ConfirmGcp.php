@@ -8,11 +8,15 @@ use yii\db\ActiveRecord;
 
 /**
  * Класс, который хранит объекты подтверждений ценностных предложений в бд
+ *
  * Class ConfirmGcp
  * @package app\models
  *
- * @property int $id
- * @property mixed $enable_expertise
+ * @property int $id                                    Идентификатор записи в таб. confirm_gcp
+ * @property int $gcp_id                                Идентификатор записи в таб. gcps
+ * @property int $count_respond                         Количество респондентов
+ * @property int $count_positive                        Количество респондентов, подтверждающих ценностное предложение
+ * @property int $enable_expertise                      Параметр разрешения на экспертизу по даному этапу
  */
 class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 {
@@ -41,17 +45,19 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Проверка на ограничение кол-ва респондентов
+     *
      * @return bool
      */
     public function checkingLimitCountRespond()
     {
-        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        if ($this->getCountRespond() < self::LIMIT_COUNT_RESPOND) return true;
         else return false;
     }
 
 
     /**
      * Получить объект текущего Gcps
+     *
      * @return ActiveQuery
      */
     public function getGcp()
@@ -61,7 +67,19 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Найти ЦП, к которому относится подтверждение
+     *
+     * @return Gcps|null
+     */
+    public function findGcp()
+    {
+        return Gcps::findOne($this->getGcpId());
+    }
+
+
+    /**
      * Получить респондентов привязанных к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getResponds()
@@ -72,6 +90,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить все объекты Mvps данного подтверждения
+     *
      * @return ActiveQuery
      */
     public function getMvps()
@@ -82,6 +101,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить вопросы привязанные к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getQuestions()
@@ -91,64 +111,19 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Установить кол-во респондентов
-     * @param $count
+     * Найти вопросы привязанные к подтверждению
+     *
+     * @return QuestionsConfirmGcp[]
      */
-    public function setCountRespond($count)
+    public function findQuestions()
     {
-        $this->count_respond = $count;
-    }
-
-
-    /**
-     * @param $count
-     */
-    public function setCountPositive($count)
-    {
-        $this->count_positive = $count;
-    }
-
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function setGcpId($id)
-    {
-        return $this->gcp_id = $id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getGcpId()
-    {
-        return $this->gcp_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return int
-     */
-    public function getEnableExpertise()
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise()
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return QuestionsConfirmGcp::findAll(['confirm_id' => $this->getId()]);
     }
 
 
     /**
      * Получить гипотезу подтверждения
+     *
      * @return ActiveQuery
      */
     public function getHypothesis()
@@ -207,6 +182,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Список вопросов, который будет показан для добавления нового вопроса
+     *
      * @return array
      */
     public function queryQuestionsGeneralList()
@@ -254,11 +230,11 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     {
         $count_interview = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         $count_positive = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_gcp.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 
         if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->mvps))) {
             return true;
@@ -274,7 +250,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsGcp::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsGcp::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -289,7 +265,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         // Кол-во респондентов, у кот-х существует анкета
         $count = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         return $count;
     }
@@ -303,7 +279,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         // Кол-во подтвердивших ЦП
         $count = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_gcp.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 
         return $count;
     }
@@ -327,4 +303,77 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         return $cachePath;
     }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setGcpId($id)
+    {
+        $this->gcp_id = $id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getGcpId()
+    {
+        return $this->gcp_id;
+    }
+
+    /**
+     * Установить кол-во респондентов
+     * @param int $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountRespond()
+    {
+        return $this->count_respond;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountPositive()
+    {
+        return $this->count_positive;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
 }

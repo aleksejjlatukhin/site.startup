@@ -135,9 +135,7 @@ class ProjectsController extends AppAdminController
     public function actionGroup ($id)
     {
         $tracker = User::findOne($id);
-        Yii::$app->view->title = 'Портфель проектов трекера «' . $tracker->getSecondName() .
-            ' ' . mb_substr($tracker->getFirstName(), 0, 1) .
-            '.' . mb_substr($tracker->getMiddleName(), 0, 1) . '.»';
+        Yii::$app->view->title = 'Портфель проектов трекера «' . $tracker->getUsername(). '.»';
         $pageClientProjects = false;
         $sortModel = new SortForm();
         $show_count_projects = ['10' => 'по 10 проектов', '20' => 'по 20 проектов', '30' => 'по 30 проектов'];

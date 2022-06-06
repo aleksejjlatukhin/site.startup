@@ -269,7 +269,7 @@ class CommunicationsController extends AppExpertController
             return Yii::$app->mailer->compose('communications__FromExpertToMainAdmin', ['user' => $user, 'communication' => $communication])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
                 ->setTo($admin->email)
-                ->setSubject('Эксперт '.$user->second_name. ' '.$user->first_name.' отправил Вам новое уведомление на сайте Spaccel.ru')
+                ->setSubject('Эксперт '.$user->username.' отправил Вам новое уведомление на сайте Spaccel.ru')
                 ->send();
         }
 

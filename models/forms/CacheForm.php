@@ -7,6 +7,12 @@ use Yii;
 use yii\base\ErrorException;
 use yii\helpers\FileHelper;
 
+/**
+ * Менеджер для работы с кэшем
+ *
+ * Class CacheForm
+ * @package app\models\forms
+ */
 class CacheForm
 {
 

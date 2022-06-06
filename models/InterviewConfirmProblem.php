@@ -12,13 +12,28 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
-
+/**
+ * Класс хранит информацию в бд о проведении интервью с респондентом
+ * на этапе подтверждения гипотезы проблемы сегмента
+ *
+ * Class InterviewConfirmProblem
+ * @package app\models
+ *
+ * @property int $id                                    Идентификатор записи
+ * @property int $respond_id                            Идентификатор респондента из таб. responds_problem
+ * @property string $interview_file                     Имя файла, с которым он был загружен
+ * @property string $server_file                        Сгенерированное имя прикрепленного файла на сервере
+ * @property int $status                                Значимость ЦП для респондента
+ * @property int $created_at                            Дата создания
+ * @property int $updated_at                            Дата редактирования
+ * @property $loadFile                                  Поле для загрузки файла
+ * @property CacheForm $_cacheManager                   Менеджер кэширования
+ */
 class InterviewConfirmProblem extends ActiveRecord
 {
 
     public $loadFile;
     public $_cacheManager;
-
 
     /**
      * {@inheritdoc}
@@ -28,21 +43,20 @@ class InterviewConfirmProblem extends ActiveRecord
         return 'interview_confirm_problem';
     }
 
-
     /**
      * InterviewConfirmProblem constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
     {
-        $this->_cacheManager = new CacheForm();
-
+        $this->setCacheManager();
         parent::__construct($config);
     }
 
-
     /**
      * Получить объект респондента
+     *
      * @return ActiveQuery
      */
     public function getRespond()
@@ -50,42 +64,30 @@ class InterviewConfirmProblem extends ActiveRecord
         return $this->hasOne(RespondsProblem::class, ['id' => 'respond_id']);
     }
 
-
     /**
-     * @param $id
+     * @return RespondsProblem|null
      */
-    public function setRespondId($id)
+    public function findRespond()
     {
-        $this->respond_id = $id;
+        return RespondsProblem::findOne($this->getRespondId());
     }
-
-
-    /**
-     * @return mixed
-     */
-    public function getRespondId()
-    {
-        return $this->respond_id;
-    }
-
 
     /**
      * @return string
      */
     public function getPathFile()
     {
-        $respond = $this->respond;
-        $confirm = $respond->confirm;
-        $problem = $confirm->problem;
-        $segment = $problem->segment;
-        $project = $problem->project;
-        $user = $project->user;
-        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id
-            .'/problems/problem-'.$problem->id.'/interviews/respond-'.$respond->id.'/';
+        $respond = $this->findRespond();
+        $confirm = $respond->findConfirm();
+        $problem = $confirm->findProblem();
+        $segment = $problem->findSegment();
+        $project = $problem->findProject();
+        $user = $project->findUser();
+        $path = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId()
+            .'/problems/problem-'.$problem->getId().'/interviews/respond-'.$respond->getId().'/';
 
         return $path;
     }
-
 
     /**
      * @param RespondsProblem $respond
@@ -93,17 +95,16 @@ class InterviewConfirmProblem extends ActiveRecord
      */
     public static function getCachePath($respond)
     {
-        $confirm = $respond->confirm;
-        $problem = $confirm->problem;
-        $segment = $problem->segment;
-        $project = $problem->project;
-        $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.
-            '/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.'/confirm/interviews/respond-'.$respond->id.'/';
+        $confirm = $respond->findConfirm();
+        $problem = $confirm->findProblem();
+        $segment = $problem->findSegment();
+        $project = $problem->findProject();
+        $user = $project->findUser();
+        $cachePath = '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId().
+            '/segments/segment-'.$segment->getId().'/problems/problem-'.$problem->getId().'/confirm/interviews/respond-'.$respond->getId().'/';
 
         return $cachePath;
     }
-
 
     /**
      * {@inheritdoc}
@@ -118,7 +119,6 @@ class InterviewConfirmProblem extends ActiveRecord
         ];
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -130,7 +130,6 @@ class InterviewConfirmProblem extends ActiveRecord
         ];
     }
 
-
     /**
      * @return array
      */
@@ -140,7 +139,6 @@ class InterviewConfirmProblem extends ActiveRecord
             TimestampBehavior::class
         ];
     }
-
 
     public function init()
     {
@@ -158,7 +156,6 @@ class InterviewConfirmProblem extends ActiveRecord
         parent::init();
     }
 
-
     /**
      * @return bool
      * @throws NotFoundHttpException
@@ -168,11 +165,11 @@ class InterviewConfirmProblem extends ActiveRecord
     {
         if ($this->validate() && $this->save()) {
 
-            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+            $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->loadFile) {
+            if ($this->getLoadFile()) {
                 if ($this->uploadFileInterview()) {
-                    $this->interview_file = $this->loadFile;
+                    $this->setInterviewFile($this->getLoadFile());
                     $this->save(false);
                 }
             }
@@ -181,7 +178,6 @@ class InterviewConfirmProblem extends ActiveRecord
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
     }
-
 
     /**
      * @return bool
@@ -192,11 +188,11 @@ class InterviewConfirmProblem extends ActiveRecord
     {
         if ($this->validate() && $this->save()) {
 
-            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+            $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->loadFile) {
+            if ($this->getLoadFile()) {
                 if ($this->uploadFileInterview()) {
-                    $this->interview_file = $this->loadFile;
+                    $this->setInterviewFile($this->getLoadFile());
                     $this->save(false);
                 }
             }
@@ -206,7 +202,6 @@ class InterviewConfirmProblem extends ActiveRecord
         throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
     }
 
-
     /**
      * @return bool
      * @throws NotFoundHttpException
@@ -214,7 +209,7 @@ class InterviewConfirmProblem extends ActiveRecord
      */
     private function uploadFileInterview()
     {
-        $path = $this->pathFile;
+        $path = $this->getPathFile();
         if (!is_dir($path)) FileHelper::createDirectory($path);
 
         if ($this->validate()) {
@@ -222,8 +217,8 @@ class InterviewConfirmProblem extends ActiveRecord
             $filename = Yii::$app->getSecurity()->generateRandomString(15);
             try{
 
-                $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
-                $this->server_file = $filename . '.' . $this->loadFile->extension;
+                $this->getLoadFile()->saveAs($path . $filename . '.' . $this->getLoadFile()->extension);
+                $this->setServerFile($filename . '.' . $this->getLoadFile()->extension);
 
             }catch (Exception $e){
 
@@ -234,5 +229,125 @@ class InterviewConfirmProblem extends ActiveRecord
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setRespondId($id)
+    {
+        $this->respond_id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRespondId()
+    {
+        return $this->respond_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInterviewFile()
+    {
+        return $this->interview_file;
+    }
+
+    /**
+     * @param string $interview_file
+     */
+    public function setInterviewFile($interview_file)
+    {
+        $this->interview_file = $interview_file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerFile()
+    {
+        return $this->server_file;
+    }
+
+    /**
+     * @param string $server_file
+     */
+    public function setServerFile($server_file)
+    {
+        $this->server_file = $server_file;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLoadFile()
+    {
+        return $this->loadFile;
+    }
+
+    /**
+     * @param mixed $loadFile
+     */
+    public function setLoadFile($loadFile)
+    {
+        $this->loadFile = $loadFile;
+    }
+
+    /**
+     * @return CacheForm
+     */
+    public function getCacheManager()
+    {
+        return $this->_cacheManager;
+    }
+
+    /**
+     *
+     */
+    public function setCacheManager()
+    {
+        $this->_cacheManager = new CacheForm();
     }
 }

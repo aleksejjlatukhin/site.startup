@@ -8,12 +8,22 @@ use yii\base\Model;
 use app\models\User;
 use Yii;
 
+/**
+ * Форма регистрации
+ *
+ * Class SingupForm
+ * @package app\models\forms
+ *
+ * @property string $email
+ * @property string $username
+ * @property string $password
+ * @property int $status
+ * @property int $confirm
+ * @property int $role
+ */
 class SingupForm extends Model
 {
 
-    public $second_name;
-    public $first_name;
-    public $middle_name;
     public $email;
     public $username;
     public $uniq_username = true;
@@ -34,9 +44,9 @@ class SingupForm extends Model
         return [
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email'], 'string', 'max' => 255],
+            [['email', 'username', 'password'], 'required'],
+            [['username', 'email', 'password'], 'trim'],
+            [['email'], 'string', 'max' => 255],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -71,9 +81,6 @@ class SingupForm extends Model
     public function attributeLabels()
     {
         return [
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'email' => 'Email',
             'username' => 'Логин',
             'password' => 'Пароль',
@@ -159,14 +166,11 @@ class SingupForm extends Model
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->second_name = $this->second_name;
-            $user->first_name = $this->first_name;
-            $user->middle_name = $this->middle_name;
-            $user->username = $this->username;
-            $user->email = $this->email;
-            $user->status = $this->status;
-            $user->confirm = $this->confirm;
-            $user->role = $this->role;
+            $user->setUsername($this->username);
+            $user->setEmail($this->email);
+            $user->setStatus($this->status);
+            $user->setConfirm($this->confirm);
+            $user->setRole($this->role);
             $user->setPassword($this->password);
             $user->generateAuthKey();
 

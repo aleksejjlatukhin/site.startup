@@ -8,7 +8,12 @@ use app\models\Segments;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
-
+/**
+ * Форма создания сегмента
+ *
+ * Class FormCreateSegment
+ * @package app\models\forms
+ */
 class FormCreateSegment extends FormSegment
 {
 
@@ -92,25 +97,25 @@ class FormCreateSegment extends FormSegment
         if ($this->validate()){
 
             $segment = new Segments();
-            $segment->name = $this->name;
-            $segment->description = $this->description;
-            $segment->project_id = $this->project_id;
-            $segment->type_of_interaction_between_subjects = $this->type_of_interaction_between_subjects;
-            $segment->add_info = $this->add_info;
+            $segment->setName($this->getName());
+            $segment->setDescription($this->getDescription());
+            $segment->setProjectId($this->getProjectId());
+            $segment->setTypeOfInteractionBetweenSubjects($this->getTypeOfInteractionBetweenSubjects());
+            $segment->setAddInfo($this->getAddInfo());
 
-            if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C){
+            if ($this->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
 
-                $segment->field_of_activity = $this->field_of_activity_b2c;
-                $segment->sort_of_activity = $this->sort_of_activity_b2c;
-                $segment->age_from = $this->age_from;
-                $segment->age_to = $this->age_to;
-                $segment->gender_consumer = $this->gender_consumer;
-                $segment->education_of_consumer = $this->education_of_consumer;
-                $segment->income_from = $this->income_from;
-                $segment->income_to = $this->income_to;
-                $segment->quantity_from = $this->quantity_from;
-                $segment->quantity_to = $this->quantity_to;
-                $segment->market_volume = $this->market_volume_b2c;
+                $segment->setFieldOfActivity($this->getFieldOfActivityB2c());
+                $segment->setSortOfActivity($this->getSortOfActivityB2c());
+                $segment->setAgeFrom($this->getAgeFrom());
+                $segment->setAgeTo($this->getAgeTo());
+                $segment->setGenderConsumer($this->getGenderConsumer());
+                $segment->setEducationOfConsumer($this->getEducationOfConsumer());
+                $segment->setIncomeFrom($this->getIncomeFrom());
+                $segment->setIncomeTo($this->getIncomeTo());
+                $segment->setQuantityFrom($this->getQuantityFrom());
+                $segment->setQuantityTo($this->getQuantityTo());
+                $segment->setMarketVolume($this->getMarketVolumeB2c());
 
                 if ($segment->save()) {
                     $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
@@ -118,17 +123,17 @@ class FormCreateSegment extends FormSegment
                 }
                 throw new NotFoundHttpException('Ошибка. Неудалось сохранить сегмент');
 
-            }elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
+            }elseif ($this->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
 
-                $segment->field_of_activity = $this->field_of_activity_b2b;
-                $segment->sort_of_activity = $this->sort_of_activity_b2b;
-                $segment->company_products = $this->company_products;
-                $segment->quantity_from = $this->quantity_from_b2b;
-                $segment->quantity_to = $this->quantity_to_b2b;
-                $segment->company_partner = $this->company_partner;
-                $segment->income_from = $this->income_company_from;
-                $segment->income_to = $this->income_company_to;
-                $segment->market_volume = $this->market_volume_b2b;
+                $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
+                $segment->setSortOfActivity($this->getSortOfActivityB2b());
+                $segment->setCompanyProducts($this->getCompanyProducts());
+                $segment->setQuantityFrom($this->getQuantityFromB2b());
+                $segment->setQuantityTo($this->getQuantityToB2b());
+                $segment->setCompanyPartner($this->getCompanyPartner());
+                $segment->setIncomeFrom($this->getIncomeCompanyFrom());
+                $segment->setIncomeTo($this->getIncomeCompanyTo());
+                $segment->setMarketVolume($this->getMarketVolumeB2b());
 
                 if ($segment->save()) {
                     $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
@@ -148,13 +153,13 @@ class FormCreateSegment extends FormSegment
      */
     public function uniqueName($attr)
     {
-        $models = Segments::findAll(['project_id' => $this->project_id]);
+        $models = Segments::findAll(['project_id' => $this->getProjectId()]);
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->name)) == mb_strtolower(str_replace(' ', '',$item->name))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
 
-                $this->addError($attr, 'Сегмент с названием «'. $this->name .'» уже существует!');
+                $this->addError($attr, 'Сегмент с названием «'. $this->getName() .'» уже существует!');
             }
         }
     }

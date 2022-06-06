@@ -19,42 +19,6 @@ $form = ActiveForm::begin([
         ->label(false);
 
 
-    echo $form->field($formRegistration, 'second_name', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Фамилия</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 50,
-        'minlength' => 2,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => '',
-        'autocomplete' => 'off'
-    ]);
-
-
-    echo $form->field($formRegistration, 'first_name', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Имя</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 50,
-        'minlength' => 2,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => '',
-        'autocomplete' => 'off'
-    ]);
-
-
-    echo $form->field($formRegistration, 'middle_name', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Отчество</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 50,
-        'minlength' => 2,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => '',
-        'autocomplete' => 'off'
-    ]);
-
-
     echo $form->field($formRegistration, 'email', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email</div><div>{input}</div>'
     ])->textInput([

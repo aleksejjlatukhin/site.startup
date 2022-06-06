@@ -17,11 +17,33 @@ use yii\web\UploadedFile;
 
 /**
  * Класс, который хранит объекты описания проектов в бд
+ *
  * Class Projects
  * @package app\models
  *
- * @property string $project_name
- * @property int $enable_expertise
+ * @property int $id                                Идентификатор проекта
+ * @property int $user_id                           Идентификатор проектанта в таб.User
+ * @property int $created_at                        Дата создания проекта
+ * @property int $updated_at                        Дата обновления проекта
+ * @property string $project_fullname               Полное наименое проекта
+ * @property string $project_name                   Короткое наименование проекта
+ * @property string $description                    Описание проекта
+ * @property string $purpose_project                Цель проекта
+ * @property string $rid                            Результат интеллектуальной деятельности
+ * @property string $patent_number                  Номер патента
+ * @property int $patent_date                       Дата получения патента
+ * @property string $patent_name                    Наименование патента
+ * @property string $core_rid                       Суть результата интеллектуальной деятельности
+ * @property string $technology                     Технология, на которой основан проект
+ * @property string $layout_technology              Макет базовой технологии
+ * @property string $register_name                  Зарегистрированное юр. лицо
+ * @property int $register_date                     Дата регистрации юр. лица
+ * @property string $site                           Адрес сайта
+ * @property string $invest_name                    Инвестор
+ * @property int $invest_date                       Дата получения инвестиций
+ * @property int $invest_amount                     Сумма инвестиций
+ * @property int $date_of_announcement              Дата анонсирования проекта
+ * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
  */
 class Projects extends ActiveRecord
 {
@@ -68,6 +90,18 @@ class Projects extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+
+    /**
+     * Поиск проектанта,
+     * которому принадлежит проект
+     *
+     * @return User|null
+     */
+    public function findUser()
+    {
+        return User::findOne($this->user_id);
     }
 
 
@@ -265,7 +299,7 @@ class Projects extends ActiveRecord
     {
         $string = '';
         $j = 0;
-        foreach ($this->authors as $author) {
+        foreach ($this->getAuthors() as $author) {
 
             $j++;
             $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$j.'</div>';
@@ -351,10 +385,10 @@ class Projects extends ActiveRecord
     public function create(){
 
         //Преобразование даты в число
-        if ($this->patent_date) $this->patent_date = strtotime($this->patent_date);
-        if ($this->register_date) $this->register_date = strtotime($this->register_date);
-        if ($this->invest_date) $this->invest_date = strtotime($this->invest_date);
-        if ($this->date_of_announcement) $this->date_of_announcement = strtotime($this->date_of_announcement);
+        $this->setPatentDate();
+        $this->setRegisterDate();
+        $this->setInvestDate();
+        $this->setDateOfAnnouncement();
 
         if ($this->save()) {
             //Сохранение команды(авторов)
@@ -377,10 +411,10 @@ class Projects extends ActiveRecord
     public function updateProject(){
 
         //Преобразование даты в число
-        if ($this->patent_date) $this->patent_date = strtotime($this->patent_date);
-        if ($this->register_date) $this->register_date = strtotime($this->register_date);
-        if ($this->invest_date) $this->invest_date = strtotime($this->invest_date);
-        if ($this->date_of_announcement) $this->date_of_announcement = strtotime($this->date_of_announcement);
+        $this->setPatentDate();
+        $this->setRegisterDate();
+        $this->setInvestDate();
+        $this->setDateOfAnnouncement();
 
         if ($this->save()) {
             //Сохранение команды(авторов)
@@ -411,10 +445,10 @@ class Projects extends ActiveRecord
             foreach ($arr_authors as $arr_author) {
 
                 $worker = new Authors();
-                $worker->fio = $arr_author['fio'];
-                $worker->role = $arr_author['role'];
-                $worker->experience = $arr_author['experience'];
-                $worker->project_id = $this->id;
+                $worker->setFio($arr_author['fio']);
+                $worker->setRole($arr_author['role']);
+                $worker->setExperience($arr_author['experience']);
+                $worker->setProjectId($this->id);
                 $worker->save();
             }
         } else {
@@ -428,16 +462,16 @@ class Projects extends ActiveRecord
                 foreach ($arr_authors as $i => $arr_author) {
 
                     if (($i+1) <= count($workers)) {
-                        $workers[$i]->fio = $arr_authors[$i]['fio'];
-                        $workers[$i]->role = $arr_authors[$i]['role'];
-                        $workers[$i]->experience = $arr_authors[$i]['experience'];
+                        $workers[$i]->setFio($arr_authors[$i]['fio']);
+                        $workers[$i]->setRole($arr_authors[$i]['role']);
+                        $workers[$i]->setExperience($arr_authors[$i]['experience']);
                         $workers[$i]->save();
                     } else {
                         $worker = new Authors();
-                        $worker->fio = $arr_authors[$i]['fio'];
-                        $worker->role = $arr_authors[$i]['role'];
-                        $worker->experience = $arr_authors[$i]['experience'];
-                        $worker->project_id = $this->id;
+                        $worker->setFio($arr_authors[$i]['fio']);
+                        $worker->setRole($arr_authors[$i]['role']);
+                        $worker->setExperience($arr_authors[$i]['experience']);
+                        $worker->setProjectId($this->id);
                         $worker->save();
                     }
                 }
@@ -445,9 +479,9 @@ class Projects extends ActiveRecord
             } else {
 
                 foreach ($arr_authors as $i => $arr_author) {
-                    $workers[$i]->fio = $arr_author['fio'];
-                    $workers[$i]->role = $arr_author['role'];
-                    $workers[$i]->experience = $arr_author['experience'];
+                    $workers[$i]->setFio($arr_author['fio']);
+                    $workers[$i]->setRole($arr_author['role']);
+                    $workers[$i]->setExperience($arr_author['experience']);
                     $workers[$i]->save();
                 }
             }
@@ -481,5 +515,213 @@ class Projects extends ActiveRecord
 
         // Удаление проекта
         $this->delete();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectFullname()
+    {
+        return $this->project_fullname;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectName()
+    {
+        return $this->project_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPurposeProject()
+    {
+        return $this->purpose_project;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRid()
+    {
+        return $this->rid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPatentNumber()
+    {
+        return $this->patent_number;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPatentDate()
+    {
+        return $this->patent_date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPatentName()
+    {
+        return $this->patent_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCoreRid()
+    {
+        return $this->core_rid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTechnology()
+    {
+        return $this->technology;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLayoutTechnology()
+    {
+        return $this->layout_technology;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegisterName()
+    {
+        return $this->register_name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRegisterDate()
+    {
+        return $this->register_date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInvestName()
+    {
+        return $this->invest_name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInvestDate()
+    {
+        return $this->invest_date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInvestAmount()
+    {
+        return $this->invest_amount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDateOfAnnouncement()
+    {
+        return $this->date_of_announcement;
+    }
+
+    /**
+     *
+     */
+    public function setPatentDate()
+    {
+        if ($this->patent_date) {
+            $this->patent_date = strtotime($this->patent_date);
+        }
+    }
+
+    /**
+     *
+     */
+    public function setRegisterDate()
+    {
+        if ($this->register_date) {
+            $this->register_date = strtotime($this->register_date);
+        }
+    }
+
+    /**
+     *
+     */
+    public function setInvestDate()
+    {
+        if ($this->invest_date) {
+            $this->invest_date = strtotime($this->invest_date);
+        }
+    }
+
+    /**
+     *
+     */
+    public function setDateOfAnnouncement()
+    {
+        if ($this->date_of_announcement) {
+            $this->date_of_announcement = strtotime($this->date_of_announcement);
+        }
     }
 }

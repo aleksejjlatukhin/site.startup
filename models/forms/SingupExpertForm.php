@@ -9,6 +9,28 @@ use app\models\KeywordsExpert;
 use app\models\User;
 use yii\base\Exception;
 
+/**
+ * Форма регистрации эксперта
+ *
+ * Class SingupExpertForm
+ * @package app\models\forms
+ *
+ * @property string $email
+ * @property string $username
+ * @property string $password
+ * @property int $status
+ * @property int $confirm
+ * @property int $role
+ * @property string $education
+ * @property string $academic_degree
+ * @property string $position
+ * @property string $type
+ * @property string $scope_professional_competence
+ * @property string $publications
+ * @property string $implemented_projects
+ * @property string $role_in_implemented_projects
+ * @property string $keywords
+ */
 class SingupExpertForm extends SingupForm
 {
 
@@ -75,14 +97,13 @@ class SingupExpertForm extends SingupForm
         return [
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
-            [['second_name', 'first_name', 'middle_name', 'email', 'username', 'password',
+            [['email', 'username', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email', 'password',
+            [['username', 'email', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email',
-                'education', 'academic_degree', 'position'], 'string', 'max' => 255],
+            [['email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
@@ -114,9 +135,6 @@ class SingupExpertForm extends SingupForm
     public function attributeLabels()
     {
         return [
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'email' => 'Email',
             'username' => 'Логин',
             'password' => 'Пароль',
@@ -145,14 +163,11 @@ class SingupExpertForm extends SingupForm
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->second_name = $this->second_name;
-            $user->first_name = $this->first_name;
-            $user->middle_name = $this->middle_name;
-            $user->username = $this->username;
-            $user->email = $this->email;
-            $user->status = $this->status;
-            $user->confirm = $this->confirm;
-            $user->role = $this->role;
+            $user->setUsername($this->username);
+            $user->setEmail($this->email);
+            $user->setStatus($this->status);
+            $user->setConfirm($this->confirm);
+            $user->setRole($this->role);
             $user->setPassword($this->password);
             $user->generateAuthKey();
 
@@ -167,15 +182,15 @@ class SingupExpertForm extends SingupForm
 
                 // Сохраняем информацию о эксперте
                 $expertInfo = new ExpertInfo();
-                $expertInfo->user_id = $user->id;
-                $expertInfo->education = $this->education;
-                $expertInfo->academic_degree = $this->academic_degree;
-                $expertInfo->position = $this->position;
-                $expertInfo->type = implode('|', $this->type);
-                $expertInfo->scope_professional_competence = $this->scope_professional_competence;
-                $expertInfo->publications = $this->publications;
-                $expertInfo->implemented_projects = $this->implemented_projects;
-                $expertInfo->role_in_implemented_projects = $this->role_in_implemented_projects;
+                $expertInfo->setUserId($user->getId());
+                $expertInfo->setEducation($this->education);
+                $expertInfo->setAcademicDegree($this->academic_degree);
+                $expertInfo->setPosition($this->position);
+                $expertInfo->setType(implode('|', $this->type));
+                $expertInfo->setScopeProfessionalCompetence($this->scope_professional_competence);
+                $expertInfo->setPublications($this->publications);
+                $expertInfo->setImplementedProjects($this->implemented_projects);
+                $expertInfo->setRoleInImplementedProjects($this->role_in_implemented_projects);
 
                 if ($expertInfo->save()) {
                     return $user;

@@ -235,7 +235,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                     <div class="row block_top">
 
-                                        <div class="col-xs-8"><?= $conversationAdmin->user->second_name.' '.$conversationAdmin->user->first_name.' '.$conversationAdmin->user->middle_name; ?></div>
+                                        <div class="col-xs-8"><?= $conversationAdmin->user->username; ?></div>
 
                                         <div class="col-xs-4 text-right">
                                             <?php if ($conversationAdmin->lastMessage) : ?>
@@ -418,7 +418,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $manager->second_name . ' ' . $manager->first_name . ' ' . $manager->middle_name; ?></div>
+                                                <div class="interlocutor"><?= $manager->username; ?></div>
                                                 <div>
                                                     <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                                     <?= date('H:i', $message['created_at']); ?>
@@ -458,7 +458,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $manager->second_name . ' ' . $manager->first_name . ' ' . $manager->middle_name; ?></div>
+                                                <div class="interlocutor"><?= $manager->username; ?></div>
                                                 <div>
                                                     <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
                                                     <?= date('H:i', $message['created_at']); ?>

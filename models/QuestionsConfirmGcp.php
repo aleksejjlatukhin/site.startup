@@ -8,6 +8,19 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 
+/**
+ * Класс хранит в бд вопросы интервью на этапе подтверждения ценностного предложения
+ *
+ * Class QuestionsConfirmGcp
+ * @package app\models
+ *
+ * @property int $id                            Идентификатор записи в таб. questions_confirm_gcp
+ * @property int $confirm_id                    Идентификатор записи в таб. confirm_gcp
+ * @property string $title                      Описание вопроса
+ * @property int $status                        Параметр указывает на важность вопроса
+ * @property int $created_at                    Дата создания вопроса
+ * @property int $updated_at                    Дата обновления вопроса
+ */
 class QuestionsConfirmGcp extends ActiveRecord
 {
 
@@ -17,6 +30,7 @@ class QuestionsConfirmGcp extends ActiveRecord
 
     /**
      * QuestionsConfirmGcp constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
@@ -39,6 +53,7 @@ class QuestionsConfirmGcp extends ActiveRecord
 
     /**
      * Получить объект подтверждения
+     *
      * @return ActiveQuery
      */
     public function getConfirm ()
@@ -48,12 +63,25 @@ class QuestionsConfirmGcp extends ActiveRecord
 
 
     /**
+     * Найти подтверждение гипотезы,
+     * к которому относится вопрос
+     *
+     * @return ConfirmGcp|null
+     */
+    public function findConfirm()
+    {
+        return ConfirmGcp::findOne($this->getConfirmId());
+    }
+
+
+    /**
      * Получить все ответы на данный вопрос
+     *
      * @return array|ActiveRecord[]
      */
     public function getAnswers()
     {
-        $answers = AnswersQuestionsConfirmGcp::find()->where(['question_id' => $this->id])
+        $answers = AnswersQuestionsConfirmGcp::find()->where(['question_id' => $this->getId()])
             ->andWhere(['not', ['answers_questions_confirm_gcp.answer' => '']])->all();
         return $answers;
     }
@@ -64,30 +92,8 @@ class QuestionsConfirmGcp extends ActiveRecord
      */
     public function setParams(array $params)
     {
-        $this->confirm_id = $params['confirm_id'];
-        $this->title = $params['title'];
-    }
-
-
-    /**
-     * Изменение статуса вопроса
-     */
-    public function changeStatus()
-    {
-        if ($this->status === QuestionStatus::STATUS_NOT_STAR){
-            $this->status = QuestionStatus::STATUS_ONE_STAR;
-        } else {
-            $this->status = QuestionStatus::STATUS_NOT_STAR;
-        }
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getStatus()
-    {
-        return $this->status;
+        $this->setConfirmId($params['confirm_id']);
+        $this->setTitle($params['title']);
     }
 
 
@@ -135,20 +141,20 @@ class QuestionsConfirmGcp extends ActiveRecord
         $this->on(self::EVENT_AFTER_INSERT, function (){
             $this->confirm->gcp->project->touch('updated_at');
             $this->confirm->gcp->project->user->touch('updated_at');
-            $this->_manager_answers->create($this->confirm, $this->id);
-            $this->_creator_question_to_general_list->create($this->confirm, $this->title);
+            $this->_manager_answers->create($this->confirm, $this->getId());
+            $this->_creator_question_to_general_list->create($this->confirm, $this->getTitle());
         });
 
         $this->on(self::EVENT_AFTER_UPDATE, function (){
             $this->confirm->gcp->project->touch('updated_at');
             $this->confirm->gcp->project->user->touch('updated_at');
-            $this->_creator_question_to_general_list->create($this->confirm, $this->title);
+            $this->_creator_question_to_general_list->create($this->confirm, $this->getTitle());
         });
 
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->confirm->gcp->project->touch('updated_at');
             $this->confirm->gcp->project->user->touch('updated_at');
-            $this->_manager_answers->delete($this->confirm, $this->id);
+            $this->_manager_answers->delete($this->confirm, $this->getId());
         });
 
         parent::init();
@@ -163,7 +169,7 @@ class QuestionsConfirmGcp extends ActiveRecord
     public function deleteAndGetData()
     {
         // Получить список вопросов без удаленного вопроса
-        $questions = self::find()->where(['confirm_id' => $this->confirm->id])->andWhere(['!=', 'id', $this->id])->all();
+        $questions = self::find()->where(['confirm_id' => $this->confirm->getId()])->andWhere(['!=', 'id', $this->getId()])->all();
         //Передаем обновленный список вопросов для добавления в программу
         $queryQuestions = $this->confirm->queryQuestionsGeneralList();
         array_push($queryQuestions, $this);
@@ -172,6 +178,91 @@ class QuestionsConfirmGcp extends ActiveRecord
             return ['questions' => $questions, 'queryQuestions' => $queryQuestions];
         }
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_id;
+    }
+
+    /**
+     * @param int $confirm_id
+     */
+    public function setConfirmId($confirm_id)
+    {
+        $this->confirm_id = $confirm_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @param int $status
+     */
+    private function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * Изменение статуса вопроса
+     */
+    public function changeStatus()
+    {
+        if ($this->getStatus() === QuestionStatus::STATUS_NOT_STAR){
+            $this->setStatus(QuestionStatus::STATUS_ONE_STAR);
+        } else {
+            $this->setStatus(QuestionStatus::STATUS_NOT_STAR);
+        }
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
 }

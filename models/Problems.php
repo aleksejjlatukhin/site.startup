@@ -12,12 +12,22 @@ use yii\helpers\FileHelper;
 
 /**
  * Класс, который хранит объекты проблем сегментов в бд
+ *
  * Class Problems
  * @package app\models
  *
- * @property int enable_expertise
- * @property string $title
- * @property int $basic_confirm_id
+ * @property int $id                                Идентификатор записи в таб. problems
+ * @property int $basic_confirm_id                  Идентификатор записи в таб. confirm_segment
+ * @property int $segment_id                        Идентификатор записи в таб. segments
+ * @property int $project_id                        Идентификатор записи в таб. projects
+ * @property string $title                          Сформированное системой название проблемы
+ * @property string $description                    Описание проблемы
+ * @property int $indicator_positive_passage        Показатель положительного прохождения теста
+ * @property int $created_at                        Дата создания проблемы
+ * @property int $updated_at                        Дата обновления проблемы
+ * @property int $time_confirm                      Дата подверждения проблемы
+ * @property int $exist_confirm                     Параметр факта подтверждения проблемы
+ * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
  */
 class Problems extends ActiveRecord
 {
@@ -37,7 +47,7 @@ class Problems extends ActiveRecord
 
 
     /**
-     * GenerationProblem constructor.
+     * Problems constructor.
      * @param array $config
      */
     public function __construct($config = [])
@@ -99,6 +109,15 @@ class Problems extends ActiveRecord
 
 
     /**
+     * @return Segments|null
+     */
+    public function findSegment()
+    {
+        return Segments::findOne($this->getSegmentId());
+    }
+
+
+    /**
      * Получить объект текущего проекта
      * @return ActiveQuery
      */
@@ -109,68 +128,11 @@ class Problems extends ActiveRecord
 
 
     /**
-     * @param $id
-     * @return mixed
+     * @return Projects|null
      */
-    public function setSegmentId($id)
+    public function findProject()
     {
-        return $this->segment_id = $id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getSegmentId()
-    {
-        return $this->segment_id;
-    }
-
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function setProjectId($id)
-    {
-        return $this->project_id = $id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getProjectId()
-    {
-        return $this->project_id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getConfirmSegmentId()
-    {
-        return $this->basic_confirm_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return int
-     */
-    public function getEnableExpertise()
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise()
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return Projects::findOne($this->getProjectId());
     }
 
 
@@ -189,6 +151,7 @@ class Problems extends ActiveRecord
     /**
      * Вопросы для проверки и ответы на них
      * создаются на этапе генерации проблем сегмента
+     *
      * @return ActiveQuery
      */
     public function getExpectedResults()
@@ -199,6 +162,7 @@ class Problems extends ActiveRecord
 
     /**
      * Список вопросов для проверки и ответов на них
+     *
      * @return string
      */
     public function getListExpectedResultsInterview()
@@ -353,5 +317,182 @@ class Problems extends ActiveRecord
 
         // Удаление проблемы
         $this->delete();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBasicConfirmId()
+    {
+        return $this->basic_confirm_id;
+    }
+
+    /**
+     * @param int $basic_confirm_id
+     */
+    public function setBasicConfirmId($basic_confirm_id)
+    {
+        $this->basic_confirm_id = $basic_confirm_id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setSegmentId($id)
+    {
+        $this->segment_id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setProjectId($id)
+    {
+        $this->project_id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmSegmentId()
+    {
+        return $this->basic_confirm_id;
+    }
+
+    /**
+     * Параметр разрешения экспертизы
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIndicatorPositivePassage()
+    {
+        return $this->indicator_positive_passage;
+    }
+
+    /**
+     * @param int $indicator_positive_passage
+     */
+    public function setIndicatorPositivePassage($indicator_positive_passage)
+    {
+        $this->indicator_positive_passage = $indicator_positive_passage;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeConfirm()
+    {
+        return $this->time_confirm;
+    }
+
+    /**
+     * @param int $time_confirm
+     */
+    public function setTimeConfirm($time_confirm)
+    {
+        $this->time_confirm = $time_confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExistConfirm()
+    {
+        return $this->exist_confirm;
+    }
+
+    /**
+     * @param int $exist_confirm
+     */
+    public function setExistConfirm($exist_confirm)
+    {
+        $this->exist_confirm = $exist_confirm;
     }
 }

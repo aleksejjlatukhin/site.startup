@@ -5,6 +5,12 @@ namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
 
+/**
+ * Менеджер по ответам на вопросы
+ *
+ * Class ManagerForAnswersAtQuestion
+ * @package app\models
+ */
 class ManagerForAnswersAtQuestion
 {
 

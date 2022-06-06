@@ -12,12 +12,22 @@ use yii\db\ActiveRecord;
 
 /**
  * Класс, который хранит объекты ценностных предложений в бд
+ *
  * Class Gcps
  * @package app\models
  *
- * @property mixed $enable_expertise
- * @property string $title
- * @property int $basic_confirm_id
+ * @property int $id                                Идентификатор записи в таб. gcps
+ * @property int $basic_confirm_id                  Идентификатор записи в таб. confirm_problem
+ * @property int $segment_id                        Идентификатор записи в таб. segments
+ * @property int $project_id                        Идентификатор записи в таб. projects
+ * @property int $problem_id                        Идентификатор записи в таб. problems
+ * @property string $title                          Сформированное системой название ценностного предложения
+ * @property string $description                    Описание ценностного предложения
+ * @property int $created_at                        Дата создания ЦП
+ * @property int $updated_at                        Дата обновления ЦП
+ * @property int $time_confirm                      Дата подверждения ЦП
+ * @property int $exist_confirm                     Параметр факта подтверждения ЦП
+ * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
  */
 class Gcps extends ActiveRecord
 {
@@ -98,12 +108,30 @@ class Gcps extends ActiveRecord
 
 
     /**
+     * @return Problems|null
+     */
+    public function findProblem()
+    {
+        return Problems::findOne($this->getProblemId());
+    }
+
+
+    /**
      * Получить объект текущего сегмента
      * @return ActiveQuery
      */
     public function getSegment ()
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
+    }
+
+
+    /**
+     * @return Segments|null
+     */
+    public function findSegment()
+    {
+        return Segments::findOne($this->getSegmentId());
     }
 
 
@@ -118,48 +146,11 @@ class Gcps extends ActiveRecord
 
 
     /**
-     * @return mixed
+     * @return Projects|null
      */
-    public function getProblemId()
+    public function findProject()
     {
-        return $this->problem_id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getSegmentId()
-    {
-        return $this->segment_id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getProjectId()
-    {
-        return $this->project_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return int
-     */
-    public function getEnableExpertise()
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise()
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return Projects::findOne($this->getProblemId());
     }
 
 
@@ -287,5 +278,173 @@ class Gcps extends ActiveRecord
 
         // Удаление ГЦП
         $this->delete();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBasicConfirmId()
+    {
+        return $this->basic_confirm_id;
+    }
+
+    /**
+     * @param int $basic_confirm_id
+     */
+    public function setBasicConfirmId($basic_confirm_id)
+    {
+        $this->basic_confirm_id = $basic_confirm_id;
+    }
+
+    /**
+     * @param int $segment_id
+     */
+    public function setSegmentId($segment_id)
+    {
+        $this->segment_id = $segment_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSegmentId()
+    {
+        return $this->segment_id;
+    }
+
+    /**
+     * @param int $project_id
+     */
+    public function setProjectId($project_id)
+    {
+        $this->project_id = $project_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    /**
+     * @param int $problem_id
+     */
+    public function setProblemId($problem_id)
+    {
+        $this->problem_id = $problem_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProblemId()
+    {
+        return $this->problem_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeConfirm()
+    {
+        return $this->time_confirm;
+    }
+
+    /**
+     * @param int $time_confirm
+     */
+    public function setTimeConfirm($time_confirm)
+    {
+        $this->time_confirm = $time_confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExistConfirm()
+    {
+        return $this->exist_confirm;
+    }
+
+    /**
+     * @param int $exist_confirm
+     */
+    public function setExistConfirm($exist_confirm)
+    {
+        $this->exist_confirm = $exist_confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
     }
 }

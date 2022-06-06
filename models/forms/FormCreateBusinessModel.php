@@ -10,10 +10,27 @@ use app\models\Problems;
 use app\models\Mvps;
 use app\models\Projects;
 use app\models\Segments;
+use app\models\User;
 use yii\base\ErrorException;
 use yii\base\Model;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма создания бизнес-модели
+ *
+ * Class FormCreateBusinessModel
+ * @package app\models\forms
+ *
+ * @property string $relations                      Взаимоотношения с клиентами
+ * @property string $partners                       Ключевые партнеры
+ * @property string $distribution_of_sales          Каналы коммуникации и сбыта
+ * @property string $resources                      Ключевые ресурсы
+ * @property string $cost                           Структура издержек
+ * @property string $revenue                        Потоки поступления доходов
+ * @property int $basic_confirm_id                  Идентификатор записи в таб. confirm_mvp
+ * @property CacheForm $_cacheManager               Менеджер кэширования
+ * @property string $cachePath                      Путь к файлу кэша
+ */
 class FormCreateBusinessModel extends Model
 {
 
@@ -35,10 +52,10 @@ class FormCreateBusinessModel extends Model
      */
     public function __construct(Mvps $preliminaryHypothesis, $config = [])
     {
-        $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($preliminaryHypothesis);
+        $this->setCacheManager();
+        $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
         $cacheName = 'formCreateHypothesisCache';
-        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
@@ -53,13 +70,20 @@ class FormCreateBusinessModel extends Model
      */
     public static function getCachePath(Mvps $preliminaryHypothesis)
     {
+        /**
+         * @var Gcps $gcp
+         * @var Problems $problem
+         * @var Segments $segment
+         * @var Projects $project
+         * @var User $user
+         */
         $gcp = $preliminaryHypothesis->gcp;
         $problem = $preliminaryHypothesis->problem;
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.
-            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$preliminaryHypothesis->id.'/business-model/formCreate/';
+        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+            '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$preliminaryHypothesis->getId().'/business-model/formCreate/';
 
         return $cachePath;
     }
@@ -101,31 +125,175 @@ class FormCreateBusinessModel extends Model
      */
     public function create (){
 
-        $confirmMvp = ConfirmMvp::findOne($this->basic_confirm_id);
-        $mvp = Mvps::findOne($confirmMvp->mvpId);
-        $gcp = Gcps::findOne($mvp->gcpId);
-        $problem = Problems::findOne($mvp->problem_id);
-        $segment = Segments::findOne($mvp->segment_id);
-        $project = Projects::findOne($mvp->project_id);
+        $confirmMvp = ConfirmMvp::findOne($this->getBasicConfirmId());
+        $mvp = Mvps::findOne($confirmMvp->getMvpId());
+        $gcp = Gcps::findOne($mvp->getGcpId());
+        $problem = Problems::findOne($mvp->getProblemId());
+        $segment = Segments::findOne($mvp->getSegmentId());
+        $project = Projects::findOne($mvp->getProjectId());
 
         $model = new BusinessModel();
-        $model->basic_confirm_id = $this->basic_confirm_id;
-        $model->mvp_id = $mvp->id;
-        $model->gcp_id = $gcp->id;
-        $model->problem_id = $problem->id;
-        $model->segment_id = $segment->id;
-        $model->project_id = $project->id;
-        $model->relations = $this->relations;
-        $model->partners = $this->partners;
-        $model->distribution_of_sales = $this->distribution_of_sales;
-        $model->resources = $this->resources;
-        $model->cost = $this->cost;
-        $model->revenue = $this->revenue;
+        $model->setBasicConfirmId($this->getBasicConfirmId());
+        $model->setMvpId($mvp->getId());
+        $model->setGcpId($gcp->getId());
+        $model->setProblemId($problem->getId());
+        $model->setSegmentId($segment->getId());
+        $model->setProjectId($project->getId());
+        $model->setRelations($this->getRelations());
+        $model->setPartners($this->getPartners());
+        $model->setDistributionOfSales($this->getDistributionOfSales());
+        $model->setResources($this->getResources());
+        $model->setCost($this->getCost());
+        $model->setRevenue($this->getRevenue());
 
         if ($model->save()){
-            $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
+            $this->getCacheManager()->deleteCache($this->getCachePathForm()); // Удаление кэша формы создания
             return $model;
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить бизнес-модель');
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
+    /**
+     * @param string $relations
+     */
+    public function setRelations($relations)
+    {
+        $this->relations = $relations;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPartners()
+    {
+        return $this->partners;
+    }
+
+    /**
+     * @param string $partners
+     */
+    public function setPartners($partners)
+    {
+        $this->partners = $partners;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDistributionOfSales()
+    {
+        return $this->distribution_of_sales;
+    }
+
+    /**
+     * @param string $distribution_of_sales
+     */
+    public function setDistributionOfSales($distribution_of_sales)
+    {
+        $this->distribution_of_sales = $distribution_of_sales;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResources()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * @param string $resources
+     */
+    public function setResources($resources)
+    {
+        $this->resources = $resources;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCost()
+    {
+        return $this->cost;
+    }
+
+    /**
+     * @param string $cost
+     */
+    public function setCost($cost)
+    {
+        $this->cost = $cost;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRevenue()
+    {
+        return $this->revenue;
+    }
+
+    /**
+     * @param string $revenue
+     */
+    public function setRevenue($revenue)
+    {
+        $this->revenue = $revenue;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBasicConfirmId()
+    {
+        return $this->basic_confirm_id;
+    }
+
+    /**
+     * @param int $basic_confirm_id
+     */
+    public function setBasicConfirmId($basic_confirm_id)
+    {
+        $this->basic_confirm_id = $basic_confirm_id;
+    }
+
+    /**
+     * @return CacheForm
+     */
+    public function getCacheManager()
+    {
+        return $this->_cacheManager;
+    }
+
+    /**
+     *
+     */
+    public function setCacheManager()
+    {
+        $this->_cacheManager = new CacheForm();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCachePathForm()
+    {
+        return $this->cachePath;
+    }
+
+    /**
+     * @param string $cachePath
+     */
+    public function setCachePathForm($cachePath)
+    {
+        $this->cachePath = $cachePath;
     }
 }

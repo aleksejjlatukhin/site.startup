@@ -6,6 +6,12 @@ use app\models\interfaces\ConfirmationInterface;
 use app\models\interfaces\RespondsInterface;
 use yii\base\Model;
 
+/**
+ * Класс для создания пустых ответов на вопросы для нового респондента
+ *
+ * Class CreatorAnswersForNewRespond
+ * @package app\models
+ */
 class CreatorAnswersForNewRespond extends Model
 {
 
@@ -15,13 +21,17 @@ class CreatorAnswersForNewRespond extends Model
      */
     public function create(RespondsInterface $respond)
     {
+        /**
+         * @var ConfirmSegment|ConfirmProblem|ConfirmGcp|ConfirmMvp $confirm
+         * @var QuestionsConfirmSegment|QuestionsConfirmProblem|QuestionsConfirmGcp|QuestionsConfirmMvp $questions
+         */
         $confirm = $respond->confirm;
         $questions = $confirm->questions;
 
         foreach ($questions as $question){
             $answer = self::getCreateModel($confirm);
-            $answer->question_id = $question->id;
-            $answer->respond_id = $respond->id;
+            $answer->setQuestionId($question->getId());
+            $answer->setRespondId($respond->getId());
             $answer->save();
         }
     }
@@ -33,13 +43,13 @@ class CreatorAnswersForNewRespond extends Model
      */
     private static function getCreateModel(ConfirmationInterface $confirm)
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() == StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new AnswersQuestionsConfirmSegment();
-        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        } elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new AnswersQuestionsConfirmProblem();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
             return new AnswersQuestionsConfirmGcp();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
             return new AnswersQuestionsConfirmMvp();
         }
         return false;

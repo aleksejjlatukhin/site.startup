@@ -5,6 +5,17 @@ namespace app\models;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс хранит информацию о загруженных презентационных файлах на этапе создания проекта
+ *
+ * Class PreFiles
+ * @package app\models
+ *
+ * @property int $id                                Идентификатор записи
+ * @property int $project_id                        Идентификатор проекта
+ * @property string $file_name                      Имя загруженного файла
+ * @property string $server_file                    Сгенерированное имя файла на сервере
+ */
 class PreFiles extends ActiveRecord
 {
 
@@ -62,5 +73,61 @@ class PreFiles extends ActiveRecord
         });
 
         parent::init();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    /**
+     * @param int $project_id
+     */
+    public function setProjectId($project_id)
+    {
+        $this->project_id = $project_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->file_name;
+    }
+
+    /**
+     * @param string $file_name
+     */
+    public function setFileName($file_name)
+    {
+        $this->file_name = $file_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerFile()
+    {
+        return $this->server_file;
+    }
+
+    /**
+     * @param string $server_file
+     */
+    public function setServerFile($server_file)
+    {
+        $this->server_file = $server_file;
     }
 }

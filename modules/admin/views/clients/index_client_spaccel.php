@@ -27,7 +27,7 @@ use yii\helpers\Url;
             <div class="block-admin-profile-link">
                 <div class="bolder">Администратор</div>
                 <?php $admin = $client->settings->admin; ?>
-                <?= Html::a($admin->first_name.' '.$admin->middle_name.' '.$admin->second_name, ['/admin/profile/index', 'id' => $admin->id], [
+                <?= Html::a($admin->username, ['/admin/profile/index', 'id' => $admin->id], [
                     'class' => 'block_name_link',
                     'title' => 'Перейти в профиль'
                 ]); ?>

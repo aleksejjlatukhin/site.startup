@@ -5,6 +5,16 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 
+/**
+ * Класс хранит информацию в бд о том, когда пользователь последний раз заходил на сайт
+ *
+ * Class CheckingOnlineUser
+ * @package app\models
+ *
+ * @property int $id                            Идентификатор записи
+ * @property int $user_id                       Идентификатор пользователя
+ * @property int $last_active_time              Дата последнего посещения
+ */
 class CheckingOnlineUser extends ActiveRecord
 {
 
@@ -30,24 +40,24 @@ class CheckingOnlineUser extends ActiveRecord
 
 
     /**
-     * @return CheckingOnlineUser|null
+     * Установить текущее время и сохранить запись в бд
      */
     public function setLastActiveTime()
     {
         $this->last_active_time = time();
-        return $this->save() ? $this : null;
+        $this->save();
     }
 
 
     /**
-     * @param $id
-     * @return CheckingOnlineUser|null
+     * Добавить новую запись
+     *
+     * @param int $id
      */
     public function addCheckingOnline($id)
     {
-        $this->user_id = $id;
-        $this->last_active_time = $this->setLastActiveTime();
-        return $this->save() ? $this : null;
+        $this->setUserId($id);
+        $this->setLastActiveTime();
     }
 
 
@@ -63,6 +73,7 @@ class CheckingOnlineUser extends ActiveRecord
 
     /**
      * Возвращает дату по русски + время
+     *
      * @return string
      */
     public function getDateRusAndTime(){
@@ -93,5 +104,37 @@ class CheckingOnlineUser extends ActiveRecord
                         . ' ' . date(' Y', $this->last_active_time);
             }
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastActiveTime()
+    {
+        return $this->last_active_time;
     }
 }

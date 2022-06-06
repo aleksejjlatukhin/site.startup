@@ -39,7 +39,7 @@ use yii\helpers\Html;
 
                 <div class="row block_top">
 
-                    <div class="col-xs-8"><?= $conversation->admin->second_name.' '.$conversation->admin->first_name.' '.$conversation->admin->middle_name; ?></div>
+                    <div class="col-xs-8"><?= $conversation->admin->username; ?></div>
 
                     <div class="col-xs-4 text-right">
                         <?php if ($conversation->lastMessage) : ?>

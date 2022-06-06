@@ -7,13 +7,20 @@ use app\models\User;
 use yii\base\Model;
 use Yii;
 
+/**
+ * Форма для редактирования профиля пользователя
+ *
+ * Class ProfileForm
+ * @package app\models\forms
+ *
+ * @property int $id                    Идентификатор пользователя
+ * @property string $username           Логин пользователя
+ * @property string $email              Эл.почта пользователя
+ */
 class ProfileForm extends Model
 {
 
     public $id;
-    public $second_name;
-    public $first_name;
-    public $middle_name;
     public $username;
     public $email;
     public $uniq_username = true;
@@ -29,9 +36,9 @@ class ProfileForm extends Model
     {
         return [
             [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'required'],
-            [['second_name', 'first_name', 'middle_name', 'username', 'email'], 'trim'],
-            [['second_name', 'first_name', 'middle_name', 'email'], 'string', 'max' => 255],
+            [['username', 'email'], 'required'],
+            [['username', 'email'], 'trim'],
+            [['email'], 'string', 'max' => 255],
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -60,9 +67,6 @@ class ProfileForm extends Model
     public function attributeLabels()
     {
         return [
-            'second_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
             'email' => 'Email',
             'username' => 'Логин',
         ];
@@ -152,11 +156,8 @@ class ProfileForm extends Model
         if ($this->sendEmail()) {
 
             $user = User::findOne($this->id);
-            $user->second_name = $this->second_name;
-            $user->first_name = $this->first_name;
-            $user->middle_name = $this->middle_name;
-            $user->email = $this->email;
-            $user->username = $this->username;
+            $user->setEmail($this->email);
+            $user->setUsername($this->username);
 
             return $user->save() ? $user : null;
 
@@ -165,6 +166,22 @@ class ProfileForm extends Model
             $this->checking_mail_sending = false;
             return  $this;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 }
 

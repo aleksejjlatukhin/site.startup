@@ -5,6 +5,12 @@ namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
 
+/**
+ * Класс добавляет вопросы в таблицы, которые содержат все вопросы добавляемые на этапах подтверждения гипотез
+ *
+ * Class CreatorQuestionToGeneralList
+ * @package app\models
+ */
 class CreatorQuestionToGeneralList
 {
 

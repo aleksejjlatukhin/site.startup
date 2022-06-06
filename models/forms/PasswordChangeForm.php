@@ -7,6 +7,17 @@ use yii\base\Exception;
 use yii\base\Model;
 use app\models\User;
 
+/**
+ * Форма для изменения пароля пользователя
+ *
+ * Class PasswordChangeForm
+ * @package app\models\forms
+ *
+ * @property string $currentPassword                Текущий пароль
+ * @property string $newPassword                    Новый пароль
+ * @property string $newPasswordRepeat              Повторный ввод нового пароля
+ * @property User $_user                            Объект текущего пользователя
+ */
 class PasswordChangeForm extends Model
 {
 
@@ -27,7 +38,7 @@ class PasswordChangeForm extends Model
      */
     public function __construct(User $user, $config = [])
     {
-        $this->_user = $user;
+        $this->setUser($user);
         parent::__construct($config);
     }
 
@@ -67,7 +78,7 @@ class PasswordChangeForm extends Model
     public function validatePassword($attribute, $params)
     {
         if (!$this->hasErrors()) {
-            if (!$this->_user->validatePassword($this->$attribute)) {
+            if (!$this->getUser()->validatePassword($this->$attribute)) {
                 $this->addError($attribute, 'Ошибка! Неверный текущий пароль.');
             }
         }
@@ -98,6 +109,70 @@ class PasswordChangeForm extends Model
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentPassword()
+    {
+        return $this->currentPassword;
+    }
+
+    /**
+     * @param string $currentPassword
+     */
+    public function setCurrentPassword($currentPassword)
+    {
+        $this->currentPassword = $currentPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewPassword()
+    {
+        return $this->newPassword;
+    }
+
+    /**
+     * @param string $newPassword
+     */
+    public function setNewPassword($newPassword)
+    {
+        $this->newPassword = $newPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewPasswordRepeat()
+    {
+        return $this->newPasswordRepeat;
+    }
+
+    /**
+     * @param string $newPasswordRepeat
+     */
+    public function setNewPasswordRepeat($newPasswordRepeat)
+    {
+        $this->newPasswordRepeat = $newPasswordRepeat;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->_user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->_user = $user;
     }
 
 }

@@ -78,7 +78,7 @@ use app\models\CommunicationResponse;
 
                     Трекер проекта:
                     <span class="bolder">
-                        <?= $admin->second_name . ' ' . $admin->first_name . ' ' . $admin->middle_name; ?>
+                        <?= $admin->username; ?>
                     </span>
 
                     <?php if (ConversationExpert::isExist($communication->expert->id, $admin->id)) : ?>

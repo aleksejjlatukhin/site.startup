@@ -86,9 +86,6 @@ class ClientsController extends AppAdminController
     public function actionGetListManagers($clientId)
     {
         $managers = User::findAll(['role' => User::ROLE_MANAGER, 'status' => User::STATUS_ACTIVE, 'confirm' => User::CONFIRM]);
-        foreach ($managers as $manager) {
-            $manager->username = $manager->second_name . ' ' . $manager->first_name . ' ' . $manager->middle_name;
-        }
 
         $customerManager = CustomerManager::find()->where(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
         if (!$customerManager) {

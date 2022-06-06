@@ -3,12 +3,19 @@
 
 namespace app\models\forms;
 
-use app\models\EditorCountResponds;
 use app\models\ConfirmSegment;
-use Throwable;
-use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма обновления подтверждения гипотезы сегмента
+ *
+ * Class FormUpdateConfirmSegment
+ * @package app\models\forms
+ *
+ * @property string $greeting_interview                 Приветствие в начале встречи
+ * @property string $view_interview                     Информация о вас для респондентов
+ * @property string $reason_interview                   Причина и тема (что побудило) для проведения исследования
+ */
 class FormUpdateConfirmSegment extends FormUpdateConfirm
 {
 
@@ -25,15 +32,15 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     public function __construct($confirmId, $config = [])
     {
         $confirm = ConfirmSegment::findOne($confirmId);
-        $this->_editorCountRespond = new EditorCountResponds();
+        $this->setEditorCountRespond();
 
         $this->setParams([
             'id' => $confirmId,
-            'count_respond' => $confirm->count_respond,
-            'count_positive' => $confirm->count_positive,
-            'greeting_interview' => $confirm->greeting_interview,
-            'view_interview' => $confirm->view_interview,
-            'reason_interview' => $confirm->reason_interview
+            'count_respond' => $confirm->getCountRespond(),
+            'count_positive' => $confirm->getCountPositive(),
+            'greeting_interview' => $confirm->getGreetingInterview(),
+            'view_interview' => $confirm->getViewInterview(),
+            'reason_interview' => $confirm->getReasonInterview()
         ]);
 
         parent::__construct($config);
@@ -46,12 +53,12 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
      */
     protected function setParams(array $params)
     {
-        $this->id = $params['id'];
-        $this->count_respond = $params['count_respond'];
-        $this->count_positive = $params['count_positive'];
-        $this->greeting_interview = $params['greeting_interview'];
-        $this->view_interview = $params['view_interview'];
-        $this->reason_interview = $params['reason_interview'];
+        $this->setId($params['id']);
+        $this->setCountRespond($params['count_respond']);
+        $this->setCountPositive($params['count_positive']);
+        $this->setGreetingInterview($params['greeting_interview']);
+        $this->setViewInterview($params['view_interview']);
+        $this->setReasonInterview($params['reason_interview']);
     }
 
 
@@ -85,31 +92,77 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmSegment|bool|null
+     * @return ConfirmSegment|bool|mixed|null
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
     public function update()
     {
         if ($this->validate()) {
 
-            $confirm = ConfirmSegment::findOne($this->id);
-            $confirm->setCountRespond($this->count_respond);
-            $confirm->setCountPositive($this->count_positive);
+            $confirm = ConfirmSegment::findOne($this->getId());
+            $confirm->setCountRespond($this->getCountRespond());
+            $confirm->setCountPositive($this->getCountPositive());
             $confirm->setParams([
-                'greeting_interview' => $this->greeting_interview,
-                'view_interview' => $this->view_interview,
-                'reason_interview' => $this->reason_interview
+                'greeting_interview' => $this->getGreetingInterview(),
+                'view_interview' => $this->getViewInterview(),
+                'reason_interview' => $this->getReasonInterview()
             ]);
 
             if ($confirm->save()) {
-                $this->_editorCountRespond->edit($confirm);
+                $this->getEditorCountRespond()->edit($confirm);
                 return $confirm;
             }
             throw new NotFoundHttpException('Ошибка. Неудалось сохранить изменения');
         }
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGreetingInterview()
+    {
+        return $this->greeting_interview;
+    }
+
+    /**
+     * @param string $greeting_interview
+     */
+    public function setGreetingInterview($greeting_interview)
+    {
+        $this->greeting_interview = $greeting_interview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewInterview()
+    {
+        return $this->view_interview;
+    }
+
+    /**
+     * @param string $view_interview
+     */
+    public function setViewInterview($view_interview)
+    {
+        $this->view_interview = $view_interview;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReasonInterview()
+    {
+        return $this->reason_interview;
+    }
+
+    /**
+     * @param string $reason_interview
+     */
+    public function setReasonInterview($reason_interview)
+    {
+        $this->reason_interview = $reason_interview;
     }
 
 }

@@ -118,7 +118,7 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
                         </div>
 
                         <div class="col-md-3 col-lg-2 informationAboutAction">
-                            <b>Автор проекта:</b> <?= $project->user->second_name.' '.$project->user->first_name.' '.$project->user->middle_name; ?>
+                            <b>Автор проекта:</b> <?= $project->user->username; ?>
                         </div>
 
                     </div>

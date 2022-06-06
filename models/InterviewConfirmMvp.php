@@ -12,13 +12,28 @@ use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
-
+/**
+ * Класс хранит информацию в бд о проведении интервью с респондентом
+ * на этапе подтверждения mvp-продукта
+ *
+ * Class InterviewConfirmMvp
+ * @package app\models
+ *
+ * @property int $id                                    Идентификатор записи
+ * @property int $respond_id                            Идентификатор респондента из таб. responds_mvp
+ * @property string $interview_file                     Имя файла, с которым он был загружен
+ * @property string $server_file                        Сгенерированное имя прикрепленного файла на сервере
+ * @property int $status                                Значимость ЦП для респондента
+ * @property int $created_at                            Дата создания
+ * @property int $updated_at                            Дата редактирования
+ * @property $loadFile                                  Поле для загрузки файла
+ * @property CacheForm $_cacheManager                   Менеджер кэширования
+ */
 class InterviewConfirmMvp extends ActiveRecord
 {
 
     public $loadFile;
     public $_cacheManager;
-
 
     /**
      * {@inheritdoc}
@@ -28,21 +43,20 @@ class InterviewConfirmMvp extends ActiveRecord
         return 'interview_confirm_mvp';
     }
 
-
     /**
      * InterviewConfirmMvp constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
     {
-        $this->_cacheManager = new CacheForm();
-
+        $this->setCacheManager();
         parent::__construct($config);
     }
 
-
     /**
      * Получить объект респондента
+     *
      * @return ActiveQuery
      */
     public function getRespond()
@@ -50,44 +64,32 @@ class InterviewConfirmMvp extends ActiveRecord
         return $this->hasOne(RespondsMvp::class, ['id' => 'respond_id']);
     }
 
-
     /**
-     * @param $id
+     * @return RespondsMvp|null
      */
-    public function setRespondId($id)
+    public function findRespond()
     {
-        $this->respond_id = $id;
+        return RespondsMvp::findOne($this->getRespondId());
     }
-
-
-    /**
-     * @return mixed
-     */
-    public function getRespondId()
-    {
-        return $this->respond_id;
-    }
-
 
     /**
      * @return string
      */
     public function getPathFile()
     {
-        $respond = $this->respond;
-        $confirm = $respond->confirm;
-        $mvp = $confirm->mvp;
-        $gcp = $mvp->gcp;
-        $problem = $mvp->problem;
-        $segment = $mvp->segment;
-        $project = $mvp->project;
-        $user = $project->user;
-        $path = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.
-            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/interviews/respond-'.$respond->id.'/';
+        $respond = $this->findRespond();
+        $confirm = $respond->findConfirm();
+        $mvp = $confirm->findMvp();
+        $gcp = $mvp->findGcp();
+        $problem = $mvp->findProblem();
+        $segment = $mvp->findSegment();
+        $project = $mvp->findProject();
+        $user = $project->findUser();
+        $path = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+            '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/interviews/respond-'.$respond->getId().'/';
 
         return $path;
     }
-
 
     /**
      * @param RespondsMvp $respond
@@ -95,19 +97,18 @@ class InterviewConfirmMvp extends ActiveRecord
      */
     public static function getCachePath($respond)
     {
-        $confirm = $respond->confirm;
-        $mvp = $confirm->mvp;
-        $gcp = $mvp->gcp;
-        $problem = $mvp->problem;
-        $segment = $mvp->segment;
-        $project = $mvp->project;
-        $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$respond->id.'/';
+        $confirm = $respond->findConfirm();
+        $mvp = $confirm->findMvp();
+        $gcp = $mvp->findGcp();
+        $problem = $mvp->findProblem();
+        $segment = $mvp->findSegment();
+        $project = $mvp->findProject();
+        $user = $project->findUser();
+        $cachePath = '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
+            '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/confirm/interviews/respond-'.$respond->getId().'/';
 
         return $cachePath;
     }
-
 
     /**
      * {@inheritdoc}
@@ -122,7 +123,6 @@ class InterviewConfirmMvp extends ActiveRecord
         ];
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -134,7 +134,6 @@ class InterviewConfirmMvp extends ActiveRecord
         ];
     }
 
-
     /**
      * @return array
      */
@@ -144,7 +143,6 @@ class InterviewConfirmMvp extends ActiveRecord
             TimestampBehavior::class
         ];
     }
-
 
     public function init()
     {
@@ -162,7 +160,6 @@ class InterviewConfirmMvp extends ActiveRecord
         parent::init();
     }
 
-
     /**
      * @return bool
      * @throws NotFoundHttpException
@@ -172,11 +169,11 @@ class InterviewConfirmMvp extends ActiveRecord
     {
         if ($this->validate() && $this->save()) {
 
-            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+            $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->loadFile) {
+            if ($this->getLoadFile()) {
                 if ($this->uploadFileInterview()) {
-                    $this->interview_file = $this->loadFile;
+                    $this->setInterviewFile($this->getLoadFile());
                     $this->save(false);
                 }
             }
@@ -185,7 +182,6 @@ class InterviewConfirmMvp extends ActiveRecord
         }
         throw new NotFoundHttpException('Ошибка. Не удалось сохранить интервью');
     }
-
 
     /**
      * @return bool
@@ -196,11 +192,11 @@ class InterviewConfirmMvp extends ActiveRecord
     {
         if ($this->validate() && $this->save()) {
 
-            $this->loadFile = UploadedFile::getInstance($this, 'loadFile');
+            $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->loadFile) {
+            if ($this->getLoadFile()) {
                 if ($this->uploadFileInterview()) {
-                    $this->interview_file = $this->loadFile;
+                    $this->setInterviewFile($this->getLoadFile());
                     $this->save(false);
                 }
             }
@@ -210,7 +206,6 @@ class InterviewConfirmMvp extends ActiveRecord
         throw new NotFoundHttpException('Ошибка. Не удалось обновить данные интервью');
     }
 
-
     /**
      * @return bool
      * @throws NotFoundHttpException
@@ -218,7 +213,7 @@ class InterviewConfirmMvp extends ActiveRecord
      */
     private function uploadFileInterview()
     {
-        $path = $this->pathFile;
+        $path = $this->getPathFile();
         if (!is_dir($path)) FileHelper::createDirectory($path);
 
         if ($this->validate()) {
@@ -226,8 +221,8 @@ class InterviewConfirmMvp extends ActiveRecord
             $filename = Yii::$app->getSecurity()->generateRandomString(15);
             try{
 
-                $this->loadFile->saveAs($path . $filename . '.' . $this->loadFile->extension);
-                $this->server_file = $filename . '.' . $this->loadFile->extension;
+                $this->getLoadFile()->saveAs($path . $filename . '.' . $this->getLoadFile()->extension);
+                $this->setServerFile($filename . '.' . $this->getLoadFile()->extension);
 
             }catch (Exception $e){
 
@@ -238,5 +233,126 @@ class InterviewConfirmMvp extends ActiveRecord
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setRespondId($id)
+    {
+        $this->respond_id = $id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getRespondId()
+    {
+        return $this->respond_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInterviewFile()
+    {
+        return $this->interview_file;
+    }
+
+    /**
+     * @param string $interview_file
+     */
+    public function setInterviewFile($interview_file)
+    {
+        $this->interview_file = $interview_file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerFile()
+    {
+        return $this->server_file;
+    }
+
+    /**
+     * @param string $server_file
+     */
+    public function setServerFile($server_file)
+    {
+        $this->server_file = $server_file;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLoadFile()
+    {
+        return $this->loadFile;
+    }
+
+    /**
+     * @param mixed $loadFile
+     */
+    public function setLoadFile($loadFile)
+    {
+        $this->loadFile = $loadFile;
+    }
+
+    /**
+     * @return CacheForm
+     */
+    public function getCacheManager()
+    {
+        return $this->_cacheManager;
+    }
+
+    /**
+     *
+     */
+    public function setCacheManager()
+    {
+        $this->_cacheManager = new CacheForm();
     }
 }

@@ -59,7 +59,7 @@ $(body).on('beforeSubmit', '#formAddAdminToUser', function (e) {
         cache: false,
         success: function(response){
 
-            // Изменение кнопки с ФИО админа
+            // Изменение кнопки с логином админа
             var button = $('#open_add_admin_modal-' + response.user.id);
             $(button).html(response.admin.username);
             if ($(button).hasClass('btn-default')) {

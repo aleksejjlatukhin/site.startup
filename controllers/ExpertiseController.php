@@ -90,7 +90,7 @@ class ExpertiseController extends AppUserPartController
                     $data[$i]['id'] = $model->id;
                     $data[$i]['updated_at'] = $model->updated_at;
                     $data[$i]['type'] = $model->getTypeExpert();
-                    $data[$i]['fio_expert'] = $model->expert->second_name . ' ' . $model->expert->first_name . ' ' . $model->expert->middle_name;
+                    $data[$i]['username_expert'] = $model->expert->username;
                     $data[$i]['general_estimation_by_one'] = $model->getGeneralEstimationByOne();
                     $data[$i]['comment'] = $model->getComment();
                     $data[$i]['form'] = !isset($interfaces[ConfirmationInterface::class]) ? new FormExpertiseSingleAnswer($model) : new FormExpertiseManyAnswer($model);

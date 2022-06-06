@@ -136,37 +136,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                     'successCssClass' => 'u-has-success-v1-1',
                 ]); ?>
 
-                <div class="col-md-4">
-                    <?= $form->field($user, 'second_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <?= $form->field($user, 'first_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <?= $form->field($user, 'middle_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => true,
-                        'readonly' => true,
-                        'class' => 'style_form_field_respond form-control',
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <?= $form->field($user, 'email', [
                         'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                     ])->textInput([
@@ -176,7 +146,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                     ]); ?>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <?= $form->field($user, 'username', [
                         'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                     ])->textInput([
@@ -239,43 +209,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                     'successCssClass' => 'u-has-success-v1-1',
                 ]); ?>
 
-                <div class="col-md-4">
-                    <?= $form->field($profile, 'second_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => 50,
-                        'minlength' => 2,
-                        'required' => true,
-                        'class' => 'style_form_field_respond form-control',
-                        'autocomplete' => 'off'
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <?= $form->field($profile, 'first_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => 50,
-                        'minlength' => 2,
-                        'required' => true,
-                        'class' => 'style_form_field_respond form-control',
-                        'autocomplete' => 'off'
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <?= $form->field($profile, 'middle_name', [
-                        'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-                    ])->textInput([
-                        'maxlength' => 50,
-                        'minlength' => 2,
-                        'required' => true,
-                        'class' => 'style_form_field_respond form-control',
-                        'autocomplete' => 'off'
-                    ]); ?>
-                </div>
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <?= $form->field($profile, 'email', [
                         'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                     ])->textInput([
@@ -287,7 +221,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                     ]); ?>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <?= $form->field($profile, 'username', [
                         'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
                     ])->textInput([
@@ -340,9 +274,8 @@ $this->registerCssFile('@web/css/profile-style.css');
 
                 <div class="row change_password_content_data_user">
 
-                    <div class="col-lg-4"><label style="padding-left: 10px;">ФИО:</label><span style="padding-left: 10px;"><?= $user->second_name.' '.$user->first_name.' '.$user->middle_name; ?></span></div>
-                    <div class="col-lg-4"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->username; ?></span></div>
-                    <div class="col-lg-4"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->email; ?></span></div>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->getUsername(); ?></span></div>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->getEmail(); ?></span></div>
 
                 </div>
 

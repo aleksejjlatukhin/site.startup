@@ -6,6 +6,22 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use Yii;
 
+/**
+ * Класс хранит информацию о том, по какому шаблону будет отправлена коммуникация эксперту от администратора
+ *
+ * Class CommunicationPatterns
+ * @package app\models
+ *
+ * @property int $id                                                Идентификатор записи
+ * @property int $communication_type                                Тип коммуникации
+ * @property int $initiator                                         Идентификатор пользователя, который создал шаблон
+ * @property int $is_active                                         Флаг активации шаблона коммуникации, указывает что будет применятся данный шаблон
+ * @property string $description                                    Описание шаблона коммуникации
+ * @property int $project_access_period                             Срок доступа к проекту
+ * @property int $created_at                                        Дата создания шаблона
+ * @property int $updated_at                                        Дата редактирования шаблона
+ * @property int $is_remote                                         В бд хранятся все шаблоны, в тос числе и удаленные, поэтому было добавлено данное поле
+ */
 class CommunicationPatterns extends ActiveRecord
 {
 
@@ -84,7 +100,127 @@ class CommunicationPatterns extends ActiveRecord
      */
     public function setParams($communication_type)
     {
+        $this->setCommunicationType($communication_type);
+        $this->setInitiator(Yii::$app->user->getId());
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommunicationType()
+    {
+        return $this->communication_type;
+    }
+
+    /**
+     * @param int $communication_type
+     */
+    public function setCommunicationType($communication_type)
+    {
         $this->communication_type = $communication_type;
-        $this->initiator = Yii::$app->user->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInitiator()
+    {
+        return $this->initiator;
+    }
+
+    /**
+     * @param int $initiator
+     */
+    public function setInitiator($initiator)
+    {
+        $this->initiator = $initiator;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIsActive()
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * @param int $is_active
+     */
+    public function setIsActive($is_active)
+    {
+        $this->is_active = $is_active;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectAccessPeriod()
+    {
+        return $this->project_access_period;
+    }
+
+    /**
+     * @param int $project_access_period
+     */
+    public function setProjectAccessPeriod($project_access_period)
+    {
+        $this->project_access_period = $project_access_period;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIsRemote()
+    {
+        return $this->is_remote;
+    }
+
+    /**
+     * @param int $is_remote
+     */
+    public function setIsRemote($is_remote)
+    {
+        $this->is_remote = $is_remote;
     }
 }

@@ -511,6 +511,7 @@ class SiteController extends AppUserPartController
     /**
      * @param $key
      * @return string|Response
+     * @throws Exception
      */
     public function actionResetPassword($key)
     {

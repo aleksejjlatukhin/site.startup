@@ -5,6 +5,16 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * Подтверждение эл.почты при регистрации с помощью перехода
+ * по ссылке отпрааленной в письме на эту почту
+ *
+ * Class AccountActivation
+ * @package app\models
+ *
+ * @property User $_user            Текущий пользователь
+ * @property bool $exist            Проверка ключа в ссылке
+ */
 class AccountActivation extends Model
 {
 
@@ -15,40 +25,41 @@ class AccountActivation extends Model
 
     /**
      * AccountActivation constructor.
+     *
      * @param $key
      * @param array $config
      */
     public function __construct($key, $config = [])
     {
         if(empty($key) || !is_string($key))
-            $this->exist = false; // Ключ не может быть пустым
-        $this->_user = User::findBySecretKey($key);
-        if(!$this->_user)
-            $this->exist = false; // Не верный ключ! Возможно истекло время его действия
+            $this->setExist(false); // Ключ не может быть пустым
+        $this->setUser(User::findBySecretKey($key));
+        if(!$this->getUser())
+            $this->setExist(false); // Не верный ключ! Возможно истекло время его действия
         parent::__construct($config);
     }
 
 
     /**
      * Подтвреждение регистрации по email
+     *
      * @return bool
      */
     public function activateAccount()
     {
-        $user = $this->_user;
-        $user->confirm = User::CONFIRM;
+        $user = $this->getUser();
+        $user->setConfirm(User::CONFIRM);
         $user->removeSecretKey();
         return $user->save();
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUsername()
     {
-        $user = $this->_user;
-        return $user->username;
+        return $this->getUser()->getUsername();
     }
 
 
@@ -57,8 +68,31 @@ class AccountActivation extends Model
      */
     public function getUser()
     {
-        $user = $this->_user;
-        return $user;
+        return $this->_user;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExist()
+    {
+        return $this->exist;
+    }
+
+    /**
+     * @param bool $exist
+     */
+    public function setExist($exist)
+    {
+        $this->exist = $exist;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->_user = $user;
     }
 
 }

@@ -3,18 +3,20 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
-use Throwable;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\StaleObjectException;
 
 /**
  * Класс, который хранит объекты подтверждений mvp-продуктов в бд
+ *
  * Class ConfirmMvp
  * @package app\models
  *
- * @property int $id
- * @property mixed $enable_expertise
+ * @property int $id                                    Идентификатор записи в таб. confirm_mvp
+ * @property int $mvp_id                                Идентификатор записи в таб. mvps
+ * @property int $count_respond                         Количество респондентов
+ * @property int $count_positive                        Количество респондентов, подтверждающих mvp-продукт
+ * @property int $enable_expertise                      Параметр разрешения на экспертизу по даному этапу
  */
 class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 {
@@ -43,17 +45,19 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Проверка на ограничение кол-ва респондентов
+     *
      * @return bool
      */
     public function checkingLimitCountRespond()
     {
-        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        if ($this->getCountRespond() < self::LIMIT_COUNT_RESPOND) return true;
         else return false;
     }
 
 
     /**
      * Получить объект текущего Mvps
+     *
      * @return ActiveQuery
      */
     public function getMvp()
@@ -63,7 +67,19 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Найти Mvp, к которому относится подтверждение
+     *
+     * @return Mvps|null
+     */
+    public function findMvp()
+    {
+        return Mvps::findOne($this->getMvpId());
+    }
+
+
+    /**
      * Получить респондентов привязанных к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getResponds()
@@ -74,6 +90,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить объект бизнес модели
+     *
      * @return ActiveQuery
      */
     public function getBusiness()
@@ -84,6 +101,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить вопросы привязанные к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getQuestions()
@@ -93,63 +111,19 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Установить кол-во респондентов
-     * @param $count
+     * Найти вопросы привязанные к подтверждению
+     *
+     * @return QuestionsConfirmMvp[]
      */
-    public function setCountRespond($count)
+    public function findQuestions()
     {
-        $this->count_respond = $count;
-    }
-
-
-    /**
-     * @param $count
-     */
-    public function setCountPositive($count)
-    {
-        $this->count_positive = $count;
-    }
-
-
-    /**
-     * @param $id
-     */
-    public function setMvpId($id)
-    {
-        $this->mvp_id = $id;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getMvpId()
-    {
-        return $this->mvp_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return int
-     */
-    public function getEnableExpertise()
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise()
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return QuestionsConfirmMvp::findAll(['confirm_id' => $this->getId()]);
     }
 
 
     /**
      * Получить гипотезу подтверждения
+     *
      * @return ActiveQuery
      */
     public function getHypothesis()
@@ -207,6 +181,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Список вопросов, который будет показан для добавления нового вопроса
+     *
      * @return array
      */
     public function queryQuestionsGeneralList()
@@ -254,13 +229,13 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     {
         $count_interview = RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         $count_positive = RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_mvp.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->business))) {
+        if ((count($this->responds) == $count_interview && $this->getCountPositive() <= $count_positive) || (!empty($this->business))) {
             return true;
         }else {
             return false;
@@ -274,7 +249,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsMvp::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsMvp::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -289,7 +264,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
         // Кол-во респондентов, у кот-х существует анкета
         $count = RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         return $count;
     }
@@ -303,7 +278,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
         // Кол-во подтвердивших MVP
         $count = RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_mvp.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
 
         return $count;
     }
@@ -312,6 +287,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     /**
      * Путь к папке всего
      * кэша данного подтверждения
+     *
      * @return string
      */
     public function getCachePath()
@@ -328,4 +304,75 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
         return $cachePath;
     }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param $id
+     */
+    public function setMvpId($id)
+    {
+        $this->mvp_id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMvpId()
+    {
+        return $this->mvp_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountRespond()
+    {
+        return $this->count_respond;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountPositive()
+    {
+        return $this->count_positive;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
 }

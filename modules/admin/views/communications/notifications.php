@@ -33,7 +33,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
                     <?php $communicationResponse = $communication->communicationResponse; ?>
 
                     <div class="col-md-2 bolder">
-                        <?= $communication->expert->second_name . ' ' . $communication->expert->first_name . ' ' . $communication->expert->middle_name; ?>
+                        <?= $communication->expert->username; ?>
                     </div>
 
                     <div class="col-md-3">

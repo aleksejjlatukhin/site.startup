@@ -14,7 +14,7 @@ use app\models\ExpertType;
 
     <!--Заголовки для списка коммуникаций по проекту-->
     <div class="row headers_data_communications">
-        <div class="col-md-2">Фамилия, имя, отчество</div>
+        <div class="col-md-2">Логин эксперта</div>
         <div class="col-md-2">Запрос на готовность провести экспертизу</div>
         <div class="col-md-1">Дата, время</div>
         <div class="col-md-3">Ответ на запрос</div>
@@ -33,7 +33,7 @@ use app\models\ExpertType;
 
                     <?php if ($key == 0) : ?>
                         <div class="col-md-2 text-center">
-                            <?= $admittedExpert->user->second_name . ' ' . $admittedExpert->user->first_name . ' ' . $admittedExpert->user->middle_name; ?>
+                            <?= $admittedExpert->user->username; ?>
                         </div>
                     <?php else : ?>
                         <div class="col-md-2"></div>

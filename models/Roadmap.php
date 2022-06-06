@@ -3,7 +3,12 @@
 
 namespace app\models;
 
-
+/**
+ * Дорожная карта по сегменту проекта
+ *
+ * Class Roadmap
+ * @package app\models
+ */
 class Roadmap extends PropertyContainer
 {
 

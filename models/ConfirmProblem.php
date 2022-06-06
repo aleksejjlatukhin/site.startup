@@ -8,11 +8,16 @@ use yii\db\ActiveRecord;
 
 /**
  * Класс, который хранит подтверждения проблем сегментов в бд
+ *
  * Class ConfirmProblem
  * @package app\models
  *
- * @property int $id
- * @property mixed $enable_expertise
+ * @property int $id                                    Идентификатор записи в таб. confirm_problem
+ * @property int $problem_id                            Идентификатор записи в таб. problems
+ * @property int $count_respond                         Количество респондентов
+ * @property int $count_positive                        Количество респондентов, подтверждающих проблему
+ * @property string $need_consumer                      Потребность потребителя
+ * @property int $enable_expertise                      Параметр разрешения на экспертизу по даному этапу
  */
 class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 {
@@ -41,17 +46,19 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Проверка на ограничение кол-ва респондентов
+     *
      * @return bool
      */
     public function checkingLimitCountRespond()
     {
-        if ($this->count_respond < self::LIMIT_COUNT_RESPOND) return true;
+        if ($this->getCountRespond() < self::LIMIT_COUNT_RESPOND) return true;
         else return false;
     }
 
 
     /**
      * Получить объект текущей проблемы
+     *
      * @return ActiveQuery
      */
     public function getProblem()
@@ -61,7 +68,18 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
 
     /**
+     * Найти проблему, к которому отновится подтверждение
+     *
+     * @return Problems|null
+     */
+    public function findProblem()
+    {
+        return Problems::findOne($this->getProblemId());
+    }
+
+    /**
      * Получить респондентов привязанных к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getResponds()
@@ -77,6 +95,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить вопросы привязанные к подтверждению
+     *
      * @return ActiveQuery
      */
     public function getQuestions()
@@ -86,78 +105,19 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
 
     /**
-     * Установить кол-во респондентов
-     * @param $count
+     * Найти вопросы привязанные к подтверждению
+     *
+     * @return QuestionsConfirmProblem[]
      */
-    public function setCountRespond($count)
+    public function findQuestions()
     {
-        $this->count_respond = $count;
-    }
-
-
-    /**
-     * Установить id проблемы
-     * @param $id
-     * @return mixed
-     */
-    public function setProblemId($id)
-    {
-        return $this->problem_id = $id;
-    }
-
-
-    /**
-     * Установить количество респондентов
-     * @param $count
-     * @return mixed
-     */
-    public function setCountPositive($count)
-    {
-        return $this->count_positive = $count;
-    }
-
-
-    /**
-     * Уствновить потребность потребителя
-     * @param $needConsumer
-     * @return mixed
-     */
-    public function setNeedConsumer($needConsumer)
-    {
-        return $this->need_consumer = $needConsumer;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getProblemId()
-    {
-        return $this->problem_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return int
-     */
-    public function getEnableExpertise()
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise()
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return QuestionsConfirmProblem::findAll(['confirm_id' => $this->getId()]);
     }
 
 
     /**
      * Получить гипотезу подтверждения
+     *
      * @return ActiveQuery
      */
     public function getHypothesis()
@@ -218,6 +178,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Список вопросов, который будет показан для добавления нового вопроса
+     *
      * @return array
      */
     public function queryQuestionsGeneralList()
@@ -266,13 +227,13 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
 
         $count_interview = RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         $count_positive = RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_problem.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_problem.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_interview && $this->count_positive <= $count_positive) || (!empty($this->gcps))) {
+        if ((count($this->responds) == $count_interview && $this->getCountPositive() <= $count_positive) || (!empty($this->gcps))) {
             return true;
         }else {
             return false;
@@ -286,7 +247,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsProblem::find()->where(['confirm_id' => $this->id])->andWhere(['not', ['info_respond' => '']])
+        $count = RespondsProblem::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
         return $count;
@@ -301,7 +262,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
         // Кол-во респондентов, у кот-х существует анкета
         $count = RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         return $count;
     }
@@ -315,7 +276,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
         //Кол-во респондентов, кот-е подтвердили проблему
         $count = RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->id, 'interview_confirm_problem.status' => '1'])->count();
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_problem.status' => '1'])->count();
 
         return $count;
     }
@@ -324,6 +285,7 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     /**
      * Путь к папке всего
      * кэша данного подтверждения
+     *
      * @return string
      */
     public function getCachePath()
@@ -336,5 +298,96 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
             '/segments/segment-'.$segment->id. '/problems/problem-'.$problem->id.'/confirm';
         return $cachePath;
     }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProblemId()
+    {
+        return $this->problem_id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setProblemId($id)
+    {
+        $this->problem_id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountRespond()
+    {
+        return $this->count_respond;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCountRespond($count)
+    {
+        $this->count_respond = $count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountPositive()
+    {
+        return $this->count_positive;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCountPositive($count)
+    {
+        $this->count_positive = $count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNeedConsumer()
+    {
+        return $this->need_consumer;
+    }
+
+    /**
+     * @param string $needConsumer
+     */
+    public function setNeedConsumer($needConsumer)
+    {
+        $this->need_consumer = $needConsumer;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEnableExpertise()
+    {
+        return $this->enable_expertise;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise()
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+    }
+
+
+
 
 }

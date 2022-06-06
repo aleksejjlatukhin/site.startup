@@ -10,6 +10,12 @@ use app\models\Mvps;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Форма создания подтверждения гипотезы mvp-продукта
+ *
+ * Class FormCreateConfirmMvp
+ * @package app\models\forms
+ */
 class FormCreateConfirmMvp extends FormCreateConfirm
 {
 
@@ -21,12 +27,11 @@ class FormCreateConfirmMvp extends FormCreateConfirm
      */
     public function __construct(Mvps $hypothesis, $config = [])
     {
-        $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
-        $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
-        $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($hypothesis);
-        $cacheName = 'formCreateConfirmCache';
-        if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
+        $this->setCreatorResponds();
+        $this->setCreatorNewResponds();
+        $this->setCacheManager();
+        $this->setCachePathForm(self::getCachePath($hypothesis));
+        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) $this[$key] = $value;
         }
@@ -50,35 +55,6 @@ class FormCreateConfirmMvp extends FormCreateConfirm
             '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$hypothesis->id.'/confirm/formCreateConfirm/';
 
         return $cachePath;
-    }
-
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function setHypothesisId($id)
-    {
-        return $this->hypothesis_id = $id;
-    }
-
-
-    /**
-     * @param $count
-     * @return mixed
-     */
-    public function setCountRespond($count)
-    {
-        return $this->count_respond = $count;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getHypothesisId()
-    {
-        return $this->hypothesis_id;
     }
 
 
@@ -116,17 +92,17 @@ class FormCreateConfirmMvp extends FormCreateConfirm
     public function create()
     {
         $model = new ConfirmMvp();
-        $model->setMvpId($this->hypothesis_id);
-        $model->setCountRespond(array_sum([$this->count_respond, $this->add_count_respond]));
-        $model->setCountPositive($this->count_positive);
+        $model->setMvpId($this->getHypothesisId());
+        $model->setCountRespond(array_sum([$this->getCountRespond(), $this->getAddCountRespond()]));
+        $model->setCountPositive($this->getCountPositive());
 
         if ($model->save()) {
             //Создание респондентов для программы подтверждения MVP из респондентов подтвердивших ГЦП
-            $this->_creatorResponds->create($model, $this);
+            $this->getCreatorResponds()->create($model, $this);
             // Добавление новых респондентов для программы подтверждения MVP
-            if ($this->add_count_respond) $this->_creatorNewResponds->create($model, $this);
+            if ($this->getAddCountRespond()) $this->getCreatorNewResponds()->create($model, $this);
             //Удаление кэша формы создания подтверждения
-            $this->_cacheManager->deleteCache($this->cachePath);
+            $this->getCacheManager()->deleteCache($this->getCachePathForm());
 
             return $model;
         }

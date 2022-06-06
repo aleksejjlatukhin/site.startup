@@ -5,6 +5,18 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 
+/**
+ * Класс хранит информацию в бд о всех вопросах,
+ * которые добавлялись на этапе подтверждения гипотезы сегмента
+ *
+ * Class AllQuestionsConfirmSegment
+ * @package app\models
+ *
+ * @property int $id                            Идентификатор записи
+ * @property string $title                      Описание вопроса
+ * @property int $user_id                       Идентификатор пользователя, который добавил вопрос
+ * @property int $created_at                    Дата создания
+ */
 class AllQuestionsConfirmSegment extends ActiveRecord
 {
 
@@ -80,5 +92,53 @@ class AllQuestionsConfirmSegment extends ActiveRecord
         ];
 
         return $array;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * @param int $user_id
+     */
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
     }
 }

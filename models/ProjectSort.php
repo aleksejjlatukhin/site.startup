@@ -6,6 +6,12 @@ namespace app\models;
 use yii\base\Model;
 use yii\db\ActiveRecord;
 
+/**
+ * Класс для сортировки проектов по заданным параметрам
+ *
+ * Class ProjectSort
+ * @package app\models
+ */
 class ProjectSort extends Model
 {
 

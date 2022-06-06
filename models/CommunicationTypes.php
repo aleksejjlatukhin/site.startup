@@ -3,7 +3,12 @@
 
 namespace app\models;
 
-
+/**
+ * Типы коммуникаций между администратором и экспертом
+ *
+ * Class CommunicationTypes
+ * @package app\models
+ */
 class CommunicationTypes
 {
 

@@ -1109,45 +1109,18 @@ class MessageController extends AppClientController
             //Беседы с трекером, которые попали в запрос
             $manager_conversations_query = ConversationManager::find()->joinWith('manager')
                 ->andWhere(['user_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $conversations_query = ConversationMainAdmin::find()->joinWith('admin')
                 ->andWhere(['main_admin_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
                 ->andWhere(['user_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $response = ['renderAjax' => $this->renderAjax('admin_conversations_query', [
                 'conversations_query' => $conversations_query, 'expert_conversations_query' => $expert_conversations_query,
@@ -1172,31 +1145,13 @@ class MessageController extends AppClientController
             $conversations_query = ConversationAdmin::find()->joinWith('user')
                 ->andWhere(['user.id_admin' => $id])
                 ->andWhere(['admin_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
                 ->andWhere(['user_id' => $id])
-                ->andWhere(['or',
-                    ['like', 'user.second_name', $query],
-                    ['like', 'user.first_name', $query],
-                    ['like', 'user.middle_name', $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                    ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
-                ])->all();
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $response = ['renderAjax' => $this->renderAjax('conversations_query', [
                 'conversations_query' => $conversations_query, 'expert_conversations_query' => $expert_conversations_query])];

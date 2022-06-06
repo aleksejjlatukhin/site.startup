@@ -19,7 +19,7 @@ use yii\helpers\Html;
 <?php endif; ?>
 
 <div class="block-fio-and-date-last-visit">
-    <div class="block-fio"><?= $user->second_name.' '.$user->first_name.' '.$user->middle_name; ?></div>
+    <div class="block-fio"><?= $user->username; ?></div>
     <div class="block-date-last-visit">
         <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
             Пользователь был в сети <?= $user->checkOnline;?>

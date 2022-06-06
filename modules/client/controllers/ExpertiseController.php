@@ -91,15 +91,7 @@ class ExpertiseController extends AppClientController
                     ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
-                        ['like', 'user.second_name', $query],
-                        ['like', 'user.first_name', $query],
-                        ['like', 'user.middle_name', $query],
-                        ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                        ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                        ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                        ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                        ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                        ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                        ['like', 'user.username', $query],
                     ])->orderBy(['id' => SORT_DESC]);
 
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
@@ -137,15 +129,7 @@ class ExpertiseController extends AppClientController
                     ->andWhere(['enable_expertise' => (string)EnableExpertise::ON])
                     ->andWhere(['or',
                         ['like', 'project_name', $query],
-                        ['like', 'user.second_name', $query],
-                        ['like', 'user.first_name', $query],
-                        ['like', 'user.middle_name', $query],
-                        ['like', "CONCAT( user.second_name, ' ', user.first_name, ' ', user.middle_name)", $query],
-                        ['like', "CONCAT( user.second_name, ' ', user.middle_name, ' ', user.first_name)", $query],
-                        ['like', "CONCAT( user.first_name, ' ', user.middle_name, ' ', user.second_name)", $query],
-                        ['like', "CONCAT( user.first_name, ' ', user.second_name, ' ', user.middle_name)", $query],
-                        ['like', "CONCAT( user.middle_name, ' ', user.first_name, ' ', user.second_name)", $query],
-                        ['like', "CONCAT( user.middle_name, ' ', user.second_name, ' ', user.first_name)", $query],
+                        ['like', 'user.username', $query],
                     ])->orderBy(['id' => SORT_DESC]);
 
                 $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);

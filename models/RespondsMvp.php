@@ -10,9 +10,22 @@ use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
+/**
+ * Класс хранит информацию о респодентах на этапе подтверждения mvp-продукта
+ *
+ * Class RespondsMvp
+ * @package app\models
+ *
+ * @property int $id                        Идентификатор записи в таб. responds_mvp
+ * @property int $confirm_id                Идентификатор записи в таб. confirm_mvp
+ * @property string $name                   ФИО респондента
+ * @property string $info_respond           Данные респондента
+ * @property string $email                  Эл.почта респондента
+ * @property int $date_plan                 Плановая дата интервью
+ * @property string $place_interview        Место проведения интервью
+ */
 class RespondsMvp extends ActiveRecord implements RespondsInterface
 {
-
 
     /**
      * {@inheritdoc}
@@ -22,9 +35,9 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         return 'responds_mvp';
     }
 
-
     /**
      * Получить интевью респондента
+     *
      * @return mixed|ActiveQuery
      */
     public function getInterview()
@@ -32,9 +45,9 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         return $this->hasOne(InterviewConfirmMvp::class, ['respond_id' => 'id']);
     }
 
-
     /**
      * Получить модель подтверждения
+     *
      * @return mixed|ActiveQuery
      */
     public function getConfirm()
@@ -42,9 +55,17 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_id']);
     }
 
+    /**
+     * @return ConfirmMvp|null
+     */
+    public function findConfirm()
+    {
+        return ConfirmMvp::findOne($this->getConfirmId());
+    }
 
     /**
      * Получить ответы респондента на вопросы
+     *
      * @return mixed|ActiveQuery
      */
     public function getAnswers()
@@ -52,70 +73,16 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         return $this->hasMany(AnswersQuestionsConfirmMvp::class, ['respond_id' => 'id']);
     }
 
-
-    /**
-     * Установить id подтверждения
-     * @param $confirmId
-     * @return mixed
-     */
-    public function setConfirmId($confirmId)
-    {
-        return $this->confirm_id = $confirmId;
-    }
-
-
-    /**
-     * Получить id подтверждения
-     * @return mixed
-     */
-    public function getConfirmId()
-    {
-        return $this->confirm_id;
-    }
-
-
-    /**
-     * Установить имя респондента
-     * @param $name
-     * @return mixed
-     */
-    public function setName($name)
-    {
-        return $this->name = $name;
-    }
-
-
-    /**
-     * Получить имя респондента
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-
     /**
      * @param array $params
      * @return mixed|void
      */
     public function setParams(array $params)
     {
-        $this->info_respond = $params['info_respond'];
-        $this->place_interview = $params['place_interview'];
-        $this->email = $params['email'];
+        $this->setInfoRespond($params['info_respond']);
+        $this->setPlaceInterview($params['place_interview']);
+        $this->setEmail($params['email']);
     }
-
-
-    /**
-     * Установить плановую дату интервью
-     * @param $datePlan
-     */
-    public function setDatePlan($datePlan)
-    {
-        $this->date_plan = $datePlan;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -133,7 +100,6 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         ];
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -147,7 +113,6 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
             'place_interview' => 'Место проведения интервью',
         ];
     }
-
 
     public function init()
     {
@@ -171,38 +136,141 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
         parent::init();
     }
 
-
     /**
      * Удаление связанных данных
      * по событию EVENT_AFTER_DELETE
+     *
      * @throws Throwable
      * @throws ErrorException
      * @throws StaleObjectException
      */
     private function deleteDataRespond()
     {
-        $descInterview = InterviewConfirmMvp::findOne(['respond_id' => $this->id]);
-        $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->id]);
-        $confirm = ConfirmMvp::findOne($this->confirmId);
-        $mvp = Mvps::findOne($confirm->mvpId);
-        $gcp = Gcps::findOne($mvp->gcpId);
-        $problem = Problems::findOne($mvp->problemId);
-        $segment = Segments::findOne($mvp->segmentId);
-        $project = Projects::findOne($mvp->projectId);
-        $user = User::findOne($project->userId);
+        $descInterview = InterviewConfirmMvp::findOne(['respond_id' => $this->getId()]);
+        $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->getId()]);
+        $confirm = ConfirmMvp::findOne($this->getConfirmId());
+        $mvp = Mvps::findOne($confirm->getMvpId());
+        $gcp = Gcps::findOne($mvp->getGcpId());
+        $problem = Problems::findOne($mvp->getProblemId());
+        $segment = Segments::findOne($mvp->getSegmentId());
+        $project = Projects::findOne($mvp->getProblem());
+        $user = User::findOne($project->getUserId());
 
         //Удаление интервью респондента
         if ($descInterview) $descInterview->delete();
         //Удаление ответов респондента на вопросы интервью
         foreach ($answers as $answer) $answer->delete();
         //Удаление дирректории респондента
-        $del_dir = UPLOAD.'/user-'.$user->id.'/project-'.$project->id.'/segments/segment-'.$segment->id.'/problems/problem-'.$problem->id.
-            '/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/interviews/respond-'.$this->id;
+        $del_dir = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/problems/problem-'.$problem->getId().
+            '/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/interviews/respond-'.$this->getId();
         if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
         //Удаление кэша для форм респондента
-        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id.
-            '/problems/problem-'.$problem->id.'/gcps/gcp-'.$gcp->id.'/mvps/mvp-'.$mvp->id.'/confirm/interviews/respond-'.$this->id;
+        $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
+            '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/confirm/interviews/respond-'.$this->getId();
         if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
     }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $confirmId
+     */
+    public function setConfirmId($confirmId)
+    {
+        $this->confirm_id = $confirmId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfirmId()
+    {
+        return $this->confirm_id;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInfoRespond()
+    {
+        return $this->info_respond;
+    }
+
+    /**
+     * @param string $info_respond
+     */
+    public function setInfoRespond($info_respond)
+    {
+        $this->info_respond = $info_respond;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDatePlan()
+    {
+        return $this->date_plan;
+    }
+
+    /**
+     * @param int $datePlan
+     */
+    public function setDatePlan($datePlan)
+    {
+        $this->date_plan = $datePlan;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlaceInterview()
+    {
+        return $this->place_interview;
+    }
+
+    /**
+     * @param string $place_interview
+     */
+    public function setPlaceInterview($place_interview)
+    {
+        $this->place_interview = $place_interview;
+    }
 }

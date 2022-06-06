@@ -11,6 +11,16 @@ use yii\base\Model;
 use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 
+/**
+ * Форма для загрузки и обновления аватарки
+ *
+ * Class AvatarForm
+ * @package app\models\forms
+ *
+ * @property int $userId                Идентификатор записи в таб. user
+ * @property mixed $loadImage           Загружаемый файл
+ * @property string $imageMax           Название файла
+ */
 class AvatarForm extends Model
 {
     public $userId;
@@ -32,13 +42,13 @@ class AvatarForm extends Model
 
     /**
      * AvatarForm constructor.
-     * @param $userId
+     * @param int $userId
      * @param array $config
      */
     public function __construct($userId, $config = [])
     {
         $user = User::findOne($userId);
-        $this->userId = $user->id;
+        $this->setUserId($user->getId());
         parent::__construct($config);
     }
 
@@ -50,11 +60,11 @@ class AvatarForm extends Model
      */
     public function loadMinImage()
     {
-        $user = User::findOne($this->userId);
+        $user = User::findOne($this->getUserId());
 
         if ($_POST['imageMin']) {
 
-            $path = UPLOAD . 'user-' . $this->userId . '/avatar/';
+            $path = UPLOAD . 'user-' . $this->getUserId() . '/avatar/';
             if (!is_dir($path)) FileHelper::createDirectory($path);
 
             $str = Yii::$app->security->generateRandomString(8);
@@ -73,16 +83,16 @@ class AvatarForm extends Model
 
                 if ($this->deleteOldAvatarImages()) {
 
-                    $user->avatar_max_image = $_POST['imageMax'];
-                    $user->avatar_image = $file;
+                    $user->setAvatarMaxImage($_POST['imageMax']);
+                    $user->setAvatarImage($file);
                     $user->update();
 
                     return true;
                 }
             } else {
                 // Редактирование аватарки
-                unlink($path . $user->avatar_image);
-                $user->avatar_image = $file;
+                unlink($path . $user->getAvatarImage());
+                $user->setAvatarImage($file);
                 return $user->update() ? true : false;
             }
         }
@@ -95,7 +105,7 @@ class AvatarForm extends Model
      */
     public function loadMaxImage()
     {
-        $path = UPLOAD.'user-'.$this->userId.'/avatar/';
+        $path = UPLOAD.'user-'.$this->getUserId().'/avatar/';
         if (!is_dir($path)) FileHelper::createDirectory($path);
 
         $uploadfile = $path . $_FILES['file']['name'];
@@ -117,14 +127,14 @@ class AvatarForm extends Model
      */
     public function deleteOldAvatarImages ()
     {
-        $user = User::findOne($this->userId);
-        $path = UPLOAD . 'user-' . $user->id . '/avatar/';
+        $user = User::findOne($this->getUserId());
+        $path = UPLOAD . 'user-' . $user->getId() . '/avatar/';
 
-        if (is_file($path . $user->avatar_max_image)) unlink($path . $user->avatar_max_image);
-        if (is_file($path . $user->avatar_image)) unlink($path . $user->avatar_image);
+        if (is_file($path . $user->getAvatarMaxImage())) unlink($path . $user->getAvatarMaxImage());
+        if (is_file($path . $user->getAvatarImage())) unlink($path . $user->getAvatarImage());
 
-        $user->avatar_max_image = null;
-        $user->avatar_image = null;
+        $user->setAvatarMaxImage(null);
+        $user->setAvatarImage(null);
         $user->save();
 
         return true;
@@ -138,12 +148,60 @@ class AvatarForm extends Model
     {
         if ($_POST['imageMax']) {
 
-            $user = User::findOne($this->userId);
-            $path = UPLOAD . 'user-' . $user->id . '/avatar/';
+            $user = User::findOne($this->getUserId());
+            $path = UPLOAD . 'user-' . $user->getId() . '/avatar/';
             unlink($path . $_POST['imageMax']);
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @param int $userId
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLoadImage()
+    {
+        return $this->loadImage;
+    }
+
+    /**
+     * @param mixed $loadImage
+     */
+    public function setLoadImage($loadImage)
+    {
+        $this->loadImage = $loadImage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageMax()
+    {
+        return $this->imageMax;
+    }
+
+    /**
+     * @param string $imageMax
+     */
+    public function setImageMax($imageMax)
+    {
+        $this->imageMax = $imageMax;
     }
 
 }
