@@ -1,7 +1,15 @@
 <?php
 
+use app\models\Projects;
+use app\models\User;
+
 $this->title = 'Уведомления';
 $this->registerCssFile('@web/css/notifications-style.css');
+
+/**
+ * @var Projects[] $projects
+ * @var User $user
+ */
 
 ?>
 
@@ -13,24 +21,24 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
             <?php foreach ($projects as $key => $project) : ?>
 
-                <div id="communications_project-<?= $project->id;?>">
+                <div id="communications_project-<?= $project->getId() ?>">
 
                     <div class="container-one_hypothesis">
 
                         <div class="col-md-9 col-lg-10">
                             <div class="project_name_table">
 
-                                <?= $project->project_name; ?> -<span class="project_fullname_text"><?= $project->project_fullname; ?></span>
+                                <?= $project->getProjectName() ?> -<span class="project_fullname_text"><?= $project->getProjectFullname() ?></span>
 
-                                <?php if ($countUnreadCommunications = $user->getCountUnreadCommunicationsByProject($project->id)) : ?>
-                                    <div class="countUnreadCommunicationsByProject active pull-left"><?= $countUnreadCommunications; ?></div>
+                                <?php if ($countUnreadCommunications = $user->getCountUnreadCommunicationsByProject($project->getId())) : ?>
+                                    <div class="countUnreadCommunicationsByProject active pull-left"><?= $countUnreadCommunications ?></div>
                                 <?php endif; ?>
 
                             </div>
                         </div>
 
                         <div class="col-md-3 col-lg-2 informationAboutAction">
-                            <b>Автор проекта:</b> <?= $project->user->username; ?>
+                            <b>Автор проекта:</b> <?= $project->user->getUsername() ?>
                         </div>
 
                     </div>

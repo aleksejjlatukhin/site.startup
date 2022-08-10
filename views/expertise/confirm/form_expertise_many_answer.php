@@ -2,12 +2,19 @@
 
 use app\models\Expertise;
 use app\models\ExpertType;
+use app\models\forms\expertise\FormExpertiseManyAnswer;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
+/**
+ * @var FormExpertiseManyAnswer $model
+ * @var string $stage
+ * @var int $stageId
+ */
+
 ?>
 
-<div><span class="bolder">Тип деятельности:</span> <?= ExpertType::getListTypes()[$model->_expertise->getTypeExpert()];?></div>
+<div><span class="bolder">Тип деятельности:</span> <?= ExpertType::getListTypes()[$model->getExpertise()->getTypeExpert()] ?></div>
 
 <hr>
 
@@ -26,13 +33,13 @@ use yii\helpers\Html;
     <div class="row container-fluid">
         <?php foreach ($model->getAnswerOptions('preparation_interview_quality') as $i => $answerOption) : ?>
 
-            <?= $form->field($model, 'checkboxesPreparationInterviewQuality['.$i.']')->checkBoxList((object)$answerOption, [
+            <?= $form->field($model, 'checkboxesPreparationInterviewQuality['.$i.']')->checkBoxList((array)$answerOption, [
                 'class' => 'parent-checkbox-expertise-many-answer',
-                'item' => function($index, $label, $name, $checked, $value) {
+                'item' => static function($index, $label, $name, $checked, $value) {
                     !empty($checked) ? $checked = 'checked' : $checked = '';
-                    return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise-many-answer' type='checkbox' {$checked} name='{$name}' value='{$value}'>{$label}</label>";
+                    return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise-many-answer' type='checkbox' $checked name='$name' value='$value'>$label</label>";
                 }
-            ])->label('Вопрос #'.++$i); ?>
+            ])->label('Вопрос #'.++$i) ?>
 
         <?php endforeach; ?>
     </div>
@@ -44,13 +51,13 @@ use yii\helpers\Html;
     <div class="row container-fluid">
         <?php foreach ($model->getAnswerOptions('conducting_interview_quality') as $i => $answerOption) : ?>
 
-            <?= $form->field($model, 'checkboxesConductingInterviewQuality['.$i.']')->checkBoxList((object)$answerOption, [
+            <?= $form->field($model, 'checkboxesConductingInterviewQuality['.$i.']')->checkBoxList((array)$answerOption, [
                 'class' => 'parent-checkbox-expertise-many-answer',
-                'item' => function($index, $label, $name, $checked, $value) {
+                'item' => static function($index, $label, $name, $checked, $value) {
                     !empty($checked) ? $checked = 'checked' : $checked = '';
-                    return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise-many-answer' type='checkbox' {$checked} name='{$name}' value='{$value}'>{$label}</label>";
+                    return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise-many-answer' type='checkbox' $checked name='$name' value='$value'>$label</label>";
                 }
-            ])->label('Вопрос #'.++$i); ?>
+            ])->label('Вопрос #'.++$i) ?>
 
         <?php endforeach; ?>
     </div>
@@ -85,7 +92,7 @@ use yii\helpers\Html;
                     'border-radius' => '8px',
                     'margin-right' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
             <?= Html::submitButton('Сохранить', [
                 'id' => 'save_expertise',
@@ -102,9 +109,9 @@ use yii\helpers\Html;
                     'border-radius' => '8px',
                     'margin-right' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
-            <?php if ($model->_expertise->getCompleted() != Expertise::COMPLETED) : ?>
+            <?php if ($model->_expertise->getCompleted() !== Expertise::COMPLETED) : ?>
                 <?= Html::submitButton('Завершить', [
                     'id' => 'completed_expertise',
                     'class' => 'btn btn-success submit-expertise',
@@ -118,7 +125,7 @@ use yii\helpers\Html;
                         'font-size' => '24px',
                         'border-radius' => '8px',
                     ]
-                ]); ?>
+                ]) ?>
             <?php endif; ?>
 
         </div>

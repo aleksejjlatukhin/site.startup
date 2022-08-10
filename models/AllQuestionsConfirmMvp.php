@@ -4,6 +4,8 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
 
 /**
  * Класс хранит информацию в бд о всех вопросах,
@@ -23,7 +25,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'all_questions_confirm_mvp';
     }
@@ -32,7 +34,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['title', 'user_id'], 'required'],
@@ -46,7 +48,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return ['title' => 'Описание вопроса'];
     }
@@ -55,12 +57,12 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }
@@ -70,31 +72,29 @@ class AllQuestionsConfirmMvp extends ActiveRecord
      * Вопросы по-умолчанию
      * @return array
      */
-    public static function defaultListQuestions()
+    public static function defaultListQuestions(): array
     {
-        $array = [
-            '0' => ['title' => 'Чем вы занимаетесь в настоящее время?'],
-            '1' => ['title' => 'Что понравилось в решении и что нет?'],
-            '2' => ['title' => 'Вписывается ли предложение в формат вашей деятельности?'],
-            '3' => ['title' => 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?'],
-            '4' => ['title' => 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?'],
-            '5' => ['title' => 'Какая цена решения должна быть по мнению респондентов?'],
-            '6' => ['title' => 'Сколько сейчас платят?'],
-            '7' => ['title' => 'Какой бюджет до этого выделяли?'],
-            '8' => ['title' => 'Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?'],
-            '9' => ['title' => 'Кто будет финансировать покупку?'],
-            '10' => ['title' => 'С кем еще мне следует переговорить?'],
-            '11' => ['title' => 'Вы бы рассказали об этом продукте своим коллегам?'],
-            '12' => ['title' => 'Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?']
+        return [
+            0 => ['title' => 'Чем вы занимаетесь в настоящее время?'],
+            1 => ['title' => 'Что понравилось в решении и что нет?'],
+            2 => ['title' => 'Вписывается ли предложение в формат вашей деятельности?'],
+            3 => ['title' => 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?'],
+            4 => ['title' => 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?'],
+            5 => ['title' => 'Какая цена решения должна быть по мнению респондентов?'],
+            6 => ['title' => 'Сколько сейчас платят?'],
+            7 => ['title' => 'Какой бюджет до этого выделяли?'],
+            8 => ['title' => 'Заплатили бы вы «X» рублей за продукт, который выполняет задачу «Y»?'],
+            9 => ['title' => 'Кто будет финансировать покупку?'],
+            10 => ['title' => 'С кем еще мне следует переговорить?'],
+            11 => ['title' => 'Вы бы рассказали об этом продукте своим коллегам?'],
+            12 => ['title' => 'Вы бы попросили своего руководителя приобрести продукт, который реализует данное ценностное предложение?']
         ];
-
-        return $array;
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -102,7 +102,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -110,7 +110,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -118,7 +118,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -126,7 +126,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -134,7 +134,7 @@ class AllQuestionsConfirmMvp extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }

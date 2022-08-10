@@ -14,10 +14,16 @@ use yii\db\BaseActiveRecord;
  * Class ConversationAdmin
  * @package app\models
  *
- * @property int $id                    идентификатор беседы
- * @property int $admin_id               идентификатор трекера
- * @property int $user_id                идентификатор проектанта
- * @property int $updated_at             дата обновления
+ * @property int $id                                    идентификатор беседы
+ * @property int $admin_id                              идентификатор трекера
+ * @property int $user_id                               идентификатор проектанта
+ * @property int $updated_at                            дата обновления
+ *
+ * @property User $admin                                Трекер
+ * @property User $user                                 Пользователь
+ * @property MessageAdmin[] $messages                   Сообщения беседы
+ * @property MessageAdmin $lastMessage                  Последнее сообщение в беседе
+ * @property int $countNewMessages                      Кол-во непрочитанных сообщений в беседе
  */
 class ConversationAdmin extends ActiveRecord
 {
@@ -25,7 +31,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'conversation_admin';
     }
@@ -34,7 +40,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id', 'admin_id', 'user_id', 'updated_at'], 'integer'],
@@ -45,7 +51,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
@@ -65,7 +71,7 @@ class ConversationAdmin extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getAdmin ()
+    public function getAdmin(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'admin_id']);
     }
@@ -76,7 +82,7 @@ class ConversationAdmin extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getUser ()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -87,7 +93,7 @@ class ConversationAdmin extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getMessages ()
+    public function getMessages(): ActiveQuery
     {
         return $this->hasMany(MessageAdmin::class, ['conversation_id' => 'id']);
     }
@@ -98,7 +104,7 @@ class ConversationAdmin extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getLastMessage ()
+    public function getLastMessage(): ActiveQuery
     {
         return $this->hasOne(MessageAdmin::class, ['conversation_id' => 'id'])->orderBy('created_at DESC');
     }
@@ -110,19 +116,17 @@ class ConversationAdmin extends ActiveRecord
      *
      * @return int|string
      */
-    public function getCountNewMessages ()
+    public function getCountNewMessages()
     {
-        $count_new_messages = MessageAdmin::find()
+        return MessageAdmin::find()
             ->where(['conversation_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-
-        return $count_new_messages;
     }
 
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -131,7 +135,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getAdminId()
+    public function getAdminId(): int
     {
         return $this->admin_id;
     }
@@ -140,7 +144,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @param int $admin_id
      */
-    public function setAdminId($admin_id)
+    public function setAdminId(int $admin_id): void
     {
         $this->admin_id = $admin_id;
     }
@@ -149,7 +153,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -158,7 +162,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -167,7 +171,7 @@ class ConversationAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

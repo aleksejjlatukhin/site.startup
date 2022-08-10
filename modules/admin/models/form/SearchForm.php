@@ -10,9 +10,9 @@ class SearchForm extends Model
     public $search;
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['search'], 'trim'],

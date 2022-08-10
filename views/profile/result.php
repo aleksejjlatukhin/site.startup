@@ -1,33 +1,40 @@
 <?php
 
+use app\models\Projects;
 use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Сводные таблицы';
 $this->registerCssFile('@web/css/profile-data-style.css');
+
+/**
+ * @var User $user
+ * @var Projects[] $projects
+ */
+
 ?>
 
 <div class="profile-result">
 
     <div class="row profile_menu">
 
-        <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->id], [
+        <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->id], [
+        <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->id], [
+        <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->id], [
+        <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->id], [
+        <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
@@ -37,13 +44,13 @@ $this->registerCssFile('@web/css/profile-data-style.css');
 
         <?php foreach ($projects as $project) : ?>
 
-            <div id="result-<?= $project->id;?>">
+            <div id="result-<?= $project->getId() ?>">
 
                 <div class="container-one_hypothesis">
 
                     <div class="col-md-8">
                         <div class="project_name_table">
-                            <?= $project->project_name; ?> -<span class="project_fullname_text"><?= $project->project_fullname; ?></span>
+                            <?= $project->getProjectName() ?> -<span class="project_fullname_text"><?= $project->getProjectFullname() ?></span>
                         </div>
                     </div>
 
@@ -66,7 +73,7 @@ $this->registerCssFile('@web/css/profile-data-style.css');
         <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
             <div class="text-center">
-                <?= Html::a('Создать проект', ['/projects/index', 'id' => Yii::$app->user->id],[
+                <?= Html::a('Создать проект', ['/projects/index', 'id' => Yii::$app->user->getId()],[
                     'class' => 'btn btn-default',
                     'style' => [
                         'background' => '#E0E0E0',

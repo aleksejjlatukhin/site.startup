@@ -29,7 +29,8 @@ class FormCreateRatesPlan extends Model
 
 
     /**
-     * FormCreateRatesPlan constructor.
+     * FormCreateRatesPlan constructor
+     *
      * @param array $config
      */
     public function __construct($config = [])
@@ -41,7 +42,7 @@ class FormCreateRatesPlan extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'description', 'max_count_project_user', 'max_count_tracker'], 'required'],
@@ -56,7 +57,7 @@ class FormCreateRatesPlan extends Model
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование',
@@ -69,12 +70,12 @@ class FormCreateRatesPlan extends Model
     /**
      * @return bool
      */
-    public function create()
+    public function create(): bool
     {
         $this->_ratesPlan->setName($this->name);
         $this->_ratesPlan->setDescription($this->description);
         $this->_ratesPlan->setMaxCountProjectUser($this->max_count_project_user);
         $this->_ratesPlan->setMaxCountTracker($this->max_count_tracker);
-        return $this->_ratesPlan->save() ? true : false;
+        return $this->_ratesPlan->save();
     }
 }

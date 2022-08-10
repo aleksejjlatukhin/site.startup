@@ -1,14 +1,19 @@
 <?php
 
+use app\models\User;
 use yii\helpers\Html;
+
+/**
+ * @var User $user
+ */
 
 ?>
 
 <!--Проверка существования аватарки-->
-<?php if ($user->avatar_image) : ?>
-    <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture']); ?>
+<?php if ($user->getAvatarImage()) : ?>
+    <?= Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'user_picture']) ?>
 <?php else : ?>
-    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
 <?php endif; ?>
 
 <!--Проверка онлайн статуса-->
@@ -19,10 +24,10 @@ use yii\helpers\Html;
 <?php endif; ?>
 
 <div class="block-fio-and-date-last-visit">
-    <div class="block-fio"><?= $user->username; ?></div>
+    <div class="block-fio"><?= $user->getUsername() ?></div>
     <div class="block-date-last-visit">
-        <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
-            Пользователь был в сети <?= $user->checkOnline;?>
+        <?php if(is_string($user->checkOnline)) : ?>
+            Пользователь был в сети <?= $user->checkOnline ?>
         <?php endif; ?>
     </div>
 </div>

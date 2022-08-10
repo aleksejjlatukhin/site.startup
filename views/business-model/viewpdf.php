@@ -1,28 +1,33 @@
 <?php
 
+use app\models\BusinessModel;
 use app\models\Segments;
 
 $this->title = 'Бизнес-модель';
+
+/**
+ * @var BusinessModel $model
+ */
 
 ?>
 
 <div class="business-model-view-export">
 
-    <h2><?= $this->title; ?></h2>
+    <h2><?= $this->title ?></h2>
 
     <table>
 
         <tr>
             <td rowspan="2" class="block-200-export">
                 <h5 style="text-transform: uppercase;">Ключевые партнеры</h5>
-                <?= $model->partners; ?>
+                <?= $model->getPartners() ?>
             </td>
             <td rowspan="" class="block-200-export">
                 <h5 style="text-transform: uppercase;">Ключевые направления</h5>
 
                 <div class="export_business_model_mini_header">Тип взаимодейстивия с рынком:</div>
                 <?php
-                if ($model->segment->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
+                if ($model->segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) {
                     echo 'В2С (бизнес-клиент)';
                 } else {
                     echo 'B2B (бизнес-бизнес)';
@@ -30,44 +35,44 @@ $this->title = 'Бизнес-модель';
                 ?>
 
                 <div class="export_business_model_mini_header">Сфера деятельности:</div>
-                <?= $model->segment->field_of_activity; ?>
+                <?= $model->segment->getFieldOfActivity() ?>
 
                 <div class="export_business_model_mini_header">Вид / специализация деятельности:</div>
-                <?= $model->segment->sort_of_activity; ?>
+                <?= $model->segment->getSortOfActivity() ?>
 
             </td>
             <td rowspan="2" class="block-200-export">
-                <h5 style="text-transform: uppercase;">Ценностное предложение</h5><?= $model->gcp->description; ?>
+                <h5 style="text-transform: uppercase;">Ценностное предложение</h5><?= $model->gcp->getDescription() ?>
             </td>
             <td rowspan="" class="block-200-export">
-                <h5 style="text-transform: uppercase;">Взаимоотношения с клиентами</h5><?= $model->relations; ?>
+                <h5 style="text-transform: uppercase;">Взаимоотношения с клиентами</h5><?= $model->getRelations() ?>
             </td>
             <td rowspan="2" class="block-200-export">
 
                 <h5 style="text-transform: uppercase;">Потребительский сегмент</h5>
 
                 <div class="export_business_model_mini_header">Наименование:</div>
-                <?= $model->segment->name; ?>
+                <?= $model->segment->getName() ?>
 
                 <div class="export_business_model_mini_header">Краткое описание:</div>
-                <?= $model->segment->description; ?>
+                <?= $model->segment->getDescription() ?>
 
                 <div class="export_business_model_mini_header">Потенциальное количество потребителей:</div>
-                <?= ' от ' . number_format($model->segment->quantity_from * 1000, 0, '', ' ') .
-                ' до ' . number_format($model->segment->quantity_to * 1000, 0, '', ' ') . ' человек'; ?>
+                <?= ' от ' . number_format($model->segment->getQuantityFrom() * 1000, 0, '', ' ') .
+                ' до ' . number_format($model->segment->getQuantityTo() * 1000, 0, '', ' ') . ' человек' ?>
 
                 <div class="export_business_model_mini_header">Объем рынка:</div>
-                <?= number_format($model->segment->market_volume * 1000000, 0, '', ' ') . ' рублей'; ?>
+                <?= number_format($model->segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>
 
             </td>
         </tr>
 
         <tr>
             <td rowspan="" class="block-200-export">
-                <h5 style="text-transform: uppercase;">Ключевые ресурсы</h5><?= $model->resources; ?>
+                <h5 style="text-transform: uppercase;">Ключевые ресурсы</h5><?= $model->getResources() ?>
             </td>
             <td rowspan="" class="block-200-export">
-                <h5 style="text-transform: uppercase;">Каналы коммуникации и сбыта</h5><?= $model->distribution_of_sales; ?>
+                <h5 style="text-transform: uppercase;">Каналы коммуникации и сбыта</h5><?= $model->getDistributionOfSales() ?>
             </td>
         </tr>
 
@@ -76,10 +81,10 @@ $this->title = 'Бизнес-модель';
     <table>
         <tr>
             <td colspan="" class="block-100-export">
-                <h5 style="text-transform: uppercase;">Структура издержек</h5><?= $model->cost; ?>
+                <h5 style="text-transform: uppercase;">Структура издержек</h5><?= $model->getCost() ?>
             </td>
             <td colspan="" class="block-100-export">
-                <h5 style="text-transform: uppercase;">Потоки поступления доходов</h5><?= $model->revenue; ?>
+                <h5 style="text-transform: uppercase;">Потоки поступления доходов</h5><?= $model->getRevenue() ?>
             </td>
         </tr>
     </table>

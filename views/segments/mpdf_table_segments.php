@@ -1,7 +1,12 @@
 <?php
 
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use app\models\Segments;
+
+/**
+ * @var Segments[] $models
+ */
 
 ?>
 
@@ -31,19 +36,19 @@ use app\models\Segments;
 
             <td class="block_segment_status">
                 <?php
-                if ($model->exist_confirm === 1) {
+                if ($model->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                }elseif ($model->exist_confirm === null && empty($model->interview)) {
+                }elseif (!$model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->exist_confirm === null && !empty($model->interview)) {
+                }elseif ($model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->exist_confirm === 0) {
+                }elseif ($model->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
@@ -51,24 +56,24 @@ use app\models\Segments;
                 ?>
             </td>
 
-            <td class="block_segment_name"><?= $model->name; ?></td>
+            <td class="block_segment_name"><?= $model->getName() ?></td>
 
             <td class="block_segment_type">
                 <?php
 
-                if ($model->type_of_interaction_between_subjects === Segments::TYPE_B2C) {
+                if ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) {
                     echo '<div class="">B2C</div>';
                 }
-                elseif ($model->type_of_interaction_between_subjects === Segments::TYPE_B2B) {
+                elseif ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
                     echo '<div class="">B2B</div>';
                 }
 
                 ?>
             </td>
 
-            <td class="block_segment_params"><?= $model->field_of_activity; ?></td>
-            <td class="block_segment_params"><?= $model->sort_of_activity; ?></td>
-            <td class="block_segment_market_volume"><?= number_format($model->market_volume, 0, '', ' '); ?></td>
+            <td class="block_segment_params"><?= $model->getFieldOfActivity() ?></td>
+            <td class="block_segment_params"><?= $model->getSortOfActivity() ?></td>
+            <td class="block_segment_market_volume"><?= number_format($model->getMarketVolume(), 0, '', ' ') ?></td>
 
         </tr>
 

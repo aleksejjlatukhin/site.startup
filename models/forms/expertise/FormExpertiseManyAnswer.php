@@ -20,7 +20,8 @@ use Yii;
  * @property $checkboxesPreparationInterviewQuality                 Оценки выбранные экспертом по вопросам качества подготовки интервью
  * @property $checkboxesConductingInterviewQuality                  Оценки выбранные экспертом по вопросам качества проведения интервью
  * @property $answerOptions                                         Объект stdClass с вариантами ответов
- * @property $comment                                               Комментарий к ответу в экспертизе
+ * @property string $comment                                        Комментарий к ответу в экспертизе
+ * @property Expertise $_expertise                                  Объект экспертизы
  */
 class FormExpertiseManyAnswer extends Model
 {
@@ -65,12 +66,12 @@ class FormExpertiseManyAnswer extends Model
      * @param Expertise $expertise
      * @param array $config
      */
-    public function __construct(Expertise $expertise, $config = [])
+    public function __construct(Expertise $expertise, array $config = [])
     {
-        $this->_expertise = $expertise;
+        $this->setExpertise($expertise);
         $this->setAnswerOptions();
-        $this->setCheckboxes($this->_expertise->getEstimation());
-        $this->comment = $this->_expertise->getComment();
+        $this->setCheckboxes($expertise->getEstimation());
+        $this->setComment($expertise->getComment());
 
         parent::__construct($config);
     }
@@ -78,10 +79,10 @@ class FormExpertiseManyAnswer extends Model
     /**
      * Получить объект stdClass с вариантами ответов
      *
-     * @param null|string $key
+     * @param string|null $key
      * @return array|object
      */
-    public function getAnswerOptions($key = null)
+    public function getAnswerOptions(string $key = null)
     {
         if($key) {
             return json_decode(json_encode($this->answerOptions), true)[$key];
@@ -92,23 +93,40 @@ class FormExpertiseManyAnswer extends Model
     /**
      * Установить массив с вариантами ответов
      */
-    public function setAnswerOptions()
+    public function setAnswerOptions(): void
     {
         // Установить путь к файлу с вариантами ответов для формы
-        $filename = StageExpertise::getList()[$this->_expertise->getStage()] . '.json';
+        $filename = StageExpertise::getList()[$this->getExpertise()->getStage()] . '.json';
 
-        if (TypesExpertAssessment::getValue($this->_expertise->getTypeExpert()) == TypesExpertAssessment::ASSESSMENT_TECHNOLOGICAL_LEVEL) {
+        /** @var string $filePath */
+        if (TypesExpertAssessment::getValue($this->getExpertise()->getTypeExpert()) === TypesExpertAssessment::ASSESSMENT_TECHNOLOGICAL_LEVEL) {
             $filePath = Yii::getAlias('@dirDataFormExpertise') . '/assessmentTechnologicalLevel/' . $filename;
-        } elseif (TypesExpertAssessment::getValue($this->_expertise->getTypeExpert()) == TypesExpertAssessment::ASSESSMENT_CONSUMER_SETTINGS) {
+        } elseif (TypesExpertAssessment::getValue($this->getExpertise()->getTypeExpert()) === TypesExpertAssessment::ASSESSMENT_CONSUMER_SETTINGS) {
             $filePath = Yii::getAlias('@dirDataFormExpertise') . '/assessmentConsumerSettings/' . $filename;
         }
 
         // Получить содержимое файла
-        /** @var string $filePath */
         if ($filePath) {
             $file = file_get_contents($filePath);
-            $this->answerOptions = json_decode($file);
+            $this->answerOptions = json_decode($file, true);
         }
+    }
+
+    /**
+     * @return Expertise
+     */
+    public function getExpertise(): Expertise
+    {
+        return $this->_expertise;
+    }
+
+    /**
+     * @param Expertise $expertise
+     * @return void
+     */
+    private function setExpertise(Expertise $expertise): void
+    {
+        $this->_expertise = $expertise;
     }
 
     /**
@@ -116,7 +134,7 @@ class FormExpertiseManyAnswer extends Model
      *
      * @return string
      */
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
@@ -126,9 +144,25 @@ class FormExpertiseManyAnswer extends Model
      *
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment(string $comment): void
     {
         $this->comment = $comment;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCheckboxesPreparationInterviewQuality()
+    {
+        return $this->checkboxesPreparationInterviewQuality;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCheckboxesConductingInterviewQuality()
+    {
+        return $this->checkboxesConductingInterviewQuality;
     }
 
     /**
@@ -136,20 +170,20 @@ class FormExpertiseManyAnswer extends Model
      *
      * @param string $estimationDB
      */
-    public function setCheckboxes($estimationDB)
+    public function setCheckboxes(string $estimationDB): void
     {
-        if (in_array($this->_expertise->getStage(), ([StageExpertise::CONFIRM_SEGMENT, StageExpertise::CONFIRM_PROBLEM, StageExpertise::CONFIRM_GCP, StageExpertise::CONFIRM_MVP]))) {
+        if (in_array($this->getExpertise()->getStage(), [StageExpertise::CONFIRM_SEGMENT, StageExpertise::CONFIRM_PROBLEM, StageExpertise::CONFIRM_GCP, StageExpertise::CONFIRM_MVP], false)) {
 
             $estimationStringPreparation = self::getStringBetween($estimationDB, 'checkboxesPreparationInterviewQuality(', ')');
             $estimationArrayPreparation = explode(';', $estimationStringPreparation);
-            foreach ($estimationArrayPreparation as $i => $item) {
+            foreach ($estimationArrayPreparation as $item) {
                 $arr = explode(':', $item);
                 $this->checkboxesPreparationInterviewQuality[$arr[0]] = [0 => $arr[1]];
             }
 
             $estimationStringConducting = self::getStringBetween($estimationDB, 'checkboxesConductingInterviewQuality(', ')');
             $estimationArrayConducting = explode(';', $estimationStringConducting);
-            foreach ($estimationArrayConducting as $i => $item) {
+            foreach ($estimationArrayConducting as $item) {
                 $arr = explode(':', $item);
                 $this->checkboxesConductingInterviewQuality[$arr[0]] = [0 => $arr[1]];
             }
@@ -159,12 +193,12 @@ class FormExpertiseManyAnswer extends Model
     /**
      * Получить подстроку между символами
      *
-     * @param $str
-     * @param $from
-     * @param $to
+     * @param string $str
+     * @param string $from
+     * @param string $to
      * @return false|string
      */
-    public static function getStringBetween($str, $from, $to)
+    public static function getStringBetween(string $str, string $from, string $to)
     {
         $sub = substr($str, strpos($str,$from)+strlen($from),strlen($str));
         return substr($sub,0,strpos($sub,$to));
@@ -177,12 +211,12 @@ class FormExpertiseManyAnswer extends Model
      * @param string $estimationDB
      * @return int
      */
-    public static function getGeneralEstimationByOne($estimationDB)
+    public static function getGeneralEstimationByOne(string $estimationDB): int
     {
         $sumEstimationPreparation = 0;
         $estimationStringPreparation = self::getStringBetween($estimationDB, 'checkboxesPreparationInterviewQuality(', ')');
         $estimationArrayPreparation = explode(';', $estimationStringPreparation);
-        foreach ($estimationArrayPreparation as $i => $item) {
+        foreach ($estimationArrayPreparation as $item) {
             $arr = explode(':', $item);
             $sumEstimationPreparation += (int)$arr[1];
         }
@@ -190,7 +224,7 @@ class FormExpertiseManyAnswer extends Model
         $sumEstimationConducting = 0;
         $estimationStringConducting = self::getStringBetween($estimationDB, 'checkboxesConductingInterviewQuality(', ')');
         $estimationArrayConducting = explode(';', $estimationStringConducting);
-        foreach ($estimationArrayConducting as $i => $item) {
+        foreach ($estimationArrayConducting as $item) {
             $arr = explode(':', $item);
             $sumEstimationConducting += (int)$arr[1];
         }
@@ -203,7 +237,7 @@ class FormExpertiseManyAnswer extends Model
      *
      * @return string
      */
-    public function writeEstimation()
+    public function writeEstimation(): string
     {
         $estimation = 'checkboxesPreparationInterviewQuality(';
         foreach ($this->checkboxesPreparationInterviewQuality as $i => $item) {
@@ -221,7 +255,7 @@ class FormExpertiseManyAnswer extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['comment'], 'string', 'max' => 2000],
@@ -235,7 +269,7 @@ class FormExpertiseManyAnswer extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'comment' => 'Напишите комментарий'
@@ -248,7 +282,7 @@ class FormExpertiseManyAnswer extends Model
      *
      * @param $attr
      */
-    public function validateCheckboxesPreparation($attr)
+    public function validateCheckboxesPreparation($attr): void
     {
         foreach ($this->checkboxesPreparationInterviewQuality as $item){
             if (!$item) {
@@ -263,7 +297,7 @@ class FormExpertiseManyAnswer extends Model
      *
      * @param $attr
      */
-    public function validateCheckboxesConducting($attr)
+    public function validateCheckboxesConducting($attr): void
     {
         foreach ($this->checkboxesConductingInterviewQuality as $item){
             if (!$item) {
@@ -282,11 +316,13 @@ class FormExpertiseManyAnswer extends Model
      * @param bool $completed
      * @return bool
      */
-    public function saveRecord($completed = false)
+    public function saveRecord(bool $completed = false): bool
     {
         $this->_expertise->setEstimation($this->writeEstimation());
         $this->_expertise->setComment($this->comment);
-        $completed ? $this->_expertise->setCompleted() : false;
+        if ($completed) {
+            $this->_expertise->setCompleted();
+        }
         return $this->_expertise->saveRecord();
     }
 }

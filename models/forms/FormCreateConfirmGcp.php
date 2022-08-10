@@ -22,7 +22,7 @@ class FormCreateConfirmGcp extends FormCreateConfirm
      * @param Gcps $hypothesis
      * @param array $config
      */
-    public function __construct(Gcps $hypothesis, $config = [])
+    public function __construct(Gcps $hypothesis, array $config = [])
     {
         $this->setCreatorResponds();
         $this->setCreatorNewResponds();
@@ -30,7 +30,9 @@ class FormCreateConfirmGcp extends FormCreateConfirm
         $this->setCachePathForm(self::getCachePath($hypothesis));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -41,23 +43,21 @@ class FormCreateConfirmGcp extends FormCreateConfirm
      * @param Gcps $hypothesis
      * @return string
      */
-    public static function getCachePath(Gcps $hypothesis)
+    public static function getCachePath(Gcps $hypothesis): string
     {
         $problem = $hypothesis->problem;
         $segment = $hypothesis->segment;
         $project = $hypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id. '/segments/segment-'.$segment->id
-            .'/problems/problem-'.$problem->id.'/gcps/gcp-'.$hypothesis->id.'/confirm/formCreateConfirm/';
-
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId()
+            .'/problems/problem-'.$problem->getId().'/gcps/gcp-'.$hypothesis->getId().'/confirm/formCreateConfirm/';
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['hypothesis_id', 'count_respond', 'count_positive'], 'required'],
@@ -70,7 +70,7 @@ class FormCreateConfirmGcp extends FormCreateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов, подтвердивших проблему',
@@ -85,7 +85,7 @@ class FormCreateConfirmGcp extends FormCreateConfirm
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create()
+    public function create(): ConfirmGcp
     {
         $model = new ConfirmGcp();
         $model->setGcpId($this->getHypothesisId());
@@ -96,7 +96,9 @@ class FormCreateConfirmGcp extends FormCreateConfirm
             //Создание респондентов для программы подтверждения ГЦП из респондентов подтвердивших проблему
             $this->getCreatorResponds()->create($model, $this);
             // Добавление новых респондентов для программы подтверждения ГЦП
-            if ($this->getAddCountRespond()) $this->getCreatorNewResponds()->create($model, $this);
+            if ($this->getAddCountRespond()) {
+                $this->getCreatorNewResponds()->create($model, $this);
+            }
             //Удаление кэша формы создания подтверждения
             $this->getCacheManager()->deleteCache($this->getCachePathForm());
 

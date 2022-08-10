@@ -1,38 +1,54 @@
 <?php
 
+use app\models\Client;
 use app\models\ClientActivation;
+use app\models\ClientRatesPlan;
 use app\models\ClientSettings;
+use app\modules\client\models\form\AvatarCompanyForm;
+use app\modules\client\models\form\FormUpdateClient;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
+/**
+ * @var Client $client
+ * @var FormUpdateClient $model
+ * @var AvatarCompanyForm $avatarForm
+ */
+
+$selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разрешен', ClientSettings::ACCESS_ADMIN_FALSE => 'Доступ запрещен'];
+
 ?>
 
 <div class="col-md-12 col-lg-4">
 
-    <?php if ($clientSettings->getAvatarImage()) : ?>
+    <?php if ($client->settings->getAvatarImage()) : ?>
 
-        <?= Html::img('/web/upload/company-'.$client->getId().'/avatar/'.$clientSettings->getAvatarImage(), ['class' => 'avatar_image']); ?>
+        <?= Html::img('/web/upload/company-'.$client->getId().'/avatar/'.$client->settings->getAvatarImage(), ['class' => 'avatar_image']) ?>
 
         <div class="block_for_buttons_avatar_image">
 
-            <div class="container_link_button_avatar_image"><?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
-
-            <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image',]);?></div>
-
-            <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/client/client-profile/delete-avatar', 'id' => $avatarForm->clientId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
+            <div class="container_link_button_avatar_image">
+                <?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?>
+            </div>
+            <div class="container_link_button_avatar_image">
+                <?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image']) ?>
+            </div>
+            <div class="container_link_button_avatar_image">
+                <?= Html::a('Удалить фотографию', Url::to(['/client/client-profile/delete-avatar']), ['class' => 'delete_image link_button_avatar_image']) ?>
+            </div>
 
         </div>
 
     <?php else : ?>
 
-        <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']); ?>
+        <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']) ?>
 
         <div class="block_for_buttons_avatar_image">
-
-            <div class="container_link_button_avatar_image"><?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
-
+            <div class="container_link_button_avatar_image">
+                <?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?>
+            </div>
         </div>
 
     <?php endif; ?>
@@ -45,8 +61,8 @@ use yii\widgets\ActiveForm;
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-    <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']); ?>
-    <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput(); ?>
+    <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']) ?>
+    <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput() ?>
 
     <?php ActiveForm::end(); ?>
 
@@ -57,27 +73,32 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
 
-        <div class="col-lg-12"><label style="padding-left: 10px;">Дата регистрации в Spaccel:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $client->created_at); ?></span></div>
+        <div class="col-lg-12"><label style="padding-left: 10px;">Дата регистрации в Spaccel:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $client->getCreatedAt()) ?></span></div>
 
         <div class="col-lg-12"><label style="padding-left: 10px;">Статус:</label>
 
-            <?php if ($client->findClientActivation()->getStatus() == ClientActivation::ACTIVE) : ?>
+            <?php
+            /** @var ClientActivation $clientActivation */
+            $clientActivation = $client->findClientActivation();
+            if ($clientActivation->getStatus() === ClientActivation::ACTIVE) : ?>
                 <span style="padding-left: 10px;">Активирована</span>
-            <?php elseif ($client->findClientActivation()->getStatus() == ClientActivation::NO_ACTIVE) : ?>
+            <?php elseif ($clientActivation->getStatus() === ClientActivation::NO_ACTIVE) : ?>
                 <span style="padding-left: 10px;">Заблокирована</span>
             <?php endif; ?>
 
         </div>
 
-        <?php if ($client->findLastClientRatesPlan()) : ?>
+        <?php
+        /** @var ClientRatesPlan  $clientRatesPlan */
+        if ($clientRatesPlan = $client->findLastClientRatesPlan()) : ?>
             <div class="col-lg-12">
                 <label style="padding-left: 10px;">Сведения о тарифе:</label>
-                <div style="padding-left: 10px;">Наименование: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getName(); ?></u></div>
-                <div style="padding-left: 10px;">Описание: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getDescription(); ?></u></div>
-                <div style="padding-left: 10px;">Максимальное количество проектантов: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getMaxCountProjectUser(); ?></u></div>
-                <div style="padding-left: 10px;">Максимальное количество трекеров: <u><?= $client->findLastClientRatesPlan()->findRatesPlan()->getMaxCountTracker(); ?></u></div>
-                <div style="padding-left: 10px;">Начало действия тарифа: <u><?= date('d.m.Y', $client->findLastClientRatesPlan()->getDateStart()); ?></u></div>
-                <div style="padding-left: 10px;">Окончание действия тарифа: <u><?= date('d.m.Y', $client->findLastClientRatesPlan()->getDateEnd()); ?></u></div>
+                <div style="padding-left: 10px;">Наименование: <u><?= $clientRatesPlan->ratesPlan->getName() ?></u></div>
+                <div style="padding-left: 10px;">Описание: <u><?= $clientRatesPlan->ratesPlan->getDescription() ?></u></div>
+                <div style="padding-left: 10px;">Максимальное количество проектантов: <u><?= $clientRatesPlan->ratesPlan->getMaxCountProjectUser() ?></u></div>
+                <div style="padding-left: 10px;">Максимальное количество трекеров: <u><?= $clientRatesPlan->ratesPlan->getMaxCountTracker() ?></u></div>
+                <div style="padding-left: 10px;">Начало действия тарифа: <u><?= date('d.m.Y', $clientRatesPlan->getDateStart()) ?></u></div>
+                <div style="padding-left: 10px;">Окончание действия тарифа: <u><?= date('d.m.Y', $clientRatesPlan->getDateEnd()) ?></u></div>
             </div>
         <?php else : ?>
             <div class="col-lg-12">
@@ -105,7 +126,7 @@ use yii\widgets\ActiveForm;
                 'maxlength' => true,
                 'readonly' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -115,7 +136,7 @@ use yii\widgets\ActiveForm;
                 'maxlength' => true,
                 'readonly' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -125,7 +146,7 @@ use yii\widgets\ActiveForm;
                 'maxlength' => true,
                 'readonly' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -137,13 +158,10 @@ use yii\widgets\ActiveForm;
                 'readonly' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
-            <?php
-            $selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разрешен', ClientSettings::ACCESS_ADMIN_FALSE => 'Доступ запрещен'];
-            ?>
 
             <?= $form->field($model, 'accessAdmin', [
                 'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>',
@@ -152,8 +170,7 @@ use yii\widgets\ActiveForm;
                 'options' => ['id' => 'selectViewAccessAdmin'],
                 'disabled' => true,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
         </div>
 
         <div class="col-xs-12 col-md-6">
@@ -170,7 +187,7 @@ use yii\widgets\ActiveForm;
                     'border-radius' => '8px',
                     'margin-top' => '35px',
                 ]
-            ])?>
+            ]) ?>
         </div>
 
         <?php ActiveForm::end(); ?>
@@ -193,7 +210,7 @@ use yii\widgets\ActiveForm;
             ])->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -202,7 +219,7 @@ use yii\widgets\ActiveForm;
             ])->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -211,7 +228,7 @@ use yii\widgets\ActiveForm;
             ])->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -222,13 +239,10 @@ use yii\widgets\ActiveForm;
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
-            <?php
-            $selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разрешен', ClientSettings::ACCESS_ADMIN_FALSE => 'Доступ запрещен'];
-            ?>
 
             <?= $form->field($model, 'accessAdmin', [
                 'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>',
@@ -237,8 +251,7 @@ use yii\widgets\ActiveForm;
                 'options' => ['id' => 'selectAccessAdmin'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
         </div>
 
         <div class="col-md-6">
@@ -254,7 +267,7 @@ use yii\widgets\ActiveForm;
                     'border-radius' => '8px',
                     'margin-top' => '35px',
                 ]
-            ])?>
+            ]) ?>
         </div>
 
         <div class="col-md-6">
@@ -271,7 +284,7 @@ use yii\widgets\ActiveForm;
                     'border-radius' => '8px',
                     'margin-top' => '35px',
                 ],
-            ]);?>
+            ]) ?>
         </div>
 
         <?php ActiveForm::end(); ?>

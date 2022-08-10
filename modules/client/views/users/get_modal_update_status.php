@@ -6,6 +6,10 @@ use yii\helpers\Url;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 
+/**
+ * @var User $model
+ */
+
 ?>
 
 <style>
@@ -22,19 +26,19 @@ use yii\helpers\Html;
     }
 </style>
 
-<?php if ($model->role === User::ROLE_USER) : ?>
+<?php if ($model->getRole() === User::ROLE_USER) : ?>
 
-    <?php if ($model->status === User::STATUS_NOT_ACTIVE) : ?>
+    <?php if ($model->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
 
-        <?php if ($model->id_admin === null) : ?>
+        <?php if (!$model->getIdAdmin()) : ?>
 
             <h4 class="row text-center">Сначала необходимо назначить трекера</h4>
 
-        <?php elseif ($model->id_admin !== null) : ?>
+        <?php else: ?>
 
             <?php $form = ActiveForm::begin([
                 'id' => 'formStatusUpdate',
-                'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+                'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -50,7 +54,7 @@ use yii\helpers\Html;
                         'options' => ['id' => 'selectStatusUpdate'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]); ?>
+                    ]) ?>
                 </div>
                 <div class="col-md-3"></div>
             </div>
@@ -75,11 +79,11 @@ use yii\helpers\Html;
 
         <?php endif; ?>
 
-    <?php elseif ($model->status === User::STATUS_ACTIVE) : ?>
+    <?php elseif ($model->getStatus() === User::STATUS_ACTIVE) : ?>
 
         <?php $form = ActiveForm::begin([
             'id' => 'formStatusUpdate',
-            'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+            'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -95,7 +99,7 @@ use yii\helpers\Html;
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-3"></div>
         </div>
@@ -118,11 +122,11 @@ use yii\helpers\Html;
 
         <?php ActiveForm::end(); ?>
 
-    <?php elseif ($model->status === User::STATUS_DELETED) : ?>
+    <?php elseif ($model->getStatus() === User::STATUS_DELETED) : ?>
 
         <?php $form = ActiveForm::begin([
             'id' => 'formStatusUpdate',
-            'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+            'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -138,7 +142,7 @@ use yii\helpers\Html;
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-3"></div>
         </div>
@@ -163,19 +167,19 @@ use yii\helpers\Html;
 
     <?php endif; ?>
 
-<?php elseif ($model->role === User::ROLE_ADMIN) : ?>
+<?php elseif ($model->getRole() === User::ROLE_ADMIN) : ?>
 
-    <?php if ($users = User::findAll(['id_admin' => $model->id])) : ?>
+    <?php if ($users = User::findAll(['id_admin' => $model->getId()])) : ?>
 
         <h4 class="text-center">Запрещено изменять статус трекера, у которого есть пользователи.</h4>
 
     <?php else : ?>
 
-        <?php if ($model->status === User::STATUS_NOT_ACTIVE) : ?>
+        <?php if ($model->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
 
             <?php $form = ActiveForm::begin([
                 'id' => 'formStatusUpdate',
-                'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+                'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -191,7 +195,7 @@ use yii\helpers\Html;
                         'options' => ['id' => 'selectStatusUpdate'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]); ?>
+                    ]) ?>
                 </div>
                 <div class="col-md-3"></div>
             </div>
@@ -214,11 +218,11 @@ use yii\helpers\Html;
 
             <?php ActiveForm::end(); ?>
 
-        <?php elseif ($model->status === User::STATUS_ACTIVE) : ?>
+        <?php elseif ($model->getStatus() === User::STATUS_ACTIVE) : ?>
 
             <?php $form = ActiveForm::begin([
                 'id' => 'formStatusUpdate',
-                'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+                'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -234,7 +238,7 @@ use yii\helpers\Html;
                         'options' => ['id' => 'selectStatusUpdate'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]); ?>
+                    ]) ?>
                 </div>
                 <div class="col-md-3"></div>
             </div>
@@ -257,11 +261,11 @@ use yii\helpers\Html;
 
             <?php ActiveForm::end(); ?>
 
-        <?php elseif ($model->status === User::STATUS_DELETED) : ?>
+        <?php elseif ($model->getStatus() === User::STATUS_DELETED) : ?>
 
             <?php $form = ActiveForm::begin([
                 'id' => 'formStatusUpdate',
-                'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+                'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -277,7 +281,7 @@ use yii\helpers\Html;
                         'options' => ['id' => 'selectStatusUpdate'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]); ?>
+                    ]) ?>
                 </div>
                 <div class="col-md-3"></div>
             </div>
@@ -304,13 +308,13 @@ use yii\helpers\Html;
 
     <?php endif; ?>
 
-<?php elseif ($model->role === User::ROLE_EXPERT) : ?>
+<?php elseif ($model->getRole() === User::ROLE_EXPERT) : ?>
 
-    <?php if ($model->status === User::STATUS_NOT_ACTIVE) : ?>
+    <?php if ($model->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
 
         <?php $form = ActiveForm::begin([
             'id' => 'formStatusUpdate',
-            'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+            'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -326,7 +330,7 @@ use yii\helpers\Html;
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-3"></div>
         </div>
@@ -349,11 +353,11 @@ use yii\helpers\Html;
 
         <?php ActiveForm::end(); ?>
 
-    <?php elseif ($model->status === User::STATUS_ACTIVE) : ?>
+    <?php elseif ($model->getStatus() === User::STATUS_ACTIVE) : ?>
 
         <?php $form = ActiveForm::begin([
             'id' => 'formStatusUpdate',
-            'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+            'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -369,7 +373,7 @@ use yii\helpers\Html;
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-3"></div>
         </div>
@@ -392,11 +396,11 @@ use yii\helpers\Html;
 
         <?php ActiveForm::end(); ?>
 
-    <?php elseif ($model->status === User::STATUS_DELETED) : ?>
+    <?php elseif ($model->getStatus() === User::STATUS_DELETED) : ?>
 
         <?php $form = ActiveForm::begin([
             'id' => 'formStatusUpdate',
-            'action' => Url::to(['/client/users/status-update', 'id' => $model->id]),
+            'action' => Url::to(['/client/users/status-update', 'id' => $model->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -412,7 +416,7 @@ use yii\helpers\Html;
                     'options' => ['id' => 'selectStatusUpdate'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-3"></div>
         </div>

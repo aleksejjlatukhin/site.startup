@@ -1,6 +1,11 @@
 <?php
 
+use app\models\Roadmap;
 use yii\helpers\Html;
+
+/**
+ * @var Roadmap $roadmap
+ */
 
 
 $segment_name = $roadmap->getProperty('segment_name');

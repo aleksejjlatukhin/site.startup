@@ -13,10 +13,13 @@ use yii\db\ActiveRecord;
  * Class AnswersQuestionsConfirmSegment
  * @package app\models
  *
- * @property int $id                    Идентификатор записи в таб. answers_questions_confirm_segment
- * @property int $question_id           Идентификатор записи в таб. questions_confirm_segment
- * @property int $respond_id            Идентификатор записи в таб. responds_segment
- * @property string $answer             Ответ на вопрос
+ * @property int $id                                            Идентификатор записи в таб. answers_questions_confirm_segment
+ * @property int $question_id                                   Идентификатор записи в таб. questions_confirm_segment
+ * @property int $respond_id                                    Идентификатор записи в таб. responds_segment
+ * @property string $answer                                     Ответ на вопрос
+ *
+ * @property QuestionsConfirmSegment $question                  Вопрос
+ * @property RespondsSegment $respond                           Респондент
  */
 class AnswersQuestionsConfirmSegment extends ActiveRecord
 {
@@ -24,7 +27,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'answers_questions_confirm_segment';
     }
@@ -32,9 +35,10 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
 
     /**
      * Получить объект вопроса
+     *
      * @return ActiveQuery
      */
-    public function getQuestion()
+    public function getQuestion(): ActiveQuery
     {
         return $this->hasOne(QuestionsConfirmSegment::class, ['id' => 'question_id']);
     }
@@ -44,7 +48,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
      * Получить объект респондента
      * @return ActiveQuery
      */
-    public function getRespond ()
+    public function getRespond (): ActiveQuery
     {
         return $this->hasOne(RespondsSegment::class, ['id' => 'respond_id']);
     }
@@ -53,7 +57,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['question_id', 'respond_id'], 'required'],
@@ -66,7 +70,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Описание ответа на вопрос',
@@ -76,7 +80,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -84,7 +88,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getQuestionId()
+    public function getQuestionId(): int
     {
         return $this->question_id;
     }
@@ -92,7 +96,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @param int $question_id
      */
-    public function setQuestionId($question_id)
+    public function setQuestionId(int $question_id): void
     {
         $this->question_id = $question_id;
     }
@@ -100,7 +104,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getRespondId()
+    public function getRespondId(): int
     {
         return $this->respond_id;
     }
@@ -108,7 +112,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @param int $respond_id
      */
-    public function setRespondId($respond_id)
+    public function setRespondId(int $respond_id): void
     {
         $this->respond_id = $respond_id;
     }
@@ -116,7 +120,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return string
      */
-    public function getAnswer()
+    public function getAnswer(): string
     {
         return $this->answer;
     }
@@ -124,7 +128,7 @@ class AnswersQuestionsConfirmSegment extends ActiveRecord
     /**
      * @param string $answer
      */
-    public function setAnswer($answer)
+    public function setAnswer(string $answer): void
     {
         $this->answer = $answer;
     }

@@ -9,8 +9,8 @@ namespace app\models;
 class TypesExpertAssessment
 {
 
-    const ASSESSMENT_TECHNOLOGICAL_LEVEL = 101;
-    const ASSESSMENT_CONSUMER_SETTINGS = 202;
+    public const ASSESSMENT_TECHNOLOGICAL_LEVEL = 101;
+    public const ASSESSMENT_CONSUMER_SETTINGS = 202;
 
     private static $listTechnologicalLevel = array(1, 2, 3, 4);
     private static $listConsumerSettings = array(5, 6);
@@ -23,18 +23,19 @@ class TypesExpertAssessment
      */
     public static function getValue($key)
     {
-        if (in_array($key, self::$listTechnologicalLevel)) {
+        if (in_array($key, self::$listTechnologicalLevel, false)) {
 
             return self::ASSESSMENT_TECHNOLOGICAL_LEVEL;
 
-        } elseif (in_array($key, self::$listConsumerSettings)) {
+        }
+
+        if (in_array($key, self::$listConsumerSettings, false)) {
 
             return self::ASSESSMENT_CONSUMER_SETTINGS;
 
-        } else {
-
-            return false;
         }
+
+        return false;
     }
 
 }

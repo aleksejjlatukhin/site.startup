@@ -1,10 +1,18 @@
 <?php
 
+use app\models\forms\SendEmailForm;
+use app\models\ResetPasswordForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
 $this->title = 'Востановление пароля';
+
+/**
+ * @var ResetPasswordForm $model
+ * @var SendEmailForm $model_send_email
+ */
+
 ?>
 
 <div class="site-resetPassword">
@@ -126,7 +134,7 @@ $this->title = 'Востановление пароля';
                         <div class="col-md-12 text-center text" style="margin: 45px 0 0 0;"></div>
 
                         <div class="col-md-12 text-center link_back" style="position: absolute; bottom: 0; height: 45px;">
-                            <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_back_password_recovery_for_email',]);?>
+                            <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_back_password_recovery_for_email']) ?>
                         </div>
 
                     </div>

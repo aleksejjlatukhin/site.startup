@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmSegment;
@@ -16,7 +15,9 @@ use app\models\Projects;
 use app\models\QuestionsConfirmSegment;
 use app\models\RespondsSegment;
 use app\models\Segments;
+use app\models\StatusConfirmHypothesis;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -47,79 +48,67 @@ class ConfirmSegmentController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
+        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
 
-            $confirm = ConfirmSegment::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Segments $hypothesis
-             * @var Projects $project
-            */
+            $confirm = ConfirmSegment::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                /** @var UserAccessToProjects $userAccessToProject */
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -134,131 +123,108 @@ class ConfirmSegmentController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif ($action->id === 'update'){
 
-            $confirm = ConfirmSegment::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Segments $hypothesis
-             * @var Projects $project
-             */
+            $confirm = ConfirmSegment::findOne((int)Yii::$app->request->get('id'));
+            $hypothesis = $confirm->hypothesis;
+            $project = $hypothesis->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->getUserId() === $currentUser->getId()){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        }elseif ($action->id === 'create'){
+
+            $hypothesis = Segments::findOne((int)Yii::$app->request->get('id'));
+            $project = $hypothesis->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->getUserId() === $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        }elseif ($action->id === 'save-confirm'){
+
+            $hypothesis = Segments::findOne((int)Yii::$app->request->get('id'));
+            $project = $hypothesis->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->getUserId() === $currentUser->getId()) {
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        } elseif ($action->id === 'add-questions'){
+
+            $confirm = ConfirmSegment::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
 
-            if ($project->getUserId() == $currentUser->getId()){
-
-                // ОТКЛЮЧАЕМ CSRF
-                $this->enableCsrfValidation = false;
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['create'])){
-
-            $hypothesis = Segments::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
-            $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()) {
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['save-confirm'])){
-
-            $hypothesis = Segments::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
-            $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()) {
-
-                // ОТКЛЮЧАЕМ CSRF
-                $this->enableCsrfValidation = false;
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        } elseif (in_array($action->id, ['add-questions'])){
-
-            $confirm = ConfirmSegment::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Segments $hypothesis
-             * @var Projects $project
-             */
-            $hypothesis = $confirm->hypothesis;
-            $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
-
-                return parent::beforeAction($action);
-
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
+                /** @var UserAccessToProjects $userAccessToProject */
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -281,9 +247,9 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      */
-    public function actionSaveCacheCreationForm($id)
+    public function actionSaveCacheCreationForm(int $id): void
     {
         $segment = Segments::findOne($id);
         $cachePath = FormCreateConfirmSegment::getCachePath($segment);
@@ -298,17 +264,17 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string|Response
      */
-    public function actionCreate($id)
+    public function actionCreate(int $id)
     {
         $segment = Segments::findOne($id);
-        $project = Projects::findOne($segment->projectId);
+        $project = Projects::findOne($segment->getProjectId());
         $model = new FormCreateConfirmSegment($segment);
 
         if ($segment->confirm){ //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $segment->confirm->id]);
+            return $this->redirect(['view', 'id' => $segment->confirm->getId()]);
         }
 
         return $this->render('create', [
@@ -320,28 +286,23 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function actionSaveConfirm($id)
+    public function actionSaveConfirm(int $id)
     {
         $segment = Segments::findOne($id);
         $model = new FormCreateConfirmSegment($segment);
         $model->setHypothesisId($id);
 
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->create()){
-
-                    $response =  ['success' => true, 'id' => $model->id];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            if ($model = $model->create()) {
+                $response =  ['success' => true, 'id' => $model->getId()];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;
@@ -349,15 +310,16 @@ class ConfirmSegmentController extends AppUserPartController
 
     /**
      * Страница со списком вопросов
-     * @param $id
+     *
+     * @param int $id
      * @return string
      */
-    public function actionAddQuestions($id)
+    public function actionAddQuestions(int $id): string
     {
         $model = ConfirmSegment::findOne($id);
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
-        $segment = Segments::findOne($model->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $segment = Segments::findOne($model->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $questions = QuestionsConfirmSegment::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -378,36 +340,30 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
+     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
-    public function actionUpdate ($id)
+    public function actionUpdate (int $id)
     {
         $model = new FormUpdateConfirmSegment($id);
         $confirm = ConfirmSegment::findOne($id);
-        $segment = Segments::findOne($confirm->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $segment = Segments::findOne($confirm->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
 
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
-                if ($confirm = $model->update()){
-
-                    $response = [
-                        'success' => true,
-                        'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
-                            'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id),
-                            'model' => $confirm, 'project' => $project
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            if ($confirm = $model->update()) {
+                $response = [
+                    'success' => true,
+                    'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
+                        'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($id),
+                        'model' => $confirm, 'project' => $project
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;
@@ -415,15 +371,15 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
         $model = ConfirmSegment::findOne($id);
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
-        $segment = Segments::findOne($model->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $segment = Segments::findOne($model->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $questions = QuestionsConfirmSegment::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -491,10 +447,11 @@ class ConfirmSegmentController extends AppUserPartController
 
     /**
      * Проверка данных подтверждения на этапе генерации ГПС
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionDataAvailabilityForNextStep($id)
+    public function actionDataAvailabilityForNextStep(int $id)
     {
         $model = ConfirmSegment::findOne($id);
         $formCreateProblem = new FormCreateProblem($model->hypothesis);
@@ -509,7 +466,7 @@ class ConfirmSegmentController extends AppUserPartController
 
         if (Yii::$app->request->isAjax) {
 
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->hypothesis->exist_confirm == 1) || (!empty($model->problems)  && $model->count_positive <= $count_positive && $model->hypothesis->exist_confirm == 1)) {
+            if (($model->problems  && $model->getCountPositive() <= $count_positive && $model->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) || (count($model->responds) === $count_descInterview && $model->getCountPositive() <= $count_positive && $model->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED)) {
 
                 $response =  [
                     'success' => true,
@@ -522,27 +479,24 @@ class ConfirmSegmentController extends AppUserPartController
                             ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->all(),
                     ]),
                 ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
 
             }else{
-
                 $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
 
     /**
      * Завершение подтверждения сегмента и переход на следующий этап
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionMovingNextStage($id)
+    public function actionMovingNextStage(int $id)
     {
         $model = ConfirmSegment::findOne($id);
         $segment = $model->segment;
@@ -558,87 +512,77 @@ class ConfirmSegmentController extends AppUserPartController
 
         if(Yii::$app->request->isAjax) {
 
-            if (count($model->responds) > $count_descInterview && empty($model->problems)) {
+            if (!$model->problems && count($model->responds) > $count_descInterview) {
 
                 $response = ['not_completed_descInterviews' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
 
-            } elseif ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->problems))) {
+            } elseif ($model->problems || (count($model->responds) === $count_descInterview && $model->getCountPositive() <= $count_positive)) {
 
-                $response =  [
-                    'success' => true,
-                    'exist_confirm' => $segment->exist_confirm,
-                ];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
+                $response =  ['success' => true, 'exist_confirm' => $segment->getExistConfirm()];
 
             }else{
 
                 $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|Response
      * @throws ErrorException
      * @throws NotFoundHttpException
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionNotExistConfirm($id)
+    public function actionNotExistConfirm(int $id)
     {
         $model = $this->findModel($id);
-        $segment = Segments::findOne($model->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $segment = Segments::findOne($model->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($segment->exist_confirm === 0) { // TODO:Создать класс StatusConfirm для обозначения статусов
-            return $this->redirect(['/segments/index', 'id' => $project->id]);
+        if ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
+            return $this->redirect(['/segments/index', 'id' => $project->getId()]);
 
-        }else {
+        }
 
-            $segment->exist_confirm = 0;
-            $segment->time_confirm = time();
-            $model->setEnableExpertise();
+        $segment->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
+        $segment->setTimeConfirm();
+        $model->setEnableExpertise();
 
-            if ($segment->update() && $model->update()){
+        if ($segment->update() && $model->update()){
 
-                $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
-                $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['/segments/index', 'id' => $project->id]);
-            }
+            $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+            $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/segments/index', 'id' => $project->getId()]);
         }
         return false;
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|Response
      * @throws ErrorException
      * @throws NotFoundHttpException
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionExistConfirm($id)
+    public function actionExistConfirm(int $id)
     {
         $model = $this->findModel($id);
-        $segment = Segments::findOne($model->segmentId);
+        $segment = Segments::findOne($model->getSegmentId());
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        $segment->exist_confirm = 1;
-        $segment->time_confirm = time();
+        $segment->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
+        $segment->setTimeConfirm();
         $model->setEnableExpertise();
 
         if ($segment->update() && $model->update()){
@@ -652,11 +596,11 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers($id)
+    public function actionGetDataQuestionsAndAnswers(int $id): array
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
@@ -670,7 +614,7 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException
      * @throws MpdfException
@@ -679,18 +623,18 @@ class ConfirmSegmentController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfQuestionsAndAnswers($id)
+    public function actionMpdfQuestionsAndAnswers(int $id)
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-segment/questions_and_answers_pdf', ['questions' => $questions]);
+        $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $segment_name = $model->segment->name;
+        $segment_name = $model->segment->getName();
         if (mb_strlen($segment_name) > 25) {
             $segment_name = mb_substr($segment_name, 0, 25) . '...';
         }
@@ -738,7 +682,7 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws CrossReferenceException
      * @throws InvalidConfigException
@@ -747,18 +691,18 @@ class ConfirmSegmentController extends AppUserPartController
      * @throws PdfParserException
      * @throws PdfTypeException
      */
-    public function actionMpdfDataResponds($id)
+    public function actionMpdfDataResponds(int $id)
     {
         $model = $this->findModel($id);
         $responds = $model->responds;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-segment/viewpdf', ['model' => $model, 'responds' => $responds]);
+        $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $segment_name = $model->segment->name;
+        $segment_name = $model->segment->getName();
         if (mb_strlen($segment_name) > 25) {
             $segment_name = mb_substr($segment_name, 0, 25) . '...';
         }
@@ -788,7 +732,7 @@ class ConfirmSegmentController extends AppUserPartController
             'defaultFont' => 'RobotoCondensed-Light',
             // call mPDF methods on the fly
             'methods' => [
-                'SetTitle' => ['Респонденты для подтверждения гипотезы сегмента «'.$model->segment->name.'»'],
+                'SetTitle' => ['Респонденты для подтверждения гипотезы сегмента «'.$segment_name.'»'],
                 'SetHeader' => ['<div style="color: #3c3c3c;">Респонденты для подтверждения гипотезы сегмента «'.$segment_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
@@ -804,11 +748,11 @@ class ConfirmSegmentController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return ConfirmSegment|null
      * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?ConfirmSegment
     {
         if (($model = ConfirmSegment::findOne($id)) !== null) {
             return $model;

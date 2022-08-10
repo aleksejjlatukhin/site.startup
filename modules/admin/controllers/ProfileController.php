@@ -3,7 +3,6 @@
 namespace app\modules\admin\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
@@ -26,27 +25,27 @@ class ProfileController extends AppAdminController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['index'])) {
+        if ($action->id === 'index') {
 
-            $admin = User::findOne(Yii::$app->request->get('id'));
-            /** @var ClientUser $adminClientUser */
+            $admin = User::findOne((int)Yii::$app->request->get('id'));
             $adminClientUser = $admin->clientUser;
 
-            if (($admin->getId() == $currentUser->getId() || User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username']))
-                && $currentClientUser->getClientId() == $adminClientUser->getClientId()) {
+            if ($currentClientUser->getClientId() === $adminClientUser->getClientId() && ($admin->getId() === $currentUser->getId() || User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username']))) {
                 return parent::beforeAction($action);
-            } elseif ($adminClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE
+            }
+
+            if ($adminClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE
                 && (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()))) {
                 return parent::beforeAction($action);
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
         }else{
             return parent::beforeAction($action);
         }
@@ -54,10 +53,10 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * Lists all User models.
-     * @return mixed
+     * @param int $id
+     * @return string
      */
-    public function actionIndex($id)
+    public function actionIndex(int $id): string
     {
         $user = User::findOne($id);
         $count_users = User::find()->where(['id_admin' => $id])->count();
@@ -80,14 +79,14 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetUserIsOnline($id)
+    public function actionGetUserIsOnline(int $id)
     {
-        $user = User::findOne($id);
-
         if (Yii::$app->request->isAjax) {
+
+        $user = User::findOne($id);
 
             if ($user->checkOnline === true) {
 
@@ -95,7 +94,9 @@ class ProfileController extends AppAdminController
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-            } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
+            }
+
+            if (is_string($user->checkOnline)) {
 
                 $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -108,20 +109,20 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|bool
      */
-    public function actionUpdateProfile($id)
+    public function actionUpdateProfile(int $id)
     {
-        $model = new ProfileForm($id);
-        $count_users = User::find()->where(['id_admin' => $id])->count();
-        $countProjects = Projects::find()->with('user')
-            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-            ->where(['user.id_admin' => $id])->count();
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
+            $model = new ProfileForm($id);
+            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $countProjects = Projects::find()->with('user')
+                ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                ->where(['user.id_admin' => $id])->count();
 
-            if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->validate()) {
 
@@ -141,16 +142,13 @@ class ProfileController extends AppAdminController
                             Yii::$app->response->format = Response::FORMAT_JSON;
                             Yii::$app->response->data = $response;
                             return $response;
-
                         }
-                        else {
 
-                            //Письмо с уведомлением не отправлено
-                            $response = ['error_send_email' => true];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        //Письмо с уведомлением не отправлено
+                        $response = ['error_send_email' => true];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
                     }
 
                 } else {
@@ -179,21 +177,24 @@ class ProfileController extends AppAdminController
                 }
             }
         }
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return bool|array
      * @throws Exception
      */
-    public function actionChangePassword($id)
+    public function actionChangePassword(int $id)
     {
-        $user = User::findOne($id);
-        $model = new PasswordChangeForm($user);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
-            if (Yii::$app->request->isAjax) {
+            $user = User::findOne($id);
+            $model = new PasswordChangeForm($user);
+
+            if ($model->load(Yii::$app->request->post())){
+
                 if ($model->validate()) {
                     if ($model->changePassword()) {
 
@@ -203,37 +204,35 @@ class ProfileController extends AppAdminController
                         return $response;
                     }
 
-                } else {
+                } elseif (!$model->validate(['currentPassword'])) {
 
-                    if (!$model->validate(['currentPassword'])) {
-
-                        $response = ['errorCurrentPassword' => 'true'];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = ['errorCurrentPassword' => true];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array|bool
-     * @throws Throwable
+     * @param int $id
+     * @return array|false
      * @throws Exception
      * @throws StaleObjectException
+     * @throws Throwable
      */
-    public function actionLoadAvatarImage ($id)
+    public function actionLoadAvatarImage(int $id)
     {
-        $avatarForm = new AvatarForm($id);
-        $count_users = User::find()->where(['id_admin' => $id])->count();
-        $countProjects = Projects::find()->with('user')
-            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-            ->where(['user.id_admin' => $id])->count();
-
         if (Yii::$app->request->isAjax) {
+
+            $avatarForm = new AvatarForm($id);
+            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $countProjects = Projects::find()->with('user')
+                ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                ->where(['user.id_admin' => $id])->count();
 
             if (isset($_POST['imageMin'])) {
 
@@ -270,16 +269,16 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetDataAvatar ($id)
+    public function actionGetDataAvatar(int $id)
     {
-        $user = User::findOne($id);
-
         if (Yii::$app->request->isAjax) {
 
-            $response = ['path_max' => '/web/upload/user-' . $user->id . '/avatar/' . $user->avatar_max_image,];
+            $user = User::findOne($id);
+
+            $response = ['path_max' => '/web/upload/user-' . $user->getId() . '/avatar/' . $user->getAvatarMaxImage()];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -290,18 +289,15 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionDeleteUnusedImage ($id)
+    public function actionDeleteUnusedImage(int $id): bool
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
-            if (isset($_POST['imageMax'])) {
-                if ($avatarForm->deleteUnusedImage()) {
-                    return true;
-                }
+            $avatarForm = new AvatarForm($id);
+            if (isset($_POST['imageMax']) && $avatarForm->deleteUnusedImage()) {
+                return true;
             }
         }
         return false;
@@ -309,18 +305,18 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionDeleteAvatar ($id)
+    public function actionDeleteAvatar(int $id)
     {
-        $avatarForm = new AvatarForm($id);
-        $count_users = User::find()->where(['id_admin' => $id])->count();
-        $countProjects = Projects::find()->with('user')
-            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-            ->where(['user.id_admin' => $id])->count();
-
         if (Yii::$app->request->isAjax) {
+
+            $avatarForm = new AvatarForm($id);
+            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $countProjects = Projects::find()->with('user')
+                ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+                ->where(['user.id_admin' => $id])->count();
 
             if ($avatarForm->deleteOldAvatarImages()) {
 
@@ -343,11 +339,11 @@ class ProfileController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return User|null
      * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?User
     {
         if (($model = User::findOne($id)) !== null) {
             return $model;

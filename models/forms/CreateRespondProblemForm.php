@@ -28,14 +28,16 @@ class CreateRespondProblemForm extends FormCreateRespondent
      * @param ConfirmProblem $confirm
      * @param array $config
      */
-    public function __construct(ConfirmProblem $confirm, $config = [])
+    public function __construct(ConfirmProblem $confirm, array $config = [])
     {
         $this->setCreatorAnswers();
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($confirm));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -47,14 +49,16 @@ class CreateRespondProblemForm extends FormCreateRespondent
      * @param ConfirmationInterface $confirm
      * @return string
      */
-    public static function getCachePath(ConfirmationInterface $confirm)
+    public static function getCachePath(ConfirmationInterface $confirm): string
     {
+        /**
+         * @var ConfirmProblem $confirm
+         */
         $problem = Problems::findOne($confirm->getProblemId());
         $segment = Segments::findOne($problem->getSegmentId());
         $project = Projects::findOne($problem->getProjectId());
         $user = User::findOne($project->getUserId());
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/problems/problem-'.$problem->getId().'/confirm/formCreateConfirm/';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/problems/problem-'.$problem->getId().'/confirm/formCreateConfirm/';
     }
 
     /**
@@ -62,7 +66,7 @@ class CreateRespondProblemForm extends FormCreateRespondent
      * @throws ErrorException
      * @throws NotFoundHttpException
      */
-    public function create ()
+    public function create (): RespondsProblem
     {
         $model = new RespondsProblem();
         $model->setConfirmId($this->getConfirmId());
@@ -88,7 +92,7 @@ class CreateRespondProblemForm extends FormCreateRespondent
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

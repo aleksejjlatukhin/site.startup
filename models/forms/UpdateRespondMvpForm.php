@@ -29,10 +29,10 @@ class UpdateRespondMvpForm extends UpdateFormRespond
 
     /**
      * UpdateRespondMvpForm constructor.
-     * @param $id
+     * @param int $id
      * @param array $config
      */
-    public function __construct($id, $config = [])
+    public function __construct(int $id, array $config = [])
     {
         $respond = RespondsMvp::findOne($id);
         foreach ($respond as $key => $value) {
@@ -45,9 +45,9 @@ class UpdateRespondMvpForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
-     * @return ConfirmMvp|ConfirmationInterface|null
+     * @return ConfirmMvp|null
      */
-    public function getConfirm()
+    public function findConfirm(): ?ConfirmMvp
     {
         return ConfirmMvp::findOne($this->getConfirmId());
     }
@@ -57,7 +57,7 @@ class UpdateRespondMvpForm extends UpdateFormRespond
      * @return RespondsMvp|null
      * @throws NotFoundHttpException
      */
-    public function update()
+    public function update(): ?RespondsMvp
     {
         $respond = RespondsMvp::findOne($this->getId());
         $respond->setName($this->getName());
@@ -67,8 +67,9 @@ class UpdateRespondMvpForm extends UpdateFormRespond
             'email' => $this->getEmail()
         ]);
         $respond->setDatePlan(strtotime($this->getDatePlan()));
-        if ($respond->save())
+        if ($respond->save()) {
             return $respond;
+        }
 
         throw new NotFoundHttpException('Ошибка. Неудалось обновить данные респондента');
     }
@@ -83,7 +84,7 @@ class UpdateRespondMvpForm extends UpdateFormRespond
 
         foreach ($models as $item){
 
-            if ($this->getId() != $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if ($this->getId() !== $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

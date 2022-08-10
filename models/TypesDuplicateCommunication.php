@@ -17,19 +17,19 @@ class TypesDuplicateCommunication
      * Дублирование коммуникации от гл.админа эксперту (назначение или отзыв с проекта)
      * Отправка происходит трекеру и проектанту
      */
-    const MAIN_ADMIN_TO_EXPERT = 333;
+    public const MAIN_ADMIN_TO_EXPERT = 333;
 
     /**
      * Отправка коммуникации трекеру и проектанту
      * при завершении экспертом этапа экспертизы по проекту
      */
-    const EXPERT_COMPLETED_EXPERTISE = 432;
+    public const EXPERT_COMPLETED_EXPERTISE = 432;
 
     /**
      * Отправка коммуникации трекеру и проектанту
      * при обновлении экспертом данных завершенной экспертизы по этапу
      */
-    const EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE = 433;
+    public const EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE = 433;
 
 
     /**
@@ -37,7 +37,7 @@ class TypesDuplicateCommunication
      *
      * @return array
      */
-    public static function getTypes()
+    public static function getTypes(): array
     {
         return [
             self::MAIN_ADMIN_TO_EXPERT,

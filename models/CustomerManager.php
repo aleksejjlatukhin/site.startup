@@ -6,6 +6,8 @@ namespace app\models;
 use app\modules\admin\models\ConversationManager;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -18,6 +20,9 @@ use yii\db\ActiveRecord;
  * @property int $user_id                   идентификатор менеджера из таблицы User
  * @property int $client_id                 идентификатор клиента (организации)
  * @property int $created_at                дата привязки менеджера по клиентам к организации
+ *
+ * @property User $user                     Менеджер
+ * @property Client $client                 Организация
  */
 class CustomerManager  extends ActiveRecord
 {
@@ -25,7 +30,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'customer_manager';
     }
@@ -34,36 +39,18 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
 
     /**
-     * @return User|null
-     */
-    public function findUser()
-    {
-        return User::findOne($this->user_id);
-    }
-
-
-    /**
      * @return ActiveQuery
      */
-    public function getClient()
+    public function getClient(): ActiveQuery
     {
         return $this->hasOne(Client::class, ['id' => 'client_id']);
-    }
-
-
-    /**
-     * @return Client|null
-     */
-    public function findClient()
-    {
-        return Client::findOne($this->client_id);
     }
 
 
@@ -74,7 +61,7 @@ class CustomerManager  extends ActiveRecord
      * @param int $userId
      * @return CustomerManager|null
      */
-    public static function addManager($clientId, $userId)
+    public static function addManager(int $clientId, int $userId): ?CustomerManager
     {
         $model = new self();
         $model->setClientId($clientId);
@@ -89,10 +76,10 @@ class CustomerManager  extends ActiveRecord
      *
      * @return void
      */
-    private function createConversationManagerWithAdminCompany()
+    private function createConversationManagerWithAdminCompany(): void
     {
         $client = Client::findOne($this->getClientId());
-        $adminCompany = User::findOne($client->findSettings()->getAdminId());
+        $adminCompany = User::findOne($client->settings->getAdminId());
         $conversationManager = new ConversationManager();
         $conversationManager->createOrUpdateRecordWithAdminCompany($this->getUserId(), $adminCompany);
     }
@@ -101,7 +88,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['client_id', 'user_id'], 'required'],
@@ -113,12 +100,12 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }
@@ -137,7 +124,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -146,7 +133,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -155,7 +142,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -164,7 +151,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
@@ -173,7 +160,7 @@ class CustomerManager  extends ActiveRecord
     /**
      * @param int $client_id
      */
-    public function setClientId($client_id)
+    public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
     }

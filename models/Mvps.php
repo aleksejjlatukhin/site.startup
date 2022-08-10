@@ -28,12 +28,21 @@ use yii\db\ActiveRecord;
  * @property int $updated_at                        Дата обновления mvp-продукта
  * @property int $time_confirm                      Дата подверждения mvp-продукта
  * @property int $exist_confirm                     Параметр факта подтверждения mvp-продукта
- * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
+ * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
+ *
+ * @property ConfirmMvp $confirm                    Подтверждение mvp-продукта
+ * @property Projects $project                      Проект
+ * @property Segments $segment                      Сегмент
+ * @property Problems $problem                      Проблема
+ * @property Gcps $gcp                              Ценностное предложение
+ * @property BusinessModel $businessModel           Бизнес-модель
+ * @property RespondsGcp[] $respondsAgents          Респонденты которые подтвердили текущее ценностное предложение
  */
 class Mvps extends ActiveRecord
 {
 
-    const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
+    public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
 
@@ -41,7 +50,7 @@ class Mvps extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'mvps';
     }
@@ -49,30 +58,31 @@ class Mvps extends ActiveRecord
 
     /**
      * Mvps constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
     {
-        $this->propertyContainer = new PropertyContainer();
-
+        $this->setPropertyContainer();
         parent::__construct($config);
     }
 
 
     /**
      * Получить объект подтверждения данного Mvps
+     *
      * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmMvp::class, ['mvp_id' => 'id']);
     }
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getConfirmGcpId()
+    public function getConfirmGcpId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -80,85 +90,54 @@ class Mvps extends ActiveRecord
 
     /**
      * Получить объект текущего проекта
+     *
      * @return ActiveQuery
      */
-    public function getProject ()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
 
     /**
-     * @return Projects|null
-     */
-    public function findProject()
-    {
-        return Projects::findOne($this->getProjectId());
-    }
-
-
-    /**
      * Получить объект текущего сегмента
+     *
      * @return ActiveQuery
      */
-    public function getSegment ()
+    public function getSegment(): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
 
 
     /**
-     * @return Segments|null
-     */
-    public function findSegment()
-    {
-        return Segments::findOne($this->getSegmentId());
-    }
-
-
-    /**
      * Получить объект текущей проблемы
+     *
      * @return ActiveQuery
      */
-    public function getProblem ()
+    public function getProblem(): ActiveQuery
     {
         return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
 
 
     /**
-     * @return Problems|null
-     */
-    public function findProblem()
-    {
-        return Problems::findOne($this->getProblemId());
-    }
-
-
-    /**
      * Получить объект текущего Gcps
+     *
      * @return ActiveQuery
      */
-    public function getGcp ()
+    public function getGcp(): ActiveQuery
     {
         return $this->hasOne(Gcps::class, ['id' => 'gcp_id']);
     }
 
 
     /**
-     * @return Gcps|null
-     */
-    public function findGcp()
-    {
-        return Gcps::findOne($this->getGcpId());
-    }
-
-
-    /**
      * Получить объект бизнес-модели
+     *
      * @return ActiveQuery
      */
-    public function getBusinessModel ()
+    public function getBusinessModel(): ActiveQuery
     {
         return $this->hasOne(BusinessModel::class, ['mvp_id' => 'id']);
     }
@@ -167,9 +146,10 @@ class Mvps extends ActiveRecord
     /**
      * Получить респондентов, которые
      * подтвердтлт текущее Gcps
+     *
      * @return array|ActiveRecord[]
      */
-    public function getRespondsAgents()
+    public function getRespondsAgents(): array
     {
         return RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
@@ -180,7 +160,7 @@ class Mvps extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['basic_confirm_id', 'title', 'description'], 'required'],
@@ -200,7 +180,7 @@ class Mvps extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'title' => 'Наименование ГMVP',
@@ -212,7 +192,7 @@ class Mvps extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -248,10 +228,10 @@ class Mvps extends ActiveRecord
 
 
     /**
-     * Удаление Mvps и связанных данных
-     * @throws Throwable
+     * @return false|int
      * @throws ErrorException
      * @throws StaleObjectException
+     * @throws Throwable
      */
     public function deleteStage ()
     {
@@ -264,33 +244,37 @@ class Mvps extends ActiveRecord
             $responds = $confirm->responds;
             foreach ($responds as $respond) {
 
-                InterviewConfirmMvp::deleteAll(['responds_mvp_id' => $respond->id]);
-                AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $respond->id]);
+                InterviewConfirmMvp::deleteAll(['responds_mvp_id' => $respond->getId()]);
+                AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $respond->getId()]);
             }
 
-            QuestionsConfirmMvp::deleteAll(['confirm_mvp_id' => $confirm->id]);
-            RespondsMvp::deleteAll(['confirm_mvp_id' => $confirm->id]);
+            QuestionsConfirmMvp::deleteAll(['confirm_mvp_id' => $confirm->getId()]);
+            RespondsMvp::deleteAll(['confirm_mvp_id' => $confirm->getId()]);
             $confirm->delete();
         }
 
         // Удаление директории MVP
-        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
-            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->gcp->id.'/mvps/mvp-'.$this->id;
-        if (file_exists($gcpPathDelete)) FileHelper::removeDirectory($gcpPathDelete);
+        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
+        if (file_exists($gcpPathDelete)) {
+            FileHelper::removeDirectory($gcpPathDelete);
+        }
 
         // Удаление кэша для форм MVP
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
-            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->gcp->id.'/mvps/mvp-'.$this->id;
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
+        if (file_exists($cachePathDelete)) {
+            FileHelper::removeDirectory($cachePathDelete);
+        }
 
         // Удаление MVP
-        $this->delete();
+        return $this->delete();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -298,7 +282,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -306,7 +290,7 @@ class Mvps extends ActiveRecord
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -314,7 +298,7 @@ class Mvps extends ActiveRecord
     /**
      * @param int $segment_id
      */
-    public function setSegmentId($segment_id)
+    public function setSegmentId(int $segment_id): void
     {
         $this->segment_id = $segment_id;
     }
@@ -322,7 +306,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getSegmentId()
+    public function getSegmentId(): int
     {
         return $this->segment_id;
     }
@@ -330,7 +314,7 @@ class Mvps extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -338,7 +322,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -346,7 +330,7 @@ class Mvps extends ActiveRecord
     /**
      * @param int $problem_id
      */
-    public function setProblemId($problem_id)
+    public function setProblemId(int $problem_id): void
     {
         $this->problem_id = $problem_id;
     }
@@ -354,7 +338,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getProblemId()
+    public function getProblemId(): int
     {
         return $this->problem_id;
     }
@@ -362,7 +346,7 @@ class Mvps extends ActiveRecord
     /**
      * @param int $gcp_id
      */
-    public function setGcpId($gcp_id)
+    public function setGcpId(int $gcp_id): void
     {
         $this->gcp_id = $gcp_id;
     }
@@ -370,7 +354,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getGcpId()
+    public function getGcpId(): int
     {
         return $this->gcp_id;
     }
@@ -378,7 +362,7 @@ class Mvps extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -386,7 +370,7 @@ class Mvps extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -394,7 +378,7 @@ class Mvps extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -402,7 +386,7 @@ class Mvps extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -410,7 +394,7 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -418,31 +402,31 @@ class Mvps extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTimeConfirm()
+    public function getTimeConfirm(): ?int
     {
         return $this->time_confirm;
     }
 
     /**
-     * @param int $time_confirm
+     * @param int|null $time_confirm
      */
-    public function setTimeConfirm($time_confirm)
+    public function setTimeConfirm(int $time_confirm = null): void
     {
-        $this->time_confirm = $time_confirm;
+        $time_confirm ? $this->time_confirm = $time_confirm : $this->time_confirm = time();
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getExistConfirm()
+    public function getExistConfirm(): ?int
     {
         return $this->exist_confirm;
     }
@@ -450,15 +434,15 @@ class Mvps extends ActiveRecord
     /**
      * @param int $exist_confirm
      */
-    public function setExistConfirm($exist_confirm)
+    public function setExistConfirm(int $exist_confirm): void
     {
         $this->exist_confirm = $exist_confirm;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getEnableExpertise()
+    public function getEnableExpertise(): string
     {
         return $this->enable_expertise;
     }
@@ -466,8 +450,24 @@ class Mvps extends ActiveRecord
     /**
      *  Установить разрешение на экспертизу
      */
-    public function setEnableExpertise()
+    public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
+    }
+
+    /**
+     * @return PropertyContainer
+     */
+    public function getPropertyContainer(): PropertyContainer
+    {
+        return $this->propertyContainer;
+    }
+
+    /**
+     *
+     */
+    public function setPropertyContainer(): void
+    {
+        $this->propertyContainer = new PropertyContainer();
     }
 }

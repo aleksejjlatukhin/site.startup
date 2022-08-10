@@ -16,27 +16,33 @@ use yii\db\ActiveRecord;
  * Class UserAccessToProjects
  * @package app\models
  *
- * @property int $id                            Идентификтор записи
- * @property int $user_id                       Идентификтор эксперта
- * @property int $project_id                    Идентификтор проекта
- * @property int $communication_id              Идентификтор коммуникации в таб. project_communications
- * @property int $communication_type            Тип коммуникации
- * @property int $cancel                        Флаг, указывает на отмену коммуникации
- * @property int $date_stop                     Дата окончания доступа к проекту
- * @property int $created_at                    Дата создания записи
- * @property int $updated_at                    Дата редактирования записи
+ * @property int $id                                                    Идентификтор записи
+ * @property int $user_id                                               Идентификтор эксперта
+ * @property int $project_id                                            Идентификтор проекта
+ * @property int $communication_id                                      Идентификтор коммуникации в таб. project_communications
+ * @property int $communication_type                                    Тип коммуникации
+ * @property int $cancel                                                Флаг, указывает на отмену коммуникации
+ * @property int $date_stop                                             Дата окончания доступа к проекту
+ * @property int $created_at                                            Дата создания записи
+ * @property int $updated_at                                            Дата редактирования записи
+ *
+ * @property ProjectCommunications $communication                       Получить объект коммуникации по которой был предоставлен доступ к проекту
+ * @property ProjectCommunications[] $userCommunications                Получить все коммуникации пользователя по проекту
+ * @property ProjectCommunications[] $userCommunicationsForAdminTable   Получить коммуникации пользователя для таблицы админа
+ * @property User $user                                                 Получить пользователя, которому был предоставлен доступ к проекту
+ * @property Projects $project                                          Получить проект, по которому был предоставлен доступ
  */
 class UserAccessToProjects extends ActiveRecord
 {
 
-    const CANCEL_TRUE = 111;
-    const CANCEL_FALSE = 222;
+    public const CANCEL_TRUE = 111;
+    public const CANCEL_FALSE = 222;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user_access_to_projects';
     }
@@ -49,7 +55,7 @@ class UserAccessToProjects extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getCommunication()
+    public function getCommunication(): ActiveQuery
     {
         return $this->hasOne(ProjectCommunications::class, ['id' => 'communication_id']);
     }
@@ -61,7 +67,7 @@ class UserAccessToProjects extends ActiveRecord
      *
      * @return array|ActiveRecord[]
      */
-    public function getUserCommunications()
+    public function getUserCommunications(): array
     {
         $communications = ProjectCommunications::find()
             ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
@@ -76,7 +82,7 @@ class UserAccessToProjects extends ActiveRecord
      *
      * @return array|ActiveRecord[]
      */
-    public function getUserCommunicationsForAdminTable()
+    public function getUserCommunicationsForAdminTable(): array
     {
         $communications = ProjectCommunications::find()
             ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
@@ -97,7 +103,7 @@ class UserAccessToProjects extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -109,7 +115,7 @@ class UserAccessToProjects extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getProject()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
@@ -118,7 +124,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['user_id', 'project_id', 'communication_id', 'communication_type', 'cancel', 'date_stop', 'created_at', 'updated_at'], 'integer'],
@@ -135,7 +141,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -148,13 +154,13 @@ class UserAccessToProjects extends ActiveRecord
      * @param int $project_id
      * @param ProjectCommunications $communication
      */
-    public function setParams ($user_id, $project_id, $communication)
+    public function setParams (int $user_id, int $project_id, ProjectCommunications $communication): void
     {
         $this->setUserId($user_id);
         $this->setProjectId($project_id);
         $this->setCommunicationId($communication->getId());
         $this->setCommunicationType($communication->getType());
-        if ($this->getCommunicationType() == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+        if ($this->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
             if ($communication->getPatternId()) {
                 $pattern = CommunicationPatterns::findOne($communication->getPatternId());
                 $this->setDateStop(time() + ($pattern->getProjectAccessPeriod() * 24 * 60 * 60));
@@ -169,7 +175,7 @@ class UserAccessToProjects extends ActiveRecord
      * Установить парметр аннулированного
      * доступа к проекту
      */
-    public function setCancel()
+    public function setCancel(): void
     {
         $this->cancel = self::CANCEL_TRUE;
     }
@@ -177,7 +183,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -185,7 +191,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -193,7 +199,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -201,7 +207,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -209,7 +215,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -217,7 +223,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getCommunicationId()
+    public function getCommunicationId(): int
     {
         return $this->communication_id;
     }
@@ -225,7 +231,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @param int $communication_id
      */
-    public function setCommunicationId($communication_id)
+    public function setCommunicationId(int $communication_id): void
     {
         $this->communication_id = $communication_id;
     }
@@ -233,7 +239,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getCommunicationType()
+    public function getCommunicationType(): int
     {
         return $this->communication_type;
     }
@@ -241,7 +247,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @param int $communication_type
      */
-    public function setCommunicationType($communication_type)
+    public function setCommunicationType(int $communication_type): void
     {
         $this->communication_type = $communication_type;
     }
@@ -249,7 +255,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getCancel()
+    public function getCancel(): int
     {
         return $this->cancel;
     }
@@ -257,7 +263,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getDateStop()
+    public function getDateStop(): int
     {
         return $this->date_stop;
     }
@@ -265,7 +271,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @param int $date_stop
      */
-    public function setDateStop($date_stop)
+    public function setDateStop(int $date_stop): void
     {
         $this->date_stop = $date_stop;
     }
@@ -273,7 +279,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -281,7 +287,7 @@ class UserAccessToProjects extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

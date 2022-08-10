@@ -205,10 +205,10 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             <p>
                 В 2012 году А. Остервальдер и его команда выпустили «Проектировщик ценностного предложения».
                 Эта работа охраняется авторским правом, и её можно использовать только со ссылкой на
-                <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']); ?>
+                <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']) ?>
             </p>
 
-            <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']); ?></div>
+            <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']) ?></div>
 
             <ul>
                 <li>
@@ -505,10 +505,10 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             <p>
                 В 2012 году А. Остервальдер и его команда выпустили «Проектировщик ценностного предложения».
                 Эта работа охраняется авторским правом, и её можно использовать только со ссылкой на
-                <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']); ?>
+                <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']) ?>
             </p>
 
-            <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']); ?></div>
+            <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']) ?></div>
 
             <ul>
                 <li>

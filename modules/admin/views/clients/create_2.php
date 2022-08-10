@@ -1,9 +1,15 @@
 <?php
 
+use app\modules\admin\models\form\FormCreateClient;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $this->title = 'Создание новой организации';
+
+/**
+ * @var FormCreateClient $formCreateClient
+ */
+
 ?>
 
 <div class="row container-fluid block-form-create-client">
@@ -12,7 +18,7 @@ $this->title = 'Создание новой организации';
         <?= Html::a('Шаг 2. Заполните форму создания организации' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
             'class' => 'link_to_instruction_page open_modal_instruction_page',
             'title' => 'Инструкция', 'onclick' => 'return false'
-        ]); ?>
+        ]) ?>
     </div>
 
     <?php $form = ActiveForm::begin([
@@ -22,7 +28,7 @@ $this->title = 'Создание новой организации';
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-        <?= $form->field($formCreateClient, 'adminCompany')->hiddenInput()->label(false); ?>
+        <?= $form->field($formCreateClient, 'adminCompany')->hiddenInput()->label(false) ?>
 
         <div class="row" style="margin-bottom: 10px;">
             <?= $form->field($formCreateClient, 'name', [
@@ -32,7 +38,7 @@ $this->title = 'Создание новой организации';
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 10px;">
@@ -43,7 +49,7 @@ $this->title = 'Создание новой организации';
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 10px;">
@@ -54,7 +60,7 @@ $this->title = 'Создание новой организации';
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 15px;">
@@ -65,7 +71,7 @@ $this->title = 'Создание новой организации';
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="form-group row container-fluid">

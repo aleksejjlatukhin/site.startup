@@ -35,7 +35,7 @@ class SearchFormExperts extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['keywords', 'name'], 'string', 'max' => 255],
@@ -50,7 +50,7 @@ class SearchFormExperts extends Model
      *
      * @return array|ActiveRecord[]
      */
-    public static function search()
+    public static function search(): array
     {
         $clientUser = ClientUser::findOne(['user_id' => Yii::$app->user->getId()]);
         $client = $clientUser->client;

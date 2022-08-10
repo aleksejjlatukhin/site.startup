@@ -37,45 +37,41 @@ class QuestionsController extends AppUserPartController
      * @throws HttpException
      * @throws BadRequestHttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
 
-        if (in_array($action->id, ['create'])){
+        if ($action->id === 'create'){
 
-            $confirm = self::getConfirm(Yii::$app->request->get('stage'), Yii::$app->request->get('id'));
+            $confirm = self::getConfirm(Yii::$app->request->get('stage'), (int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if ($project->getUserId() === Yii::$app->user->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif (in_array($action->id, ['delete']) || in_array($action->id, ['update'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $question = self::getModel(Yii::$app->request->get('stage'), Yii::$app->request->get('id'));
+        } elseif (in_array($action->id, ['delete', 'update'])){
+
+            $question = self::getModel(Yii::$app->request->get('stage'), (int)Yii::$app->request->get('id'));
             $confirm = $question->confirm;
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-            if ($project->user_id == Yii::$app->user->id){
+            if ($project->getUserId() === Yii::$app->user->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         }else{
             return parent::beforeAction($action);
@@ -85,20 +81,19 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return array|bool
      */
-    public function actionCreate($stage, $id)
+    public function actionCreate(int $stage, int $id)
     {
-        $form = new FormCreateQuestion();
-        $form->setConfirmId($id);
-        $model = self::getCreateModel($stage);
+        if(Yii::$app->request->isAjax) {
 
-        if ($form->load(Yii::$app->request->post())){
+            $form = new FormCreateQuestion();
+            $form->setConfirmId($id);
+            $model = self::getCreateModel($stage);
 
-            if(Yii::$app->request->isAjax) {
-
+            if ($form->load(Yii::$app->request->post())){
                 if ($result = $form->create($model)){
 
                     $response = [
@@ -118,11 +113,11 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetFormUpdate ($stage, $id)
+    public function actionGetFormUpdate(int $stage, int $id)
     {
         $model = self::getModel($stage, $id);
         $form = new FormUpdateQuestion($model);
@@ -144,19 +139,18 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return array|bool
      */
-    public function actionUpdate($stage, $id)
+    public function actionUpdate(int $stage, int $id)
     {
-        $model = self::getModel($stage, $id);
-        $form = new FormUpdateQuestion($model);
+        if (Yii::$app->request->isAjax) {
 
-        if ($form->load(Yii::$app->request->post())) {
+            $model = self::getModel($stage, $id);
+            $form = new FormUpdateQuestion($model);
 
-            if (Yii::$app->request->isAjax) {
-
+            if ($form->load(Yii::$app->request->post())) {
                 if ($result = $form->update()){
 
                     $response = [
@@ -176,23 +170,21 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionChangeStatus($stage, $id)
+    public function actionChangeStatus(int $stage, int $id): bool
     {
-        $model = self::getModel($stage, $id);
-        $model->changeStatus();
-
         if (Yii::$app->request->isAjax) {
+
+            $model = self::getModel($stage, $id);
+            $model->changeStatus();
+
             if ($model->update()){
-                $response = true;
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
+                return true;
             }
         }
         return false;
@@ -200,17 +192,17 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return array|bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionDelete ($stage, $id)
+    public function actionDelete(int $stage, int $id)
     {
-        $model = self::getModel($stage, $id);
-
         if(Yii::$app->request->isAjax) {
+
+            $model = self::getModel($stage, $id);
 
             if ($data = $model->deleteAndGetData()){
 
@@ -229,11 +221,11 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetQueryQuestions ($stage, $id)
+    public function actionGetQueryQuestions(int $stage, int $id)
     {
         $confirm = self::getConfirm($stage, $id);
         $questions = $confirm->questions;
@@ -249,19 +241,25 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return QuestionsConfirmGcp|QuestionsConfirmMvp|QuestionsConfirmProblem|QuestionsConfirmSegment|bool|null
      */
-    private static function getModel($stage, $id)
+    private static function getModel(int $stage, int $id)
     {
-        if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return QuestionsConfirmSegment::findOne($id);
-        } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return QuestionsConfirmProblem::findOne($id);
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
             return QuestionsConfirmGcp::findOne($id);
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
             return QuestionsConfirmMvp::findOne($id);
         }
         return false;
@@ -269,18 +267,24 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
+     * @param int $stage
      * @return QuestionsConfirmGcp|QuestionsConfirmMvp|QuestionsConfirmProblem|QuestionsConfirmSegment|bool
      */
-    private static function getCreateModel($stage)
+    private static function getCreateModel(int $stage)
     {
-        if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new QuestionsConfirmSegment();
-        } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new QuestionsConfirmProblem();
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
             return new QuestionsConfirmGcp();
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
             return new QuestionsConfirmMvp();
         }
         return false;
@@ -288,19 +292,25 @@ class QuestionsController extends AppUserPartController
 
 
     /**
-     * @param $stage
-     * @param $id
+     * @param int $stage
+     * @param int $id
      * @return ConfirmGcp|ConfirmMvp|ConfirmProblem|ConfirmSegment|bool|null
      */
-    private static function getConfirm($stage, $id)
+    private static function getConfirm(int $stage, int $id)
     {
-        if ($stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return ConfirmSegment::findOne($id);
-        } elseif($stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return ConfirmProblem::findOne($id);
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
             return ConfirmGcp::findOne($id);
-        }elseif($stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
             return ConfirmMvp::findOne($id);
         }
         return false;

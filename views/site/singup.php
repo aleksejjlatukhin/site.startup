@@ -1,8 +1,13 @@
 <?php
 
+use app\models\forms\SingupForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
+
+/**
+ * @var SingupForm $formRegistration
+ */
 
 
 $form = ActiveForm::begin([
@@ -58,7 +63,7 @@ $form = ActiveForm::begin([
     <div class="block-exist-agree">
 
         <?= $form->field($formRegistration, 'exist_agree', ['template' => '{input}{label}'])
-            ->checkbox(['value' => 1, 'checked ' => true, 'class' => 'custom-checkbox'], false); ?>
+            ->checkbox(['value' => 1, 'checked ' => true, 'class' => 'custom-checkbox'], false) ?>
 
         <?= Html::a('Я согласен с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
             ['/site/confidentiality-policy'], [
@@ -66,7 +71,7 @@ $form = ActiveForm::begin([
                 'title' => 'Ознакомиться с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
                 'style' => ['color' => '#FFFFFF', 'line-height' => '18px']
             ]
-        ); ?>
+        ) ?>
 
     </div>
 
@@ -86,7 +91,7 @@ $form = ActiveForm::begin([
                 'font-size' => '16px',
                 'font-weight' => '700'
             ]
-        ]); ?>
+        ]) ?>
 
     </div>
 

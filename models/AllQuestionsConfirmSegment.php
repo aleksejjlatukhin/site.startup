@@ -4,6 +4,8 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use yii\db\BaseActiveRecord;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * Класс хранит информацию в бд о всех вопросах,
@@ -23,7 +25,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'all_questions_confirm_segment';
     }
@@ -32,7 +34,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['title', 'user_id'], 'required'],
@@ -46,7 +48,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return ['title' => 'Описание вопроса'];
     }
@@ -55,12 +57,12 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }
@@ -68,36 +70,35 @@ class AllQuestionsConfirmSegment extends ActiveRecord
 
     /**
      * Вопросы по-умолчанию
+     *
      * @return array
      */
-    public static function defaultListQuestions()
+    public static function defaultListQuestions(): array
     {
-        $array = [
-            '0' => ['title' => 'Чем вы занимаетесь в настоящее время?'],
-            '1' => ['title' => 'На каком этапе проекта вы находитесь?'],
-            '2' => ['title' => 'Что получается и что не получается в вашем проекте? Приведите примеры.'],
-            '3' => ['title' => 'Как вы определяете цели, задачи и последовательность действий?'],
-            '4' => ['title' => 'Как вы добиваетесь достижения поставленной цели?'],
-            '5' => ['title' => 'Что пытались сделать, чтобы определить верные последовательные действия?'],
-            '6' => ['title' => 'Как вы решали проблему в последний раз, какие шаги предпринимали?'],
-            '7' => ['title' => 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?'],
-            '8' => ['title' => 'Что не нравится в текущем положении вещей?'],
-            '9' => ['title' => 'Что вы пытались с этим сделать?'],
-            '10' => ['title' => 'Если ничего не делали, то почему?'],
-            '11' => ['title' => 'Сколько денег / времени на это тратится сейчас?'],
-            '12' => ['title' => 'Что влияет на решение о покупке продукта?'],
-            '13' => ['title' => 'Как принимается решение о покупке?'],
-            '14' => ['title' => 'Расскажите, что произойдет, если вы не сможете решать потребность? Что при решении доставляет вам неудобство?'],
-            '15' => ['title' => 'Расскажите, пожалуйста, про последний раз, когда вы сталкивались с этими сложностями. Почему это было тяжело?']
+        return [
+            0 => ['title' => 'Чем вы занимаетесь в настоящее время?'],
+            1 => ['title' => 'На каком этапе проекта вы находитесь?'],
+            2 => ['title' => 'Что получается и что не получается в вашем проекте? Приведите примеры.'],
+            3 => ['title' => 'Как вы определяете цели, задачи и последовательность действий?'],
+            4 => ['title' => 'Как вы добиваетесь достижения поставленной цели?'],
+            5 => ['title' => 'Что пытались сделать, чтобы определить верные последовательные действия?'],
+            6 => ['title' => 'Как вы решали проблему в последний раз, какие шаги предпринимали?'],
+            7 => ['title' => 'Как и посредством какого инструмента / процесса вы справляетесь с задачей?'],
+            8 => ['title' => 'Что не нравится в текущем положении вещей?'],
+            9 => ['title' => 'Что вы пытались с этим сделать?'],
+            10 => ['title' => 'Если ничего не делали, то почему?'],
+            11 => ['title' => 'Сколько денег / времени на это тратится сейчас?'],
+            12 => ['title' => 'Что влияет на решение о покупке продукта?'],
+            13 => ['title' => 'Как принимается решение о покупке?'],
+            14 => ['title' => 'Расскажите, что произойдет, если вы не сможете решать потребность? Что при решении доставляет вам неудобство?'],
+            15 => ['title' => 'Расскажите, пожалуйста, про последний раз, когда вы сталкивались с этими сложностями. Почему это было тяжело?']
         ];
-
-        return $array;
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -105,7 +106,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -113,7 +114,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -121,7 +122,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -129,7 +130,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -137,7 +138,7 @@ class AllQuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }

@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmGcp;
@@ -18,6 +17,7 @@ use app\models\Mvps;
 use app\models\Projects;
 use app\models\Segments;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use setasign\Fpdi\PdfParser\PdfParserException;
@@ -46,76 +46,67 @@ class BusinessModelController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['index'])){
+        if ($action->id === 'index'){
 
-            $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get('id'));
+            $confirmMvp = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
             $mvp = Mvps::findOne($confirmMvp->getMvpId());
-            /** @var Projects $project*/
             $project = $mvp->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert(Yii::$app->user->identity['username'])) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
+                /** @var UserAccessToProjects $userAccessToProject */
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -130,107 +121,92 @@ class BusinessModelController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        }elseif ($action->id === 'update'){
 
-            $model = BusinessModel::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
+            $model = BusinessModel::findOne((int)Yii::$app->request->get('id'));
             $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['create'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $confirmMvp = ConfirmMvp::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
+        } elseif ($action->id === 'create'){
+
+            $confirmMvp = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
             $project = $confirmMvp->mvp->project;
 
             /*Ограничение доступа к проэктам пользователя*/
 
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['mpdf-business-model'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $model = BusinessModel::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
+        } elseif ($action->id === 'mpdf-business-model'){
+
+            $model = BusinessModel::findOne((int)Yii::$app->request->get('id'));
             $project = $model->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
+                /** @var UserAccessToProjects $userAccessToProject */
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -253,23 +229,25 @@ class BusinessModelController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return string
+     * @param int $id
+     * @return string|Response
      */
-    public function actionIndex ($id)
+    public function actionIndex (int $id)
     {
         $model = BusinessModel::findOne(['basic_confirm_id' => $id]);
-        if (!$model) return $this->redirect(['/business-model/instruction', 'id' => $id]);
+        if (!$model) {
+            return $this->redirect(['/business-model/instruction', 'id' => $id]);
+        }
 
         $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvps::findOne($confirmMvp->mvpId);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
-        $gcp = Gcps::findOne($confirmGcp->gcpId);
-        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
-        $problem = Problems::findOne($confirmProblem->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $mvp = Mvps::findOne($confirmMvp->getMvpId());
+        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
+        $gcp = Gcps::findOne($confirmGcp->getGcpId());
+        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
+        $problem = Problems::findOne($confirmProblem->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($confirmSegment->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
 
         return $this->render('index', [
             'model' => $model,
@@ -287,13 +265,15 @@ class BusinessModelController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return string
+     * @param int $id
+     * @return string|Response
      */
-    public function actionInstruction ($id)
+    public function actionInstruction (int $id)
     {
         $model = BusinessModel::findOne(['basic_confirm_id' => $id]);
-        if ($model) return $this->redirect(['/business-model/index', 'id' => $id]);
+        if ($model) {
+            return $this->redirect(['/business-model/index', 'id' => $id]);
+        }
 
         return $this->render('index_first', [
             'confirmMvp' => ConfirmMvp::findOne($id),
@@ -317,10 +297,10 @@ class BusinessModelController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionSaveCacheCreationForm($id)
+    public function actionSaveCacheCreationForm(int $id): bool
     {
         $confirmMvp = ConfirmMvp::findOne($id);
         $cachePath = FormCreateBusinessModel::getCachePath($confirmMvp->hypothesis);
@@ -343,18 +323,17 @@ class BusinessModelController extends AppUserPartController
      */
     public function actionCreate($id)
     {
-        $confirmMvp = ConfirmMvp::findOne($id);
-        $model = new FormCreateBusinessModel($confirmMvp->hypothesis);
-        $model->basic_confirm_id = $id;
+        if(Yii::$app->request->isAjax) {
 
-        $mvp = Mvps::findOne($confirmMvp->mvpId);
-        $gcp = Gcps::findOne($mvp->gcpId);
-        $segment = Segments::findOne($mvp->segmentId);
+            $confirmMvp = ConfirmMvp::findOne($id);
+            $model = new FormCreateBusinessModel($confirmMvp->hypothesis);
+            $model->setBasicConfirmId($id);
 
-        if ($model->load(Yii::$app->request->post())) {
+            $mvp = Mvps::findOne($confirmMvp->getMvpId());
+            $gcp = Gcps::findOne($mvp->getGcpId());
+            $segment = Segments::findOne($mvp->getSegmentId());
 
-            if(Yii::$app->request->isAjax) {
-
+            if ($model->load(Yii::$app->request->post())) {
                 if ($businessModel = $model->create()) {
 
                     $response = [
@@ -374,11 +353,11 @@ class BusinessModelController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      */
-    public function actionGetHypothesisToUpdate ($id)
+    public function actionGetHypothesisToUpdate (int $id)
     {
         $model = $this->findModel($id);
 
@@ -396,26 +375,25 @@ class BusinessModelController extends AppUserPartController
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
-        $model = $this->findModel($id);
-        $confirmMvp = ConfirmMvp::findOne($model->getConfirmMvpId());
-        $gcp = $model->gcp;
-        $segment = $model->segment;
+        if(Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $model = $this->findModel($id);
+            $confirmMvp = $model->confirmMvp;
+            $gcp = $model->gcp;
+            $segment = $model->segment;
 
-            if(Yii::$app->request->isAjax) {
-
+            if ($model->load(Yii::$app->request->post())) {
                 if ($model->save()) {
 
                     $response = [
                         'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->id]),
+                            'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->getId()]),
                             'segment' => $segment,
                             'gcp' => $gcp,
                         ]),
@@ -431,11 +409,12 @@ class BusinessModelController extends AppUserPartController
 
     /**
      * Включить разрешение на экспертизу
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      */
-    public function actionEnableExpertise($id)
+    public function actionEnableExpertise(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
@@ -449,7 +428,7 @@ class BusinessModelController extends AppUserPartController
 
                 $response = [
                     'renderAjax' => $this->renderAjax('_index_ajax', [
-                        'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->id]),
+                        'model' => BusinessModel::findOne(['basic_confirm_id' => $confirmMvp->getId()]),
                         'segment' => $segment,
                         'gcp' => $gcp,
                     ]),
@@ -463,8 +442,7 @@ class BusinessModelController extends AppUserPartController
     }
 
     /**
-     * export in pdf
-     * @param string $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException
      * @throws MpdfException
@@ -473,17 +451,17 @@ class BusinessModelController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfBusinessModel($id) {
+    public function actionMpdfBusinessModel(int $id) {
 
         $model = $this->findModel($id);
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/business-model/viewpdf', ['model' => $model]);
+        $content = $this->renderPartial('viewpdf', ['model' => $model]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $filename = 'business-model-'. $model->id .'.pdf';
+        $filename = 'business-model-'. $model->getId() .'.pdf';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -508,7 +486,7 @@ class BusinessModelController extends AppUserPartController
             // call mPDF methods on the fly
             'methods' => [
                 'SetTitle' => ['Бизнес-модель PDF'],
-                'SetHeader' => ['<div style="color: #3c3c3c;">Бизнес-модель для проекта «'.$model->project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Бизнес-модель для проекта «'.$model->project->getProjectName().'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',
@@ -522,13 +500,11 @@ class BusinessModelController extends AppUserPartController
     }
 
     /**
-     * Finds the BusinessModel model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return BusinessModel the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param int $id
+     * @return BusinessModel|null
+     * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?BusinessModel
     {
         if (($model = BusinessModel::findOne($id)) !== null) {
             return $model;

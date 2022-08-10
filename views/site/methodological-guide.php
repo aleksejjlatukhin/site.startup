@@ -8,7 +8,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
 <div class="methodological-guide">
 
-    <h2 class="main-header"><?= $this->title; ?></h2>
+    <h2 class="main-header"><?= $this->title ?></h2>
 
     <h3 class="header-content">Оглавление</h3>
 
@@ -291,7 +291,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     и протестировать свои предположения непосредственно на потребителях. Тестирование и извлечение уроков требует тщательного
                     продумывания такой процедуры – разработки экспериментов. Детальное описание можно прочитать перед началом выполнения каждого
                     этапа.
-                    <p class="text-center"><?= Html::img('/images/pictures/guide_picture_1.png', ['class' => 'guide-picture']);?></p>
+                    <p class="text-center"><?= Html::img('/images/pictures/guide_picture_1.png', ['class' => 'guide-picture']) ?></p>
                     <p class="bold text-center">Рис. 1. Цикл осмысления в процессе развития потребителей</p><br>
                 </li>
                 <li class="pl-15">
@@ -538,7 +538,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
     <!--11. Этап 9. Разработка бизнес-модели-->
-    <h3 class="header-text"id="developing_business_model">11.<span>Этап 9. Разработка бизнес-модели</span></h3>
+    <h3 class="header-text" id="developing_business_model">11.<span>Этап 9. Разработка бизнес-модели</span></h3>
 
     <div class="container-list">
 

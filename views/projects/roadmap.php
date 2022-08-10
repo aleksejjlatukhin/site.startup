@@ -1,7 +1,11 @@
 <?php
 
+use app\models\Roadmap;
 use yii\helpers\Html;
 
+/**
+ * @var Roadmap[] $roadmaps
+ */
 
 
 $content = '';
@@ -79,7 +83,7 @@ foreach ($roadmaps as $roadmap) {
 
     $segment_name = $roadmap->getProperty('segment_name');
 
-    if ($roadmap->getProperty('fact_segment_confirm') != null) {
+    if ($roadmap->getProperty('fact_segment_confirm') !== null) {
 
         if ($roadmap->getProperty('fact_segment_confirm') <= $roadmap->getProperty('plan_segment_confirm')){
 
@@ -93,7 +97,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_gps') != null) {
+    if ($roadmap->getProperty('fact_gps') !== null) {
 
         if ($roadmap->getProperty('fact_gps') <= $roadmap->getProperty('plan_gps')){
 
@@ -107,7 +111,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_gps_confirm') != null) {
+    if ($roadmap->getProperty('fact_gps_confirm') !== null) {
 
         if ($roadmap->getProperty('fact_gps_confirm') <= $roadmap->getProperty('plan_gps_confirm')){
 
@@ -121,7 +125,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_gcp') != null) {
+    if ($roadmap->getProperty('fact_gcp') !== null) {
 
         if ($roadmap->getProperty('fact_gcp') <= $roadmap->getProperty('plan_gcp')){
 
@@ -135,7 +139,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_gcp_confirm') != null) {
+    if ($roadmap->getProperty('fact_gcp_confirm') !== null) {
 
         if ($roadmap->getProperty('fact_gcp_confirm') <= $roadmap->getProperty('plan_gcp_confirm')){
 
@@ -149,7 +153,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_mvp') != null) {
+    if ($roadmap->getProperty('fact_mvp') !== null) {
 
         if ($roadmap->getProperty('fact_mvp') <= $roadmap->getProperty('plan_mvp')){
 
@@ -163,7 +167,7 @@ foreach ($roadmaps as $roadmap) {
     }
 
 
-    if ($roadmap->getProperty('fact_mvp_confirm') != null) {
+    if ($roadmap->getProperty('fact_mvp_confirm') !== null) {
 
         if ($roadmap->getProperty('fact_mvp_confirm') <= $roadmap->getProperty('plan_mvp_confirm')){
 

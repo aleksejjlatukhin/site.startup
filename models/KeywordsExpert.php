@@ -13,7 +13,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $id                        Идентификатор записи
  * @property int $expert_id                 Идентификатор эксперта в таб.User
- * @property int $description               Ключевые слова
+ * @property string $description               Ключевые слова
  */
 class KeywordsExpert extends ActiveRecord
 {
@@ -21,7 +21,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'keywords_expert';
     }
@@ -30,7 +30,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['expert_id', 'description'], 'required'],
@@ -44,7 +44,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Ключевые слова'
@@ -55,7 +55,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @param int $expertId
      */
-    public function setExpertId($expertId)
+    public function setExpertId(int $expertId): void
     {
         $this->expert_id = $expertId;
     }
@@ -64,7 +64,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @return int
      */
-    public function getExpertId()
+    public function getExpertId(): int
     {
         return $this->expert_id;
     }
@@ -73,7 +73,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -82,7 +82,7 @@ class KeywordsExpert extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -90,10 +90,11 @@ class KeywordsExpert extends ActiveRecord
 
     /**
      * Сохранение ключевых слов эксперта при регистрации
+     *
      * @param int $expertId
      * @param string $description
      */
-    public static function create($expertId, $description)
+    public static function create(int $expertId, string $description): void
     {
         $keywords = new self();
         $keywords->setExpertId($expertId);
@@ -104,9 +105,9 @@ class KeywordsExpert extends ActiveRecord
 
     /**
      * Редактирование ключевых слов эксперта
-     * @param $description
+     * @param string $description
      */
-    public function edit($description)
+    public function edit(string $description): void
     {
         $this->setDescription($description);
         $this->save();

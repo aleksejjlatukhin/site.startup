@@ -36,105 +36,106 @@ class MessageController extends AppAdminController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
 
-        if (in_array($action->id, ['view'])){
+        if ($action->id === 'view'){
 
            if (!User::isUserManager(Yii::$app->user->identity['username'])) {
+
                if (!Yii::$app->request->get('type')) {
-                   $conversation = ConversationMainAdmin::findOne(Yii::$app->request->get('id'));
-                   $admin = User::findOne(['id' => $conversation->admin_id]);
+
+                   $conversation = ConversationMainAdmin::findOne((int)Yii::$app->request->get('id'));
+                   $admin = User::findOne(['id' => $conversation->getAdminId()]);
                    // Ограничение доступа
-                   if (($admin->id == Yii::$app->user->id) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
+                   if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || $admin->getId() === Yii::$app->user->getId()){
                        // ОТКЛЮЧАЕМ CSRF
                        $this->enableCsrfValidation = false;
                        return parent::beforeAction($action);
-
-                   }else{
-                       throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                    }
-               } elseif (Yii::$app->request->get('type') == 'manager') {
 
-                   $conversation = ConversationManager::findOne(Yii::$app->request->get('id'));
+                   throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+               }
+
+               if (Yii::$app->request->get('type') === 'manager') {
+
+                   $conversation = ConversationManager::findOne((int)Yii::$app->request->get('id'));
                    $user = User::findOne(['id' => $conversation->getUserId()]);
                    // Ограничение доступа
-                   if ($user->id == Yii::$app->user->id){
+                   if ($user->getId() === Yii::$app->user->getId()){
                        // ОТКЛЮЧАЕМ CSRF
                        $this->enableCsrfValidation = false;
                        return parent::beforeAction($action);
-
-                   }else{
-                       throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                    }
-               }
-           } else {
-               $conversation = ConversationManager::findOne(Yii::$app->request->get('id'));
-               $manager = User::findOne(['id' => $conversation->getManagerId()]);
-               // Ограничение доступа
-               if (($manager->id == Yii::$app->user->id) || User::isUserMainAdmin(Yii::$app->user->identity['username'])){
-                   // ОТКЛЮЧАЕМ CSRF
-                   $this->enableCsrfValidation = false;
-                   return parent::beforeAction($action);
 
-               }else{
                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                }
-           }
-        }
-        elseif (in_array($action->id, ['technical-support'])){
 
-            $conversation = ConversationDevelopment::findOne(Yii::$app->request->get());
+               throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+           }
+
+            $conversation = ConversationManager::findOne((int)Yii::$app->request->get('id'));
+            $manager = User::findOne(['id' => $conversation->getManagerId()]);
+            // Ограничение доступа
+            if (User::isUserMainAdmin(Yii::$app->user->identity['username']) || $manager->getId() === Yii::$app->user->getId()){
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        } elseif ($action->id === 'technical-support'){
+
+            $conversation = ConversationDevelopment::findOne((int)Yii::$app->request->get('id'));
             $user = $conversation->user;
             $development = $conversation->development;
 
             // Ограничение доступа
-            if (($user->id == Yii::$app->user->id) || ($development->id == Yii::$app->user->id)){
+            if (in_array(Yii::$app->user->getId(), [$user->getId(), $development->getId()], false)){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }
-        elseif (in_array($action->id, ['index'])) {
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $admin = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_ADMIN]);
-            $mainAdmin = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_MAIN_ADMIN]);
-            $development = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_DEV]);
-            $manager = User::findOne(['id' => Yii::$app->request->get(), 'role' => User::ROLE_MANAGER]);
+        } elseif ($action->id === 'index') {
+
+            $admin = User::findOne(['id' => (int)Yii::$app->request->get('id'), 'role' => User::ROLE_ADMIN]);
+            $mainAdmin = User::findOne(['id' => (int)Yii::$app->request->get('id'), 'role' => User::ROLE_MAIN_ADMIN]);
+            $development = User::findOne(['id' => (int)Yii::$app->request->get('id'), 'role' => User::ROLE_DEV]);
+            $manager = User::findOne(['id' => (int)Yii::$app->request->get('id'), 'role' => User::ROLE_MANAGER]);
 
             // Ограничение доступа
-            if (in_array(Yii::$app->user->id, [
+            if (in_array(Yii::$app->user->getId(), [
                 $admin ? $admin->getId() : null,
                 $mainAdmin ? $mainAdmin->getId() : null,
                 $development ? $development->getId() : null,
                 $manager ? $manager->getId() : null
-            ])){
+            ], false)){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
 
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }
-        else{
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        } else{
+
             return parent::beforeAction($action);
         }
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|string
      */
-    public function actionIndex ($id)
+    public function actionIndex(int $id)
     {
         if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
@@ -169,13 +170,13 @@ class MessageController extends AppAdminController
             ]);
         }
 
-        elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) {
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
             $admin = User::findOne($id);
             // Форма поиска
             $searchForm = new SearchForm();
             // Беседа трекера с главным админом
-            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
+            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->getId()]);
             // Беседа трекера с техподдержкой
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
             // Все беседы трекера с проектантами
@@ -185,8 +186,10 @@ class MessageController extends AppAdminController
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
             // Все беседы трекера с экспертами
-            $conversationsExpert = ConversationExpert::find()->where(['user_id' => $id])
-                ->orderBy(['updated_at' => SORT_DESC])->all();
+            $conversationsExpert = ConversationExpert::find()
+                ->where(['user_id' => $id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
 
             return $this->render('index-admin', [
                 'admin' => $admin,
@@ -198,7 +201,7 @@ class MessageController extends AppAdminController
             ]);
         }
 
-        elseif (User::isUserDev(Yii::$app->user->identity['username'])) {
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
             $development = User::findOne($id);
             // Форма поиска
@@ -215,7 +218,8 @@ class MessageController extends AppAdminController
                 'allConversations' => $allConversations,
             ]);
         }
-        elseif (User::isUserManager(Yii::$app->user->identity['username'])) {
+
+        if (User::isUserManager(Yii::$app->user->identity['username'])) {
 
             $manager = User::findOne($id);
             // Форма поиска
@@ -240,11 +244,11 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $pathname
+     * @param int $id
+     * @param string $pathname
      * @return array|bool
      */
-    public function actionGetListUpdateConversations ($id, $pathname)
+    public function actionGetListUpdateConversations(int $id, string $pathname)
     {
         if (Yii::$app->request->isAjax) {
 
@@ -253,92 +257,51 @@ class MessageController extends AppAdminController
                 if ($pathname === 'index') {
 
                     $admin = User::findOne($id);
-                    $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
-                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->id]);
+                    $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->getId()]);
+                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->getId()]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForAdminAjax' => $this->renderAjax('update_conversation_main_admin_for_admin', [
-                            'conversationAdminMain' => $conversationAdminMain, 'admin' => $admin,
-                        ]),
-                        'conversationDevelopmentForAdminAjax' => $this->renderAjax('update_conversation_development_for_admin', [
-                            'conversation_development' => $conversation_development, 'admin' => $admin,
-                        ]),
-                        'conversationsUserForAdminAjax' => $this->renderAjax('update_conversations_user_for_admin', [
-                            'allConversations' => ConversationAdmin::find()->joinWith('user')
-                                ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
-                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'view') {
+                } elseif ($pathname === 'view') {
 
                     $conversationAdminMain = ConversationMainAdmin::findOne($id);
                     $admin = $conversationAdminMain->admin;
-                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->id]);
+                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->getId()]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForAdminAjax' => $this->renderAjax('update_conversation_main_admin_for_admin', [
-                            'conversationAdminMain' => $conversationAdminMain, 'admin' => $admin,
-                        ]),
-                        'conversationDevelopmentForAdminAjax' => $this->renderAjax('update_conversation_development_for_admin', [
-                            'conversation_development' => $conversation_development, 'admin' => $admin,
-                        ]),
-                        'conversationsUserForAdminAjax' => $this->renderAjax('update_conversations_user_for_admin', [
-                            'allConversations' => ConversationAdmin::find()->joinWith('user')
-                                ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
-                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'technical-support') {
+                } elseif ($pathname === 'technical-support') {
 
                     $conversation_development = ConversationDevelopment::findOne($id);
                     $admin = $conversation_development->user;
-                    $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
+                    $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->getId()]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForAdminAjax' => $this->renderAjax('update_conversation_main_admin_for_admin', [
-                            'conversationAdminMain' => $conversationAdminMain, 'admin' => $admin,
-                        ]),
-                        'conversationDevelopmentForAdminAjax' => $this->renderAjax('update_conversation_development_for_admin', [
-                            'conversation_development' => $conversation_development, 'admin' => $admin,
-                        ]),
-                        'conversationsUserForAdminAjax' => $this->renderAjax('update_conversations_user_for_admin', [
-                            'allConversations' => ConversationAdmin::find()->joinWith('user')
-                                ->andWhere(['user.id_admin' => $admin->id])->andWhere(['admin_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
-                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->id])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
+                } else {
+                    return false;
                 }
+
+                $response = [
+                    'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->getId(),
+                    'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
+                    'conversationAdminMainForAdminAjax' => $this->renderAjax('update_conversation_main_admin_for_admin', [
+                        'conversationAdminMain' => $conversationAdminMain, 'admin' => $admin,
+                    ]),
+                    'conversationDevelopmentForAdminAjax' => $this->renderAjax('update_conversation_development_for_admin', [
+                        'conversation_development' => $conversation_development, 'admin' => $admin,
+                    ]),
+                    'conversationsUserForAdminAjax' => $this->renderAjax('update_conversations_user_for_admin', [
+                        'allConversations' => ConversationAdmin::find()->joinWith('user')
+                            ->where(['user.id_admin' => $admin->getId()])->andWhere(['admin_id' => $admin->getId()])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                    'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
+                        'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->getId()])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+
             }
-            elseif (User::isUserManager(Yii::$app->user->identity['username'])) {
+
+            if (User::isUserManager(Yii::$app->user->identity['username'])) {
 
                 if ($pathname === 'index') {
 
@@ -346,219 +309,118 @@ class MessageController extends AppAdminController
                     $conversationAdminMain = ConversationManager::findOne(['manager_id' => $id, 'user_id' => $manager->mainAdmin->getId()]);
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForManagerAjax' => $this->renderAjax('update_conversation_main_admin_for_manager', [
-                            'conversationAdminMain' => $conversationAdminMain, 'manager' => $manager,
-                        ]),
-                        'conversationDevelopmentForManagerAjax' => $this->renderAjax('update_conversation_development_for_manager', [
-                            'conversation_development' => $conversation_development, 'manager' => $manager,
-                        ]),
-                        'conversationsClientForManagerAjax' => $this->renderAjax('update_conversations_client_for_manager',[
-                            'conversationsAdmin' => ConversationManager::find()->where(['manager_id' => $id, 'role' => User::ROLE_ADMIN_COMPANY])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-
-                elseif ($pathname === 'view') {
+                } elseif ($pathname === 'view') {
 
                     $conversationAdminMain = ConversationManager::findOne($id);
-                    /** @var User $manager */
                     $manager = $conversationAdminMain->manager;
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $manager->getId()]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForManagerAjax' => $this->renderAjax('update_conversation_main_admin_for_manager', [
-                            'conversationAdminMain' => $conversationAdminMain, 'manager' => $manager,
-                        ]),
-                        'conversationDevelopmentForManagerAjax' => $this->renderAjax('update_conversation_development_for_manager', [
-                            'conversation_development' => $conversation_development, 'manager' => $manager,
-                        ]),
-                        'conversationsClientForManagerAjax' => $this->renderAjax('update_conversations_client_for_manager',[
-                            'conversationsAdmin' => ConversationManager::find()->where(['manager_id' => $manager->getId(), 'role' => User::ROLE_ADMIN_COMPANY])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-
-                elseif ($pathname === 'technical-support') {
+                } elseif ($pathname === 'technical-support') {
 
                     $conversation_development = ConversationDevelopment::findOne($id);
-                    /** @var User $manager */
                     $manager = $conversation_development->user;
-                    $conversationAdminMain = ConversationManager::findOne(['manager_id' => $manager->id, 'role' => User::ROLE_MAIN_ADMIN]);
+                    $conversationAdminMain = ConversationManager::findOne(['manager_id' => $manager->getId(), 'role' => User::ROLE_MAIN_ADMIN]);
 
-                    $response = [
-                        'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->id,
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationAdminMainForManagerAjax' => $this->renderAjax('update_conversation_main_admin_for_manager', [
-                            'conversationAdminMain' => $conversationAdminMain, 'manager' => $manager,
-                        ]),
-                        'conversationDevelopmentForManagerAjax' => $this->renderAjax('update_conversation_development_for_manager', [
-                            'conversation_development' => $conversation_development, 'manager' => $manager,
-                        ]),
-                        'conversationsClientForManagerAjax' => $this->renderAjax('update_conversations_client_for_manager',[
-                            'conversationsAdmin' => ConversationManager::find()->where(['manager_id' => $manager->getId(), 'role' => User::ROLE_ADMIN_COMPANY])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
+                } else {
+                    return false;
                 }
+
+                $response = [
+                    'blockConversationAdminMain' => '#adminMainConversation-' . $conversationAdminMain->getId(),
+                    'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
+                    'conversationAdminMainForManagerAjax' => $this->renderAjax('update_conversation_main_admin_for_manager', [
+                        'conversationAdminMain' => $conversationAdminMain, 'manager' => $manager,
+                    ]),
+                    'conversationDevelopmentForManagerAjax' => $this->renderAjax('update_conversation_development_for_manager', [
+                        'conversation_development' => $conversation_development, 'manager' => $manager,
+                    ]),
+                    'conversationsClientForManagerAjax' => $this->renderAjax('update_conversations_client_for_manager',[
+                        'conversationsAdmin' => ConversationManager::find()->where(['manager_id' => $manager->getId(), 'role' => User::ROLE_ADMIN_COMPANY])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+
             }
-            elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+
+            if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
                 if ($pathname === 'index') {
 
                     $main_admin = User::findOne($id);
-                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->id]);
+                    $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->getId()]);
 
-                    $response = [
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationDevelopmentForAdminMainAjax' => $this->renderAjax('update_conversation_development_for_main_admin', [
-                            'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
-                        ]),
-                        'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
-                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
-                            'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'view') {
+                } elseif ($pathname === 'view') {
 
                     $conversation = ConversationMainAdmin::findOne($id);
                     $main_admin = $conversation->mainAdmin;
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->getId()]);
 
-                    $response = [
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
-                        'conversationDevelopmentForAdminMainAjax' => $this->renderAjax('update_conversation_development_for_main_admin', [
-                            'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
-                        ]),
-                        'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
-                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
-                            'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'view-manager') {
+                } elseif ($pathname === 'view-manager') {
 
                     $conversation = ConversationManager::findOne($id);
                     $main_admin = $conversation->user;
                     $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->getId()]);
 
-                    $response = [
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
-                        'conversationDevelopmentForAdminMainAjax' => $this->renderAjax('update_conversation_development_for_main_admin', [
-                            'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
-                        ]),
-                        'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
-                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
-                            'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'technical-support') {
+                } elseif ($pathname === 'technical-support') {
 
                     $conversation_development = ConversationDevelopment::findOne($id);
                     $main_admin = $conversation_development->user;
 
-                    $response = [
-                        'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->id,
-                        'conversationDevelopmentForAdminMainAjax' => $this->renderAjax('update_conversation_development_for_main_admin', [
-                            'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
-                        ]),
-                        'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                            'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
-                            'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                        'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
-                            'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
-                                ->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
+                } else {
+                    return false;
                 }
+
+                $response = [
+                    'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
+                    'conversationDevelopmentForAdminMainAjax' => $this->renderAjax('update_conversation_development_for_main_admin', [
+                        'conversation_development' => $conversation_development, 'main_admin' => $main_admin,
+                    ]),
+                    'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
+                        'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                    'conversationsExpertForAdminMainAjax' => $this->renderAjax('update_conversations_expert_for_main_admin', [
+                        'expertConversations' => ConversationExpert::find()->where(['user_id' => $main_admin->getId()])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                    'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
+                        'managerConversations' => ConversationManager::find()->where(['user_id' => $main_admin->getId()])
+                            ->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+
             }
-            elseif (User::isUserDev(Yii::$app->user->identity['username'])) {
+
+            if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
                 if ($pathname === 'index') {
 
                     $development = User::findOne($id);
 
-                    $response = [
-                        'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                            'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-                }
-                elseif ($pathname === 'technical-support') {
+                } elseif ($pathname === 'technical-support') {
 
                     $conversation = ConversationDevelopment::findOne($id);
                     $development = $conversation->development;
 
-                    $response = [
-                        'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                            'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
+                } else {
+                    return false;
                 }
+
+                $response = [
+                    'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
+                        'allConversations' => ConversationDevelopment::find()->joinWith('user')
+                            ->where(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
 
@@ -567,28 +429,28 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionCheckingUnreadMessageMainAdmin ($id)
+    public function actionCheckingUnreadMessageMainAdmin(int $id)
     {
-        $message = MessageMainAdmin::findOne($id);
-
         if(Yii::$app->request->isAjax) {
 
-            if ($message->status == MessageMainAdmin::READ_MESSAGE) {
+            $message = MessageMainAdmin::findOne($id);
+
+            if ($message->getStatus() === MessageMainAdmin::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkRead' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkRead' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
@@ -596,28 +458,28 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionCheckingUnreadMessageManager ($id)
+    public function actionCheckingUnreadMessageManager(int $id)
     {
-        $message = MessageManager::findOne($id);
-
         if(Yii::$app->request->isAjax) {
 
-            if ($message->status == MessageManager::READ_MESSAGE) {
+            $message = MessageManager::findOne($id);
+
+            if ($message->getStatus() === MessageManager::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkRead' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkRead' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
@@ -625,19 +487,19 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesMainAdmin ($id, $idLastMessageOnPage)
+    public function actionCheckNewMessagesMainAdmin(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationMainAdmin::findOne($id);
-        $main_admin = $conversation->mainAdmin;
-        $admin = $conversation->admin;
-        $lastMessageOnPage = MessageMainAdmin::findOne($idLastMessageOnPage);
-        $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
-
         if(Yii::$app->request->isAjax) {
+
+            $conversation = ConversationMainAdmin::findOne($id);
+            $main_admin = $conversation->mainAdmin;
+            $admin = $conversation->admin;
+            $lastMessageOnPage = MessageMainAdmin::findOne($idLastMessageOnPage);
+            $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $conversation->getId()])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
             if ($messages) {
 
@@ -651,12 +513,12 @@ class MessageController extends AppAdminController
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkNewMessages' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkNewMessages' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
@@ -664,23 +526,19 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesManager ($id, $idLastMessageOnPage)
+    public function actionCheckNewMessagesManager(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationManager::findOne($id);
-        /**
-         * @var User $main_admin
-         * @var User $manager
-        */
-        $main_admin = $conversation->user;
-        $manager = $conversation->manager;
-        $lastMessageOnPage = MessageManager::findOne($idLastMessageOnPage);
-        $messages = MessageManager::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
-
         if(Yii::$app->request->isAjax) {
+
+            $conversation = ConversationManager::findOne($id);
+            $main_admin = $conversation->user;
+            $manager = $conversation->manager;
+            $lastMessageOnPage = MessageManager::findOne($idLastMessageOnPage);
+            $messages = MessageManager::find()->andWhere(['conversation_id' => $conversation->getId()])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
             if ($messages) {
 
@@ -694,12 +552,12 @@ class MessageController extends AppAdminController
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkNewMessages' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkNewMessages' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
@@ -707,16 +565,16 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param null $type
+     * @param int $id
+     * @param string|null $type
      * @return bool|string
      */
-    public function actionView ($id, $type = null)
+    public function actionView(int $id, string $type = null)
     {
         $conversation = ConversationMainAdmin::findOne($id);
         $formMessage = new FormCreateMessageMainAdmin();
-        $main_admin = User::findOne(['id' => $conversation->main_admin_id]);
-        $admin = User::findOne(['id' => $conversation->admin_id]);
+        $main_admin = $conversation->mainAdmin;
+        $admin = $conversation->admin;
         $searchForm = new SearchForm(); // Форма поиска
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
         // Вывод сообщений через пагинацию
@@ -730,30 +588,31 @@ class MessageController extends AppAdminController
 
             if (!$type) {
                 // Беседа админа с техподдержкой
-                $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->id]);
+                $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->getId()]);
                 // Все беседы главного админа с менеджерами
                 $managerConversations = ConversationManager::find()
-                    ->andWhere(['user_id' => $main_admin->id])
+                    ->andWhere(['user_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
                 // Все беседы главного админа с трекерами
                 $allConversations = ConversationMainAdmin::find()
-                    ->andWhere(['main_admin_id' => $main_admin->id])
+                    ->andWhere(['main_admin_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
                 // Все беседы главного админа с экспертами
                 $expertConversations = ConversationExpert::find()
-                    ->andWhere(['user_id' => $main_admin->id])
+                    ->andWhere(['user_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
 
                 // Если есть кэш, добавляем его в форму сообщения
-                $cache->cachePath = '../runtime/cache/forms/user-' . $main_admin->id . '/messages/category_main_admin/conversation-' . $conversation->id . '/';
+                $cache->cachePath = '../runtime/cache/forms/user-' . $main_admin->getId() . '/messages/category_main_admin/conversation-' . $conversation->getId() . '/';
                 $cache_form_message = $cache->get('formCreateMessageMainAdminCache');
-                if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageMainAdmin']['description'];
+                if ($cache_form_message) {
+                    $formMessage->setDescription($cache_form_message['FormCreateMessageMainAdmin']['description']);
+                }
 
                 return $this->render('view', [
-                    'conversation' => $conversation,
                     'formMessage' => $formMessage,
                     'main_admin' => $main_admin,
                     'admin' => $admin,
@@ -767,12 +626,14 @@ class MessageController extends AppAdminController
                     'expertConversations' => $expertConversations,
                 ]);
 
-            } elseif ($type == 'manager') {
+            }
+
+            if ($type === 'manager') {
 
                 $conversation = ConversationManager::findOne($id);
                 $formMessage = new FormCreateMessageManager();
-                $main_admin = User::findOne(['id' => $conversation->getUserId()]);
-                $manager = User::findOne(['id' => $conversation->getManagerId()]);
+                $main_admin = $conversation->user;
+                $manager = $conversation->manager;
                 $searchForm = new SearchForm(); // Форма поиска
                 $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
                 // Вывод сообщений через пагинацию
@@ -783,30 +644,31 @@ class MessageController extends AppAdminController
                 $countMessages = MessageManager::find()->where(['conversation_id' => $id])->count();
 
                 // Беседа админа с техподдержкой
-                $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->id]);
+                $conversation_development = ConversationDevelopment::findOne(['user_id' => $main_admin->getId()]);
                 // Все беседы главного админа с менеджерами
                 $managerConversations = ConversationManager::find()
-                    ->andWhere(['user_id' => $main_admin->id])
+                    ->andWhere(['user_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
                 // Все беседы главного админа с трекерами
                 $allConversations = ConversationMainAdmin::find()
-                    ->andWhere(['main_admin_id' => $main_admin->id])
+                    ->andWhere(['main_admin_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
                 // Все беседы главного админа с экспертами
                 $expertConversations = ConversationExpert::find()
-                    ->andWhere(['user_id' => $main_admin->id])
+                    ->andWhere(['user_id' => $main_admin->getId()])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->all();
 
                 // Если есть кэш, добавляем его в форму сообщения
-                $cache->cachePath = '../runtime/cache/forms/user-' . $main_admin->id . '/messages/category_manager/conversation-' . $conversation->id . '/';
+                $cache->cachePath = '../runtime/cache/forms/user-' . $main_admin->getId() . '/messages/category_manager/conversation-' . $conversation->getId() . '/';
                 $cache_form_message = $cache->get('formCreateMessageManagerCache');
-                if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageManager']['description'];
+                if ($cache_form_message) {
+                    $formMessage->setDescription($cache_form_message['FormCreateMessageManager']['description']);
+                }
 
                 return $this->render('view_manager_for_main_admin', [
-                    'conversation' => $conversation,
                     'formMessage' => $formMessage,
                     'main_admin' => $main_admin,
                     'manager' => $manager,
@@ -825,28 +687,29 @@ class MessageController extends AppAdminController
         if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
             // Беседа трекера с главным админом
-            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->id]);
+            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $admin->getId()]);
             // Беседа трекера с техподдержкой
-            $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->id]);
+            $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->getId()]);
             // Все беседы трекера с экспертами
             $expertConversations = ConversationExpert::find()
-                ->andWhere(['user_id' => $admin->id])
+                ->andWhere(['user_id' => $admin->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
             // Все беседы трекера с проектантами
             $allConversations = ConversationAdmin::find()->joinWith('user')
-                ->andWhere(['user.id_admin' => $admin->id])
-                ->andWhere(['admin_id' => $admin->id])
+                ->andWhere(['user.id_admin' => $admin->getId()])
+                ->andWhere(['admin_id' => $admin->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Если есть кэш, добавляем его в форму сообщения
-            $cache->cachePath = '../runtime/cache/forms/user-'.$admin->id.'/messages/category_main_admin/conversation-'.$conversation->id.'/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$admin->getId().'/messages/category_main_admin/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageMainAdminCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageMainAdmin']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageMainAdmin']['description']);
+            }
 
             return $this->render('view-admin', [
-                'conversation' => $conversation,
                 'formMessage' => $formMessage,
                 'main_admin' => $main_admin,
                 'admin' => $admin,
@@ -866,8 +729,8 @@ class MessageController extends AppAdminController
             // Беседа менеджера с главным админом Spaccel
             $conversation = ConversationManager::findOne($id);
             $formMessage = new FormCreateMessageManager();
-            $main_admin = User::findOne(['id' => $conversation->getUserId()]);
-            $manager = User::findOne(['id' => $conversation->getManagerId()]);
+            $main_admin = $conversation->user;
+            $manager = $conversation->manager;
 
             // Вывод сообщений через пагинацию
             $query = MessageManager::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
@@ -884,7 +747,9 @@ class MessageController extends AppAdminController
             // Если есть кэш, добавляем его в форму сообщения
             $cache->cachePath = '../runtime/cache/forms/user-'.$manager->getId().'/messages/category_manager/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageManagerCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageManager']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageManager']['description']);
+            }
 
             return $this->render('view-manager', [
                 'conversation' => $conversation,
@@ -903,29 +768,37 @@ class MessageController extends AppAdminController
         return false;
     }
 
+
     /**
-     * @param $id
-     * @param $page
-     * @param $final
+     * @param int $id
+     * @param int $page
+     * @param int $final
      * @return array|bool
      */
-    public function actionGetPageMessage ($id, $page, $final)
+    public function actionGetPageMessage(int $id, int $page, int $final)
     {
-        $conversation = ConversationMainAdmin::findOne($id);
-        $main_admin = $conversation->mainAdmin;
-        $admin = $conversation->admin;
-        $query = MessageMainAdmin::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
-        $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
-        $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
-        $messages = array_reverse($messages);
-
-        // Проверяем является ли страница последней
-        $lastPage = false; $lastMessage = MessageMainAdmin::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
-        foreach ($messages as $message) {
-            if ($message->id == $lastMessage->id) { $lastPage = true; }
-        }
-
         if(Yii::$app->request->isAjax) {
+
+            $conversation = ConversationMainAdmin::findOne($id);
+            $main_admin = $conversation->mainAdmin;
+            $admin = $conversation->admin;
+            $query = MessageMainAdmin::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+            $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
+            $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
+            $messages = array_reverse($messages);
+
+            // Проверяем является ли страница последней
+            $lastPage = false;
+            /**
+             * @var MessageMainAdmin[] $messages
+             * @var MessageMainAdmin $lastMessage
+             */
+            $lastMessage = MessageMainAdmin::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+            foreach ($messages as $message) {
+                if ($message->getId() === $lastMessage->getId()) {
+                    $lastPage = true;
+                }
+            }
 
             $response = ['nextPageMessageAjax' => $this->renderAjax('message_main_admin_pagination_ajax', [
                 'messages' => $messages, 'pagesMessages' => $pagesMessages,
@@ -940,32 +813,35 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $page
-     * @param $final
+     * @param int $id
+     * @param int $page
+     * @param int $final
      * @return array|bool
      */
-    public function actionGetPageMessageManagerMainAdmin ($id, $page, $final)
+    public function actionGetPageMessageManagerMainAdmin(int $id, int $page, int $final)
     {
-        $conversation = ConversationManager::findOne($id);
-        /**
-         * @var User $main_admin
-         * @var User $manager
-        */
-        $main_admin = $conversation->user;
-        $manager = $conversation->manager;
-        $query = MessageManager::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
-        $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
-        $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
-        $messages = array_reverse($messages);
-
-        // Проверяем является ли страница последней
-        $lastPage = false; $lastMessage = MessageManager::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
-        foreach ($messages as $message) {
-            if ($message->id == $lastMessage->id) { $lastPage = true; }
-        }
-
         if(Yii::$app->request->isAjax) {
+
+            $conversation = ConversationManager::findOne($id);
+            $main_admin = $conversation->user;
+            $manager = $conversation->manager;
+            $query = MessageManager::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+            $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
+            $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
+            $messages = array_reverse($messages);
+
+            // Проверяем является ли страница последней
+            $lastPage = false;
+            /**
+             * @var MessageManager[] $messages
+             * @var MessageManager $lastMessage
+             */
+            $lastMessage = MessageManager::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+            foreach ($messages as $message) {
+                if ($message->getId() === $lastMessage->getId()) {
+                    $lastPage = true;
+                }
+            }
 
             $response = ['nextPageMessageAjax' => $this->renderAjax('message_manager_main_admin_pagination_ajax', [
                 'messages' => $messages, 'pagesMessages' => $pagesMessages,
@@ -980,88 +856,91 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionSaveCacheMessageMainAdminForm ($id)
+    public function actionSaveCacheMessageMainAdminForm(int $id): bool
     {
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
-        $data = $_POST; //Массив, который будем записывать в кэш
-        $conversation = ConversationMainAdmin::findOne($id);
-        $user = User::findOne(Yii::$app->user->id);
-
         if(Yii::$app->request->isAjax) {
 
-            if ($conversation->mainAdmin->id == $user->id || $conversation->admin->id == $user->id) {
+            $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $conversation = ConversationMainAdmin::findOne($id);
+            $user = User::findOne(Yii::$app->user->getId());
 
-                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_main_admin/conversation-'.$conversation->id.'/';
+            if ($conversation->getMainAdminId() === $user->getId() || $conversation->getAdminId() === $user->getId()) {
+
+                $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_main_admin/conversation-'.$conversation->getId().'/';
                 $key = 'formCreateMessageMainAdminCache'; //Формируем ключ
                 $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
             }
         }
-
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionSaveCacheMessageManagerForm ($id)
+    public function actionSaveCacheMessageManagerForm(int $id): bool
     {
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
-        $data = $_POST; //Массив, который будем записывать в кэш
-        $conversation = ConversationManager::findOne($id);
-        $user = User::findOne(Yii::$app->user->getId());
-
         if(Yii::$app->request->isAjax) {
 
-            if ($conversation->user->getId() == $user->getId() || $conversation->manager->getId() == $user->getId()) {
+            $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $conversation = ConversationManager::findOne($id);
+            $user = User::findOne(Yii::$app->user->getId());
+
+            if ($conversation->getUserId() === $user->getId() || $conversation->getManagerId() === $user->getId()) {
 
                 $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_manager/conversation-'.$conversation->getId().'/';
                 $key = 'formCreateMessageManagerCache'; //Формируем ключ
                 $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
             }
         }
-
         return false;
     }
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      * @throws Exception
      */
-    public function actionSendMessage ($id, $idLastMessageOnPage)
+    public function actionSendMessage(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationMainAdmin::findOne($id);
-        $main_admin = $conversation->mainAdmin;
-        $admin = $conversation->admin;
-        $formMessage = new FormCreateMessageMainAdmin();
-        $lastMessageOnPage = MessageMainAdmin::findOne($idLastMessageOnPage);
+        if (Yii::$app->request->isAjax){
 
-        if ($formMessage->load(Yii::$app->request->post())) {
+            $conversation = ConversationMainAdmin::findOne($id);
+            $main_admin = $conversation->mainAdmin;
+            $admin = $conversation->admin;
+            $formMessage = new FormCreateMessageMainAdmin();
+            $lastMessageOnPage = MessageMainAdmin::findOne($idLastMessageOnPage);
 
-            if (Yii::$app->request->isAjax){
+            if ($formMessage->load(Yii::$app->request->post())) {
 
                 if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $admin->id;
-                    $formMessage->adressee_id = $main_admin->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($admin->getId());
+                    $formMessage->setAdresseeId($main_admin->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$admin->id.'/messages/category_main_admin/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$admin->getId().'/messages/category_main_admin/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageMainAdmin::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'admin',
@@ -1083,23 +962,28 @@ class MessageController extends AppAdminController
 
                 elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $main_admin->id;
-                    $formMessage->adressee_id = $admin->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($main_admin->getId());
+                    $formMessage->setAdresseeId($admin->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$main_admin->id.'/messages/category_main_admin/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$main_admin->getId().'/messages/category_main_admin/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageMainAdmin::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageMainAdmin::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'main_admin',
                             'countUnreadMessages' => $main_admin->countUnreadMessages,
                             'conversationsAdminForAdminMainAjax' => $this->renderAjax('update_conversations_admin_for_main_admin', [
-                                'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->id])
+                                'allConversations' => ConversationMainAdmin::find()->andWhere(['main_admin_id' => $main_admin->getId()])
                                     ->orderBy(['updated_at' => SORT_DESC])->all(),
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_main_admin', [
@@ -1120,42 +1004,43 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      * @throws ErrorException
      * @throws Exception
      * @throws NotFoundHttpException
      */
-    public function actionSendMessageManagerMainAdmin ($id, $idLastMessageOnPage)
+    public function actionSendMessageManagerMainAdmin(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationManager::findOne($id);
-        /**
-         * @var User $main_admin
-         * @var User $manager
-         */
-        $main_admin = $conversation->user;
-        $manager = $conversation->manager;
-        $formMessage = new FormCreateMessageManager();
-        $lastMessageOnPage = MessageManager::findOne($idLastMessageOnPage);
+        if (Yii::$app->request->isAjax){
 
-        if ($formMessage->load(Yii::$app->request->post())) {
+            $conversation = ConversationManager::findOne($id);
+            $main_admin = $conversation->user;
+            $manager = $conversation->manager;
+            $formMessage = new FormCreateMessageManager();
+            $lastMessageOnPage = MessageManager::findOne($idLastMessageOnPage);
 
-            if (Yii::$app->request->isAjax){
+            if ($formMessage->load(Yii::$app->request->post())) {
 
                 if (User::isUserManager(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $manager->id;
-                    $formMessage->adressee_id = $main_admin->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($manager->getId());
+                    $formMessage->setAdresseeId($main_admin->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$manager->id.'/messages/category_manager/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$manager->getId().'/messages/category_manager/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageManager::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageManager::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'manager',
@@ -1177,23 +1062,28 @@ class MessageController extends AppAdminController
 
                 elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $main_admin->id;
-                    $formMessage->adressee_id = $manager->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($main_admin->getId());
+                    $formMessage->setAdresseeId($manager->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$main_admin->id.'/messages/category_manager/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$main_admin->getId().'/messages/category_manager/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageManager::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageManager::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'main_admin',
                             'countUnreadMessages' => $main_admin->countUnreadMessages,
                             'conversationsManagerForAdminMainAjax' => $this->renderAjax('update_conversations_manager_for_main_admin', [
-                                'managerConversations' => ConversationManager::find()->andWhere(['user_id' => $main_admin->id])
+                                'managerConversations' => ConversationManager::find()->andWhere(['user_id' => $main_admin->getId()])
                                     ->orderBy(['updated_at' => SORT_DESC])->all(),
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_main_admin_for_manager', [
@@ -1214,29 +1104,29 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|false
      */
-    public function actionGetAdminConversationQuery ($id)
+    public function actionGetAdminConversationQuery(int $id)
     {
         if (Yii::$app->request->isAjax){
 
             $query = trim($_POST['SearchForm']['search']);
             //Беседы с менеджерами, которые попали в запрос
             $manager_conversations_query = ConversationManager::find()->joinWith('manager')
-                ->andWhere(['user_id' => $id])
+                ->where(['user_id' => $id])
                 ->andWhere(['like', 'user.username', $query])
                 ->all();
 
             //Беседы с трекерами, которые попали в запрос
             $conversations_query = ConversationMainAdmin::find()->joinWith('admin')
-                ->andWhere(['main_admin_id' => $id])
+                ->where(['main_admin_id' => $id])
                 ->andWhere(['like', 'user.username', $query])
                 ->all();
 
             //Беседы с экспертами, которые попали в запрос
             $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
-                ->andWhere(['user_id' => $id])
+                ->where(['user_id' => $id])
                 ->andWhere(['like', 'user.username', $query])
                 ->all();
 
@@ -1247,28 +1137,31 @@ class MessageController extends AppAdminController
             Yii::$app->response->data = $response;
             return $response;
         }
+
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|false
      */
-    public function actionGetConversationQuery ($id)
+    public function actionGetConversationQuery(int $id)
     {
         if (Yii::$app->request->isAjax){
 
             $query = trim($_POST['SearchForm']['search']);
             //Беседы с пользователями, которые попали в запрос
             $conversations_query = ConversationAdmin::find()->joinWith('user')
-                ->andWhere(['user.id_admin' => $id])
+                ->where(['user.id_admin' => $id])
                 ->andWhere(['admin_id' => $id])
                 ->andWhere(['like', 'user.username', $query])
                 ->all();
 
             $expert_conversations_query = ConversationExpert::find()->joinWith('expert')
-                ->andWhere(['user_id' => $id])
-                ->andWhere(['like', 'user.username', $query])->all();
+                ->where(['user_id' => $id])
+                ->andWhere(['like', 'user.username', $query])
+                ->all();
 
             $response = ['renderAjax' => $this->renderAjax('conversations_query', [
                 'conversations_query' => $conversations_query, 'expert_conversations_query' => $expert_conversations_query])];
@@ -1276,21 +1169,23 @@ class MessageController extends AppAdminController
             Yii::$app->response->data = $response;
             return $response;
         }
+
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|false
      */
-    public function actionGetDevelopmentConversationQuery ($id)
+    public function actionGetDevelopmentConversationQuery(int $id)
     {
         if (Yii::$app->request->isAjax){
 
             $query = trim($_POST['SearchForm']['search']);
             //Беседы техподдержки, которые попали в запрос
             $conversations_query = ConversationDevelopment::find()->joinWith('user')
-                ->andWhere(['dev_id' => $id])
+                ->where(['dev_id' => $id])
                 ->andWhere(['like', 'user.username', $query])
                 ->all();
 
@@ -1299,10 +1194,16 @@ class MessageController extends AppAdminController
             Yii::$app->response->data = $response;
             return $response;
         }
+
+        return false;
     }
 
 
-    public function actionGetManagerConversationQuery ($id)
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionGetManagerConversationQuery(int $id)
     {
         if (Yii::$app->request->isAjax){
 
@@ -1318,25 +1219,38 @@ class MessageController extends AppAdminController
             Yii::$app->response->data = $response;
             return $response;
         }
+
+        return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionReadMessageMainAdmin ($id)
+    public function actionReadMessageMainAdmin(int $id)
     {
         if (Yii::$app->request->isAjax){
+
             $model = MessageMainAdmin::findOne($id);
-            $model->status = MessageMainAdmin::READ_MESSAGE;
-            if ($model->save()) {
+            $model->setStatus(MessageMainAdmin::READ_MESSAGE);
 
-                $user = User::findOne($model->adressee_id);
-                $countUnreadMessagesForConversation = MessageMainAdmin::find()->where(['adressee_id' => $model->adressee_id, 'sender_id' => $model->sender_id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            if ($model->save()) {
+                $user = User::findOne($model->getAdresseeId());
+                $countUnreadMessagesForConversation = MessageMainAdmin::find()
+                    ->where([
+                        'adressee_id' => $model->getAdresseeId(),
+                        'sender_id' => $model->getSenderId(),
+                        'status' => MessageMainAdmin::NO_READ_MESSAGE
+                    ])->count();
+
                 // Передаем id блока беседы
-                if (User::isUserMainAdmin($user->username)) $blockConversation = '#adminConversation-' . $model->conversation_id;
-                elseif (User::isUserAdmin($user->username)) $blockConversation = '#adminMainConversation-' . $model->conversation_id;
+                $blockConversation = '';
+                if (User::isUserMainAdmin($user->getUsername())) {
+                    $blockConversation = '#adminConversation-' . $model->getConversationId();
+                } elseif (User::isUserAdmin($user->getUsername())) {
+                    $blockConversation = '#adminMainConversation-' . $model->getConversationId();
+                }
 
                 $response = [
                     'success' => true,
@@ -1355,21 +1269,32 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionReadMessageManager ($id)
+    public function actionReadMessageManager(int $id)
     {
         if (Yii::$app->request->isAjax){
-            $model = MessageManager::findOne($id);
-            $model->status = MessageManager::READ_MESSAGE;
-            if ($model->save()) {
 
-                $user = User::findOne($model->adressee_id);
-                $countUnreadMessagesForConversation = MessageManager::find()->where(['adressee_id' => $model->adressee_id, 'sender_id' => $model->sender_id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $model = MessageManager::findOne($id);
+            $model->setStatus(MessageManager::READ_MESSAGE);
+
+            if ($model->save()) {
+                $user = User::findOne($model->getAdresseeId());
+                $countUnreadMessagesForConversation = MessageManager::find()
+                    ->where([
+                        'adressee_id' => $model->getAdresseeId(),
+                        'sender_id' => $model->getSenderId(),
+                        'status' => MessageManager::NO_READ_MESSAGE
+                    ])->count();
+
                 // Передаем id блока беседы
-                if (User::isUserMainAdmin($user->username)) $blockConversation = '#managerConversation-' . $model->conversation_id;
-                elseif (User::isUserManager($user->username)) $blockConversation = '#adminMainConversation-' . $model->conversation_id;
+                $blockConversation = '';
+                if (User::isUserMainAdmin($user->getUsername())) {
+                    $blockConversation = '#managerConversation-' . $model->getConversationId();
+                } elseif (User::isUserManager($user->getUsername())) {
+                    $blockConversation = '#adminMainConversation-' . $model->getConversationId();
+                }
 
                 $response = [
                     'success' => true,
@@ -1388,34 +1313,47 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $category
-     * @param $id
-     * @return \yii\console\Response|Response
+     * @param int $category
+     * @param int $id
+     * @return false|\yii\console\Response|Response
      * @throws NotFoundHttpException
      */
-    public function actionDownload ($category, $id)
+    public function actionDownload(int $category, int $id)
     {
-        $model = MessageFiles::findOne(['category' => $category, 'id' => $id]);
-        if ($category == MessageFiles::CATEGORY_ADMIN) $message = MessageAdmin::findOne($model->message_id);
-        else if ($category == MessageFiles::CATEGORY_MAIN_ADMIN) $message = MessageMainAdmin::findOne($model->message_id);
-        else if ($category == MessageFiles::CATEGORY_TECHNICAL_SUPPORT) $message = MessageDevelopment::findOne($model->message_id);
-        else if ($category == MessageFiles::CATEGORY_MANAGER) $message = MessageManager::findOne($model->message_id);
+        /** @var MessageFiles $model */
+        $model = MessageFiles::find()
+            ->where([
+                'category' => $category,
+                'id' => $id
+            ])->one();
 
-        $path = UPLOAD.'/user-'.$message->sender_id.'/messages/category-'.$category.'/message-'.$message->id.'/';
-        $file = $path . $model->server_file;
+        if ($category === MessageFiles::CATEGORY_ADMIN) {
+            $message = MessageAdmin::findOne($model->getMessageId());
+        } elseif ($category === MessageFiles::CATEGORY_MAIN_ADMIN) {
+            $message = MessageMainAdmin::findOne($model->getMessageId());
+        } elseif ($category === MessageFiles::CATEGORY_TECHNICAL_SUPPORT) {
+            $message = MessageDevelopment::findOne($model->getMessageId());
+        } elseif ($category === MessageFiles::CATEGORY_MANAGER) {
+            $message = MessageManager::findOne($model->getMessageId());
+        } else {
+            return false;
+        }
+
+        $path = UPLOAD.'/user-'.$message->getSenderId().'/messages/category-'.$category.'/message-'.$message->getId().'/';
+        $file = $path . $model->getServerFile();
 
         if (file_exists($file)) {
-            return Yii::$app->response->sendFile($file, $model->file_name);
+            return Yii::$app->response->sendFile($file, $model->getFileName());
         }
         throw new NotFoundHttpException('Данный файл не найден');
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|string
      */
-    public function actionTechnicalSupport ($id)
+    public function actionTechnicalSupport(int $id)
     {
         $conversation = ConversationDevelopment::findOne($id);
         $formMessage = new FormCreateMessageDevelopment();
@@ -1434,26 +1372,28 @@ class MessageController extends AppAdminController
 
             // Все беседы главного админа с менеджерами
             $managerConversations = ConversationManager::find()
-                ->where(['user_id' => $user->id])
+                ->where(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Все беседы главного админа с трекерами
             $allConversations = ConversationMainAdmin::find()->joinWith('admin')
-                ->andWhere(['main_admin_id' => $user->id])
+                ->where(['main_admin_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Все беседы главного админа с экспертами
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $user->id])
+                ->where(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Если есть кэш, добавляем его в форму сообщения
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id.'/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageDevelopmentCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageDevelopment']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageDevelopment']['description']);
+            }
 
             return $this->render('technical-support-main-admin', [
                 'conversation_development' => $conversation,
@@ -1470,27 +1410,29 @@ class MessageController extends AppAdminController
             ]);
         }
 
-        elseif (User::isUserAdmin(Yii::$app->user->identity['username'])) {
+        if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
             // Беседа трекера с главным админом
-            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $user->id]);
+            $conversationAdminMain = ConversationMainAdmin::findOne(['admin_id' => $user->getId()]);
             $main_admin = $conversationAdminMain->mainAdmin;
             // Все беседы трекера с экспертами
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $user->id])
+                ->where(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
             // Все беседы трекера с проектантами
             $allConversations = ConversationAdmin::find()->joinWith('user')
-                ->andWhere(['user.id_admin' => $user->id])
-                ->andWhere(['admin_id' => $user->id])
+                ->where(['user.id_admin' => $user->getId()])
+                ->andWhere(['admin_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Если есть кэш, добавляем его в форму сообщения
-            $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id.'/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageDevelopmentCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageDevelopment']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageDevelopment']['description']);
+            }
 
             return $this->render('technical-support-admin', [
                 'conversation_development' => $conversation,
@@ -1506,19 +1448,29 @@ class MessageController extends AppAdminController
                 'expertConversations' => $expertConversations,
                 'allConversations' => $allConversations,
             ]);
+
         }
 
-        elseif (User::isUserManager(Yii::$app->user->identity['username'])) {
+        if (User::isUserManager(Yii::$app->user->identity['username'])) {
 
             // Все беседы менеджера с админами организаций
-            $conversationsAdmin = ConversationManager::find()->where(['manager_id' => $user->getId(), 'role' => User::ROLE_ADMIN_COMPANY])->orderBy(['updated_at' => SORT_DESC])->all();
+            $conversationsAdmin = ConversationManager::find()
+                ->where([
+                    'manager_id' => $user->getId(),
+                    'role' => User::ROLE_ADMIN_COMPANY
+                ])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->all();
+
             // Бесда менеджера с админом Spaccel
             $conversationAdminMain = ConversationManager::findOne(['manager_id' => $user->getId(), 'role' => User::ROLE_MAIN_ADMIN]);
 
             // Если есть кэш, добавляем его в форму сообщения
             $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageDevelopmentCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageDevelopment']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageDevelopment']['description']);
+            }
 
             return $this->render('technical-support-manager', [
                 'conversation_development' => $conversation,
@@ -1532,24 +1484,26 @@ class MessageController extends AppAdminController
                 'conversationsAdmin' => $conversationsAdmin,
                 'conversationAdminMain' => $conversationAdminMain,
             ]);
+
         }
 
-        elseif (User::isUserDev(Yii::$app->user->identity['username'])) {
+        if (User::isUserDev(Yii::$app->user->identity['username'])) {
 
             $allConversations = ConversationDevelopment::find()->joinWith('user')
-                ->andWhere(['dev_id' => $development->id])
+                ->where(['dev_id' => $development->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
             // Если есть кэш, добавляем его в форму сообщения
-            $cache->cachePath = '../runtime/cache/forms/user-'.$development->id.'/messages/category_technical_support/conversation-'.$conversation->id.'/';
+            $cache->cachePath = '../runtime/cache/forms/user-'.$development->getId().'/messages/category_technical_support/conversation-'.$conversation->getId().'/';
             $cache_form_message = $cache->get('formCreateMessageDevelopmentCache');
-            if ($cache_form_message) $formMessage->description = $cache_form_message['FormCreateMessageDevelopment']['description'];
+            if ($cache_form_message) {
+                $formMessage->setDescription($cache_form_message['FormCreateMessageDevelopment']['description']);
+            }
 
-            if (User::isUserAdmin($user->username)) {
+            if (User::isUserAdmin($user->getUsername())) {
 
                 return $this->render('technical-support-development-for-admin', [
-                    'conversation' => $conversation,
                     'formMessage' => $formMessage,
                     'admin' => $user,
                     'searchForm' => $searchForm,
@@ -1561,10 +1515,9 @@ class MessageController extends AppAdminController
                 ]);
             }
 
-            elseif (User::isUserMainAdmin($user->username)) {
+            if (User::isUserMainAdmin($user->getUsername())) {
 
                 return $this->render('technical-support-development-for-main-admin', [
-                    'conversation' => $conversation,
                     'formMessage' => $formMessage,
                     'main_admin' => $user,
                     'searchForm' => $searchForm,
@@ -1576,10 +1529,9 @@ class MessageController extends AppAdminController
                 ]);
             }
 
-            elseif (User::isUserManager($user->username)) {
+            if (User::isUserManager($user->getUsername())) {
 
                 return $this->render('technical-support-development-for-manager', [
-                    'conversation' => $conversation,
                     'formMessage' => $formMessage,
                     'manager' => $user,
                     'searchForm' => $searchForm,
@@ -1597,28 +1549,28 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionCheckingUnreadMessageDevelopment ($id)
+    public function actionCheckingUnreadMessageDevelopment(int $id)
     {
-        $message = MessageDevelopment::findOne($id);
-
         if(Yii::$app->request->isAjax) {
 
-            if ($message->status == MessageDevelopment::READ_MESSAGE) {
+            $message = MessageDevelopment::findOne($id);
+
+            if ($message->getStatus() === MessageDevelopment::READ_MESSAGE) {
 
                 $response = ['checkRead' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkRead' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkRead' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
@@ -1626,19 +1578,19 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      */
-    public function actionCheckNewMessagesDevelopment ($id, $idLastMessageOnPage)
+    public function actionCheckNewMessagesDevelopment(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationDevelopment::findOne($id);
-        $development = $conversation->development;
-        $user = $conversation->user;
-        $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
-        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
-
         if(Yii::$app->request->isAjax) {
+
+            $conversation = ConversationDevelopment::findOne($id);
+            $development = $conversation->development;
+            $user = $conversation->user;
+            $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
+            $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $conversation->getId()])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
 
             if ($messages) {
 
@@ -1659,48 +1611,57 @@ class MessageController extends AppAdminController
                             'messages' => $messages, 'development' => $development, 'user' => $user, 'lastMessageOnPage' => $lastMessageOnPage,
                         ]),
                     ];
+                } else {
+                    return false;
                 }
 
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-                $response = ['checkNewMessages' => false];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['checkNewMessages' => false];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
 
         return false;
     }
 
     /**
-     * @param $id
-     * @param $page
-     * @param $final
+     * @param int $id
+     * @param int $page
+     * @param int $final
      * @return array|bool
      */
-    public function actionGetPageMessageDevelopment ($id, $page, $final)
+    public function actionGetPageMessageDevelopment(int $id, int $page, int $final)
     {
-        $conversation = ConversationDevelopment::findOne($id);
-        $user = $conversation->user;
-        $development = $conversation->development;
-        $query = MessageDevelopment::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
-        $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
-        $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
-        $messages = array_reverse($messages);
-
-        // Проверяем является ли страница последней
-        $lastPage = false; $lastMessage = MessageDevelopment::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
-        foreach ($messages as $message) {
-            if ($message->id == $lastMessage->id) { $lastPage = true; }
-        }
-
         if(Yii::$app->request->isAjax) {
 
-            if (User::isUserMainAdmin($user->username)) {
+            $conversation = ConversationDevelopment::findOne($id);
+            $user = $conversation->user;
+            $development = $conversation->development;
+            $query = MessageDevelopment::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+            $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
+            $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
+            $messages = array_reverse($messages);
+
+            // Проверяем является ли страница последней
+            $lastPage = false;
+            /**
+             * @var MessageDevelopment $lastMessage
+             * @var MessageDevelopment[] $messages
+             */
+            $lastMessage = MessageDevelopment::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+            foreach ($messages as $message) {
+                if ($message->getId() === $lastMessage->getId()) {
+                    $lastPage = true;
+                }
+            }
+
+            if (User::isUserMainAdmin($user->getUsername())) {
 
                 $response = ['nextPageMessageAjax' => $this->renderAjax('message_development_and_main_admin_pagination_ajax', [
                     'messages' => $messages, 'pagesMessages' => $pagesMessages,
@@ -1710,7 +1671,8 @@ class MessageController extends AppAdminController
                 Yii::$app->response->data = $response;
                 return $response;
             }
-            elseif (User::isUserAdmin($user->username)) {
+
+            if (User::isUserAdmin($user->getUsername())) {
 
                 $response = ['nextPageMessageAjax' => $this->renderAjax('message_development_and_admin_pagination_ajax', [
                     'messages' => $messages, 'pagesMessages' => $pagesMessages,
@@ -1725,21 +1687,21 @@ class MessageController extends AppAdminController
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionSaveCacheMessageDevelopmentForm ($id)
+    public function actionSaveCacheMessageDevelopmentForm(int $id): bool
     {
-        $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
-        $data = $_POST; //Массив, который будем записывать в кэш
-        $conversation = ConversationDevelopment::findOne($id);
-        $user = User::findOne(Yii::$app->user->id);
-
         if(Yii::$app->request->isAjax) {
 
-            if ($conversation->development->id == $user->id || $conversation->user->id == $user->id) {
+            $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
+            $data = $_POST; //Массив, который будем записывать в кэш
+            $conversation = ConversationDevelopment::findOne($id);
+            $user = User::findOne(Yii::$app->user->getId());
 
-                $cache->cachePath = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id.'/';
+            if ($conversation->getDevId() === $user->getId() || $conversation->getUserId() === $user->getId()) {
+
+                $cache->cachePath = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId().'/';
                 $key = 'formCreateMessageDevelopmentCache'; //Формируем ключ
                 $cache->set($key, $data, 3600*24*30); //Создаем файл кэша на 30дней
             }
@@ -1750,38 +1712,43 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
-     * @param $idLastMessageOnPage
+     * @param int $id
+     * @param int $idLastMessageOnPage
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      * @throws Exception
      */
-    public function actionSendMessageDevelopment ($id, $idLastMessageOnPage)
+    public function actionSendMessageDevelopment(int $id, int $idLastMessageOnPage)
     {
-        $conversation = ConversationDevelopment::findOne($id);
-        $development = $conversation->development;
-        $user = $conversation->user;
-        $formMessage = new FormCreateMessageDevelopment();
-        $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
+        if (Yii::$app->request->isAjax){
 
-        if ($formMessage->load(Yii::$app->request->post())) {
+            $conversation = ConversationDevelopment::findOne($id);
+            $development = $conversation->development;
+            $user = $conversation->user;
+            $formMessage = new FormCreateMessageDevelopment();
+            $lastMessageOnPage = MessageDevelopment::findOne($idLastMessageOnPage);
 
-            if (Yii::$app->request->isAjax){
+            if ($formMessage->load(Yii::$app->request->post())) {
 
                 if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $user->id;
-                    $formMessage->adressee_id = $development->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($user->getId());
+                    $formMessage->setAdresseeId($development->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageDevelopment::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'admin',
@@ -1803,17 +1770,22 @@ class MessageController extends AppAdminController
 
                 elseif (User::isUserManager(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $user->id;
-                    $formMessage->adressee_id = $development->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($user->getId());
+                    $formMessage->setAdresseeId($development->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageDevelopment::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'admin',
@@ -1835,17 +1807,22 @@ class MessageController extends AppAdminController
 
                 elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $user->id;
-                    $formMessage->adressee_id = $development->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($user->getId());
+                    $formMessage->setAdresseeId($development->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->id.'/messages/category_technical_support/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/messages/category_technical_support/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageDevelopment::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
                         $response =  [
                             'sender' => 'main_admin',
@@ -1867,25 +1844,30 @@ class MessageController extends AppAdminController
 
                 elseif (User::isUserDev(Yii::$app->user->identity['username'])) {
 
-                    $formMessage->conversation_id = $id;
-                    $formMessage->sender_id = $development->id;
-                    $formMessage->adressee_id = $user->id;
+                    $formMessage->setConversationId($id);
+                    $formMessage->setSenderId($development->getId());
+                    $formMessage->setAdresseeId($user->getId());
                     if ($formMessage->create()) {
 
                         //Удаление кэша формы создания сообщения
-                        $cachePathDelete = '../runtime/cache/forms/user-'.$development->id.'/messages/category_technical_support/conversation-'.$conversation->id;
-                        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+                        $cachePathDelete = '../runtime/cache/forms/user-'.$development->getId().'/messages/category_technical_support/conversation-'.$conversation->getId();
+                        if (file_exists($cachePathDelete)) {
+                            FileHelper::removeDirectory($cachePathDelete);
+                        }
 
                         // Сообщения, которых ещё нет на странице
-                        $messages = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->andWhere(['>', 'id', $idLastMessageOnPage])->all();
+                        $messages = MessageDevelopment::find()
+                            ->where(['conversation_id' => $id])
+                            ->andWhere(['>', 'id', $idLastMessageOnPage])
+                            ->all();
 
-                        if (User::isUserAdmin($user->username) || User::isUserManager($user->username)) {
+                        if (User::isUserAdmin($user->getUsername()) || User::isUserManager($user->getUsername())) {
 
                             $response =  [
                                 'sender' => 'development',
                                 'countUnreadMessages' => $development->countUnreadMessages,
                                 'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                                    'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
+                                    'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
                                 ]),
                                 'addNewMessagesAjax' => $this->renderAjax('check_new_messages_development_and_admin', [
                                     'messages' => $messages, 'development' => $development, 'user' => $user, 'lastMessageOnPage' => $lastMessageOnPage,
@@ -1897,13 +1879,13 @@ class MessageController extends AppAdminController
                             return $response;
                         }
 
-                        elseif (User::isUserMainAdmin($user->username)) {
+                        if (User::isUserMainAdmin($user->getUsername())) {
 
                             $response =  [
                                 'sender' => 'development',
                                 'countUnreadMessages' => $development->countUnreadMessages,
                                 'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                                    'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->id])->orderBy(['updated_at' => SORT_DESC])->all(),
+                                    'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
                                 ]),
                                 'addNewMessagesAjax' => $this->renderAjax('check_new_messages_development_and_main_admin', [
                                     'messages' => $messages, 'development' => $development, 'user' => $user, 'lastMessageOnPage' => $lastMessageOnPage,
@@ -1924,23 +1906,36 @@ class MessageController extends AppAdminController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionReadMessageDevelopment ($id)
+    public function actionReadMessageDevelopment(int $id)
     {
         if (Yii::$app->request->isAjax){
+
             $model = MessageDevelopment::findOne($id);
-            $model->status = MessageDevelopment::READ_MESSAGE;
+            $model->setStatus(MessageDevelopment::READ_MESSAGE);
             if ($model->save()) {
 
-                $user = User::findOne($model->adressee_id);
-                $countUnreadMessagesForConversation = MessageDevelopment::find()->where(['adressee_id' => $model->adressee_id, 'sender_id' => $model->sender_id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+                $user = User::findOne($model->getAdresseeId());
+                $countUnreadMessagesForConversation = MessageDevelopment::find()
+                    ->where([
+                        'adressee_id' => $model->getAdresseeId(),
+                        'sender_id' => $model->getSenderId(),
+                        'status' => MessageDevelopment::NO_READ_MESSAGE
+                    ])->count();
+
                 // Передаем id блока беседы
-                if (User::isUserMainAdmin($user->username)) $blockConversation = '#conversationTechnicalSupport-' . $model->conversation_id;
-                elseif (User::isUserAdmin($user->username)) $blockConversation = '#conversationTechnicalSupport-' . $model->conversation_id;
-                elseif (User::isUserDev($user->username)) $blockConversation = '#adminConversation-' . $model->conversation_id;
-                elseif (User::isUserManager($user->username)) $blockConversation = '#conversationTechnicalSupport-' . $model->conversation_id;
+                $blockConversation = '';
+                if (User::isUserMainAdmin($user->getUsername())) {
+                    $blockConversation = '#conversationTechnicalSupport-' . $model->getConversationId();
+                } elseif (User::isUserAdmin($user->getUsername())) {
+                    $blockConversation = '#conversationTechnicalSupport-' . $model->getConversationId();
+                } elseif (User::isUserDev($user->getUsername())) {
+                    $blockConversation = '#adminConversation-' . $model->getConversationId();
+                } elseif (User::isUserManager($user->getUsername())) {
+                    $blockConversation = '#conversationTechnicalSupport-' . $model->getConversationId();
+                }
 
                 $response = [
                     'success' => true,
@@ -1965,7 +1960,7 @@ class MessageController extends AppAdminController
      * @param int $expert_id
      * @return array|bool
      */
-    public function actionCreateExpertConversation($user_id, $expert_id)
+    public function actionCreateExpertConversation(int $user_id, int $expert_id)
     {
         if(Yii::$app->request->isAjax) {
 

@@ -14,7 +14,7 @@ $this->title = 'Экспертизы';
         <?= Html::a('Экспертизы (сортировка по экспертам)' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
             'class' => 'link_to_instruction_page open_modal_instruction_page',
             'title' => 'Инструкция', 'onclick' => 'return false'
-        ]); ?>
+        ]) ?>
 
     </div>
 
@@ -35,6 +35,6 @@ $this->title = 'Экспертизы';
                 'border-radius' => '8px',
                 'margin-top' => '35px',
             ],
-        ]);?>
+        ]) ?>
     </div>
 </div>

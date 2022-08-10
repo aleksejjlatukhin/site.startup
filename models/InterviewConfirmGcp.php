@@ -23,11 +23,13 @@ use yii\web\UploadedFile;
  * @property int $respond_id                            Идентификатор респондента из таб. responds_gcp
  * @property string $interview_file                     Имя файла, с которым он был загружен
  * @property string $server_file                        Сгенерированное имя прикрепленного файла на сервере
- * @property int $status                                Значимость ЦП для респондента
+ * @property int $status                                Значимость гипотезы для респондента
  * @property int $created_at                            Дата создания
  * @property int $updated_at                            Дата редактирования
  * @property $loadFile                                  Поле для загрузки файла
  * @property CacheForm $_cacheManager                   Менеджер кэширования
+ *
+ * @property RespondsGcp $respond                       Респондент
  */
 class InterviewConfirmGcp extends ActiveRecord
 {
@@ -38,7 +40,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'interview_confirm_gcp';
     }
@@ -59,59 +61,47 @@ class InterviewConfirmGcp extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getRespond()
+    public function getRespond(): ActiveQuery
     {
         return $this->hasOne(RespondsGcp::class, ['id' => 'respond_id']);
     }
 
     /**
-     * @return RespondsGcp|null
-     */
-    public function findRespond()
-    {
-        return RespondsGcp::findOne($this->getRespondId());
-    }
-
-    /**
      * @return string
      */
-    public function getPathFile()
+    public function getPathFile(): string
     {
-        $respond = $this->findRespond();
-        $confirm = $respond->findConfirm();
-        $gcp = $confirm->findGcp();
-        $problem = $gcp->findProblem();
-        $segment = $gcp->findSegment();
-        $project = $gcp->findProject();
-        $user = $project->findUser();
-        $path = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+        $respond = $this->respond;
+        $confirm = $respond->confirm;
+        $gcp = $confirm->gcp;
+        $problem = $gcp->problem;
+        $segment = $gcp->segment;
+        $project = $gcp->project;
+        $user = $project->user;
+        return UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/interviews/respond-'.$respond->getId().'/';
-
-        return $path;
     }
 
     /**
      * @param RespondsGcp $respond
      * @return string
      */
-    public static function getCachePath($respond)
+    public static function getCachePath(RespondsGcp $respond): string
     {
-        $confirm = $respond->findConfirm();
-        $gcp = $confirm->findGcp();
-        $problem = $gcp->findProblem();
-        $segment = $gcp->findSegment();
-        $project = $gcp->findProject();
-        $user = $project->findUser();
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
+        $confirm = $respond->confirm;
+        $gcp = $confirm->gcp;
+        $problem = $gcp->problem;
+        $segment = $gcp->segment;
+        $project = $gcp->project;
+        $user = $project->user;
+        return '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/confirm/interviews/respond-'.$respond->getId().'/';
-
-        return $cachePath;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['respond_id', 'status'], 'required'],
@@ -124,7 +114,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'interview_file' => 'Файл',
@@ -135,7 +125,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -163,17 +153,15 @@ class InterviewConfirmGcp extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function create()
+    public function create(): bool
     {
         if ($this->validate() && $this->save()) {
 
             $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->getLoadFile()) {
-                if ($this->uploadFileInterview()) {
-                    $this->setInterviewFile($this->getLoadFile());
-                    $this->save(false);
-                }
+            if ($this->getLoadFile() && $this->uploadFileInterview()) {
+                $this->setInterviewFile($this->getLoadFile());
+                $this->save(false);
             }
 
             return true;
@@ -186,17 +174,15 @@ class InterviewConfirmGcp extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function updateInterview()
+    public function updateInterview(): bool
     {
         if ($this->validate() && $this->save()) {
 
             $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->getLoadFile()) {
-                if ($this->uploadFileInterview()) {
-                    $this->setInterviewFile($this->getLoadFile());
-                    $this->save(false);
-                }
+            if ($this->getLoadFile() && $this->uploadFileInterview()) {
+                $this->setInterviewFile($this->getLoadFile());
+                $this->save(false);
             }
 
             return true;
@@ -209,10 +195,12 @@ class InterviewConfirmGcp extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    private function uploadFileInterview()
+    private function uploadFileInterview(): bool
     {
         $path = $this->getPathFile();
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         if ($this->validate()) {
 
@@ -228,15 +216,15 @@ class InterviewConfirmGcp extends ActiveRecord
             }
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -244,7 +232,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @param int $id
      */
-    public function setRespondId($id)
+    public function setRespondId(int $id): void
     {
         $this->respond_id = $id;
     }
@@ -253,7 +241,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return int
      */
-    public function getRespondId()
+    public function getRespondId(): int
     {
         return $this->respond_id;
     }
@@ -261,7 +249,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return string
      */
-    public function getInterviewFile()
+    public function getInterviewFile(): string
     {
         return $this->interview_file;
     }
@@ -269,7 +257,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @param string $interview_file
      */
-    public function setInterviewFile($interview_file)
+    public function setInterviewFile(string $interview_file): void
     {
         $this->interview_file = $interview_file;
     }
@@ -277,7 +265,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return string
      */
-    public function getServerFile()
+    public function getServerFile(): string
     {
         return $this->server_file;
     }
@@ -285,7 +273,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @param string $server_file
      */
-    public function setServerFile($server_file)
+    public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
     }
@@ -293,7 +281,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -301,7 +289,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -309,7 +297,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -317,7 +305,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
@@ -333,7 +321,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @param mixed $loadFile
      */
-    public function setLoadFile($loadFile)
+    public function setLoadFile($loadFile): void
     {
         $this->loadFile = $loadFile;
     }
@@ -341,7 +329,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -349,7 +337,7 @@ class InterviewConfirmGcp extends ActiveRecord
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }

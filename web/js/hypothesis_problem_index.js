@@ -402,7 +402,7 @@ $(body).on('click', '.remove_expectedResults_for_create', function(){
 });
 
 
-//Удаление формы автора проекта в редактировании
+//Удаление формы вопрос-ответ
 $(body).on('click', '.remove-expectedResults', function(){
 
     var clickId = $(this).attr('id');

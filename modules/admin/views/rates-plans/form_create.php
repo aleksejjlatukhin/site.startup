@@ -1,8 +1,15 @@
 <?php
 
+use app\modules\admin\models\form\FormCreateRatesPlan;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm; ?>
+use yii\widgets\ActiveForm;
+
+/**
+ * @var FormCreateRatesPlan $model
+ */
+
+?>
 
 <div class="row container-fluid block-form-create-rates-plan">
 
@@ -24,7 +31,7 @@ use yii\widgets\ActiveForm; ?>
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 15px;">
@@ -35,7 +42,7 @@ use yii\widgets\ActiveForm; ?>
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 10px;">
@@ -45,7 +52,7 @@ use yii\widgets\ActiveForm; ?>
                 'type' => 'number',
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 10px;">
@@ -55,7 +62,7 @@ use yii\widgets\ActiveForm; ?>
                 'type' => 'number',
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="form-group row container-fluid">

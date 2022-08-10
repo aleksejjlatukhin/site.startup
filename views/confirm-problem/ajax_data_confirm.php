@@ -1,9 +1,19 @@
 <?php
 
+use app\models\ConfirmProblem;
+use app\models\forms\FormUpdateConfirmProblem;
+use app\models\Problems;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use app\models\User;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+
+/**
+ * @var ConfirmProblem $model
+ * @var Problems $problem
+ * @var FormUpdateConfirmProblem $formUpdateConfirmProblem
+ */
 
 ?>
 
@@ -15,12 +25,12 @@ use yii\helpers\Url;
         <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                 <?= Html::button('Редактировать', [
                     'id' => 'show_form_update_data',
@@ -47,53 +57,53 @@ use yii\helpers\Url;
 
         <div class="row">
             <div class="col-md-12">Цель проекта</div>
-            <div class="col-md-12"><?= $problem->project->purpose_project;?></div>
+            <div class="col-md-12"><?= $problem->project->getPurposeProject() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Приветствие в начале встречи</div>
-            <div class="col-md-12"><?= $problem->segment->confirm->greeting_interview; ?></div>
+            <div class="col-md-12"><?= $problem->segment->confirm->getGreetingInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Информация о вас для респондентов</div>
-            <div class="col-md-12"><?= $problem->segment->confirm->view_interview; ?></div>
+            <div class="col-md-12"><?= $problem->segment->confirm->getViewInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-            <div class="col-md-12"><?= $problem->segment->confirm->reason_interview; ?></div>
+            <div class="col-md-12"><?= $problem->segment->confirm->getReasonInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-            <div class="col-md-12"><?= $problem->description;?></div>
+            <div class="col-md-12"><?= $problem->getDescription() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Показатель положительного прохождения теста</div>
-            <div class="col-md-12">К = <?= $model->problem->indicator_positive_passage; ?> %</div>
+            <div class="col-md-12">К = <?= $model->problem->getIndicatorPositivePassage() ?> %</div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Вопросы для проверки гипотезы проблемы и ответы на них:</div>
-            <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview(); ?></div>
+            <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Потребность потребителя сегмента, которую проверяем</div>
-            <div class="col-md-12"><?= $model->need_consumer;?></div>
+            <div class="col-md-12"><?= $model->getNeedConsumer() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Количество респондентов (представителей сегмента):
-                <span><?= $model->count_respond; ?></span>
+                <span><?= $model->getCountRespond() ?></span>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Необходимое количество респондентов, подтверждающих проблему:
-                <span><?= $model->count_positive; ?></span>
+                <span><?= $model->getCountPositive() ?></span>
             </div>
         </div>
 
@@ -106,7 +116,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'update_data_confirm',
-        'action' => Url::to(['/confirm-problem/update', 'id' => $model->id]),
+        'action' => Url::to(['/confirm-problem/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -118,7 +128,7 @@ use yii\helpers\Url;
         <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
@@ -159,37 +169,37 @@ use yii\helpers\Url;
 
             <div class="row">
                 <div class="col-md-12">Цель проекта</div>
-                <div class="col-md-12"><?= $problem->project->purpose_project;?></div>
+                <div class="col-md-12"><?= $problem->project->getPurposeProject() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Приветствие в начале встречи</div>
-                <div class="col-md-12"><?= $problem->segment->confirm->greeting_interview; ?></div>
+                <div class="col-md-12"><?= $problem->segment->confirm->getGreetingInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Информация о вас для респондентов</div>
-                <div class="col-md-12"><?= $problem->segment->confirm->view_interview; ?></div>
+                <div class="col-md-12"><?= $problem->segment->confirm->getViewInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                <div class="col-md-12"><?= $problem->segment->confirm->reason_interview; ?></div>
+                <div class="col-md-12"><?= $problem->segment->confirm->getReasonInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-                <div class="col-md-12"><?= $problem->description; ?></div>
+                <div class="col-md-12"><?= $problem->getDescription() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Показатель положительного прохождения теста</div>
-                <div class="col-md-12">К = <?= $model->problem->indicator_positive_passage; ?> %</div>
+                <div class="col-md-12">К = <?= $model->problem->getIndicatorPositivePassage() ?> %</div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Вопросы для проверки гипотезы проблемы и ответы на них:</div>
-                <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview(); ?></div>
+                <div class="col-md-12"><?= $model->problem->getListExpectedResultsInterview() ?></div>
             </div>
 
         </div>
@@ -205,7 +215,7 @@ use yii\helpers\Url;
                     'placeholder' => '',
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
-                ]);
+                ])
             ?>
 
         </div>
@@ -221,7 +231,7 @@ use yii\helpers\Url;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>
@@ -237,7 +247,7 @@ use yii\helpers\Url;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_positive',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>

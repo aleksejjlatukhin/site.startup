@@ -17,29 +17,32 @@ use yii\db\ActiveRecord;
  * Class Expertise
  * @package app\models
  *
- * @property $id                    Идентификатор экспертизы
- * @property $stage                 Этап проекта от 0 до 9, по которому проведена экспертиза
- * @property $stage_id              Идентификатор этапа проекта, по которому проведена экспертиза
- * @property $expert_id             Идентификатор эксперта
- * @property $user_id               Идентификатор проектанта проекта, по которому проходит экспертиза
- * @property $type_expert           Тип деятельности эксперта, по которому была проведена экспертиза
- * @property $estimation            Оценка (оценки) выставленная экспертом
- * @property $comment               Комментарий(рекомендации) эксперта
- * @property $communication_id      Идентификатор коммуникации из таблицы project_communications, по которой был дан доступ к экспертизе
- * @property $completed             Параметр завершенности экспертизы, если экспертизы завершена, то её могут видеть другие пользователи. Если экспертиза завершена, то будут отправлены коммуникации (уведомления) проектанту и трекеру
- * @property $created_at            Время создания экспертизы
- * @property $updated_at            Время обновления экспертизы
+ * @property int $id                    Идентификатор экспертизы
+ * @property int $stage                 Этап проекта от 0 до 9, по которому проведена экспертиза
+ * @property int $stage_id              Идентификатор этапа проекта, по которому проведена экспертиза
+ * @property int $expert_id             Идентификатор эксперта
+ * @property int $user_id               Идентификатор проектанта проекта, по которому проходит экспертиза
+ * @property int $type_expert           Тип деятельности эксперта, по которому была проведена экспертиза
+ * @property string $estimation            Оценка (оценки) выставленная экспертом
+ * @property string $comment               Комментарий(рекомендации) эксперта
+ * @property int $communication_id      Идентификатор коммуникации из таблицы project_communications, по которой был дан доступ к экспертизе
+ * @property int $completed             Параметр завершенности экспертизы, если экспертизы завершена, то её могут видеть другие пользователи. Если экспертиза завершена, то будут отправлены коммуникации (уведомления) проектанту и трекеру
+ * @property int $created_at            Время создания экспертизы
+ * @property int $updated_at            Время обновления экспертизы
+ *
+ * @property User $user                 Проектант
+ * @property User $expert               Эксперт
  */
 class Expertise extends ActiveRecord
 {
 
-    const COMPLETED = 1001;
-    const NO_COMPLETED = 1010;
+    public const COMPLETED = 1001;
+    public const NO_COMPLETED = 1010;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'expertise';
     }
@@ -47,7 +50,7 @@ class Expertise extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -58,7 +61,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getStage()
+    public function getStage(): int
     {
         return $this->stage;
     }
@@ -69,7 +72,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $stage
      */
-    public function setStage($stage)
+    public function setStage(int $stage): void
     {
         $this->stage = $stage;
     }
@@ -80,7 +83,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getStageId()
+    public function getStageId(): int
     {
         return $this->stage_id;
     }
@@ -91,7 +94,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $stageId
      */
-    public function setStageId($stageId)
+    public function setStageId(int $stageId): void
     {
         $this->stage_id = $stageId;
     }
@@ -101,7 +104,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getExpertId()
+    public function getExpertId(): int
     {
         return $this->expert_id;
     }
@@ -111,7 +114,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $expertId
      */
-    public function setExpertId($expertId)
+    public function setExpertId(int $expertId): void
     {
         $this->expert_id = $expertId;
     }
@@ -121,7 +124,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -131,7 +134,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $userId
      */
-    public function setUserId($userId)
+    public function setUserId(int $userId): void
     {
         $this->user_id = $userId;
     }
@@ -141,7 +144,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getTypeExpert()
+    public function getTypeExpert(): int
     {
         return $this->type_expert;
     }
@@ -151,7 +154,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $typeExpert
      */
-    public function setTypeExpert($typeExpert)
+    public function setTypeExpert(int $typeExpert): void
     {
         $this->type_expert = $typeExpert;
     }
@@ -161,7 +164,7 @@ class Expertise extends ActiveRecord
      *
      * @return string
      */
-    public function getEstimation()
+    public function getEstimation(): string
     {
         return $this->estimation;
     }
@@ -169,9 +172,9 @@ class Expertise extends ActiveRecord
     /**
      * Установить оценку эксперта
      *
-     * @param $estimation
+     * @param string $estimation
      */
-    public function setEstimation($estimation)
+    public function setEstimation(string $estimation): void
     {
         $this->estimation = $estimation;
     }
@@ -185,12 +188,12 @@ class Expertise extends ActiveRecord
      */
     public function getGeneralEstimationByOne()
     {
-        $stageClass = StageExpertise::getClassByStage(StageExpertise::getList()[$this->stage]);
+        $stageClass = StageExpertise::getClassByStage(StageExpertise::getList()[$this->getStage()]);
         $interfaces = class_implements($stageClass);
         if (!isset($interfaces[ConfirmationInterface::class])) {
-            return $this->estimation;
+            return $this->getEstimation();
         }
-        return FormExpertiseManyAnswer::getGeneralEstimationByOne($this->estimation);
+        return FormExpertiseManyAnswer::getGeneralEstimationByOne($this->getEstimation());
     }
 
     /**
@@ -198,7 +201,7 @@ class Expertise extends ActiveRecord
      *
      * @return string
      */
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
@@ -208,7 +211,7 @@ class Expertise extends ActiveRecord
      *
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment(string $comment): void
     {
         $this->comment = $comment;
     }
@@ -218,7 +221,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getCommunicationId()
+    public function getCommunicationId(): int
     {
         return $this->communication_id;
     }
@@ -228,7 +231,7 @@ class Expertise extends ActiveRecord
      *
      * @param int $communicationId
      */
-    public function setCommunicationId($communicationId)
+    public function setCommunicationId(int $communicationId): void
     {
         $this->communication_id = $communicationId;
     }
@@ -239,7 +242,7 @@ class Expertise extends ActiveRecord
      *
      * @return int
      */
-    public function getCompleted()
+    public function getCompleted(): int
     {
         return $this->completed;
     }
@@ -248,7 +251,7 @@ class Expertise extends ActiveRecord
      * Установить параметр
      * завершения экспертизы
      */
-    public function setCompleted()
+    public function setCompleted(): void
     {
         $this->completed = self::COMPLETED;
     }
@@ -258,36 +261,16 @@ class Expertise extends ActiveRecord
      * Получение объекта коммуникации, по которой была назначена экспертиза
      * @return ProjectCommunications|null
      */
-    public function findProjectCommunication()
+    public function findProjectCommunication(): ?ProjectCommunications
     {
-        return ProjectCommunications::findOne($this->communication_id);
-    }
-
-
-    /**
-     * Получение объекта проектанта
-     * @return User|null
-     */
-    public function findUser()
-    {
-        return User::findOne($this->user_id);
-    }
-
-
-    /**
-     * Получение объекта эксперта
-     * @return User|null
-     */
-    public function findExpert()
-    {
-        return User::findOne($this->expert_id);
+        return ProjectCommunications::findOne($this->getCommunicationId());
     }
 
 
     /**
      * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -296,7 +279,7 @@ class Expertise extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getExpert()
+    public function getExpert(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'expert_id']);
     }
@@ -305,7 +288,7 @@ class Expertise extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['stage', 'stage_id', 'expert_id', 'user_id', 'type_expert', 'estimation', 'comment', 'communication_id'], 'required'],
@@ -325,7 +308,7 @@ class Expertise extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
@@ -336,13 +319,13 @@ class Expertise extends ActiveRecord
     /**
      * Проверка на наличие и завершенность экспертизы
      *
-     * @param $stage
-     * @param $stageId
-     * @param $type
-     * @param $expertId
+     * @param int $stage
+     * @param int $stageId
+     * @param int $type
+     * @param int $expertId
      * @return int|null
      */
-    public static function checkExistAndCheckCompleted($stage, $stageId, $type, $expertId)
+    public static function checkExistAndCheckCompleted(int $stage, int $stageId, int $type, int $expertId): ?int
     {
         $expertise = self::findOne([
             'stage' => $stage,
@@ -351,24 +334,25 @@ class Expertise extends ActiveRecord
             'expert_id' => $expertId
         ]);
 
-        return $expertise ? $expertise->completed : null;
+        return $expertise->completed ?? null;
     }
 
 
     /**
      * @param bool $insert
      * @param array $changedAttributes
+     * @return void
      */
-    public function afterSave($insert, $changedAttributes)
+    public function afterSave($insert, $changedAttributes): void
     {
-        if ($insert && $this->completed == self::COMPLETED) {
+        if ($insert && $this->getCompleted() === self::COMPLETED) {
             // Отправка уведомления о завершении экспетизы при ее создании
             $this->sendCommunications();
         } elseif (!$insert) {
-            if (isset($changedAttributes['completed']) && $changedAttributes['completed'] != $this->completed && $this->completed == self::COMPLETED) {
+            if (isset($changedAttributes['completed']) && $changedAttributes['completed'] !== $this->getCompleted() && $this->getCompleted() === self::COMPLETED) {
                 // Отправка уведомления о завершении экспетизы при ее обновлении
                 $this->sendCommunications();
-            } elseif (!isset($changedAttributes['completed']) && ((isset($changedAttributes['estimation']) || isset($changedAttributes['comment'])) || isset($changedAttributes['estimation']) && isset($changedAttributes['comment'])) && $this->completed == self::COMPLETED) {
+            } elseif (!isset($changedAttributes['completed']) && ((isset($changedAttributes['estimation']) || isset($changedAttributes['comment'])) || (isset($changedAttributes['estimation']) && isset($changedAttributes['comment']))) && $this->getCompleted() == self::COMPLETED) {
                 // Отправка уведомления об обновлении данных ранее завершенной экспертизы
                 $this->sendCommunications(true);
             }
@@ -382,9 +366,9 @@ class Expertise extends ActiveRecord
      *
      * @return bool
      */
-    public function saveRecord()
+    public function saveRecord(): bool
     {
-        return ($this->validate() && $this->save()) ? true : false;
+        return $this->validate() && $this->save();
     }
 
 
@@ -393,18 +377,34 @@ class Expertise extends ActiveRecord
      *
      * @param bool $update
      */
-    private function sendCommunications($update = false)
+    private function sendCommunications(bool $update = false): void
     {
         $communication = $this->findProjectCommunication();
         if (!$update) {
             // Отправить коммуникацию о завершении экспертизы
-            DuplicateCommunications::create($communication, $this->findUser(), TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE, $this);
-            DuplicateCommunications::create($communication, $this->findUser()->admin, TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE, $this);
+            DuplicateCommunications::create($communication, $this->user, TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE, $this);
+            DuplicateCommunications::create($communication, $this->user->admin, TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE, $this);
         }else {
             // Отправить коммуникацию об обновлении данных ранее завершенной экспертизы
-            DuplicateCommunications::create($communication, $this->findUser(), TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE, $this);
-            DuplicateCommunications::create($communication, $this->findUser()->admin, TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE, $this);
+            DuplicateCommunications::create($communication, $this->user, TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE, $this);
+            DuplicateCommunications::create($communication, $this->user->admin, TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE, $this);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt(): int
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt(): int
+    {
+        return $this->updated_at;
     }
 
 }

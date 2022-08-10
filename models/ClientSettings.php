@@ -19,17 +19,20 @@ use yii\db\ActiveRecord;
  * @property string $avatar_max_image       оригинальное загруженное фото аватара клиента
  * @property string $avatar_image           урезанное (которое все видят) фото аватара клиента
  * @property int $access_admin              доступ из Spaccel к данным организации
+ *
+ * @property Client $client                 Организация
+ * @property User $admin                    Админ организации
  */
 class ClientSettings extends ActiveRecord
 {
 
-    const ACCESS_ADMIN_TRUE = 83996983;
-    const ACCESS_ADMIN_FALSE = 1243234;
+    public const ACCESS_ADMIN_TRUE = 83996983;
+    public const ACCESS_ADMIN_FALSE = 1243234;
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'client_settings';
     }
@@ -40,18 +43,9 @@ class ClientSettings extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getClient()
+    public function getClient(): ActiveQuery
     {
         return $this->hasOne(Client::class, ['id' => 'client_id']);
-    }
-
-
-    /**
-     * @return Client|null
-     */
-    public function findClient()
-    {
-        return Client::findOne($this->client_id);
     }
 
 
@@ -61,25 +55,16 @@ class ClientSettings extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getAdmin()
+    public function getAdmin(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'admin_id']);
     }
 
 
     /**
-     * @return User|null
-     */
-    public function findAdmin()
-    {
-        return User::findOne($this->admin_id);
-    }
-
-
-    /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -88,7 +73,7 @@ class ClientSettings extends ActiveRecord
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
@@ -97,7 +82,7 @@ class ClientSettings extends ActiveRecord
     /**
      * @param int $client_id
      */
-    public function setClientId($client_id)
+    public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
     }
@@ -106,7 +91,7 @@ class ClientSettings extends ActiveRecord
     /**
      * @return int
      */
-    public function getAdminId()
+    public function getAdminId(): int
     {
         return $this->admin_id;
     }
@@ -115,43 +100,43 @@ class ClientSettings extends ActiveRecord
     /**
      * @param int $admin_id
      */
-    public function setAdminId($admin_id)
+    public function setAdminId(int $admin_id): void
     {
         $this->admin_id = $admin_id;
     }
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAvatarMaxImage()
+    public function getAvatarMaxImage(): ?string
     {
         return $this->avatar_max_image;
     }
 
 
     /**
-     * @param string $avatar_max_image
+     * @param string|null $avatar_max_image
      */
-    public function setAvatarMaxImage($avatar_max_image)
+    public function setAvatarMaxImage(?string $avatar_max_image = null): void
     {
         $this->avatar_max_image = $avatar_max_image;
     }
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAvatarImage()
+    public function getAvatarImage(): ?string
     {
-        return $this->avatar_image;
+        return $this->avatar_image ?: '';
     }
 
 
     /**
-     * @param string $avatar_image
+     * @param string|null $avatar_image
      */
-    public function setAvatarImage($avatar_image)
+    public function setAvatarImage(?string $avatar_image = null): void
     {
         $this->avatar_image = $avatar_image;
     }
@@ -160,7 +145,7 @@ class ClientSettings extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['client_id', 'admin_id'], 'required'],
@@ -180,7 +165,7 @@ class ClientSettings extends ActiveRecord
      * @param array $params
      * @return bool
      */
-    public static function createRecord($params)
+    public static function createRecord(array $params): bool
     {
         $settings = new self();
         $settings->setAttributes($params);
@@ -193,7 +178,7 @@ class ClientSettings extends ActiveRecord
     /**
      * @return int
      */
-    public function getAccessAdmin()
+    public function getAccessAdmin(): int
     {
         return $this->access_admin;
     }
@@ -201,7 +186,7 @@ class ClientSettings extends ActiveRecord
     /**
      * @param int $access_admin
      */
-    public function setAccessAdmin($access_admin)
+    public function setAccessAdmin(int $access_admin): void
     {
         $this->access_admin = $access_admin;
     }

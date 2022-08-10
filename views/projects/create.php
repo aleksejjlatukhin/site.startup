@@ -1,9 +1,17 @@
 <?php
 
+use app\models\Authors;
+use app\models\Projects;
+use app\models\User;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 
+/**
+ * @var User $user
+ * @var Projects $model
+ * @var Authors $author
+*/
 ?>
 
 
@@ -11,7 +19,7 @@ use yii\helpers\Html;
 
     <?php $form = ActiveForm::begin([
         'id' => 'project_create_form',
-        'action' => Url::to(['projects/create', 'id' => $user->id]),
+        'action' => Url::to(['projects/create', 'id' => $user->getId()]),
         'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -123,7 +131,7 @@ use yii\helpers\Html;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
             </div>
 
             <div class="row" style="margin-bottom: 20px;">
@@ -141,12 +149,12 @@ use yii\helpers\Html;
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-3">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения патента</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения патента</label>' ?>
                     <?= \kartik\date\DatePicker::widget([
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[patent_date]',
-                        'value' => $model->patent_date == null ? null : $model->patent_date,
+                        'value' => empty($model->patent_date) ? null : $model->patent_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -158,7 +166,7 @@ use yii\helpers\Html;
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
                         ]
-                    ]);?>
+                    ]) ?>
 
                 </div>
             </div>
@@ -189,7 +197,7 @@ use yii\helpers\Html;
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
                             'autocomplete' => 'off'
-                        ]); ?>
+                        ]) ?>
 
                         <?= $form->field($author, "[0]role", [
                             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -200,7 +208,7 @@ use yii\helpers\Html;
                             'class' => 'style_form_field_respond form-control',
                             'placeholder' => '',
                             'autocomplete' => 'off'
-                        ]); ?>
+                        ]) ?>
 
                         <?= $form->field($author, "[0]experience", [
                             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -236,7 +244,7 @@ use yii\helpers\Html;
                     'border-radius' => '8px',
                     'margin-right' => '5px',
                 ]
-            ]);?>
+            ]) ?>
 
         </div>
     </div>
@@ -296,12 +304,12 @@ use yii\helpers\Html;
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-3">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата регистрации</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата регистрации</label>' ?>
                     <?= \kartik\date\DatePicker::widget([
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[register_date]',
-                        'value' => $model->register_date == null ? null : $model->register_date,
+                        'value' => empty($model->register_date) ? null : $model->register_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -313,7 +321,7 @@ use yii\helpers\Html;
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
                         ]
-                    ]);?>
+                    ]) ?>
 
                 </div>
             </div>
@@ -393,13 +401,13 @@ use yii\helpers\Html;
                     'id' => 'invest_amount_create',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);?>
+                ]) ?>
             </div>
 
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-12">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения инвестиций</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения инвестиций</label>' ?>
 
                 </div>
                 <div class="col-md-3">
@@ -408,7 +416,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[invest_date]',
-                        'value' => $model->invest_date == null ? null : $model->invest_date,
+                        'value' => empty($model->invest_date) ? null : $model->invest_date,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -420,7 +428,7 @@ use yii\helpers\Html;
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
                         ]
-                    ]);?>
+                    ]) ?>
 
                 </div>
 
@@ -453,7 +461,7 @@ use yii\helpers\Html;
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-12">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата анонсирования проекта</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата анонсирования проекта</label>' ?>
 
                 </div>
                 <div class="col-md-3">
@@ -462,7 +470,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[date_of_announcement]',
-                        'value' => $model->date_of_announcement == null ? null : $model->date_of_announcement,
+                        'value' => empty($model->date_of_announcement) ? null : $model->date_of_announcement,
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -474,7 +482,7 @@ use yii\helpers\Html;
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
                         ]
-                    ]);?>
+                    ]) ?>
 
                 </div>
 

@@ -19,14 +19,14 @@ use yii\db\ActiveRecord;
 class CommunicationResponse extends ActiveRecord
 {
 
-    const POSITIVE_RESPONSE = 543;
-    const NEGATIVE_RESPONSE = 678;
+    public const POSITIVE_RESPONSE = 543;
+    public const NEGATIVE_RESPONSE = 678;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'communication_response';
     }
@@ -35,7 +35,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['answer', 'communication_id'], 'integer'],
@@ -57,7 +57,7 @@ class CommunicationResponse extends ActiveRecord
      * @param string $comment
      * @param int $communication_id
      */
-    public function setParams($answer, $comment, $communication_id, $expert_types = null)
+    public function setParams(int $answer, string $comment, int $communication_id, array $expert_types = null): void
     {
         $this->setAnswer($answer);
         $this->setExpertTypes($expert_types);
@@ -68,7 +68,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -76,7 +76,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @return int
      */
-    public function getCommunicationId()
+    public function getCommunicationId(): int
     {
         return $this->communication_id;
     }
@@ -84,7 +84,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @param int $communication_id
      */
-    public function setCommunicationId($communication_id)
+    public function setCommunicationId(int $communication_id): void
     {
         $this->communication_id = $communication_id;
     }
@@ -92,7 +92,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @return int
      */
-    public function getAnswer()
+    public function getAnswer(): int
     {
         return $this->answer;
     }
@@ -100,7 +100,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @param int $answer
      */
-    public function setAnswer($answer)
+    public function setAnswer(int $answer): void
     {
         $this->answer = $answer;
     }
@@ -108,7 +108,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @return string
      */
-    public function getExpertTypes()
+    public function getExpertTypes(): string
     {
         return $this->expert_types;
     }
@@ -116,7 +116,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @param array|null $expert_types
      */
-    public function setExpertTypes($expert_types)
+    public function setExpertTypes(?array $expert_types): void
     {
         $this->expert_types = $expert_types ? implode('|', $expert_types) : '';
     }
@@ -124,7 +124,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @return string
      */
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
@@ -132,7 +132,7 @@ class CommunicationResponse extends ActiveRecord
     /**
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment(string $comment): void
     {
         $this->comment = $comment;
     }

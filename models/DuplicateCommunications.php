@@ -15,18 +15,30 @@ use yii\db\ActiveRecord;
  *
  * Class DuplicateCommunications
  * @package app\models
+ *
+ * @property int $id                         Идентификатор записи
+ * @property int $type                       Тип дублирующей коммуникации
+ * @property int $source_id                  Идентификатор записи оригинальной коммуникации
+ * @property int $sender_id                  Идентификатор отправителя коммуникации
+ * @property int $adressee_id                Идентификатор получателя коммуникации
+ * @property string $description             Описание коммуникации
+ * @property int $status                     Статус прочтения коммуникации
+ * @property int $created_at                 Дата создания коммуникации
+ * @property int $updated_at                 Дата обновления коммуникации
+ *
+ * @property ProjectCommunications $source   Получить объект оригинальной коммуникации
  */
 class DuplicateCommunications extends ActiveRecord implements CommunicationsInterface
 {
 
-    const READ = 2468;
-    const NO_READ = 3579;
+    public const READ = 2468;
+    public const NO_READ = 3579;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'duplicate_communications';
     }
@@ -37,15 +49,15 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      *
      * @return ProjectCommunications|null
      */
-    public function getSource()
+    public function getSource(): ?ProjectCommunications
     {
-        if (in_array($this->type, [
+        if (in_array($this->getType(), [
             TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT,
             TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE,
             TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE
-        ]))
+        ], false))
         {
-            return ProjectCommunications::findOne($this->source_id);
+            return ProjectCommunications::findOne($this->getSourceId());
         }
 
         return null;
@@ -55,7 +67,7 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['source_id', 'sender_id', 'adressee_id', 'type', 'status', 'created_at', 'updated_at'], 'integer'],
@@ -74,7 +86,7 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -91,7 +103,7 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      * @param false|Expertise $expertise
      * @return DuplicateCommunications|null
      */
-    public static function create($source, $adressee, $type, $expertise = false)
+    public static function create(CommunicationsInterface $source, User $adressee, int $type, $expertise = false): ?DuplicateCommunications
     {
         $model = new self();
 
@@ -113,15 +125,15 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      * @param false|Expertise $expertise
      * @return bool
      */
-    private function setParams($source, $adressee, $type, $expertise)
+    private function setParams(CommunicationsInterface $source, User $adressee, int $type, $expertise): bool
     {
         if (is_a($source, ProjectCommunications::class)) {
 
-            $this->type = $type;
-            $this->source_id = $source->getId();
-            $this->sender_id = $source->getSenderId();
-            $this->adressee_id = $adressee->getId();
-            $this->description = PatternsDescriptionDuplicateCommunication::getValue($source, $adressee, $type, $expertise);
+            $this->setType($type);
+            $this->setSourceId($source->getId());
+            $this->setSenderId($source->getSenderId());
+            $this->setAdresseeId($adressee->getId());
+            $this->setDescription(PatternsDescriptionDuplicateCommunication::getValue($source, $adressee, $type, $expertise));
 
             return true;
         }
@@ -135,9 +147,9 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      *
      * @return bool
      */
-    public function isNeedReadButton()
+    public function isNeedReadButton(): bool
     {
-        if ($this->status == self::NO_READ) {
+        if ($this->getStatus() === self::NO_READ) {
             return true;
         }
         return false;
@@ -148,9 +160,17 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      * Установить параметр
      * прочтения коммуникации
      */
-    public function setStatusRead()
+    public function setStatusRead(): void
     {
         $this->status = self::READ;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
     }
 
 
@@ -159,29 +179,107 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
      *
      * @return int
      */
-    public function getAdresseeId()
+    public function getAdresseeId(): int
     {
         return $this->adressee_id;
     }
 
+    /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId(int $adressee_id): void
+    {
+        $this->adressee_id = $adressee_id;
+    }
 
     /**
      * Получить id отправителя коммуникации
      *
      * @return int
      */
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->sender_id;
     }
 
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId(int $sender_id): void
+    {
+        $this->sender_id = $sender_id;
+    }
 
     /**
      * Получить id коммуникации
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType(int $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSourceId(): int
+    {
+        return $this->source_id;
+    }
+
+    /**
+     * @param int $source_id
+     */
+    public function setSourceId(int $source_id): void
+    {
+        $this->source_id = $source_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt(): int
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt(): int
+    {
+        return $this->updated_at;
     }
 }

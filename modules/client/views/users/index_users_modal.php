@@ -1,16 +1,15 @@
 <?php
 
 use yii\bootstrap\Modal;
-use yii\helpers\Html;
 
 ?>
 
 
-<?php // Модальное окно добавления администратора
+<?php // Модальное окно добавления трекера
 Modal::begin([
     'options' => ['id' => 'add_admin_modal'],
     'size' => 'modal-md',
-    'header' => '<h3 class="text-center">Назначение администратора</h3>',
+    'header' => '<h3 class="text-center">Назначение трекера</h3>',
 ]); ?>
 <!--Контент добавляется через Ajax-->
 <?php Modal::end(); ?>

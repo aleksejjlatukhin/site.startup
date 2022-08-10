@@ -50,14 +50,16 @@ class FormCreateBusinessModel extends Model
      * @param Mvps $preliminaryHypothesis
      * @param array $config
      */
-    public function __construct(Mvps $preliminaryHypothesis, $config = [])
+    public function __construct(Mvps $preliminaryHypothesis, array $config = [])
     {
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -68,7 +70,7 @@ class FormCreateBusinessModel extends Model
      * @param Mvps $preliminaryHypothesis
      * @return string
      */
-    public static function getCachePath(Mvps $preliminaryHypothesis)
+    public static function getCachePath(Mvps $preliminaryHypothesis): string
     {
         /**
          * @var Gcps $gcp
@@ -82,17 +84,15 @@ class FormCreateBusinessModel extends Model
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$preliminaryHypothesis->getId().'/business-model/formCreate/';
-
-        return $cachePath;
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['relations', 'distribution_of_sales', 'resources'], 'string', 'max' => 255],
@@ -105,7 +105,7 @@ class FormCreateBusinessModel extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'relations' => 'Взаимоотношения с клиентами',
@@ -123,7 +123,8 @@ class FormCreateBusinessModel extends Model
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create (){
+    public function create (): BusinessModel
+    {
 
         $confirmMvp = ConfirmMvp::findOne($this->getBasicConfirmId());
         $mvp = Mvps::findOne($confirmMvp->getMvpId());
@@ -156,7 +157,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getRelations()
+    public function getRelations(): string
     {
         return $this->relations;
     }
@@ -164,7 +165,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $relations
      */
-    public function setRelations($relations)
+    public function setRelations(string $relations): void
     {
         $this->relations = $relations;
     }
@@ -172,7 +173,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getPartners()
+    public function getPartners(): string
     {
         return $this->partners;
     }
@@ -180,7 +181,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $partners
      */
-    public function setPartners($partners)
+    public function setPartners(string $partners): void
     {
         $this->partners = $partners;
     }
@@ -188,7 +189,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getDistributionOfSales()
+    public function getDistributionOfSales(): string
     {
         return $this->distribution_of_sales;
     }
@@ -196,7 +197,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $distribution_of_sales
      */
-    public function setDistributionOfSales($distribution_of_sales)
+    public function setDistributionOfSales(string $distribution_of_sales): void
     {
         $this->distribution_of_sales = $distribution_of_sales;
     }
@@ -204,7 +205,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getResources()
+    public function getResources(): string
     {
         return $this->resources;
     }
@@ -212,7 +213,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $resources
      */
-    public function setResources($resources)
+    public function setResources(string $resources): void
     {
         $this->resources = $resources;
     }
@@ -220,7 +221,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getCost()
+    public function getCost(): string
     {
         return $this->cost;
     }
@@ -228,7 +229,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $cost
      */
-    public function setCost($cost)
+    public function setCost(string $cost): void
     {
         $this->cost = $cost;
     }
@@ -236,7 +237,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getRevenue()
+    public function getRevenue(): string
     {
         return $this->revenue;
     }
@@ -244,7 +245,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $revenue
      */
-    public function setRevenue($revenue)
+    public function setRevenue(string $revenue): void
     {
         $this->revenue = $revenue;
     }
@@ -252,7 +253,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -260,7 +261,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -268,7 +269,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -276,7 +277,7 @@ class FormCreateBusinessModel extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -284,7 +285,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }
@@ -292,7 +293,7 @@ class FormCreateBusinessModel extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }

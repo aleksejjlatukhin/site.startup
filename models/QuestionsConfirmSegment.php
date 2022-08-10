@@ -13,12 +13,17 @@ use yii\db\StaleObjectException;
  * Class QuestionsConfirmSegment
  * @package app\models
  *
- * @property int $id                            Идентификатор записи в таб. questions_confirm_segment
- * @property int $confirm_id                    Идентификатор записи в таб. confirm_segment
- * @property string $title                      Описание вопроса
- * @property int $status                        Параметр указывает на важность вопроса
- * @property int $created_at                    Дата создания вопроса
- * @property int $updated_at                    Дата обновления вопроса
+ * @property int $id                                                                Идентификатор записи в таб. questions_confirm_segment
+ * @property int $confirm_id                                                        Идентификатор записи в таб. confirm_segment
+ * @property string $title                                                          Описание вопроса
+ * @property int $status                                                            Параметр указывает на важность вопроса
+ * @property int $created_at                                                        Дата создания вопроса
+ * @property int $updated_at                                                        Дата обновления вопроса
+ * @property ManagerForAnswersAtQuestion $_manager_answers                          Менеджер по ответам на вопросы
+ * @property CreatorQuestionToGeneralList $_creator_question_to_general_list        Менеджер, который добавляет вопросы в таблицы, которые содержат все вопросы добавляемые на этапах подтверждения гипотез
+ *
+ * @property ConfirmSegment $confirm                                                Подтверждение сегмента
+ * @property AnswersQuestionsConfirmSegment[] $answers                              Все ответы на данный вопрос
  */
 class QuestionsConfirmSegment extends ActiveRecord
 {
@@ -34,9 +39,8 @@ class QuestionsConfirmSegment extends ActiveRecord
      */
     public function __construct($config = [])
     {
-        $this->_manager_answers = new ManagerForAnswersAtQuestion();
-        $this->_creator_question_to_general_list = new CreatorQuestionToGeneralList();
-
+        $this->setManagerAnswers();
+        $this->setCreatorQuestionToGeneralList();
         parent::__construct($config);
     }
 
@@ -44,7 +48,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'questions_confirm_segment';
     }
@@ -55,21 +59,9 @@ class QuestionsConfirmSegment extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmSegment::class, ['id' => 'confirm_id']);
-    }
-
-
-    /**
-     * Найти подтверждение гипотезы,
-     * к которому относится вопрос
-     *
-     * @return ConfirmSegment|null
-     */
-    public function findConfirm()
-    {
-        return ConfirmSegment::findOne($this->getConfirmId());
     }
 
 
@@ -78,18 +70,19 @@ class QuestionsConfirmSegment extends ActiveRecord
      *
      * @return array|ActiveRecord[]
      */
-    public function getAnswers()
+    public function getAnswers(): array
     {
-        $answers = AnswersQuestionsConfirmSegment::find()->where(['question_id' => $this->getId()])
-            ->andWhere(['not', ['answers_questions_confirm_segment.answer' => '']])->all();
-        return $answers;
+        return AnswersQuestionsConfirmSegment::find()
+            ->where(['question_id' => $this->getId()])
+            ->andWhere(['not', ['answers_questions_confirm_segment.answer' => '']])
+            ->all();
     }
 
 
     /**
      * @param array $params
      */
-    public function setParams(array $params)
+    public function setParams(array $params): void
     {
         $this->setConfirmId($params['confirm_id']);
         $this->setTitle($params['title']);
@@ -99,7 +92,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['confirm_id', 'title'], 'required'],
@@ -118,7 +111,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return ['title' => 'Описание вопроса'];
     }
@@ -127,7 +120,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -141,20 +134,20 @@ class QuestionsConfirmSegment extends ActiveRecord
         $this->on(self::EVENT_AFTER_INSERT, function (){
             $this->confirm->hypothesis->project->touch('updated_at');
             $this->confirm->hypothesis->project->user->touch('updated_at');
-            $this->_manager_answers->create($this->confirm, $this->getId());
-            $this->_creator_question_to_general_list->create($this->confirm, $this->getTitle());
+            $this->getManagerAnswers()->create($this->confirm, $this->getId());
+            $this->getCreatorQuestionToGeneralList()->create($this->confirm, $this->getTitle());
         });
 
         $this->on(self::EVENT_AFTER_UPDATE, function (){
             $this->confirm->hypothesis->project->touch('updated_at');
             $this->confirm->hypothesis->project->user->touch('updated_at');
-            $this->_creator_question_to_general_list->create($this->confirm, $this->getTitle());
+            $this->getCreatorQuestionToGeneralList()->create($this->confirm, $this->getTitle());
         });
 
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->confirm->hypothesis->project->touch('updated_at');
             $this->confirm->hypothesis->project->user->touch('updated_at');
-            $this->_manager_answers->delete($this->confirm, $this->getId());
+            $this->getManagerAnswers()->delete($this->confirm, $this->getId());
         });
 
         parent::init();
@@ -172,7 +165,7 @@ class QuestionsConfirmSegment extends ActiveRecord
         $questions = self::find()->where(['confirm_id' => $this->confirm->getId()])->andWhere(['!=', 'id', $this->getId()])->all();
         //Передаем обновленный список вопросов для добавления в программу
         $queryQuestions = $this->confirm->queryQuestionsGeneralList();
-        array_push($queryQuestions, $this);
+        $queryQuestions[] = $this;
 
         if ($this->delete()) {
             return ['questions' => $questions, 'queryQuestions' => $queryQuestions];
@@ -183,7 +176,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -191,7 +184,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -199,7 +192,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @param int $confirm_id
      */
-    public function setConfirmId($confirm_id)
+    public function setConfirmId(int $confirm_id): void
     {
         $this->confirm_id = $confirm_id;
     }
@@ -207,7 +200,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -215,7 +208,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -223,7 +216,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -231,7 +224,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
@@ -239,7 +232,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * @param int $status
      */
-    private function setStatus($status)
+    private function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -247,7 +240,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     /**
      * Изменение статуса вопроса
      */
-    public function changeStatus()
+    public function changeStatus(): void
     {
         if ($this->getStatus() === QuestionStatus::STATUS_NOT_STAR){
             $this->setStatus(QuestionStatus::STATUS_ONE_STAR);
@@ -258,10 +251,42 @@ class QuestionsConfirmSegment extends ActiveRecord
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
+    }
+
+    /**
+     * @return ManagerForAnswersAtQuestion
+     */
+    public function getManagerAnswers(): ManagerForAnswersAtQuestion
+    {
+        return $this->_manager_answers;
+    }
+
+    /**
+     *
+     */
+    public function setManagerAnswers(): void
+    {
+        $this->_manager_answers = new ManagerForAnswersAtQuestion();
+    }
+
+    /**
+     * @return CreatorQuestionToGeneralList
+     */
+    public function getCreatorQuestionToGeneralList(): CreatorQuestionToGeneralList
+    {
+        return $this->_creator_question_to_general_list;
+    }
+
+    /**
+     *
+     */
+    public function setCreatorQuestionToGeneralList(): void
+    {
+        $this->_creator_question_to_general_list = new CreatorQuestionToGeneralList();
     }
 }

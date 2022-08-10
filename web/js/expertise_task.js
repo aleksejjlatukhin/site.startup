@@ -158,7 +158,7 @@ $(body).on('click', '.send-communication', function (e) {
 
             if (response.success) {
 
-                if (response.type === '100') {
+                if (response.type === 100) {
                     $(container).html('<div class="text-success">Запрос сделан</div>');
                 }
 
@@ -175,7 +175,7 @@ $(body).on('click', '.send-communication', function (e) {
                     });
 
 
-                    if (response.type === '300' || response.type === '350') {
+                    if (response.type === 300 || response.type === 350) {
 
                         // Меняем в шапке сайта в иконке количество непрочитанных коммуникаций
                         var blockCountUnreadCommunications = $(body).find('.countUnreadCommunications');

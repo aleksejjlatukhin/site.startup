@@ -20,17 +20,17 @@ use yii\db\ActiveRecord;
 class MessageFiles extends ActiveRecord
 {
 
-    const CATEGORY_ADMIN = 1;
-    const CATEGORY_MAIN_ADMIN = 2;
-    const CATEGORY_TECHNICAL_SUPPORT = 3;
-    const CATEGORY_EXPERT = 4;
-    const CATEGORY_MANAGER = 5;
+    public const CATEGORY_ADMIN = 1;
+    public const CATEGORY_MAIN_ADMIN = 2;
+    public const CATEGORY_TECHNICAL_SUPPORT = 3;
+    public const CATEGORY_EXPERT = 4;
+    public const CATEGORY_MANAGER = 5;
 
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'message_files';
     }
@@ -39,7 +39,7 @@ class MessageFiles extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['category', 'message_id'], 'integer'],
@@ -57,7 +57,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -65,7 +65,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @return int
      */
-    public function getMessageId()
+    public function getMessageId(): int
     {
         return $this->message_id;
     }
@@ -73,7 +73,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @param int $message_id
      */
-    public function setMessageId($message_id)
+    public function setMessageId(int $message_id): void
     {
         $this->message_id = $message_id;
     }
@@ -81,7 +81,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @return int
      */
-    public function getCategory()
+    public function getCategory(): int
     {
         return $this->category;
     }
@@ -89,7 +89,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @param int $category
      */
-    public function setCategory($category)
+    public function setCategory(int $category): void
     {
         $this->category = $category;
     }
@@ -97,7 +97,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @return string
      */
-    public function getFileName()
+    public function getFileName(): string
     {
         return $this->file_name;
     }
@@ -105,7 +105,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @param string $file_name
      */
-    public function setFileName($file_name)
+    public function setFileName(string $file_name): void
     {
         $this->file_name = $file_name;
     }
@@ -113,7 +113,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @return string
      */
-    public function getServerFile()
+    public function getServerFile(): string
     {
         return $this->server_file;
     }
@@ -121,7 +121,7 @@ class MessageFiles extends ActiveRecord
     /**
      * @param string $server_file
      */
-    public function setServerFile($server_file)
+    public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
     }

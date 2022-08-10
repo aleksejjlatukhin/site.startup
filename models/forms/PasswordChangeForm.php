@@ -36,7 +36,7 @@ class PasswordChangeForm extends Model
      * @param User $user
      * @param array $config
      */
-    public function __construct(User $user, $config = [])
+    public function __construct(User $user, array $config = [])
     {
         $this->setUser($user);
         parent::__construct($config);
@@ -46,7 +46,7 @@ class PasswordChangeForm extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['currentPassword', 'newPassword', 'newPasswordRepeat'], 'required'],
@@ -61,7 +61,7 @@ class PasswordChangeForm extends Model
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'newPassword' => 'Новый пароль',
@@ -75,12 +75,10 @@ class PasswordChangeForm extends Model
      * @param string $attribute
      * @param array $params
      */
-    public function validatePassword($attribute, $params)
+    public function validatePassword(string $attribute, array $params): void
     {
-        if (!$this->hasErrors()) {
-            if (!$this->getUser()->validatePassword($this->$attribute)) {
-                $this->addError($attribute, 'Ошибка! Неверный текущий пароль.');
-            }
+        if (!$this->hasErrors() && !$this->getUser()->validatePassword($this->$attribute)) {
+            $this->addError($attribute, 'Ошибка! Неверный текущий пароль.');
         }
     }
 
@@ -88,7 +86,7 @@ class PasswordChangeForm extends Model
     /**
      * @param $attr
      */
-    public function spaceInPassword ($attr)
+    public function spaceInPassword ($attr): void
     {
         if (preg_match('/\s+/',$this->$attr)) {
             $this->addError($attr, 'Не допускается использование пробелов');
@@ -100,21 +98,21 @@ class PasswordChangeForm extends Model
      * @return boolean
      * @throws Exception
      */
-    public function changePassword()
+    public function changePassword(): ?bool
     {
         if ($this->validate()) {
             $user = $this->_user;
             $user->setPassword($this->newPassword);
             return $user->save();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * @return string
      */
-    public function getCurrentPassword()
+    public function getCurrentPassword(): string
     {
         return $this->currentPassword;
     }
@@ -122,7 +120,7 @@ class PasswordChangeForm extends Model
     /**
      * @param string $currentPassword
      */
-    public function setCurrentPassword($currentPassword)
+    public function setCurrentPassword(string $currentPassword): void
     {
         $this->currentPassword = $currentPassword;
     }
@@ -130,7 +128,7 @@ class PasswordChangeForm extends Model
     /**
      * @return string
      */
-    public function getNewPassword()
+    public function getNewPassword(): string
     {
         return $this->newPassword;
     }
@@ -138,7 +136,7 @@ class PasswordChangeForm extends Model
     /**
      * @param string $newPassword
      */
-    public function setNewPassword($newPassword)
+    public function setNewPassword(string $newPassword): void
     {
         $this->newPassword = $newPassword;
     }
@@ -146,7 +144,7 @@ class PasswordChangeForm extends Model
     /**
      * @return string
      */
-    public function getNewPasswordRepeat()
+    public function getNewPasswordRepeat(): string
     {
         return $this->newPasswordRepeat;
     }
@@ -154,7 +152,7 @@ class PasswordChangeForm extends Model
     /**
      * @param string $newPasswordRepeat
      */
-    public function setNewPasswordRepeat($newPasswordRepeat)
+    public function setNewPasswordRepeat(string $newPasswordRepeat): void
     {
         $this->newPasswordRepeat = $newPasswordRepeat;
     }
@@ -162,7 +160,7 @@ class PasswordChangeForm extends Model
     /**
      * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->_user;
     }
@@ -170,7 +168,7 @@ class PasswordChangeForm extends Model
     /**
      * @param User $user
      */
-    public function setUser($user)
+    public function setUser(User $user): void
     {
         $this->_user = $user;
     }

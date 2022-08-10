@@ -3,7 +3,6 @@
 
 namespace app\models\forms;
 
-use app\models\interfaces\ConfirmationInterface;
 use yii\base\Model;
 
 /**
@@ -35,7 +34,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'info_respond', 'place_interview', 'date_plan'], 'required'],
@@ -52,7 +51,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Респондент',
@@ -64,10 +63,7 @@ abstract class UpdateFormRespond extends Model
     }
 
 
-    /**
-     * @return ConfirmationInterface
-     */
-    abstract public function getConfirm();
+    abstract public function findConfirm();
 
     abstract public function update();
 
@@ -76,7 +72,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -84,7 +80,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -92,7 +88,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -100,7 +96,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -108,7 +104,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return string
      */
-    public function getInfoRespond()
+    public function getInfoRespond(): string
     {
         return $this->info_respond;
     }
@@ -116,7 +112,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param string $info_respond
      */
-    public function setInfoRespond($info_respond)
+    public function setInfoRespond(string $info_respond): void
     {
         $this->info_respond = $info_respond;
     }
@@ -124,7 +120,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return string
      */
-    public function getPlaceInterview()
+    public function getPlaceInterview(): string
     {
         return $this->place_interview;
     }
@@ -132,7 +128,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param string $place_interview
      */
-    public function setPlaceInterview($place_interview)
+    public function setPlaceInterview(string $place_interview): void
     {
         $this->place_interview = $place_interview;
     }
@@ -140,7 +136,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -148,7 +144,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -164,7 +160,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param mixed $date_plan
      */
-    public function setDatePlan($date_plan)
+    public function setDatePlan($date_plan): void
     {
         $this->date_plan = $date_plan;
     }
@@ -172,7 +168,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -180,7 +176,7 @@ abstract class UpdateFormRespond extends Model
     /**
      * @param int $confirm_id
      */
-    public function setConfirmId($confirm_id)
+    public function setConfirmId(int $confirm_id): void
     {
         $this->confirm_id = $confirm_id;
     }

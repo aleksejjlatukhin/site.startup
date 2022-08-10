@@ -26,7 +26,7 @@ class SortForm extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['field', 'type'], 'trim'],

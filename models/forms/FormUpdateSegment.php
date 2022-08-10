@@ -19,13 +19,12 @@ class FormUpdateSegment extends FormSegment
 
     public $id;
 
-
     /**
      * FormUpdateSegment constructor.
      * @param int $id
      * @param array $config
      */
-    public function __construct($id, $config = [])
+    public function __construct($id, array $config = [])
     {
         $model = Segments::findOne($id);
         $this->setId($id);
@@ -35,7 +34,7 @@ class FormUpdateSegment extends FormSegment
         $this->setAddInfo($model->getAddInfo());
         $this->setTypeOfInteractionBetweenSubjects($model->getTypeOfInteractionBetweenSubjects());
 
-        if ($model->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
+        if ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
 
             $this->setFieldOfActivityB2c($model->getFieldOfActivity());
             $this->setSortOfActivityB2c($model->getSortOfActivity());
@@ -49,7 +48,7 @@ class FormUpdateSegment extends FormSegment
             $this->setQuantityTo($model->getQuantityTo());
             $this->setMarketVolumeB2c($model->getMarketVolume());
 
-        }elseif ($model->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
+        }elseif ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
             $this->setFieldOfActivityB2b($model->getFieldOfActivity());
             $this->setSortOfActivityB2b($model->getSortOfActivity());
@@ -70,9 +69,10 @@ class FormUpdateSegment extends FormSegment
      * Проверка заполнения полей формы
      * @return bool
      */
-    public function checkFillingFields () {
+    public function checkFillingFields (): bool
+    {
 
-        if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
+        if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
                 && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
@@ -81,10 +81,11 @@ class FormUpdateSegment extends FormSegment
                 && !empty($this->market_volume_b2c)) {
 
                 return true;
-            } else {
-                return false;
             }
-        } elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
+            return false;
+        }
+
+        if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
                 && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
@@ -92,10 +93,10 @@ class FormUpdateSegment extends FormSegment
                 && !empty($this->income_company_to) && !empty($this->market_volume_b2b)) {
 
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
+
         return false;
     }
 
@@ -104,14 +105,14 @@ class FormUpdateSegment extends FormSegment
      * @return Segments|null
      * @throws NotFoundHttpException
      */
-    public function update()
+    public function update(): ?Segments
     {
         $segment = Segments::findOne($this->getId());
         $segment->setName($this->getName());
         $segment->setDescription($this->getDescription());
         $segment->setAddInfo($this->getAddInfo());
 
-        if ($segment->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
+        if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
 
             $segment->setFieldOfActivity($this->getFieldOfActivityB2c());
             $segment->setSortOfActivity($this->getSortOfActivityB2c());
@@ -125,10 +126,12 @@ class FormUpdateSegment extends FormSegment
             $segment->setQuantityTo($this->getQuantityTo());
             $segment->setMarketVolume($this->getMarketVolumeB2c());
 
-            if ($segment->save()) return $segment;
+            if ($segment->save()) {
+                return $segment;
+            }
             throw new NotFoundHttpException('Неудалось сохранить сегмент');
 
-        }elseif ($segment->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
+        }elseif ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
             $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
             $segment->setSortOfActivity($this->getSortOfActivityB2b());
@@ -140,7 +143,9 @@ class FormUpdateSegment extends FormSegment
             $segment->setIncomeTo($this->getIncomeCompanyTo());
             $segment->setMarketVolume($this->getMarketVolumeB2b());
 
-            if ($segment->save()) return $segment;
+            if ($segment->save()) {
+                return $segment;
+            }
             throw new NotFoundHttpException('Неудалось сохранить сегмент');
         }
         return null;
@@ -150,13 +155,13 @@ class FormUpdateSegment extends FormSegment
     /**
      * @param $attr
      */
-    public function uniqueName($attr)
+    public function uniqueName($attr): void
     {
         $models = Segments::findAll(['project_id' => $this->getProjectId()]);
 
         foreach ($models as $item){
 
-            if ($this->getId() != $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if ($this->getId() !== $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Сегмент с названием «'. $this->getName() .'» уже существует!');
             }
@@ -166,7 +171,7 @@ class FormUpdateSegment extends FormSegment
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -174,7 +179,7 @@ class FormUpdateSegment extends FormSegment
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }

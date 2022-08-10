@@ -25,7 +25,7 @@ class SendEmailForm extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['email', 'filter', 'filter' => 'trim'],
@@ -36,7 +36,7 @@ class SendEmailForm extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Эл.почта'
@@ -48,7 +48,7 @@ class SendEmailForm extends Model
      * @return bool
      * @throws Exception
      */
-    public function sendEmail()
+    public function sendEmail(): bool
     {
         /* @var $user User */
         $user = User::findOne(['email' => $this->getEmail()]);
@@ -73,7 +73,7 @@ class SendEmailForm extends Model
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -81,7 +81,7 @@ class SendEmailForm extends Model
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }

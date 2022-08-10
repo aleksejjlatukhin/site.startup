@@ -13,26 +13,33 @@ use yii\db\ActiveRecord;
  * Class MessageAdmin
  * @package app\models
  *
- * @property int $id                            идентификатор сообщения
- * @property int $conversation_id               идентификатор беседы
- * @property int $sender_id                     идентификатор отправителя
- * @property int $adressee_id                   идентификатор получателя
- * @property string $description                текст сообщения
- * @property int $status                        статус сообщения
- * @property int $created_at                    дата создания
- * @property int $updated_at                    дата обновления
+ * @property int $id                                            идентификатор сообщения
+ * @property int $conversation_id                               идентификатор беседы
+ * @property int $sender_id                                     идентификатор отправителя
+ * @property int $adressee_id                                   идентификатор получателя
+ * @property string $description                                текст сообщения
+ * @property int $status                                        статус сообщения
+ * @property int $created_at                                    дата создания
+ * @property int $updated_at                                    дата обновления
+ *
+ * @property ConversationAdmin $conversation                    Беседа
+ * @property User $sender                                       Отправитель
+ * @property User $adressee                                     Получатель
+ * @property MessageFiles[] $files                              Прикрепленные файлы
+ * @property string $dayAndDateRus                              Дата и день отправления сообщения по-русски
+ * @property string $dateRus                                    Дата отправления сообщения по-русски
  */
 class MessageAdmin extends ActiveRecord
 {
 
-    const READ_MESSAGE = 20;
-    const NO_READ_MESSAGE = 10;
+    public const READ_MESSAGE = 20;
+    public const NO_READ_MESSAGE = 10;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'message_admin';
     }
@@ -41,7 +48,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'filter', 'filter' => 'trim'],
@@ -57,7 +64,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -83,7 +90,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -93,9 +100,10 @@ class MessageAdmin extends ActiveRecord
 
     /**
      * Получить объект беседы
+     *
      * @return ActiveQuery
      */
-    public function getConversation()
+    public function getConversation(): ActiveQuery
     {
         return $this->hasOne(ConversationAdmin::class, ['id' => 'conversation_id']);
     }
@@ -103,9 +111,10 @@ class MessageAdmin extends ActiveRecord
 
     /**
      * Получить объект отправителя
+     *
      * @return ActiveQuery
      */
-    public function getSender ()
+    public function getSender(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'sender_id']);
     }
@@ -113,9 +122,10 @@ class MessageAdmin extends ActiveRecord
 
     /**
      * Получить объект получателя
+     *
      * @return ActiveQuery
      */
-    public function getAdressee ()
+    public function getAdressee(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'adressee_id']);
     }
@@ -123,9 +133,10 @@ class MessageAdmin extends ActiveRecord
 
     /**
      * Получить прикрепленные файлы
+     *
      * @return MessageFiles[]
      */
-    public function getFiles ()
+    public function getFiles(): array
     {
         return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_ADMIN, 'message_id' => $this->getId()]);
     }
@@ -134,9 +145,11 @@ class MessageAdmin extends ActiveRecord
     /**
      * Получить дату отправки сообщения
      * День и дата по-русски
+     *
      * @return string
      */
-    public function getDayAndDateRus(){
+    public function getDayAndDateRus(): string
+    {
 
         $days = array(
             'Воскресенье', 'Понедельник', 'Вторник', 'Среда',
@@ -149,26 +162,28 @@ class MessageAdmin extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->getCreatedAt()) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) === date('d.n.Y')) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->getCreatedAt()) == (date('d', time()) - 1)
-            && date('n.Y', $this->getCreatedAt()) == date('n.Y', time())) {
+
+        if (date('d', $this->getCreatedAt()) === (date('d') - 1)
+            && date('n.Y', $this->getCreatedAt()) === date('n.Y')) {
             return 'Вчера';
         }
-        else {
-            return ( $days[(date('w', $this->getCreatedAt()))] . ', ' . date('d', $this->getCreatedAt())
-                . ' ' . $monthes[(date('n', $this->getCreatedAt()))] . ' ' . date(' Y', $this->getCreatedAt()));
-        }
+
+        return ( $days[(date('w', $this->getCreatedAt()))] . ', ' . date('d', $this->getCreatedAt())
+            . ' ' . $monthes[(date('n', $this->getCreatedAt()))] . ' ' . date(' Y', $this->getCreatedAt()));
     }
 
 
     /**
      * Получить дату отправки сообщения
      * Дата по-русски
+     *
      * @return string
      */
-    public function getDateRus(){
+    public function getDateRus(): string
+    {
 
         $monthes = array(
             1 => 'Января', 2 => 'Февраля', 3 => 'Марта', 4 => 'Апреля',
@@ -176,24 +191,24 @@ class MessageAdmin extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->getCreatedAt()) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) === date('d.n.Y')) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->getCreatedAt()) == (date('d', time()) - 1)
-            && date('n.Y', $this->getCreatedAt()) == date('n.Y', time())) {
+
+        if (date('d', $this->getCreatedAt()) === (date('d') - 1)
+            && date('n.Y', $this->getCreatedAt()) === date('n.Y')) {
             return 'Вчера';
         }
-        else {
-            return ( date('d', $this->getCreatedAt()) . ' ' . $monthes[(date('n', $this->getCreatedAt()))]
-                . ' ' . date(' Y', $this->getCreatedAt()));
-        }
+
+        return ( date('d', $this->getCreatedAt()) . ' ' . $monthes[(date('n', $this->getCreatedAt()))]
+            . ' ' . date(' Y', $this->getCreatedAt()));
     }
 
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -202,7 +217,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getConversationId()
+    public function getConversationId(): int
     {
         return $this->conversation_id;
     }
@@ -211,7 +226,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @param int $conversation_id
      */
-    public function setConversationId($conversation_id)
+    public function setConversationId(int $conversation_id): void
     {
         $this->conversation_id = $conversation_id;
     }
@@ -220,7 +235,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->sender_id;
     }
@@ -229,7 +244,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @param int $sender_id
      */
-    public function setSenderId($sender_id)
+    public function setSenderId(int $sender_id): void
     {
         $this->sender_id = $sender_id;
     }
@@ -238,7 +253,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getAdresseeId()
+    public function getAdresseeId(): int
     {
         return $this->adressee_id;
     }
@@ -247,7 +262,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @param int $adressee_id
      */
-    public function setAdresseeId($adressee_id)
+    public function setAdresseeId(int $adressee_id): void
     {
         $this->adressee_id = $adressee_id;
     }
@@ -256,7 +271,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -265,7 +280,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -274,7 +289,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -283,7 +298,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -292,7 +307,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -301,7 +316,7 @@ class MessageAdmin extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

@@ -1,10 +1,20 @@
 <?php
 
+use app\models\ExpectedResultsInterviewConfirmProblem;
+use app\models\forms\FormUpdateProblem;
+use app\models\RespondsSegment;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use kartik\select2\Select2;
 use app\models\Problems;
+
+/**
+ * @var Problems $model
+ * @var RespondsSegment[] $responds
+ * @var FormUpdateProblem $formUpdate
+ * @var ExpectedResultsInterviewConfirmProblem $expectedResult
+ */
 
 ?>
 
@@ -49,7 +59,7 @@ use app\models\Problems;
         </div>
 
 
-        <? //Список респондентов(представителей сегмента) и их вариантов проблем ?>
+        <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
         <div class="all_responds_problems row container-fluid" style="margin: 0;">
 
             <?php foreach ($responds as $respond) : ?>
@@ -59,14 +69,14 @@ use app\models\Problems;
                     <div class="col-md-4 block_respond_problem_column">
 
                         <?php
-                        $respond_name = $respond->name;
+                        $respond_name = $respond->getName();
                         if (mb_strlen($respond_name) > 30) {
                             $respond_name = mb_substr($respond_name, 0, 30) . '...';
                         }
                         ?>
-                        <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['/problems/get-interview-respond', 'id' => $respond->id], [
+                        <?= Html::a('<div title="'.$respond->getName().'">' . $respond_name . '</div>', ['/problems/get-interview-respond', 'id' => $respond->getId()], [
                             'class' => 'get_interview_respond',
-                        ]); ?>
+                        ]) ?>
 
                     </div>
 
@@ -78,7 +88,7 @@ use app\models\Problems;
                             $descInterview_result = mb_substr($descInterview_result, 0, 70) . '...';
                         }
                         ?>
-                        <?= '<div title="'.$respond->interview->result.'">' . $descInterview_result . '</div>'; ?>
+                        <?= '<div title="'.$respond->interview->result.'">' . $descInterview_result . '</div>' ?>
 
                     </div>
 
@@ -92,7 +102,7 @@ use app\models\Problems;
 
             <?php $form = ActiveForm::begin([
                 'id' => 'hypothesisUpdateForm',
-                'action' => Url::to(['/problems/update', 'id' => $formUpdate->id]),
+                'action' => Url::to(['/problems/update', 'id' => $formUpdate->getId()]),
                 'options' => ['class' => 'g-py-15 hypothesisUpdateForm'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -102,7 +112,7 @@ use app\models\Problems;
 
                 <div class="col-md-12">
 
-                    <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+                    <?php $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
@@ -122,24 +132,23 @@ use app\models\Problems;
                         'template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>',
                     ])->widget(Select2::class, [
                         'data' => Problems::getValuesForSelectIndicatorPositivePassage(),
-                        'options' => ['id' => 'indicator_positive_passage-'.$formUpdate->id],
+                        'options' => ['id' => 'indicator_positive_passage-'.$formUpdate->getId()],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]);
-                    ?>
+                    ]) ?>
 
                 </div>
 
                 <h4 class="col-md-12 text-center bolder" style="margin-bottom: 20px;">Вопросы для проверки гипотезы проблемы и ответы на них:</h4>
 
                 <div class="container-expectedResults">
-                    <div class="row container-fluid item-expectedResults item-expectedResults-<?= $formUpdate->id; ?>">
+                    <div class="row container-fluid item-expectedResults item-expectedResults-<?= $formUpdate->getId() ?>">
 
-                        <?php if ($formUpdate->_expectedResultsInterview) : ?>
+                        <?php if ($formUpdate->getExpectedResultsInterview()) : ?>
 
-                            <?php foreach ($formUpdate->_expectedResultsInterview as $i => $expectedResult): ?>
+                            <?php foreach ($formUpdate->getExpectedResultsInterview() as $i => $expectedResult): ?>
 
-                                <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->id . '_' . $i; ?>">
+                                <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->getId() . '_' . $i ?>">
 
                                     <div class="col-md-6 field-EXR">
 
@@ -150,7 +159,7 @@ use app\models\Problems;
                                             'placeholder' => 'Напишите вопрос',
                                             'id' => '_expectedResults_question-' . $i,
                                             'class' => 'style_form_field_respond form-control',
-                                        ]); ?>
+                                        ]) ?>
 
                                     </div>
 
@@ -163,16 +172,16 @@ use app\models\Problems;
                                             'placeholder' => 'Напишите ответ',
                                             'id' => '_expectedResults_answer-' . $i,
                                             'class' => 'style_form_field_respond form-control',
-                                        ]); ?>
+                                        ]) ?>
 
                                     </div>
 
-                                    <?php if ($i != 0) : ?>
+                                    <?php if ($i !== 0) : ?>
 
                                         <div class="col-md-12" style="margin-bottom: 15px;">
 
                                             <?= Html::button('Удалить вопрос/ответ', [
-                                                'id' => 'remove-expectedResults-' . $formUpdate->id . '_' . $i . '-' . $expectedResult->id,
+                                                'id' => 'remove-expectedResults-' . $formUpdate->getId() . '_' . $i . '-' . $expectedResult->getId(),
                                                 'class' => "remove-expectedResults btn btn-default",
                                                 'style' => [
                                                     'display' => 'flex',
@@ -183,7 +192,7 @@ use app\models\Problems;
                                                     'font-size' => '16px',
                                                     'border-radius' => '8px',
                                                 ]
-                                            ]); ?>
+                                            ]) ?>
                                         </div>
 
                                     <?php endif; ?>
@@ -196,7 +205,7 @@ use app\models\Problems;
 
                             <?php $i = 0; ?>
 
-                            <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->id . '_' . $i; ?>">
+                            <div class="rowExpectedResults row-expectedResults-<?= $formUpdate->getId() . '_' . $i ?>">
 
                                 <div class="col-md-6 field-EXR">
 
@@ -207,7 +216,7 @@ use app\models\Problems;
                                         'placeholder' => 'Напишите вопрос',
                                         'id' => '_expectedResults_question-' . $i,
                                         'class' => 'style_form_field_respond form-control',
-                                    ]); ?>
+                                    ]) ?>
 
                                 </div>
 
@@ -220,7 +229,7 @@ use app\models\Problems;
                                         'placeholder' => 'Напишите ответ',
                                         'id' => '_expectedResults_answer-' . $i,
                                         'class' => 'style_form_field_respond form-control',
-                                    ]); ?>
+                                    ]) ?>
 
                                 </div>
 
@@ -233,7 +242,7 @@ use app\models\Problems;
 
                 <div class="col-md-12">
                     <?= Html::button('Добавить вопрос/ответ', [
-                        'id' => 'add_expectedResults-' . $formUpdate->id,
+                        'id' => 'add_expectedResults-' . $formUpdate->getId(),
                         'class' => "btn btn-default add_expectedResults",
                         'style' => [
                             'display' => 'flex',
@@ -248,7 +257,7 @@ use app\models\Problems;
                             'border-radius' => '8px',
                             'margin-right' => '5px',
                         ]
-                    ]);?>
+                    ]) ?>
                 </div>
 
             </div>

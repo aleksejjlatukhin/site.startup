@@ -12,6 +12,7 @@ use app\models\forms\FormUpdateSegment;
 use app\models\Projects;
 use app\models\Roadmap;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -43,92 +44,84 @@ class SegmentsController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        if (in_array($action->id, ['update', 'delete'])){
 
-            $model = Segments::findOne(Yii::$app->request->get('id'));
+            $model = Segments::findOne((int)Yii::$app->request->get('id'));
             $project = Projects::findOne($model->getProjectId());
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['mpdf-segment'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $model = Segments::findOne(Yii::$app->request->get());
+        }elseif ($action->id === 'mpdf-segment'){
+
+            $model = Segments::findOne((int)Yii::$app->request->get('id'));
             $project = Projects::findOne($model->getProjectId());
 
             //Ограничение доступа к проэктам пользователя
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                /** @var UserAccessToProjects $userAccessToProject */
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                            if (time() < $userAccessToProject->date_stop) {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -143,67 +136,63 @@ class SegmentsController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['index']) || in_array($action->id, ['mpdf-table-segments'])){
+        }elseif (in_array($action->id, ['index', 'mpdf-table-segments'])){
 
-            $project = Projects::findOne(Yii::$app->request->get('id'));
+            $project = Projects::findOne((int)Yii::$app->request->get('id'));
 
             //Ограничение доступа к проэктам пользователя
 
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                /** @var UserAccessToProjects $userAccessToProject */
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
 
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
+                            return parent::beforeAction($action);
 
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -218,22 +207,19 @@ class SegmentsController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['create'])){
+        }elseif ($action->id === 'create'){
 
-            $project = Projects::findOne(Yii::$app->request->get());
+            $project = Projects::findOne((int)Yii::$app->request->get('id'));
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         }else{
             return parent::beforeAction($action);
@@ -243,15 +229,17 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return string
+     * @param int $id
+     * @return Response|string
      */
-    public function actionIndex($id)
+    public function actionIndex(int $id)
     {
         $project = Projects::findOne($id);
-        $models = Segments::findAll(['project_id' => $project->id]);
+        $models = Segments::findAll(['project_id' => $project->getId()]);
 
-        if (!$models) return $this->redirect(['/segments/instruction', 'id' => $id]);
+        if (!$models) {
+            return $this->redirect(['/segments/instruction', 'id' => $id]);
+        }
 
         return $this->render('index', [
             'project' => $project,
@@ -262,13 +250,15 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return string
+     * @param int $id
+     * @return Response|string
      */
-    public function actionInstruction ($id)
+    public function actionInstruction (int $id)
     {
         $models = Segments::findAll(['project_id' => $id]);
-        if ($models) return $this->redirect(['/segments/index', 'id' => $id]);
+        if ($models) {
+            return $this->redirect(['/segments/index', 'id' => $id]);
+        }
 
         return $this->render('index_first', [
             'project' => Projects::findOne($id),
@@ -315,10 +305,10 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionSaveCacheCreationForm($id)
+    public function actionSaveCacheCreationForm(int $id): bool
     {
         $project = Projects::findOne($id);
         $cachePath = FormCreateSegment::getCachePath($project);
@@ -334,10 +324,10 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetHypothesisToCreate ($id)
+    public function actionGetHypothesisToCreate (int $id)
     {
         $project = Projects::findOne($id);
         $model = new FormCreateSegment($project);
@@ -360,74 +350,70 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function actionCreate($id)
+    public function actionCreate(int $id)
     {
         $project = Projects::findOne($id);
         $model = new FormCreateSegment($project);
         $model->project_id = $id;
 
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
 
-            if(Yii::$app->request->isAjax) {
+            if ($model->checkFillingFields()) {
 
-                if ($model->checkFillingFields() == true) {
+                if ($model->validate(['name'])) {
 
-                    if ($model->validate(['name'])) {
+                    if ($model->create()) {
 
-                        if ($model->create()) {
+                        $type_sort_id = $_POST['type_sort_id'];
 
-                            $type_sort_id = $_POST['type_sort_id'];
+                        if ($type_sort_id !== '') {
 
-                            if ($type_sort_id != '') {
+                            $sort = new SegmentSort();
 
-                                $sort = new SegmentSort();
+                            $response =  [
+                                'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => $sort->fetchModels($id, $type_sort_id),
+                                ]),
+                            ];
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
+                            return $response;
 
-                                $response =  [
-                                    'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => $sort->fetchModels($id, $type_sort_id),
-                                    ]),
-                                ];
-                                Yii::$app->response->format = Response::FORMAT_JSON;
-                                Yii::$app->response->data = $response;
-                                return $response;
-
-                            } else {
-
-                                $response =  [
-                                    'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => Segments::findAll(['project_id' => $id]),
-                                    ]),
-                                ];
-                                Yii::$app->response->format = Response::FORMAT_JSON;
-                                Yii::$app->response->data = $response;
-                                return $response;
-                            }
                         }
 
-                    }else {
-
-                        //Сегмент с таким именем уже существует
-                        $response =  ['segment_already_exists' => true];
+                        $response =  [
+                            'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Segments::findAll(['project_id' => $id]),
+                            ]),
+                        ];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;
                     }
 
-                } else {
+                }else {
 
-                    //Данные не загружены
-                    $response =  ['data_not_loaded' => true];
+                    //Сегмент с таким именем уже существует
+                    $response =  ['segment_already_exists' => true];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+
+            } else {
+
+                //Данные не загружены
+                $response =  ['data_not_loaded' => true];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;
@@ -435,10 +421,10 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetHypothesisToUpdate ($id)
+    public function actionGetHypothesisToUpdate (int $id)
     {
         $model = new FormUpdateSegment($id);
 
@@ -446,7 +432,7 @@ class SegmentsController extends AppUserPartController
 
             $response = [
                 'model' => $model,
-                'renderAjax' => $this->renderAjax('update', ['model' => $model,]),
+                'renderAjax' => $this->renderAjax('update', ['model' => $model]),
             ];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
@@ -457,71 +443,67 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $segment = $this->findModel($id);
-        $project = Projects::findOne(['id' => $segment->project_id]);
+        $project = Projects::findOne(['id' => $segment->getProjectId()]);
         $model = new FormUpdateSegment($id);
 
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
 
-            if(Yii::$app->request->isAjax) {
+            if ($model->checkFillingFields()) {
 
-                if ($model->checkFillingFields() == true) {
+                if ($model->validate(['name'])) {
 
-                    if ($model->validate(['name'])) {
+                    if ($model->update()) {
 
-                        if ($model->update()) {
+                        $type_sort_id = $_POST['type_sort_id'];
 
-                            $type_sort_id = $_POST['type_sort_id'];
+                        if ($type_sort_id !== '') {
 
-                            if ($type_sort_id != '') {
+                            $sort = new SegmentSort();
 
-                                $sort = new SegmentSort();
+                            $response =  [
+                                'success' => true,
+                                'renderAjax' => $this->renderAjax('_index_ajax', [
+                                    'models' => $sort->fetchModels($project->id, $type_sort_id),
+                                ]),
+                            ];
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
+                            return $response;
 
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => $sort->fetchModels($project->id, $type_sort_id),
-                                    ]),
-                                ];
-                                Yii::$app->response->format = Response::FORMAT_JSON;
-                                Yii::$app->response->data = $response;
-                                return $response;
-
-                            } else {
-
-                                $response =  [
-                                    'success' => true,
-                                    'renderAjax' => $this->renderAjax('_index_ajax', [
-                                        'models' => Segments::findAll(['project_id' => $project->id]),
-                                    ]),
-                                ];
-                                Yii::$app->response->format = Response::FORMAT_JSON;
-                                Yii::$app->response->data = $response;
-                                return $response;
-                            }
                         }
-                    }else {
 
-                        //Сегмент с таким именем уже существует
-                        $response =  ['segment_already_exists' => true];
+                        $response =  [
+                            'success' => true,
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Segments::findAll(['project_id' => $project->id]),
+                            ]),
+                        ];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;
                     }
-                } else {
+                }else {
 
-                    //Данные не загружены
-                    $response =  ['data_not_loaded' => true];
+                    //Сегмент с таким именем уже существует
+                    $response =  ['segment_already_exists' => true];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+            } else {
+
+                //Данные не загружены
+                $response =  ['data_not_loaded' => true];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;
@@ -530,10 +512,10 @@ class SegmentsController extends AppUserPartController
 
     /**
      * Включить разрешение на экспертизу
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionEnableExpertise($id)
+    public function actionEnableExpertise(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -544,7 +526,7 @@ class SegmentsController extends AppUserPartController
                 //Проверка наличия сортировки
                 $type_sort_id = $_POST['type_sort_id'];
 
-                if ($type_sort_id != '') {
+                if ($type_sort_id !== '') {
 
                     $sort = new SegmentSort();
 
@@ -558,17 +540,17 @@ class SegmentsController extends AppUserPartController
                     Yii::$app->response->data = $response;
                     return $response;
 
-                } else {
-                    $response = [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'models' => Segments::findAll(['project_id' => $segment->getProjectId()]),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
                 }
+
+                $response = [
+                    'success' => true,
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'models' => Segments::findAll(['project_id' => $segment->getProjectId()]),
+                    ]),
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;
@@ -578,7 +560,7 @@ class SegmentsController extends AppUserPartController
     /**
      * @return array
      */
-    public function actionListTypeSort()
+    public function actionListTypeSort(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -598,10 +580,10 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionShowAllInformation ($id)
+    public function actionShowAllInformation (int $id)
     {
         $segment = Segments::findOne($id);
 
@@ -620,7 +602,7 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws MpdfException
      * @throws CrossReferenceException
@@ -628,7 +610,7 @@ class SegmentsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfSegment ($id) {
+    public function actionMpdfSegment (int $id) {
 
         $model = Segments::findOne($id);
 
@@ -638,7 +620,7 @@ class SegmentsController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $filename = 'Сегмент «'.$model->name .'».pdf';
+        $filename = 'Сегмент «'.$model->getName() .'».pdf';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -657,8 +639,8 @@ class SegmentsController extends AppUserPartController
             'marginFooter' => 5,
             // call mPDF methods on the fly
             'methods' => [
-                'SetTitle' => [$model->name],
-                'SetHeader' => ['<div style="color: #3c3c3c;">Сегмент «'.$model->name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetTitle' => [$model->getName()],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Сегмент «'.$model->getName().'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',
@@ -673,7 +655,7 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws MpdfException
      * @throws CrossReferenceException
@@ -681,7 +663,7 @@ class SegmentsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfTableSegments ($id) {
+    public function actionMpdfTableSegments (int $id) {
 
         $project = Projects::findOne($id);
         $models = $project->segments;
@@ -692,7 +674,7 @@ class SegmentsController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $filename = 'Сегменты проекта «'.$project->project_name .'».pdf';
+        $filename = 'Сегменты проекта «'.$project->getProjectName() .'».pdf';
 
         $pdf = new Pdf([
             // set to use core fonts only
@@ -711,8 +693,8 @@ class SegmentsController extends AppUserPartController
             'marginFooter' => 5,
             // call mPDF methods on the fly
             'methods' => [
-                'SetTitle' => ['Сегменты проекта «'.$project->project_name .'»'],
-                'SetHeader' => ['<div style="color: #3c3c3c;">Сегменты проекта «'.$project->project_name.'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
+                'SetTitle' => ['Сегменты проекта «'.$project->getProjectName() .'»'],
+                'SetHeader' => ['<div style="color: #3c3c3c;">Сегменты проекта «'.$project->getProjectName().'»</div>||<div style="color: #3c3c3c;">Сгенерировано: ' . date("H:i d.m.Y") . '</div>'],
                 'SetFooter' => ['<div style="color: #3c3c3c;">Страница {PAGENO}</div>'],
                 //'SetSubject' => 'Generating PDF files via yii2-mpdf extension has never been easy',
                 //'SetAuthor' => 'Kartik Visweswaran',
@@ -727,10 +709,10 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionShowRoadmap ($id)
+    public function actionShowRoadmap (int $id)
     {
         $roadmap = new Roadmap($id);
         $segment = Segments::findOne($id);
@@ -750,22 +732,19 @@ class SegmentsController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      * @throws NotFoundHttpException
      * @throws Throwable
      * @throws ErrorException
      * @throws StaleObjectException
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
 
-        if(Yii::$app->request->isAjax) {
-
-            if ($model->deleteStage()) {
-                return true;
-            }
+        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+            return true;
         }
         return false;
     }
@@ -773,11 +752,11 @@ class SegmentsController extends AppUserPartController
     /**
      * Finds the Segments model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
+     * @param int $id
      * @return Segments the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel(int $id): Segments
     {
         if (($model = Segments::findOne($id)) !== null) {
             return $model;

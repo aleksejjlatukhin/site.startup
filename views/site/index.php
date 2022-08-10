@@ -1,10 +1,21 @@
 <?php
 
+use app\models\forms\SendEmailForm;
+use app\models\forms\SingupForm;
+use app\models\LoginForm;
+use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
 $this->title = 'Главная';
+
+/**
+ * @var User $user
+ * @var LoginForm $model_login
+ * @var SendEmailForm $model_send_email
+ * @var SingupForm $model_signup
+ */
 
 ?>
 <div class="site-index">
@@ -63,8 +74,7 @@ $this->title = 'Главная';
 
                         <?= $form->field($model_login, 'rememberMe', [
                             'template' => "{input}{label}"
-                        ])->checkbox(['checked' => true, 'class' => 'custom-checkbox'],false)->label('Запомнить меня');
-                        ?>
+                        ])->checkbox(['checked' => true, 'class' => 'custom-checkbox'],false)->label('Запомнить меня') ?>
 
                     </div>
 
@@ -89,7 +99,7 @@ $this->title = 'Главная';
                     <div class="col-md-12 text-center">
                         <?= Html::a('Зарегистрироваться',['/site/registration'], [
                             'class' => 'link_singup',
-                        ]);?>
+                        ]) ?>
                     </div>
 
                     <?php ActiveForm::end(); ?>
@@ -128,7 +138,7 @@ $this->title = 'Главная';
                             'onclick' => 'return false',
                             'class' => 'link_singup',
                             'id' => 'go_back_login_form',
-                        ]);?>
+                        ]) ?>
                     </div>
 
                 </div>
@@ -180,7 +190,7 @@ $this->title = 'Главная';
                     <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
 
                     <div class="col-md-12 text-center">
-                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_to_back_login_form',]);?>
+                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_to_back_login_form']) ?>
                     </div>
 
                     <?php ActiveForm::end(); ?>
@@ -195,7 +205,7 @@ $this->title = 'Главная';
                     <div class="col-md-12 text-center text" style="margin: 45px 0 0 0;"></div>
 
                     <div class="col-md-12 text-center link_back" style="position: absolute; bottom: 0; height: 45px;">
-                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go2_to_back_login_form',]);?>
+                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go2_to_back_login_form']) ?>
                     </div>
 
                 </div>
@@ -212,7 +222,7 @@ $this->title = 'Главная';
                             'onclick' => 'return false',
                             'class' => 'link_singup',
                             'id' => 'go4_to_back_login_form',
-                        ]);?>
+                        ]) ?>
                     </div>
 
                 </div>
@@ -240,6 +250,8 @@ $this->title = 'Главная';
 </div>
 
 <!--Модальные окна-->
-<?= $this->render('_index_modal', ['user' => $user]); ?>
+<?php if (!Yii::$app->user->isGuest) {
+    echo $this->render('_index_modal', ['user' => $user]);
+} ?>
 <!--Подключение скриптов-->
 <?php $this->registerJsFile('@web/js/site_index.js'); ?>

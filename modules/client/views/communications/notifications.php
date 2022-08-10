@@ -1,14 +1,21 @@
 <?php
 
+use yii\data\Pagination;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use app\models\ProjectCommunications;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use yii\helpers\Url;
+use yii\widgets\LinkPager;
 
 $this->title = 'Уведомления';
 $this->registerCssFile('@web/css/notifications-style.css');
+
+/**
+ * @var ProjectCommunications[] $communications
+ * @var Pagination $pages
+ */
 
 ?>
 
@@ -33,29 +40,29 @@ $this->registerCssFile('@web/css/notifications-style.css');
                     <?php $communicationResponse = $communication->communicationResponse; ?>
 
                     <div class="col-md-2 bolder">
-                        <?= $communication->expert->username; ?>
+                        <?= $communication->expert->getUsername() ?>
                     </div>
 
                     <div class="col-md-3">
-                        <?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer] . ' ' .
-                        Html::a($communication->project->project_name, ['/projects/index', 'id' => $communication->project->user_id]); ?>
+                        <?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->getAnswer()] . ' ' .
+                        Html::a($communication->project->getProjectName(), ['/projects/index', 'id' => $communication->project->getUserId()]) ?>
                     </div>
 
                     <div class="col-md-3">
-                        <?php if ($communicationResponse->comment) : ?>
-                            <b>Комментарий: </b><?= $communicationResponse->comment; ?>
+                        <?php if ($communicationResponse->getComment()) : ?>
+                            <b>Комментарий: </b><?= $communicationResponse->getComment() ?>
                         <?php endif; ?>
                     </div>
 
-                    <?php if ($communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
+                    <?php if ($communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) : ?>
 
                         <?php if ($responsiveCommunication = $communication->responsiveCommunication) : ?>
 
-                            <?php if ($responsiveCommunication->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
+                            <?php if ($responsiveCommunication->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
 
                                 <div class="col-md-2 text-success">Назначен(-а) на проект</div>
 
-                            <?php elseif ($responsiveCommunication->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) : ?>
+                            <?php elseif ($responsiveCommunication->getType() === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) : ?>
 
                                 <div class="col-md-2 text-danger">Отказано</div>
 
@@ -68,34 +75,34 @@ $this->registerCssFile('@web/css/notifications-style.css');
                                     <div class="col-md-6">
                                         <?= Html::a('Назначить', Url::to([
                                             '/client/communications/get-form-types-expert',
-                                            'id' => $communication->id,
+                                            'id' => $communication->getId(),
                                         ]), [
                                             'class' => 'btn btn-success get-form-types-expert',
-                                            'id' => 'appoints_expert_project-'.$communication->id,
+                                            'id' => 'appoints_expert_project-'.$communication->getId(),
                                             'style' => [
                                                 'background' => '#52BE7F',
                                                 'min-width' => '100%',
                                                 'font-size' => '18px',
                                                 'border-radius' => '8px',
                                             ]
-                                        ]); ?>
+                                        ]) ?>
                                     </div>
                                     <div class="col-md-6">
                                         <?= Html::a('Отказать', Url::to([
                                             '/client/communications/send',
-                                            'adressee_id' => $communication->sender_id,
-                                            'project_id' => $communication->project_id,
+                                            'adressee_id' => $communication->getSenderId(),
+                                            'project_id' => $communication->getProjectId(),
                                             'type' => CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
-                                            'triggered_communication_id' => $communication->id
+                                            'triggered_communication_id' => $communication->getId()
                                         ]), [
                                             'class' => 'btn btn-danger send-communication',
-                                            'id' => 'appoints_does_not_expert_project-'.$communication->project_id,
+                                            'id' => 'appoints_does_not_expert_project-'.$communication->getProjectId(),
                                             'style' => [
                                                 'min-width' => '100%',
                                                 'font-size' => '18px',
                                                 'border-radius' => '8px',
                                             ]
-                                        ]); ?>
+                                        ]) ?>
                                     </div>
                                 </div>
                             </div>
@@ -104,15 +111,15 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
                     <?php else : ?>
 
-                        <?php if ($communication->status == ProjectCommunications::NO_READ) : ?>
+                        <?php if ($communication->getStatus() === ProjectCommunications::NO_READ) : ?>
 
                             <div class="col-md-2">
                                 Чтобы отметить уведомление как прочитанное, нажмите
                                 <?= Html::button('OK', [
-                                    'id' => 'read_notification-'.$communication->id,
+                                    'id' => 'read_notification-'.$communication->getId(),
                                     'class' => 'btn btn-default link-read-notification',
                                     'style' => ['border-radius' => '8px'],
-                                ]); ?>
+                                ]) ?>
                             </div>
 
                         <?php else : ?>
@@ -124,7 +131,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
                     <?php endif; ?>
 
                     <div class="col-md-2 text-center">
-                        <?= date('d.m.Y H:i',$communication->created_at); ?>
+                        <?= date('d.m.Y H:i',$communication->getCreatedAt()) ?>
                     </div>
 
                 </div>
@@ -132,11 +139,11 @@ $this->registerCssFile('@web/css/notifications-style.css');
             <?php endforeach; ?>
 
             <div class="pagination-admin-projects-result">
-                <?= \yii\widgets\LinkPager::widget([
+                <?= LinkPager::widget([
                     'pagination' => $pages,
                     'activePageCssClass' => 'pagination_active_page',
                     'options' => ['class' => 'admin-projects-result-pagin-list'],
-                ]); ?>
+                ]) ?>
             </div>
 
         <?php else : ?>

@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmSegment;
@@ -18,7 +17,9 @@ use app\models\QuestionsConfirmProblem;
 use app\models\RespondsSegment;
 use app\models\RespondsProblem;
 use app\models\Segments;
+use app\models\StatusConfirmHypothesis;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -50,79 +51,67 @@ class ConfirmProblemController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
+        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
 
-            $confirm = ConfirmProblem::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Problems $hypothesis
-             * @var Projects $project
-             */
+            $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                /** @var UserAccessToProjects $userAccessToProject */
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -137,131 +126,106 @@ class ConfirmProblemController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update']) || in_array($action->id, ['delete'])){
+        }elseif (in_array($action->id, ['update', 'delete'])){
 
-            $confirm = ConfirmProblem::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Problems $hypothesis
-             * @var Projects $project
-             */
+            $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
-
-                // ОТКЛЮЧАЕМ CSRF
-                $this->enableCsrfValidation = false;
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['create'])){
-
-            $hypothesis = Problems::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
-            $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
-
-                return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        }elseif (in_array($action->id, ['save-confirm'])){
-
-            $hypothesis = Problems::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
-            $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif (in_array($action->id, ['add-questions'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $confirm = ConfirmProblem::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Problems $hypothesis
-             * @var Projects $project
-             */
+        }elseif ($action->id === 'create'){
+
+            $hypothesis = Problems::findOne((int)Yii::$app->request->get('id'));
+            $project = $hypothesis->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->getUserId() === $currentUser->getId()){
+
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        }elseif ($action->id === 'save-confirm'){
+
+            $hypothesis = Problems::findOne((int)Yii::$app->request->get('id'));
+            $project = $hypothesis->project;
+
+            /*Ограничение доступа к проэктам пользователя*/
+            if ($project->getUserId() === $currentUser->getId()){
+
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        } elseif ($action->id === 'add-questions'){
+
+            $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                /** @var UserAccessToProjects $userAccessToProject */
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -284,9 +248,9 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      */
-    public function actionSaveCacheCreationForm($id)
+    public function actionSaveCacheCreationForm(int $id): void
     {
         $problem = Problems::findOne($id);
         $cachePath = FormCreateConfirmProblem::getCachePath($problem);
@@ -301,26 +265,26 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string|Response
      */
-    public function actionCreate($id)
+    public function actionCreate(int $id)
     {
         $problem = Problems::findOne($id);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($confirmSegment->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $model = new FormCreateConfirmProblem($problem);
 
         //кол-во представителей сегмента
         $count_represent_segment = RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $confirmSegment->id, 'interview_confirm_segment.status' => '1'])->count();
+            ->where(['confirm_id' => $confirmSegment->getId(), 'interview_confirm_segment.status' => '1'])->count();
 
         $model->setCountRespond($count_represent_segment);
 
         if ($problem->confirm){ //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $problem->confirm->id]);
+            return $this->redirect(['view', 'id' => $problem->confirm->getId()]);
         }
 
         return $this->render('create', [
@@ -334,24 +298,21 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws ErrorException
      * @throws NotFoundHttpException
      */
-    public function actionSaveConfirm($id)
+    public function actionSaveConfirm(int $id)
     {
-        $problem = Problems::findOne($id);
-        $model = new FormCreateConfirmProblem($problem);
-        $model->setHypothesisId($id);
+        if(Yii::$app->request->isAjax) {
+            $problem = Problems::findOne($id);
+            $model = new FormCreateConfirmProblem($problem);
+            $model->setHypothesisId($id);
 
-        if ($model->load(Yii::$app->request->post())) {
-
-            if(Yii::$app->request->isAjax) {
-
+            if ($model->load(Yii::$app->request->post())) {
                 if ($model = $model->create()){
-
-                    $response =  ['success' => true, 'id' => $model->id];
+                    $response =  ['success' => true, 'id' => $model->getId()];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
@@ -364,17 +325,17 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * Страница со списком вопросов
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionAddQuestions($id)
+    public function actionAddQuestions(int $id): string
     {
         $model = ConfirmProblem::findOne($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = Problems::findOne($model->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
+        $problem = Problems::findOne($model->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($problem->getSegmentId());
+        $project = Projects::findOne($problem->getProjectId());
         $questions = QuestionsConfirmProblem::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -397,28 +358,27 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return array|bool
+     * @param int $id
+     * @return array|false
+     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
-    public function actionUpdate ($id)
+    public function actionUpdate (int $id)
     {
-        $model = new FormUpdateConfirmProblem($id);
-        $problem = Problems::findOne($id);
+        if(Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $model = new FormUpdateConfirmProblem($id);
+            $confirm = ConfirmProblem::findOne($id);
+            $problem = $confirm->problem;
 
-            if(Yii::$app->request->isAjax) {
-
-                if ($model = $model->update()){
+            if ($model->load(Yii::$app->request->post())) {
+                if ($confirm = $model->update()){
 
                     $response = [
                         'success' => true,
                         'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
                             'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($id),
-                            'model' => $model, 'problem' => $problem
+                            'model' => $confirm, 'problem' => $problem
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
@@ -432,18 +392,18 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
         $model = $this->findModel($id);
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
-        $problem = Problems::findOne($model->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $problem = Problems::findOne($model->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($confirmSegment->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $questions = QuestionsConfirmProblem::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -512,10 +472,11 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * Проверка данных подтверждения на этапе разработки ГЦП
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionDataAvailabilityForNextStep($id)
+    public function actionDataAvailabilityForNextStep(int $id)
     {
         $model = ConfirmProblem::findOne($id);
         $formCreateGcp = new FormCreateGcp($model->hypothesis);
@@ -531,7 +492,7 @@ class ConfirmProblemController extends AppUserPartController
 
         if (Yii::$app->request->isAjax) {
 
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1) || (!empty($model->gcps)  && $model->count_positive <= $count_positive && $model->problem->exist_confirm == 1)) {
+            if (($model->gcps  && $model->getCountPositive() <= $count_positive && $model->problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) || (count($model->responds) === $count_descInterview && $model->getCountPositive() <= $count_positive && $model->problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED)) {
 
                 $response =  [
                     'success' => true,
@@ -545,13 +506,12 @@ class ConfirmProblemController extends AppUserPartController
                 Yii::$app->response->data = $response;
                 return $response;
 
-            }else{
-
-                $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['error' => true];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
@@ -559,10 +519,11 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * Завершение подтверждения ГПС и переход на следующий этап
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionMovingNextStage($id)
+    public function actionMovingNextStage(int $id)
     {
         $model = ConfirmProblem::findOne($id);
         $problem = $model->problem;
@@ -577,106 +538,105 @@ class ConfirmProblemController extends AppUserPartController
 
         if(Yii::$app->request->isAjax) {
 
-            if (count($model->responds) > $count_descInterview && empty($model->gcps)) {
+            if (!$model->gcps && count($model->responds) > $count_descInterview) {
 
                 $response = ['not_completed_descInterviews' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            }if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->gcps))) {
+            }
+            if ($model->gcps || (count($model->responds) === $count_descInterview && $model->getCountPositive() <= $count_positive)) {
 
                 $response =  [
                     'success' => true,
-                    'exist_confirm' => $problem->exist_confirm,
+                    'exist_confirm' => $problem->getExistConfirm(),
                 ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
 
-            }else{
-
-                $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['error' => true];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|Response
      * @throws ErrorException
      * @throws NotFoundHttpException
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionNotExistConfirm($id)
+    public function actionNotExistConfirm(int $id)
     {
         $model = $this->findModel($id);
-        $problem = Problems::findOne($model->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
+        $problem = Problems::findOne($model->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($problem->exist_confirm === 0) { // ToDo:Создать класс StatusConfirm для обозначения статусов
-            return $this->redirect(['/problems/index', 'id' => $confirmSegment->id]);
+        if ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
+            return $this->redirect(['/problems/index', 'id' => $confirmSegment->getId()]);
 
-        }else {
-
-            $problem->exist_confirm = 0;
-            $problem->time_confirm = time();
-            $model->setEnableExpertise();
-
-            if ($problem->update() && $model->update()){
-
-                $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
-                $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['/problems/index', 'id' => $confirmSegment->id]);
-            }
         }
-        return false;
-    }
 
-
-    /**
-     * @param $id
-     * @return bool|Response
-     * @throws ErrorException
-     * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function actionExistConfirm($id)
-    {
-        $model = $this->findModel($id);
-        $problem = Problems::findOne($model->problemId);
-        $cacheManager = new CacheForm();
-        $cachePath = $model->getCachePath();
-
-        $problem->exist_confirm = 1;
-        $problem->time_confirm = time();
+        $problem->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
+        $problem->setTimeConfirm();
         $model->setEnableExpertise();
 
         if ($problem->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
-            return $this->redirect(['/gcps/index', 'id' => $model->id]);
+            return $this->redirect(['/problems/index', 'id' => $confirmSegment->getId()]);
         }
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
+     * @return bool|Response
+     * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionExistConfirm(int $id)
+    {
+        $model = $this->findModel($id);
+        $problem = Problems::findOne($model->getProblemId());
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
+
+        $problem->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
+        $problem->setTimeConfirm();
+        $model->setEnableExpertise();
+
+        if ($problem->update() && $model->update()){
+
+            $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+            $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['/gcps/index', 'id' => $model->getId()]);
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers($id)
+    public function actionGetDataQuestionsAndAnswers(int $id): array
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
@@ -690,7 +650,7 @@ class ConfirmProblemController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException
      * @throws MpdfException
@@ -699,18 +659,18 @@ class ConfirmProblemController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfQuestionsAndAnswers($id)
+    public function actionMpdfQuestionsAndAnswers(int $id)
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-problem/questions_and_answers_pdf', ['questions' => $questions]);
+        $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $problem_desc = $model->problem->description;
+        $problem_desc = $model->problem->getDescription();
         if (mb_strlen($problem_desc) > 25) {
             $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
@@ -773,12 +733,12 @@ class ConfirmProblemController extends AppUserPartController
         $responds = $model->responds;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-problem/viewpdf', ['model' => $model, 'responds' => $responds]);
+        $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $problem_desc = $model->problem->description;
+        $problem_desc = $model->problem->getDescription();
         if (mb_strlen($problem_desc) > 25) {
             $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
@@ -823,13 +783,11 @@ class ConfirmProblemController extends AppUserPartController
     }
 
     /**
-     * Finds the ConfirmProblem model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return ConfirmProblem the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param int $id
+     * @return ConfirmProblem|null
+     * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?ConfirmProblem
     {
         if (($model = ConfirmProblem::findOne($id)) !== null) {
             return $model;

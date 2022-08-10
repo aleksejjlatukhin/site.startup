@@ -27,12 +27,21 @@ use yii\db\ActiveRecord;
  * @property int $updated_at                        Дата обновления ЦП
  * @property int $time_confirm                      Дата подверждения ЦП
  * @property int $exist_confirm                     Параметр факта подтверждения ЦП
- * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
+ * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
+ *
+ * @property ConfirmGcp $confirm                    Подтверждение ценностного предложения
+ * @property BusinessModel[] $businessModels        Бизнес-модели
+ * @property Mvps[] $mvps                           Mvp-продукты
+ * @property Problems $problem                      Проблема
+ * @property Segments $segment                      Сегмент
+ * @property Projects $project                      Проект
+ * @property RespondsProblem[] $respondsAgents      Респонденты, которые подтвердили текущую проблему
  */
 class Gcps extends ActiveRecord
 {
 
-    const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
+    public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
 
@@ -40,7 +49,7 @@ class Gcps extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'gcps';
     }
@@ -48,30 +57,31 @@ class Gcps extends ActiveRecord
 
     /**
      * Gcps constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
     {
-        $this->propertyContainer = new PropertyContainer();
-
+        $this->setPropertyContainer();
         parent::__construct($config);
     }
 
 
     /**
      * Получить объект подтверждения данного Gcps
+     *
      * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmGcp::class, ['gcp_id' => 'id']);
     }
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getConfirmProblemId()
+    public function getConfirmProblemId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -79,9 +89,10 @@ class Gcps extends ActiveRecord
 
     /**
      * Получить все бизнес-модели данного Gcps
+     *
      * @return ActiveQuery
      */
-    public function getBusinessModels ()
+    public function getBusinessModels(): ActiveQuery
     {
         return $this->hasMany(BusinessModel::class, ['gcp_id' => 'id']);
     }
@@ -89,9 +100,10 @@ class Gcps extends ActiveRecord
 
     /**
      * Получить все объекты Mvps данного Gcps
+     *
      * @return ActiveQuery
      */
-    public function getMvps ()
+    public function getMvps(): ActiveQuery
     {
         return $this->hasMany(Mvps::class, ['gcp_id' => 'id']);
     }
@@ -99,78 +111,55 @@ class Gcps extends ActiveRecord
 
     /**
      * Получить объект текущей проблемы
+     *
      * @return ActiveQuery
      */
-    public function getProblem()
+    public function getProblem(): ActiveQuery
     {
         return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
 
 
     /**
-     * @return Problems|null
-     */
-    public function findProblem()
-    {
-        return Problems::findOne($this->getProblemId());
-    }
-
-
-    /**
      * Получить объект текущего сегмента
+     *
      * @return ActiveQuery
      */
-    public function getSegment ()
+    public function getSegment (): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
 
 
     /**
-     * @return Segments|null
-     */
-    public function findSegment()
-    {
-        return Segments::findOne($this->getSegmentId());
-    }
-
-
-    /**
      * Получить объект текущего проекта
+     *
      * @return ActiveQuery
      */
-    public function getProject ()
+    public function getProject (): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
 
     /**
-     * @return Projects|null
-     */
-    public function findProject()
-    {
-        return Projects::findOne($this->getProblemId());
-    }
-
-
-    /**
      * Получить респондентов, которые
      * подтвердтлт текущую проблему
+     *
      * @return array|ActiveRecord[]
      */
-    public function getRespondsAgents()
+    public function getRespondsAgents(): array
     {
         return RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->confirmProblemId, 'interview_confirm_problem.status' => '1'])->all();
+            ->where(['confirm_id' => $this->getConfirmProblemId(), 'interview_confirm_problem.status' => '1'])->all();
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['title', 'description'], 'trim'],
@@ -189,7 +178,7 @@ class Gcps extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'title' => 'Наименование ГЦП',
@@ -203,7 +192,7 @@ class Gcps extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -239,10 +228,10 @@ class Gcps extends ActiveRecord
 
 
     /**
-     * Удаление Gcps и связанных данных
-     * @throws Throwable
+     * @return false|int
      * @throws ErrorException
      * @throws StaleObjectException
+     * @throws Throwable
      */
     public function deleteStage ()
     {
@@ -257,33 +246,37 @@ class Gcps extends ActiveRecord
             $responds = $confirm->responds;
             foreach ($responds as $respond) {
 
-                InterviewConfirmGcp::deleteAll(['respond_id' => $respond->id]);
-                AnswersQuestionsConfirmGcp::deleteAll(['respond_id' => $respond->id]);
+                InterviewConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
+                AnswersQuestionsConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
             }
 
-            QuestionsConfirmGcp::deleteAll(['confirm_id' => $confirm->id]);
-            RespondsGcp::deleteAll(['confirm_id' => $confirm->id]);
+            QuestionsConfirmGcp::deleteAll(['confirm_id' => $confirm->getId()]);
+            RespondsGcp::deleteAll(['confirm_id' => $confirm->getId()]);
             $confirm->delete();
         }
 
         // Удаление директории ГЦП
-        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
-            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->id;
-        if (file_exists($gcpPathDelete)) FileHelper::removeDirectory($gcpPathDelete);
+        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->getId();
+        if (file_exists($gcpPathDelete)) {
+            FileHelper::removeDirectory($gcpPathDelete);
+        }
 
         // Удаление кэша для форм ГЦП
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.
-            '/problems/problem-'.$this->problem->id.'/gcps/gcp-'.$this->id;
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->getId();
+        if (file_exists($cachePathDelete)) {
+            FileHelper::removeDirectory($cachePathDelete);
+        }
 
         // Удаление ГЦП
-        $this->delete();
+        return $this->delete();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -291,7 +284,7 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -299,7 +292,7 @@ class Gcps extends ActiveRecord
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -307,7 +300,7 @@ class Gcps extends ActiveRecord
     /**
      * @param int $segment_id
      */
-    public function setSegmentId($segment_id)
+    public function setSegmentId(int $segment_id): void
     {
         $this->segment_id = $segment_id;
     }
@@ -315,7 +308,7 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getSegmentId()
+    public function getSegmentId(): int
     {
         return $this->segment_id;
     }
@@ -323,7 +316,7 @@ class Gcps extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -331,7 +324,7 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -339,7 +332,7 @@ class Gcps extends ActiveRecord
     /**
      * @param int $problem_id
      */
-    public function setProblemId($problem_id)
+    public function setProblemId(int $problem_id): void
     {
         $this->problem_id = $problem_id;
     }
@@ -347,7 +340,7 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getProblemId()
+    public function getProblemId(): int
     {
         return $this->problem_id;
     }
@@ -355,7 +348,7 @@ class Gcps extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -363,7 +356,7 @@ class Gcps extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -371,7 +364,7 @@ class Gcps extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -379,7 +372,7 @@ class Gcps extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -387,7 +380,7 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -395,31 +388,31 @@ class Gcps extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTimeConfirm()
+    public function getTimeConfirm(): ?int
     {
         return $this->time_confirm;
     }
 
     /**
-     * @param int $time_confirm
+     * @param int|null $time_confirm
      */
-    public function setTimeConfirm($time_confirm)
+    public function setTimeConfirm(int $time_confirm = null): void
     {
-        $this->time_confirm = $time_confirm;
+        $time_confirm ? $this->time_confirm = $time_confirm : $this->time_confirm = time();
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getExistConfirm()
+    public function getExistConfirm(): ?int
     {
         return $this->exist_confirm;
     }
@@ -427,15 +420,15 @@ class Gcps extends ActiveRecord
     /**
      * @param int $exist_confirm
      */
-    public function setExistConfirm($exist_confirm)
+    public function setExistConfirm(int $exist_confirm): void
     {
         $this->exist_confirm = $exist_confirm;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getEnableExpertise()
+    public function getEnableExpertise(): string
     {
         return $this->enable_expertise;
     }
@@ -443,8 +436,24 @@ class Gcps extends ActiveRecord
     /**
      *  Установить разрешение на экспертизу
      */
-    public function setEnableExpertise()
+    public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
+    }
+
+    /**
+     * @return PropertyContainer
+     */
+    public function getPropertyContainer(): PropertyContainer
+    {
+        return $this->propertyContainer;
+    }
+
+    /**
+     *
+     */
+    public function setPropertyContainer(): void
+    {
+        $this->propertyContainer = new PropertyContainer();
     }
 }

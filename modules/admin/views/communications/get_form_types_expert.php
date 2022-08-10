@@ -1,11 +1,18 @@
 <?php
 
+use app\models\ProjectCommunications;
+use app\modules\admin\models\form\FormExpertTypes;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use app\models\ExpertType;
 use yii\helpers\Url;
 use app\models\CommunicationTypes;
 use yii\helpers\Html;
+
+/**
+ * @var ProjectCommunications $communicationExpert
+ * @var FormExpertTypes $formExpertTypes
+ */
 
 ?>
 
@@ -14,10 +21,10 @@ use yii\helpers\Html;
     <?php $form = ActiveForm::begin([
         'id' => 'form_types_expert',
         'action' => Url::to(['/admin/communications/send',
-            'adressee_id' => $communicationExpert->sender_id,
-            'project_id' => $communicationExpert->project_id,
+            'adressee_id' => $communicationExpert->getSenderId(),
+            'project_id' => $communicationExpert->getProjectId(),
             'type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
-            'triggered_communication_id' => $communicationExpert->id
+            'triggered_communication_id' => $communicationExpert->getId()
         ]),
         'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
@@ -28,7 +35,7 @@ use yii\helpers\Html;
             <?= $form->field($formExpertTypes, 'expert_types', [
                 'template' => '<div>{input}</div>',
             ])->widget(Select2::class, [
-                'data' => ExpertType::getListTypes(null, $communicationExpert->communicationResponse->expert_types),
+                'data' => ExpertType::getListTypes(null, $communicationExpert->communicationResponse->getExpertTypes()),
                 'options' => [
                     'id' => 'communication_response_expert_types',
                     'multiple' => true,
@@ -40,7 +47,7 @@ use yii\helpers\Html;
                     'selectOptions' => ['class' => 'text-success'],
                     'unselectOptions' => ['class' => 'text-danger'],
                 ]
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">

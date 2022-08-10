@@ -12,24 +12,24 @@ namespace app\models;
 abstract class ExpertType
 {
 
-    const EXPERT_IN_SCIENTIFIC_FIELD = 1;
-    const DEVELOPER_CONSTRUCTOR = 2;
-    const DEVELOPER_PROGRAMMER = 3;
-    const INDUSTRY_MARKETING_SPECIALIST = 4;
-    const SPECIALIST_IN_INTELLECTUAL_PROPERTY_REGISTRATION = 5;
-    const COMMUNICATIONS_SPECIALIST = 6;
+    public const EXPERT_IN_SCIENTIFIC_FIELD = 1;
+    public const DEVELOPER_CONSTRUCTOR = 2;
+    public const DEVELOPER_PROGRAMMER = 3;
+    public const INDUSTRY_MARKETING_SPECIALIST = 4;
+    public const SPECIALIST_IN_INTELLECTUAL_PROPERTY_REGISTRATION = 5;
+    public const COMMUNICATIONS_SPECIALIST = 6;
 
 
     /**
      * @var array
      */
     private static $listTypes = [
-        '1' => 'Ученый-эксперт в научной сфере',
-        '2' => 'Разработчик-конструктор',
-        '3' => 'Разработчик-программист',
-        '4' => 'Отраслевой специалист по маркетингу',
-        '5' => 'Специалист по регистрации ИС',
-        '6' => 'Спецалист по коммуникациям'
+        1 => 'Ученый-эксперт в научной сфере',
+        2 => 'Разработчик-конструктор',
+        3 => 'Разработчик-программист',
+        4 => 'Отраслевой специалист по маркетингу',
+        5 => 'Специалист по регистрации ИС',
+        6 => 'Спецалист по коммуникациям'
     ];
 
 
@@ -38,21 +38,23 @@ abstract class ExpertType
      * @param string|null $strKeys
      * @return array
      */
-    public static function getListTypes($expert = null, $strKeys = null)
+    public static function getListTypes(User $expert = null, string $strKeys = null): array
     {
 
         $list = array();
 
         if ($expert && !$strKeys) {
 
-            $keys = self::getValue($expert->expertInfo->type);
+            $keys = self::getValue($expert->expertInfo->getType());
             foreach ($keys as $key) {
                 $list[$key] = self::$listTypes[$key];
             }
 
             return $list;
 
-        } elseif (!$expert && $strKeys) {
+        }
+
+        if (!$expert && $strKeys) {
 
             $keys = self::getValue($strKeys);
             foreach ($keys as $key) {
@@ -70,9 +72,9 @@ abstract class ExpertType
      * @param $value string
      * @return false|int|string
      */
-    public static function getKey($value)
+    public static function getKey(string $value)
     {
-        return array_search($value, self::$listTypes);
+        return array_search($value, self::$listTypes, false);
     }
 
 
@@ -80,7 +82,7 @@ abstract class ExpertType
      * @param string $types
      * @return array
      */
-    public static function getValue($types)
+    public static function getValue(string $types): array
     {
         return explode('|', $types);
     }
@@ -90,7 +92,7 @@ abstract class ExpertType
      * @param string $types
      * @return string
      */
-    public static function getContent($types)
+    public static function getContent(string $types): string
     {
         $array = array();
         foreach (self::getValue($types) as $value) {

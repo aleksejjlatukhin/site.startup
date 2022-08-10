@@ -72,7 +72,7 @@ abstract class FormSegment extends Model
      * Проверка заполнения полей формы
      * @return bool
      */
-    abstract public function checkFillingFields ();
+    abstract public function checkFillingFields (): bool;
 
 
     /**
@@ -85,7 +85,7 @@ abstract class FormSegment extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b'], 'string', 'max' => 255],
@@ -111,7 +111,7 @@ abstract class FormSegment extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование сегмента',
@@ -144,7 +144,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -152,7 +152,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -160,7 +160,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -168,7 +168,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -176,7 +176,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -184,7 +184,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -192,7 +192,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getTypeOfInteractionBetweenSubjects()
+    public function getTypeOfInteractionBetweenSubjects(): int
     {
         return $this->type_of_interaction_between_subjects;
     }
@@ -200,7 +200,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $type_of_interaction_between_subjects
      */
-    public function setTypeOfInteractionBetweenSubjects($type_of_interaction_between_subjects)
+    public function setTypeOfInteractionBetweenSubjects(int $type_of_interaction_between_subjects): void
     {
         $this->type_of_interaction_between_subjects = $type_of_interaction_between_subjects;
     }
@@ -208,7 +208,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getFieldOfActivityB2c()
+    public function getFieldOfActivityB2c(): string
     {
         return $this->field_of_activity_b2c;
     }
@@ -216,7 +216,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $field_of_activity_b2c
      */
-    public function setFieldOfActivityB2c($field_of_activity_b2c)
+    public function setFieldOfActivityB2c(string $field_of_activity_b2c): void
     {
         $this->field_of_activity_b2c = $field_of_activity_b2c;
     }
@@ -224,7 +224,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getFieldOfActivityB2b()
+    public function getFieldOfActivityB2b(): string
     {
         return $this->field_of_activity_b2b;
     }
@@ -232,7 +232,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $field_of_activity_b2b
      */
-    public function setFieldOfActivityB2b($field_of_activity_b2b)
+    public function setFieldOfActivityB2b(string $field_of_activity_b2b): void
     {
         $this->field_of_activity_b2b = $field_of_activity_b2b;
     }
@@ -240,7 +240,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getSortOfActivityB2c()
+    public function getSortOfActivityB2c(): string
     {
         return $this->sort_of_activity_b2c;
     }
@@ -248,7 +248,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $sort_of_activity_b2c
      */
-    public function setSortOfActivityB2c($sort_of_activity_b2c)
+    public function setSortOfActivityB2c(string $sort_of_activity_b2c): void
     {
         $this->sort_of_activity_b2c = $sort_of_activity_b2c;
     }
@@ -256,7 +256,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getSortOfActivityB2b()
+    public function getSortOfActivityB2b(): string
     {
         return $this->sort_of_activity_b2b;
     }
@@ -264,7 +264,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $sort_of_activity_b2b
      */
-    public function setSortOfActivityB2b($sort_of_activity_b2b)
+    public function setSortOfActivityB2b(string $sort_of_activity_b2b): void
     {
         $this->sort_of_activity_b2b = $sort_of_activity_b2b;
     }
@@ -272,7 +272,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getAgeFrom()
+    public function getAgeFrom(): int
     {
         return $this->age_from;
     }
@@ -280,7 +280,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $age_from
      */
-    public function setAgeFrom($age_from)
+    public function setAgeFrom(int $age_from): void
     {
         $this->age_from = $age_from;
     }
@@ -288,7 +288,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getAgeTo()
+    public function getAgeTo(): int
     {
         return $this->age_to;
     }
@@ -296,7 +296,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $age_to
      */
-    public function setAgeTo($age_to)
+    public function setAgeTo(int $age_to): void
     {
         $this->age_to = $age_to;
     }
@@ -304,7 +304,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getGenderConsumer()
+    public function getGenderConsumer(): int
     {
         return $this->gender_consumer;
     }
@@ -312,7 +312,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $gender_consumer
      */
-    public function setGenderConsumer($gender_consumer)
+    public function setGenderConsumer(int $gender_consumer): void
     {
         $this->gender_consumer = $gender_consumer;
     }
@@ -320,7 +320,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getEducationOfConsumer()
+    public function getEducationOfConsumer(): int
     {
         return $this->education_of_consumer;
     }
@@ -328,7 +328,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $education_of_consumer
      */
-    public function setEducationOfConsumer($education_of_consumer)
+    public function setEducationOfConsumer(int $education_of_consumer): void
     {
         $this->education_of_consumer = $education_of_consumer;
     }
@@ -336,7 +336,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getIncomeFrom()
+    public function getIncomeFrom(): int
     {
         return $this->income_from;
     }
@@ -344,7 +344,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $income_from
      */
-    public function setIncomeFrom($income_from)
+    public function setIncomeFrom(int $income_from): void
     {
         $this->income_from = $income_from;
     }
@@ -352,7 +352,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getIncomeTo()
+    public function getIncomeTo(): int
     {
         return $this->income_to;
     }
@@ -360,7 +360,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $income_to
      */
-    public function setIncomeTo($income_to)
+    public function setIncomeTo(int $income_to): void
     {
         $this->income_to = $income_to;
     }
@@ -368,7 +368,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getIncomeCompanyFrom()
+    public function getIncomeCompanyFrom(): int
     {
         return $this->income_company_from;
     }
@@ -376,7 +376,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $income_company_from
      */
-    public function setIncomeCompanyFrom($income_company_from)
+    public function setIncomeCompanyFrom(int $income_company_from): void
     {
         $this->income_company_from = $income_company_from;
     }
@@ -384,7 +384,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getIncomeCompanyTo()
+    public function getIncomeCompanyTo(): int
     {
         return $this->income_company_to;
     }
@@ -392,7 +392,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $income_company_to
      */
-    public function setIncomeCompanyTo($income_company_to)
+    public function setIncomeCompanyTo(int $income_company_to): void
     {
         $this->income_company_to = $income_company_to;
     }
@@ -400,7 +400,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getQuantityFrom()
+    public function getQuantityFrom(): int
     {
         return $this->quantity_from;
     }
@@ -408,7 +408,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $quantity_from
      */
-    public function setQuantityFrom($quantity_from)
+    public function setQuantityFrom(int $quantity_from): void
     {
         $this->quantity_from = $quantity_from;
     }
@@ -416,7 +416,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getQuantityTo()
+    public function getQuantityTo(): int
     {
         return $this->quantity_to;
     }
@@ -424,7 +424,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $quantity_to
      */
-    public function setQuantityTo($quantity_to)
+    public function setQuantityTo(int $quantity_to): void
     {
         $this->quantity_to = $quantity_to;
     }
@@ -432,7 +432,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getQuantityFromB2b()
+    public function getQuantityFromB2b(): int
     {
         return $this->quantity_from_b2b;
     }
@@ -440,7 +440,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $quantity_from_b2b
      */
-    public function setQuantityFromB2b($quantity_from_b2b)
+    public function setQuantityFromB2b(int $quantity_from_b2b): void
     {
         $this->quantity_from_b2b = $quantity_from_b2b;
     }
@@ -448,7 +448,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getQuantityToB2b()
+    public function getQuantityToB2b(): int
     {
         return $this->quantity_to_b2b;
     }
@@ -456,7 +456,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $quantity_to_b2b
      */
-    public function setQuantityToB2b($quantity_to_b2b)
+    public function setQuantityToB2b(int $quantity_to_b2b): void
     {
         $this->quantity_to_b2b = $quantity_to_b2b;
     }
@@ -464,7 +464,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getMarketVolumeB2c()
+    public function getMarketVolumeB2c(): int
     {
         return $this->market_volume_b2c;
     }
@@ -472,7 +472,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $market_volume_b2c
      */
-    public function setMarketVolumeB2c($market_volume_b2c)
+    public function setMarketVolumeB2c(int $market_volume_b2c): void
     {
         $this->market_volume_b2c = $market_volume_b2c;
     }
@@ -480,7 +480,7 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getMarketVolumeB2b()
+    public function getMarketVolumeB2b(): int
     {
         return $this->market_volume_b2b;
     }
@@ -488,7 +488,7 @@ abstract class FormSegment extends Model
     /**
      * @param int $market_volume_b2b
      */
-    public function setMarketVolumeB2b($market_volume_b2b)
+    public function setMarketVolumeB2b(int $market_volume_b2b): void
     {
         $this->market_volume_b2b = $market_volume_b2b;
     }
@@ -496,7 +496,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getCompanyProducts()
+    public function getCompanyProducts(): string
     {
         return $this->company_products;
     }
@@ -504,7 +504,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $company_products
      */
-    public function setCompanyProducts($company_products)
+    public function setCompanyProducts(string $company_products): void
     {
         $this->company_products = $company_products;
     }
@@ -512,7 +512,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getCompanyPartner()
+    public function getCompanyPartner(): string
     {
         return $this->company_partner;
     }
@@ -520,7 +520,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $company_partner
      */
-    public function setCompanyPartner($company_partner)
+    public function setCompanyPartner(string $company_partner): void
     {
         $this->company_partner = $company_partner;
     }
@@ -528,7 +528,7 @@ abstract class FormSegment extends Model
     /**
      * @return string
      */
-    public function getAddInfo()
+    public function getAddInfo(): string
     {
         return $this->add_info;
     }
@@ -536,7 +536,7 @@ abstract class FormSegment extends Model
     /**
      * @param string $add_info
      */
-    public function setAddInfo($add_info)
+    public function setAddInfo(string $add_info): void
     {
         $this->add_info = $add_info;
     }

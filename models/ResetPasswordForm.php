@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use yii\base\Exception;
 use yii\base\Model;
 
 /**
@@ -25,7 +26,7 @@ class ResetPasswordForm extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['password', 'string'],
@@ -36,7 +37,7 @@ class ResetPasswordForm extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'password' => 'Пароль'
@@ -49,21 +50,23 @@ class ResetPasswordForm extends Model
      * @param $key
      * @param array $config
      */
-    public function __construct($key, $config = [])
+    public function __construct($key, array $config = [])
     {
-        if(empty($key) || !is_string($key))
-            $this->exist = false; // Ключ не может быть пустым
+        if(empty($key) || !is_string($key)) {
+            $this->exist = false;
+        } // Ключ не может быть пустым
         $this->_user = User::findBySecretKey($key);
-        if(!$this->_user)
-            $this->exist = false; // Не верный ключ
+        if(!$this->_user) {
+            $this->exist = false;
+        } // Не верный ключ
         parent::__construct($config);
     }
 
     /**
      * @return bool
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
-    public function resetPassword()
+    public function resetPassword(): bool
     {
         /* @var $user User */
         $user = $this->_user;

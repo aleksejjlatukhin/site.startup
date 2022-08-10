@@ -23,11 +23,14 @@ use yii\web\UploadedFile;
  * @property int $respond_id                            Идентификатор респондента из таб. responds_segment
  * @property string $interview_file                     Имя файла, с которым он был загружен
  * @property string $server_file                        Сгенерированное имя прикрепленного файла на сервере
- * @property int $status                                Значимость ЦП для респондента
+ * @property int $status                                Значимость гипотезы для респондента
  * @property int $created_at                            Дата создания
  * @property int $updated_at                            Дата редактирования
  * @property $loadFile                                  Поле для загрузки файла
  * @property CacheForm $_cacheManager                   Менеджер кэширования
+ * @property string $result                             Варианты проблем
+ *
+ * @property RespondsSegment $respond                   Респондент
  */
 class InterviewConfirmSegment extends ActiveRecord
 {
@@ -38,7 +41,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'interview_confirm_segment';
     }
@@ -59,55 +62,43 @@ class InterviewConfirmSegment extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getRespond()
+    public function getRespond(): ActiveQuery
     {
         return $this->hasOne(RespondsSegment::class, ['id' => 'respond_id']);
     }
 
     /**
-     * @return RespondsSegment|null
-     */
-    public function findRespond()
-    {
-        return RespondsSegment::findOne($this->getRespondId());
-    }
-
-    /**
      * @return string
      */
-    public function getPathFile()
+    public function getPathFile(): string
     {
-        $respond = $this->findRespond();
-        $confirm = $respond->findConfirm();
-        $segment = $confirm->findSegment();
-        $project = $segment->findProject();
-        $user = $project->findUser();
-        $path = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId()
+        $respond = $this->respond;
+        $confirm = $respond->confirm;
+        $segment = $confirm->segment;
+        $project = $segment->project;
+        $user = $project->user;
+        return UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId()
             .'/interviews/respond-'.$respond->getId().'/';
-
-        return $path;
     }
 
     /**
      * @param RespondsSegment $respond
      * @return string
      */
-    public static function getCachePath($respond)
+    public static function getCachePath(RespondsSegment $respond): string
     {
-        $confirm = $respond->findConfirm();
-        $segment = $confirm->findSegment();
-        $project = $segment->findProject();
-        $user = $project->findUser();
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId().
+        $confirm = $respond->confirm;
+        $segment = $confirm->segment;
+        $project = $segment->project;
+        $user = $project->user;
+        return '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId().
             '/segments/segment-'.$segment->getId().'/confirm/interviews/respond-'.$respond->getId().'/';
-
-        return $cachePath;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['respond_id', 'result', 'status'], 'required'],
@@ -121,7 +112,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'interview_file' => 'Файл',
@@ -133,7 +124,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -161,17 +152,15 @@ class InterviewConfirmSegment extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function create()
+    public function create(): bool
     {
         if ($this->validate() && $this->save()) {
 
             $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->getLoadFile()) {
-                if ($this->uploadFileInterview()) {
-                    $this->setInterviewFile($this->getLoadFile());
-                    $this->save(false);
-                }
+            if ($this->getLoadFile() && $this->uploadFileInterview()) {
+                $this->setInterviewFile($this->getLoadFile());
+                $this->save(false);
             }
 
             return true;
@@ -184,17 +173,15 @@ class InterviewConfirmSegment extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function updateInterview()
+    public function updateInterview(): bool
     {
         if ($this->validate() && $this->save()) {
 
             $this->setLoadFile(UploadedFile::getInstance($this, 'loadFile'));
 
-            if ($this->getLoadFile()) {
-                if ($this->uploadFileInterview()) {
-                    $this->setInterviewFile($this->getLoadFile());
-                    $this->save(false);
-                }
+            if ($this->getLoadFile() && $this->uploadFileInterview()) {
+                $this->setInterviewFile($this->getLoadFile());
+                $this->save(false);
             }
 
             return true;
@@ -207,10 +194,12 @@ class InterviewConfirmSegment extends ActiveRecord
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    private function uploadFileInterview()
+    private function uploadFileInterview(): bool
     {
         $path = $this->getPathFile();
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         if ($this->validate()) {
 
@@ -226,15 +215,15 @@ class InterviewConfirmSegment extends ActiveRecord
             }
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -242,7 +231,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @param int $id
      */
-    public function setRespondId($id)
+    public function setRespondId(int $id): void
     {
         $this->respond_id = $id;
     }
@@ -250,7 +239,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getRespondId()
+    public function getRespondId(): int
     {
         return $this->respond_id;
     }
@@ -258,7 +247,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return string
      */
-    public function getInterviewFile()
+    public function getInterviewFile(): string
     {
         return $this->interview_file;
     }
@@ -266,7 +255,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @param string $interview_file
      */
-    public function setInterviewFile($interview_file)
+    public function setInterviewFile(string $interview_file): void
     {
         $this->interview_file = $interview_file;
     }
@@ -274,7 +263,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return string
      */
-    public function getServerFile()
+    public function getServerFile(): string
     {
         return $this->server_file;
     }
@@ -282,7 +271,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @param string $server_file
      */
-    public function setServerFile($server_file)
+    public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
     }
@@ -290,7 +279,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -298,7 +287,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -306,7 +295,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -314,7 +303,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
@@ -330,7 +319,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @param mixed $loadFile
      */
-    public function setLoadFile($loadFile)
+    public function setLoadFile($loadFile): void
     {
         $this->loadFile = $loadFile;
     }
@@ -338,7 +327,7 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -346,8 +335,24 @@ class InterviewConfirmSegment extends ActiveRecord
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
+    }
+
+    /**
+     * @return string
+     */
+    public function getResult(): string
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param string $result
+     */
+    public function setResult(string $result): void
+    {
+        $this->result = $result;
     }
 }

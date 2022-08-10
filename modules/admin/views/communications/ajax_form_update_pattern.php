@@ -1,10 +1,16 @@
 <?php
 
+use app\modules\admin\models\form\FormUpdateCommunicationPattern;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use app\models\CommunicationTypes;
+
+/**
+ * @var FormUpdateCommunicationPattern $formPattern
+ * @var array $selection_project_access_period
+ */
 
 ?>
 
@@ -14,8 +20,8 @@ use app\models\CommunicationTypes;
             'id' => 'update_pattern',
             'action' => Url::to([
                 '/admin/communications/update-pattern',
-                'communicationType' => $formPattern->communication_type,
-                'id' => $formPattern->id
+                'communicationType' => $formPattern->getCommunicationType(),
+                'id' => $formPattern->getId()
             ]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
@@ -31,24 +37,23 @@ use app\models\CommunicationTypes;
             'placeholder' => '',
         ]) ?>
 
-        <?php if ($formPattern->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
+        <?php if ($formPattern->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
 
             <?= $form->field($formPattern, 'project_access_period', [
                 'template' => '<div class="col-md-12" style="padding-left: 30px;">{label}</div><div class="col-md-2" style="margin-bottom: 15px;">{input}</div>',
             ])->widget(Select2::class, [
                 'data' => $selection_project_access_period,
-                'options' => ['id' => 'selection_project_access_period_update-'.$formPattern->id],
+                'options' => ['id' => 'selection_project_access_period_update-'.$formPattern->getId()],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
 
         <?php endif; ?>
 
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-2">
-                    <?= Html::a('Отмена', ['/admin/communications/cancel-edit-pattern', 'id' => $formPattern->id],[
+                    <?= Html::a('Отмена', ['/admin/communications/cancel-edit-pattern', 'id' => $formPattern->getId()],[
                         'class' => 'btn btn-default cancel-edit-pattern',
                         'style' => [
                             'display' => 'flex',

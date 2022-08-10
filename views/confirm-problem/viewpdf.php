@@ -1,6 +1,13 @@
 <?php
 
+use app\models\ConfirmProblem;
+use app\models\RespondsProblem;
 use yii\helpers\Html;
+
+/**
+ * @var ConfirmProblem $model
+ * @var RespondsProblem[] $responds
+ */
 
 ?>
 
@@ -55,46 +62,45 @@ use yii\helpers\Html;
 
                 <td colspan="1" style="width: 50px; text-align: center;">
                     <?php
-                    if ($respond->interview->status == 1) {
-                        echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
-                    }
-                    elseif ($respond->interview->status === null) {
-                        echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
-                    }
-                    elseif ($respond->interview->status == 0) {
-                        echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
+                    if ($respond->interview) {
+                        if ($respond->interview->getStatus() === 1) {
+                            echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
+                        }
+                        elseif ($respond->interview->getStatus() === 0) {
+                            echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
+                        }
                     }
                     else {
-                        echo '';
+                        echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                     }
                     ?>
                 </td>
 
                 <td colspan="3" style="width: 265px; padding: 15px 5px; color: #FFFFFF; font-size: 16px; text-align: center;">
-                    <?=  $respond->name; ?>
+                    <?=  $respond->getName() ?>
                 </td>
 
                 <td colspan="3" style="width: 265px; padding: 15px 5px; color: #FFFFFF; font-size: 12px;">
-                    <?php if ($respond->info_respond) : ?>
-                        <?= $respond->info_respond; ?>
+                    <?php if ($respond->getInfoRespond()) : ?>
+                        <?= $respond->getInfoRespond() ?>
                     <?php endif; ?>
                 </td>
 
                 <td colspan="3" style="width: 265px; padding: 15px 5px; color: #FFFFFF; font-size: 12px;">
-                    <?php if ($respond->place_interview) : ?>
-                        <?= $respond->place_interview; ?>
+                    <?php if ($respond->getPlaceInterview()) : ?>
+                        <?= $respond->getPlaceInterview() ?>
                     <?php endif; ?>
                 </td>
 
                 <td colspan="1" style="width: 100px; padding: 15px 5px; text-align: center; color: #FFFFFF; font-size: 15px;">
-                    <?php if ($respond->date_plan) : ?>
-                        <?= date("d.m.y", $respond->date_plan); ?>
+                    <?php if ($respond->getDatePlan()) : ?>
+                        <?= date("d.m.y", $respond->getDatePlan()) ?>
                     <?php endif; ?>
                 </td>
 
                 <td colspan="1" style="width: 100px; padding: 15px 5px; text-align: center; color: #FFFFFF; font-size: 15px;">
-                    <?php if ($respond->interview->updated_at) : ?>
-                        <?= date("d.m.y", $respond->interview->updated_at); ?>
+                    <?php if ($respond->interview) : ?>
+                        <?= date("d.m.y", $respond->interview->getUpdatedAt()) ?>
                     <?php endif; ?>
                 </td>
 

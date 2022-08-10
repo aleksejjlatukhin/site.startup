@@ -18,23 +18,23 @@ class CreatorQuestionToGeneralList
      * @param ConfirmationInterface $confirm
      * @param $title
      */
-    public function create(ConfirmationInterface $confirm, $title)
+    public function create(ConfirmationInterface $confirm, $title): void
     {
         $user = $confirm->hypothesis->project->user;
         $class = self::getClassQuestion($confirm);
-        $baseQuestions = $class::find()->where(['user_id' => $user->id])->select('title')->all();
+        $baseQuestions = $class::find()->where(['user_id' => $user->getId()])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){
-            if ($baseQuestion->title == $title){
+            if ($baseQuestion->title === $title){
                 $existQuestions++;
             }
         }
 
-        if ($existQuestions == 0){
+        if ($existQuestions === 0){
             $general_question = self::getModel($confirm);
-            $general_question->title = $title;
-            $general_question->user_id = $user->id;
+            $general_question->setTitle($title);
+            $general_question->setUserId($user->getId());
             $general_question->save();
         }
     }
@@ -46,13 +46,19 @@ class CreatorQuestionToGeneralList
      */
     private static function getClassQuestion($confirm)
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return AllQuestionsConfirmSegment::class;
-        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return AllQuestionsConfirmProblem::class;
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_GCP) {
             return AllQuestionsConfirmGcp::class;
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_MVP) {
             return AllQuestionsConfirmMvp::class;
         }
         return false;
@@ -65,13 +71,19 @@ class CreatorQuestionToGeneralList
      */
     private static function getModel($confirm)
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new AllQuestionsConfirmSegment();
-        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new AllQuestionsConfirmProblem();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_GCP) {
             return new AllQuestionsConfirmGcp();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->stage === StageConfirm::STAGE_CONFIRM_MVP) {
             return new AllQuestionsConfirmMvp();
         }
         return false;

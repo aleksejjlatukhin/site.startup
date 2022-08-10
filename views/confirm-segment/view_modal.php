@@ -1,7 +1,12 @@
 <?php
 
+use app\models\ConfirmSegment;
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
+
+/**
+ * @var ConfirmSegment $model
+ */
 
 ?>
 
@@ -122,7 +127,7 @@ Modal::begin([
             'id' => 'cancel-not_exist-confirm',
         ]).
 
-        Html::a('Ок', ['/confirm-segment/not-exist-confirm', 'id' => $model->id],[
+        Html::a('Ок', ['/confirm-segment/not-exist-confirm', 'id' => $model->getId()],[
             'class' => 'btn btn-default',
             'style' => ['width' => '120px'],
             'id' => 'not_exist-confirm',
@@ -155,7 +160,7 @@ Modal::begin([
             'style' => ['width' => '120px'],
         ]).
 
-        Html::a('Ок', ['/confirm-segment/exist-confirm', 'id' => $model->id],[
+        Html::a('Ок', ['/confirm-segment/exist-confirm', 'id' => $model->getId()],[
             'class' => 'btn btn-default',
             'style' => ['width' => '120px'],
             'id' => 'exist-confirm',
@@ -178,7 +183,7 @@ Modal::begin([
     'options' => ['id' => 'showQuestionsAndAnswers'],
     'size' => 'modal-lg',
     'header' => Html::a('<div style="margin-top: -15px;">Ответы респондентов на вопросы интервью' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
-        '/confirm-segment/mpdf-questions-and-answers', 'id' => $model->id], [
+        '/confirm-segment/mpdf-questions-and-answers', 'id' => $model->getId()], [
         'class' => 'export_link',
         'target' => '_blank',
         'title' => 'Скачать в pdf',

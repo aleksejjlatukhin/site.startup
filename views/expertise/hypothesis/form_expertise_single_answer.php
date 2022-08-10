@@ -1,13 +1,20 @@
 <?php
 
+use app\models\forms\expertise\FormExpertiseSingleAnswer;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use app\models\Expertise;
 use app\models\ExpertType;
 
+/**
+ * @var FormExpertiseSingleAnswer $model
+ * @var string $stage
+ * @var int $stageId
+ */
+
 ?>
 
-<div><span class="bolder">Тип деятельности:</span> <?= ExpertType::getListTypes()[$model->_expertise->getTypeExpert()];?></div>
+<div><span class="bolder">Тип деятельности:</span> <?= ExpertType::getListTypes()[$model->getExpertise()->getTypeExpert()] ?></div>
 <hr>
 
 <?php if ((array)$model->getAnswerOptions()) : ?>
@@ -20,11 +27,11 @@ use app\models\ExpertType;
 ]); ?>
 
     <?= $form->field($model, 'checkbox')->checkBoxList($model->getAnswerOptions(), [
-        'item' => function($index, $label, $name, $checked, $value) {
+        'item' => static function($index, $label, $name, $checked, $value) {
             !empty($checked) ? $checked = 'checked' : $checked = '';
-            return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise' type='checkbox' {$checked} name='{$name}' value='{$value}'>{$label}</label>";
+            return "<label class='checkbox col-md-12' style='font-weight: normal; margin-left: 5px;'><input class='checkbox-expertise' type='checkbox' $checked name='$name' value='$value'>$label</label>";
         }
-    ]); ?>
+    ]) ?>
 
     <div class="row" style="margin-bottom: 15px;">
         <?= $form->field($model, 'comment', [
@@ -54,7 +61,7 @@ use app\models\ExpertType;
                     'border-radius' => '8px',
                     'margin-right' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
             <?= Html::submitButton('Сохранить', [
                 'id' => 'save_expertise',
@@ -71,9 +78,9 @@ use app\models\ExpertType;
                     'border-radius' => '8px',
                     'margin-right' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
-            <?php if ($model->_expertise->getCompleted() != Expertise::COMPLETED) : ?>
+            <?php if ($model->getExpertise()->getCompleted() !== Expertise::COMPLETED) : ?>
                 <?= Html::submitButton('Завершить', [
                     'id' => 'completed_expertise',
                     'class' => 'btn btn-success submit-expertise',
@@ -87,7 +94,7 @@ use app\models\ExpertType;
                         'font-size' => '24px',
                         'border-radius' => '8px',
                     ]
-                ]); ?>
+                ]) ?>
             <?php endif; ?>
 
         </div>

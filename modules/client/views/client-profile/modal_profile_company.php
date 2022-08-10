@@ -14,7 +14,7 @@ Modal::begin([
 ]); ?>
 
 <div class="">
-    <?= Html::img('', ['class' => 'profile_photo_i']); ?>
+    <?= Html::img('', ['class' => 'profile_photo_i']) ?>
 </div>
 
 <div class="">
@@ -32,7 +32,7 @@ Modal::begin([
             'border-radius' => '8px',
             'margin-top' => '35px',
         ],
-    ]);?>
+    ]) ?>
 </div>
 
 <?php Modal::end(); ?>

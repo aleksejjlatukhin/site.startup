@@ -15,6 +15,11 @@ use yii\db\ActiveRecord;
  * @property int project_id
  * @property int communication_id
  * @property string types
+ *
+ * @property ProjectCommunications $communication                   Коммуникация назначения на проект
+ * @property Projects $project                                      Проект, на который был назначен эксперт
+ * @property User $expert                                           Эксперт, назначенный на проект
+ *
  * @package app\models
  */
 class TypesAccessToExpertise extends ActiveRecord
@@ -23,7 +28,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'types_access_to_expertise';
     }
@@ -32,7 +37,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -41,7 +46,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @param int $userId
      */
-    public function setUserId($userId)
+    public function setUserId(int $userId): void
     {
         $this->user_id = $userId;
     }
@@ -50,7 +55,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -59,7 +64,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @param int $projectId
      */
-    public function setProjectId($projectId)
+    public function setProjectId(int $projectId): void
     {
         $this->project_id = $projectId;
     }
@@ -68,7 +73,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -77,7 +82,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @param int $communicationId
      */
-    public function setCommunicationId($communicationId)
+    public function setCommunicationId(int $communicationId): void
     {
         $this->communication_id = $communicationId;
     }
@@ -86,7 +91,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return int
      */
-    public function getCommunicationId()
+    public function getCommunicationId(): int
     {
         return $this->communication_id;
     }
@@ -95,7 +100,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @param array $arrayTypes
      */
-    public function setTypes($arrayTypes)
+    public function setTypes(array $arrayTypes): void
     {
         $this->types = implode('|', $arrayTypes);
     }
@@ -104,7 +109,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @return string
      */
-    public function getTypes()
+    public function getTypes(): string
     {
         return $this->types;
     }
@@ -116,7 +121,7 @@ class TypesAccessToExpertise extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getCommunication()
+    public function getCommunication(): ActiveQuery
     {
         return $this->hasOne(ProjectCommunications::class, ['id' => 'communication_id']);
     }
@@ -128,7 +133,7 @@ class TypesAccessToExpertise extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getProject()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
@@ -140,7 +145,7 @@ class TypesAccessToExpertise extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getExpert()
+    public function getExpert(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -149,7 +154,7 @@ class TypesAccessToExpertise extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['user_id', 'project_id', 'communication_id'], 'integer'],
@@ -168,7 +173,7 @@ class TypesAccessToExpertise extends ActiveRecord
      * @param array $arrayTypes
      * @return TypesAccessToExpertise|null
      */
-    public function create($userId, $projectId, $communicationId, $arrayTypes)
+    public function create(int $userId, int $projectId, int $communicationId, array $arrayTypes): ?TypesAccessToExpertise
     {
         $this->setUserId($userId);
         $this->setProjectId($projectId);

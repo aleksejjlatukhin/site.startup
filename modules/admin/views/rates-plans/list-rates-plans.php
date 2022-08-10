@@ -1,10 +1,18 @@
 <?php
 
+use app\models\ClientRatesPlan;
+use app\models\RatesPlan;
+use kartik\date\DatePicker;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\select2\Select2;
+
+/**
+ * @var RatesPlan[] $ratesPlans
+ * @var ClientRatesPlan $clientRatesPlan
+ */
 
 ?>
 
@@ -43,7 +51,7 @@ use kartik\select2\Select2;
                 ],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]); ?>
+            ]) ?>
         </div>
         <div class="col-md-2"></div>
     </div>
@@ -51,11 +59,11 @@ use kartik\select2\Select2;
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            <?= \kartik\date\DatePicker::widget([
+            <?= DatePicker::widget([
                 'type' => 2,
                 'removeButton' => false,
                 'name' => 'ClientRatesPlan[date_start]',
-                'value' => $clientRatesPlan->date_start == null ? null : $clientRatesPlan->date_start,
+                'value' => $clientRatesPlan->getDateStart() ? date('d.m.Y', $clientRatesPlan->getDateStart()) : null,
                 'readonly' => true,
                 'pluginOptions' => [
                     'autoclose'=>true,
@@ -68,7 +76,7 @@ use kartik\select2\Select2;
                     'style' => ['padding-right' => '20px'],
                     'placeholder' => 'Выберите дату начала',
                 ]
-            ]);?>
+            ]) ?>
         </div>
         <div class="col-md-2"></div>
     </div>
@@ -76,11 +84,11 @@ use kartik\select2\Select2;
     <div class="row" style="margin-top: 15px;">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            <?= \kartik\date\DatePicker::widget([
+            <?= DatePicker::widget([
                 'type' => 2,
                 'removeButton' => false,
                 'name' => 'ClientRatesPlan[date_end]',
-                'value' => $clientRatesPlan->date_end == null ? null : $clientRatesPlan->date_end,
+                'value' => $clientRatesPlan->getDateEnd() ? date('d.m.Y', $clientRatesPlan->getDateEnd()) : null,
                 'readonly' => true,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -93,12 +101,12 @@ use kartik\select2\Select2;
                     'style' => ['padding-right' => '20px'],
                     'placeholder' => 'Выберите дату окончания',
                 ]
-            ]);?>
+            ]) ?>
         </div>
         <div class="col-md-2"></div>
     </div>
 
-    <?= $form->field($clientRatesPlan, 'client_id')->hiddenInput()->label(false); ?>
+    <?= $form->field($clientRatesPlan, 'client_id')->hiddenInput()->label(false) ?>
 
     <div class="row" style="display:flex; justify-content: center;">
         <?= Html::submitButton('Сохранить', [

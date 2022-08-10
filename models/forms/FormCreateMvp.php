@@ -39,14 +39,16 @@ class FormCreateMvp extends Model
      * @param Gcps $preliminaryHypothesis
      * @param array $config
      */
-    public function __construct(Gcps $preliminaryHypothesis, $config = [])
+    public function __construct(Gcps $preliminaryHypothesis, array $config = [])
     {
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -57,7 +59,7 @@ class FormCreateMvp extends Model
      * @param Gcps $preliminaryHypothesis
      * @return string
      */
-    public static function getCachePath(Gcps $preliminaryHypothesis)
+    public static function getCachePath(Gcps $preliminaryHypothesis): string
     {
         /**
          * @var Problems $problem
@@ -69,17 +71,15 @@ class FormCreateMvp extends Model
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$preliminaryHypothesis->getId().'/mvps/formCreate/';
-
-        return $cachePath;
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'trim'],
@@ -94,8 +94,9 @@ class FormCreateMvp extends Model
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create()
+    public function create(): Mvps
     {
+        /** @var Mvps $last_model */
         $last_model = Mvps::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmGcp = ConfirmGcp::findOne($this->getBasicConfirmId());
         $gcp = Gcps::findOne($confirmGcp->getGcpId());
@@ -110,7 +111,7 @@ class FormCreateMvp extends Model
         $mvp->setGcpId($gcp->getId());
         $mvp->setBasicConfirmId($this->getBasicConfirmId());
         $mvp->setDescription($this->getDescription());
-        $last_model_number = explode(' ',$last_model->title)[1];
+        $last_model_number = explode(' ',$last_model->getTitle())[1];
         $mvp->setTitle('MVP ' . ($last_model_number + 1));
 
         if ($mvp->save()){
@@ -123,7 +124,7 @@ class FormCreateMvp extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -131,7 +132,7 @@ class FormCreateMvp extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -139,7 +140,7 @@ class FormCreateMvp extends Model
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -147,7 +148,7 @@ class FormCreateMvp extends Model
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -155,7 +156,7 @@ class FormCreateMvp extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -163,7 +164,7 @@ class FormCreateMvp extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -171,7 +172,7 @@ class FormCreateMvp extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }
@@ -179,7 +180,7 @@ class FormCreateMvp extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }

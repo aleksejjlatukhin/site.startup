@@ -27,7 +27,7 @@ class FormCreateConfirmProblem extends FormCreateConfirm
      * @param Problems $hypothesis
      * @param array $config
      */
-    public function __construct(Problems $hypothesis, $config = [])
+    public function __construct(Problems $hypothesis, array $config = [])
     {
         $this->setCreatorResponds();
         $this->setCreatorNewResponds();
@@ -35,7 +35,9 @@ class FormCreateConfirmProblem extends FormCreateConfirm
         $this->setCachePathForm(self::getCachePath($hypothesis));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -47,21 +49,20 @@ class FormCreateConfirmProblem extends FormCreateConfirm
      * @param Problems $hypothesis
      * @return string
      */
-    public static function getCachePath(Problems $hypothesis)
+    public static function getCachePath(Problems $hypothesis): string
     {
         $segment = $hypothesis->segment;
         $project = $hypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.
-            '/segments/segment-'.$segment->id.'/problems/problem-'.$hypothesis->id.'/confirm/formCreateConfirm/';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().
+            '/segments/segment-'.$segment->getId().'/problems/problem-'.$hypothesis->getId().'/confirm/formCreateConfirm/';
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['hypothesis_id', 'count_respond', 'count_positive', 'need_consumer'], 'required'],
@@ -76,7 +77,7 @@ class FormCreateConfirmProblem extends FormCreateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -92,7 +93,7 @@ class FormCreateConfirmProblem extends FormCreateConfirm
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create()
+    public function create(): ConfirmProblem
     {
         $model = new ConfirmProblem();
         $model->setProblemId($this->getHypothesisId());
@@ -104,7 +105,9 @@ class FormCreateConfirmProblem extends FormCreateConfirm
             // Создание респондентов для программы подтверждения ГПС из представителей сегмента
             $this->getCreatorResponds()->create($model, $this);
             // Добавление новых респондентов для программы подтверждения ГПС
-            if ($this->getAddCountRespond()) $this->getCreatorNewResponds()->create($model, $this);
+            if ($this->getAddCountRespond()) {
+                $this->getCreatorNewResponds()->create($model, $this);
+            }
             // Удаление кэша формы создания подтверждения
             $this->getCacheManager()->deleteCache($this->getCachePathForm());
 
@@ -117,7 +120,7 @@ class FormCreateConfirmProblem extends FormCreateConfirm
     /**
      * @return string
      */
-    public function getNeedConsumer()
+    public function getNeedConsumer(): string
     {
         return $this->need_consumer;
     }

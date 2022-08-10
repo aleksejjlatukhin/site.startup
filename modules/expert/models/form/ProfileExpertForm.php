@@ -8,6 +8,20 @@ use yii\base\Model;
 use app\models\ExpertType;
 use Yii;
 
+/**
+ * @property  int $id                                       id пользователя
+ * @property  string $username                              Логин
+ * @property  string $email                                 Эл. почта
+ * @property  string $education                             Образование
+ * @property  string $academic_degree                       Ученая степень
+ * @property  string $position                              Должность
+ * @property  array $type                                   Тип эксперта
+ * @property  string $scope_professional_competence         Сфера профессиональной компетенции
+ * @property  string $publications                          Научные публикации
+ * @property  string $implemented_projects                  Реализованные проекты
+ * @property  string $role_in_implemented_projects          Роль в реализованных проектах
+ * @property  string $keywords                              Ключевые слова
+ */
 class ProfileExpertForm extends  Model
 {
 
@@ -92,7 +106,7 @@ class ProfileExpertForm extends  Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
@@ -112,24 +126,26 @@ class ProfileExpertForm extends  Model
 
     /**
      * ProfileForm constructor.
-     * @param $id
+     *
+     * @param int $id
      * @param array $config
      */
-    public function __construct($id, $config = [])
+    public function __construct($id, array $config = [])
     {
+        /** @var User $user */
         $user = User::find()->with(['expertInfo', 'keywords'])->where(['id' => $id])->one();
-        $this->keywords = $user->keywords->description;
+        $this->keywords = $user->keywords->getDescription();
         foreach ($user as $key => $value) {
-            if (property_exists($this, $key)) $this[$key] = $value;
+            if (property_exists($this, $key)) {
+                $this[$key] = $value;
+            }
         }
         foreach ($user->expertInfo as $key => $value) {
-            if (property_exists($this, $key)) {
-                if ($key != 'id') {
-                    if ($key == 'type') {
-                        $this[$key] = ExpertType::getValue($value);
-                    } else {
-                        $this[$key] = $value;
-                    }
+            if (property_exists($this, $key) && $key !== 'id') {
+                if ($key === 'type') {
+                    $this[$key] = ExpertType::getValue($value);
+                } else {
+                    $this[$key] = $value;
                 }
             }
         }
@@ -140,7 +156,7 @@ class ProfileExpertForm extends  Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Email',
@@ -164,12 +180,13 @@ class ProfileExpertForm extends  Model
      * и сравниваем их с тем, что в форме
      * @param $attr
      */
-    public function uniqUsername($attr)
+    public function uniqUsername($attr): void
     {
+        /** @var User[] $users */
         $users = User::find()->all();
 
         foreach ($users as $user){
-            if ($user->id != $this->id && mb_strtolower($this->username) === mb_strtolower($user->username)){
+            if ($user->getId() !== $this->id && mb_strtolower($this->username) === mb_strtolower($user->getUsername())){
                 $this->uniq_username = false;
                 $this->addError($attr, 'Этот логин уже занят.');
             }
@@ -180,7 +197,7 @@ class ProfileExpertForm extends  Model
     /**
      * @param $attr
      */
-    public function matchUsername($attr)
+    public function matchUsername($attr): void
     {
         if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
             $this->match_username = false;
@@ -197,12 +214,13 @@ class ProfileExpertForm extends  Model
     /**
      * @param $attr
      */
-    public function uniqEmail($attr)
+    public function uniqEmail($attr): void
     {
+        /** @var User[] $users */
         $users = User::find()->all();
 
         foreach ($users as $user){
-            if ($user->id != $this->id && $this->email === $user->email){
+            if ($user->getId() !== $this->getId() && $this->getEmail() === $user->getEmail()){
                 $this->uniq_email = false;
                 $this->addError($attr, 'Эта почта уже зарегистрирована.');
             }
@@ -214,7 +232,7 @@ class ProfileExpertForm extends  Model
      * Отправка уведомления на email
      * @return bool
      */
-    public function sendEmail()
+    public function sendEmail(): bool
     {
         try {
 
@@ -240,34 +258,225 @@ class ProfileExpertForm extends  Model
     {
         if ($this->sendEmail()) {
 
-            $user = User::findOne($this->id);
-            $user->email = $this->email;
-            $user->username = $this->username;
+            $user = User::findOne($this->getId());
+            $user->setEmail($this->getEmail());
+            $user->setUsername($this->getUsername());
 
             if ($user->save()) {
 
                 // Сохраняем ключевые слова
-                $user->keywords->edit($this->keywords);
+                $user->keywords->edit($this->getKeywords());
                 // Сохраняем информацию о эксперте
                 $expertInfo = $user->expertInfo;
-                $expertInfo->education = $this->education;
-                $expertInfo->academic_degree = $this->academic_degree;
-                $expertInfo->position = $this->position;
-                $expertInfo->type = implode('|', $this->type);
-                $expertInfo->scope_professional_competence = $this->scope_professional_competence;
-                $expertInfo->publications = $this->publications;
-                $expertInfo->implemented_projects = $this->implemented_projects;
-                $expertInfo->role_in_implemented_projects = $this->role_in_implemented_projects;
+                $expertInfo->setEducation($this->getEducation());
+                $expertInfo->setAcademicDegree($this->getAcademicDegree());
+                $expertInfo->setPosition($this->getPosition());
+                $expertInfo->setType(implode('|', $this->getType()));
+                $expertInfo->setScopeProfessionalCompetence($this->getScopeProfessionalCompetence());
+                $expertInfo->setPublications($this->getPublications());
+                $expertInfo->setImplementedProjects($this->getImplementedProjects());
+                $expertInfo->setRoleInImplementedProjects($this->getRoleInImplementedProjects());
 
                 if ($expertInfo->save()) {
                     return $user;
                 }
             }
-
-        } else {
-
-            $this->checking_mail_sending = false;
-            return  $this;
         }
+
+        $this->checking_mail_sending = false;
+        return  $this;
+
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEducation(): string
+    {
+        return $this->education;
+    }
+
+    /**
+     * @param string $education
+     */
+    public function setEducation(string $education): void
+    {
+        $this->education = $education;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcademicDegree(): string
+    {
+        return $this->academic_degree;
+    }
+
+    /**
+     * @param string $academic_degree
+     */
+    public function setAcademicDegree(string $academic_degree): void
+    {
+        $this->academic_degree = $academic_degree;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosition(): string
+    {
+        return $this->position;
+    }
+
+    /**
+     * @param string $position
+     */
+    public function setPosition(string $position): void
+    {
+        $this->position = $position;
+    }
+
+    /**
+     * @return array
+     */
+    public function getType(): array
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param array $type
+     */
+    public function setType(array $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopeProfessionalCompetence(): string
+    {
+        return $this->scope_professional_competence;
+    }
+
+    /**
+     * @param string $scope_professional_competence
+     */
+    public function setScopeProfessionalCompetence(string $scope_professional_competence): void
+    {
+        $this->scope_professional_competence = $scope_professional_competence;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublications(): string
+    {
+        return $this->publications;
+    }
+
+    /**
+     * @param string $publications
+     */
+    public function setPublications(string $publications): void
+    {
+        $this->publications = $publications;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImplementedProjects(): string
+    {
+        return $this->implemented_projects;
+    }
+
+    /**
+     * @param string $implemented_projects
+     */
+    public function setImplementedProjects(string $implemented_projects): void
+    {
+        $this->implemented_projects = $implemented_projects;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoleInImplementedProjects(): string
+    {
+        return $this->role_in_implemented_projects;
+    }
+
+    /**
+     * @param string $role_in_implemented_projects
+     */
+    public function setRoleInImplementedProjects(string $role_in_implemented_projects): void
+    {
+        $this->role_in_implemented_projects = $role_in_implemented_projects;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeywords(): string
+    {
+        return $this->keywords;
+    }
+
+    /**
+     * @param string $keywords
+     */
+    public function setKeywords(string $keywords): void
+    {
+        $this->keywords = $keywords;
     }
 }

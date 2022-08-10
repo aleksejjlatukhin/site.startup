@@ -1,9 +1,15 @@
 <?php
 
+use app\models\DataForUserListExpertise;
 use app\models\forms\expertise\FormExpertiseManyAnswer;
 use app\models\forms\expertise\FormExpertiseSingleAnswer;
 use app\models\ExpertType;
 
+/**
+ * @var DataForUserListExpertise[] $data
+ * @var string $stage
+ * @var int $stageId
+ */
 
 ?>
 
@@ -18,11 +24,11 @@ use app\models\ExpertType;
                 <div class="row container-fluid" style="border-bottom: 1px solid #ccc; padding-bottom: 15px; padding-top: 15px;">
                     <div class="col-xs-8">
                         <div class="row">
-                            <div class="col-xs-2 text-center"><?= date('d.m.y', $item['updated_at']); ?></div>
-                            <div class="col-xs-10">Тип деятельности: <?= ExpertType::getContent($item['type']); ?></div>
+                            <div class="col-xs-2 text-center"><?= date('d.m.y', $item->getUpdatedAt()) ?></div>
+                            <div class="col-xs-10">Тип деятельности: <?= ExpertType::getContent($item->getType()) ?></div>
                         </div>
                     </div>
-                    <div class="col-xs-4">Эксперт: <?= $item['username_expert']; ?></div>
+                    <div class="col-xs-4">Эксперт: <?= $item->getUsernameExpert() ?></div>
                 </div>
 
                 <!--Заголовки для списка экспертиз-->
@@ -38,23 +44,23 @@ use app\models\ExpertType;
 
                 <div class="row container-fluid" style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">
 
-                    <?php if ($item['form'] instanceof FormExpertiseSingleAnswer) : ?>
+                    <?php if ($item->getForm() instanceof FormExpertiseSingleAnswer) : ?>
 
                         <div class="col-xs-8">
                             <div class="row">
                                 <div class="col-xs-2 text-center">
-                                    <?= $item['general_estimation_by_one']; ?>
+                                    <?= $item->getGeneralEstimationByOne() ?>
                                 </div>
                                 <div class="col-xs-10">
-                                    <?php $arr = (array)$item['form']->getAnswerOptions(); echo $arr[$item['general_estimation_by_one']];?>
+                                    <?php $arr = (array)$item->getForm()->getAnswerOptions(); echo $arr[$item->getGeneralEstimationByOne()]; ?>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xs-4">
-                            <?= $item['comment']; ?>
+                            <?= $item->getComment() ?>
                         </div>
 
-                    <?php elseif ($item['form'] instanceof FormExpertiseManyAnswer) : ?>
+                    <?php elseif ($item->getForm() instanceof FormExpertiseManyAnswer) : ?>
 
                         <div class="col-xs-8">
 
@@ -63,13 +69,13 @@ use app\models\ExpertType;
                                 <div class="col-xs-10"><h4 class="bolder">Качество подготовки интервью</h4></div>
                             </div>
 
-                            <?php foreach ((array)$item['form']->getAnswerOptions('preparation_interview_quality') as $i => $answerOption) : ?>
+                            <?php foreach ((array)$item->getForm()->getAnswerOptions('preparation_interview_quality') as $i => $answerOption) : ?>
                                 <div class="row">
                                     <div class="col-xs-2 text-center">
-                                        <?= $item['form']->checkboxesPreparationInterviewQuality[$i][0]; ?>
+                                        <?= $item->getForm()->getCheckboxesPreparationInterviewQuality()[$i][0] ?>
                                     </div>
                                     <div class="col-xs-10">
-                                        <?= $answerOption[$item['form']->checkboxesPreparationInterviewQuality[$i][0]]; ?>
+                                        <?= $answerOption[$item->getForm()->getCheckboxesPreparationInterviewQuality()[$i][0]] ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -79,20 +85,20 @@ use app\models\ExpertType;
                                 <div class="col-xs-10"><h4 class="bolder">Качество проведения интервью</h4></div>
                             </div>
 
-                            <?php foreach ((array)$item['form']->getAnswerOptions('conducting_interview_quality') as $i => $answerOption) : ?>
+                            <?php foreach ((array)$item->getForm()->getAnswerOptions('conducting_interview_quality') as $i => $answerOption) : ?>
                                 <div class="row">
                                     <div class="col-xs-2 text-center">
-                                        <?= $item['form']->checkboxesConductingInterviewQuality[$i][0]; ?>
+                                        <?= $item->getForm()->getCheckboxesConductingInterviewQuality()[$i][0] ?>
                                     </div>
                                     <div class="col-xs-10">
-                                        <?= $answerOption[$item['form']->checkboxesConductingInterviewQuality[$i][0]]; ?>
+                                        <?= $answerOption[$item->getForm()->getCheckboxesConductingInterviewQuality()[$i][0]] ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
 
                         </div>
                         <div class="col-xs-4">
-                            <?= $item['comment']; ?>
+                            <?= $item->getComment() ?>
                         </div>
 
                     <?php endif; ?>
@@ -100,7 +106,7 @@ use app\models\ExpertType;
                 </div>
 
                 <div class="row container-fluid" style="padding-bottom: 15px; padding-top: 15px;">
-                    <div class="col-xs-12 bolder">Общий балл за экспертизу: <?= $item['general_estimation_by_one']; ?></div>
+                    <div class="col-xs-12 bolder">Общий балл за экспертизу: <?= $item->getGeneralEstimationByOne() ?></div>
                 </div>
             </div>
 

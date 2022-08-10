@@ -40,11 +40,11 @@ class FormUpdateClient extends Model
      * @param Client $client
      * @param array $config
      */
-    public function __construct(Client $client, $config = [])
+    public function __construct(Client $client, array $config = [])
     {
         $this->_client = $client;
         $this->attributes = $this->_client->attributes;
-        $this->accessAdmin = $client->findSettings()->getAccessAdmin();
+        $this->accessAdmin = $client->settings->getAccessAdmin();
         parent::__construct($config);
     }
 
@@ -52,7 +52,7 @@ class FormUpdateClient extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id'], 'integer'],
@@ -73,7 +73,7 @@ class FormUpdateClient extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование организации',
@@ -87,7 +87,7 @@ class FormUpdateClient extends Model
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -95,7 +95,7 @@ class FormUpdateClient extends Model
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -103,7 +103,7 @@ class FormUpdateClient extends Model
     /**
      * @return string
      */
-    public function getFullname()
+    public function getFullname(): string
     {
         return $this->fullname;
     }
@@ -111,7 +111,7 @@ class FormUpdateClient extends Model
     /**
      * @return string
      */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
@@ -119,7 +119,7 @@ class FormUpdateClient extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -127,7 +127,7 @@ class FormUpdateClient extends Model
     /**
      * @return int
      */
-    public function getAccessAdmin()
+    public function getAccessAdmin(): int
     {
         return $this->accessAdmin;
     }
@@ -137,11 +137,11 @@ class FormUpdateClient extends Model
      * @throws \Throwable
      * @throws StaleObjectException
      */
-    public function update()
+    public function update(): bool
     {
         $this->_client->attributes = $this->attributes;
-        $clientSettings = $this->_client->findSettings();
-        if ($clientSettings->getAccessAdmin() != $this->getAccessAdmin()) {
+        $clientSettings = $this->_client->settings;
+        if ($clientSettings->getAccessAdmin() !== $this->getAccessAdmin()) {
             try {
                 $clientSettings->setAccessAdmin($this->getAccessAdmin());
                 $clientSettings->update();

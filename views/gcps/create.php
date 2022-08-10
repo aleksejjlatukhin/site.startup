@@ -1,8 +1,17 @@
 <?php
 
+use app\models\ConfirmProblem;
+use app\models\forms\FormCreateGcp;
+use app\models\Segments;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var ConfirmProblem $confirmProblem
+ * @var FormCreateGcp $model
+ * @var Segments $segment
+ */
 
 ?>
 
@@ -11,7 +20,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'hypothesisCreateForm',
-        'action' => Url::to(['/gcps/create', 'id' => $confirmProblem->id]),
+        'action' => Url::to(['/gcps/create', 'id' => $confirmProblem->getId()]),
         'options' => ['class' => 'g-py-15 hypothesisCreateForm'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -29,7 +38,7 @@ use yii\helpers\Url;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
@@ -38,7 +47,7 @@ use yii\helpers\Url;
 
             Для какого сегмента предназначено:
             <span class="gcp_create_segment_link">
-                <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
+                <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->getId()], [
                     'class' => 'openAllInformationSegment',
                     'title' => 'Посмотреть описание',
                 ]) ?>
@@ -53,7 +62,7 @@ use yii\helpers\Url;
                 Для удовлетворения следующей потребности сегмента:
             </div>
 
-            <div><?= $confirmProblem->need_consumer;?></div>
+            <div><?= $confirmProblem->getNeedConsumer() ?></div>
 
         </div>
 
@@ -67,8 +76,7 @@ use yii\helpers\Url;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Все выгоды формулируются по трем критериям: временной, экономический и качественный факторы.
 Первые два параметра выгоды должны быть исчисляемыми. Параметр качества(исчисляемый /лаконичный текст).',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -81,7 +89,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Укажите параметры аналога, с которыми сравниваются параметры нового продукта',
-            ]); ?>
+            ]) ?>
 
         </div>
 

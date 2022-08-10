@@ -27,20 +27,17 @@ class ClientProfileController extends AppClientController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
-        if (in_array($action->id, ['index'])) {
+        if ($action->id === 'index') {
 
-            $admin = User::findOne(Yii::$app->user->id);
+            $admin = User::findOne(Yii::$app->user->getId());
             $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
-
             if ($clientSettings && User::isUserAdminCompany($admin->getUsername())) {
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
         } else {
             return parent::beforeAction($action);
         }
@@ -50,7 +47,7 @@ class ClientProfileController extends AppClientController
     /**
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         /** @var Client $client */
         $client = Client::find()
@@ -74,13 +71,13 @@ class ClientProfileController extends AppClientController
      * @throws StaleObjectExceptionAlias
      * @throws \Throwable
      */
-    public function actionLoadAvatarImage ()
+    public function actionLoadAvatarImage()
     {
-        $admin = User::findOne(Yii::$app->user->id);
-        $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
-        $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
-
         if (Yii::$app->request->isAjax) {
+
+            $admin = User::findOne(Yii::$app->user->getId());
+            $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
+            $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
 
             if (isset($_POST['imageMin'])) {
 
@@ -92,8 +89,7 @@ class ClientProfileController extends AppClientController
                         'success' => true, 'client' => $client,
                         'renderAjax' => $this->renderAjax('ajax_view', [
                             'client' => $client, 'model' => new FormUpdateClient($client),
-                            'avatarForm' => new AvatarCompanyForm($client->getId()),
-                            'clientSettings' => ClientSettings::findOne(['client_id' => $client->getId()]),
+                            'avatarForm' => new AvatarCompanyForm($client->getId())
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
@@ -120,13 +116,12 @@ class ClientProfileController extends AppClientController
     /**
      * @return array|bool
      */
-    public function actionGetDataAvatar ()
+    public function actionGetDataAvatar()
     {
-        $admin = User::findOne(Yii::$app->user->id);
-        $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
-
         if (Yii::$app->request->isAjax) {
 
+            $admin = User::findOne(Yii::$app->user->getId());
+            $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
             $response = ['path_max' => '/web/upload/company-' . $clientSettings->getClientId() . '/avatar/' . $clientSettings->getAvatarMaxImage()];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
@@ -140,17 +135,16 @@ class ClientProfileController extends AppClientController
     /**
      * @return bool
      */
-    public function actionDeleteUnusedImage ()
+    public function actionDeleteUnusedImage(): bool
     {
-        $admin = User::findOne(Yii::$app->user->id);
-        $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
-        $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
-
         if (Yii::$app->request->isAjax) {
-            if (isset($_POST['imageMax'])) {
-                if ($avatarForm->deleteUnusedImage()) {
-                    return true;
-                }
+
+            $admin = User::findOne(Yii::$app->user->getId());
+            $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
+            $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
+
+            if (isset($_POST['imageMax']) && $avatarForm->deleteUnusedImage()) {
+                return true;
             }
         }
         return false;
@@ -161,13 +155,13 @@ class ClientProfileController extends AppClientController
      * @throws StaleObjectExceptionAlias
      * @throws \Throwable
      */
-    public function actionDeleteAvatar ()
+    public function actionDeleteAvatar()
     {
-        $admin = User::findOne(Yii::$app->user->id);
-        $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
-        $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
-
         if (Yii::$app->request->isAjax) {
+
+            $admin = User::findOne(Yii::$app->user->getId());
+            $clientSettings = ClientSettings::findOne(['admin_id' => $admin->getId()]);
+            $avatarForm = new AvatarCompanyForm($clientSettings->getClientId());
 
             if ($avatarForm->deleteOldAvatarImages()) {
 
@@ -177,8 +171,7 @@ class ClientProfileController extends AppClientController
                     'success' => true, 'client' => $client,
                     'renderAjax' => $this->renderAjax('ajax_view', [
                         'client' => $client, 'model' => new FormUpdateClient($client),
-                        'avatarForm' => new AvatarCompanyForm($client->getId()),
-                        'clientSettings' => ClientSettings::findOne(['client_id' => $client->getId()]),
+                        'avatarForm' => new AvatarCompanyForm($client->getId())
                     ]),
                 ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -191,32 +184,33 @@ class ClientProfileController extends AppClientController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws StaleObjectExceptionAlias
      * @throws \Throwable
      */
-    public function actionUpdateProfile($id)
+    public function actionUpdateProfile(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
             $client = Client::findOne($id);
             $model = new FormUpdateClient($client);
 
-            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-                if ($model->update()) {
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->validate()) {
+                    if ($model->update()) {
 
-                    $response = [
-                        'success' => true, 'client' => $client,
-                        'renderAjax' => $this->renderAjax('ajax_view', [
-                            'client' => $client, 'model' => $model,
-                            'avatarForm' => new AvatarCompanyForm($id),
-                            'clientSettings' => ClientSettings::findOne(['client_id' => $id]),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
+                        $response = [
+                            'success' => true, 'client' => $client,
+                            'renderAjax' => $this->renderAjax('ajax_view', [
+                                'client' => $client, 'model' => $model,
+                                'avatarForm' => new AvatarCompanyForm($id)
+                            ]),
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
                 }
             }
         }

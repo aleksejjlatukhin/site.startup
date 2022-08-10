@@ -26,100 +26,77 @@ class UsersController extends AppAdminController
 
     public $layout = '@app/modules/admin/views/layouts/users';
 
+
     /**
      * @param $action
      * @return bool
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
         if (in_array($action->id, ['index', 'admins', 'experts'])) {
 
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
-                if (Yii::$app->request->get('id')) {
+                if ((int)Yii::$app->request->get('id')) {
 
-                    $client = Client::findOne(Yii::$app->request->get('id'));
+                    $client = Client::findOne((int)Yii::$app->request->get('id'));
 
-                    if ($currentClientUser->getClientId() == $client->getId()) {
-
-                        return parent::beforeAction($action);
-
-                    } elseif ($client->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+                    if ($currentClientUser->getClientId() === $client->getId()) {
 
                         return parent::beforeAction($action);
 
-                    } else {
-
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                     }
+
+                    if ($client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+
+                        return parent::beforeAction($action);
+
+                    }
+
+                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
 
                 return parent::beforeAction($action);
-
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif ($action->id == 'status-update') {
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+        } elseif (in_array($action->id, ['status-update', 'add-admin'])) {
 
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
-                if ($action->id == 'status-update') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
-
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
-
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        } elseif ($action->id == 'add-admin') {
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
+        } elseif ($action->id === 'group') {
 
-                if ($action->id == 'add-admin') {
-                    // ОТКЛЮЧАЕМ CSRF
-                    $this->enableCsrfValidation = false;
-                }
-
-                return parent::beforeAction($action);
-
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
-
-        } elseif ($action->id == 'group') {
-
-            $user = User::findOne(Yii::$app->request->get('id'));
-            /** @var ClientUser $clientUser */
+            $user = User::findOne((int)Yii::$app->request->get('id'));
             $clientUser = $user->clientUser;
             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
             $admin = User::findOne($clientSettings->getAdminId());
 
             if (User::isUserMainAdmin($admin->getUsername())) {
-                if ($user->getId() == $currentUser->getId() || User::isUserDev($currentUser->getUsername())
+                if ($user->getId() === $currentUser->getId() || User::isUserDev($currentUser->getUsername())
                     || User::isUserMainAdmin($currentUser->getUsername())) {
                     return parent::beforeAction($action);
-                } else{
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
-            } elseif (User::isUserAdminCompany($admin->getUsername()) && $clientSettings->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
+
+            } elseif (User::isUserAdminCompany($admin->getUsername()) && $clientSettings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
                 if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
                     return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
             }
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         } else{
             return parent::beforeAction($action);
@@ -132,10 +109,10 @@ class UsersController extends AppAdminController
     /**
      * Список проектантов организации
      *
-     * @param null|int $id
+     * @param int|null $id
      * @return string
      */
-    public function actionIndex($id = null)
+    public function actionIndex(int $id = null): string
     {
         if ($id) {
             $client = Client::findOne($id);
@@ -165,22 +142,22 @@ class UsersController extends AppAdminController
                 'users' => $users,
                 'pages' => $pages,
             ]);
-        } else {
-            return $this->render('index',[
-                'users' => $users,
-                'pages' => $pages,
-            ]);
         }
+
+        return $this->render('index',[
+            'users' => $users,
+            'pages' => $pages,
+        ]);
     }
 
 
     /**
      * Получить данные для модального окна назначения трекера проектанту
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetModalAddAdminToUser ($id)
+    public function actionGetModalAddAdminToUser(int $id)
     {
         if (Yii::$app->request->isAjax){
 
@@ -205,14 +182,14 @@ class UsersController extends AppAdminController
     /**
      * Получить данные для модального окна изменения статуса пользователя
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetModalUpdateStatus ($id)
+    public function actionGetModalUpdateStatus(int $id)
     {
         $model = User::findOne($id);
         if (Yii::$app->request->isAjax){
-            $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $model]),];
+            $response = ['renderAjax' => $this->renderAjax('get_modal_update_status', ['model' => $model])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -224,10 +201,10 @@ class UsersController extends AppAdminController
     /**
      * Список трекеров организации
      *
-     * @param null|int $id
+     * @param int|null $id
      * @return string
      */
-    public function actionAdmins($id = null)
+    public function actionAdmins(int $id = null): string
     {
         if ($id) {
             $client = Client::findOne($id);
@@ -247,35 +224,34 @@ class UsersController extends AppAdminController
             ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
-        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
-        $clientId = (ClientUser::findOne(['user_id' => Yii::$app->user->id])->getClientId());
+        $clientId = (ClientUser::findOne(['user_id' => Yii::$app->user->getId()])->getClientId());
 
         if ($id) {
             return $this->render('admins_company',[
                 'client' => $client,
                 'users' => $users,
-                'pages' => $pages,
-                'clientId' => $clientId,
-            ]);
-        } else {
-            return $this->render('admins',[
-                'users' => $users,
-                'pages' => $pages,
-                'clientId' => $clientId,
+                'pages' => $pages
             ]);
         }
+
+        return $this->render('admins',[
+            'users' => $users,
+            'pages' => $pages,
+            'clientId' => $clientId
+        ]);
     }
 
 
     /**
      * Список экспертов организации
      *
-     * @param null|int $id
+     * @param int|null $id
      * @return string
      */
-    public function actionExperts($id = null)
+    public function actionExperts(int $id = null): string
     {
         if ($id) {
             $client = Client::findOne($id);
@@ -295,7 +271,7 @@ class UsersController extends AppAdminController
             ->where(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
-        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
@@ -305,12 +281,12 @@ class UsersController extends AppAdminController
                 'users' => $users,
                 'pages' => $pages,
             ]);
-        } else {
-            return $this->render('experts',[
-                'users' => $users,
-                'pages' => $pages,
-            ]);
         }
+
+        return $this->render('experts',[
+            'users' => $users,
+            'pages' => $pages,
+        ]);
     }
 
 
@@ -319,7 +295,7 @@ class UsersController extends AppAdminController
      *
      * @return string
      */
-    public function actionManagers()
+    public function actionManagers(): string
     {
         $user = User::findOne(Yii::$app->user->getId());
         /**
@@ -348,37 +324,37 @@ class UsersController extends AppAdminController
     /**
      * Изменение статуса пользователя
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionStatusUpdate ($id)
+    public function actionStatusUpdate(int $id)
     {
-        $model = User::findOne($id);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $model = User::findOne($id);
 
-            if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->save()) {
 
-                    if (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_ADMIN)) {
+                    if (($model->getStatus() === User::STATUS_ACTIVE) && ($model->getRole() === User::ROLE_ADMIN)) {
                         //Создание беседы между трекером и главным админом
                         $model->createConversationMainAdmin();
 
-                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_EXPERT)) {
+                    } elseif (($model->getStatus() === User::STATUS_ACTIVE) && ($model->getRole() === User::ROLE_EXPERT)) {
                         //Создание беседы между экспертом и главным админом
                         User::createConversationExpert($model->mainAdmin, $model);
 
-                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_USER)) {
+                    } elseif (($model->getStatus() === User::STATUS_ACTIVE) && ($model->getRole() === User::ROLE_USER)) {
                         //Создание беседы между трекером и проектантом
                         $model->createConversationAdmin($model);
 
-                    } elseif (($model->status == User::STATUS_ACTIVE) && ($model->role == User::ROLE_MANAGER)) {
+                    } elseif (($model->getStatus() === User::STATUS_ACTIVE) && ($model->getRole() === User::ROLE_MANAGER)) {
                         //Создание беседы между главным алмином и менедром по клиентам
                         ConversationManager::createRecordWithMainAdmin($model->getId(), $model->mainAdmin);
                     }
 
-                    if (($model->status == User::STATUS_ACTIVE) && ($model->role != User::ROLE_DEV)) {
+                    if (($model->getStatus() === User::STATUS_ACTIVE) && ($model->getRole() !== User::ROLE_DEV)) {
                         //Создание беседы между техподдержкой и пользователем
                         $model->createConversationDevelopment();
                     }
@@ -401,24 +377,24 @@ class UsersController extends AppAdminController
     /**
      * Назначение трекера проектанту
      *
-     * @param $id
-     * @param $id_admin
+     * @param int $id
+     * @param int $id_admin
      * @return array|bool
      */
-    public function actionAddAdmin ($id, $id_admin)
+    public function actionAddAdmin(int $id, int $id_admin)
     {
-        $model = User::findOne($id);
-        $admin = User::findOne($id_admin);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $model = User::findOne($id);
+            $admin = User::findOne($id_admin);
 
-            if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->save()) {
 
-                    $conversation = ConversationAdmin::findOne(['user_id' => $model->id]);
+                    $conversation = ConversationAdmin::findOne(['user_id' => $model->getId()]);
                     if ($conversation) {
-                        $conversation->admin_id = $model->id_admin;
+                        $conversation->setAdminId($model->getIdAdmin());
                         $conversation->save();
                     }
 
@@ -437,14 +413,13 @@ class UsersController extends AppAdminController
     /**
      * Список проектантов для трекера организации
      *
-     * @param $id
-     * @param null $page
+     * @param int $id
+     * @param int|null $page
      * @return string
      */
-    public function actionGroup($id, $page = null)
+    public function actionGroup(int $id, int $page = null): string
     {
         $admin = User::findOne($id);
-        /** @var ClientUser $clientUser */
         $clientUser = $admin->clientUser;
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
@@ -456,7 +431,7 @@ class UsersController extends AppAdminController
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $users = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
         $currentUser = User::findOne(Yii::$app->user->getId());
-        $checkCurrentUserToClient = $clientUser->getClientId() == $currentUser->clientUser->getClientId();
+        $checkCurrentUserToClient = $clientUser->getClientId() === $currentUser->clientUser->getClientId();
 
         return $this->render('group',[
             'admin' => $admin,
@@ -471,15 +446,14 @@ class UsersController extends AppAdminController
     /**
      * Обновить на странице данных для проверки онлайн пользователь или нет
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionUpdateDataColumnUser ($id)
+    public function actionUpdateDataColumnUser(int $id)
     {
-        $user = User::findOne($id);
-
         if (Yii::$app->request->isAjax){
 
+            $user = User::findOne($id);
             $response = ['renderAjax' => $this->renderAjax('update_column_user', ['user' => $user])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;

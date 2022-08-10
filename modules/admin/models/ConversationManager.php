@@ -16,11 +16,17 @@ use yii\db\BaseActiveRecord;
  * Class ConversationManager
  * @package app\modules\admin\models
  *
- * @property int $id                    идентификатор беседы
- * @property int $manager_id            идентификатор менеджера
- * @property int $user_id               идентификатор пользователя
- * @property int $role                  идентификатор пользователя
- * @property int $updated_at            дата обновления
+ * @property int $id                                        идентификатор беседы
+ * @property int $manager_id                                идентификатор менеджера
+ * @property int $user_id                                   идентификатор пользователя
+ * @property int $role                                      идентификатор пользователя
+ * @property int $updated_at                                дата обновления
+ *
+ * @property User $user                                     Пользователь
+ * @property User $manager                                  Менеджер
+ * @property MessageManager[] $messages                     Сообщения беседы
+ * @property MessageManager $lastMessage                    Последнее сообщение в беседе
+ * @property int $countNewMessages                          Кол-во непрочитанных сообщений в беседе
  */
 class ConversationManager extends ActiveRecord
 {
@@ -28,7 +34,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'conversation_manager';
     }
@@ -37,7 +43,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
 
@@ -49,7 +55,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             //Использование поведения TimestampBehavior ActiveRecord
@@ -74,19 +80,19 @@ class ConversationManager extends ActiveRecord
      *
      * @return ConversationManager|null
      */
-    public function createOrUpdateRecordWithAdminCompany($managerId, $user)
+    public function createOrUpdateRecordWithAdminCompany(int $managerId, User $user): ?ConversationManager
     {
         $record = self::findOne(['user_id' => $user->getId(), 'role' => $user->getRole()]);
 
         if ($record) {
             $record->setManagerId($managerId);
             return $record->save() ? $record : null;
-        } else {
-            $this->manager_id = $managerId;
-            $this->user_id = $user->getId();
-            $this->role = $user->getRole();
-            return $this->save() ? $this : null;
         }
+
+        $this->setManagerId($managerId);
+        $this->setUserId($user->getId());
+        $this->setRole($user->getRole());
+        return $this->save() ? $this : null;
     }
 
 
@@ -98,7 +104,7 @@ class ConversationManager extends ActiveRecord
      *
      * @return ConversationManager|null
      */
-    public static function createRecordWithMainAdmin($managerId, $user)
+    public static function createRecordWithMainAdmin(int $managerId, User $user): ?ConversationManager
     {
         $record = self::findOne(['manager_id' => $managerId, 'role' => User::ROLE_MAIN_ADMIN]);
 
@@ -115,9 +121,10 @@ class ConversationManager extends ActiveRecord
 
     /**
      * Получить объект менеджера
+     *
      * @return ActiveQuery
      */
-    public function getManager ()
+    public function getManager(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'manager_id']);
     }
@@ -125,9 +132,10 @@ class ConversationManager extends ActiveRecord
 
     /**
      * Получить объект пользователя
+     *
      * @return ActiveQuery
      */
-    public function getUser ()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -135,9 +143,10 @@ class ConversationManager extends ActiveRecord
 
     /**
      * Получить все сообщения беседы
+     *
      * @return ActiveQuery
      */
-    public function getMessages ()
+    public function getMessages(): ActiveQuery
     {
         return $this->hasMany(MessageManager::class, ['conversation_id' => 'id']);
     }
@@ -145,9 +154,10 @@ class ConversationManager extends ActiveRecord
 
     /**
      * Получить последнее сообщение беседы
+     *
      * @return ActiveQuery
      */
-    public function getLastMessage ()
+    public function getLastMessage(): ActiveQuery
     {
         return $this->hasOne(MessageManager::class, ['conversation_id' => 'id'])->orderBy('created_at DESC');
     }
@@ -155,20 +165,19 @@ class ConversationManager extends ActiveRecord
 
     /**
      * Получить кол-во непрочитанных сообщений беседы
-     * @return int|string
+     *
+     * @return int
      */
-    public function getCountNewMessages ()
+    public function getCountNewMessages(): int
     {
-        $count_new_messages = MessageManager::find()
-            ->where(['conversation_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
-
-        return $count_new_messages;
+        return MessageManager::find()
+            ->where(['conversation_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -176,7 +185,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return int
      */
-    public function getManagerId()
+    public function getManagerId(): int
     {
         return $this->manager_id;
     }
@@ -184,7 +193,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @param int $manager_id
      */
-    public function setManagerId($manager_id)
+    public function setManagerId(int $manager_id): void
     {
         $this->manager_id = $manager_id;
     }
@@ -192,7 +201,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -200,7 +209,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -208,7 +217,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return int
      */
-    public function getRole()
+    public function getRole(): int
     {
         return $this->role;
     }
@@ -216,7 +225,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @param int $role
      */
-    public function setRole($role)
+    public function setRole(int $role): void
     {
         $this->role = $role;
     }
@@ -224,7 +233,7 @@ class ConversationManager extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

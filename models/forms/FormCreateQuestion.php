@@ -29,7 +29,7 @@ class FormCreateQuestion extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['confirm_id', 'title'], 'required'],
@@ -42,7 +42,7 @@ class FormCreateQuestion extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return ['title' => 'Описание вопроса'];
     }
@@ -51,12 +51,12 @@ class FormCreateQuestion extends Model
      * @param QuestionsConfirmSegment|QuestionsConfirmProblem|QuestionsConfirmGcp|QuestionsConfirmMvp $model
      * @return array|null
      */
-    public function create($model)
+    public function create($model): ?array
     {
         $model->setParams(['confirm_id' => $this->getConfirmId(), 'title' => $this->getTitle()]);
         if ($model->save()){
-            $confirm = $model->findConfirm();
-            $questions = $confirm->findQuestions();
+            $confirm = $model->confirm;
+            $questions = $confirm->questions;
             $queryQuestions = $confirm->queryQuestionsGeneralList();
 
             return ['model' => $model, 'questions' => $questions, 'queryQuestions' => $queryQuestions];
@@ -67,7 +67,7 @@ class FormCreateQuestion extends Model
     /**
      * @return string
      */
-    public function getListQuestions()
+    public function getListQuestions(): string
     {
         return $this->list_questions;
     }
@@ -75,7 +75,7 @@ class FormCreateQuestion extends Model
     /**
      * @param string $list_questions
      */
-    public function setListQuestions($list_questions)
+    public function setListQuestions(string $list_questions): void
     {
         $this->list_questions = $list_questions;
     }
@@ -83,7 +83,7 @@ class FormCreateQuestion extends Model
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -91,7 +91,7 @@ class FormCreateQuestion extends Model
     /**
      * @param int $id
      */
-    public function setConfirmId($id)
+    public function setConfirmId(int $id): void
     {
         $this->confirm_id = $id;
     }
@@ -99,7 +99,7 @@ class FormCreateQuestion extends Model
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -107,7 +107,7 @@ class FormCreateQuestion extends Model
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }

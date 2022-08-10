@@ -1,12 +1,19 @@
 <?php
 
-use app\models\Projects;
+use yii\data\Pagination;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
+use yii\widgets\LinkPager;
 
 $this->title = 'Менеджеры';
 $this->registerCssFile('@web/css/users-index-style.css');
+
+/**
+ * @var User[] $users
+ * @var Pagination $pages
+ */
+
 ?>
 
 <div class="users-admins">
@@ -25,7 +32,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'border-radius' => '8px 0 0 8px',
             ],
             'class' => 'btn btn-lg btn-default',
-        ]);?>
+        ]) ?>
 
         <?= Html::a( 'Трекеры', Url::to(['/admin/users/admins']),[
             'style' => [
@@ -39,7 +46,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'border-radius' => '0',
             ],
             'class' => 'btn btn-lg btn-default',
-        ]);?>
+        ]) ?>
 
         <?= Html::a( 'Эксперты', Url::to(['/admin/users/experts']),[
             'style' => [
@@ -53,7 +60,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'border-radius' => '0',
             ],
             'class' => 'btn btn-lg btn-default',
-        ]);?>
+        ]) ?>
 
         <?= Html::button( 'Менеджеры',[
             'style' => [
@@ -67,7 +74,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                 'border-radius' => '0 8px 8px 0',
             ],
             'class' => 'btn btn-lg btn-success',
-        ]);?>
+        ]) ?>
 
     </div>
 
@@ -105,15 +112,15 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
             <?php foreach ($users as $user) : ?>
 
-                <div class="row container-one_user user_container_number-<?=$user->id;?>">
+                <div class="row container-one_user user_container_number-<?=$user->getId() ?>">
 
-                    <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $user->id;?>">
+                    <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $user->getId() ?>">
 
                         <!--Проверка существования аватарки-->
-                        <?php if ($user->avatar_image) : ?>
-                            <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'user_picture']); ?>
+                        <?php if ($user->getAvatarImage()) : ?>
+                            <?= Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'user_picture']) ?>
                         <?php else : ?>
-                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                         <?php endif; ?>
 
                         <!--Проверка онлайн статуса-->
@@ -124,10 +131,10 @@ $this->registerCssFile('@web/css/users-index-style.css');
                         <?php endif; ?>
 
                         <div class="block-fio-and-date-last-visit">
-                            <div class="block-fio"><?= $user->username; ?></div>
+                            <div class="block-fio"><?= $user->getUsername() ?></div>
                             <div class="block-date-last-visit">
-                                <?php if($user->checkOnline !== true && $user->checkOnline !== false) : ?>
-                                    Пользователь был в сети <?= $user->checkOnline;?>
+                                <?php if(is_string($user->checkOnline)) : ?>
+                                    Пользователь был в сети <?= $user->checkOnline ?>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -149,17 +156,17 @@ $this->registerCssFile('@web/css/users-index-style.css');
                                 'border-radius' => '8px',
                             ],
                             'class' => 'btn btn-lg btn-default',
-                        ]);?>
+                        ]) ?>
 
                     </div>
 
                     <div class="col-md-2 column-user-status">
 
-                        <?php if ($user->status === User::STATUS_DELETED) : ?>
+                        <?php if ($user->getStatus() === User::STATUS_DELETED) : ?>
 
                             <?= Html::submitButton('Заблокирован', [
                                 'class' => 'btn btn-lg btn-danger open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
+                                'id' => 'open_change_status_modal-'.$user->getId(),
                                 'style' => [
                                     'display' => 'flex',
                                     'align-items' => 'center',
@@ -170,13 +177,13 @@ $this->registerCssFile('@web/css/users-index-style.css');
                                     'font-size' => '18px',
                                     'border-radius' => '8px',
                                 ],
-                            ]);?>
+                            ]) ?>
 
-                        <?php elseif ($user->status === User::STATUS_NOT_ACTIVE) : ?>
+                        <?php elseif ($user->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
 
                             <?= Html::submitButton('Не активирован', [
                                 'class' => 'btn btn-lg btn-default open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
+                                'id' => 'open_change_status_modal-'.$user->getId(),
                                 'style' => [
                                     'display' => 'flex',
                                     'align-items' => 'center',
@@ -187,13 +194,13 @@ $this->registerCssFile('@web/css/users-index-style.css');
                                     'font-size' => '18px',
                                     'border-radius' => '8px',
                                 ],
-                            ]);?>
+                            ]) ?>
 
-                        <?php elseif ($user->status === User::STATUS_ACTIVE) : ?>
+                        <?php elseif ($user->getStatus() === User::STATUS_ACTIVE) : ?>
 
                             <?= Html::submitButton('Активирован', [
                                 'class' => 'btn btn-lg btn-success open_change_status_modal',
-                                'id' => 'open_change_status_modal-'.$user->id,
+                                'id' => 'open_change_status_modal-'.$user->getId(),
                                 'style' => [
                                     'display' => 'flex',
                                     'align-items' => 'center',
@@ -204,22 +211,22 @@ $this->registerCssFile('@web/css/users-index-style.css');
                                     'font-size' => '18px',
                                     'border-radius' => '8px',
                                 ],
-                            ]);?>
+                            ]) ?>
 
                         <?php endif; ?>
 
                     </div>
 
                     <div class="col-md-2 text-center">
-                        <div class=""><?= $user->email; ?></div>
+                        <div class=""><?= $user->getEmail() ?></div>
                     </div>
 
                     <div class="col-md-1 text-center">
-                        <?= date('d.m.Y', $user->updated_at); ?>
+                        <?= date('d.m.Y', $user->getUpdatedAt()) ?>
                     </div>
 
                     <div class="col-md-1 text-center">
-                        <?= date('d.m.Y', $user->created_at); ?>
+                        <?= date('d.m.Y', $user->getCreatedAt()) ?>
                     </div>
 
                 </div>
@@ -227,11 +234,11 @@ $this->registerCssFile('@web/css/users-index-style.css');
             <?php endforeach; ?>
 
             <div class="pagination-users">
-                <?= \yii\widgets\LinkPager::widget([
+                <?= LinkPager::widget([
                     'pagination' => $pages,
                     'activePageCssClass' => 'pagination_active_page',
                     'options' => ['class' => 'pagination-users-list'],
-                ]); ?>
+                ]) ?>
             </div>
 
         </div>

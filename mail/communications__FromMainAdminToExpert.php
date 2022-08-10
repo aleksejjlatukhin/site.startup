@@ -1,3 +1,11 @@
+<?php
+
+use app\models\ProjectCommunications;
+
+/** @var ProjectCommunications $communication*/
+
+?>
+
 <p>
-    <?= $communication->getDescriptionPattern(true); ?>
+    <?= $communication->getDescriptionPattern(true) ?>
 </p>

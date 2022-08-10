@@ -14,21 +14,21 @@ namespace app\models;
 class StageExpertise
 {
 
-    const PROJECT = 0;
-    const SEGMENT = 1;
-    const CONFIRM_SEGMENT = 2;
-    const PROBLEM = 3;
-    const CONFIRM_PROBLEM = 4;
-    const GCP = 5;
-    const CONFIRM_GCP = 6;
-    const MVP = 7;
-    const CONFIRM_MVP = 8;
-    const BUSINESS_MODEL = 9;
+    public const PROJECT = 0;
+    public const SEGMENT = 1;
+    public const CONFIRM_SEGMENT = 2;
+    public const PROBLEM = 3;
+    public const CONFIRM_PROBLEM = 4;
+    public const GCP = 5;
+    public const CONFIRM_GCP = 6;
+    public const MVP = 7;
+    public const CONFIRM_MVP = 8;
+    public const BUSINESS_MODEL = 9;
 
     /**
      * @var array
      */
-    private static $list = [
+    private static $list = array(
         self::PROJECT => 'project',
         self::SEGMENT => 'segment',
         self::CONFIRM_SEGMENT => 'confirm_segment',
@@ -39,7 +39,7 @@ class StageExpertise
         self::MVP => 'mvp',
         self::CONFIRM_MVP => 'confirm_mvp',
         self::BUSINESS_MODEL => 'business_model'
-    ];
+    );
 
     /**
      * @var array
@@ -60,7 +60,7 @@ class StageExpertise
     /**
      * @return array
      */
-    public static function getList()
+    public static function getList(): array
     {
         return self::$list;
     }
@@ -71,13 +71,13 @@ class StageExpertise
      */
     public static function getKey($value)
     {
-        return array_search($value, self::$list);
+        return array_search($value, self::$list, false);
     }
 
     /**
      * @return array
      */
-    public static function getListClasses()
+    public static function getListClasses(): array
     {
         return self::$listClasses;
     }
@@ -90,7 +90,7 @@ class StageExpertise
      * @param $stage string
      * @return mixed
      */
-    public static function getClassByStage($stage)
+    public static function getClassByStage(string $stage)
     {
         return self::getListClasses()[$stage];
     }
@@ -122,32 +122,32 @@ class StageExpertise
      * @param int $stageId
      * @return string
      */
-    public static function getTitle($stage, $stageId)
+    public static function getTitle(string $stage, int $stageId): string
     {
         $title = '';
         $class = self::getClassByStage($stage);
         $obj = $class::findOne($stageId);
 
         if ($obj instanceof Projects) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->project_name . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->getProjectName() . '»';
         } elseif ($obj instanceof Segments) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->name . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->getName() . '»';
         } elseif ($obj instanceof ConfirmSegment) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->segment->name . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->segment->getName() . '»';
         } elseif ($obj instanceof Problems) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmProblem) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->problem->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->problem->getTitle() . '»';
         } elseif ($obj instanceof Gcps) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmGcp) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->gcp->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->gcp->getTitle() . '»';
         } elseif ($obj instanceof Mvps) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmMvp) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->mvp->title . '»';
+            $title = self::$listTitle[$stage] . '</br> «' . $obj->mvp->getTitle() . '»';
         } elseif ($obj instanceof BusinessModel) {
-            $title = self::$listTitle[$stage] . '</br> для «' . $obj->mvp->title . '»';
+            $title = self::$listTitle[$stage] . '</br> для «' . $obj->mvp->getTitle() . '»';
         }
 
         return $title;

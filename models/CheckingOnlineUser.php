@@ -21,7 +21,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'checking_online_user';
     }
@@ -30,7 +30,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['user_id', 'last_active_time'], 'required'],
@@ -42,7 +42,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * Установить текущее время и сохранить запись в бд
      */
-    public function setLastActiveTime()
+    public function setLastActiveTime(): void
     {
         $this->last_active_time = time();
         $this->save();
@@ -54,7 +54,7 @@ class CheckingOnlineUser extends ActiveRecord
      *
      * @param int $id
      */
-    public function addCheckingOnline($id)
+    public function addCheckingOnline(int $id): void
     {
         $this->setUserId($id);
         $this->setLastActiveTime();
@@ -62,12 +62,14 @@ class CheckingOnlineUser extends ActiveRecord
 
 
     /**
-     * @return bool|mixed
+     * @return bool|string
      */
     public function isOnline()
     {
-        if ($this->last_active_time > time() - (5*60)) return true;
-        else return $this->dateRusAndTime;
+        if ($this->last_active_time > time() - (5*60)) {
+            return true;
+        }
+        return $this->getDateRusAndTime();
     }
 
 
@@ -76,7 +78,8 @@ class CheckingOnlineUser extends ActiveRecord
      *
      * @return string
      */
-    public function getDateRusAndTime(){
+    public function getDateRusAndTime(): string
+    {
 
         $monthes = array(
             1 => 'января', 2 => 'февраля', 3 => 'марта', 4 => 'апреля',
@@ -84,32 +87,31 @@ class CheckingOnlineUser extends ActiveRecord
             9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря'
         );
 
-        if (date('d.n.Y', $this->last_active_time) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->last_active_time) === date('d.n.Y')) {
             return 'сегодня в ' . date('H:i', $this->last_active_time);
         }
-        elseif (date('d', $this->last_active_time) == (date('d', time()) - 1)
-            && date('n.Y', $this->last_active_time) == date('n.Y', time())) {
+        elseif (date('d', $this->last_active_time) === (date('d') - 1)
+            && date('n.Y', $this->last_active_time) === date('n.Y')) {
             return 'вчера в ' . date('H:i', $this->last_active_time);
         }
         else {
 
-            if (date('Y', $this->last_active_time) == date('Y', time())) {
+            if (date('Y', $this->last_active_time) === date('Y')) {
 
                 return date('d', $this->last_active_time) . ' ' . $monthes[(date('n', $this->last_active_time))]
                     . ' в ' . date('H:i', $this->last_active_time);
 
-            } else {
-
-                return date('d', $this->last_active_time) . ' ' . $monthes[(date('n', $this->last_active_time))]
-                        . ' ' . date(' Y', $this->last_active_time);
             }
+
+            return date('d', $this->last_active_time) . ' ' . $monthes[(date('n', $this->last_active_time))]
+                    . ' ' . date(' Y', $this->last_active_time);
         }
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -117,7 +119,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -125,7 +127,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -133,7 +135,7 @@ class CheckingOnlineUser extends ActiveRecord
     /**
      * @return int
      */
-    public function getLastActiveTime()
+    public function getLastActiveTime(): int
     {
         return $this->last_active_time;
     }

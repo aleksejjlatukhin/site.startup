@@ -3,10 +3,14 @@
 use yii\bootstrap\Modal;
 use app\models\User;
 
+/**
+ * @var User $user
+ */
+
 ?>
 
 
-<?php if ($user->status === User::STATUS_NOT_ACTIVE) : ?>
+<?php if ($user->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
 
     <?php
     Modal::begin([
@@ -23,7 +27,7 @@ use app\models\User;
     <?php Modal::end(); ?>
 
 
-<?php elseif ($user->status === User::STATUS_DELETED) : ?>
+<?php elseif ($user->getStatus() === User::STATUS_DELETED) : ?>
 
     <?php
     Modal::begin([

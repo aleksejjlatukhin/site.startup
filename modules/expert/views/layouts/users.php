@@ -8,6 +8,13 @@ use app\assets\AppAsset;
 use app\models\User;
 use yii\bootstrap\Modal;
 
+/**
+ * @var string $content
+ * @var User $user
+ */
+
+$user = User::findOne(Yii::$app->user->getId());
+
 AppAsset::register($this);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/images/icons/favicon.png']);
 
@@ -26,11 +33,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 <body>
 <?php $this->beginBody() ?>
 
-<?php $user = User::findOne(Yii::$app->user->id); ?>
-
 <div class="shared-container" id="simplebar-shared-container">
 
-    <div class="wrap" id="identifying_recipient_new_message-<?= Yii::$app->user->id; ?>">
+    <div class="wrap" id="identifying_recipient_new_message-<?= $user->getId() ?>">
 
         <div style="margin-bottom: -20px;">
 
@@ -52,26 +57,24 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                 'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
                 'items' => [
 
-                    !Yii::$app->user->isGuest ? (
                     ['label' => $user->countUnreadCommunications ? '<div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления'])
-                        : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления']), 'url' => ['/expert/communications/notifications', 'id' => Yii::$app->user->id]]) : '',
+                        : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления']), 'url' => ['/expert/communications/notifications', 'id' => $user->getId()]],
 
                     ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messager', 'title' => 'Экспертизы']), 'url' => ['/expert/expertise/index']],
 
                     [
-                        'label' => Yii::$app->user->identity['avatar_image'] ? Html::img('/web/upload/user-'.Yii::$app->user->id.'/avatar/'.Yii::$app->user->identity['avatar_image'], ['class' => 'icon_user_avatar user_profile_picture'])
+                        'label' => $user->getAvatarImage() ? Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'icon_user_avatar user_profile_picture'])
                             : Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_user_avatar_default user_profile_picture']),
                         'items' => [
-                            ['label' => 'Мой профиль', 'url' => Url::to(['/expert/profile/index', 'id' => Yii::$app->user->id])],
-                            ['label' => '<span>Выход ('.Yii::$app->user->identity['username'].')</span>', 'url' => Url::to(['/site/logout'])],
+                            ['label' => 'Мой профиль', 'url' => Url::to(['/expert/profile/index', 'id' => $user->getId()])],
+                            ['label' => '<span>Выход ('.$user->getUsername().')</span>', 'url' => Url::to(['/site/logout'])],
                         ],
                     ],
 
                     ['label' => $user->countUnreadMessages ? '<div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messager', 'title' => 'Сообщения'])
-                        : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messager', 'title' => 'Сообщения']), 'url' => ['/expert/message/index', 'id' => Yii::$app->user->id]],
+                        : '<div class="countUnreadMessages"></div>' . Html::img('/images/icons/icon_messager_animation.svg', ['class' => 'icon_messager', 'title' => 'Сообщения']), 'url' => ['/expert/message/index', 'id' => $user->getId()]],
 
-                    !Yii::$app->user->isGuest ? (
-                    ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messager', 'title' => 'Методическое руководство']), 'url' => ['/site/methodological-guide']]) : '',
+                    ['label' => Html::img('/images/icons/icon_light_bulb.png', ['class' => 'icon_messager', 'title' => 'Методическое руководство']), 'url' => ['/site/methodological-guide']],
                 ],
                 'encodeLabels' => false,
             ]);

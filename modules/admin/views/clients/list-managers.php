@@ -1,10 +1,17 @@
 <?php
 
+use app\models\CustomerManager;
+use app\models\User;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\select2\Select2;
+
+/**
+ * @var CustomerManager $customerManager
+ * @var User[] $managers
+ */
 
 ?>
 
@@ -40,12 +47,12 @@ use kartik\select2\Select2;
                 'options' => ['id' => 'selectChangeManagerToClient'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]); ?>
+            ]) ?>
         </div>
         <div class="col-md-2"></div>
     </div>
 
-    <?= $form->field($customerManager, 'client_id')->hiddenInput()->label(false); ?>
+    <?= $form->field($customerManager, 'client_id')->hiddenInput()->label(false) ?>
 
     <div class="row" style="display:flex; justify-content: center;">
         <?= Html::submitButton('Сохранить', [

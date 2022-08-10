@@ -44,7 +44,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'filter', 'filter' => 'trim'],
@@ -57,11 +57,11 @@ class FormCreateMessageAdmin extends Model
 
 
     /**
-     * @return MessageAdmin|bool
+     * @return MessageAdmin
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function create()
+    public function create(): MessageAdmin
     {
         $model = new MessageAdmin();
         $model->setDescription($this->getDescription());
@@ -73,7 +73,9 @@ class FormCreateMessageAdmin extends Model
             //Загрузка презентационных файлов
             $this->setMessageId($model->getId());
             $this->setMessageFiles(UploadedFile::getInstances($this, 'message_files'));
-            if ($this->getMessageFiles()) $this->uploadMessageFiles();
+            if ($this->getMessageFiles()) {
+                $this->uploadMessageFiles();
+            }
 
             return $model;
         }
@@ -83,14 +85,16 @@ class FormCreateMessageAdmin extends Model
 
 
     /**
-     * @return bool
+     * @return void
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    private function uploadMessageFiles(){
-
+    private function uploadMessageFiles(): void
+    {
         $path = UPLOAD.'/user-'.$this->getSenderId().'/messages/category-'.$this->getCategory().'/message-'.$this->getMessageId().'/';
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         if($this->validate()){
 
@@ -114,17 +118,13 @@ class FormCreateMessageAdmin extends Model
                     throw new NotFoundHttpException('Невозможно загрузить файл!');
                 }
             }
-            return true;
-        }else{
-            return false;
         }
-
     }
 
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -132,7 +132,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -140,7 +140,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return int
      */
-    public function getConversationId()
+    public function getConversationId(): int
     {
         return $this->conversation_id;
     }
@@ -148,7 +148,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param int $conversation_id
      */
-    public function setConversationId($conversation_id)
+    public function setConversationId(int $conversation_id): void
     {
         $this->conversation_id = $conversation_id;
     }
@@ -156,7 +156,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return int
      */
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->sender_id;
     }
@@ -164,7 +164,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param int $sender_id
      */
-    public function setSenderId($sender_id)
+    public function setSenderId(int $sender_id): void
     {
         $this->sender_id = $sender_id;
     }
@@ -172,7 +172,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return int
      */
-    public function getAdresseeId()
+    public function getAdresseeId(): int
     {
         return $this->adressee_id;
     }
@@ -180,7 +180,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param int $adressee_id
      */
-    public function setAdresseeId($adressee_id)
+    public function setAdresseeId(int $adressee_id): void
     {
         $this->adressee_id = $adressee_id;
     }
@@ -196,7 +196,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param mixed $message_files
      */
-    public function setMessageFiles($message_files)
+    public function setMessageFiles($message_files): void
     {
         $this->message_files = $message_files;
     }
@@ -204,7 +204,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return int
      */
-    public function getCategory()
+    public function getCategory(): int
     {
         return $this->category;
     }
@@ -212,7 +212,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param int $category
      */
-    public function setCategory($category)
+    public function setCategory(int $category): void
     {
         $this->category = $category;
     }
@@ -220,7 +220,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @return int
      */
-    public function getMessageId()
+    public function getMessageId(): int
     {
         return $this->message_id;
     }
@@ -228,7 +228,7 @@ class FormCreateMessageAdmin extends Model
     /**
      * @param int $message_id
      */
-    public function setMessageId($message_id)
+    public function setMessageId(int $message_id): void
     {
         $this->message_id = $message_id;
     }

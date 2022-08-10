@@ -35,42 +35,38 @@ class ProfileController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['index']) || in_array($action->id, ['result']) || in_array($action->id, ['roadmap'])
-            || in_array($action->id, ['report']) || in_array($action->id,['presentation'])) {
+        if (in_array($action->id, ['index', 'result', 'roadmap', 'report', 'presentation'])) {
 
-            $user = User::findOne(Yii::$app->request->get('id'));
+            $user = User::findOne((int)Yii::$app->request->get('id'));
 
-            if ($currentUser->getId() == $user->getId()) {
-
-                return parent::beforeAction($action);
-            }
-            elseif (User::isUserAdmin($currentUser->getUsername()) && $user->getIdAdmin() == $currentUser->getId()) {
+            if ($currentUser->getId() === $user->getId()) {
 
                 return parent::beforeAction($action);
             }
-            elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
+            if (User::isUserAdmin($currentUser->getUsername()) && $user->getIdAdmin() === $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+            }
+
+            if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
                 $modelClientUser = $user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
 
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
             }
-            else {
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-            }
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
         }else{
             return parent::beforeAction($action);
         }
@@ -78,11 +74,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * Lists all User models.
-     * @param $id
-     * @return mixed
+     * @param int $id
+     * @return string
      */
-    public function actionIndex($id)
+    public function actionIndex(int $id): string
     {
         $user = User::findOne($id);
         $profile = new ProfileForm($id);
@@ -99,10 +94,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetUserIsOnline($id)
+    public function actionGetUserIsOnline(int $id)
     {
         $user = User::findOne($id);
 
@@ -114,29 +109,29 @@ class ProfileController extends AppUserPartController
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-            } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
-
-                $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+
         }
         return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|bool
      */
-    public function actionUpdateProfile($id)
+    public function actionUpdateProfile(int $id)
     {
-        $model = new ProfileForm($id);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
+            $model = new ProfileForm($id);
 
-            if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())){
 
                 if ($model->validate()) {
 
@@ -158,14 +153,12 @@ class ProfileController extends AppUserPartController
                             return $response;
 
                         }
-                        else {
 
-                            //Письмо с уведомлением не отправлено
-                            $response = ['error_send_email' => true];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        //Письмо с уведомлением не отправлено
+                        $response = ['error_send_email' => true];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
                     }
 
                 } else {
@@ -194,21 +187,23 @@ class ProfileController extends AppUserPartController
                 }
             }
         }
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return bool[]|false|string[]
      * @throws Exception
      */
-    public function actionChangePassword($id)
+    public function actionChangePassword(int $id)
     {
-        $user = User::findOne($id);
-        $model = new PasswordChangeForm($user);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
-            if (Yii::$app->request->isAjax) {
+            $user = User::findOne($id);
+            $model = new PasswordChangeForm($user);
+
+            if ($model->load(Yii::$app->request->post())){
                 if ($model->validate()) {
                     if ($model->changePassword()) {
 
@@ -218,29 +213,27 @@ class ProfileController extends AppUserPartController
                         return $response;
                     }
 
-                } else {
+                } elseif (!$model->validate(['currentPassword'])) {
 
-                    if (!$model->validate(['currentPassword'])) {
-
-                        $response = ['errorCurrentPassword' => 'true'];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = ['errorCurrentPassword' => 'true'];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+        return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws Throwable
      * @throws Exception
      * @throws StaleObjectException
      */
-    public function actionLoadAvatarImage ($id)
+    public function actionLoadAvatarImage(int $id)
     {
         $avatarForm = new AvatarForm($id);
 
@@ -281,16 +274,16 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetDataAvatar ($id)
+    public function actionGetDataAvatar(int $id)
     {
         $user = User::findOne($id);
 
         if (Yii::$app->request->isAjax) {
 
-            $response = ['path_max' => '/web/upload/user-' . $user->id . '/avatar/' . $user->avatar_max_image,];
+            $response = ['path_max' => '/web/upload/user-' . $user->getId() . '/avatar/' . $user->getAvatarMaxImage()];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -300,32 +293,29 @@ class ProfileController extends AppUserPartController
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionDeleteUnusedImage ($id)
+    public function actionDeleteUnusedImage(int $id): bool
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
-            if (isset($_POST['imageMax'])) {
-                if ($avatarForm->deleteUnusedImage()) {
-                    return true;
-                }
+            $avatarForm = new AvatarForm($id);
+            if (isset($_POST['imageMax']) && $avatarForm->deleteUnusedImage()) {
+                return true;
             }
         }
         return false;
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionDeleteAvatar ($id)
+    public function actionDeleteAvatar(int $id)
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
+
+            $avatarForm = new AvatarForm($id);
 
             if ($avatarForm->deleteOldAvatarImages()) {
 
@@ -348,10 +338,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionResult ($id)
+    public function actionResult(int $id): string
     {
         $user = User::findOne($id);
         $projects = Projects::findAll(['user_id' => $id]);
@@ -364,10 +354,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetDataProjects ($id)
+    public function actionGetDataProjects(int $id)
     {
         $projects = Projects::findAll(['user_id' => $id]);
 
@@ -383,10 +373,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetResultProject ($id)
+    public function actionGetResultProject(int $id)
     {
         $project = Projects::findOne($id);
 
@@ -402,10 +392,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionRoadmap ($id)
+    public function actionRoadmap(int $id): string
     {
         $user = User::findOne($id);
         $projects = Projects::findAll(['user_id' => $id]);
@@ -418,16 +408,16 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetRoadmapProject ($id)
+    public function actionGetRoadmapProject(int $id)
     {
         $project = Projects::findOne($id);
         $roadmaps = [];
 
         foreach ($project->segments as $i => $segment){
-            $roadmaps[$i] = new Roadmap($segment->id);
+            $roadmaps[$i] = new Roadmap($segment->getId());
         }
 
         if(Yii::$app->request->isAjax) {
@@ -445,10 +435,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionReport ($id)
+    public function actionReport(int $id): string
     {
         $user = User::findOne($id);
         $projects = Projects::findAll(['user_id' => $id]);
@@ -492,7 +482,7 @@ class ProfileController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $response = [
-                'renderAjax' => $this->renderAjax('_report_ajax', ['segments' => $segments]),
+                'renderAjax' => $this->renderAjax('/projects/report', ['segments' => $segments]),
                 'project' => $project,
             ];
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -504,10 +494,10 @@ class ProfileController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionPresentation ($id)
+    public function actionPresentation(int $id): string
     {
         $user = User::findOne($id);
         $projects = Projects::findAll(['user_id' => $id]);
@@ -541,11 +531,11 @@ class ProfileController extends AppUserPartController
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return User|null
      * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?User
     {
         if (($model = User::findOne($id)) !== null) {
             return $model;

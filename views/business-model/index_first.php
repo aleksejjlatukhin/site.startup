@@ -1,11 +1,16 @@
 <?php
 
+use app\models\ConfirmMvp;
 use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Генерация бизнес-модели';
 $this->registerCssFile('@web/css/business-model-index-style.css');
 $this->registerCssFile('@web/css/methodological-guide-style.css');
+
+/**
+ * @var ConfirmMvp $confirmMvp
+ */
 
 ?>
 
@@ -21,9 +26,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Бизнес-модель</div></div>',
-                                ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->id],
+                                ['/confirm-mvp/data-availability-for-next-step', 'id' => $confirmMvp->getId()],
                                 ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-left']
-                            ); ?>
+                            ) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -76,7 +81,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
         </div>
 
         <!--Модальные окна-->
-        <?= $this->render('modal'); ?>
+        <?= $this->render('modal') ?>
 
     <?php else : ?>
 

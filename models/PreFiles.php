@@ -15,6 +15,8 @@ use yii\db\ActiveRecord;
  * @property int $project_id                        Идентификатор проекта
  * @property string $file_name                      Имя загруженного файла
  * @property string $server_file                    Сгенерированное имя файла на сервере
+ *
+ * @property Projects $project                      Проект
  */
 class PreFiles extends ActiveRecord
 {
@@ -22,7 +24,7 @@ class PreFiles extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'pre_files';
     }
@@ -32,7 +34,7 @@ class PreFiles extends ActiveRecord
      * Получить объект проекта
      * @return ActiveQuery
      */
-    public function getProject()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
@@ -41,7 +43,7 @@ class PreFiles extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['project_id', 'file_name'], 'required'],
@@ -54,7 +56,7 @@ class PreFiles extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -78,7 +80,7 @@ class PreFiles extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -86,7 +88,7 @@ class PreFiles extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -94,7 +96,7 @@ class PreFiles extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -102,7 +104,7 @@ class PreFiles extends ActiveRecord
     /**
      * @return string
      */
-    public function getFileName()
+    public function getFileName(): string
     {
         return $this->file_name;
     }
@@ -110,7 +112,7 @@ class PreFiles extends ActiveRecord
     /**
      * @param string $file_name
      */
-    public function setFileName($file_name)
+    public function setFileName(string $file_name): void
     {
         $this->file_name = $file_name;
     }
@@ -118,7 +120,7 @@ class PreFiles extends ActiveRecord
     /**
      * @return string
      */
-    public function getServerFile()
+    public function getServerFile(): string
     {
         return $this->server_file;
     }
@@ -126,7 +128,7 @@ class PreFiles extends ActiveRecord
     /**
      * @param string $server_file
      */
-    public function setServerFile($server_file)
+    public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
     }

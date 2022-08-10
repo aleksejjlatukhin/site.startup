@@ -1,10 +1,16 @@
 <?php
 
+use app\models\User;
 use yii\helpers\Html;
 use app\models\ExpertType;
 use app\models\CommunicationTypes;
 use app\models\ProjectCommunications;
 use yii\helpers\Url;
+
+/**
+ * @var User[] $experts
+ * @var int $project_id
+ */
 
 ?>
 
@@ -28,15 +34,15 @@ use yii\helpers\Url;
 
     <?php foreach ($experts as $expert) : ?>
 
-        <div class="row container-one_user user_container_number-<?=$expert->id;?>">
+        <div class="row container-one_user user_container_number-<?=$expert->getId() ?>">
 
-            <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $expert->id;?>" title="Перейти в профиль эксперта">
+            <div class="col-md-3 column-user-fio" id="link_user_profile-<?= $expert->getId() ?>" title="Перейти в профиль эксперта">
 
                 <!--Проверка существования аватарки-->
-                <?php if ($expert->avatar_image) : ?>
-                    <?= Html::img('/web/upload/user-'.$expert->id.'/avatar/'.$expert->avatar_image, ['class' => 'user_picture']); ?>
+                <?php if ($expert->getAvatarImage()) : ?>
+                    <?= Html::img('/web/upload/user-'.$expert->getId().'/avatar/'.$expert->getAvatarImage(), ['class' => 'user_picture']) ?>
                 <?php else : ?>
-                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                 <?php endif; ?>
 
                 <!--Проверка онлайн статуса-->
@@ -47,42 +53,42 @@ use yii\helpers\Url;
                 <?php endif; ?>
 
                 <div class="block-fio-and-date-last-visit">
-                    <div class="block-fio"><?= $expert->username; ?></div>
+                    <div class="block-fio"><?= $expert->getUsername() ?></div>
                     <div class="block-date-last-visit">
-                        <?php if($expert->checkOnline !== true && $expert->checkOnline !== false) : ?>
-                            Пользователь был в сети <?= $expert->checkOnline;?>
+                        <?php if(is_string($expert->checkOnline)) : ?>
+                            Пользователь был в сети <?= $expert->checkOnline ?>
                         <?php endif; ?>
                     </div>
                 </div>
 
             </div>
 
-            <div class="col-md-3 text_description" title="<?= $expert->expertInfo->scope_professional_competence; ?>">
-                <?= $expert->expertInfo->scope_professional_competence; ?>
+            <div class="col-md-3 text_description" title="<?= $expert->expertInfo->getScopeProfessionalCompetence() ?>">
+                <?= $expert->expertInfo->getScopeProfessionalCompetence() ?>
             </div>
 
-            <div class="col-md-3 text_description" title="<?= ExpertType::getContent($expert->expertInfo->type); ?>">
-                <?= ExpertType::getContent($expert->expertInfo->type); ?>
+            <div class="col-md-3 text_description" title="<?= ExpertType::getContent($expert->expertInfo->getType()) ?>">
+                <?= ExpertType::getContent($expert->expertInfo->getType()) ?>
             </div>
 
-            <div class="col-md-2 text_description" title="<?= $expert->keywords->description; ?>">
-                <?= $expert->keywords->description; ?>
+            <div class="col-md-2 text_description" title="<?= $expert->keywords->getDescription() ?>">
+                <?= $expert->keywords->getDescription() ?>
             </div>
 
             <div class="col-md-1">
 
                 <div class="row pull-right">
 
-                    <?php if (ProjectCommunications::isNeedAskExpert($expert->id, $project_id)) : ?>
+                    <?php if (ProjectCommunications::isNeedAskExpert($expert->getId(), $project_id)) : ?>
 
                         <?= Html::a('Сделать запрос', Url::to([
                             '/client/communications/send',
-                            'adressee_id' => $expert->id,
+                            'adressee_id' => $expert->getId(),
                             'project_id' => $project_id,
                             'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
                         ]), [
                             'class' => 'btn btn-default send-communication',
-                            'id' => 'send_communication-'.$expert->id,
+                            'id' => 'send_communication-'.$expert->getId(),
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -94,7 +100,7 @@ use yii\helpers\Url;
                                 'font-size' => '18px',
                                 'border-radius' => '8px',
                             ]
-                        ]); ?>
+                        ]) ?>
 
                     <?php else : ?>
 

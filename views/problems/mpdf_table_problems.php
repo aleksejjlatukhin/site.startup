@@ -1,6 +1,12 @@
 <?php
 
+use app\models\Problems;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
+
+/**
+ * @var Problems[] $models
+ */
 
 ?>
 
@@ -27,19 +33,19 @@ use yii\helpers\Html;
 
             <td class="block_problem_status">
                 <?php
-                if ($model->exist_confirm === 1) {
+                if ($model->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                }elseif ($model->exist_confirm === null && empty($model->confirm)) {
+                }elseif (!$model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
+                }elseif ($model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->exist_confirm === 0) {
+                }elseif ($model->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
@@ -47,14 +53,14 @@ use yii\helpers\Html;
                 ?>
             </td>
 
-            <td class="block_problem_title"><?= $model->title; ?></td>
-            <td class="block_problem_description"><?= $model->description; ?></td>
-            <td class="block_problem_params"><?= 'K = ' . $model->indicator_positive_passage . ' %'; ?></td>
-            <td class="block_problem_date"><?= date("d.m.y", $model->created_at); ?></td>
+            <td class="block_problem_title"><?= $model->getTitle() ?></td>
+            <td class="block_problem_description"><?= $model->getDescription() ?></td>
+            <td class="block_problem_params"><?= 'K = ' . $model->getIndicatorPositivePassage() . ' %' ?></td>
+            <td class="block_problem_date"><?= date("d.m.y", $model->getCreatedAt()) ?></td>
 
             <td class="block_problem_date">
-                <?php if ($model->time_confirm) : ?>
-                    <?= date("d.m.y", $model->time_confirm); ?>
+                <?php if ($model->getTimeConfirm()) : ?>
+                    <?= date("d.m.y", $model->getTimeConfirm()) ?>
                 <?php endif; ?>
             </td>
 

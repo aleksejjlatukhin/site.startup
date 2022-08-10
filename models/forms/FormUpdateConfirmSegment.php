@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmSegment;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -29,7 +30,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
      * @param $confirmId
      * @param array $config
      */
-    public function __construct($confirmId, $config = [])
+    public function __construct($confirmId, array $config = [])
     {
         $confirm = ConfirmSegment::findOne($confirmId);
         $this->setEditorCountRespond();
@@ -49,9 +50,9 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    protected function setParams(array $params)
+    protected function setParams(array $params): void
     {
         $this->setId($params['id']);
         $this->setCountRespond($params['count_respond']);
@@ -65,7 +66,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['greeting_interview', 'view_interview', 'reason_interview'], 'trim'],
@@ -79,7 +80,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -92,8 +93,9 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmSegment|bool|mixed|null
+     * @return bool|ConfirmSegment|null
      * @throws NotFoundHttpException
+     * @throws ErrorException
      */
     public function update()
     {
@@ -120,7 +122,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @return string
      */
-    public function getGreetingInterview()
+    public function getGreetingInterview(): string
     {
         return $this->greeting_interview;
     }
@@ -128,7 +130,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @param string $greeting_interview
      */
-    public function setGreetingInterview($greeting_interview)
+    public function setGreetingInterview(string $greeting_interview): void
     {
         $this->greeting_interview = $greeting_interview;
     }
@@ -136,7 +138,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @return string
      */
-    public function getViewInterview()
+    public function getViewInterview(): string
     {
         return $this->view_interview;
     }
@@ -144,7 +146,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @param string $view_interview
      */
-    public function setViewInterview($view_interview)
+    public function setViewInterview(string $view_interview): void
     {
         $this->view_interview = $view_interview;
     }
@@ -152,7 +154,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @return string
      */
-    public function getReasonInterview()
+    public function getReasonInterview(): string
     {
         return $this->reason_interview;
     }
@@ -160,7 +162,7 @@ class FormUpdateConfirmSegment extends FormUpdateConfirm
     /**
      * @param string $reason_interview
      */
-    public function setReasonInterview($reason_interview)
+    public function setReasonInterview(string $reason_interview): void
     {
         $this->reason_interview = $reason_interview;
     }

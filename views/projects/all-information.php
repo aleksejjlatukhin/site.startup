@@ -1,79 +1,38 @@
 <?php
 
+use app\models\Projects;
 use yii\helpers\Html;
+
+/**
+ * @var Projects $project
+ */
+
 
 $string = '';
 $default_value = '_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _';
 
-$patent_name = $project->patent_name;
-if (empty($patent_name)) {
-    $patent_name = $default_value;
-}
-
-$patent_number = $project->patent_number;
-if (empty($patent_number)) {
-    $patent_number = $default_value;
-}
-
-$patent_date = date('d.m.Y', $project->patent_date);
-if (empty($project->patent_date)) {
-    $patent_date = $default_value;
-}
-
-$layout_technology = $project->layout_technology;
-if (empty($layout_technology)) {
-    $layout_technology = $default_value;
-}
-
-$site = $project->site;
-if (empty($site)) {
-    $site = $default_value;
-}
-
-$register_name = $project->register_name;
-if (empty($register_name)) {
-    $register_name = $default_value;
-}
-
-$register_date = date('d.m.Y', $project->register_date);
-if (empty($project->register_date)) {
-    $register_date = $default_value;
-}
-
-$invest_name = $project->invest_name;
-if (empty($invest_name)) {
-    $invest_name = $default_value;
-}
-
-$invest_amount = number_format($project->invest_amount, 0, '', ' ') . ' руб.';
-if (empty($project->invest_amount)) {
-    $invest_amount = $default_value;
-}
-
-$invest_date = date('d.m.Y', $project->invest_date);
-if (empty($project->invest_date)) {
-    $invest_date = $default_value;
-}
-
-$announcement_event = $project->announcement_event;
-if (empty($announcement_event)) {
-    $announcement_event = $default_value;
-}
-
-$date_of_announcement = date('d.m.Y', $project->date_of_announcement);
-if (empty($project->date_of_announcement)) {
-    $date_of_announcement = $default_value;
-}
+$patent_name = $project->getPatentName() ?: $default_value;
+$patent_number = $project->getPatentNumber() ?: $default_value;
+$patent_date = $project->getPatentDate() ? date('d.m.Y', $project->getPatentDate()) : $default_value;
+$layout_technology = $project->getLayoutTechnology() ?: $default_value;
+$site = $project->getSite() ?: $default_value;
+$register_name = $project->getRegisterName() ?: $default_value;
+$register_date = $project->getRegisterDate() ? date('d.m.Y', $project->getRegisterDate()) : $default_value;
+$invest_name = $project->getInvestName() ?: $default_value;
+$invest_amount = $project->getInvestAmount() ? number_format($project->getInvestAmount(), 0, '', ' ') . ' руб.' : $default_value;
+$invest_date = $project->getInvestDate() ? date('d.m.Y', $project->getInvestDate()) : $default_value;
+$announcement_event = $project->getAnnouncementEvent() ?: $default_value;
+$date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $project->getDateOfAnnouncement()) : $default_value;
 
 ?>
 
 <div class="block_export_link_hypothesis">
     <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
-        '/projects/mpdf-project', 'id' => $project->id], [
+        '/projects/mpdf-project', 'id' => $project->getId()], [
         'class' => 'export_link_hypothesis',
         'target' => '_blank',
         'title' => 'Скачать в pdf',
-    ]); ?>
+    ]) ?>
 </div>
 
 <?php
@@ -81,14 +40,14 @@ if (empty($project->date_of_announcement)) {
 $string .= '<div class="row container-fluid" style="color: #4F4F4F;">';
 
 $string .= '<div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Описание проекта</div></div>
-                    <div style="font-weight: 700;">Сокращенное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->project_name.'</div>
-                    <div style="font-weight: 700;">Полное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->project_fullname.'</div>
-                    <div style="font-weight: 700;">Описание проекта</div><div style="margin-bottom: 10px;">'.$project->description.'</div>
-                    <div style="font-weight: 700;">Цель проекта</div><div style="margin-bottom: 20px;">'.$project->purpose_project.'</div>
+                    <div style="font-weight: 700;">Сокращенное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->getProjectName().'</div>
+                    <div style="font-weight: 700;">Полное наименование проекта</div><div style="margin-bottom: 10px;">'.$project->getProjectFullname().'</div>
+                    <div style="font-weight: 700;">Описание проекта</div><div style="margin-bottom: 10px;">'.$project->getDescription().'</div>
+                    <div style="font-weight: 700;">Цель проекта</div><div style="margin-bottom: 20px;">'.$project->getPurposeProject().'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Результат интеллектуальной деятельности</div></div>
-                    <div style="font-weight: 700;">Результат интеллектуальной деятельности</div><div style="margin-bottom: 10px;">'.$project->rid.'</div>
-                    <div style="font-weight: 700;">Суть результата интеллектуальной деятельности</div><div style="margin-bottom: 20px;">'.$project->core_rid.'</div>
+                    <div style="font-weight: 700;">Результат интеллектуальной деятельности</div><div style="margin-bottom: 10px;">'.$project->getRid().'</div>
+                    <div style="font-weight: 700;">Суть результата интеллектуальной деятельности</div><div style="margin-bottom: 20px;">'.$project->getCoreRid().'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Сведения о патенте</div></div>
                     <div style="font-weight: 700;">Наименование патента</div><div style="margin-bottom: 10px;">'.$patent_name.'</div>
@@ -99,7 +58,7 @@ $string .= '<div class="panel panel-default"><div class="panel-heading" style="f
                     <div style="margin-bottom: 10px;">'.$project->showListAuthors().'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Сведения о технологии</div></div>
-                    <div style="font-weight: 700;">На какой технологии основан проект</div><div style="margin-bottom: 10px;">'.$project->technology.'</div>
+                    <div style="font-weight: 700;">На какой технологии основан проект</div><div style="margin-bottom: 10px;">'.$project->getTechnology().'</div>
                     <div style="font-weight: 700;">Макет базовой технологии</div><div style="margin-bottom: 20px;">'.$layout_technology.'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Регистрация юридического лица</div></div>
@@ -124,12 +83,12 @@ $string .= '<div style="margin-bottom: 20px;">';
 
 if (!empty($project->preFiles)) {
     foreach ($project->preFiles as $file) {
-        $filename = $file->file_name;
+        $filename = $file->getFileName();
         if (mb_strlen($filename) > 35) {
-            $filename = mb_substr($file->file_name, 0, 35) . '...';
+            $filename = mb_substr($file->getFileName(), 0, 35) . '...';
         }
-        $string .= '<div style="display: flex; margin: 2px 0; align-items: center;" class="one_block_file-' . $file->id . '">' .
-            Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) . '</div></div>', ['/projects/download', 'id' => $file->id], [
+        $string .= '<div style="display: flex; margin: 2px 0; align-items: center;" class="one_block_file-' . $file->getId() . '">' .
+            Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) . '</div></div>', ['/projects/download', 'id' => $file->getId()], [
                 'title' => 'Скачать файл',
                 'class' => 'btn btn-default prefiles',
                 'style' => [

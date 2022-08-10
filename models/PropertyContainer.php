@@ -5,6 +5,7 @@ namespace app\models;
 
 use yii\base\Exception;
 use app\models\interfaces\PropertyContainerInterface;
+use yii\base\Model;
 
 /**
  * Класс для реализации паттерна проектирования "Контейнер свойств"
@@ -14,7 +15,7 @@ use app\models\interfaces\PropertyContainerInterface;
  *
  * @property array $propertyContainer
  */
-class PropertyContainer implements PropertyContainerInterface
+class PropertyContainer extends Model implements PropertyContainerInterface
 {
 
     /**
@@ -26,9 +27,9 @@ class PropertyContainer implements PropertyContainerInterface
     /**
      * @param $propertyName
      * @param $value
-     * @return mixed
+     * @return void
      */
-    public function addProperty($propertyName, $value)
+    public function addProperty($propertyName, $value): void
     {
         $this->propertyContainer[$propertyName] = $value;
     }
@@ -36,9 +37,9 @@ class PropertyContainer implements PropertyContainerInterface
 
     /**
      * @param $propertyName
-     * @return mixed
+     * @return void
      */
-    public function deleteProperty($propertyName)
+    public function deleteProperty($propertyName): void
     {
         unset($this->propertyContainer[$propertyName]);
     }
@@ -50,17 +51,17 @@ class PropertyContainer implements PropertyContainerInterface
      */
     public function getProperty($propertyName)
     {
-        return $this->propertyContainer[$propertyName] ? $this->propertyContainer[$propertyName] : null;
+        return $this->propertyContainer[$propertyName] ?: null;
     }
 
 
     /**
      * @param $propertyName
      * @param $value
-     * @return mixed
+     * @return void
      * @throws Exception
      */
-    public function setProperty($propertyName, $value)
+    public function setProperty($propertyName, $value): void
     {
         if (!isset($this->propertyContainer[$propertyName])) {
             throw new Exception("Property $propertyName not found");

@@ -1,8 +1,13 @@
 <?php
 
+use app\models\Gcps;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var Gcps $model
+ */
 
 ?>
 
@@ -12,7 +17,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'hypothesisUpdateForm',
-        'action' => Url::to(['/gcps/update', 'id' => $model->id]),
+        'action' => Url::to(['/gcps/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15 hypothesisUpdateForm'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -27,8 +32,7 @@ use yii\helpers\Url;
                     'maxlength' => true,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
-                ]);
-                ?>
+                ]) ?>
 
             </div>
         </div>

@@ -39,10 +39,11 @@ class FormCreateProblem extends Model
 
     /**
      * FormCreateProblem constructor.
+     *
      * @param Segments $preliminaryHypothesis
      * @param array $config
      */
-    public function __construct(Segments $preliminaryHypothesis, $config = [])
+    public function __construct(Segments $preliminaryHypothesis, array $config = [])
     {
         $this->setExpectedResultsInterview();
         $this->setCacheManager();
@@ -64,7 +65,7 @@ class FormCreateProblem extends Model
      * @param Segments $preliminaryHypothesis
      * @return string
      */
-    public static function getCachePath(Segments $preliminaryHypothesis)
+    public static function getCachePath(Segments $preliminaryHypothesis): string
     {
         /**
          * @var Projects $project
@@ -72,15 +73,14 @@ class FormCreateProblem extends Model
          */
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$preliminaryHypothesis->getId().'/problems/formCreate/';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$preliminaryHypothesis->getId().'/problems/formCreate/';
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'trim'],
@@ -93,7 +93,7 @@ class FormCreateProblem extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Описание гипотезы проблемы сегмента',
@@ -107,13 +107,16 @@ class FormCreateProblem extends Model
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create()
+    public function create(): Problems
     {
+        /**
+         * @var Problems $last_model
+         */
         $last_model = Problems::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmSegment = ConfirmSegment::findOne($this->getBasicConfirmId());
 
         $problem = new Problems();
-        $problem->setProjectId($confirmSegment->hypothesis->projectId);
+        $problem->setProjectId($confirmSegment->hypothesis->getProjectId());
         $problem->setSegmentId($confirmSegment->getSegmentId());
         $problem->setBasicConfirmId($this->getBasicConfirmId());
         $problem->setDescription($this->getDescription());
@@ -125,7 +128,7 @@ class FormCreateProblem extends Model
         $expectedResults = $_POST[$className]['_expectedResultsInterview'];
 
         if ($problem->save()) {
-            $this->saveExpectedResultsInterview($expectedResults, $problem->id);
+            $this->saveExpectedResultsInterview($expectedResults, $problem->getId());
             $this->getCacheManager()->deleteCache($this->getCachePathForm()); // Удаление кэша формы создания
             return $problem;
         }
@@ -135,9 +138,9 @@ class FormCreateProblem extends Model
 
     /**
      * @param $query
-     * @param $problemId
+     * @param int $problemId
      */
-    private function saveExpectedResultsInterview($query, $problemId)
+    private function saveExpectedResultsInterview($query, int $problemId): void
     {
         foreach ($query as $k => $q) {
             $newExpectedResultsInterview[$k] = new ExpectedResultsInterviewConfirmProblem();
@@ -151,7 +154,7 @@ class FormCreateProblem extends Model
     /**
      * @return ExpectedResultsInterviewConfirmProblem
      */
-    public function getExpectedResultsInterview()
+    public function getExpectedResultsInterview(): ExpectedResultsInterviewConfirmProblem
     {
         return $this->_expectedResultsInterview;
     }
@@ -159,7 +162,7 @@ class FormCreateProblem extends Model
     /**
      *
      */
-    public function setExpectedResultsInterview()
+    public function setExpectedResultsInterview(): void
     {
         $this->_expectedResultsInterview = new ExpectedResultsInterviewConfirmProblem();
     }
@@ -167,7 +170,7 @@ class FormCreateProblem extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -175,7 +178,7 @@ class FormCreateProblem extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -183,7 +186,7 @@ class FormCreateProblem extends Model
     /**
      * @return int
      */
-    public function getIndicatorPositivePassage()
+    public function getIndicatorPositivePassage(): int
     {
         return $this->indicator_positive_passage;
     }
@@ -191,7 +194,7 @@ class FormCreateProblem extends Model
     /**
      * @param int $indicator_positive_passage
      */
-    public function setIndicatorPositivePassage($indicator_positive_passage)
+    public function setIndicatorPositivePassage(int $indicator_positive_passage): void
     {
         $this->indicator_positive_passage = $indicator_positive_passage;
     }
@@ -199,7 +202,7 @@ class FormCreateProblem extends Model
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -207,7 +210,7 @@ class FormCreateProblem extends Model
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -215,7 +218,7 @@ class FormCreateProblem extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -223,7 +226,7 @@ class FormCreateProblem extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -231,7 +234,7 @@ class FormCreateProblem extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }
@@ -239,7 +242,7 @@ class FormCreateProblem extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }

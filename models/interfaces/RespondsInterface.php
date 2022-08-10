@@ -31,74 +31,74 @@ interface RespondsInterface
     /**
      * @return int
      */
-    public function getId();
+    public function getId(): int;
 
     /**
      * Установить id подтверждения
      * @param int $confirmId
      */
-    public function setConfirmId($confirmId);
+    public function setConfirmId(int $confirmId);
 
     /**
      * Получить id подтверждения
      * @return int
      */
-    public function getConfirmId();
+    public function getConfirmId(): int;
 
     /**
      * Установить имя респондента
      * @param string $name
      */
-    public function setName($name);
+    public function setName(string $name);
 
     /**
      * Получить имя респондента
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @param array $params
      */
-    public function setParams(array $params);
+    public function setParams(array $params): void;
 
     /**
      * @return string
      */
-    public function getInfoRespond();
+    public function getInfoRespond(): string;
 
     /**
      * @param string $info_respond
      */
-    public function setInfoRespond($info_respond);
+    public function setInfoRespond(string $info_respond);
 
     /**
      * @return string
      */
-    public function getEmail();
+    public function getEmail(): string;
 
     /**
      * @param string $email
      */
-    public function setEmail($email);
+    public function setEmail(string $email);
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDatePlan();
+    public function getDatePlan(): ?int;
 
     /**
      * @param int $datePlan
      */
-    public function setDatePlan($datePlan);
+    public function setDatePlan(int $datePlan);
 
     /**
      * @return string
      */
-    public function getPlaceInterview();
+    public function getPlaceInterview(): string;
 
     /**
      * @param string $place_interview
      */
-    public function setPlaceInterview($place_interview);
+    public function setPlaceInterview(string $place_interview);
 }

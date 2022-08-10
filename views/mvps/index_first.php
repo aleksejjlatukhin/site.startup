@@ -1,11 +1,16 @@
 <?php
 
+use app\models\ConfirmGcp;
 use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Разработка MVP';
 $this->registerCssFile('@web/css/mvp-index-style.css');
 $this->registerCssFile('@web/css/methodological-guide-style.css');
+
+/**
+ * @var ConfirmGcp $confirmGcp
+ */
 
 ?>
 
@@ -21,9 +26,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить продукт MVP</div></div>',
-                            ['/confirm-gcp/data-availability-for-next-step', 'id' => $confirmGcp->id],
+                            ['/confirm-gcp/data-availability-for-next-step', 'id' => $confirmGcp->getId()],
                             ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-left']
-                        ); ?>
+                        ) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -77,7 +82,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
         </div>
 
         <!--Модальные окна-->
-        <?= $this->render('modal'); ?>
+        <?= $this->render('modal') ?>
 
     <?php else : ?>
 

@@ -40,13 +40,13 @@ class ClientsController extends AppAdminController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
             return parent::beforeAction($action);
-        }else{
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
         }
+
+        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
     }
 
 
@@ -54,8 +54,9 @@ class ClientsController extends AppAdminController
      * Старница со списком клиентов (организаций)
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
+        /** @var Client $clientSpaccel */
         $clientSpaccel = Client::find()
             ->leftJoin('client_user', '`client_user`.`client_id` = `client`.`id`')
             ->leftJoin('user', '`user`.`id` = `client_user`.`user_id`')
@@ -64,7 +65,7 @@ class ClientsController extends AppAdminController
 
         $countUsersOnPage = 20;
         $query = Client::find()->where(['!=', 'id', $clientSpaccel->getId()]);
-        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $clients = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
 
@@ -83,7 +84,7 @@ class ClientsController extends AppAdminController
      * @param int $clientId
      * @return array|bool
      */
-    public function actionGetListManagers($clientId)
+    public function actionGetListManagers(int $clientId)
     {
         $managers = User::findAll(['role' => User::ROLE_MANAGER, 'status' => User::STATUS_ACTIVE, 'confirm' => User::CONFIRM]);
 
@@ -110,24 +111,14 @@ class ClientsController extends AppAdminController
      */
     public function actionAddManager()
     {
-        if (Yii::$app->request->isAjax){
-            if ($_POST['CustomerManager']) {
-                $userId = $_POST['CustomerManager']['user_id'];
-                $clientId = $_POST['CustomerManager']['client_id'];
-                $customerManager = CustomerManager::find()->where(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
-                if ($customerManager) {
-                    if ($customerManager->getUserId() != $userId) {
-                        CustomerManager::addManager($clientId, $userId);
-                        $response = [
-                            'renderAjax' => $this->renderAjax('data_client', ['client' => Client::findOne($clientId)]),
-                            'client_id' => $clientId,
-                        ];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
-                    }
-                    return false;
-                } else {
+        if (Yii::$app->request->isAjax && $_POST['CustomerManager']) {
+            $userId = $_POST['CustomerManager']['user_id'];
+            $clientId = $_POST['CustomerManager']['client_id'];
+
+            /** @var CustomerManager $customerManager */
+            $customerManager = CustomerManager::find()->where(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
+            if ($customerManager) {
+                if ($customerManager->getUserId() !== $userId) {
                     CustomerManager::addManager($clientId, $userId);
                     $response = [
                         'renderAjax' => $this->renderAjax('data_client', ['client' => Client::findOne($clientId)]),
@@ -137,7 +128,17 @@ class ClientsController extends AppAdminController
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+                return false;
             }
+
+            CustomerManager::addManager($clientId, $userId);
+            $response = [
+                'renderAjax' => $this->renderAjax('data_client', ['client' => Client::findOne($clientId)]),
+                'client_id' => $clientId,
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
@@ -153,8 +154,7 @@ class ClientsController extends AppAdminController
     {
         $formCreateAdminCompany = new FormCreateAdminCompany();
         $formCreateClient = new FormCreateClient();
-        $adminCompany = null;
-        if ($formCreateAdminCompany->load(Yii::$app->request->post()) && $formCreateAdminCompany->validate()) {
+        if ($formCreateAdminCompany->validate() && $formCreateAdminCompany->load(Yii::$app->request->post())) {
             foreach ($formCreateAdminCompany->attributes as $k => $value) {
                 $formCreateClient->adminCompany .= $k . 'abracadabraKey:' . $value . 'abracadabraValue';
             }
@@ -162,7 +162,7 @@ class ClientsController extends AppAdminController
                 'formCreateClient' => $formCreateClient
             ]);
         }
-        if ($formCreateClient->load(Yii::$app->request->post()) && $formCreateClient->validate()) {
+        if ($formCreateClient->validate() && $formCreateClient->load(Yii::$app->request->post())) {
 
             $attributesAdminCompany = array();
             $data = explode('abracadabraValue', $formCreateClient->adminCompany);
@@ -177,13 +177,13 @@ class ClientsController extends AppAdminController
                     if (ClientUser::createRecord($client->getId(), $admin->getId())) {
                         if (ClientSettings::createRecord(['client_id' => $client->getId(), 'admin_id' => $admin->getId()])) {
                             return $this->redirect('/admin/clients/index');
-                        } else {
-                            ConversationDevelopment::deleteAll(['user_id' => $admin->getId()]);
-                            ClientUser::deleteAll(['client_id' => $client->getId(), 'user_id' => $admin->getId()]);
-                            User::deleteAll(['id' => $admin->getId()]);
-                            ClientActivation::deleteAll(['client_id' => $client->getId()]);
-                            Client::deleteAll(['id' => $client->getId()]);
                         }
+
+                        ConversationDevelopment::deleteAll(['user_id' => $admin->getId()]);
+                        ClientUser::deleteAll(['client_id' => $client->getId(), 'user_id' => $admin->getId()]);
+                        User::deleteAll(['id' => $admin->getId()]);
+                        ClientActivation::deleteAll(['client_id' => $client->getId()]);
+                        Client::deleteAll(['id' => $client->getId()]);
                     } else {
                         ConversationDevelopment::deleteAll(['user_id' => $admin->getId()]);
                         User::deleteAll(['id' => $admin->getId()]);
@@ -209,17 +209,19 @@ class ClientsController extends AppAdminController
     /**
      * Изменение статуса организации (клиента)
      *
-     * @param $clientId
+     * @param int $clientId
      * @return array|bool
      */
-    public function actionChangeStatus($clientId)
+    public function actionChangeStatus(int $clientId)
     {
         if (Yii::$app->request->isAjax) {
             $client = Client::findOne($clientId);
-            $status = $client->findClientActivation()->getStatus();
+            /** @var ClientActivation $clientActivationOld */
+            $clientActivationOld = $client->findClientActivation();
+            $status = $clientActivationOld->getStatus();
             $clientActivation = new ClientActivation();
             $clientActivation->setClientId($clientId);
-            if ($status == ClientActivation::ACTIVE) {
+            if ($status === ClientActivation::ACTIVE) {
                 $clientActivation->setStatus(ClientActivation::NO_ACTIVE);
             } else {
                 $clientActivation->setStatus(ClientActivation::ACTIVE);
@@ -242,7 +244,7 @@ class ClientsController extends AppAdminController
      * @param int $id
      * @return string
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
         $client = Client::findById($id);
         $clientSettings = ClientSettings::findOne(['client_id' => $id]);

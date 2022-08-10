@@ -1,6 +1,12 @@
 <?php
 
+use app\models\Projects;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
+
+/**
+ * @var Projects $project
+ */
 
 ?>
 
@@ -87,7 +93,9 @@ use yii\helpers\Html;
 
                         <?php $count_exist_confirm_segment = 0; ?>
                         <?php foreach ($project->segments as $segment) : ?>
-                            <?php if ($segment->exist_confirm === 1) $count_exist_confirm_segment++; ?>
+                            <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
+                                $count_exist_confirm_segment++;
+                            } ?>
                         <?php endforeach; ?>
 
                         <?php if ($count_exist_confirm_segment > 0) : ?>
@@ -105,7 +113,9 @@ use yii\helpers\Html;
 
                         <?php $count_exist_confirm_problem = 0; ?>
                         <?php foreach ($project->problems as $problem) : ?>
-                            <?php if ($problem->exist_confirm === 1) $count_exist_confirm_problem++; ?>
+                            <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
+                                $count_exist_confirm_problem++;
+                            } ?>
                         <?php endforeach; ?>
 
                         <?php if ($count_exist_confirm_problem > 0) : ?>
@@ -123,7 +133,9 @@ use yii\helpers\Html;
 
                         <?php $count_exist_confirm_gcp = 0; ?>
                         <?php foreach ($project->gcps as $gcp) : ?>
-                            <?php if ($gcp->exist_confirm === 1) $count_exist_confirm_gcp++; ?>
+                            <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
+                                $count_exist_confirm_gcp++;
+                            } ?>
                         <?php endforeach; ?>
 
                         <?php if ($count_exist_confirm_gcp > 0) : ?>
@@ -141,7 +153,9 @@ use yii\helpers\Html;
 
                         <?php $count_exist_confirm_mvp = 0; ?>
                         <?php foreach ($project->mvps as $mvp) : ?>
-                            <?php if ($mvp->exist_confirm === 1) $count_exist_confirm_mvp++; ?>
+                            <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) {
+                                $count_exist_confirm_mvp++;
+                            } ?>
                         <?php endforeach; ?>
 
                         <?php if ($count_exist_confirm_mvp > 0) : ?>
@@ -183,36 +197,36 @@ use yii\helpers\Html;
 
                                 <!--Наименования сегментов-->
                                 <div class="column_segment_name">
-                                    <?= Html::a('<span>Сегмент ' . ($number_segment+1) . ': </span>' . $segment->name,
-                                        ['/segments/index', 'id' => $segment->projectId], ['class' => 'link_in_column_result_table']); ?>
+                                    <?= Html::a('<span>Сегмент ' . ($number_segment+1) . ': </span>' . $segment->getName(),
+                                        ['/segments/index', 'id' => $segment->getProjectId()], ['class' => 'link_in_column_result_table']) ?>
                                 </div>
 
                                 <!--Статусы сегментов-->
-                                <?php if ($segment->exist_confirm === 1) : ?>
+                                <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                     <div class="text-center regular_column_for_segment">
                                         <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                            ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title'=> 'Посмотреть подтверждение сегмента']);
+                                            ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title'=> 'Посмотреть подтверждение сегмента'])
                                         ?>
                                     </div>
 
-                                <?php elseif ($segment->exist_confirm === 0) : ?>
+                                <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                     <div class="text-center regular_column_for_segment">
                                         <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                            ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title'=> 'Посмотреть подтверждение сегмента']);
+                                            ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title'=> 'Посмотреть подтверждение сегмента'])
                                         ?>
                                     </div>
 
-                                <?php elseif ($segment->confirm && $segment->exist_confirm === null) : ?>
+                                <?php elseif ($segment->confirm && $segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                     <div class="text-center regular_column_for_segment">
                                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                            ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title'=> 'Посмотреть подтверждение сегмента']);
+                                            ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title'=> 'Посмотреть подтверждение сегмента'])
                                         ?>
                                     </div>
 
-                                <?php elseif (empty($segment->confirm) && $segment->exist_confirm === null) : ?>
+                                <?php elseif (!$segment->confirm && $segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                     <div class="text-center regular_column_for_segment_empty">- - -</div>
 
@@ -220,12 +234,14 @@ use yii\helpers\Html;
 
                                 <!--Даты создания сегментов-->
                                 <div class="text-center regular_column_for_segment">
-                                    <?= date('d.m.y',$segment->created_at); ?>
+                                    <?= date('d.m.y',$segment->getCreatedAt()) ?>
                                 </div>
 
                                 <!--Даты подтверждения сегментов-->
                                 <div class="text-center regular_column_for_segment">
-                                    <?php if ($segment->time_confirm !== null) echo date('d.m.y', $segment->time_confirm); ?>
+                                    <?php if ($segment->getTimeConfirm() !== null) {
+                                        echo date('d.m.y', $segment->getTimeConfirm());
+                                    } ?>
                                 </div>
 
                             </div>
@@ -234,7 +250,7 @@ use yii\helpers\Html;
                             <div class="" style="display:flex; flex-direction: column; width: 69.45%;">
 
                                 <!--Если у сегмента отсутствуют гипотезы проблем-->
-                                <?php if (empty($segment->problems)) : ?>
+                                <?php if (!$segment->problems) : ?>
 
                                     <div class="" style="display:flex; height: 100%;">
 
@@ -265,48 +281,52 @@ use yii\helpers\Html;
                                         <div class="problem-blocks" style="display:flex; height: 100%; width: 100%;">
 
                                             <!--Наименования проблем-->
-                                            <?php $problem_title = 'ГПС ' . ($number_segment+1) . '.' . explode(' ',$problem->title)[1]; ?>
+                                            <?php $problem_title = 'ГПС ' . ($number_segment+1) . '.' . explode(' ',$problem->getTitle())[1]; ?>
                                             <div class="text-center first_regular_column_of_stage_for_problem">
-                                                <?= Html::a($problem_title, ['/problems/index', 'id' => $problem->confirmSegmentId],
-                                                    ['class' => 'link_in_column_result_table', 'title' => $problem->description]); ?>
+                                                <?= Html::a($problem_title, ['/problems/index', 'id' => $problem->getConfirmSegmentId()],
+                                                    ['class' => 'link_in_column_result_table', 'title' => $problem->getDescription()]) ?>
                                             </div>
 
                                             <!--Статусы проблем-->
-                                            <?php if ($problem->exist_confirm === 1) : ?>
+                                            <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                 <div class="text-center regular_column_for_problem">
                                                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                        ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title'=> 'Посмотреть подтверждение ГПС']);
+                                                        ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГПС'])
                                                     ?>
                                                 </div>
 
-                                            <?php elseif ($problem->exist_confirm === 0) : ?>
+                                            <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                                 <div class="text-center regular_column_for_problem">
                                                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                        ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title'=> 'Посмотреть подтверждение ГПС']);
+                                                        ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГПС'])
                                                     ?>
                                                 </div>
 
-                                            <?php elseif ($problem->confirm && $problem->exist_confirm === null) : ?>
+                                            <?php elseif ($problem->confirm && $problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                 <div class="text-center regular_column_for_problem">
                                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                        ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title'=> 'Посмотреть подтверждение ГПС']);
+                                                        ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГПС'])
                                                     ?>
                                                 </div>
 
-                                            <?php elseif (empty($problem->confirm) && $problem->exist_confirm === null) : ?>
+                                            <?php elseif (!$problem->confirm && $problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                 <div class="text-center regular_column_for_problem_empty">- - -</div>
 
                                             <?php endif; ?>
 
                                             <!--Даты создания проблем-->
-                                            <div class="text-center regular_column_for_problem"><?= date('d.m.y',$problem->created_at); ?></div>
+                                            <div class="text-center regular_column_for_problem"><?= date('d.m.y',$problem->getCreatedAt()) ?></div>
 
                                             <!--Даты подтверждения проблем-->
-                                            <div class="text-center regular_column_for_problem"><?php if ($problem->time_confirm !== null) echo date('d.m.y',$problem->time_confirm); ?></div>
+                                            <div class="text-center regular_column_for_problem">
+                                                <?php if ($problem->getTimeConfirm() !== null) {
+                                                    echo date('d.m.y', $problem->getTimeConfirm());
+                                                } ?>
+                                            </div>
 
 
                                             <!--Параметры ценностных предложений-->
@@ -316,7 +336,7 @@ use yii\helpers\Html;
                                                 <div class="" style="display:flex; height: 100%;">
 
                                                     <!--Если у проблемы отсутствуют гипотезы ценностных предложений-->
-                                                    <?php if (empty($problem->gcps)) : ?>
+                                                    <?php if (!$problem->gcps) : ?>
 
                                                         <div class="text-center first_regular_column_of_stage_for_gcp"></div>
                                                         <div class="text-center regular_column_for_gcp"></div>
@@ -337,55 +357,59 @@ use yii\helpers\Html;
                                                     <div class="gcp-blocks" style="display:flex; height: 100%;">
 
                                                         <!--Наименования ценностных предложений-->
-                                                        <?php $gcp_title = 'ГЦП ' . ($number_segment+1) . '.' . explode(' ',$problem->title)[1] . '.' . explode(' ',$gcp->title)[1]; ?>
+                                                        <?php $gcp_title = 'ГЦП ' . ($number_segment+1) . '.' . explode(' ',$problem->getTitle())[1] . '.' . explode(' ',$gcp->getTitle())[1]; ?>
                                                         <div class="text-center first_regular_column_of_stage_for_gcp">
-                                                            <?= Html::a($gcp_title, ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                                                ['class' => 'link_in_column_result_table', 'title' => $gcp->description]); ?>
+                                                            <?= Html::a($gcp_title, ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                                                ['class' => 'link_in_column_result_table', 'title' => $gcp->getDescription()]) ?>
                                                         </div>
 
                                                         <!--Статусы ценностных предложений-->
-                                                        <?php if ($gcp->exist_confirm === 1) : ?>
+                                                        <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                             <div class="text-center regular_column_for_gcp">
                                                                 <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title'=> 'Посмотреть подтверждение ГЦП']);
+                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГЦП'])
                                                                 ?>
                                                             </div>
 
-                                                        <?php elseif ($gcp->exist_confirm === 0) : ?>
+                                                        <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                                             <div class="text-center regular_column_for_gcp">
                                                                 <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title'=> 'Посмотреть подтверждение ГЦП']);
+                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГЦП'])
                                                                 ?>
                                                             </div>
 
-                                                        <?php elseif ($gcp->confirm && $gcp->exist_confirm === null) : ?>
+                                                        <?php elseif ($gcp->confirm && $gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                             <div class="text-center regular_column_for_gcp">
                                                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title'=> 'Посмотреть подтверждение ГЦП']);
+                                                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГЦП'])
                                                                 ?>
                                                             </div>
 
-                                                        <?php elseif (empty($gcp->confirm) && $gcp->exist_confirm === null) : ?>
+                                                        <?php elseif (!$gcp->confirm && $gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                             <div class="text-center regular_column_for_gcp_empty">- - -</div>
 
                                                         <?php endif; ?>
 
                                                         <!--Даты создания ценностных предложений-->
-                                                        <div class="text-center regular_column_for_gcp"><?= date('d.m.y',$gcp->created_at); ?></div>
+                                                        <div class="text-center regular_column_for_gcp"><?= date('d.m.y',$gcp->getCreatedAt()) ?></div>
 
                                                         <!--Даты подтверждения ценностных предложений-->
-                                                        <div class="text-center regular_column_for_gcp"><?php if ($gcp->time_confirm !== null) echo date('d.m.y',$gcp->time_confirm); ?></div>
+                                                        <div class="text-center regular_column_for_gcp">
+                                                            <?php if ($gcp->getTimeConfirm() !== null) {
+                                                                echo date('d.m.y', $gcp->getTimeConfirm());
+                                                            } ?>
+                                                        </div>
 
 
                                                         <!--Параметры mvps-->
                                                         <div class="" style="display:flex; flex-direction: column; width: 56.3%;">
 
                                                             <!--Если у ценностного предложения отсутствуют mvp-->
-                                                            <?php if (empty($gcp->mvps)) : ?>
+                                                            <?php if (!$gcp->mvps) : ?>
 
                                                                 <div class="" style="display:flex; height: 100%;">
 
@@ -404,50 +428,54 @@ use yii\helpers\Html;
 
                                                                     <!--Наименования mvps-->
                                                                     <?php
-                                                                    $mvp_title = 'MVP ' . ($number_segment+1) . '.' . explode(' ',$problem->title)[1]
-                                                                        . '.' . explode(' ',$gcp->title)[1] . '.' . explode(' ',$mvp->title)[1];
+                                                                    $mvp_title = 'MVP ' . ($number_segment+1) . '.' . explode(' ',$problem->getTitle())[1]
+                                                                        . '.' . explode(' ',$gcp->getTitle())[1] . '.' . explode(' ',$mvp->getTitle())[1];
                                                                     ?>
                                                                     <div class="text-center first_regular_column_of_stage_for_mvp">
-                                                                        <?= Html::a($mvp_title, ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                                                            ['class' => 'link_in_column_result_table', 'title' => $mvp->description]); ?>
+                                                                        <?= Html::a($mvp_title, ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                                                            ['class' => 'link_in_column_result_table', 'title' => $mvp->getDescription()]) ?>
                                                                     </div>
 
                                                                     <!--Статусы mvps-->
-                                                                    <?php if ($mvp->exist_confirm === 1) : ?>
+                                                                    <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                                         <div class="text-center regular_column_for_mvp">
                                                                             <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть подтверждение MVP']);
+                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть подтверждение MVP'])
                                                                             ?>
                                                                         </div>
 
-                                                                    <?php elseif ($mvp->exist_confirm === 0) : ?>
+                                                                    <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                                                         <div class="text-center regular_column_for_mvp">
                                                                             <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть подтверждение MVP']);
+                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть подтверждение MVP'])
                                                                             ?>
                                                                         </div>
 
-                                                                    <?php elseif ($mvp->confirm && $mvp->exist_confirm === null) : ?>
+                                                                    <?php elseif ($mvp->confirm && $mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                                         <div class="text-center regular_column_for_mvp">
                                                                             <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть подтверждение MVP']);
+                                                                                ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть подтверждение MVP'])
                                                                             ?>
                                                                         </div>
 
-                                                                    <?php elseif (empty($mvp->confirm) && $mvp->exist_confirm === null) : ?>
+                                                                    <?php elseif (!$mvp->confirm && $mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                                         <div class="text-center regular_column_for_mvp_empty">- - -</div>
 
                                                                     <?php endif; ?>
 
                                                                     <!--Даты создания mvps-->
-                                                                    <div class="text-center regular_column_for_mvp"><?= date('d.m.y',$mvp->created_at); ?></div>
+                                                                    <div class="text-center regular_column_for_mvp"><?= date('d.m.y',$mvp->getCreatedAt()) ?></div>
 
                                                                     <!--Даты подтверждения mvps-->
-                                                                    <div class="text-center regular_column_for_mvp"><?php if ($mvp->time_confirm !== null) echo date('d.m.y',$mvp->time_confirm); ?></div>
+                                                                    <div class="text-center regular_column_for_mvp">
+                                                                        <?php if ($mvp->getTimeConfirm() !== null) {
+                                                                            echo date('d.m.y', $mvp->getTimeConfirm());
+                                                                        } ?>
+                                                                    </div>
 
 
                                                                     <!--Бизнес модели-->
@@ -455,7 +483,7 @@ use yii\helpers\Html;
 
                                                                         <div class="text-center column_business_model_for_mvp">
                                                                             <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
-                                                                                ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть бизнес-модель']);?>
+                                                                                ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
                                                                         </div>
 
                                                                     <?php else : ?>
@@ -467,7 +495,7 @@ use yii\helpers\Html;
 
                                                                 </div>
 
-                                                            <?endforeach; ?>
+                                                            <?php endforeach; ?>
 
                                                         </div>
                                                     </div>

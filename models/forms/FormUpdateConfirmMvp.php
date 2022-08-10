@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmMvp;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -17,10 +18,10 @@ class FormUpdateConfirmMvp extends FormUpdateConfirm
 
     /**
      * FormUpdateConfirmMvp constructor.
-     * @param $confirmId
+     * @param int $confirmId
      * @param array $config
      */
-    public function __construct($confirmId, $config = [])
+    public function __construct(int $confirmId, array $config = [])
     {
         $confirm = ConfirmMvp::findOne($confirmId);
         $this->setEditorCountRespond();
@@ -37,9 +38,9 @@ class FormUpdateConfirmMvp extends FormUpdateConfirm
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    protected function setParams(array $params)
+    protected function setParams(array $params): void
     {
         $this->setId($params['id']);
         $this->setCountRespond($params['count_respond']);
@@ -50,7 +51,7 @@ class FormUpdateConfirmMvp extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
@@ -62,7 +63,7 @@ class FormUpdateConfirmMvp extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -72,8 +73,9 @@ class FormUpdateConfirmMvp extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmMvp|bool|mixed|null
+     * @return ConfirmMvp|false|null
      * @throws NotFoundHttpException
+     * @throws ErrorException
      */
     public function update()
     {

@@ -29,13 +29,13 @@ class RatesPlansController extends AppAdminController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
             return parent::beforeAction($action);
-        }else{
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
         }
+
+        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
     }
 
     /**
@@ -43,7 +43,7 @@ class RatesPlansController extends AppAdminController
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $ratesPlans = RatesPlan::find()->all();
         return $this->render('index', [
@@ -61,7 +61,7 @@ class RatesPlansController extends AppAdminController
     {
         if (Yii::$app->request->isAjax) {
             $model = new FormCreateRatesPlan();
-            $response = ['renderAjax' => $this->renderAjax('form_create', ['model' => $model]),];
+            $response = ['renderAjax' => $this->renderAjax('form_create', ['model' => $model])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -76,8 +76,8 @@ class RatesPlansController extends AppAdminController
     public function actionCreate()
     {
         $model = new FormCreateRatesPlan();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->create()) {
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->create()) {
                 return $this->redirect('/admin/rates-plans/index');
             }
         }
@@ -91,7 +91,7 @@ class RatesPlansController extends AppAdminController
      * @param int $clientId
      * @return array|bool
      */
-    public function actionGetListRatesPlans($clientId)
+    public function actionGetListRatesPlans(int $clientId)
     {
         if (Yii::$app->request->isAjax){
 
@@ -103,12 +103,10 @@ class RatesPlansController extends AppAdminController
             if (!$clientRatesPlan) {
                 $clientRatesPlan = new ClientRatesPlan();
                 $clientRatesPlan->setClientId($clientId);
-            } else {
-                $clientRatesPlan->setDateStart(date('d.m.Y', $clientRatesPlan->getDateStart()));
-                $clientRatesPlan->setDateEnd(date('d.m.Y', $clientRatesPlan->getDateEnd()));
             }
 
-            $response = ['renderAjax' => $this->renderAjax('list-rates-plans', ['ratesPlans' => $ratesPlans, 'clientRatesPlan' => $clientRatesPlan])];
+            $response = ['renderAjax' => $this->renderAjax('list-rates-plans', [
+                'ratesPlans' => $ratesPlans, 'clientRatesPlan' => $clientRatesPlan])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;

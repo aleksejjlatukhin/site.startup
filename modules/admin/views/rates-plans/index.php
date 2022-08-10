@@ -1,9 +1,16 @@
 <?php
 
+use app\models\RatesPlan;
+use yii\helpers\Html;
+
 $this->title = 'Тарифные планы';
 $this->registerCssFile('@web/css/rates-planes-style.css');
 
-use yii\helpers\Html; ?>
+/**
+ * @var RatesPlan[] $ratesPlans
+ */
+
+?>
 
 <div class="container-fluid">
 
@@ -12,12 +19,12 @@ use yii\helpers\Html; ?>
             <?= Html::a('Тарифные планы' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page',
                 'title' => 'Инструкция', 'onclick' => 'return false'
-            ]); ?>
+            ]) ?>
         </div>
         <div class="col-md-6" style="margin-top: 30px;">
             <?=  Html::a( '<div class="new_rates_plan_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый тарифный план</div></div>', ['/admin/rates-plans/get-form-create'],
                 ['id' => 'showRatesPlanToCreate', 'class' => 'new_rates_plan_link_plus pull-right']
-            ); ?>
+            ) ?>
         </div>
     </div>
 
@@ -48,19 +55,19 @@ use yii\helpers\Html; ?>
             <div class="row container-one_rates_plan">
 
                 <div class="col-md-2" style="padding-left: 25px;">
-                    <?= $ratesPlan->name; ?>
+                    <?= $ratesPlan->getName() ?>
                 </div>
 
                 <div class="col-md-5" style="padding-left: 10px;">
-                    <?= $ratesPlan->description; ?>
+                    <?= $ratesPlan->getDescription() ?>
                 </div>
 
                 <div class="col-md-3 text-center">
-                    <?= $ratesPlan->max_count_project_user . ' проектантов / ' . $ratesPlan->max_count_tracker . ' трекера(-ов)'; ?>
+                    <?= $ratesPlan->getMaxCountProjectUser() . ' проектантов / ' . $ratesPlan->getMaxCountTracker() . ' трекера(-ов)' ?>
                 </div>
 
                 <div class="col-md-2 text-center">
-                    <?= date('d.m.Y', $ratesPlan->created_at); ?>
+                    <?= date('d.m.Y', $ratesPlan->getCreatedAt()) ?>
                 </div>
 
             </div>

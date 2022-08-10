@@ -22,7 +22,7 @@ use yii\web\UploadedFile;
  * @property int $sender_id                             Идентификатор отправителя
  * @property int $adressee_id                           Идентификатор получателя
  *
- * @property $message_files                             Прикрепленные файлы
+ * @property UploadedFile[] $message_files              Прикрепленные файлы
  * @property int $category                              Категория к которой относится беседа
  * @property int $message_id                            Идентификатор созданного сообщения
  * @property string $server_file                        Сгенерированное имя прикрепленного файла для хранения на сервере
@@ -44,7 +44,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'filter', 'filter' => 'trim'],
@@ -61,7 +61,7 @@ class FormCreateMessageDevelopment extends Model
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function create()
+    public function create(): MessageDevelopment
     {
         $model = new MessageDevelopment();
         $model->setDescription($this->getDescription());
@@ -73,7 +73,9 @@ class FormCreateMessageDevelopment extends Model
             //Загрузка презентационных файлов
             $this->setMessageId($model->getId());
             $this->setMessageFiles(UploadedFile::getInstances($this, 'message_files'));
-            if ($this->getMessageFiles()) $this->uploadMessageFiles();
+            if ($this->getMessageFiles()) {
+                $this->uploadMessageFiles();
+            }
 
             return $model;
         }
@@ -83,14 +85,16 @@ class FormCreateMessageDevelopment extends Model
 
 
     /**
-     * @return bool
+     * @return void
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    private function uploadMessageFiles(){
-
+    private function uploadMessageFiles(): void
+    {
         $path = UPLOAD.'/user-'.$this->getSenderId().'/messages/category-'.$this->getCategory().'/message-'.$this->getMessageId().'/';
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         if($this->validate()){
 
@@ -114,9 +118,6 @@ class FormCreateMessageDevelopment extends Model
                     throw new NotFoundHttpException('Невозможно загрузить файл!');
                 }
             }
-            return true;
-        }else{
-            return false;
         }
 
     }
@@ -124,7 +125,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -132,7 +133,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -140,7 +141,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return int
      */
-    public function getConversationId()
+    public function getConversationId(): int
     {
         return $this->conversation_id;
     }
@@ -148,7 +149,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param int $conversation_id
      */
-    public function setConversationId($conversation_id)
+    public function setConversationId(int $conversation_id): void
     {
         $this->conversation_id = $conversation_id;
     }
@@ -156,7 +157,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return int
      */
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->sender_id;
     }
@@ -164,7 +165,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param int $sender_id
      */
-    public function setSenderId($sender_id)
+    public function setSenderId(int $sender_id): void
     {
         $this->sender_id = $sender_id;
     }
@@ -172,7 +173,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return int
      */
-    public function getAdresseeId()
+    public function getAdresseeId(): int
     {
         return $this->adressee_id;
     }
@@ -180,23 +181,23 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param int $adressee_id
      */
-    public function setAdresseeId($adressee_id)
+    public function setAdresseeId(int $adressee_id): void
     {
         $this->adressee_id = $adressee_id;
     }
 
     /**
-     * @return mixed
+     * @return UploadedFile[]
      */
-    public function getMessageFiles()
+    public function getMessageFiles(): array
     {
         return $this->message_files;
     }
 
     /**
-     * @param mixed $message_files
+     * @param UploadedFile[] $message_files
      */
-    public function setMessageFiles($message_files)
+    public function setMessageFiles(array $message_files): void
     {
         $this->message_files = $message_files;
     }
@@ -204,7 +205,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return int
      */
-    public function getCategory()
+    public function getCategory(): int
     {
         return $this->category;
     }
@@ -212,7 +213,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param int $category
      */
-    public function setCategory($category)
+    public function setCategory(int $category): void
     {
         $this->category = $category;
     }
@@ -220,7 +221,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return int
      */
-    public function getMessageId()
+    public function getMessageId(): int
     {
         return $this->message_id;
     }
@@ -228,7 +229,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param int $message_id
      */
-    public function setMessageId($message_id)
+    public function setMessageId(int $message_id): void
     {
         $this->message_id = $message_id;
     }
@@ -236,7 +237,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @return string
      */
-    public function getServerFile()
+    public function getServerFile(): string
     {
         return $this->server_file;
     }
@@ -244,7 +245,7 @@ class FormCreateMessageDevelopment extends Model
     /**
      * @param string $server_file
      */
-    public function setServerFile($server_file)
+    public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
     }

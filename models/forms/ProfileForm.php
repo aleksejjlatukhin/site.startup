@@ -32,7 +32,7 @@ class ProfileForm extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
@@ -48,14 +48,17 @@ class ProfileForm extends Model
 
     /**
      * ProfileForm constructor.
-     * @param $id
+     *
+     * @param int $id
      * @param array $config
      */
-    public function __construct($id, $config = [])
+    public function __construct(int $id, array $config = [])
     {
         $user = User::findOne($id);
         foreach ($user as $key => $value) {
-            if (property_exists($this, $key)) $this[$key] = $value;
+            if (property_exists($this, $key)) {
+                $this[$key] = $value;
+            }
         }
         parent::__construct($config);
     }
@@ -64,7 +67,7 @@ class ProfileForm extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Email',
@@ -77,14 +80,16 @@ class ProfileForm extends Model
      * Собственное правило для поля username
      * Переводим все логины в нижний регистр
      * и сравниваем их с тем, что в форме
+     *
      * @param $attr
      */
-    public function uniqUsername($attr)
+    public function uniqUsername($attr): void
     {
+        /** @var User[] $users */
         $users = User::find()->all();
 
         foreach ($users as $user){
-            if ($user->id != $this->id && mb_strtolower($this->username) === mb_strtolower($user->username)){
+            if ($user->getId() !== $this->getId() && mb_strtolower($this->getUsername()) === mb_strtolower($user->getUsername())){
                 $this->uniq_username = false;
                 $this->addError($attr, 'Этот логин уже занят.');
             }
@@ -95,7 +100,7 @@ class ProfileForm extends Model
     /**
      * @param $attr
      */
-    public function matchUsername($attr)
+    public function matchUsername($attr): void
     {
         if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
             $this->match_username = false;
@@ -112,12 +117,13 @@ class ProfileForm extends Model
     /**
      * @param $attr
      */
-    public function uniqEmail($attr)
+    public function uniqEmail($attr): void
     {
+        /** @var User[] $users */
         $users = User::find()->all();
 
         foreach ($users as $user){
-            if ($user->id != $this->id && $this->email === $user->email){
+            if ($user->getId() !== $this->getId() && $this->getEmail() === $user->getEmail()){
                 $this->uniq_email = false;
                 $this->addError($attr, 'Эта почта уже зарегистрирована.');
             }
@@ -129,7 +135,7 @@ class ProfileForm extends Model
      * Отправка уведомления на email
      * @return bool
      */
-    public function sendEmail()
+    public function sendEmail(): bool
     {
         try {
 
@@ -161,17 +167,16 @@ class ProfileForm extends Model
 
             return $user->save() ? $user : null;
 
-        } else {
-
-            $this->checking_mail_sending = false;
-            return  $this;
         }
+
+        $this->checking_mail_sending = false;
+        return  $this;
     }
 
     /**
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -179,9 +184,17 @@ class ProfileForm extends Model
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 }
 

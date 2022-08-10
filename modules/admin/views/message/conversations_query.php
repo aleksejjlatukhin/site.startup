@@ -1,6 +1,13 @@
 <?php
 
+use app\models\ConversationAdmin;
+use app\modules\expert\models\ConversationExpert;
 use yii\helpers\Html;
+
+/**
+ * @var ConversationAdmin[] $conversations_query
+ * @var ConversationExpert[] $expert_conversations_query
+ */
 
 ?>
 
@@ -12,30 +19,30 @@ use yii\helpers\Html;
 
     <?php foreach ($conversations_query as $conversation) : ?>
 
-        <div class="conversation-link" id="conversation-<?= $conversation->id; ?>">
+        <div class="conversation-link" id="conversation-<?= $conversation->getId() ?>">
 
-            <?php if ($conversation->user->avatar_image) : ?>
-                <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture_search']); ?>
+            <?php if ($conversation->user->getAvatarImage()) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture_search']) ?>
             <?php else : ?>
-                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']) ?>
             <?php endif; ?>
 
-            <?= $conversation->user->username; ?>
+            <?= $conversation->user->getUsername() ?>
         </div>
 
     <?php endforeach; ?>
 
     <?php foreach ($expert_conversations_query as $conversation) : ?>
 
-        <div class="conversation-link" id="expertConversation-<?= $conversation->id; ?>">
+        <div class="conversation-link" id="expertConversation-<?= $conversation->getId() ?>">
 
-            <?php if ($conversation->expert->avatar_image) : ?>
-                <?= Html::img('/web/upload/user-'.$conversation->expert->id.'/avatar/'.$conversation->expert->avatar_image, ['class' => 'user_picture_search']); ?>
+            <?php if ($conversation->expert->getAvatarImage()) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation->getExpertId().'/avatar/'.$conversation->expert->getAvatarImage(), ['class' => 'user_picture_search']) ?>
             <?php else : ?>
-                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']); ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_search_default']) ?>
             <?php endif; ?>
 
-            <?= $conversation->expert->username; ?>
+            <?= $conversation->expert->getUsername() ?>
         </div>
 
     <?php endforeach; ?>

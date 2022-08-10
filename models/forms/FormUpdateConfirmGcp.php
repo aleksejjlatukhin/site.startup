@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmGcp;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -18,10 +19,10 @@ class FormUpdateConfirmGcp extends FormUpdateConfirm
 
     /**
      * FormUpdateConfirmGcp constructor.
-     * @param $confirmId
+     * @param int $confirmId
      * @param array $config
      */
-    public function __construct($confirmId, $config = [])
+    public function __construct(int $confirmId, array $config = [])
     {
         $confirm = ConfirmGcp::findOne($confirmId);
         $this->setEditorCountRespond();
@@ -38,9 +39,9 @@ class FormUpdateConfirmGcp extends FormUpdateConfirm
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    protected function setParams(array $params)
+    protected function setParams(array $params): void
     {
         $this->setId($params['id']);
         $this->setCountRespond($params['count_respond']);
@@ -51,7 +52,7 @@ class FormUpdateConfirmGcp extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
@@ -63,7 +64,7 @@ class FormUpdateConfirmGcp extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -73,8 +74,9 @@ class FormUpdateConfirmGcp extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmGcp|bool|mixed|null
+     * @return ConfirmGcp|false|null
      * @throws NotFoundHttpException
+     * @throws ErrorException
      */
     public function update()
     {

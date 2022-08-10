@@ -1,11 +1,17 @@
 <?php
 
 use app\models\CommunicationTypes;
+use app\models\UserAccessToProjects;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use yii\helpers\Url;
 use app\models\CommunicationResponse;
 use app\models\ExpertType;
+
+/**
+ * @var UserAccessToProjects[] $admittedExperts
+ * @var int $project_id
+ */
 
 ?>
 
@@ -27,13 +33,14 @@ use app\models\ExpertType;
 
         <div class="row line_data_communication">
 
-            <?php foreach ($userCommunications = $admittedExpert->userCommunicationsForAdminTable as $key => $communication) : ?>
+            <?php $userCommunications = $admittedExpert->userCommunicationsForAdminTable;
+            foreach ($userCommunications as $key => $communication) : ?>
 
                 <div class="row">
 
-                    <?php if ($key == 0) : ?>
+                    <?php if ($key === 0) : ?>
                         <div class="col-md-2 text-center">
-                            <?= $admittedExpert->user->username; ?>
+                            <?= $admittedExpert->user->getUsername() ?>
                         </div>
                     <?php else : ?>
                         <div class="col-md-2"></div>
@@ -44,23 +51,23 @@ use app\models\ExpertType;
                         <div class="row">
                             <div class="col-md-8">
 
-                                <?php if ($communication->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
+                                <?php if ($communication->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
 
                                     <div class="text-success">Запрос сделан</div>
                                     <div class="">Доступ к проекту до:</div>
-                                    <div class=""><?= date('d.m.y H:i', $communication->userAccessToProject->date_stop); ?></div>
+                                    <div class=""><?= date('d.m.y H:i', $communication->userAccessToProject->getDateStop()) ?></div>
 
-                                    <?php if ($key == array_key_last($userCommunications)) : ?>
+                                    <?php if ($key === array_key_last($userCommunications)) : ?>
 
                                         <div class="revoke-request-button">
                                             <?= Html::a('Отозвать запрос', Url::to([
                                                 '/client/communications/send',
-                                                'adressee_id' => $communication->expert->id,
-                                                'project_id' => $communication->project_id,
+                                                'adressee_id' => $communication->expert->getId(),
+                                                'project_id' => $communication->getProjectId(),
                                                 'type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE
                                             ]), [
                                                 'class' => 'btn btn-danger send-communication',
-                                                'id' => 'send_communication-'.$communication->expert->id,
+                                                'id' => 'send_communication-'.$communication->expert->getId(),
                                                 'style' => [
                                                     'display' => 'flex',
                                                     'align-items' => 'center',
@@ -69,49 +76,49 @@ use app\models\ExpertType;
                                                     'font-size' => '18px',
                                                     'border-radius' => '8px',
                                                 ]
-                                            ]); ?>
+                                            ]) ?>
                                         </div>
 
                                     <?php endif; ?>
 
-                                <?php elseif ($communication->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
+                                <?php elseif ($communication->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
                                     <div class="text-danger">Запрос отозван</div>
                                 <?php endif; ?>
 
                             </div>
 
                             <div class="col-md-4">
-                                <?php if ($communication->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE ||
-                                    $communication->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
-                                    <div><?= date('d.m.y H:i', $communication->created_at) ?></div>
+                                <?php if ($communication->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE ||
+                                    $communication->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
+                                    <div><?= date('d.m.y H:i', $communication->getCreatedAt()) ?></div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    <?php if ($communication->sender_id != $admittedExpert->user_id) : ?>
+                    <?php if ($communication->getSenderId() !== $admittedExpert->getUserId()) : ?>
 
                         <?php $communicationExpert = $communication->responsiveCommunication; ?>
                         <?php if ($communicationResponse = $communicationExpert->communicationResponse) : ?>
 
                             <div class="col-md-3">
 
-                                <?php if ($communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
+                                <?php if ($communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) : ?>
 
-                                    <div><b>Ответ: </b><span class="text-success"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer];?></span></div>
+                                    <div><b>Ответ: </b><span class="text-success"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->getAnswer()] ?></span></div>
 
-                                    <div><b>Типы деятельности: </b><?= ExpertType::getContent($communicationResponse->expert_types)?></div>
+                                    <div><b>Типы деятельности: </b><?= ExpertType::getContent($communicationResponse->getExpertTypes()) ?></div>
 
-                                    <?php if ($communicationResponse->comment) : ?>
-                                        <div><b>Комментарий: </b><?= $communicationResponse->comment; ?></div>
+                                    <?php if ($communicationResponse->getComment()) : ?>
+                                        <div><b>Комментарий: </b><?= $communicationResponse->getComment() ?></div>
                                     <?php endif; ?>
 
-                                <?php elseif ($communicationResponse->answer == CommunicationResponse::NEGATIVE_RESPONSE) : ?>
+                                <?php elseif ($communicationResponse->getAnswer() === CommunicationResponse::NEGATIVE_RESPONSE) : ?>
 
-                                    <div><b>Ответ: </b><span class="text-danger"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->answer];?></span></div>
+                                    <div><b>Ответ: </b><span class="text-danger"><?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->getAnswer()] ?></span></div>
 
-                                    <?php if ($communicationResponse->comment) : ?>
-                                        <div><b>Комментарий: </b><?= $communicationResponse->comment; ?></div>
+                                    <?php if ($communicationResponse->getComment()) : ?>
+                                        <div><b>Комментарий: </b><?= $communicationResponse->getComment() ?></div>
                                     <?php endif; ?>
 
                                 <?php endif; ?>
@@ -119,50 +126,50 @@ use app\models\ExpertType;
                             </div>
 
                             <div class="col-md-1">
-                                <?= date('d.m.Y H:i', $communicationExpert->created_at); ?>
+                                <?= date('d.m.Y H:i', $communicationExpert->getCreatedAt()) ?>
                             </div>
 
-                            <?php if ($communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
+                            <?php if ($communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) : ?>
 
                                 <?php if ($responsiveCommunication = $communicationExpert->responsiveCommunication) : ?>
 
                                     <?php if ($communicationWithdrawFromProject = $responsiveCommunication->responsiveCommunication) : ?>
 
                                         <div class="col-md-2 text-danger">Отозван(-а) с проекта</div>
-                                        <div class="col-md-1"><?= date('d.m.Y H:i', $communicationWithdrawFromProject->created_at); ?></div>
+                                        <div class="col-md-1"><?= date('d.m.Y H:i', $communicationWithdrawFromProject->getCreatedAt()) ?></div>
 
                                     <?php else : ?>
 
-                                        <?php if ($responsiveCommunication->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
+                                        <?php if ($responsiveCommunication->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
 
                                             <div class="col-md-2">
                                                 <div class="text-success">Назначен(-а) на проект</div>
-                                                <div><b>Типы деятельности: </b><?= ExpertType::getContent($responsiveCommunication->typesAccessToExpertise->types);?></div>
+                                                <div><b>Типы деятельности: </b><?= ExpertType::getContent($responsiveCommunication->typesAccessToExpertise->getTypes()) ?></div>
                                                 <div>
                                                     <?= Html::a('Отозвать эксперта', Url::to([
                                                         '/client/communications/send',
-                                                        'adressee_id' => $communicationExpert->sender_id,
-                                                        'project_id' => $communicationExpert->project_id,
+                                                        'adressee_id' => $communicationExpert->getSenderId(),
+                                                        'project_id' => $communicationExpert->getProjectId(),
                                                         'type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT,
-                                                        'triggered_communication_id' => $responsiveCommunication->id
+                                                        'triggered_communication_id' => $responsiveCommunication->getId()
                                                     ]), [
                                                         'class' => 'btn btn-danger send-communication',
-                                                        'id' => 'withdraws_expert_from_project-'.$communicationExpert->project_id,
+                                                        'id' => 'withdraws_expert_from_project-'.$communicationExpert->getProjectId(),
                                                         'style' => [
                                                             'width' => '160px',
                                                             'font-size' => '18px',
                                                             'border-radius' => '8px',
                                                             'margin-top' => '10px'
                                                         ]
-                                                    ]); ?>
+                                                    ]) ?>
                                                 </div>
                                             </div>
-                                            <div class="col-md-1"><?= date('d.m.Y H:i', $responsiveCommunication->created_at); ?></div>
+                                            <div class="col-md-1"><?= date('d.m.Y H:i', $responsiveCommunication->getCreatedAt()) ?></div>
 
-                                        <?php elseif ($responsiveCommunication->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) : ?>
+                                        <?php elseif ($responsiveCommunication->getType() === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) : ?>
 
                                             <div class="col-md-2 text-danger">Отказано</div>
-                                            <div class="col-md-1"><?= date('d.m.Y H:i', $responsiveCommunication->created_at); ?></div>
+                                            <div class="col-md-1"><?= date('d.m.Y H:i', $responsiveCommunication->getCreatedAt()) ?></div>
 
                                         <?php endif; ?>
 
@@ -175,7 +182,7 @@ use app\models\ExpertType;
                                             <div class="col-md-12">
                                                 <?= Html::a('Назначить', Url::to([
                                                     '/client/communications/get-form-types-expert',
-                                                    'id' => $communicationExpert->id,
+                                                    'id' => $communicationExpert->getId(),
                                                 ]), [
                                                     'class' => 'btn btn-success get-form-types-expert',
                                                     'style' => [
@@ -185,25 +192,25 @@ use app\models\ExpertType;
                                                         'border-radius' => '8px',
                                                         'margin-top' => '5px'
                                                     ]
-                                                ]); ?>
+                                                ]) ?>
                                             </div>
                                             <div class="col-md-12">
                                                 <?= Html::a('Отказать', Url::to([
                                                     '/client/communications/send',
-                                                    'adressee_id' => $communicationExpert->sender_id,
-                                                    'project_id' => $communicationExpert->project_id,
+                                                    'adressee_id' => $communicationExpert->getSenderId(),
+                                                    'project_id' => $communicationExpert->getProjectId(),
                                                     'type' => CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
-                                                    'triggered_communication_id' => $communicationExpert->id
+                                                    'triggered_communication_id' => $communicationExpert->getId()
                                                 ]), [
                                                     'class' => 'btn btn-danger send-communication',
-                                                    'id' => 'appoints_does_not_expert_project-'.$communicationExpert->project_id,
+                                                    'id' => 'appoints_does_not_expert_project-'.$communicationExpert->getProjectId(),
                                                     'style' => [
                                                         'width' => '140px',
                                                         'font-size' => '18px',
                                                         'border-radius' => '8px',
                                                         'margin-top' => '10px'
                                                     ]
-                                                ]); ?>
+                                                ]) ?>
                                             </div>
                                         </div>
                                     </div>
@@ -228,7 +235,7 @@ use app\models\ExpertType;
 
                 </div>
 
-                <?php if ($key != array_key_last($userCommunications)) : ?>
+                <?php if ($key !== array_key_last($userCommunications)) : ?>
                     <br>
                 <?php endif; ?>
 

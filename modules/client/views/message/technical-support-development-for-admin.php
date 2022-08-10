@@ -1,15 +1,31 @@
 <?php
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
+use app\models\ConversationDevelopment;
+use app\models\forms\FormCreateMessageDevelopment;
+use app\modules\admin\models\form\SearchForm;
+use yii\data\Pagination;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\User;
 use app\models\MessageDevelopment;
+use yii\widgets\LinkPager;
 
 $this->title = 'Сообщения';
 $this->registerCssFile('@web/css/admin-message-view.css');
+
+/**
+ * @var FormCreateMessageDevelopment $formMessage
+ * @var User $admin
+ * @var SearchForm $searchForm
+ * @var MessageDevelopment[] $messages
+ * @var int $countMessages
+ * @var Pagination $pagesMessages
+ * @var User $development
+ * @var ConversationDevelopment[] $allConversations
+ */
+
 ?>
 
 <div class="message-technical-support">
@@ -32,7 +48,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
             <?php $form = ActiveForm::begin([
                 'id' => 'search_user_conversation',
-                'action' => Url::to(['/admin/message/get-development-conversation-query', 'id' => $development->id]),
+                'action' => Url::to(['/admin/message/get-development-conversation-query', 'id' => $development->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -44,8 +60,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         'placeholder' => 'Поиск',
                         'class' => 'style_form_field_respond',
                         'autocomplete' => 'off'])
-                    ->label(false);
-                ?>
+                    ->label(false) ?>
 
             <?php ActiveForm::end(); ?>
 
@@ -75,20 +90,20 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                         <?php foreach ($allConversations as $conversation) : ?>
 
-                            <?php if (User::isUserSimple($conversation->user->username)) : ?>
+                            <?php if (User::isUserSimple($conversation->user->getUsername())) : ?>
 
-                                <div class="container-user_messages" id="conversation-<?= $conversation->id;?>">
+                                <div class="container-user_messages" id="conversation-<?= $conversation->getId() ?>">
 
                                     <!--Проверка существования аватарки-->
-                                    <?php if ($conversation->user->avatar_image) : ?>
-                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php if ($conversation->user->getAvatarImage()) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                     <?php else : ?>
-                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                     <?php endif; ?>
 
                                     <!--Кол-во непрочитанных сообщений от пользователя-->
                                     <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                     <?php else : ?>
                                         <div class="countUnreadMessagesSender"></div>
                                     <?php endif; ?>
@@ -104,11 +119,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
-                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -116,15 +131,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                         <?php if ($conversation->lastMessage) : ?>
                                             <div class="block_bottom_exist_message">
 
-                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                 <?php else : ?>
-                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                 <?php endif; ?>
 
                                                 <div>
-                                                    <?php if ($conversation->lastMessage->description) : ?>
-                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                        <?= $conversation->lastMessage->getDescription() ?>
                                                     <?php else : ?>
                                                         ...
                                                     <?php endif; ?>
@@ -137,20 +152,20 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                     </div>
                                 </div>
 
-                            <?php elseif (User::isUserManager($conversation->user->username)) : ?>
+                            <?php elseif (User::isUserManager($conversation->user->getUsername())) : ?>
 
-                                <div class="container-user_messages" id="adminConversation-<?= $conversation->id;?>">
+                                <div class="container-user_messages" id="adminConversation-<?= $conversation->getId() ?>">
 
                                     <!--Проверка существования аватарки-->
-                                    <?php if ($conversation->user->avatar_image) : ?>
-                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php if ($conversation->user->getAvatarImage()) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                     <?php else : ?>
-                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                     <?php endif; ?>
 
                                     <!--Кол-во непрочитанных сообщений от пользователя-->
                                     <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                     <?php else : ?>
                                         <div class="countUnreadMessagesSender"></div>
                                     <?php endif; ?>
@@ -166,11 +181,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
-                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -178,15 +193,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                         <?php if ($conversation->lastMessage) : ?>
                                             <div class="block_bottom_exist_message">
 
-                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                 <?php else : ?>
-                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                 <?php endif; ?>
 
                                                 <div>
-                                                    <?php if ($conversation->lastMessage->description) : ?>
-                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                        <?= $conversation->lastMessage->getDescription() ?>
                                                     <?php else : ?>
                                                         ...
                                                     <?php endif; ?>
@@ -199,37 +214,36 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                     </div>
                                 </div>
 
-                            <?php elseif (User::isUserAdmin($conversation->user->username)) : ?>
+                            <?php elseif (User::isUserAdmin($conversation->user->getUsername())) : ?>
 
                                 <?php
-                                /** @var ClientUser $clientUser */
                                 $clientUser = $conversation->user->clientUser;
                                 $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
                                 $adminCompany = User::findOne(['id' => $clientSettings->getAdminId()]);
                                 ?>
 
-                                <?php if ($conversation->user_id != $admin->id) : ?>
+                                <?php if ($conversation->getUserId() !== $admin->getId()) : ?>
 
                                     <?php if (User::isUserMainAdmin($adminCompany->getUsername())) : ?>
 
-                                        <div class="container-user_messages" id="adminConversation-<?= $conversation->id;?>">
+                                        <div class="container-user_messages" id="adminConversation-<?= $conversation->getId() ?>">
 
                                     <?php else : ?>
 
-                                        <div class="container-user_messages" id="clientAdminConversation-<?= $conversation->id;?>">
+                                        <div class="container-user_messages" id="clientAdminConversation-<?= $conversation->getId() ?>">
 
                                     <?php endif; ?>
 
                                         <!--Проверка существования аватарки-->
-                                        <?php if ($conversation->user->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                        <?php if ($conversation->user->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                         <?php endif; ?>
 
                                         <!--Кол-во непрочитанных сообщений от пользователя-->
                                         <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                            <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                            <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                         <?php else : ?>
                                             <div class="countUnreadMessagesSender"></div>
                                         <?php endif; ?>
@@ -245,11 +259,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                             <div class="row block_top">
 
-                                                <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                                <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                                 <div class="col-xs-4 text-right">
                                                     <?php if ($conversation->lastMessage) : ?>
-                                                        <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                        <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -257,15 +271,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                             <?php if ($conversation->lastMessage) : ?>
                                                 <div class="block_bottom_exist_message">
 
-                                                    <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                        <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                    <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                        <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                     <?php else : ?>
-                                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                     <?php endif; ?>
 
                                                     <div>
-                                                        <?php if ($conversation->lastMessage->description) : ?>
-                                                            <?= $conversation->lastMessage->description; ?>
+                                                        <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                            <?= $conversation->lastMessage->getDescription() ?>
                                                         <?php else : ?>
                                                             ...
                                                         <?php endif; ?>
@@ -282,24 +296,24 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                     <?php if (User::isUserMainAdmin($adminCompany->getUsername())) : ?>
 
-                                        <div class="container-user_messages active-message" id="adminConversation-<?= $conversation->id;?>">
+                                        <div class="container-user_messages active-message" id="adminConversation-<?= $conversation->getId() ?>">
 
                                     <?php else : ?>
 
-                                        <div class="container-user_messages active-message" id="clientAdminConversation-<?= $conversation->id;?>">
+                                        <div class="container-user_messages active-message" id="clientAdminConversation-<?= $conversation->getId() ?>">
 
                                     <?php endif; ?>
 
                                         <!--Проверка существования аватарки-->
-                                        <?php if ($conversation->user->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                        <?php if ($conversation->user->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                         <?php endif; ?>
 
                                         <!--Кол-во непрочитанных сообщений от пользователя-->
                                         <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                            <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                            <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                         <?php else : ?>
                                             <div class="countUnreadMessagesSender"></div>
                                         <?php endif; ?>
@@ -315,11 +329,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                             <div class="row block_top">
 
-                                                <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                                <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                                 <div class="col-xs-4 text-right">
                                                     <?php if ($conversation->lastMessage) : ?>
-                                                        <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                        <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -327,15 +341,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                             <?php if ($conversation->lastMessage) : ?>
                                                 <div class="block_bottom_exist_message">
 
-                                                    <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                        <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                    <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                        <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                     <?php else : ?>
-                                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                     <?php endif; ?>
 
                                                     <div>
-                                                        <?php if ($conversation->lastMessage->description) : ?>
-                                                            <?= $conversation->lastMessage->description; ?>
+                                                        <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                            <?= $conversation->lastMessage->getDescription() ?>
                                                         <?php else : ?>
                                                             ...
                                                         <?php endif; ?>
@@ -350,20 +364,20 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                 <?php endif; ?>
 
-                            <?php elseif (User::isUserExpert($conversation->user->username)) : ?>
+                            <?php elseif (User::isUserExpert($conversation->user->getUsername())) : ?>
 
-                                <div class="container-user_messages" id="expertConversation-<?= $conversation->id;?>">
+                                <div class="container-user_messages" id="expertConversation-<?= $conversation->getId() ?>">
 
                                     <!--Проверка существования аватарки-->
-                                    <?php if ($conversation->user->avatar_image) : ?>
-                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php if ($conversation->user->getAvatarImage()) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                     <?php else : ?>
-                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                     <?php endif; ?>
 
                                     <!--Кол-во непрочитанных сообщений от пользователя-->
                                     <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                     <?php else : ?>
                                         <div class="countUnreadMessagesSender"></div>
                                     <?php endif; ?>
@@ -379,11 +393,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
-                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -391,15 +405,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                         <?php if ($conversation->lastMessage) : ?>
                                             <div class="block_bottom_exist_message">
 
-                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                 <?php else : ?>
-                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                 <?php endif; ?>
 
                                                 <div>
-                                                    <?php if ($conversation->lastMessage->description) : ?>
-                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                        <?= $conversation->lastMessage->getDescription() ?>
                                                     <?php else : ?>
                                                         ...
                                                     <?php endif; ?>
@@ -412,20 +426,20 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                     </div>
                                 </div>
 
-                            <?php elseif (User::isUserMainAdmin($conversation->user->username)) : ?>
+                            <?php elseif (User::isUserMainAdmin($conversation->user->getUsername())) : ?>
 
-                                <div class="container-user_messages" id="adminConversation-<?= $conversation->id;?>">
+                                <div class="container-user_messages" id="adminConversation-<?= $conversation->getId() ?>">
 
                                     <!--Проверка существования аватарки-->
-                                    <?php if ($conversation->user->avatar_image) : ?>
-                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php if ($conversation->user->getAvatarImage()) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                     <?php else : ?>
-                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                     <?php endif; ?>
 
                                     <!--Кол-во непрочитанных сообщений от пользователя-->
                                     <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                     <?php else : ?>
                                         <div class="countUnreadMessagesSender"></div>
                                     <?php endif; ?>
@@ -441,11 +455,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
-                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -453,15 +467,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                         <?php if ($conversation->lastMessage) : ?>
                                             <div class="block_bottom_exist_message">
 
-                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                 <?php else : ?>
-                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                 <?php endif; ?>
 
                                                 <div>
-                                                    <?php if ($conversation->lastMessage->description) : ?>
-                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                        <?= $conversation->lastMessage->getDescription() ?>
                                                     <?php else : ?>
                                                         ...
                                                     <?php endif; ?>
@@ -474,20 +488,20 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                     </div>
                                 </div>
 
-                            <?php elseif (User::isUserAdminCompany($conversation->user->username)) : ?>
+                            <?php elseif (User::isUserAdminCompany($conversation->user->getUsername())) : ?>
 
-                                <div class="container-user_messages" id="clientAdminConversation-<?= $conversation->id;?>">
+                                <div class="container-user_messages" id="clientAdminConversation-<?= $conversation->getId() ?>">
 
                                     <!--Проверка существования аватарки-->
-                                    <?php if ($conversation->user->avatar_image) : ?>
-                                        <?= Html::img('/web/upload/user-'.$conversation->user->id.'/avatar/'.$conversation->user->avatar_image, ['class' => 'user_picture']); ?>
+                                    <?php if ($conversation->user->getAvatarImage()) : ?>
+                                        <?= Html::img('/web/upload/user-'.$conversation->getUserId().'/avatar/'.$conversation->user->getAvatarImage(), ['class' => 'user_picture']) ?>
                                     <?php else : ?>
-                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+                                        <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
                                     <?php endif; ?>
 
                                     <!--Кол-во непрочитанных сообщений от пользователя-->
                                     <?php if ($conversation->user->countUnreadMessagesDevelopmentFromUser) : ?>
-                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser; ?></div>
+                                        <div class="countUnreadMessagesSender active"><?= $conversation->user->countUnreadMessagesDevelopmentFromUser ?></div>
                                     <?php else : ?>
                                         <div class="countUnreadMessagesSender"></div>
                                     <?php endif; ?>
@@ -503,11 +517,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                         <div class="row block_top">
 
-                                            <div class="col-xs-8"><?= $conversation->user->username; ?></div>
+                                            <div class="col-xs-8"><?= $conversation->user->getUsername() ?></div>
 
                                             <div class="col-xs-4 text-right">
                                                 <?php if ($conversation->lastMessage) : ?>
-                                                    <?= date('d.m.y H:i', $conversation->lastMessage->created_at); ?>
+                                                    <?= date('d.m.y H:i', $conversation->lastMessage->getCreatedAt()) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -515,15 +529,15 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                                         <?php if ($conversation->lastMessage) : ?>
                                             <div class="block_bottom_exist_message">
 
-                                                <?php if ($conversation->lastMessage->sender->avatar_image) : ?>
-                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->sender->id.'/avatar/'.$conversation->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+                                                <?php if ($conversation->lastMessage->sender->getAvatarImage()) : ?>
+                                                    <?= Html::img('/web/upload/user-'.$conversation->lastMessage->getSenderId().'/avatar/'.$conversation->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
                                                 <?php else : ?>
-                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                                                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
                                                 <?php endif; ?>
 
                                                 <div>
-                                                    <?php if ($conversation->lastMessage->description) : ?>
-                                                        <?= $conversation->lastMessage->description; ?>
+                                                    <?php if ($conversation->lastMessage->getDescription()) : ?>
+                                                        <?= $conversation->lastMessage->getDescription() ?>
                                                     <?php else : ?>
                                                         ...
                                                     <?php endif; ?>
@@ -563,16 +577,16 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php if ($countMessages > $pagesMessages->pageSize) : ?>
 
                             <div class="pagination-messages">
-                                <?= \yii\widgets\LinkPager::widget([
+                                <?= LinkPager::widget([
                                     'pagination' => $pagesMessages,
                                     'activePageCssClass' => 'pagination_active_page',
                                     'options' => ['class' => 'messages-pagination-list pagination'],
                                     'maxButtonCount' => 1,
-                                ]); ?>
+                                ]) ?>
                             </div>
 
                             <div class="text-center block_for_link_next_page_masseges">
-                                <?= Html::a('Посмотреть предыдущие сообщения', ['#'], ['class' => 'button_next_page_masseges'])?>
+                                <?= Html::a('Посмотреть предыдущие сообщения', ['#'], ['class' => 'button_next_page_masseges']) ?>
                             </div>
 
                         <?php endif; ?>
@@ -583,44 +597,44 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                             <?php
                             // Вывод общих дат для сообщений
-                            if (!in_array($message->dayAndDateRus, $totalDateMessages)) {
-                                array_push($totalDateMessages, $message->dayAndDateRus);
+                            if (!in_array($message->dayAndDateRus, $totalDateMessages, false)) {
+                                $totalDateMessages[] = $message->dayAndDateRus;
                                 echo '<div class="dayAndDayMessage">'.$message->dayAndDateRus.'</div>';
                             }
                             ?>
 
-                            <?php if ($message->sender_id != $admin->id) : ?>
+                            <?php if ($message->getSenderId() !== $admin->getId()) : ?>
 
-                                <?php if ($message->status == MessageDevelopment::NO_READ_MESSAGE) : ?>
+                                <?php if ($message->getStatus() === MessageDevelopment::NO_READ_MESSAGE) : ?>
 
-                                    <div class="message addressee-admin unreadmessage" id="message_id-<?= $message->id;?>">
+                                    <div class="message addressee-admin unreadmessage" id="message_id-<?= $message->getId() ?>">
 
-                                        <?php if ($development->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$development->id.'/avatar/'.$development->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php if ($development->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$development->getId().'/avatar/'.$development->getAvatarImage(), ['class' => 'user_picture_message']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']) ?>
                                         <?php endif; ?>
 
                                         <div class="sender_data">
                                             <div class="sender_info">
                                                 <div>Техническая поддержка</div>
                                                 <div>
-                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
-                                                    <?= date('H:i', $message['created_at']); ?>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']) ?>
+                                                    <?= date('H:i', $message->getCreatedAt()) ?>
                                                 </div>
                                             </div>
 
                                             <div class="message-description">
 
-                                                <?php if ($message->description) : ?>
-                                                    <?= $message->description; ?>
+                                                <?php if ($message->getDescription()) : ?>
+                                                    <?= $message->getDescription() ?>
                                                 <?php endif; ?>
 
                                                 <?php if ($message->files) : ?>
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->getFileName(), ['/admin/message/download', 'category' => $file->getCategory(), 'id' => $file->getId()], ['target' => '_blank', 'title' => $file->getFileName()]) ?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -633,34 +647,34 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                 <?php else : ?>
 
-                                    <div class="message addressee-admin" id="message_id-<?= $message->id;?>">
+                                    <div class="message addressee-admin" id="message_id-<?= $message->getId() ?>">
 
-                                        <?php if ($development->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$development->id.'/avatar/'.$development->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php if ($development->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$development->getId().'/avatar/'.$development->getAvatarImage(), ['class' => 'user_picture_message']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']) ?>
                                         <?php endif; ?>
 
                                         <div class="sender_data">
                                             <div class="sender_info">
                                                 <div>Техническая поддержка</div>
                                                 <div>
-                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
-                                                    <?= date('H:i', $message['created_at']); ?>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']) ?>
+                                                    <?= date('H:i', $message->getCreatedAt()) ?>
                                                 </div>
                                             </div>
 
                                             <div class="message-description">
 
-                                                <?php if ($message->description) : ?>
-                                                    <?= $message->description; ?>
+                                                <?php if ($message->getDescription()) : ?>
+                                                    <?= $message->getDescription() ?>
                                                 <?php endif; ?>
 
                                                 <?php if ($message->files) : ?>
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->getFileName(), ['/admin/message/download', 'category' => $file->getCategory(), 'id' => $file->getId()], ['target' => '_blank', 'title' => $file->getFileName()]) ?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -675,36 +689,36 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                             <?php else : ?>
 
-                                <?php if ($message->status == MessageDevelopment::NO_READ_MESSAGE) : ?>
+                                <?php if ($message->getStatus() === MessageDevelopment::NO_READ_MESSAGE) : ?>
 
-                                    <div class="message addressee-development unreadmessage" id="message_id-<?= $message->id;?>">
+                                    <div class="message addressee-development unreadmessage" id="message_id-<?= $message->getId() ?>">
 
-                                        <?php if ($admin->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php if ($admin->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$admin->getId().'/avatar/'.$admin->getAvatarImage(), ['class' => 'user_picture_message']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']) ?>
                                         <?php endif; ?>
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $admin->username; ?></div>
+                                                <div class="interlocutor"><?= $admin->getUsername() ?></div>
                                                 <div>
-                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
-                                                    <?= date('H:i', $message['created_at']); ?>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']) ?>
+                                                    <?= date('H:i', $message->getCreatedAt()) ?>
                                                 </div>
                                             </div>
 
                                             <div class="message-description">
 
-                                                <?php if ($message->description) : ?>
-                                                    <?= $message->description; ?>
+                                                <?php if ($message->getDescription()) : ?>
+                                                    <?= $message->getDescription() ?>
                                                 <?php endif; ?>
 
                                                 <?php if ($message->files) : ?>
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->getFileName(), ['/admin/message/download', 'category' => $file->getCategory(), 'id' => $file->getId()], ['target' => '_blank', 'title' => $file->getFileName()]) ?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -717,34 +731,34 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                                 <?php else : ?>
 
-                                    <div class="message addressee-development" id="message_id-<?= $message->id;?>">
+                                    <div class="message addressee-development" id="message_id-<?= $message->getId() ?>">
 
-                                        <?php if ($admin->avatar_image) : ?>
-                                            <?= Html::img('/web/upload/user-'.$admin->id.'/avatar/'.$admin->avatar_image, ['class' => 'user_picture_message']); ?>
+                                        <?php if ($admin->getAvatarImage()) : ?>
+                                            <?= Html::img('/web/upload/user-'.$admin->getId().'/avatar/'.$admin->getAvatarImage(), ['class' => 'user_picture_message']) ?>
                                         <?php else : ?>
-                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']); ?>
+                                            <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default_message']) ?>
                                         <?php endif; ?>
 
                                         <div class="sender_data">
                                             <div class="sender_info">
-                                                <div class="interlocutor"><?= $admin->username; ?></div>
+                                                <div class="interlocutor"><?= $admin->getUsername() ?></div>
                                                 <div>
-                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']); ?>
-                                                    <?= date('H:i', $message['created_at']); ?>
+                                                    <?= Html::img('/images/icons/icon_double_check.png', ['class' => 'icon_read_message']) ?>
+                                                    <?= date('H:i', $message->getCreatedAt()) ?>
                                                 </div>
                                             </div>
 
                                             <div class="message-description">
 
-                                                <?php if ($message->description) : ?>
-                                                    <?= $message->description; ?>
+                                                <?php if ($message->getDescription()) : ?>
+                                                    <?= $message->getDescription() ?>
                                                 <?php endif; ?>
 
                                                 <?php if ($message->files) : ?>
                                                     <div class="message-description-files">
                                                         <?php foreach ($message->files as $file) : ?>
                                                             <div>
-                                                                <?= Html::a($file->file_name, ['/admin/message/download', 'category' => $file->category, 'id' => $file->id], ['target' => '_blank', 'title' => $file->file_name]);?>
+                                                                <?= Html::a($file->getFileName(), ['/admin/message/download', 'category' => $file->getCategory(), 'id' => $file->getId()], ['target' => '_blank', 'title' => $file->getFileName()]) ?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -768,7 +782,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-development',
-                            'action' => Url::to(['/admin/message/send-message-development', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/admin/message/send-message-development', 'id' => Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',
@@ -789,11 +803,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                             <?= $form->field($formMessage, 'message_files[]', ['template' => "{label}\n{input}"])->fileInput(['id' => 'input_message_files', 'multiple' => true, 'accept' => 'text/plain, application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/x-png, image/jpeg'])->label(false) ?>
 
-                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']); ?>
+                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']) ?>
 
-                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']); ?>
+                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']) ?>
 
-                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']); ?>
+                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']) ?>
 
                         </div>
 
@@ -817,7 +831,7 @@ $this->registerCssFile('@web/css/admin-message-view.css');
                         <?php
                         $form = ActiveForm::begin([
                             'id' => 'create-message-development',
-                            'action' => Url::to(['/admin/message/send-message-development', 'id' => \Yii::$app->request->get('id')]),
+                            'action' => Url::to(['/admin/message/send-message-development', 'id' => Yii::$app->request->get('id')]),
                             'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
                             'errorCssClass' => 'u-has-error-v1',
                             'successCssClass' => 'u-has-success-v1-1',
@@ -838,11 +852,11 @@ $this->registerCssFile('@web/css/admin-message-view.css');
 
                             <?= $form->field($formMessage, 'message_files[]', ['template' => "{label}\n{input}"])->fileInput(['id' => 'input_message_files', 'multiple' => true, 'accept' => 'text/plain, application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/x-png, image/jpeg'])->label(false) ?>
 
-                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']); ?>
+                            <?= Html::submitButton('Отправить', ['id' =>  'submit_send_message']) ?>
 
-                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']); ?>
+                            <?= Html::img('/images/icons/send_email_button.png', ['class' => 'send_message_button', 'title' => 'Отправить сообщение']) ?>
 
-                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']); ?>
+                            <?= Html::img('/images/icons/button_attach_files.png', ['class' => 'attach_files_button', 'title' => 'Прикрепить файлы']) ?>
 
                         </div>
 

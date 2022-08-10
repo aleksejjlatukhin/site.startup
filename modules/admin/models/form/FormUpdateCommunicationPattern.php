@@ -13,6 +13,11 @@ use yii\db\StaleObjectException;
  * Форма редактирования шаблона коммуникации
  * Class FormUpdateCommunicationPattern
  * @package app\modules\admin\models\form
+ *
+ * @property int $id
+ * @property int $communication_type
+ * @property string $description
+ * @property int $project_access_period
  */
 class FormUpdateCommunicationPattern extends Model
 {
@@ -25,15 +30,16 @@ class FormUpdateCommunicationPattern extends Model
 
     /**
      * FormUpdateCommunicationPattern constructor.
-     * @param $id
-     * @param $communicationType
+     *
+     * @param int $id
+     * @param int $communicationType
      * @param array $config
      */
-    public function __construct($id, $communicationType, $config = [])
+    public function __construct(int $id, int $communicationType, array $config = [])
     {
         $pattern = CommunicationPatterns::find()
             ->where(['id' => $id, 'communication_type' => $communicationType])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->one();
 
         $this->setParams($pattern);
@@ -44,7 +50,7 @@ class FormUpdateCommunicationPattern extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['communication_type', 'project_access_period'], 'integer'],
@@ -58,7 +64,7 @@ class FormUpdateCommunicationPattern extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Описание шаблона коммуникации',
@@ -69,28 +75,98 @@ class FormUpdateCommunicationPattern extends Model
 
     /**
      * Установка параметров формы
-     * @param $pattern
+     *
+     * @param CommunicationPatterns $pattern
      */
-    public function setParams($pattern)
+    public function setParams(CommunicationPatterns $pattern): void
     {
-        $this->id = $pattern->id;
-        $this->communication_type = $pattern->communication_type;
-        $this->description = $pattern->description;
-        $this->project_access_period = $pattern->project_access_period;
+        $this->setId($pattern->getId());
+        $this->setCommunicationType($pattern->getCommunicationType());
+        $this->setDescription($pattern->getDescription());
+        $this->setProjectAccessPeriod($pattern->getProjectAccessPeriod());
     }
 
 
     /**
      * Обновление шаблона
      * коммуникации
+     *
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function update()
+    public function update(): void
     {
-        $pattern = CommunicationPatterns::findOne($this->id);
-        $pattern->description = $this->description;
-        $pattern->project_access_period = $this->project_access_period;
+        $pattern = CommunicationPatterns::findOne($this->getId());
+        $pattern->setDescription($this->getDescription());
+        $pattern->setProjectAccessPeriod($this->getProjectAccessPeriod());
         $pattern->update(true, ['description', 'project_access_period']);
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommunicationType(): int
+    {
+        return $this->communication_type;
+    }
+
+    /**
+     * @param int $communication_type
+     * @return void
+     */
+    public function setCommunicationType(int $communication_type): void
+    {
+        $this->communication_type = $communication_type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return void
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProjectAccessPeriod(): int
+    {
+        return $this->project_access_period;
+    }
+
+    /**
+     * @param int $project_access_period
+     * @return void
+     */
+    public function setProjectAccessPeriod(int $project_access_period): void
+    {
+        $this->project_access_period = $project_access_period;
     }
 }

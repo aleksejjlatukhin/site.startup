@@ -9,6 +9,17 @@ use app\models\CommunicationTypes;
 
 $this->title = 'Настройки коммуникаций';
 $this->registerCssFile('@web/css/communication-settings-style.css');
+
+/**
+ * @var CommunicationPatterns $formPattern
+ * @var array $selection_project_access_period
+ * @var CommunicationPatterns[] $patternsCARCE
+ * @var CommunicationPatterns[] $patternsCWRARCE
+ * @var CommunicationPatterns[] $patternsCAEP
+ * @var CommunicationPatterns[] $patternsCDNAEP
+ * @var CommunicationPatterns[] $patternsCWEFP
+ */
+
 ?>
 
 <div class="communication-settings">
@@ -19,7 +30,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
             <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page',
                 'title' => 'Инструкция', 'onclick' => 'return false'
-            ]); ?>
+            ]) ?>
 
         </div>
 
@@ -41,7 +52,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                     'border-radius' => '8px',
                     'margin-bottom' => '15px'
                 ],
-            ]);?>
+            ]) ?>
 
         </div>
     </div>
@@ -55,7 +66,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         <div class="col-xs-4 col-sm-3">
                             <?=  Html::a( '<div class="new_pattern_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png']) . '</div><div>Добавить шаблон</div></div>', ['#'],
                                 ['id' => 'show_form_pattern_CARCE', 'class' => 'new_pattern_link_plus']
-                            ); ?>
+                            ) ?>
                         </div>
                     </div>
                 </div>
@@ -90,8 +101,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         'options' => ['id' => 'selection_project_access_period'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]);
-                    ?>
+                    ]) ?>
 
                     <div class="col-md-12">
                         <div class="row">
@@ -131,65 +141,65 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
                     <!--Созданные шаблоны-->
                     <?php foreach ($patternsCARCE as $pattern) : ?>
-                        <div class="row style-row-pattern row-pattern-<?= $pattern->id; ?>">
+                        <div class="row style-row-pattern row-pattern-<?= $pattern->getId() ?>">
 
-                            <div class="col-xs-6 col-lg-8"><?= $pattern->description; ?></div>
+                            <div class="col-xs-6 col-lg-8"><?= $pattern->getDescription() ?></div>
                             <div class="col-xs-3 col-lg-2 text-center">
-                                <?php if (in_array($pattern->project_access_period, [1, 21])) {
-                                    echo $pattern->project_access_period . ' день';
-                                } elseif (in_array($pattern->project_access_period, [2, 3, 4, 22, 23, 24])) {
-                                    echo $pattern->project_access_period . ' дня';
+                                <?php if (in_array($pattern->getProjectAccessPeriod(), [1, 21])) {
+                                    echo $pattern->getProjectAccessPeriod() . ' день';
+                                } elseif (in_array($pattern->getProjectAccessPeriod(), [2, 3, 4, 22, 23, 24])) {
+                                    echo $pattern->getProjectAccessPeriod() . ' дня';
                                 } else {
-                                    echo $pattern->project_access_period . ' дней';
+                                    echo $pattern->getProjectAccessPeriod() . ' дней';
                                 } ?>
                             </div>
                             <div class="col-xs-3 col-lg-2 text-center">
 
-                                <?php if ($pattern->is_active == CommunicationPatterns::ACTIVE) : ?>
+                                <?php if ($pattern->getIsActive() === CommunicationPatterns::ACTIVE) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_active.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
-                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->id],
+                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->getId()],
                                         [
                                             'class' => 'deactivate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Отменить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php else : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_default.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                         [
-                                            '/client/communications/activate-pattern', 'id' => $pattern->id,
-                                            'communicationType' => $pattern->communication_type
+                                            '/client/communications/activate-pattern', 'id' => $pattern->getId(),
+                                            'communicationType' => $pattern->getCommunicationType()
                                         ],
                                         [
                                             'class' => 'activate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Применить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php endif; ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                     [
-                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->id,
-                                        'communicationType' => $pattern->communication_type
+                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->getId(),
+                                        'communicationType' => $pattern->getCommunicationType()
                                     ],
                                     [
                                         'class' => 'update-communication-pattern',
                                         'title' => 'Редактировать'
                                     ]
-                                ); ?>
+                                ) ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),
-                                    ['/client/communications/delete-pattern', 'id' => $pattern->id],
+                                    ['/client/communications/delete-pattern', 'id' => $pattern->getId()],
                                     [
                                         'class' => 'delete-communication-pattern',
                                         'title' => 'Удалить'
                                     ]
-                                ); ?>
+                                ) ?>
 
                             </div>
                         </div>
@@ -199,7 +209,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
             <!--Шаблон по умолчанию-->
             <div class="row block-default-pattern bg-success">
-                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE; ?></div>
+                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE ?></div>
                 <div class="col-xs-4 col-sm-3 col-lg-2 text-center">По умолчанию</div>
             </div>
 
@@ -215,7 +225,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         <div class="col-xs-4 col-sm-3">
                             <?=  Html::a( '<div class="new_pattern_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png']) . '</div><div>Добавить шаблон</div></div>', ['#'],
                                 ['id' => 'show_form_pattern_CWRARCE', 'class' => 'new_pattern_link_plus']
-                            ); ?>
+                            ) ?>
                         </div>
                     </div>
                 </div>
@@ -280,57 +290,57 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
                     <!--Созданные шаблоны-->
                     <?php foreach ($patternsCWRARCE as $pattern) : ?>
-                        <div class="row style-row-pattern row-pattern-<?= $pattern->id; ?>">
+                        <div class="row style-row-pattern row-pattern-<?= $pattern->getId() ?>">
 
-                            <div class="col-xs-9 col-lg-10"><?= $pattern->description; ?></div>
+                            <div class="col-xs-9 col-lg-10"><?= $pattern->getDescription() ?></div>
 
                             <div class="col-xs-3 col-lg-2 text-center">
 
-                                <?php if ($pattern->is_active == CommunicationPatterns::ACTIVE) : ?>
+                                <?php if ($pattern->getIsActive() === CommunicationPatterns::ACTIVE) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_active.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
-                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->id],
+                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->getId()],
                                         [
                                             'class' => 'deactivate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Отменить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php else : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_default.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                         [
-                                            '/client/communications/activate-pattern', 'id' => $pattern->id,
-                                            'communicationType' => $pattern->communication_type
+                                            '/client/communications/activate-pattern', 'id' => $pattern->getId(),
+                                            'communicationType' => $pattern->getCommunicationType()
                                         ],
                                         [
                                             'class' => 'activate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Применить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php endif; ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                     [
-                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->id,
-                                        'communicationType' => $pattern->communication_type
+                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->getId(),
+                                        'communicationType' => $pattern->getCommunicationType()
                                     ],
                                     [
                                         'class' => 'update-communication-pattern',
                                         'title' => 'Редактировать'
                                     ]
-                                ); ?>
+                                ) ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),
-                                    ['/client/communications/delete-pattern', 'id' => $pattern->id],
+                                    ['/client/communications/delete-pattern', 'id' => $pattern->getId()],
                                     [
                                         'class' => 'delete-communication-pattern',
                                         'title' => 'Удалить'
                                     ]
-                                ); ?>
+                                ) ?>
 
                             </div>
                         </div>
@@ -340,7 +350,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
             <!--Шаблон по умолчанию-->
             <div class="row block-default-pattern bg-success">
-                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE; ?></div>
+                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE ?></div>
                 <div class="col-xs-4 col-sm-3 col-lg-2 text-center">По умолчанию</div>
             </div>
 
@@ -356,7 +366,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         <div class="col-xs-4 col-sm-3">
                             <?=  Html::a( '<div class="new_pattern_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png']) . '</div><div>Добавить шаблон</div></div>', ['#'],
                                 ['id' => 'show_form_pattern_CAEP', 'class' => 'new_pattern_link_plus']
-                            ); ?>
+                            ) ?>
                         </div>
                     </div>
                 </div>
@@ -421,57 +431,57 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
                     <!--Созданные шаблоны-->
                     <?php foreach ($patternsCAEP as $pattern) : ?>
-                        <div class="row style-row-pattern row-pattern-<?= $pattern->id; ?>">
+                        <div class="row style-row-pattern row-pattern-<?= $pattern->getId() ?>">
 
-                            <div class="col-xs-9 col-lg-10"><?= $pattern->description; ?></div>
+                            <div class="col-xs-9 col-lg-10"><?= $pattern->getDescription() ?></div>
 
                             <div class="col-xs-3 col-lg-2 text-center">
 
-                                <?php if ($pattern->is_active == CommunicationPatterns::ACTIVE) : ?>
+                                <?php if ($pattern->getIsActive() === CommunicationPatterns::ACTIVE) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_active.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
-                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->id],
+                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->getId()],
                                         [
                                             'class' => 'deactivate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Отменить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php else : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_default.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                         [
-                                            '/client/communications/activate-pattern', 'id' => $pattern->id,
-                                            'communicationType' => $pattern->communication_type
+                                            '/client/communications/activate-pattern', 'id' => $pattern->getId(),
+                                            'communicationType' => $pattern->getCommunicationType()
                                         ],
                                         [
                                             'class' => 'activate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Применить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php endif; ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                     [
-                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->id,
-                                        'communicationType' => $pattern->communication_type
+                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->getId(),
+                                        'communicationType' => $pattern->getCommunicationType()
                                     ],
                                     [
                                         'class' => 'update-communication-pattern',
                                         'title' => 'Редактировать'
                                     ]
-                                ); ?>
+                                ) ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),
-                                    ['/client/communications/delete-pattern', 'id' => $pattern->id],
+                                    ['/client/communications/delete-pattern', 'id' => $pattern->getId()],
                                     [
                                         'class' => 'delete-communication-pattern',
                                         'title' => 'Удалить'
                                     ]
-                                ); ?>
+                                ) ?>
 
                             </div>
                         </div>
@@ -481,7 +491,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
             <!--Шаблон по умолчанию-->
             <div class="row block-default-pattern bg-success">
-                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT; ?></div>
+                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT ?></div>
                 <div class="col-xs-4 col-sm-3 col-lg-2 text-center">По умолчанию</div>
             </div>
 
@@ -497,7 +507,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         <div class="col-xs-4 col-sm-3">
                             <?=  Html::a( '<div class="new_pattern_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png']) . '</div><div>Добавить шаблон</div></div>', ['#'],
                                 ['id' => 'show_form_pattern_CDNAEP', 'class' => 'new_pattern_link_plus']
-                            ); ?>
+                            ) ?>
                         </div>
                     </div>
                 </div>
@@ -562,57 +572,57 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
                     <!--Созданные шаблоны-->
                     <?php foreach ($patternsCDNAEP as $pattern) : ?>
-                        <div class="row style-row-pattern row-pattern-<?= $pattern->id; ?>">
+                        <div class="row style-row-pattern row-pattern-<?= $pattern->getId() ?>">
 
-                            <div class="col-xs-9 col-lg-10"><?= $pattern->description; ?></div>
+                            <div class="col-xs-9 col-lg-10"><?= $pattern->getDescription() ?></div>
 
                             <div class="col-xs-3 col-lg-2 text-center">
 
-                                <?php if ($pattern->is_active == CommunicationPatterns::ACTIVE) : ?>
+                                <?php if ($pattern->getIsActive() === CommunicationPatterns::ACTIVE) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_active.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
-                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->id],
+                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->getId()],
                                         [
                                             'class' => 'deactivate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Отменить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php else : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_default.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                         [
-                                            '/client/communications/activate-pattern', 'id' => $pattern->id,
-                                            'communicationType' => $pattern->communication_type
+                                            '/client/communications/activate-pattern', 'id' => $pattern->getId(),
+                                            'communicationType' => $pattern->getCommunicationType()
                                         ],
                                         [
                                             'class' => 'activate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Применить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php endif; ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                     [
-                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->id,
-                                        'communicationType' => $pattern->communication_type
+                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->getId(),
+                                        'communicationType' => $pattern->getCommunicationType()
                                     ],
                                     [
                                         'class' => 'update-communication-pattern',
                                         'title' => 'Редактировать'
                                     ]
-                                ); ?>
+                                ) ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),
-                                    ['/client/communications/delete-pattern', 'id' => $pattern->id],
+                                    ['/client/communications/delete-pattern', 'id' => $pattern->getId()],
                                     [
                                         'class' => 'delete-communication-pattern',
                                         'title' => 'Удалить'
                                     ]
-                                ); ?>
+                                ) ?>
 
                             </div>
                         </div>
@@ -622,7 +632,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
             <!--Шаблон по умолчанию-->
             <div class="row block-default-pattern bg-success">
-                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT; ?></div>
+                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT ?></div>
                 <div class="col-xs-4 col-sm-3 col-lg-2 text-center">По умолчанию</div>
             </div>
 
@@ -638,7 +648,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
                         <div class="col-xs-4 col-sm-3">
                             <?=  Html::a( '<div class="new_pattern_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png']) . '</div><div>Добавить шаблон</div></div>', ['#'],
                                 ['id' => 'show_form_pattern_CWEFP', 'class' => 'new_pattern_link_plus']
-                            ); ?>
+                            ) ?>
                         </div>
                     </div>
                 </div>
@@ -703,57 +713,57 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
                     <!--Созданные шаблоны-->
                     <?php foreach ($patternsCWEFP as $pattern) : ?>
-                        <div class="row style-row-pattern row-pattern-<?= $pattern->id; ?>">
+                        <div class="row style-row-pattern row-pattern-<?= $pattern->getId() ?>">
 
-                            <div class="col-xs-9 col-lg-10"><?= $pattern->description; ?></div>
+                            <div class="col-xs-9 col-lg-10"><?= $pattern->getDescription() ?></div>
 
                             <div class="col-xs-3 col-lg-2 text-center">
 
-                                <?php if ($pattern->is_active == CommunicationPatterns::ACTIVE) : ?>
+                                <?php if ($pattern->getIsActive() === CommunicationPatterns::ACTIVE) : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_active.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
-                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->id],
+                                        ['/client/communications/deactivate-pattern', 'id' => $pattern->getId()],
                                         [
                                             'class' => 'deactivate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Отменить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php else : ?>
 
                                     <?= Html::a(Html::img('/images/icons/icon_circle_default.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                         [
-                                            '/client/communications/activate-pattern', 'id' => $pattern->id,
-                                            'communicationType' => $pattern->communication_type
+                                            '/client/communications/activate-pattern', 'id' => $pattern->getId(),
+                                            'communicationType' => $pattern->getCommunicationType()
                                         ],
                                         [
                                             'class' => 'activate-communication-pattern',
                                             'style' => ['margin-left' => '30px'],
                                             'title' => 'Применить'
                                         ]
-                                    ); ?>
+                                    ) ?>
 
                                 <?php endif; ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),
                                     [
-                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->id,
-                                        'communicationType' => $pattern->communication_type
+                                        '/client/communications/get-form-update-communication-pattern', 'id' => $pattern->getId(),
+                                        'communicationType' => $pattern->getCommunicationType()
                                     ],
                                     [
                                         'class' => 'update-communication-pattern',
                                         'title' => 'Редактировать'
                                     ]
-                                ); ?>
+                                ) ?>
 
                                 <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),
-                                    ['/client/communications/delete-pattern', 'id' => $pattern->id],
+                                    ['/client/communications/delete-pattern', 'id' => $pattern->getId()],
                                     [
                                         'class' => 'delete-communication-pattern',
                                         'title' => 'Удалить'
                                     ]
-                                ); ?>
+                                ) ?>
 
                             </div>
                         </div>
@@ -763,7 +773,7 @@ $this->registerCssFile('@web/css/communication-settings-style.css');
 
             <!--Шаблон по умолчанию-->
             <div class="row block-default-pattern bg-success">
-                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT; ?></div>
+                <div class="col-xs-8 col-sm-9 col-lg-10"><?= CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT ?></div>
                 <div class="col-xs-4 col-sm-3 col-lg-2 text-center">По умолчанию</div>
             </div>
 

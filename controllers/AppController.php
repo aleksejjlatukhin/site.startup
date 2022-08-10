@@ -17,28 +17,27 @@ class AppController extends Controller
      * @return bool
      * @throws BadRequestHttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
-        if (!Yii::$app->user->isGuest) $this->setOnlineTime();
+        if (!Yii::$app->user->isGuest) {
+            $this->setOnlineTime();
+        }
         return parent::beforeAction($action);
     }
 
     /**
      * @return bool
      */
-    public function setOnlineTime()
+    public function setOnlineTime(): bool
     {
         $user = User::findOne(Yii::$app->user->id);
-        /**
-         * @var CheckingOnlineUser $checkingOnline
-         */
         if ($checkingOnline = $user->checkingOnline) {
             $checkingOnline->setLastActiveTime();
             return true;
-        } else {
-            $checkingOnline = new CheckingOnlineUser();
-            $checkingOnline->addCheckingOnline(Yii::$app->user->id);
-            return true;
         }
+
+        $checkingOnline = new CheckingOnlineUser();
+        $checkingOnline->addCheckingOnline(Yii::$app->user->id);
+        return true;
     }
 }

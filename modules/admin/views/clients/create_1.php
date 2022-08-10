@@ -1,9 +1,15 @@
 <?php
 
+use app\modules\admin\models\form\FormCreateAdminCompany;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $this->title = 'Создание новой организации';
+
+/**
+ * @var FormCreateAdminCompany $formCreateAdminCompany
+ */
+
 ?>
 
 <div class="row container-fluid block-form-create-client">
@@ -12,14 +18,14 @@ $this->title = 'Создание новой организации';
         <?= Html::a('Шаг 1. Заполните форму создания администратора' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
             'class' => 'link_to_instruction_page open_modal_instruction_page',
             'title' => 'Инструкция', 'onclick' => 'return false'
-        ]); ?>
+        ]) ?>
     </div>
 
     <!--Вывод ошибок валидации собственных правил формы-->
     <?php if ($errors = $formCreateAdminCompany->errors) : ?>
         <?php foreach ($errors as $k => $error) : ?>
             <div class="text-center text-danger">
-                <?= implode('\n', (array)$error); ?>
+                <?= implode('\n', (array)$error) ?>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -41,7 +47,7 @@ $this->title = 'Создание новой организации';
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Введите от 3 до 32 символов',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="row" style="margin-bottom: 15px;">
@@ -54,7 +60,7 @@ $this->title = 'Создание новой организации';
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="form-group row container-fluid">

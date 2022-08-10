@@ -32,7 +32,7 @@ class FormCreateClient extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'fullname', 'city', 'description'], 'required'],
@@ -48,7 +48,7 @@ class FormCreateClient extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование организации',
@@ -62,7 +62,7 @@ class FormCreateClient extends Model
     /**
      * @return Client|null
      */
-    public function create()
+    public function create(): ?Client
     {
         $client = new Client();
         $client->setName($this->name);

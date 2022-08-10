@@ -1,13 +1,25 @@
 <?php
 
-use app\models\ProjectCommunications;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
+use app\models\Gcps;
+use app\models\Problems;
+use app\models\Projects;
+use app\models\Segments;
 use yii\helpers\Html;
 use app\models\User;
-use app\models\EnableExpertise;
-use app\models\StageExpertise;
 
 $this->title = 'Разработка гипотез ценностных предложений';
 $this->registerCssFile('@web/css/gcp-index-style.css');
+
+/**
+ * @var Gcps[] $models
+ * @var ConfirmProblem $confirmProblem
+ * @var Problems $problem
+ * @var ConfirmSegment $confirmSegment
+ * @var Segments $segment
+ * @var Projects $project
+ */
 
 ?>
 <div class="gcp-index">
@@ -16,22 +28,22 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name">
             <span>Проект:</span>
-            <?= $project->project_name; ?>
+            <?= $project->getProjectName() ?>
         </div>
 
-        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->id], [
+        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openAllInformationProject link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openReportProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openResultTableProject link_in_the_header text-center',
         ]) ?>
 
@@ -42,24 +54,24 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
     <div class="row navigation_blocks">
 
         <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segments/index', 'id' => $project->id],
+            ['/segments/index', 'id' => $project->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/confirm-segment/view', 'id' => $confirmSegment->id],
+            ['/confirm-segment/view', 'id' => $confirmSegment->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
-            ['/problems/index', 'id' => $confirmSegment->id],
+            ['/problems/index', 'id' => $confirmSegment->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <?= Html::a('<div class="stage_number">4</div><div>Подтверждение гипотез проблем сегментов</div>',
-            ['/confirm-problem/view', 'id' => $confirmProblem->id],
+            ['/confirm-problem/view', 'id' => $confirmProblem->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <div class="active_navigation_block navigation_block">
             <div class="stage_number">5</div>
@@ -95,35 +107,35 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
         <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
 
             <?php
-            $segment_name = $segment->name;
+            $segment_name = $segment->getName();
             if (mb_strlen($segment_name) > 15){
                 $segment_name = mb_substr($segment_name, 0, 15) . '...';
             }
 
-            $problem_description = $problem->description;
+            $problem_description = $problem->getDescription();
             if (mb_strlen($problem_description) > 50){
                 $problem_description = mb_substr($problem_description, 0, 50) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']) ?>
 
             <?php
-            $problem_description = $problem->description;
+            $problem_description = $problem->getDescription();
             if (mb_strlen($problem_description) > 100){
                 $problem_description = mb_substr($problem_description, 0, 100) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']) ?>
 
         </div>
 
-        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
+        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
@@ -132,9 +144,9 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
     <div class="row block_description_stage">
         <div>Наименование сегмента:</div>
-        <div><?= $segment->name;?></div>
+        <div><?= $segment->getName() ?></div>
         <div>Формулировка проблемы:</div>
-        <div><?= $problem->description;?></div>
+        <div><?= $problem->getDescription() ?></div>
     </div>
 
 
@@ -146,15 +158,15 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
             <div class="col-md-6" style="padding-top: 17px; padding-bottom: 17px;">
                 <?= Html::a('Ценностные предложения' . Html::img('/images/icons/icon_report_next.png'), ['/gcps/get-instruction'],[
                     'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-                ]); ?>
+                ]) ?>
             </div>
 
             <div class="col-md-6" style="padding-top: 15px; padding-bottom: 15px;">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                     <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новое ценностное предложение</div></div>',
-                        ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->id],
+                        ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->getId()],
                         ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
-                    ); ?>
+                    ) ?>
                 <?php endif; ?>
             </div>
 
@@ -176,9 +188,9 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
             <div class="col-lg-1 text-center header_date_confirm"><div>Дата подтв.</div></div>
 
             <div class="col-lg-3 text-right" style="padding-right: 8px;">
-                <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/gcps/mpdf-table-gcps', 'id' => $confirmProblem->id], [
+                <?= Html::a(Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]), ['/gcps/mpdf-table-gcps', 'id' => $confirmProblem->getId()], [
                     'target'=>'_blank', 'title'=> 'Экспорт в pdf',
-                ]);?>
+                ]) ?>
             </div>
 
         </div>
@@ -187,233 +199,7 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
         <div class="block_all_hypothesis row" style="padding-left: 10px; padding-right: 10px;">
 
             <!--Данные для списка ценностных предложений-->
-            <?php foreach ($models as $model) : ?>
-
-                <div class="row container-one_hypothesis row_hypothesis-<?= $model->id;?>">
-                    <div class="col-lg-1">
-                        <div class="row">
-                            <div class="col-lg-4" style="padding: 0;">
-
-                                <?php
-                                if ($model->exist_confirm === 1) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
-
-                                }elseif ($model->exist_confirm === null && empty($model->confirm)) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
-
-                                }elseif ($model->exist_confirm === null && !empty($model->confirm)) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
-
-                                }elseif ($model->exist_confirm === 0) {
-
-                                    echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
-
-                                }
-                                ?>
-
-                            </div>
-
-                            <div class="col-lg-8 hypothesis_title" style="padding: 0 0 0 5px;">
-
-                                <?= $model->title; ?>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6 text_description_problem" title="<?= $model->description; ?>">
-                        <?= $model->description; ?>
-                    </div>
-
-                    <div class="col-lg-1 text-center">
-                        <?= date("d.m.y", $model->created_at); ?>
-                    </div>
-
-                    <div class="col-lg-1 text-center">
-                        <?php if ($model->time_confirm) : ?>
-                            <?= date("d.m.y", $model->time_confirm); ?>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="col-lg-3">
-                        <div class="row pull-right" style="padding-right: 10px; display:flex; align-items: center;">
-                            <div style="margin-right: 25px;">
-
-                                <?php if ($model->confirm) : ?>
-
-                                    <?= Html::a('Далее', ['/confirm-gcp/view', 'id' => $model->confirm->id], [
-                                        'class' => 'btn btn-default',
-                                        'style' => [
-                                            'display' => 'flex',
-                                            'align-items' => 'center',
-                                            'justify-content' => 'center',
-                                            'color' => '#FFFFFF',
-                                            'background' => '#52BE7F',
-                                            'width' => '120px',
-                                            'height' => '40px',
-                                            'font-size' => '18px',
-                                            'border-radius' => '8px',
-                                        ]
-                                    ]);
-                                    ?>
-
-                                <?php else : ?>
-
-                                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-                                        <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
-
-                                            <?= Html::a('Подтвердить', ['#'], [
-                                                'disabled' => true,
-                                                'onclick' => 'return false;',
-                                                'title' => 'Необходимо разрешить экспертизу',
-                                                'class' => 'btn btn-default',
-                                                'style' => [
-                                                    'display' => 'flex',
-                                                    'align-items' => 'center',
-                                                    'justify-content' => 'center',
-                                                    'color' => '#FFFFFF',
-                                                    'background' => '#707F99',
-                                                    'width' => '120px',
-                                                    'height' => '40px',
-                                                    'font-size' => '18px',
-                                                    'border-radius' => '8px',
-                                                ]
-                                            ]); ?>
-
-                                        <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
-
-                                            <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $model->id], [
-                                                'class' => 'btn btn-default',
-                                                'style' => [
-                                                    'display' => 'flex',
-                                                    'align-items' => 'center',
-                                                    'justify-content' => 'center',
-                                                    'color' => '#FFFFFF',
-                                                    'background' => '#707F99',
-                                                    'width' => '120px',
-                                                    'height' => '40px',
-                                                    'font-size' => '18px',
-                                                    'border-radius' => '8px',
-                                                ]
-                                            ]); ?>
-
-                                        <?php endif; ?>
-
-                                    <?php else: ?>
-
-                                        <?= Html::a('Подтвердить', ['#'], [
-                                            'onclick' => 'return false',
-                                            'class' => 'btn btn-default',
-                                            'style' => [
-                                                'display' => 'flex',
-                                                'align-items' => 'center',
-                                                'justify-content' => 'center',
-                                                'color' => '#FFFFFF',
-                                                'background' => '#707F99',
-                                                'width' => '120px',
-                                                'height' => '40px',
-                                                'font-size' => '18px',
-                                                'border-radius' => '8px',
-                                            ]
-                                        ]); ?>
-
-                                    <?php endif; ?>
-
-                                <?php endif; ?>
-
-                            </div>
-                            <div>
-
-                                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-                                    <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-danger.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['/gcps/enable-expertise', 'id' => $model->id], [
-                                            'class' => 'link-enable-expertise',
-                                            'title' => 'Разрешить экспертизу',
-                                        ]); ?>
-
-                                    <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::GCP], 'stageId' => $model->id], [
-                                            'class' => 'link-get-list-expertise',
-                                            'title' => 'Смотреть экспертизу',
-                                        ]); ?>
-
-                                    <?php endif; ?>
-
-                                    <?= Html::a(Html::img('/images/icons/icon_update.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]),['/gcps/get-hypothesis-to-update', 'id' => $model->id], [
-                                        'class' => 'update-hypothesis',
-                                        'title' => 'Редактировать',
-                                    ]); ?>
-
-                                    <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/gcps/delete', 'id' => $model->id], [
-                                        'class' => 'delete_hypothesis',
-                                        'title' => 'Удалить',
-                                    ]); ?>
-
-                                <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
-
-                                    <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-danger.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['#'], [
-                                            'onclick' => 'return false;',
-                                            'class' => 'no-get-list-expertise',
-                                            'style' => ['margin-left' => '20px'],
-                                            'title' => 'Экспертиза не разрешена',
-                                        ]); ?>
-
-                                    <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->projectId)) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::GCP], 'stageId' => $model->id], [
-                                            'class' => 'link-get-list-expertise',
-                                            'style' => ['margin-left' => '20px'],
-                                            'title' => 'Экспертиза',
-                                        ]); ?>
-
-                                    <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->projectId)) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['#'], [
-                                            'onclick' => 'return false;',
-                                            'style' => ['margin-left' => '20px'],
-                                            'title' => 'Экспертиза не доступна',
-                                        ]); ?>
-
-                                    <?php endif; ?>
-
-                                <?php else : ?>
-
-                                    <?php if ($model->getEnableExpertise() == EnableExpertise::OFF) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-danger.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['#'], [
-                                            'onclick' => 'return false;',
-                                            'class' => 'no-get-list-expertise',
-                                            'style' => ['margin-left' => '20px'],
-                                            'title' => 'Экспертиза не разрешена',
-                                        ]); ?>
-
-                                    <?php elseif ($model->getEnableExpertise() == EnableExpertise::ON) : ?>
-
-                                        <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '20px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::GCP], 'stageId' => $model->id], [
-                                            'class' => 'link-get-list-expertise',
-                                            'style' => ['margin-left' => '20px'],
-                                            'title' => 'Смотреть экспертизу',
-                                        ]); ?>
-
-                                    <?php endif; ?>
-
-                                <?php endif; ?>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            <?php endforeach; ?>
+            <?= $this->render('_index_ajax', ['models' => $models]) ?>
 
         </div>
     </div>
@@ -426,17 +212,17 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
             <div>
 
                 <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]) ?>
                     <div>Ценностное предложение подтверждено</div>
                 </div>
 
                 <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]) ?>
                     <div>Ценностное предложение не подтверждено</div>
                 </div>
 
                 <div style="display:flex; align-items: center;">
-                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]);?>
+                    <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px', 'margin-right' => '8px']]) ?>
                     <div>Ценностное предложение ожидает подтверждения</div>
                 </div>
 
@@ -448,7 +234,7 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
 
     <!--Модальные окна-->
-    <?= $this->render('modal'); ?>
+    <?= $this->render('modal') ?>
 
 </div>
 

@@ -14,49 +14,64 @@ class Roadmap extends PropertyContainer
 
     /**
      * Roadmap constructor.
-     * @param $id
+     * @param int $id
+     * @param array $config
      */
-    public function __construct($id)
+    public function __construct(int $id, array $config = [])
     {
         $segment = Segments::findOne($id);
         $confirm_segment = Segments::findOne(['id' => $id, 'exist_confirm' =>  1]);
 
-        $last_gps = Problems::find()->where(['basic_confirm_id' => $segment->confirm->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_gps = Problems::find()->where(['basic_confirm_id' => $segment->confirm->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        /**
+         * @var Problems $last_gps
+         * @var Problems $first_confirm_gps
+         */
+        if ($confirm_segment) {
+            $last_gps = Problems::find()->where(['basic_confirm_id' => $segment->confirm->getId()])->orderBy(['created_at' => SORT_DESC])->one();
+            $first_confirm_gps = Problems::find()->where(['basic_confirm_id' => $segment->confirm->getId(), 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        }
 
-        $last_gcp = Gcps::find()->where(['segment_id' => $segment->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_gcp = Gcps::find()->where(['segment_id' => $segment->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        /**
+         * @var Gcps $last_gcp
+         * @var Gcps $first_confirm_gcp
+        */
+        $last_gcp = Gcps::find()->where(['segment_id' => $segment->getId()])->orderBy(['created_at' => SORT_DESC])->one();
+        $first_confirm_gcp = Gcps::find()->where(['segment_id' => $segment->getId(), 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
-        $last_mvp = Mvps::find()->where(['segment_id' => $segment->id])->orderBy(['created_at' => SORT_DESC])->one();
-        $first_confirm_mvp = Mvps::find()->where(['segment_id' => $segment->id, 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
+        /**
+         * @var Mvps $last_mvp
+         * @var Mvps $first_confirm_mvp
+        */
+        $last_mvp = Mvps::find()->where(['segment_id' => $segment->getId()])->orderBy(['created_at' => SORT_DESC])->one();
+        $first_confirm_mvp = Mvps::find()->where(['segment_id' => $segment->getId(), 'exist_confirm' => 1])->andWhere(['not', ['time_confirm' => null]])->orderBy(['time_confirm' => SORT_ASC])->one();
 
-        $this->addProperty('created_at', $segment->created_at);
-        $this->addProperty('plan_segment_confirm', ($segment->created_at + 3600*24*10));
-        $this->addProperty('plan_gps', ($segment->created_at + 3600*24*20));
-        $this->addProperty('plan_gps_confirm', ($segment->created_at + 3600*24*30));
-        $this->addProperty('plan_gcp', ($segment->created_at + 3600*24*40));
-        $this->addProperty('plan_gcp_confirm', ($segment->created_at + 3600*24*50));
-        $this->addProperty('plan_mvp', ($segment->created_at + 3600*24*60));
-        $this->addProperty('plan_mvp_confirm', ($segment->created_at + 3600*24*70));
+        $this->addProperty('created_at', $segment->getCreatedAt());
+        $this->addProperty('plan_segment_confirm', ($segment->getCreatedAt() + 3600*24*10));
+        $this->addProperty('plan_gps', ($segment->getCreatedAt() + 3600*24*20));
+        $this->addProperty('plan_gps_confirm', ($segment->getCreatedAt() + 3600*24*30));
+        $this->addProperty('plan_gcp', ($segment->getCreatedAt() + 3600*24*40));
+        $this->addProperty('plan_gcp_confirm', ($segment->getCreatedAt() + 3600*24*50));
+        $this->addProperty('plan_mvp', ($segment->getCreatedAt() + 3600*24*60));
+        $this->addProperty('plan_mvp_confirm', ($segment->getCreatedAt() + 3600*24*70));
 
-        $this->addProperty('fact_segment_confirm', $confirm_segment->time_confirm);
-        $this->addProperty('fact_gps', $last_gps->created_at);
-        $this->addProperty('fact_gps_confirm', $first_confirm_gps->time_confirm);
-        $this->addProperty('fact_gcp', $last_gcp->created_at);
-        $this->addProperty('fact_gcp_confirm', $first_confirm_gcp->time_confirm);
-        $this->addProperty('fact_mvp', $last_mvp->created_at);
-        $this->addProperty('fact_mvp_confirm', $first_confirm_mvp->time_confirm);
+        $confirm_segment ? $this->addProperty('fact_segment_confirm', $confirm_segment->getTimeConfirm()) : $this->addProperty('fact_segment_confirm', null);
+        $last_gps ? $this->addProperty('fact_gps', $last_gps->getCreatedAt()) : $this->addProperty('fact_gps', null);
+        $first_confirm_gps ? $this->addProperty('fact_gps_confirm', $first_confirm_gps->getTimeConfirm()) : $this->addProperty('fact_gps_confirm', null);
+        $last_gcp ? $this->addProperty('fact_gcp', $last_gcp->getCreatedAt()) : $this->addProperty('fact_gcp', null);
+        $first_confirm_gcp ? $this->addProperty('fact_gcp_confirm', $first_confirm_gcp->getTimeConfirm()) : $this->addProperty('fact_gcp_confirm', null);
+        $last_mvp ? $this->addProperty('fact_mvp', $last_mvp->getCreatedAt()) : $this->addProperty('fact_mvp', null);
+        $first_confirm_mvp ? $this->addProperty('fact_mvp_confirm', $first_confirm_mvp->getTimeConfirm()) : $this->addProperty('fact_mvp_confirm', null);
 
-        $this->addProperty('id_confirm_segment', $segment->confirm->id);
-        $this->addProperty('id_page_last_problem', $last_gps->confirmSegmentId);
-        $this->addProperty('id_confirm_problem', $first_confirm_gps->confirm->id);
-        $this->addProperty('id_page_last_gcp', $last_gcp->confirmProblemId);
-        $this->addProperty('id_confirm_gcp', $first_confirm_gcp->confirm->id);
-        $this->addProperty('id_page_last_mvp', $last_mvp->confirmGcpId);
-        $this->addProperty('id_confirm_mvp', $first_confirm_mvp->confirm->id);
-        $this->addProperty('segment_name', $segment->name);
+        $segment->confirm ? $this->addProperty('id_confirm_segment', $segment->confirm->getId()) : $this->addProperty('id_confirm_segment', null);
+        $last_gps ? $this->addProperty('id_page_last_problem', $last_gps->getConfirmSegmentId()) : $this->addProperty('id_page_last_problem', null);
+        $first_confirm_gps->confirm ? $this->addProperty('id_confirm_problem', $first_confirm_gps->confirm->getId()) : $this->addProperty('id_confirm_problem', null);
+        $last_gcp ? $this->addProperty('id_page_last_gcp', $last_gcp->getConfirmProblemId()) : $this->addProperty('id_page_last_gcp', null);
+        $first_confirm_gcp->confirm ? $this->addProperty('id_confirm_gcp', $first_confirm_gcp->confirm->getId()) : $this->addProperty('id_confirm_gcp', null);
+        $last_mvp ? $this->addProperty('id_page_last_mvp', $last_mvp->getConfirmGcpId()) : $this->addProperty('id_page_last_mvp', null);
+        $first_confirm_mvp->confirm ? $this->addProperty('id_confirm_mvp', $first_confirm_mvp->confirm->getId()) : $this->addProperty('id_confirm_mvp', null);
+        $this->addProperty('segment_name', $segment->getName());
 
-        return $this;
+        parent::__construct($config);
     }
 
 }

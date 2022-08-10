@@ -1,13 +1,17 @@
 <?php
 
+use app\models\SortForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
-?>
 
-<?php
+$this->title ?: $this->title = 'Портфель проектов';
 
-$this->title ? $this->title : $this->title = 'Портфель проектов';
+/**
+ * @var SortForm $sortModel
+ * @var array $show_count_projects
+ * @var bool $pageClientProjects
+ */
 
 ?>
 
@@ -28,7 +32,7 @@ $this->title ? $this->title : $this->title = 'Портфель проектов'
             <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page',
                 'title' => 'Инструкция', 'onclick' => 'return false'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-2">
@@ -45,8 +49,7 @@ $this->title ? $this->title : $this->title = 'Портфель проектов'
                             'data' => $show_count_projects,
                             'options' => ['id' => 'field_count_projects',],
                             'hideSearch' => true, //Скрытие поиска
-                        ]);
-                    ?>
+                        ]) ?>
                 </div>
 
             </div>

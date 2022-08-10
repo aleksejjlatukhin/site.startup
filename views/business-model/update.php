@@ -1,8 +1,13 @@
 <?php
 
+use app\models\BusinessModel;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var BusinessModel $model
+ */
 
 ?>
 
@@ -12,7 +17,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'hypothesisUpdateForm',
-        'action' => Url::to(['/business-model/update', 'id' => $model->id]),
+        'action' => Url::to(['/business-model/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15 hypothesisUpdateForm'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -29,8 +34,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -42,8 +46,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -55,8 +58,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -68,8 +70,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -81,8 +82,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -94,8 +94,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 

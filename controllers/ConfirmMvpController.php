@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmGcp;
@@ -22,7 +21,9 @@ use app\models\QuestionsConfirmMvp;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\Segments;
+use app\models\StatusConfirmHypothesis;
 use app\models\User;
+use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
 use Mpdf\MpdfException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
@@ -54,79 +55,68 @@ class ConfirmMvpController extends AppUserPartController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view']) || in_array($action->id, ['mpdf-questions-and-answers']) || in_array($action->id, ['mpdf-data-responds'])){
+        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
 
-            $confirm = ConfirmMvp::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Mvps $hypothesis
-             * @var Projects $project
-             */
+            $confirm = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
+                /** @var UserAccessToProjects $userAccessToProject */
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
+                            return parent::beforeAction($action);
 
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
                         }
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -141,131 +131,109 @@ class ConfirmMvpController extends AppUserPartController
                 throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['update'])){
+        } elseif ($action->id === 'update'){
 
-            $confirm = ConfirmMvp::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Mvps $hypothesis
-             * @var Projects $project
-             */
+            $confirm = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
 
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['create'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $hypothesis = Mvps::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
+        } elseif ($action->id === 'create'){
+
+            $hypothesis = Mvps::findOne((int)Yii::$app->request->get('id'));
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['save-confirm-mvp'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $hypothesis = Mvps::findOne(Yii::$app->request->get('id'));
-            /** @var Projects $project */
+        }elseif ($action->id === 'save-confirm-mvp'){
+
+            $hypothesis = Mvps::findOne((int)Yii::$app->request->get('id'));
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
-
-            if ($project->getUserId() == $currentUser->getId()){
+            if ($project->getUserId() === $currentUser->getId()){
 
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
-
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif (in_array($action->id, ['add-questions'])){
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            $confirm = ConfirmMvp::findOne(Yii::$app->request->get('id'));
-            /**
-             * @var Mvps $hypothesis
-             * @var Projects $project
-             */
+        }elseif ($action->id === 'add-questions'){
+
+            $confirm = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
             /*Ограничение доступа к проэктам пользователя*/
 
-            if (($project->getUserId() == $currentUser->getId())){
+            if (($project->getUserId() === $currentUser->getId())){
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() == $currentUser->getId()) {
+            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
             } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
-                /** @var ClientUser $modelClientUser */
                 $modelClientUser = $project->user->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
+
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
+                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
             } elseif (User::isUserExpert($currentUser->getUsername())) {
 
-                $expert = User::findOne(Yii::$app->user->id);
+                $expert = User::findOne(Yii::$app->user->getId());
 
-                $userAccessToProject = $expert->findUserAccessToProject($project->id);
+                $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
+                /** @var UserAccessToProjects $userAccessToProject */
                 if ($userAccessToProject) {
 
-                    if ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $responsiveCommunication = $userAccessToProject->communication->responsiveCommunication;
 
                         if ($responsiveCommunication) {
 
-                            if ($responsiveCommunication->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) {
+                            if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
 
                                 return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                             }
 
-                        } else {
+                        } elseif (time() < $userAccessToProject->getDateStop()) {
 
-                            if (time() < $userAccessToProject->date_stop) {
-
-                                return parent::beforeAction($action);
-
-                            } else {
-                                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-                            }
+                            return parent::beforeAction($action);
                         }
 
-                    } elseif ($userAccessToProject->communication_type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+
+                    } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
@@ -288,9 +256,10 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
+     * @return void
      */
-    public function actionSaveCacheCreationForm($id)
+    public function actionSaveCacheCreationForm(int $id): void
     {
         $mvp = Mvps::findOne($id);
         $cachePath = FormCreateConfirmMvp::getCachePath($mvp);
@@ -305,31 +274,31 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string|Response
      */
-    public function actionCreate($id)
+    public function actionCreate(int $id)
     {
         $mvp = Mvps::findOne($id);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
-        $gcp = Gcps::findOne($confirmGcp->gcpId);
-        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
-        $problem = Problems::findOne($confirmProblem->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
+        $gcp = Gcps::findOne($confirmGcp->getGcpId());
+        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
+        $problem = Problems::findOne($confirmProblem->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($confirmSegment->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $model = new FormCreateConfirmMvp($mvp);
 
         //кол-во респондентов, подтвердивших текущую проблему
         $count_represent_gcp = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $confirmGcp->id, 'interview_confirm_gcp.status' => '1'])->count();
+            ->where(['confirm_id' => $confirmGcp->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 
-        $model->count_respond = $count_represent_gcp;
+        $model->setCountRespond($count_represent_gcp);
 
         if ($mvp->confirm){
             //Если у MVP создана программа подтверждения, то перейти на страницу подтверждения
-            return $this->redirect(['view', 'id' => $mvp->confirm->id]);
+            return $this->redirect(['view', 'id' => $mvp->confirm->getId()]);
         }
 
         return $this->render('create', [
@@ -347,24 +316,23 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function actionSaveConfirm($id)
+    public function actionSaveConfirm(int $id)
     {
-        $mvp = Mvps::findOne($id);
-        $model = new FormCreateConfirmMvp($mvp);
-        $model->setHypothesisId($id);
+        if(Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $mvp = Mvps::findOne($id);
+            $model = new FormCreateConfirmMvp($mvp);
+            $model->setHypothesisId($id);
 
-            if(Yii::$app->request->isAjax) {
-
+            if ($model->load(Yii::$app->request->post())) {
                 if ($model = $model->create()) {
 
-                    $response =  ['success' => true, 'id' => $model->id];
+                    $response =  ['success' => true, 'id' => $model->getId()];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
@@ -377,21 +345,22 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * Страница со списком вопросов
-     * @param $id
+     *
+     * @param int $id
      * @return string
      */
-    public function actionAddQuestions($id)
+    public function actionAddQuestions(int $id): string
     {
         $model = ConfirmMvp::findOne($id);
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
-        $mvp = Mvps::findOne($model->mvpId);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
-        $gcp = Gcps::findOne($confirmGcp->gcpId);
-        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
-        $problem = Problems::findOne($confirmProblem->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($problem->segmentId);
-        $project = Projects::findOne($problem->projectId);
+        $mvp = Mvps::findOne($model->getMvpId());
+        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
+        $gcp = Gcps::findOne($confirmGcp->getGcpId());
+        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
+        $problem = Problems::findOne($confirmProblem->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($problem->getSegmentId());
+        $project = Projects::findOne($problem->getProjectId());
         $questions = QuestionsConfirmMvp::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -418,21 +387,20 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
-     * @return array|bool
+     * @param int $id
+     * @return array|false
+     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
-        $model = new FormUpdateConfirmMvp($id);
-        $mvp = Mvps::findOne($id);
+        if(Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())) {
+            $model = new FormUpdateConfirmMvp($id);
+            $confirm = ConfirmMvp::findOne($id);
+            $mvp = $confirm->mvp;
 
-            if(Yii::$app->request->isAjax) {
-
+            if ($model->load(Yii::$app->request->post())) {
                 if ($model = $model->update()){
 
                     $response = [
@@ -453,22 +421,22 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
         $model = $this->findModel($id);
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
-        $mvp = Mvps::findOne($model->mvpId);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
-        $gcp = Gcps::findOne($confirmGcp->gcpId);
-        $confirmProblem = ConfirmProblem::findOne($gcp->confirmProblemId);
-        $problem = Problems::findOne($confirmProblem->problemId);
-        $confirmSegment = ConfirmSegment::findOne($problem->confirmSegmentId);
-        $segment = Segments::findOne($confirmSegment->segmentId);
-        $project = Projects::findOne($segment->projectId);
+        $mvp = Mvps::findOne($model->getMvpId());
+        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
+        $gcp = Gcps::findOne($confirmGcp->getGcpId());
+        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
+        $problem = Problems::findOne($confirmProblem->getProblemId());
+        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
+        $segment = Segments::findOne($confirmSegment->getSegmentId());
+        $project = Projects::findOne($segment->getProjectId());
         $questions = QuestionsConfirmMvp::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
 
@@ -541,10 +509,11 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * Проверка данных подтверждения на этапе генерации бизнес-модели
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionDataAvailabilityForNextStep($id)
+    public function actionDataAvailabilityForNextStep(int $id)
     {
         $model = ConfirmMvp::findOne($id);
         $formCreateBusinessModel = new FormCreateBusinessModel($model->hypothesis);
@@ -558,7 +527,7 @@ class ConfirmMvpController extends AppUserPartController
             ->where(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
-            if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1) || (!empty($model->business)  && $model->count_positive <= $count_positive && $model->mvp->exist_confirm == 1)) {
+            if ($model->getCountPositive() <= $count_positive && $model->mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED && ($model->business || (count($model->responds) === $count_descInterview && $model->mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED))) {
 
                 $response =  [
                     'success' => true,
@@ -571,13 +540,12 @@ class ConfirmMvpController extends AppUserPartController
                 Yii::$app->response->data = $response;
                 return $response;
 
-            }else{
-
-                $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['error' => true];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
@@ -585,10 +553,11 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * Завершение подтверждения MVP и переход на следующий этап
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionMovingNextStage($id)
+    public function actionMovingNextStage(int $id)
     {
         $model = ConfirmMvp::findOne($id);
         $mvp = $model->mvp;
@@ -603,106 +572,104 @@ class ConfirmMvpController extends AppUserPartController
 
         if(Yii::$app->request->isAjax) {
 
-            if (count($model->responds) > $count_descInterview && empty($model->business)) {
+            if (!$model->business && count($model->responds) > $count_descInterview) {
 
                 $response = ['not_completed_descInterviews' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
+            }
 
-            }if ((count($model->responds) == $count_descInterview && $model->count_positive <= $count_positive) || (!empty($model->business))) {
+            if ($model->business || (count($model->responds) === $count_descInterview && $model->getCountPositive() <= $count_positive)) {
 
                 $response =  [
                     'success' => true,
-                    'exist_confirm' => $mvp->exist_confirm,
+                    'exist_confirm' => $mvp->getExistConfirm(),
                 ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-
-            }else{
-
-                $response = ['error' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['error' => true];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool|Response
      * @throws ErrorException
      * @throws NotFoundHttpException
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionNotExistConfirm($id)
+    public function actionNotExistConfirm(int $id)
     {
         $model = $this->findModel($id);
-        $mvp = Mvps::findOne($model->mvpId);
-        $confirmGcp = ConfirmGcp::findOne($mvp->confirmGcpId);
+        $mvp = Mvps::findOne($model->getMvpId());
+        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
         $cacheManager = new CacheForm();
         $cachePath = $model->getCachePath();
 
-        if ($mvp->exist_confirm === 0) { // ToDo:Создать класс StatusConfirm для обозначения статусов
-            return $this->redirect(['mvps/index', 'id' => $confirmGcp->id]);
+        if ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
+            return $this->redirect(['mvps/index', 'id' => $confirmGcp->getId()]);
 
-        }else {
-
-            $mvp->exist_confirm = 0;
-            $mvp->time_confirm = time();
-            $model->setEnableExpertise();
-
-            if ($mvp->update() && $model->update()){
-
-                $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
-                $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);
-                return $this->redirect(['mvps/index', 'id' => $confirmGcp->id]);
-            }
         }
-        return false;
-    }
 
-
-    /**
-     * @param $id
-     * @return bool|Response
-     * @throws ErrorException
-     * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function actionExistConfirm($id)
-    {
-        $model = $this->findModel($id);
-        $mvp = Mvps::findOne($model->mvpId);
-        $cacheManager = new CacheForm();
-        $cachePath = $model->getCachePath();
-
-        $mvp->exist_confirm = 1;
-        $mvp->time_confirm = time();
+        $mvp->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
+        $mvp->setTimeConfirm();
         $model->setEnableExpertise();
 
         if ($mvp->update() && $model->update()){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);
-            return $this->redirect(['business-model/index', 'id' => $model->id]);
+            return $this->redirect(['mvps/index', 'id' => $confirmGcp->getId()]);
         }
         return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
+     * @return bool|Response
+     * @throws ErrorException
+     * @throws NotFoundHttpException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionExistConfirm(int $id)
+    {
+        $model = $this->findModel($id);
+        $mvp = Mvps::findOne($model->getMvpId());
+        $cacheManager = new CacheForm();
+        $cachePath = $model->getCachePath();
+
+        $mvp->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
+        $mvp->setTimeConfirm();
+        $model->setEnableExpertise();
+
+        if ($mvp->update() && $model->update()){
+
+            $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
+            $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);
+            return $this->redirect(['business-model/index', 'id' => $model->getId()]);
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers($id)
+    public function actionGetDataQuestionsAndAnswers(int $id): array
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
@@ -716,7 +683,7 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException
      * @throws MpdfException
@@ -725,18 +692,18 @@ class ConfirmMvpController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfQuestionsAndAnswers($id)
+    public function actionMpdfQuestionsAndAnswers(int $id)
     {
         $model = $this->findModel($id);
         $questions = $model->questions;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-mvp/questions_and_answers_pdf', ['questions' => $questions]);
+        $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $mvp_desc = $model->mvp->description;
+        $mvp_desc = $model->mvp->getDescription();
         if (mb_strlen($mvp_desc) > 25) {
             $mvp_desc = mb_substr($mvp_desc, 0, 25) . '...';
         }
@@ -784,7 +751,7 @@ class ConfirmMvpController extends AppUserPartController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return mixed
      * @throws NotFoundHttpException
      * @throws MpdfException
@@ -793,18 +760,18 @@ class ConfirmMvpController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfDataResponds($id)
+    public function actionMpdfDataResponds(int $id)
     {
         $model = $this->findModel($id);
         $responds = $model->responds;
 
         // get your HTML raw content without any layouts or scripts
-        $content = $this->renderPartial('/confirm-mvp/viewpdf', ['model' => $model, 'responds' => $responds]);
+        $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
 
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $mvp_desc = $model->mvp->description;
+        $mvp_desc = $model->mvp->getDescription();
         if (mb_strlen($mvp_desc) > 25) {
             $mvp_desc = mb_substr($mvp_desc, 0, 25) . '...';
         }
@@ -849,13 +816,11 @@ class ConfirmMvpController extends AppUserPartController
     }
 
     /**
-     * Finds the ConfirmMvp model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return ConfirmMvp the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param int $id
+     * @return ConfirmMvp|null
+     * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?ConfirmMvp
     {
         if (($model = ConfirmMvp::findOne($id)) !== null) {
             return $model;

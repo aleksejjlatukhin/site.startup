@@ -27,14 +27,16 @@ class CreateRespondSegmentForm extends FormCreateRespondent
      * @param ConfirmSegment $confirm
      * @param array $config
      */
-    public function __construct(ConfirmSegment $confirm, $config = [])
+    public function __construct(ConfirmSegment $confirm, array $config = [])
     {
         $this->setCreatorAnswers();
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($confirm));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -46,13 +48,15 @@ class CreateRespondSegmentForm extends FormCreateRespondent
      * @param ConfirmationInterface $confirm
      * @return string
      */
-    public static function getCachePath(ConfirmationInterface $confirm)
+    public static function getCachePath(ConfirmationInterface $confirm): string
     {
+        /**
+         * @var ConfirmSegment $confirm
+         */
         $segment = Segments::findOne($confirm->getSegmentId());
         $project = Projects::findOne($segment->getProjectId());
         $user = User::findOne($project->getUserId());
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm/formCreateRespond/';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm/formCreateRespond/';
     }
 
     /**
@@ -60,7 +64,7 @@ class CreateRespondSegmentForm extends FormCreateRespondent
      * @throws ErrorException
      * @throws NotFoundHttpException
      */
-    public function create ()
+    public function create (): RespondsSegment
     {
         $model = new RespondsSegment();
         $model->setConfirmId($this->getConfirmId());
@@ -86,7 +90,7 @@ class CreateRespondSegmentForm extends FormCreateRespondent
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

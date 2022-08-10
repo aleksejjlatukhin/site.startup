@@ -27,7 +27,14 @@ use yii\db\ActiveRecord;
  * @property string $revenue                        Потоки поступления доходов
  * @property int $created_at                        Дата создания mvp-продукта
  * @property int $updated_at                        Дата обновления mvp-продукта
- * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
+ *
+ * @property Projects $project                      Проект
+ * @property Segments $segment                      Сегмент
+ * @property Problems $problem                      Проблема
+ * @property Gcps $gcp                              Ценностное предложение
+ * @property Mvps $mvp                              Mvp-продукт
+ * @property ConfirmMvp $confirmMvp                 Подтверждение mvp-продукта
  */
 class BusinessModel extends ActiveRecord
 {
@@ -35,7 +42,7 @@ class BusinessModel extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'business_model';
     }
@@ -43,9 +50,10 @@ class BusinessModel extends ActiveRecord
 
     /**
      * Получить объект проекта
+     *
      * @return ActiveQuery
      */
-    public function getProject ()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
@@ -53,9 +61,10 @@ class BusinessModel extends ActiveRecord
 
     /**
      * Получить объект сегмента
+     *
      * @return ActiveQuery
      */
-    public function getSegment ()
+    public function getSegment(): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
@@ -63,9 +72,10 @@ class BusinessModel extends ActiveRecord
 
     /**
      * Получить объект проблемы
+     *
      * @return ActiveQuery
      */
-    public function getProblem ()
+    public function getProblem(): ActiveQuery
     {
         return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
@@ -73,9 +83,10 @@ class BusinessModel extends ActiveRecord
 
     /**
      * Получить объект Gcps
+     *
      * @return ActiveQuery
      */
-    public function getGcp ()
+    public function getGcp(): ActiveQuery
     {
         return $this->hasOne(Gcps::class, ['id' => 'gcp_id']);
     }
@@ -83,22 +94,12 @@ class BusinessModel extends ActiveRecord
 
     /**
      * Получить объект Mvps
+     *
      * @return ActiveQuery
      */
-    public function getMvp ()
+    public function getMvp(): ActiveQuery
     {
         return $this->hasOne(Mvps::class, ['id' => 'mvp_id']);
-    }
-
-
-    /**
-     * Найти Mvp, к которому относится бизнес-модель
-     *
-     * @return Mvps|null
-     */
-    public function findMvp()
-    {
-        return Mvps::findOne($this->getMvpId());
     }
 
 
@@ -106,7 +107,7 @@ class BusinessModel extends ActiveRecord
      * Получить объект подтверждения Mvps
      * @return ActiveQuery
      */
-    public function getConfirmMvp()
+    public function getConfirmMvp(): ActiveQuery
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'basic_confirm_id']);
     }
@@ -115,7 +116,7 @@ class BusinessModel extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['basic_confirm_id', 'relations', 'partners', 'distribution_of_sales', 'resources', 'cost', 'revenue'], 'required'],
@@ -135,7 +136,7 @@ class BusinessModel extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -153,7 +154,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -180,7 +181,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -188,7 +189,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -196,7 +197,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -204,7 +205,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getSegmentId()
+    public function getSegmentId(): int
     {
         return $this->segment_id;
     }
@@ -212,7 +213,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $segment_id
      */
-    public function setSegmentId($segment_id)
+    public function setSegmentId(int $segment_id): void
     {
         $this->segment_id = $segment_id;
     }
@@ -220,7 +221,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -228,7 +229,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -236,7 +237,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getProblemId()
+    public function getProblemId(): int
     {
         return $this->problem_id;
     }
@@ -244,7 +245,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $problem_id
      */
-    public function setProblemId($problem_id)
+    public function setProblemId(int $problem_id): void
     {
         $this->problem_id = $problem_id;
     }
@@ -252,7 +253,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getGcpId()
+    public function getGcpId(): int
     {
         return $this->gcp_id;
     }
@@ -260,7 +261,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $gcp_id
      */
-    public function setGcpId($gcp_id)
+    public function setGcpId(int $gcp_id): void
     {
         $this->gcp_id = $gcp_id;
     }
@@ -268,7 +269,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getMvpId()
+    public function getMvpId(): int
     {
         return $this->mvp_id;
     }
@@ -276,7 +277,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param int $mvp_id
      */
-    public function setMvpId($mvp_id)
+    public function setMvpId(int $mvp_id): void
     {
         $this->mvp_id = $mvp_id;
     }
@@ -284,7 +285,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getRelations()
+    public function getRelations(): string
     {
         return $this->relations;
     }
@@ -292,7 +293,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $relations
      */
-    public function setRelations($relations)
+    public function setRelations(string $relations): void
     {
         $this->relations = $relations;
     }
@@ -300,7 +301,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getPartners()
+    public function getPartners(): string
     {
         return $this->partners;
     }
@@ -308,7 +309,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $partners
      */
-    public function setPartners($partners)
+    public function setPartners(string $partners): void
     {
         $this->partners = $partners;
     }
@@ -316,7 +317,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getDistributionOfSales()
+    public function getDistributionOfSales(): string
     {
         return $this->distribution_of_sales;
     }
@@ -324,7 +325,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $distribution_of_sales
      */
-    public function setDistributionOfSales($distribution_of_sales)
+    public function setDistributionOfSales(string $distribution_of_sales): void
     {
         $this->distribution_of_sales = $distribution_of_sales;
     }
@@ -332,7 +333,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getResources()
+    public function getResources(): string
     {
         return $this->resources;
     }
@@ -340,7 +341,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $resources
      */
-    public function setResources($resources)
+    public function setResources(string $resources): void
     {
         $this->resources = $resources;
     }
@@ -348,7 +349,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getCost()
+    public function getCost(): string
     {
         return $this->cost;
     }
@@ -356,7 +357,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $cost
      */
-    public function setCost($cost)
+    public function setCost(string $cost): void
     {
         $this->cost = $cost;
     }
@@ -364,7 +365,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return string
      */
-    public function getRevenue()
+    public function getRevenue(): string
     {
         return $this->revenue;
     }
@@ -372,7 +373,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @param string $revenue
      */
-    public function setRevenue($revenue)
+    public function setRevenue(string $revenue): void
     {
         $this->revenue = $revenue;
     }
@@ -380,7 +381,7 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -388,23 +389,23 @@ class BusinessModel extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getConfirmMvpId()
+    public function getConfirmMvpId(): int
     {
         return $this->basic_confirm_id;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getEnableExpertise()
+    public function getEnableExpertise(): string
     {
         return $this->enable_expertise;
     }
@@ -412,7 +413,7 @@ class BusinessModel extends ActiveRecord
     /**
      *  Установить разрешение на экспертизу
      */
-    public function setEnableExpertise()
+    public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
     }

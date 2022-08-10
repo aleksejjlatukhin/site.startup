@@ -1,5 +1,13 @@
 <?php
 
+use app\models\InterviewConfirmGcp;
+use app\models\InterviewConfirmMvp;
+use app\models\InterviewConfirmProblem;
+use app\models\InterviewConfirmSegment;
+use app\models\RespondsGcp;
+use app\models\RespondsMvp;
+use app\models\RespondsProblem;
+use app\models\RespondsSegment;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use kartik\select2\Select2;
@@ -7,12 +15,17 @@ use app\models\StageConfirm;
 use yii\helpers\Url;
 use app\models\QuestionStatus;
 
+/**
+ * @var RespondsSegment|RespondsProblem|RespondsGcp|RespondsMvp $respond
+ * @var InterviewConfirmSegment|InterviewConfirmProblem|InterviewConfirmGcp|InterviewConfirmMvp $model
+ */
+
 ?>
 
 
 <?php $form = ActiveForm::begin([
     'id' => 'formCreateDescInterview',
-    'action' => Url::to(['/interviews/create', 'stage' => $respond->confirm->stage, 'id' => $respond->id]),
+    'action' => Url::to(['/interviews/create', 'stage' => $respond->confirm->getStage(), 'id' => $respond->getId()]),
     'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
     'errorCssClass' => 'u-has-error-v1',
     'successCssClass' => 'u-has-success-v1-1',
@@ -21,29 +34,29 @@ use app\models\QuestionStatus;
 <?php if ($respond->answers) : ?>
     <?php foreach ($respond->answers as $index => $answer) : ?>
 
-        <?php if ($answer->question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+        <?php if ($answer->question->getStatus() === QuestionStatus::STATUS_ONE_STAR) : ?>
 
-            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px; color: #52be7f;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px; color: #52be7f;">{label}</div><div>{input}</div>'])->label($answer->question->getTitle())
             ->textarea([
                 'row' => 2,
                 'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]); ?>
+            ]) ?>
 
-        <?php elseif($answer->question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+        <?php elseif($answer->question->getStatus() === QuestionStatus::STATUS_NOT_STAR) : ?>
 
-            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->title)
+            <?= $form->field($answer, "[$index]answer", ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label($answer->question->getTitle())
                 ->textarea([
                     'row' => 2,
                     'maxlength' => true,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
-                ]); ?>
+                ]) ?>
 
         <?php endif; ?>
 
-        <?= $form->field($answer, "[$index]question_id")->label(false)->hiddenInput(); ?>
+        <?= $form->field($answer, "[$index]question_id")->label(false)->hiddenInput() ?>
 
     <?php endforeach; ?>
 <?php endif; ?>
@@ -72,7 +85,7 @@ use app\models\QuestionStatus;
                         'font-size' => '24px',
                         'border-radius' => '8px',
                     ],
-                ]); ?>
+                ]) ?>
 
             <div class='title_file' style="padding-left: 20px; padding-top: 5px;">Файл не выбран</div>
 
@@ -80,7 +93,7 @@ use app\models\QuestionStatus;
 
     </div>
 
-    <?php if ($respond->confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) : ?>
+    <?php if ($respond->confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) : ?>
 
         <div class="col-md-12" style="margin-top: -10px;">
 
@@ -90,7 +103,7 @@ use app\models\QuestionStatus;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Опишите краткий вывод по интервью',
-            ]); ?>
+            ]) ?>
 
         </div>
 
@@ -107,12 +120,11 @@ use app\models\QuestionStatus;
                 'options' => ['id' => 'descInterview_status'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
-    <?php elseif ($respond->confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) : ?>
+    <?php elseif ($respond->confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) : ?>
 
         <div class="col-md-12">
 
@@ -127,12 +139,11 @@ use app\models\QuestionStatus;
                 'options' => ['id' => 'descInterview_status'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
-    <?php elseif ($respond->confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) : ?>
+    <?php elseif ($respond->confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) : ?>
 
         <div class="col-md-12">
 
@@ -147,12 +158,11 @@ use app\models\QuestionStatus;
                 'options' => ['id' => 'descInterview_status'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
-    <?php elseif ($respond->confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) : ?>
+    <?php elseif ($respond->confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) : ?>
 
         <div class="col-md-12">
 
@@ -167,8 +177,7 @@ use app\models\QuestionStatus;
                 'options' => ['id' => 'descInterview_status'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 

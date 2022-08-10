@@ -1,9 +1,14 @@
 <?php
 
+use app\models\DuplicateCommunications;
 use yii\helpers\Html;
 
 $this->title = 'Уведомления';
 $this->registerCssFile('@web/css/notifications-style.css');
+
+/**
+ * @var DuplicateCommunications[] $communications
+ */
 
 ?>
 
@@ -26,23 +31,23 @@ $this->registerCssFile('@web/css/notifications-style.css');
                     <div class="col-xs-10">
 
                         <div>
-                            <?= $communication->description;?>
+                            <?= $communication->getDescription() ?>
                         </div>
 
                         <?php if ($communication->isNeedReadButton()) : ?>
                             <div class="read-notification">
                                 Чтобы отметить уведомление как прочитанное, нажмите <?= Html::button('OK', [
-                                    'id' => 'read_notification-'.$communication->id,
+                                    'id' => 'read_notification-'.$communication->getId(),
                                     'class' => 'btn btn-default link-read-notification',
                                     'style' => ['border-radius' => '8px'],
-                                ]);?>
+                                ]) ?>
                             </div>
                         <?php endif; ?>
 
                     </div>
 
                     <div class="col-xs-2 text-center">
-                        <?= date('d.m.Y H:i',$communication->created_at); ?>
+                        <?= date('d.m.Y H:i',$communication->getCreatedAt()) ?>
                     </div>
 
                 </div>

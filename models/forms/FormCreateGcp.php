@@ -4,7 +4,6 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
-use app\models\User;
 use yii\base\ErrorException;
 use yii\base\Model;
 use app\models\Projects;
@@ -42,14 +41,16 @@ class FormCreateGcp extends Model
      * @param Problems $preliminaryHypothesis
      * @param array $config
      */
-    public function __construct(Problems $preliminaryHypothesis, $config = [])
+    public function __construct(Problems $preliminaryHypothesis, array $config = [])
     {
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -60,27 +61,20 @@ class FormCreateGcp extends Model
      * @param Problems $preliminaryHypothesis
      * @return string
      */
-    public static function getCachePath(Problems $preliminaryHypothesis)
+    public static function getCachePath(Problems $preliminaryHypothesis): string
     {
-        /**
-         * @var Segments $segment
-         * @var Projects $project
-         * @var User $user
-         */
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId()
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId()
             .'/problems/problem-'.$preliminaryHypothesis->getId().'/gcps/formCreate/';
-
-        return $cachePath;
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['good', 'benefit', 'contrast'], 'trim'],
@@ -94,7 +88,7 @@ class FormCreateGcp extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'good' => 'Формулировка перспективного продукта',
@@ -109,8 +103,9 @@ class FormCreateGcp extends Model
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create()
+    public function create(): Gcps
     {
+        /** @var Gcps $last_model */
         $last_model = Gcps::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmProblem = ConfirmProblem::findOne($this->getBasicConfirmId());
         $problem = Problems::findOne($confirmProblem->getProblemId());
@@ -122,7 +117,7 @@ class FormCreateGcp extends Model
         $gcp->setSegmentId($segment->getId());
         $gcp->setProblemId($problem->getId());
         $gcp->setBasicConfirmId($this->getBasicConfirmId());
-        $last_model_number = explode(' ',$last_model->title)[1];
+        $last_model_number = explode(' ',$last_model->getTitle())[1];
         $gcp->setTitle('ГЦП ' . ($last_model_number + 1));
 
         $gcp->description = 'Наш продукт ' . mb_strtolower($this->getGood()) . ' ';
@@ -141,7 +136,7 @@ class FormCreateGcp extends Model
     /**
      * @return string
      */
-    public function getGood()
+    public function getGood(): string
     {
         return $this->good;
     }
@@ -149,7 +144,7 @@ class FormCreateGcp extends Model
     /**
      * @param string $good
      */
-    public function setGood($good)
+    public function setGood(string $good): void
     {
         $this->good = $good;
     }
@@ -157,7 +152,7 @@ class FormCreateGcp extends Model
     /**
      * @return string
      */
-    public function getBenefit()
+    public function getBenefit(): string
     {
         return $this->benefit;
     }
@@ -165,7 +160,7 @@ class FormCreateGcp extends Model
     /**
      * @param string $benefit
      */
-    public function setBenefit($benefit)
+    public function setBenefit(string $benefit): void
     {
         $this->benefit = $benefit;
     }
@@ -173,7 +168,7 @@ class FormCreateGcp extends Model
     /**
      * @return string
      */
-    public function getContrast()
+    public function getContrast(): string
     {
         return $this->contrast;
     }
@@ -181,7 +176,7 @@ class FormCreateGcp extends Model
     /**
      * @param string $contrast
      */
-    public function setContrast($contrast)
+    public function setContrast(string $contrast): void
     {
         $this->contrast = $contrast;
     }
@@ -189,7 +184,7 @@ class FormCreateGcp extends Model
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -197,7 +192,7 @@ class FormCreateGcp extends Model
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -205,7 +200,7 @@ class FormCreateGcp extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -213,7 +208,7 @@ class FormCreateGcp extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -221,7 +216,7 @@ class FormCreateGcp extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }
@@ -229,7 +224,7 @@ class FormCreateGcp extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }

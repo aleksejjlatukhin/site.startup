@@ -14,10 +14,16 @@ use yii\db\BaseActiveRecord;
  * Class ConversationDevelopment
  * @package app\models
  *
- * @property int $id                        идентификатор беседы
- * @property int $dev_id                    идентификатор техподдержки
- * @property int $user_id                   идентификатор пользователя
- * @property int $updated_at                дата обновления
+ * @property int $id                                    идентификатор беседы
+ * @property int $dev_id                                идентификатор техподдержки
+ * @property int $user_id                               идентификатор пользователя
+ * @property int $updated_at                            дата обновления
+ *
+ * @property User $development                          Техподдержка
+ * @property User $user                                 Пользователь
+ * @property MessageDevelopment[] $messages             Сообщения беседы
+ * @property MessageDevelopment $lastMessage            Последнее сообщение в беседе
+ * @property int $countNewMessages                      Кол-во непрочитанных сообщений в беседе
  */
 class ConversationDevelopment extends ActiveRecord
 {
@@ -25,7 +31,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'conversation_development';
     }
@@ -34,7 +40,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id', 'dev_id', 'user_id', 'updated_at'], 'integer'],
@@ -45,7 +51,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
@@ -62,9 +68,10 @@ class ConversationDevelopment extends ActiveRecord
 
     /**
      * Получить объект техподдержки
+     *
      * @return ActiveQuery
      */
-    public function getDevelopment ()
+    public function getDevelopment(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'dev_id']);
     }
@@ -72,9 +79,10 @@ class ConversationDevelopment extends ActiveRecord
 
     /**
      * Получить объект пользователя
+     *
      * @return ActiveQuery
      */
-    public function getUser ()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -82,9 +90,10 @@ class ConversationDevelopment extends ActiveRecord
 
     /**
      * Получить все сообщения беседы
+     *
      * @return ActiveQuery
      */
-    public function getMessages ()
+    public function getMessages(): ActiveQuery
     {
         return $this->hasMany(MessageDevelopment::class, ['conversation_id' => 'id']);
     }
@@ -92,9 +101,10 @@ class ConversationDevelopment extends ActiveRecord
 
     /**
      * Получить последнее сообщение беседы
+     *
      * @return ActiveQuery
      */
-    public function getLastMessage ()
+    public function getLastMessage(): ActiveQuery
     {
         return $this->hasOne(MessageDevelopment::class, ['conversation_id' => 'id'])->orderBy('created_at DESC');
     }
@@ -103,21 +113,20 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * Получить кол-во непрочитанных
      * сообщений беседы
-     * @return int|string
+     *
+     * @return int
      */
-    public function getCountNewMessages ()
+    public function getCountNewMessages(): int
     {
-        $count_new_messages = MessageDevelopment::find()
+        return MessageDevelopment::find()
             ->where(['conversation_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-
-        return $count_new_messages;
     }
 
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -126,7 +135,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return int
      */
-    public function getDevId()
+    public function getDevId(): int
     {
         return $this->dev_id;
     }
@@ -135,7 +144,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @param int $dev_id
      */
-    public function setDevId($dev_id)
+    public function setDevId(int $dev_id): void
     {
         $this->dev_id = $dev_id;
     }
@@ -144,7 +153,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -153,7 +162,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -162,7 +171,7 @@ class ConversationDevelopment extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

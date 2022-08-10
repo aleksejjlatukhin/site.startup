@@ -5,6 +5,8 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -20,6 +22,9 @@ use yii\db\ActiveRecord;
  * @property int $date_start            дата начала действия тарифа у клиента
  * @property int $date_end              дата окончания действия тарифа у клиента
  * @property int $created_at            дата создания записи в таблице client_rates_plan
+ *
+ * @property RatesPlan $ratesPlan       Тарифный план
+ * @property Client $client             Организация
  */
 class ClientRatesPlan extends ActiveRecord
 {
@@ -27,7 +32,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'client_rates_plan';
     }
@@ -36,43 +41,25 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getRatesPlan()
+    public function getRatesPlan(): ActiveQuery
     {
         return $this->hasOne(RatesPlan::class, ['id' => 'rates_plan_id']);
     }
 
 
     /**
-     * @return RatesPlan|null
-     */
-    public function findRatesPlan()
-    {
-        return RatesPlan::findOne($this->rates_plan_id);
-    }
-
-
-    /**
      * @return ActiveQuery
      */
-    public function getClient()
+    public function getClient(): ActiveQuery
     {
         return $this->hasOne(Client::class, ['id' => 'client_id']);
     }
 
 
     /**
-     * @return Client|null
-     */
-    public function findClient()
-    {
-        return Client::findOne($this->client_id);
-    }
-
-
-    /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['client_id', 'rates_plan_id', 'date_start', 'date_end'], 'required'],
@@ -84,7 +71,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'date_start' => 'Начало действия тарифа',
@@ -97,12 +84,12 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }
@@ -111,7 +98,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -120,7 +107,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
@@ -129,7 +116,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @param int $client_id
      */
-    public function setClientId($client_id)
+    public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
     }
@@ -138,7 +125,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getRatesPlanId()
+    public function getRatesPlanId(): int
     {
         return $this->rates_plan_id;
     }
@@ -147,16 +134,16 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @param int $rates_plan_id
      */
-    public function setRatesPlanId($rates_plan_id)
+    public function setRatesPlanId(int $rates_plan_id): void
     {
         $this->rates_plan_id = $rates_plan_id;
     }
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDateStart()
+    public function getDateStart(): ?int
     {
         return $this->date_start;
     }
@@ -165,16 +152,16 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @param int $date_start
      */
-    public function setDateStart($date_start)
+    public function setDateStart(int $date_start): void
     {
         $this->date_start = $date_start;
     }
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDateEnd()
+    public function getDateEnd(): ?int
     {
         return $this->date_end;
     }
@@ -183,7 +170,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @param int $date_end
      */
-    public function setDateEnd($date_end)
+    public function setDateEnd(int $date_end): void
     {
         $this->date_end = $date_end;
     }
@@ -192,7 +179,7 @@ class ClientRatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }

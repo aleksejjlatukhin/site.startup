@@ -5,6 +5,8 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -19,6 +21,8 @@ use yii\db\ActiveRecord;
  * @property int $max_count_project_user        максимальное количество проектантов по тарифному плану
  * @property int $max_count_tracker             максимальное количество трекеров по тарифному плану
  * @property int $created_at                    дата создания тарифного плана
+ *
+ * @property ClientRatesPlan[] $clientRatesPlans
  */
 class RatesPlan extends ActiveRecord
 {
@@ -26,7 +30,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'rates_plan';
     }
@@ -35,25 +39,16 @@ class RatesPlan extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getClientRatesPlans()
+    public function getClientRatesPlans(): ActiveQuery
     {
         return $this->hasMany(ClientRatesPlan::class, ['rates_plan_id' => 'id']);
     }
 
 
     /**
-     * @return ClientRatesPlan[]
-     */
-    public function findClientRatesPlans()
-    {
-        return ClientRatesPlan::findAll(['rates_plan_id' => $this->id]);
-    }
-
-
-    /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'description', 'max_count_project_user', 'max_count_tracker'], 'required'],
@@ -67,7 +62,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование',
@@ -82,12 +77,12 @@ class RatesPlan extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }
@@ -96,7 +91,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -105,7 +100,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -114,7 +109,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -123,7 +118,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -132,7 +127,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -141,7 +136,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getMaxCountProjectUser()
+    public function getMaxCountProjectUser(): int
     {
         return $this->max_count_project_user;
     }
@@ -150,7 +145,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @param int $max_count_project_user
      */
-    public function setMaxCountProjectUser($max_count_project_user)
+    public function setMaxCountProjectUser(int $max_count_project_user): void
     {
         $this->max_count_project_user = $max_count_project_user;
     }
@@ -159,7 +154,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getMaxCountTracker()
+    public function getMaxCountTracker(): int
     {
         return $this->max_count_tracker;
     }
@@ -168,7 +163,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @param int $max_count_tracker
      */
-    public function setMaxCountTracker($max_count_tracker)
+    public function setMaxCountTracker(int $max_count_tracker): void
     {
         $this->max_count_tracker = $max_count_tracker;
     }
@@ -177,7 +172,7 @@ class RatesPlan extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }

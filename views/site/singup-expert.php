@@ -1,23 +1,23 @@
 <?php
 
+use app\models\forms\SingupExpertForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use app\models\ExpertType;
 
+/**
+ * @var SingupExpertForm $formRegistration
+ */
+
 ?>
 
 <style>
-    .select2-container--krajee
-    .select2-selection--multiple
-    .select2-search--inline
-    .select2-search__field {
+    .select2-container--krajee .select2-selection--multiple .select2-search--inline .select2-search__field {
         height: 38px;
     }
-    .select2-container
-    .select2-search--inline
-    .select2-search__field {
+    .select2-container .select2-search--inline .select2-search__field {
         font-size: 16px;
     }
 </style>
@@ -191,7 +191,7 @@ $form = ActiveForm::begin([
     <div class="block-exist-agree">
 
         <?= $form->field($formRegistration, 'exist_agree', ['template' => '{input}{label}'])
-            ->checkbox(['value' => 1, 'checked ' => true, 'class' => 'custom-checkbox'], false); ?>
+            ->checkbox(['value' => 1, 'checked ' => true, 'class' => 'custom-checkbox'], false) ?>
 
         <?= Html::a('Я согласен с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
             ['/site/confidentiality-policy'], [
@@ -199,7 +199,7 @@ $form = ActiveForm::begin([
                 'title' => 'Ознакомиться с настоящей Политикой конфиденциальности и условиями обработки моих персональных данных',
                 'style' => ['color' => '#FFFFFF', 'line-height' => '18px']
             ]
-        ); ?>
+        ) ?>
 
     </div>
 
@@ -219,7 +219,7 @@ $form = ActiveForm::begin([
                 'font-size' => '16px',
                 'font-weight' => '700'
             ]
-        ]); ?>
+        ]) ?>
 
     </div>
 

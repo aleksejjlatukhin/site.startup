@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
+use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -21,10 +22,10 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
 
     /**
      * FormUpdateConfirmProblem constructor.
-     * @param $confirmId
+     * @param int $confirmId
      * @param array $config
      */
-    public function __construct($confirmId, $config = [])
+    public function __construct(int $confirmId, array $config = [])
     {
         $confirm = ConfirmProblem::findOne($confirmId);
         $this->setEditorCountRespond();
@@ -42,9 +43,9 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    protected function setParams(array $params)
+    protected function setParams(array $params): void
     {
         $this->setId($params['id']);
         $this->setCountRespond($params['count_respond']);
@@ -56,7 +57,7 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['need_consumer', 'trim'],
@@ -70,7 +71,7 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -81,7 +82,8 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
 
 
     /**
-     * @return ConfirmProblem|bool|mixed|null
+     * @return ConfirmProblem|false|null
+     * @throws ErrorException
      * @throws NotFoundHttpException
      */
     public function update()
@@ -105,7 +107,7 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
     /**
      * @return string
      */
-    public function getNeedConsumer()
+    public function getNeedConsumer(): string
     {
         return $this->need_consumer;
     }
@@ -113,7 +115,7 @@ class FormUpdateConfirmProblem extends FormUpdateConfirm
     /**
      * @param string $need_consumer
      */
-    public function setNeedConsumer($need_consumer)
+    public function setNeedConsumer(string $need_consumer): void
     {
         $this->need_consumer = $need_consumer;
     }

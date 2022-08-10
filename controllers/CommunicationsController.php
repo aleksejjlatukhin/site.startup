@@ -23,19 +23,18 @@ class CommunicationsController extends AppUserPartController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
 
-        if ($action->id == 'notifications') {
+        if ($action->id === 'notifications') {
 
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                || (Yii::$app->user->getId() == Yii::$app->request->get('id'))) {
+                || (Yii::$app->user->getId() === (int)Yii::$app->request->get('id'))) {
 
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         } else{
             return parent::beforeAction($action);
@@ -47,10 +46,10 @@ class CommunicationsController extends AppUserPartController
     /**
      * Страница уведомлений
      *
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionNotifications($id)
+    public function actionNotifications(int $id): string
     {
         $communications = DuplicateCommunications::find()
             ->where(['adressee_id' => $id])
@@ -72,7 +71,7 @@ class CommunicationsController extends AppUserPartController
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionReadCommunication($id)
+    public function actionReadCommunication(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -82,10 +81,10 @@ class CommunicationsController extends AppUserPartController
 
             $user = User::findOne($communication->getAdresseeId());
             $countUnreadCommunications = $user->getCountUnreadCommunications();
-            $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->getSource()->getProjectId());
+            $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->source->getProjectId());
 
             $response = [
-                'project_id' => $communication->getSource()->getProjectId(),
+                'project_id' => $communication->source->getProjectId(),
                 'countUnreadCommunications' => $countUnreadCommunications,
                 'countUnreadCommunicationsByProject' => $countUnreadCommunicationsByProject
             ];

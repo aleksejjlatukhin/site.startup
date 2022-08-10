@@ -17,6 +17,8 @@ use yii\db\ActiveRecord;
  * @property int $problem_id                Идентификатор записи в таб. problems
  * @property string $question               Вопрос
  * @property string $answer                 Ответ
+ *
+ * @property Problems $problem              Проблема
  */
 class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
 {
@@ -24,7 +26,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'expected_results_interview_confirm_problem';
     }
@@ -33,7 +35,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getProblem()
+    public function getProblem(): ActiveQuery
     {
         return $this->hasOne(Problems::class, ['id' => 'problem_id']);
     }
@@ -42,7 +44,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['problem_id', 'question', 'answer'], 'required'],
@@ -55,7 +57,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'question' => 'Вопрос',
@@ -87,7 +89,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -95,7 +97,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @param int $id
      */
-    public function setProblemId($id)
+    public function setProblemId(int $id): void
     {
         $this->problem_id = $id;
     }
@@ -103,7 +105,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @return int
      */
-    public function getProblemId()
+    public function getProblemId(): int
     {
         return $this->problem_id;
     }
@@ -111,7 +113,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @return string
      */
-    public function getQuestion()
+    public function getQuestion(): string
     {
         return $this->question;
     }
@@ -119,7 +121,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @param string $question
      */
-    public function setQuestion($question)
+    public function setQuestion(string $question): void
     {
         $this->question = $question;
     }
@@ -127,7 +129,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @return string
      */
-    public function getAnswer()
+    public function getAnswer(): string
     {
         return $this->answer;
     }
@@ -135,7 +137,7 @@ class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
     /**
      * @param string $answer
      */
-    public function setAnswer($answer)
+    public function setAnswer(string $answer): void
     {
         $this->answer = $answer;
     }

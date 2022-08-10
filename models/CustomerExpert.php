@@ -20,18 +20,21 @@ use yii\db\ActiveRecord;
  * @property int $status                    статус эксперта по данному клиенту
  * @property int $created_at                дата привязки эксперта по клиентам к организации
  * @property int $updated_at                дата изменения статуса эксперта по клиентам к организации
+ *
+ * @property User $user                     Эксперт
+ * @property Client $client                 Организация
  */
 class CustomerExpert extends ActiveRecord
 {
 
-    const ACTIVE = 9378;
-    const NO_ACTIVE = 8351;
+    public const ACTIVE = 9378;
+    public const NO_ACTIVE = 8351;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'customer_expert';
     }
@@ -40,7 +43,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -49,7 +52,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getClient()
+    public function getClient(): ActiveQuery
     {
         return $this->hasOne(Client::class, ['id' => 'client_id']);
     }
@@ -58,7 +61,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['client_id', 'user_id'], 'required'],
@@ -77,7 +80,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
@@ -88,7 +91,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -97,7 +100,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -106,7 +109,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -115,7 +118,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
@@ -124,7 +127,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @param int $client_id
      */
-    public function setClientId($client_id)
+    public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
     }
@@ -133,7 +136,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -142,7 +145,7 @@ class CustomerExpert extends ActiveRecord
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }

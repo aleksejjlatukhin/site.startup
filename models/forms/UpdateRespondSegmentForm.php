@@ -29,10 +29,10 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
 
     /**
      * UpdateRespondForm constructor.
-     * @param $id
+     * @param int $id
      * @param array $config
      */
-    public function __construct($id, $config = [])
+    public function __construct(int $id, array $config = [])
     {
         $respond = RespondsSegment::findOne($id);
         foreach ($respond as $key => $value) {
@@ -45,9 +45,10 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
-     * @return ConfirmationInterface|ConfirmSegment|null
+     * 
+     * @return ConfirmSegment|null
      */
-    public function getConfirm()
+    public function findConfirm(): ?ConfirmSegment
     {
         return ConfirmSegment::findOne($this->getConfirmId());
     }
@@ -57,7 +58,7 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
      * @return RespondsSegment|null
      * @throws NotFoundHttpException
      */
-    public function update()
+    public function update(): ?RespondsSegment
     {
         $respond = RespondsSegment::findOne($this->getId());
         $respond->setName($this->getName());
@@ -67,8 +68,9 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
             'email' => $this->getEmail()
         ]);
         $respond->setDatePlan(strtotime($this->getDatePlan()));
-        if ($respond->save())
+        if ($respond->save()) {
             return $respond;
+        }
 
         throw new NotFoundHttpException('Ошибка. Неудалось обновить данные респондента');
     }
@@ -83,7 +85,7 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
 
         foreach ($models as $item){
 
-            if ($this->getId() != $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if ($this->getId() !== $item->getId() && mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

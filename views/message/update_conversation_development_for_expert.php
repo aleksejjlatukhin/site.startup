@@ -1,19 +1,26 @@
 <?php
 
+use app\models\ConversationDevelopment;
+use app\models\User;
 use yii\helpers\Html;
+
+/**
+ * @var ConversationDevelopment $conversation_development
+ * @var User $expert
+ */
 
 ?>
 
 <!--Проверка существования аватарки-->
-<?php if ($conversation_development->development->avatar_image) : ?>
-    <?= Html::img('/web/upload/user-'.$conversation_development->development->id.'/avatar/'.$conversation_development->development->avatar_image, ['class' => 'user_picture']); ?>
+<?php if ($conversation_development->development->getAvatarImage()) : ?>
+    <?= Html::img('/web/upload/user-'.$conversation_development->getDevId().'/avatar/'.$conversation_development->development->getAvatarImage(), ['class' => 'user_picture']) ?>
 <?php else : ?>
-    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
 <?php endif; ?>
 
 <!--Кол-во непрочитанных сообщений от техподдержки-->
 <?php if ($expert->countUnreadMessagesFromDev) : ?>
-    <div class="countUnreadMessagesSender active"><?= $expert->countUnreadMessagesFromDev; ?></div>
+    <div class="countUnreadMessagesSender active"><?= $expert->countUnreadMessagesFromDev ?></div>
 <?php else : ?>
     <div class="countUnreadMessagesSender"></div>
 <?php endif; ?>
@@ -33,7 +40,7 @@ use yii\helpers\Html;
 
         <div class="col-xs-4 text-right">
             <?php if ($conversation_development->lastMessage) : ?>
-                <?= date('d.m.y H:i', $conversation_development->lastMessage->created_at); ?>
+                <?= date('d.m.y H:i', $conversation_development->lastMessage->getCreatedAt()) ?>
             <?php endif; ?>
         </div>
     </div>
@@ -41,15 +48,15 @@ use yii\helpers\Html;
     <?php if ($conversation_development->lastMessage) : ?>
         <div class="block_bottom_exist_message">
 
-            <?php if ($conversation_development->lastMessage->sender->avatar_image) : ?>
-                <?= Html::img('/web/upload/user-'.$conversation_development->lastMessage->sender->id.'/avatar/'.$conversation_development->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+            <?php if ($conversation_development->lastMessage->sender->getAvatarImage()) : ?>
+                <?= Html::img('/web/upload/user-'.$conversation_development->lastMessage->getSenderId().'/avatar/'.$conversation_development->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
             <?php else : ?>
-                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
             <?php endif; ?>
 
             <div>
-                <?php if ($conversation_development->lastMessage->description) : ?>
-                    <?= $conversation_development->lastMessage->description; ?>
+                <?php if ($conversation_development->lastMessage->getDescription()) : ?>
+                    <?= $conversation_development->lastMessage->getDescription() ?>
                 <?php else : ?>
                     ...
                 <?php endif; ?>

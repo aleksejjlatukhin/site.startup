@@ -26,14 +26,16 @@ class FormCreateSegment extends FormSegment
      * @param Projects $project
      * @param array $config
      */
-    public function __construct(Projects $project, $config = [])
+    public function __construct(Projects $project, array $config = [])
     {
         $this->_cacheManager = new CacheForm();
         $this->cachePath = self::getCachePath($project);
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -44,12 +46,10 @@ class FormCreateSegment extends FormSegment
      * @param Projects $project
      * @return string
      */
-    public static function getCachePath(Projects $project)
+    public static function getCachePath(Projects $project): string
     {
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id. '/projects/project-'.$project->id.'/segments/formCreate/';
-
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId().'/segments/formCreate/';
     }
 
 
@@ -57,9 +57,9 @@ class FormCreateSegment extends FormSegment
      * Проверка заполнения полей формы
      * @return bool
      */
-    public function checkFillingFields ()
+    public function checkFillingFields (): bool
     {
-        if ($this->type_of_interaction_between_subjects == Segments::TYPE_B2C) {
+        if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
                 && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
@@ -68,10 +68,12 @@ class FormCreateSegment extends FormSegment
                 && !empty($this->market_volume_b2c)) {
 
                 return true;
-            } else {
-                return false;
             }
-        } elseif ($this->type_of_interaction_between_subjects == Segments::TYPE_B2B) {
+            return false;
+
+        }
+
+        if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
                 && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
@@ -79,10 +81,10 @@ class FormCreateSegment extends FormSegment
                 && !empty($this->income_company_to) && !empty($this->market_volume_b2b)) {
 
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
+
         return false;
     }
 
@@ -103,7 +105,7 @@ class FormCreateSegment extends FormSegment
             $segment->setTypeOfInteractionBetweenSubjects($this->getTypeOfInteractionBetweenSubjects());
             $segment->setAddInfo($this->getAddInfo());
 
-            if ($this->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2C){
+            if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
 
                 $segment->setFieldOfActivity($this->getFieldOfActivityB2c());
                 $segment->setSortOfActivity($this->getSortOfActivityB2c());
@@ -123,7 +125,7 @@ class FormCreateSegment extends FormSegment
                 }
                 throw new NotFoundHttpException('Ошибка. Неудалось сохранить сегмент');
 
-            }elseif ($this->getTypeOfInteractionBetweenSubjects() == Segments::TYPE_B2B) {
+            }elseif ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
                 $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
                 $segment->setSortOfActivity($this->getSortOfActivityB2b());
@@ -151,13 +153,13 @@ class FormCreateSegment extends FormSegment
     /**
      * @param $attr
      */
-    public function uniqueName($attr)
+    public function uniqueName($attr): void
     {
         $models = Segments::findAll(['project_id' => $this->getProjectId()]);
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Сегмент с названием «'. $this->getName() .'» уже существует!');
             }

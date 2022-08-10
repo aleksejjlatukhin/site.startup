@@ -1,27 +1,45 @@
 <?php
 
+use app\models\forms\AvatarForm;
+use app\models\forms\PasswordChangeForm;
+use app\models\forms\ProfileForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
 use yii\widgets\ActiveForm;
 
+/**
+ * @var User $user
+ * @var int $count_users
+ * @var int $countProjects
+ * @var ProfileForm $profile
+ * @var PasswordChangeForm $passwordChangeForm
+ * @var AvatarForm $avatarForm
+ */
+
 ?>
 
 <div class="col-md-12 col-lg-4">
 
-    <?php if ($user['avatar_image']) : ?>
+    <?php if ($user->getAvatarImage()) : ?>
 
-        <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'avatar_image']); ?>
+        <?= Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'avatar_image']) ?>
 
-        <?php if ($user->id == Yii::$app->user->id) : ?>
+        <?php if ($user->getId() === Yii::$app->user->getId()) : ?>
 
             <div class="block_for_buttons_avatar_image">
 
-                <div class="container_link_button_avatar_image"><?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
+                <div class="container_link_button_avatar_image">
+                    <?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?>
+                </div>
 
-                <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image',]);?></div>
+                <div class="container_link_button_avatar_image">
+                    <?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image']) ?>
+                </div>
 
-                <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/client/profile/delete-avatar', 'id' => $avatarForm->userId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
+                <div class="container_link_button_avatar_image">
+                    <?= Html::a('Удалить фотографию', Url::to(['/client/profile/delete-avatar', 'id' => $avatarForm->getUserId()]), ['class' => 'delete_image link_button_avatar_image']) ?>
+                </div>
 
             </div>
 
@@ -29,13 +47,13 @@ use yii\widgets\ActiveForm;
 
     <?php else : ?>
 
-        <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']); ?>
+        <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']) ?>
 
-        <?php if ($user->id == Yii::$app->user->id) : ?>
+        <?php if ($user->getId() === Yii::$app->user->getId()) : ?>
 
             <div class="block_for_buttons_avatar_image">
 
-                <div class="container_link_button_avatar_image"><?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
+                <div class="container_link_button_avatar_image"><?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?></div>
 
             </div>
 
@@ -51,8 +69,8 @@ use yii\widgets\ActiveForm;
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-    <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']); ?>
-    <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput(); ?>
+    <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']) ?>
+    <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput() ?>
 
     <?php ActiveForm::end(); ?>
 
@@ -63,53 +81,94 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
 
-        <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
+        <?php if ($user->getId() === Yii::$app->user->getId()) : ?>
 
-        <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
+            <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;">
+                            <?= date('d.m.Y', $user->getCreatedAt()) ?>
+                        </span></div>
 
-        <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
+            <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;">
+                            <?= date('d.m.Y', $user->getUpdatedAt()) ?>
+                        </span></div>
 
-            <?php if ($user['status'] == User::STATUS_ACTIVE) : ?>
-                <span style="padding-left: 10px;">Активирован</span>
-            <?php elseif ($user['status'] == User::STATUS_NOT_ACTIVE) : ?>
-                <span style="padding-left: 10px;">Не активирован</span>
-            <?php elseif ($user['status'] == User::STATUS_DELETED) : ?>
-                <span style="padding-left: 10px;">Заблокирован</span>
-            <?php endif; ?>
+            <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
 
-        </div>
+                <?php if ($user->getStatus() === User::STATUS_ACTIVE) : ?>
+                    <span style="padding-left: 10px;">Активирован</span>
+                <?php elseif ($user->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
+                    <span style="padding-left: 10px;">Не активирован</span>
+                <?php elseif ($user->getStatus() === User::STATUS_DELETED) : ?>
+                    <span style="padding-left: 10px;">Заблокирован</span>
+                <?php endif; ?>
+
+            </div>
+
+        <?php else : ?>
+
+            <div class="col-md-12">
+                <div class="user_is_online">
+                    <?php if ($user->checkOnline === true) : ?>
+                        Пользователь сейчас Online
+                    <?php elseif(is_string($user->checkOnline)) : ?>
+                        Пользователь был в сети <?= $user->checkOnline ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;">
+                            <?= date('d.m.Y', $user->getCreatedAt()) ?>
+                        </span></div>
+
+            <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;">
+                            <?= date('d.m.Y', $user->getUpdatedAt()) ?>
+                        </span></div>
+
+            <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
+
+                <?php if ($user->getStatus() === User::STATUS_ACTIVE) : ?>
+                    <span style="padding-left: 10px;">Активирован</span>
+                <?php elseif ($user->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
+                    <span style="padding-left: 10px;">Не активирован</span>
+                <?php elseif ($user->getStatus() === User::STATUS_DELETED) : ?>
+                    <span style="padding-left: 10px;">Заблокирован</span>
+                <?php endif; ?>
+
+            </div>
+
+        <?php endif; ?>
 
     </div>
 
-    <div class="view_user_form row">
 
-        <?php $form = ActiveForm::begin([
-            'options' => ['class' => 'g-py-15'],
-            'errorCssClass' => 'u-has-error-v1',
-            'successCssClass' => 'u-has-success-v1-1',
-        ]); ?>
+    <?php if ($user->getId() === Yii::$app->user->getId()) : ?>
 
-        <div class="col-md-6">
-            <?= $form->field($user, 'email', [
-                'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-            ])->textInput([
-                'maxlength' => true,
-                'readonly' => true,
-                'class' => 'style_form_field_respond form-control',
+        <div class="view_user_form row">
+
+            <?php $form = ActiveForm::begin([
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
-        </div>
 
-        <div class="col-md-6">
-            <?= $form->field($user, 'username', [
-                'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
-            ])->textInput([
-                'maxlength' => true,
-                'readonly' => true,
-                'class' => 'style_form_field_respond form-control',
-            ]); ?>
-        </div>
+            <div class="col-md-6">
+                <?= $form->field($user, 'email', [
+                    'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'readonly' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]) ?>
+            </div>
 
-        <?php if ($user->id == Yii::$app->user->id) : ?>
+            <div class="col-md-6">
+                <?= $form->field($user, 'username', [
+                    'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'readonly' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]) ?>
+            </div>
 
             <div class="col-md-6">
                 <?= Html::button('Редактировать профиль', [
@@ -125,7 +184,7 @@ use yii\widgets\ActiveForm;
                         'border-radius' => '8px',
                         'margin-top' => '35px',
                     ]
-                ])?>
+                ]) ?>
             </div>
 
             <div class="col-md-6">
@@ -143,66 +202,100 @@ use yii\widgets\ActiveForm;
                         'border-radius' => '8px',
                         'margin-top' => '35px',
                     ],
-                ]);?>
+                ]) ?>
             </div>
 
-        <?php endif; ?>
+            <?php ActiveForm::end(); ?>
 
-        <?php ActiveForm::end(); ?>
+        </div>
+
+    <?php else : ?>
+
+        <div class="view_user_form row" style="padding-top: 15px;">
+
+            <?php $form = ActiveForm::begin([
+                'options' => ['class' => 'g-py-15'],
+                'errorCssClass' => 'u-has-error-v1',
+                'successCssClass' => 'u-has-success-v1-1',
+            ]); ?>
+
+            <div class="col-md-6">
+                <?= $form->field($user, 'email', [
+                    'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'readonly' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]) ?>
+            </div>
+
+            <div class="col-md-6">
+                <?= $form->field($user, 'username', [
+                    'template' => '<div style="padding-left: 10px;">{label}</div><div>{input}</div>'
+                ])->textInput([
+                    'maxlength' => true,
+                    'readonly' => true,
+                    'class' => 'style_form_field_respond form-control',
+                ]) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
 
 
-        <?php if (User::isUserMainAdmin(Yii::$app->user->identity['username']) ||  User::isUserDev(Yii::$app->user->identity['username'])) :?>
+            <?php if (User::isUserAdminCompany(Yii::$app->user->identity['username'])) :?>
 
-            <?php if ($count_users > 0) : ?>
+                <?php if ($count_users > 0) : ?>
 
-                <div class="col-md-4 text-center" style="margin-top: 37px; font-weight: 700; font-size: 24px;">Администрирование:</div>
+                    <div class="col-md-4 text-center" style="margin-top: 22px; font-weight: 700; font-size: 24px;">Администрирование:</div>
 
-                <div class="col-md-4">
-                    <?= Html::a('<div class="text-center">Пользователи - ' . $count_users . '</div>',
-                        Url::to(['/client/users/group', 'id' => $user['id']]), [
-                            'class' => 'btn btn-default',
-                            'style' => [
-                                'color' => '#FFFFFF',
-                                'background' => '#707F99',
-                                'padding' => '0 7px',
-                                'width' => '100%',
-                                'height' => '40px',
-                                'font-size' => '24px',
-                                'border-radius' => '8px',
-                                'margin-top' => '35px',
-                            ]
-                        ])?>
-                </div>
+                    <div class="col-md-4">
+                        <?= Html::a('<div class="text-center">Пользователи - ' . $count_users . '</div>',
+                            Url::to(['/client/users/group', 'id' => $user->getId()]), [
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'padding' => '0 7px',
+                                    'width' => '100%',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                    'margin-top' => '20px',
+                                ]
+                            ]) ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <?= Html::a( '<div class="text-center">Проекты - ' . $countProjects . '</div>',
-                        Url::to(['/client/projects/group', 'id' => $user['id']]), [
-                            'class' => 'btn btn-default',
-                            'style' => [
-                                'color' => '#FFFFFF',
-                                'background' => '#707F99',
-                                'padding' => '0 7px',
-                                'width' => '100%',
-                                'height' => '40px',
-                                'font-size' => '24px',
-                                'border-radius' => '8px',
-                                'margin-top' => '35px',
-                            ]
-                        ]);?>
-                </div>
+                    <div class="col-md-4">
+                        <?= Html::a( '<div class="text-center">Проекты - ' . $countProjects . '</div>',
+                            Url::to(['/client/projects/group', 'id' => $user->getId()]), [
+                                'class' => 'btn btn-default',
+                                'style' => [
+                                    'color' => '#FFFFFF',
+                                    'background' => '#707F99',
+                                    'padding' => '0 7px',
+                                    'width' => '100%',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                    'margin-top' => '20px',
+                                ]
+                            ]) ?>
+                    </div>
+
+                <?php endif; ?>
 
             <?php endif; ?>
 
-        <?php endif; ?>
+        </div>
 
+    <?php endif; ?>
 
-    </div>
 
     <div class="update_user_form row">
 
         <?php $form = ActiveForm::begin([
             'id' => 'update_data_profile',
-            'action' => Url::to(['/client/profile/update-profile', 'id' => $profile->id]),
+            'action' => Url::to(['/client/profile/update-profile', 'id' => $profile->getId()]),
             'options' => ['class' => 'g-py-15'],
             'errorCssClass' => 'u-has-error-v1',
             'successCssClass' => 'u-has-success-v1-1',
@@ -217,7 +310,7 @@ use yii\widgets\ActiveForm;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-6">
@@ -230,7 +323,7 @@ use yii\widgets\ActiveForm;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Введите от 3 до 32 символов',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-6">
@@ -246,7 +339,7 @@ use yii\widgets\ActiveForm;
                     'border-radius' => '8px',
                     'margin-top' => '35px',
                 ]
-            ])?>
+            ]) ?>
         </div>
 
         <div class="col-md-6">
@@ -263,7 +356,7 @@ use yii\widgets\ActiveForm;
                     'border-radius' => '8px',
                     'margin-top' => '35px',
                 ],
-            ]);?>
+            ]) ?>
         </div>
 
         <?php ActiveForm::end(); ?>
@@ -274,8 +367,8 @@ use yii\widgets\ActiveForm;
 
         <div class="row change_password_content_data_user">
 
-            <div class="col-lg-6"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->username; ?></span></div>
-            <div class="col-lg-6"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->email; ?></span></div>
+            <div class="col-lg-6"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->getUsername() ?></span></div>
+            <div class="col-lg-6"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->getEmail() ?></span></div>
 
         </div>
 
@@ -283,7 +376,7 @@ use yii\widgets\ActiveForm;
 
             <?php $form = ActiveForm::begin([
                 'id' => 'form_change_password_user',
-                'action' => Url::to(['/client/profile/change-password', 'id' => $user->id]),
+                'action' => Url::to(['/client/profile/change-password', 'id' => $user->getId()]),
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -362,7 +455,7 @@ use yii\widgets\ActiveForm;
                         'border-radius' => '8px',
                         'margin-top' => '35px',
                     ],
-                ]);?>
+                ]) ?>
             </div>
 
             <?php ActiveForm::end(); ?>

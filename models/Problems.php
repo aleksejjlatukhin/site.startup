@@ -16,23 +16,33 @@ use yii\helpers\FileHelper;
  * Class Problems
  * @package app\models
  *
- * @property int $id                                Идентификатор записи в таб. problems
- * @property int $basic_confirm_id                  Идентификатор записи в таб. confirm_segment
- * @property int $segment_id                        Идентификатор записи в таб. segments
- * @property int $project_id                        Идентификатор записи в таб. projects
- * @property string $title                          Сформированное системой название проблемы
- * @property string $description                    Описание проблемы
- * @property int $indicator_positive_passage        Показатель положительного прохождения теста
- * @property int $created_at                        Дата создания проблемы
- * @property int $updated_at                        Дата обновления проблемы
- * @property int $time_confirm                      Дата подверждения проблемы
- * @property int $exist_confirm                     Параметр факта подтверждения проблемы
- * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property int $id                                                        Идентификатор записи в таб. problems
+ * @property int $basic_confirm_id                                          Идентификатор записи в таб. confirm_segment
+ * @property int $segment_id                                                Идентификатор записи в таб. segments
+ * @property int $project_id                                                Идентификатор записи в таб. projects
+ * @property string $title                                                  Сформированное системой название проблемы
+ * @property string $description                                            Описание проблемы
+ * @property int $indicator_positive_passage                                Показатель положительного прохождения теста
+ * @property int $created_at                                                Дата создания проблемы
+ * @property int $updated_at                                                Дата обновления проблемы
+ * @property int $time_confirm                                              Дата подверждения проблемы
+ * @property int $exist_confirm                                             Параметр факта подтверждения проблемы
+ * @property string $enable_expertise                                       Параметр разрешения на экспертизу по даному этапу
+ * @property PropertyContainer $propertyContainer                           Свойство для реализации шаблона 'контейнер свойств'
+ *
+ * @property Gcps[] $gcps                                                   Ценностные предложения
+ * @property Mvps[] $mvps                                                   Mvp-продукты
+ * @property BusinessModel[] $businessModels                                Бизнес-модели
+ * @property ConfirmProblem $confirm                                        Подтверждение проблемы
+ * @property Segments $segment                                              Сегмент
+ * @property Projects $project                                              Проект
+ * @property RespondsSegment[] $respondsAgents                              Представители сегмента
+ * @property ExpectedResultsInterviewConfirmProblem[] $expectedResults      Вопросы для проверки и ответы на них создаются на этапе генерации проблем сегмента
  */
 class Problems extends ActiveRecord
 {
 
-    const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
+    public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
     public $propertyContainer;
 
@@ -40,7 +50,7 @@ class Problems extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'problems';
     }
@@ -48,21 +58,22 @@ class Problems extends ActiveRecord
 
     /**
      * Problems constructor.
+     *
      * @param array $config
      */
     public function __construct($config = [])
     {
-        $this->propertyContainer = new PropertyContainer();
-
+        $this->setPropertyContainer();
         parent::__construct($config);
     }
 
 
     /**
      * Получить все объекты Gcp данной проблемы
+     *
      * @return ActiveQuery
      */
-    public function getGcps()
+    public function getGcps(): ActiveQuery
     {
         return $this->hasMany(Gcps::class, ['problem_id' => 'id']);
     }
@@ -70,9 +81,10 @@ class Problems extends ActiveRecord
 
     /**
      * Получить все объекты Mvp данной проблемы
+     *
      * @return ActiveQuery
      */
-    public function getMvps()
+    public function getMvps(): ActiveQuery
     {
         return $this->hasMany(Mvps::class, ['problem_id' => 'id']);
     }
@@ -80,9 +92,10 @@ class Problems extends ActiveRecord
 
     /**
      * Получить все бизнес-модели данной проблемы
+     *
      * @return ActiveQuery
      */
-    public function getBusinessModels ()
+    public function getBusinessModels(): ActiveQuery
     {
         return $this->hasMany(BusinessModel::class, ['problem_id' => 'id']);
     }
@@ -90,9 +103,10 @@ class Problems extends ActiveRecord
 
     /**
      * Получить объект подтверждения данной проблемы
+     *
      * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmProblem::class, ['problem_id' => 'id']);
     }
@@ -100,51 +114,36 @@ class Problems extends ActiveRecord
 
     /**
      * Получить объект текущего сегмента
+     *
      * @return ActiveQuery
      */
-    public function getSegment()
+    public function getSegment(): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
 
 
     /**
-     * @return Segments|null
-     */
-    public function findSegment()
-    {
-        return Segments::findOne($this->getSegmentId());
-    }
-
-
-    /**
      * Получить объект текущего проекта
+     *
      * @return ActiveQuery
      */
-    public function getProject ()
+    public function getProject (): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
 
 
     /**
-     * @return Projects|null
-     */
-    public function findProject()
-    {
-        return Projects::findOne($this->getProjectId());
-    }
-
-
-    /**
      * Получить представителей сегмента
+     *
      * @return array|ActiveRecord[]
      */
-    public function getRespondsAgents()
+    public function getRespondsAgents(): array
     {
         return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->basic_confirm_id, 'interview_confirm_segment.status' => '1'])->all();
+            ->where(['confirm_id' => $this->getBasicConfirmId(), 'interview_confirm_segment.status' => '1'])->all();
     }
 
 
@@ -154,7 +153,7 @@ class Problems extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getExpectedResults()
+    public function getExpectedResults(): ActiveQuery
     {
         return $this->hasMany(ExpectedResultsInterviewConfirmProblem::class, ['problem_id' => 'id']);
     }
@@ -165,11 +164,11 @@ class Problems extends ActiveRecord
      *
      * @return string
      */
-    public function getListExpectedResultsInterview()
+    public function getListExpectedResultsInterview(): string
     {
         $str = ''; $n = 1;
         foreach ($this->expectedResults as $expectedResult) {
-            $str .= '<b>' . $n . '.</b> ' . $expectedResult->question . ' (' . $expectedResult->answer . ') </br>';
+            $str .= '<b>' . $n . '.</b> ' . $expectedResult->getQuestion() . ' (' . $expectedResult->getAnswer() . ') </br>';
             $n++;
         }
         return $str;
@@ -179,29 +178,29 @@ class Problems extends ActiveRecord
     /**
      * @return array
      */
-    public static function getValuesForSelectIndicatorPositivePassage()
+    public static function getValuesForSelectIndicatorPositivePassage(): array
     {
         return [
-            '5' => 'Показатель положительного прохождения теста - 5%',
-            '10' => 'Показатель положительного прохождения теста - 10%',
-            '15' => 'Показатель положительного прохождения теста - 15%',
-            '20' => 'Показатель положительного прохождения теста - 20%',
-            '25' => 'Показатель положительного прохождения теста - 25%',
-            '30' => 'Показатель положительного прохождения теста - 30%',
-            '35' => 'Показатель положительного прохождения теста - 35%',
-            '40' => 'Показатель положительного прохождения теста - 40%',
-            '45' => 'Показатель положительного прохождения теста - 45%',
-            '50' => 'Показатель положительного прохождения теста - 50%',
-            '55' => 'Показатель положительного прохождения теста - 55%',
-            '60' => 'Показатель положительного прохождения теста - 60%',
-            '65' => 'Показатель положительного прохождения теста - 65%',
-            '70' => 'Показатель положительного прохождения теста - 70%',
-            '75' => 'Показатель положительного прохождения теста - 75%',
-            '80' => 'Показатель положительного прохождения теста - 80%',
-            '85' => 'Показатель положительного прохождения теста - 85%',
-            '90' => 'Показатель положительного прохождения теста - 90%',
-            '95' => 'Показатель положительного прохождения теста - 95%',
-            '100' => 'Показатель положительного прохождения теста - 100%',
+            5 => 'Показатель положительного прохождения теста - 5%',
+            10 => 'Показатель положительного прохождения теста - 10%',
+            15 => 'Показатель положительного прохождения теста - 15%',
+            20 => 'Показатель положительного прохождения теста - 20%',
+            25 => 'Показатель положительного прохождения теста - 25%',
+            30 => 'Показатель положительного прохождения теста - 30%',
+            35 => 'Показатель положительного прохождения теста - 35%',
+            40 => 'Показатель положительного прохождения теста - 40%',
+            45 => 'Показатель положительного прохождения теста - 45%',
+            50 => 'Показатель положительного прохождения теста - 50%',
+            55 => 'Показатель положительного прохождения теста - 55%',
+            60 => 'Показатель положительного прохождения теста - 60%',
+            65 => 'Показатель положительного прохождения теста - 65%',
+            70 => 'Показатель положительного прохождения теста - 70%',
+            75 => 'Показатель положительного прохождения теста - 75%',
+            80 => 'Показатель положительного прохождения теста - 80%',
+            85 => 'Показатель положительного прохождения теста - 85%',
+            90 => 'Показатель положительного прохождения теста - 90%',
+            95 => 'Показатель положительного прохождения теста - 95%',
+            100 => 'Показатель положительного прохождения теста - 100%',
         ];
     }
 
@@ -209,7 +208,7 @@ class Problems extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['basic_confirm_id', 'title'], 'required'],
@@ -228,7 +227,7 @@ class Problems extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'title' => 'Название ГПС',
@@ -242,7 +241,7 @@ class Problems extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -271,7 +270,7 @@ class Problems extends ActiveRecord
         $this->on(self::EVENT_AFTER_DELETE, function (){
             $this->project->touch('updated_at');
             $this->project->user->touch('updated_at');
-            ExpectedResultsInterviewConfirmProblem::deleteAll(['problem_id' => $this->id]);
+            ExpectedResultsInterviewConfirmProblem::deleteAll(['problem_id' => $this->getId()]);
         });
 
         parent::init();
@@ -279,10 +278,10 @@ class Problems extends ActiveRecord
 
 
     /**
-     * Удаление проблемы и связанных данных
-     * @throws Throwable
+     * @return false|int
      * @throws ErrorException
      * @throws StaleObjectException
+     * @throws Throwable
      */
     public function deleteStage ()
     {
@@ -297,32 +296,36 @@ class Problems extends ActiveRecord
             $responds = $confirm->responds;
             foreach ($responds as $respond) {
 
-                InterviewConfirmProblem::deleteAll(['respond_id' => $respond->id]);
-                AnswersQuestionsConfirmProblem::deleteAll(['respond_id' => $respond->id]);
+                InterviewConfirmProblem::deleteAll(['respond_id' => $respond->getId()]);
+                AnswersQuestionsConfirmProblem::deleteAll(['respond_id' => $respond->getId()]);
             }
 
-            QuestionsConfirmProblem::deleteAll(['confirm_id' => $confirm->id]);
-            RespondsProblem::deleteAll(['confirm_id' => $confirm->id]);
+            QuestionsConfirmProblem::deleteAll(['confirm_id' => $confirm->getId()]);
+            RespondsProblem::deleteAll(['confirm_id' => $confirm->getId()]);
 
             $confirm->delete();
         }
 
         // Удаление директории проблемы
-        $problemPathDelete = UPLOAD.'/user-'.$this->project->user->id.'/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.'/problems/problem-'.$this->id;
-        if (file_exists($problemPathDelete)) FileHelper::removeDirectory($problemPathDelete);
+        $problemPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().'/problems/problem-'.$this->getId();
+        if (file_exists($problemPathDelete)) {
+            FileHelper::removeDirectory($problemPathDelete);
+        }
 
         // Удаление кэша для форм проблемы
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->id.'/projects/project-'.$this->project->id.'/segments/segment-'.$this->segment->id.'/problems/problem-'.$this->id;
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().'/problems/problem-'.$this->getId();
+        if (file_exists($cachePathDelete)) {
+            FileHelper::removeDirectory($cachePathDelete);
+        }
 
         // Удаление проблемы
-        $this->delete();
+        return $this->delete();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -330,7 +333,7 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getBasicConfirmId()
+    public function getBasicConfirmId(): int
     {
         return $this->basic_confirm_id;
     }
@@ -338,7 +341,7 @@ class Problems extends ActiveRecord
     /**
      * @param int $basic_confirm_id
      */
-    public function setBasicConfirmId($basic_confirm_id)
+    public function setBasicConfirmId(int $basic_confirm_id): void
     {
         $this->basic_confirm_id = $basic_confirm_id;
     }
@@ -346,7 +349,7 @@ class Problems extends ActiveRecord
     /**
      * @param int $id
      */
-    public function setSegmentId($id)
+    public function setSegmentId(int $id): void
     {
         $this->segment_id = $id;
     }
@@ -354,7 +357,7 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getSegmentId()
+    public function getSegmentId(): int
     {
         return $this->segment_id;
     }
@@ -362,7 +365,7 @@ class Problems extends ActiveRecord
     /**
      * @param int $id
      */
-    public function setProjectId($id)
+    public function setProjectId(int $id): void
     {
         $this->project_id = $id;
     }
@@ -370,24 +373,24 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getConfirmSegmentId()
+    public function getConfirmSegmentId(): int
     {
         return $this->basic_confirm_id;
     }
 
     /**
      * Параметр разрешения экспертизы
-     * @return int
+     * @return string
      */
-    public function getEnableExpertise()
+    public function getEnableExpertise(): string
     {
         return $this->enable_expertise;
     }
@@ -395,7 +398,7 @@ class Problems extends ActiveRecord
     /**
      *  Установить разрешение на экспертизу
      */
-    public function setEnableExpertise()
+    public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
     }
@@ -403,7 +406,7 @@ class Problems extends ActiveRecord
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -411,7 +414,7 @@ class Problems extends ActiveRecord
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -419,7 +422,7 @@ class Problems extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -427,7 +430,7 @@ class Problems extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -435,7 +438,7 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getIndicatorPositivePassage()
+    public function getIndicatorPositivePassage(): int
     {
         return $this->indicator_positive_passage;
     }
@@ -443,7 +446,7 @@ class Problems extends ActiveRecord
     /**
      * @param int $indicator_positive_passage
      */
-    public function setIndicatorPositivePassage($indicator_positive_passage)
+    public function setIndicatorPositivePassage(int $indicator_positive_passage): void
     {
         $this->indicator_positive_passage = $indicator_positive_passage;
     }
@@ -451,7 +454,7 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -459,31 +462,31 @@ class Problems extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTimeConfirm()
+    public function getTimeConfirm(): ?int
     {
         return $this->time_confirm;
     }
 
     /**
-     * @param int $time_confirm
+     * @param int|null $time_confirm
      */
-    public function setTimeConfirm($time_confirm)
+    public function setTimeConfirm(int $time_confirm = null): void
     {
-        $this->time_confirm = $time_confirm;
+        $time_confirm ? $this->time_confirm = $time_confirm : $this->time_confirm = time();
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getExistConfirm()
+    public function getExistConfirm(): ?int
     {
         return $this->exist_confirm;
     }
@@ -491,8 +494,24 @@ class Problems extends ActiveRecord
     /**
      * @param int $exist_confirm
      */
-    public function setExistConfirm($exist_confirm)
+    public function setExistConfirm(int $exist_confirm): void
     {
         $this->exist_confirm = $exist_confirm;
+    }
+
+    /**
+     * @return PropertyContainer
+     */
+    public function getPropertyContainer(): PropertyContainer
+    {
+        return $this->propertyContainer;
+    }
+
+    /**
+     *
+     */
+    public function setPropertyContainer(): void
+    {
+        $this->propertyContainer = new PropertyContainer();
     }
 }

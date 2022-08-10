@@ -27,7 +27,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['count_respond', 'count_positive'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
@@ -49,7 +49,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -57,7 +57,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -65,7 +65,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @return int
      */
-    public function getCountRespond()
+    public function getCountRespond(): int
     {
         return $this->count_respond;
     }
@@ -73,7 +73,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @param int $count_respond
      */
-    public function setCountRespond($count_respond)
+    public function setCountRespond(int $count_respond): void
     {
         $this->count_respond = $count_respond;
     }
@@ -81,7 +81,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @return int
      */
-    public function getCountPositive()
+    public function getCountPositive(): int
     {
         return $this->count_positive;
     }
@@ -89,7 +89,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @param int $count_positive
      */
-    public function setCountPositive($count_positive)
+    public function setCountPositive(int $count_positive): void
     {
         $this->count_positive = $count_positive;
     }
@@ -97,7 +97,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      * @return EditorCountResponds
      */
-    public function getEditorCountRespond()
+    public function getEditorCountRespond(): EditorCountResponds
     {
         return $this->_editorCountRespond;
     }
@@ -105,7 +105,7 @@ abstract class FormUpdateConfirm extends Model
     /**
      *
      */
-    public function setEditorCountRespond()
+    public function setEditorCountRespond(): void
     {
         $this->_editorCountRespond = new EditorCountResponds();
     }

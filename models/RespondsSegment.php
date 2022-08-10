@@ -3,10 +3,8 @@
 namespace app\models;
 
 use app\models\interfaces\RespondsInterface;
-use Throwable;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
-use yii\db\StaleObjectException;
 use yii\helpers\FileHelper;
 use yii\db\ActiveRecord;
 
@@ -16,13 +14,17 @@ use yii\db\ActiveRecord;
  * Class RespondsSegment
  * @package app\models
  *
- * @property int $id                        Идентификатор записи в таб. responds_segment
- * @property int $confirm_id                Идентификатор записи в таб. confirm_segment
- * @property string $name                   ФИО респондента
- * @property string $info_respond           Данные респондента
- * @property string $email                  Эл.почта респондента
- * @property int $date_plan                 Плановая дата интервью
- * @property string $place_interview        Место проведения интервью
+ * @property int $id                                    Идентификатор записи в таб. responds_segment
+ * @property int $confirm_id                            Идентификатор записи в таб. confirm_segment
+ * @property string $name                               ФИО респондента
+ * @property string $info_respond                       Данные респондента
+ * @property string $email                              Эл.почта респондента
+ * @property int $date_plan                             Плановая дата интервью
+ * @property string $place_interview                    Место проведения интервью
+ *
+ * @property ConfirmSegment $confirm                    Подтверждение сегмента
+ * @property InterviewConfirmSegment $interview         Информация о проведении интервью
+ * @property AnswersQuestionsConfirmSegment[] $answers  Ответы на вопросы интервью
  */
 class RespondsSegment extends ActiveRecord implements RespondsInterface
 {
@@ -31,7 +33,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'responds_segment';
     }
@@ -39,28 +41,21 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
 
     /**
      * Получить модель подтверждения
-     * @return mixed|ActiveQuery
+     *
+     * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmSegment::class, ['id' => 'confirm_id']);
     }
 
 
     /**
-     * @return ConfirmSegment|null
-     */
-    public function findConfirm()
-    {
-        return ConfirmSegment::findOne($this->getConfirmId());
-    }
-
-
-    /**
      * Получить интевью респондента
-     * @return mixed|ActiveQuery
+     *
+     * @return ActiveQuery
      */
-    public function getInterview()
+    public function getInterview(): ActiveQuery
     {
         return $this->hasOne(InterviewConfirmSegment::class, ['respond_id' => 'id']);
     }
@@ -68,9 +63,10 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
 
     /**
      * Получить ответы респондента на вопросы
-     * @return mixed|ActiveQuery
+     *
+     * @return ActiveQuery
      */
-    public function getAnswers()
+    public function getAnswers(): ActiveQuery
     {
         return $this->hasMany(AnswersQuestionsConfirmSegment::class, ['respond_id' => 'id']);
     }
@@ -78,9 +74,9 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    public function setParams(array $params)
+    public function setParams(array $params): void
     {
         $this->setInfoRespond($params['info_respond']);
         $this->setPlaceInterview($params['place_interview']);
@@ -91,7 +87,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['confirm_id', 'name'], 'required'],
@@ -108,7 +104,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Фамилия, имя, отчество',
@@ -144,38 +140,40 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
 
 
     /**
-     * Удаление связанных данных
-     * по событию EVENT_AFTER_DELETE
-     *
-     * @throws Throwable
+     * @return void
      * @throws ErrorException
-     * @throws StaleObjectException
      */
-    private function deleteDataRespond()
+    private function deleteDataRespond(): void
     {
-        $interview = InterviewConfirmSegment::findOne(['respond_id' => $this->getId()]);
-        $answers = AnswersQuestionsConfirmSegment::findAll(['respond_id' => $this->getId()]);
         $confirm = ConfirmSegment::findOne($this->getConfirmId());
         $segment = Segments::findOne($confirm->getSegmentId());
         $project = Projects::findOne($segment->getProjectId());
         $user = User::findOne($project->getUserId());
 
         //Удаление интервью респондента
-        if ($interview) $interview->delete();
+        if (InterviewConfirmSegment::findOne(['respond_id' => $this->getId()])) {
+            InterviewConfirmSegment::deleteAll(['respond_id' => $this->getId()]);
+        }
         //Удаление ответов респондента на вопросы интервью
-        foreach ($answers as $answer) $answer->delete();
+        if (AnswersQuestionsConfirmSegment::findAll(['respond_id' => $this->getId()])) {
+            AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $this->getId()]);
+        }
         //Удаление дирректории респондента
         $del_dir = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/interviews/respond-'.$this->getId();
-        if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+        if (file_exists($del_dir)) {
+            FileHelper::removeDirectory($del_dir);
+        }
         //Удаление кэша для форм респондента
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm/interviews/respond-'.$this->getId();
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        if (file_exists($cachePathDelete)) {
+            FileHelper::removeDirectory($cachePathDelete);
+        }
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -183,7 +181,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param int $confirmId
      */
-    public function setConfirmId($confirmId)
+    public function setConfirmId(int $confirmId): void
     {
         $this->confirm_id = $confirmId;
     }
@@ -192,7 +190,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -201,7 +199,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -210,7 +208,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -218,7 +216,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getInfoRespond()
+    public function getInfoRespond(): string
     {
         return $this->info_respond;
     }
@@ -226,7 +224,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param string $info_respond
      */
-    public function setInfoRespond($info_respond)
+    public function setInfoRespond(string $info_respond): void
     {
         $this->info_respond = $info_respond;
     }
@@ -234,7 +232,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -242,15 +240,15 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDatePlan()
+    public function getDatePlan(): ?int
     {
         return $this->date_plan;
     }
@@ -258,7 +256,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param int $datePlan
      */
-    public function setDatePlan($datePlan)
+    public function setDatePlan(int $datePlan): void
     {
         $this->date_plan = $datePlan;
     }
@@ -266,7 +264,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getPlaceInterview()
+    public function getPlaceInterview(): string
     {
         return $this->place_interview;
     }
@@ -274,7 +272,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     /**
      * @param string $place_interview
      */
-    public function setPlaceInterview($place_interview)
+    public function setPlaceInterview(string $place_interview): void
     {
         $this->place_interview = $place_interview;
     }

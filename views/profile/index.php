@@ -1,5 +1,8 @@
 <?php
 
+use app\models\forms\AvatarForm;
+use app\models\forms\PasswordChangeForm;
+use app\models\forms\ProfileForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
@@ -7,6 +10,13 @@ use yii\widgets\ActiveForm;
 
 $this->title = 'Данные пользователя';
 $this->registerCssFile('@web/css/profile-style.css');
+
+/**
+ * @var User $user
+ * @var ProfileForm $profile
+ * @var PasswordChangeForm $passwordChangeForm
+ * @var AvatarForm $avatarForm
+ */
 ?>
 
 <div class="user-index">
@@ -15,23 +25,23 @@ $this->registerCssFile('@web/css/profile-style.css');
 
         <div class="row profile_menu">
 
-            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->id], [
+            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->id], [
+            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->id], [
+            <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->id], [
+            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->id], [
+            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
@@ -46,17 +56,17 @@ $this->registerCssFile('@web/css/profile-style.css');
 
             <?php if ($user['avatar_image']) : ?>
 
-                <?= Html::img('/web/upload/user-'.$user->id.'/avatar/'.$user->avatar_image, ['class' => 'avatar_image']); ?>
+                <?= Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'avatar_image']) ?>
 
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
                     <div class="block_for_buttons_avatar_image">
 
-                        <div class="container_link_button_avatar_image"><?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
+                        <div class="container_link_button_avatar_image"><?= Html::a('Обновить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?></div>
 
-                        <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image',]);?></div>
+                        <div class="container_link_button_avatar_image"><?= Html::a('Редактировать миниатюру', '#', ['class' => 'update_image link_button_avatar_image']) ?></div>
 
-                        <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/profile/delete-avatar', 'id' => $avatarForm->userId]), ['class' => 'delete_image link_button_avatar_image',]);?></div>
+                        <div class="container_link_button_avatar_image"><?= Html::a('Удалить фотографию', Url::to(['/profile/delete-avatar', 'id' => $avatarForm->getUserId()]), ['class' => 'delete_image link_button_avatar_image']) ?></div>
 
                     </div>
 
@@ -64,13 +74,13 @@ $this->registerCssFile('@web/css/profile-style.css');
 
             <?php else : ?>
 
-                <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']); ?>
+                <?= Html::img('/images/avatar/default.jpg',['class' => 'avatar_image']) ?>
 
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
                     <div class="block_for_buttons_avatar_image">
 
-                        <div class="container_link_button_avatar_image"><?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image',]);?></div>
+                        <div class="container_link_button_avatar_image"><?= Html::a('Добавить фотографию', '#', ['class' => 'add_image link_button_avatar_image']) ?></div>
 
                     </div>
 
@@ -86,8 +96,8 @@ $this->registerCssFile('@web/css/profile-style.css');
                 'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
 
-            <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']); ?>
-            <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput(); ?>
+            <?= $form->field($avatarForm, 'loadImage', ['template' => '<div style="display:none;">{input}</div>'])->fileInput(['id' => 'loadImageAvatar', 'accept' => 'image/x-png,image/jpeg']) ?>
+            <?= $form->field($avatarForm, 'imageMax')->label(false)->hiddenInput() ?>
 
             <?php ActiveForm::end(); ?>
 
@@ -103,24 +113,24 @@ $this->registerCssFile('@web/css/profile-style.css');
                         <div class="user_is_online">
                             <?php if ($user->checkOnline === true) : ?>
                                 Пользователь сейчас Online
-                            <?php elseif($user->checkOnline !== true && $user->checkOnline !== false) : ?>
-                                Пользователь был в сети <?= $user->checkOnline;?>
+                            <?php else : ?>
+                                Пользователь был в сети <?= $user->checkOnline ?>
                             <?php endif; ?>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['created_at']); ?></span></div>
+                <div class="col-lg-4"><label style="padding-left: 10px;">Дата регистрации:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user->getCreatedAt()) ?></span></div>
 
-                <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user['updated_at']); ?></span></div>
+                <div class="col-lg-4"><label style="padding-left: 10px;">Последнее изменение:</label><span style="padding-left: 10px;"><?= date('d.m.Y', $user->getUpdatedAt()) ?></span></div>
 
                 <div class="col-lg-4"><label style="padding-left: 10px;">Статус:</label>
 
-                    <?php if ($user['status'] == User::STATUS_ACTIVE) : ?>
+                    <?php if ($user->getStatus() === User::STATUS_ACTIVE) : ?>
                         <span style="padding-left: 10px;">Активирован</span>
-                    <?php elseif ($user['status'] == User::STATUS_NOT_ACTIVE) : ?>
+                    <?php elseif ($user->getStatus() === User::STATUS_NOT_ACTIVE) : ?>
                         <span style="padding-left: 10px;">Не активирован</span>
-                    <?php elseif ($user['status'] == User::STATUS_DELETED) : ?>
+                    <?php elseif ($user->getStatus() === User::STATUS_DELETED) : ?>
                         <span style="padding-left: 10px;">Заблокирован</span>
                     <?php endif; ?>
 
@@ -143,7 +153,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                         'maxlength' => true,
                         'readonly' => true,
                         'class' => 'style_form_field_respond form-control',
-                    ]); ?>
+                    ]) ?>
                 </div>
 
                 <div class="col-md-6">
@@ -153,7 +163,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                         'maxlength' => true,
                         'readonly' => true,
                         'class' => 'style_form_field_respond form-control',
-                    ]); ?>
+                    ]) ?>
                 </div>
 
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
@@ -172,7 +182,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                                 'border-radius' => '8px',
                                 'margin-top' => '35px',
                             ]
-                        ])?>
+                        ]) ?>
                     </div>
 
                     <div class="col-md-6">
@@ -190,7 +200,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                                 'border-radius' => '8px',
                                 'margin-top' => '35px',
                             ],
-                        ]);?>
+                        ]) ?>
                     </div>
 
                 <?php endif; ?>
@@ -203,7 +213,7 @@ $this->registerCssFile('@web/css/profile-style.css');
 
                 <?php $form = ActiveForm::begin([
                     'id' => 'update_data_profile',
-                    'action' => Url::to(['/profile/update-profile', 'id' => $profile->id]),
+                    'action' => Url::to(['/profile/update-profile', 'id' => $profile->getId()]),
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
@@ -218,7 +228,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]); ?>
+                    ]) ?>
                 </div>
 
                 <div class="col-md-6">
@@ -231,7 +241,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => 'Введите от 3 до 32 символов',
                         'autocomplete' => 'off'
-                    ]); ?>
+                    ]) ?>
                 </div>
 
                 <div class="col-md-6">
@@ -263,7 +273,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                             'border-radius' => '8px',
                             'margin-top' => '35px',
                         ],
-                    ]);?>
+                    ]) ?>
                 </div>
 
                 <?php ActiveForm::end(); ?>
@@ -274,8 +284,8 @@ $this->registerCssFile('@web/css/profile-style.css');
 
                 <div class="row change_password_content_data_user">
 
-                    <div class="col-lg-4"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->getUsername(); ?></span></div>
-                    <div class="col-lg-4"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->getEmail(); ?></span></div>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Логин:</label><span style="padding-left: 10px;"><?= $user->getUsername() ?></span></div>
+                    <div class="col-lg-4"><label style="padding-left: 10px;">Email:</label><span style="padding-left: 10px;"><?= $user->getEmail() ?></span></div>
 
                 </div>
 
@@ -283,7 +293,7 @@ $this->registerCssFile('@web/css/profile-style.css');
 
                     <?php $form = ActiveForm::begin([
                         'id' => 'form_change_password_user',
-                        'action' => Url::to(['/profile/change-password', 'id' => $user->id]),
+                        'action' => Url::to(['/profile/change-password', 'id' => $user->getId()]),
                         'options' => ['class' => 'g-py-15'],
                         'errorCssClass' => 'u-has-error-v1',
                         'successCssClass' => 'u-has-success-v1-1',
@@ -361,7 +371,7 @@ $this->registerCssFile('@web/css/profile-style.css');
                                 'border-radius' => '8px',
                                 'margin-top' => '35px',
                             ],
-                        ]);?>
+                        ]) ?>
                     </div>
 
                     <?php ActiveForm::end(); ?>
@@ -375,7 +385,7 @@ $this->registerCssFile('@web/css/profile-style.css');
     </div>
 
     <!--Модальные окна-->
-    <?= $this->render('modal'); ?>
+    <?= $this->render('modal') ?>
 
 </div>
 

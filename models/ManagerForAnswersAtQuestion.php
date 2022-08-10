@@ -16,33 +16,40 @@ class ManagerForAnswersAtQuestion
 
     /**
      * Создание пустого ответа для нового вопроса для каждого респондента
+     *
      * @param ConfirmationInterface $confirm
-     * @param $question_id
+     * @param int $question_id
      */
-    public function create(ConfirmationInterface $confirm, $question_id)
+    public function create(ConfirmationInterface $confirm, int $question_id): void
     {
         foreach ($confirm->responds as $respond) {
             $answer = self::getModel($confirm);
-            $answer->question_id = $question_id;
-            $answer->respond_id = $respond->id;
+            $answer->setQuestionId($question_id);
+            $answer->setRespondId($respond->getId());
             $answer->save();
         }
     }
 
 
     /**
-     * @param $confirm
+     * @param ConfirmationInterface $confirm
      * @return AnswersQuestionsConfirmGcp|AnswersQuestionsConfirmMvp|AnswersQuestionsConfirmProblem|AnswersQuestionsConfirmSegment|bool
      */
-    private static function getModel($confirm)
+    private static function getModel(ConfirmationInterface $confirm)
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new AnswersQuestionsConfirmSegment();
-        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new AnswersQuestionsConfirmProblem();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return new AnswersQuestionsConfirmGcp();
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return new AnswersQuestionsConfirmMvp();
         }
         return false;
@@ -51,31 +58,37 @@ class ManagerForAnswersAtQuestion
 
     /**
      * @param ConfirmationInterface $confirm
-     * @param $question_id
+     * @param int $question_id
      */
-    public function delete(ConfirmationInterface $confirm, $question_id)
+    public function delete(ConfirmationInterface $confirm, int $question_id): void
     {
         $class = self::getClassAnswer($confirm);
         foreach ($confirm->responds as $respond) {
-            $answer = $class::find()->where(['question_id' => $question_id, 'respond_id' => $respond->id])->one();
+            $answer = $class::find()->where(['question_id' => $question_id, 'respond_id' => $respond->getId()])->one();
             $answer->delete();
         }
     }
 
 
     /**
-     * @param $confirm
+     * @param ConfirmationInterface $confirm
      * @return bool|string
      */
-    private static function getClassAnswer($confirm)
+    private static function getClassAnswer(ConfirmationInterface $confirm)
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return AnswersQuestionsConfirmSegment::class;
-        } elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return AnswersQuestionsConfirmProblem::class;
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return AnswersQuestionsConfirmGcp::class;
-        }elseif($confirm->stage == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return AnswersQuestionsConfirmMvp::class;
         }
         return false;

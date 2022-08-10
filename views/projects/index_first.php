@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Authors;
 use yii\helpers\Html;
 use app\models\User;
 use yii\widgets\ActiveForm;
@@ -7,6 +8,11 @@ use yii\widgets\ActiveForm;
 $this->title = 'Проекты';
 $this->registerCssFile('@web/css/projects-index-style.css');
 $this->registerCssFile('@web/css/methodological-guide-style.css');
+
+/**
+ * @var User $user
+ * @var Authors $new_author
+*/
 
 ?>
 
@@ -21,9 +27,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             <div class="row container-fluid">
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->id],
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
                             ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-left']
-                        ); ?>
+                        ) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -155,7 +161,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
                         'autocomplete' => 'off'
-                    ]); ?>
+                    ]) ?>
 
                     <?= $form->field($new_author, "[0]role", [
                         'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -166,7 +172,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                         'class' => 'style_form_field_respond form-control',
                         'placeholder' => '',
                         'autocomplete' => 'off'
-                    ]); ?>
+                    ]) ?>
 
                     <?= $form->field($new_author, "[0]experience", [
                         'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -193,7 +199,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                                 'font-size' => '24px',
                                 'border-radius' => '8px',
                             ]
-                        ]); ?>
+                        ]) ?>
                     </div>
                 </div>
             </div>
@@ -203,7 +209,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
         </div>
 
         <!--Модальные окна-->
-        <?= $this->render('modal'); ?>
+        <?= $this->render('modal') ?>
 
     <?php else : ?>
 

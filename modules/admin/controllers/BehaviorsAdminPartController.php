@@ -5,14 +5,16 @@ namespace app\modules\admin\controllers;
 
 use app\controllers\AppController;
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 
 class BehaviorsAdminPartController extends AppController
 {
-    public function behaviors()
+    /**
+     * @return array[]
+     */
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -30,8 +32,7 @@ class BehaviorsAdminPartController extends AppController
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            $user = User::findOne(Yii::$app->user->id);
-                            /** @var ClientUser $clientUser */
+                            $user = User::findOne(Yii::$app->user->getId());
                             $clientUser = $user->clientUser;
                             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
                             $admin = User::findOne($clientSettings->getAdminId());

@@ -30,7 +30,7 @@ class AvatarForm extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['userId'], 'integer'],
@@ -45,7 +45,7 @@ class AvatarForm extends Model
      * @param int $userId
      * @param array $config
      */
-    public function __construct($userId, $config = [])
+    public function __construct($userId, array $config = [])
     {
         $user = User::findOne($userId);
         $this->setUserId($user->getId());
@@ -58,14 +58,16 @@ class AvatarForm extends Model
      * @throws Exception
      * @throws StaleObjectException
      */
-    public function loadMinImage()
+    public function loadMinImage(): bool
     {
         $user = User::findOne($this->getUserId());
 
         if ($_POST['imageMin']) {
 
             $path = UPLOAD . 'user-' . $this->getUserId() . '/avatar/';
-            if (!is_dir($path)) FileHelper::createDirectory($path);
+            if (!is_dir($path)) {
+                FileHelper::createDirectory($path);
+            }
 
             $str = Yii::$app->security->generateRandomString(8);
             $file = 'avatar_' . $str . '_min.png';
@@ -93,7 +95,7 @@ class AvatarForm extends Model
                 // Редактирование аватарки
                 unlink($path . $user->getAvatarImage());
                 $user->setAvatarImage($file);
-                return $user->update() ? true : false;
+                return (bool)$user->update();
             }
         }
         return false;
@@ -103,10 +105,12 @@ class AvatarForm extends Model
      * @return array
      * @throws Exception
      */
-    public function loadMaxImage()
+    public function loadMaxImage(): array
     {
         $path = UPLOAD.'user-'.$this->getUserId().'/avatar/';
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         $uploadfile = $path . $_FILES['file']['name'];
         $arr = array();
@@ -125,16 +129,20 @@ class AvatarForm extends Model
     /**
      * @return bool
      */
-    public function deleteOldAvatarImages ()
+    public function deleteOldAvatarImages (): bool
     {
         $user = User::findOne($this->getUserId());
         $path = UPLOAD . 'user-' . $user->getId() . '/avatar/';
 
-        if (is_file($path . $user->getAvatarMaxImage())) unlink($path . $user->getAvatarMaxImage());
-        if (is_file($path . $user->getAvatarImage())) unlink($path . $user->getAvatarImage());
+        if (is_file($path . $user->getAvatarMaxImage())) {
+            unlink($path . $user->getAvatarMaxImage());
+        }
+        if (is_file($path . $user->getAvatarImage())) {
+            unlink($path . $user->getAvatarImage());
+        }
 
-        $user->setAvatarMaxImage(null);
-        $user->setAvatarImage(null);
+        $user->setAvatarMaxImage();
+        $user->setAvatarImage();
         $user->save();
 
         return true;
@@ -144,7 +152,7 @@ class AvatarForm extends Model
     /**
      * @return bool
      */
-    public function deleteUnusedImage ()
+    public function deleteUnusedImage (): bool
     {
         if ($_POST['imageMax']) {
 
@@ -159,7 +167,7 @@ class AvatarForm extends Model
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->userId;
     }
@@ -167,7 +175,7 @@ class AvatarForm extends Model
     /**
      * @param int $userId
      */
-    public function setUserId($userId)
+    public function setUserId(int $userId): void
     {
         $this->userId = $userId;
     }
@@ -183,7 +191,7 @@ class AvatarForm extends Model
     /**
      * @param mixed $loadImage
      */
-    public function setLoadImage($loadImage)
+    public function setLoadImage($loadImage): void
     {
         $this->loadImage = $loadImage;
     }
@@ -191,7 +199,7 @@ class AvatarForm extends Model
     /**
      * @return string
      */
-    public function getImageMax()
+    public function getImageMax(): string
     {
         return $this->imageMax;
     }
@@ -199,7 +207,7 @@ class AvatarForm extends Model
     /**
      * @param string $imageMax
      */
-    public function setImageMax($imageMax)
+    public function setImageMax(string $imageMax): void
     {
         $this->imageMax = $imageMax;
     }

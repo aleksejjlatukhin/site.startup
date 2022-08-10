@@ -13,6 +13,6 @@ namespace app\models;
  */
 class EnableExpertise
 {
-    const ON = 1;
-    const OFF = 0;
+    public const ON = '1';
+    public const OFF = '0';
 }

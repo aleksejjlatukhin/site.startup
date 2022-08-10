@@ -5,7 +5,6 @@ namespace app\modules\expert\controllers;
 
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\User;
@@ -30,40 +29,41 @@ class ProfileController extends AppExpertController
      * @return bool
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
-        /** @var ClientUser $currentClientUser */
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['index'])) {
+        if ($action->id === 'index') {
 
-            $expert = User::findOne(Yii::$app->request->get('id'));
+            $expert = User::findOne((int)Yii::$app->request->get('id'));
 
-            if ($expert->getId() == $currentUser->getId()) {
-
-                return parent::beforeAction($action);
-
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $expert->getIdAdmin() == $currentUser->getId()) {
+            if ($expert->getId() === $currentUser->getId()) {
 
                 return parent::beforeAction($action);
 
-            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+            }
 
-                /** @var ClientUser $modelClientUser */
+            if (User::isUserAdmin($currentUser->getUsername()) && $expert->getIdAdmin() === $currentUser->getId()) {
+
+                return parent::beforeAction($action);
+
+            }
+
+            if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+
                 $modelClientUser = $expert->clientUser;
 
-                if ($currentClientUser->getClientId() == $modelClientUser->getClientId()) {
+                if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
                     return parent::beforeAction($action);
-                } elseif ($modelClientUser->findClient()->findSettings()->getAccessAdmin() == ClientSettings::ACCESS_ADMIN_TRUE) {
-                    return parent::beforeAction($action);
-                } else {
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
                 }
 
-            } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
+                    return parent::beforeAction($action);
+                }
+
             }
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
         }else{
             return parent::beforeAction($action);
         }
@@ -71,12 +71,16 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function actionIndex($id)
+    public function actionIndex(int $id): string
     {
-        $user = User::find()->with(['expertInfo', 'keywords'])->where(['id' => $id])->one();
+        /** @var User $user */
+        $user = User::find()
+            ->with(['expertInfo', 'keywords'])
+            ->where(['id' => $id])
+            ->one();
         $profile = new ProfileExpertForm($id);
         $passwordChangeForm = new PasswordChangeForm($user);
         $avatarForm = new AvatarForm($id);
@@ -91,10 +95,10 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetUserIsOnline($id)
+    public function actionGetUserIsOnline(int $id)
     {
         $user = User::findOne($id);
 
@@ -106,7 +110,9 @@ class ProfileController extends AppExpertController
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-            } elseif ($user->checkOnline !== true && $user->checkOnline !== false) {
+            }
+
+            if (is_string($user->checkOnline)) {
 
                 $response = ['user_logout' => true, 'message' => 'Пользователь был в сети ' . $user->checkOnline];
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -119,16 +125,16 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return array|bool
      */
-    public function actionUpdateProfile($id)
+    public function actionUpdateProfile(int $id)
     {
-        $model = new ProfileExpertForm($id);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
+            $model = new ProfileExpertForm($id);
 
-            if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())){
 
                 if ($model->validate()) {
 
@@ -151,14 +157,12 @@ class ProfileController extends AppExpertController
                             return $response;
 
                         }
-                        else {
 
-                            //Письмо с уведомлением не отправлено
-                            $response = ['error_send_email' => true];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-                        }
+                        //Письмо с уведомлением не отправлено
+                        $response = ['error_send_email' => true];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
                     }
 
                 } else {
@@ -187,21 +191,24 @@ class ProfileController extends AppExpertController
                 }
             }
         }
+
+        return false;
     }
 
 
     /**
-     * @param $id
-     * @return array
+     * @param int $id
+     * @return bool|string[]
      * @throws Exception
      */
-    public function actionChangePassword($id)
+    public function actionChangePassword(int $id)
     {
-        $user = User::findOne($id);
-        $model = new PasswordChangeForm($user);
+        if (Yii::$app->request->isAjax) {
 
-        if ($model->load(Yii::$app->request->post())){
-            if (Yii::$app->request->isAjax) {
+            $user = User::findOne($id);
+            $model = new PasswordChangeForm($user);
+
+            if ($model->load(Yii::$app->request->post())){
                 if ($model->validate()) {
                     if ($model->changePassword()) {
 
@@ -211,33 +218,32 @@ class ProfileController extends AppExpertController
                         return $response;
                     }
 
-                } else {
+                } elseif (!$model->validate(['currentPassword'])) {
 
-                    if (!$model->validate(['currentPassword'])) {
-
-                        $response = ['errorCurrentPassword' => 'true'];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $response = ['errorCurrentPassword' => 'true'];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
+
+        return false;
     }
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws Exception
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionLoadAvatarImage ($id)
+    public function actionLoadAvatarImage(int $id)
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
+
+            $avatarForm = new AvatarForm($id);
 
             if (isset($_POST['imageMin'])) {
 
@@ -275,16 +281,15 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetDataAvatar ($id)
+    public function actionGetDataAvatar(int $id)
     {
-        $user = User::findOne($id);
-
         if (Yii::$app->request->isAjax) {
 
-            $response = ['path_max' => '/web/upload/user-' . $user->id . '/avatar/' . $user->avatar_max_image,];
+            $user = User::findOne($id);
+            $response = ['path_max' => '/web/upload/user-' . $user->getId() . '/avatar/' . $user->getAvatarMaxImage()];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -295,18 +300,17 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      */
-    public function actionDeleteUnusedImage ($id)
+    public function actionDeleteUnusedImage(int $id): bool
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
-            if (isset($_POST['imageMax'])) {
-                if ($avatarForm->deleteUnusedImage()) {
-                    return true;
-                }
+
+            $avatarForm = new AvatarForm($id);
+
+            if (isset($_POST['imageMax']) && $avatarForm->deleteUnusedImage()) {
+                return true;
             }
         }
         return false;
@@ -314,14 +318,14 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionDeleteAvatar ($id)
+    public function actionDeleteAvatar(int $id)
     {
-        $avatarForm = new AvatarForm($id);
-
         if (Yii::$app->request->isAjax) {
+
+            $avatarForm = new AvatarForm($id);
 
             if ($avatarForm->deleteOldAvatarImages()) {
 
@@ -345,11 +349,11 @@ class ProfileController extends AppExpertController
 
 
     /**
-     * @param $id
+     * @param int $id
      * @return User|null
      * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel(int $id): ?User
     {
         if (($model = User::findOne($id)) !== null) {
             return $model;

@@ -16,26 +16,33 @@ use yii\db\ActiveRecord;
  * Class MessageManager
  * @package app\modules\admin\models
  *
- * @property int $id                            идентификатор сообщения
- * @property int $conversation_id               идентификатор беседы
- * @property int $sender_id                     идентификатор отправителя
- * @property int $adressee_id                   идентификатор получателя
- * @property string $description                текст сообщения
- * @property int $status                        статус сообщения
- * @property int $created_at                    дата создания в бд
- * @property int $updated_at                    дата обновления в бд
+ * @property int $id                                            идентификатор сообщения
+ * @property int $conversation_id                               идентификатор беседы
+ * @property int $sender_id                                     идентификатор отправителя
+ * @property int $adressee_id                                   идентификатор получателя
+ * @property string $description                                текст сообщения
+ * @property int $status                                        статус сообщения
+ * @property int $created_at                                    дата создания в бд
+ * @property int $updated_at                                    дата обновления в бд
+ *
+ * @property ConversationManager $conversation                  Беседа
+ * @property User $sender                                       Отправитель
+ * @property User $adressee                                     Получатель
+ * @property MessageFiles[] $files                              Прикрепленные файлы
+ * @property string $dayAndDateRus                              Дата и день отправления сообщения по-русски
+ * @property string $dateRus                                    Дата отправления сообщения по-русски
  */
 class MessageManager extends ActiveRecord
 {
 
-    const READ_MESSAGE = 20;
-    const NO_READ_MESSAGE = 10;
+    public const READ_MESSAGE = 20;
+    public const NO_READ_MESSAGE = 10;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'message_manager';
     }
@@ -44,7 +51,7 @@ class MessageManager extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'filter', 'filter' => 'trim'],
@@ -60,7 +67,7 @@ class MessageManager extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -86,7 +93,7 @@ class MessageManager extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -99,7 +106,7 @@ class MessageManager extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getConversation()
+    public function getConversation(): ActiveQuery
     {
         return $this->hasOne(ConversationManager::class, ['id' => 'conversation_id']);
     }
@@ -110,7 +117,7 @@ class MessageManager extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getSender ()
+    public function getSender(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'sender_id']);
     }
@@ -121,7 +128,7 @@ class MessageManager extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getAdressee ()
+    public function getAdressee(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'adressee_id']);
     }
@@ -132,9 +139,9 @@ class MessageManager extends ActiveRecord
      *
      * @return MessageFiles[]
      */
-    public function getFiles ()
+    public function getFiles(): array
     {
-        return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_MANAGER, 'message_id' => $this->id]);
+        return MessageFiles::findAll(['category' => MessageFiles::CATEGORY_MANAGER, 'message_id' => $this->getId()]);
     }
 
 
@@ -144,7 +151,8 @@ class MessageManager extends ActiveRecord
      *
      * @return string
      */
-    public function getDayAndDateRus(){
+    public function getDayAndDateRus(): string
+    {
 
         $days = array(
             'Воскресенье', 'Понедельник', 'Вторник', 'Среда',
@@ -157,17 +165,17 @@ class MessageManager extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->created_at) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) === date('d.n.Y')) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->created_at) == (date('d', time()) - 1)
-            && date('n.Y', $this->created_at) == date('n.Y', time())) {
+
+        if (date('d', $this->getCreatedAt()) === (date('d') - 1)
+            && date('n.Y', $this->getCreatedAt()) === date('n.Y')) {
             return 'Вчера';
         }
-        else {
-            return ( $days[(date('w', $this->created_at))] . ', ' . date('d', $this->created_at)
-                . ' ' . $monthes[(date('n', $this->created_at))] . ' ' . date(' Y', $this->created_at));
-        }
+
+        return ( $days[(date('w', $this->getCreatedAt()))] . ', ' . date('d', $this->getCreatedAt())
+            . ' ' . $monthes[(date('n', $this->getCreatedAt()))] . ' ' . date(' Y', $this->getCreatedAt()));
     }
 
 
@@ -177,7 +185,8 @@ class MessageManager extends ActiveRecord
      *
      * @return string
      */
-    public function getDateRus(){
+    public function getDateRus(): string
+    {
 
         $monthes = array(
             1 => 'Января', 2 => 'Февраля', 3 => 'Марта', 4 => 'Апреля',
@@ -185,16 +194,132 @@ class MessageManager extends ActiveRecord
             9 => 'Сентября', 10 => 'Октября', 11 => 'Ноября', 12 => 'Декабря'
         );
 
-        if (date('d.n.Y', $this->created_at) == date('d.n.Y', time())) {
+        if (date('d.n.Y', $this->getCreatedAt()) === date('d.n.Y')) {
             return 'Сегодня';
         }
-        elseif (date('d', $this->created_at) == (date('d', time()) - 1)
-            && date('n.Y', $this->created_at) == date('n.Y', time())) {
+
+        if (date('d', $this->getCreatedAt()) === (date('d') - 1)
+            && date('n.Y', $this->getCreatedAt()) === date('n.Y')) {
             return 'Вчера';
         }
-        else {
-            return ( date('d', $this->created_at) . ' ' . $monthes[(date('n', $this->created_at))]
-                . ' ' . date(' Y', $this->created_at));
-        }
+
+        return ( date('d', $this->getCreatedAt()) . ' ' . $monthes[(date('n', $this->getCreatedAt()))]
+            . ' ' . date(' Y', $this->getCreatedAt()));
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getConversationId(): int
+    {
+        return $this->conversation_id;
+    }
+
+
+    /**
+     * @param int $conversation_id
+     */
+    public function setConversationId(int $conversation_id): void
+    {
+        $this->conversation_id = $conversation_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSenderId(): int
+    {
+        return $this->sender_id;
+    }
+
+
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId(int $sender_id): void
+    {
+        $this->sender_id = $sender_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAdresseeId(): int
+    {
+        return $this->adressee_id;
+    }
+
+
+    /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId(int $adressee_id): void
+    {
+        $this->adressee_id = $adressee_id;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param int $status
+     */
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt(): int
+    {
+        return $this->created_at;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt(): int
+    {
+        return $this->updated_at;
     }
 }

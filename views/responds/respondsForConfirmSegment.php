@@ -1,10 +1,20 @@
 <?php
 
+use app\models\ConfirmSegment;
 use app\models\EnableExpertise;
 use app\models\ProjectCommunications;
+use app\models\RespondsSegment;
 use app\models\StageExpertise;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use app\models\User;
+use yii\widgets\LinkPager;
+
+/**
+ * @var RespondsSegment[] $responds
+ * @var ConfirmSegment $confirm
+ * @var int $pagesResponds
+ */
 
 ?>
 
@@ -20,17 +30,16 @@ use app\models\User;
                 <div style="padding-right: 10px; padding-bottom: 3px;">
 
                     <?php
-                    if ($respond->interview->status == 1) {
-                        echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
-                    }
-                    elseif ($respond->interview->status === null) {
-                        echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);
-                    }
-                    elseif ($respond->interview->status == 0) {
-                        echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
+                    if ($respond->interview) {
+                        if ($respond->interview->getStatus() === 1) {
+                            echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
+                        }
+                        elseif ($respond->interview->getStatus() === 0) {
+                            echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
+                        }
                     }
                     else {
-                        echo '';
+                        echo  Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);
                     }
                     ?>
 
@@ -38,21 +47,21 @@ use app\models\User;
 
                 <div class="" style="overflow: hidden; max-height: 60px; padding: 5px 0;">
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
-                        <?=  Html::a($respond->name, ['#'], [
-                            'id' => "respond_name-$respond->id",
+                        <?=  Html::a($respond->getName(), ['#'], [
+                            'id' => "respond_name-" . $respond->getId(),
                             'class' => 'container-respond_name_link showRespondUpdateForm',
                             'title' => 'Редактировать данные респондента',
-                        ]); ?>
+                        ]) ?>
 
                     <?php else : ?>
 
-                        <?=  Html::a($respond->name, ['#'], [
-                            'id' => "respond_name-$respond->id",
+                        <?=  Html::a($respond->getName(), ['#'], [
+                            'id' => "respond_name-" . $respond->getId(),
                             'class' => 'container-respond_name_link showRespondUpdateForm',
                             'title' => 'Данные респондента',
-                        ]); ?>
+                        ]) ?>
 
                     <?php endif; ?>
 
@@ -60,20 +69,20 @@ use app\models\User;
 
             </div>
 
-            <div class="col-md-2" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->info_respond; ?>">
-                <?= $respond->info_respond; ?>
+            <div class="col-md-2" style="font-size: 14px; padding: 0 10px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->getInfoRespond() ?>">
+                <?= $respond->getInfoRespond() ?>
             </div>
 
-            <div class="col-md-2" style="font-size: 14px; padding: 0 5px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->place_interview; ?>">
-                <?= $respond->place_interview; ?>
+            <div class="col-md-2" style="font-size: 14px; padding: 0 5px 0 0; overflow: hidden; max-height: inherit;" title="<?= $respond->getPlaceInterview() ?>">
+                <?= $respond->getPlaceInterview() ?>
             </div>
 
             <div class="col-md-1">
 
                 <?php
-                if (!empty($respond->date_plan)){
+                if ($respond->getDatePlan()) {
 
-                    echo '<div class="text-center" style="padding: 0 5px; margin-left: -10px;">' . date("d.m.y", $respond->date_plan) . '</div>';
+                    echo '<div class="text-center" style="padding: 0 5px; margin-left: -10px;">' . date("d.m.y", $respond->getDatePlan()) . '</div>';
                 }
                 ?>
 
@@ -82,18 +91,18 @@ use app\models\User;
             <div class="col-md-1">
 
                 <?php
-                if (!empty($respond->interview)){
+                if ($respond->interview){
 
-                    $date_fact = date("d.m.y", $respond->interview->updated_at);
+                    $date_fact = date("d.m.y", $respond->interview->getUpdatedAt());
                     echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
-                }elseif (!empty($respond->info_respond) && !empty($respond->place_interview) && !empty($respond->date_plan)
-                    && empty($respond->interview->updated_at) && User::isUserSimple(Yii::$app->user->identity['username'])){
+                }elseif (!empty($respond->getInfoRespond()) && !empty($respond->getPlaceInterview()) && $respond->getDatePlan()
+                    && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                     echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
                             Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]),
-                            ['/responds/data-availability', 'stage' => $confirm->stage, 'id' => $confirm->id], [
-                            'id' => 'respond_descInterview_form-' . $respond->id,
+                            ['/responds/data-availability', 'stage' => $confirm->getStage(), 'id' => $confirm->getId()], [
+                            'id' => 'respond_descInterview_form-' . $respond->getId(),
                             'class' => 'showDescInterviewCreateForm',
                             'title' => 'Добавить интервью'
                         ]) .
@@ -103,14 +112,14 @@ use app\models\User;
             </div>
 
             <?php if ($respond->interview) : ?>
-                <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->interview->result; ?>">
-                    <?= $respond->interview->result; ?>
+                <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->interview->getResult() ?>">
+                    <?= $respond->interview->getResult() ?>
                 </div>
             <?php else : ?>
                 <div class="col-md-2"></div>
             <?php endif; ?>
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                 <div class="col-md-1" style="text-align: right;">
 
@@ -118,7 +127,7 @@ use app\models\User;
                     if ($respond->interview) {
 
                         echo Html::a(Html::img('/images/icons/update_warning_vector.png', ['style' => ['width' => '24px', 'margin-right' => '20px']]), ['#'], [
-                            'id' => 'descInterview_form-' . $respond->interview->id,
+                            'id' => 'descInterview_form-' . $respond->interview->getId(),
                             'class' => 'showDescInterviewUpdateForm',
                             'title' => 'Редактировать результаты интервью',
                         ]);
@@ -126,7 +135,7 @@ use app\models\User;
 
                     echo Html::a(Html::img('/images/icons/icon_delete.png',
                         ['style' => ['width' => '24px']]), ['#'], [
-                        'id' => 'link_respond_delete-' . $respond->id,
+                        'id' => 'link_respond_delete-' . $respond->getId(),
                         'class' => 'showDeleteRespondModal',
                         'title' => 'Удалить респондента',
                     ]);
@@ -134,7 +143,7 @@ use app\models\User;
 
                 </div>
 
-            <? else : ?>
+            <?php else : ?>
 
                 <div class="col-md-1" style="text-align: center;">
 
@@ -142,7 +151,7 @@ use app\models\User;
                     if ($respond->interview) {
 
                         echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
-                            'id' => 'descInterview_form-' . $respond->interview->id,
+                            'id' => 'descInterview_form-' . $respond->interview->getId(),
                             'class' => 'showDescInterviewUpdateForm',
                             'title' => 'Результаты опроса',
                         ]);
@@ -151,7 +160,7 @@ use app\models\User;
 
                 </div>
 
-            <? endif; ?>
+            <?php endif; ?>
 
         </div>
 
@@ -159,11 +168,11 @@ use app\models\User;
 
     <!--Pagination-->
     <div class="pagination-responds-confirm">
-        <?= \yii\widgets\LinkPager::widget([
+        <?= LinkPager::widget([
             'pagination' => $pagesResponds,
             'activePageCssClass' => 'pagination_active_page',
             'options' => ['class' => 'responds-confirm-pagin-list'],
-        ]); ?>
+        ]) ?>
     </div>
 
 </div>
@@ -174,37 +183,37 @@ use app\models\User;
     <div class="col-md-12" style="color: #4F4F4F; font-size: 16px; display: flex; justify-content: space-between; padding: 10px 20px; border-radius: 12px; border: 2px solid #707F99; align-items: center; margin-top: 30px;">
 
         <div class="" style="padding: 0;">
-            Необходимо респондентов: <?= $confirm->count_positive;?>
+            Необходимо респондентов: <?= $confirm->getCountPositive() ?>
         </div>
 
         <div class="" style="padding: 0;">
-            Внесено респондентов: <?= $confirm->countRespondsOfModel;?>
+            Внесено респондентов: <?= $confirm->getCountRespondsOfModel() ?>
         </div>
 
         <div class="" style="padding: 0;">
-            <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);?>
-            Соответствуют сегменту: <?= $confirm->countConfirmMembers;?>
+            <?= Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) ?>
+            Соответствуют сегменту: <?= $confirm->getCountConfirmMembers() ?>
         </div>
 
         <div class="" style="padding: 0;">
-            <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);?>
-            Не соответствуют сегменту: <?= ($confirm->countDescInterviewsOfModel - $confirm->countConfirmMembers);?>
+            <?= Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]) ?>
+            Не соответствуют сегменту: <?= ($confirm->getCountDescInterviewsOfModel() - $confirm->getCountConfirmMembers()) ?>
         </div>
 
         <div class="" style="padding: 0;">
-            <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]);?>
-            Не опрошены: <?= ($confirm->count_respond - $confirm->countDescInterviewsOfModel);?>
+            <?= Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px',]]) ?>
+            Не опрошены: <?= ($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) ?>
         </div>
 
         <div style="display:flex; align-items:center; padding: 0;">
 
-            <?php if ($confirm->getEnableExpertise() == EnableExpertise::ON) : ?>
+            <?php if ($confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
 
                 <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                    <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->projectId)) : ?>
+                    <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->getProjectId())) : ?>
 
-                        <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_SEGMENT], 'stageId' => $confirm->id], [
+                        <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_SEGMENT], 'stageId' => $confirm->getId()], [
                             'class' => 'link-get-list-expertise btn btn-lg btn-default',
                             'title' => 'Экспертиза',
                             'style' => [
@@ -219,13 +228,13 @@ use app\models\User;
                                 'border-radius' => '8px',
                                 'margin-right' => '10px',
                             ],
-                        ]); ?>
+                        ]) ?>
 
                     <?php endif; ?>
 
                 <?php else : ?>
 
-                    <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_SEGMENT], 'stageId' => $confirm->id], [
+                    <?= Html::a('Экспертиза',['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::CONFIRM_SEGMENT], 'stageId' => $confirm->getId()], [
                         'class' => 'link-get-list-expertise btn btn-lg btn-default',
                         'title' => 'Смотреть экспертизу',
                         'style' => [
@@ -240,17 +249,17 @@ use app\models\User;
                             'border-radius' => '8px',
                             'margin-right' => '10px',
                         ],
-                    ]); ?>
+                    ]) ?>
 
                 <?php endif; ?>
 
             <?php endif; ?>
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
-                <?php if ($confirm->buttonMovingNextStage === true) : ?>
+                <?php if ($confirm->getButtonMovingNextStage()) : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
+                    <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
                     'style' => [
                         'display' => 'flex',
                         'align-items' => 'center',
@@ -263,13 +272,13 @@ use app\models\User;
                     ],
                     'class' => 'btn btn-lg btn-success',
                     'id' => 'button_MovingNextStage',
-                    ]);?>
+                    ]) ?>
 
                 <?php else : ?>
 
-                    <?php if (($confirm->count_respond - $confirm->countDescInterviewsOfModel) == '0') : ?>
+                    <?php if (($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) === 0) : ?>
 
-                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
+                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -283,11 +292,11 @@ use app\models\User;
                         ],
                         'class' => 'btn btn-lg btn-default',
                         'id' => 'button_MovingNextStage',
-                        ]);?>
+                        ]) ?>
 
                     <?php else : ?>
 
-                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->id],[
+                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -301,7 +310,7 @@ use app\models\User;
                             ],
                             'class' => 'btn btn-lg btn-default',
                             'id' => 'button_MovingNextStage',
-                        ]);?>
+                        ]) ?>
 
                     <?php endif; ?>
 
@@ -309,9 +318,9 @@ use app\models\User;
 
             <?php else : ?>
 
-                <?php if ($confirm->hypothesis->exist_confirm == 1) : ?>
+                <?php if ($confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
-                    <?= Html::a( 'Далее', ['/problems/index', 'id' => $confirm->id],[
+                    <?= Html::a( 'Далее', ['/problems/index', 'id' => $confirm->getId()],[
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -323,7 +332,7 @@ use app\models\User;
                             'border-radius' => '8px',
                         ],
                         'class' => 'btn btn-lg btn-success',
-                    ]);?>
+                    ]) ?>
 
                 <?php else : ?>
 
@@ -341,7 +350,7 @@ use app\models\User;
                         ],
                         'class' => 'btn btn-lg btn-default',
                         'onclick' => 'return false',
-                    ]);?>
+                    ]) ?>
 
                 <?php endif; ?>
 

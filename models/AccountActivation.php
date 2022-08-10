@@ -14,6 +14,8 @@ use yii\base\Model;
  *
  * @property User $_user            Текущий пользователь
  * @property bool $exist            Проверка ключа в ссылке
+ *
+ * @property User $user             Пользователь
  */
 class AccountActivation extends Model
 {
@@ -22,30 +24,31 @@ class AccountActivation extends Model
     private $_user;
     public $exist = true;
 
-
     /**
      * AccountActivation constructor.
      *
      * @param $key
      * @param array $config
      */
-    public function __construct($key, $config = [])
+    public function __construct($key, array $config = [])
     {
-        if(empty($key) || !is_string($key))
-            $this->setExist(false); // Ключ не может быть пустым
+        if(empty($key) || !is_string($key)) {
+            $this->setExist(false);
+        }
+        // Ключ не может быть пустым
         $this->setUser(User::findBySecretKey($key));
-        if(!$this->getUser())
-            $this->setExist(false); // Не верный ключ! Возможно истекло время его действия
+        if(!$this->getUser()) {
+            $this->setExist(false);
+        } // Не верный ключ! Возможно истекло время его действия
         parent::__construct($config);
     }
-
 
     /**
      * Подтвреждение регистрации по email
      *
      * @return bool
      */
-    public function activateAccount()
+    public function activateAccount(): bool
     {
         $user = $this->getUser();
         $user->setConfirm(User::CONFIRM);
@@ -53,20 +56,18 @@ class AccountActivation extends Model
         return $user->save();
     }
 
-
     /**
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->getUser()->getUsername();
     }
 
-
     /**
      * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->_user;
     }
@@ -74,7 +75,7 @@ class AccountActivation extends Model
     /**
      * @return bool
      */
-    public function isExist()
+    public function isExist(): bool
     {
         return $this->exist;
     }
@@ -82,7 +83,7 @@ class AccountActivation extends Model
     /**
      * @param bool $exist
      */
-    public function setExist($exist)
+    public function setExist(bool $exist): void
     {
         $this->exist = $exist;
     }
@@ -90,7 +91,7 @@ class AccountActivation extends Model
     /**
      * @param User $user
      */
-    public function setUser($user)
+    public function setUser(User $user): void
     {
         $this->_user = $user;
     }

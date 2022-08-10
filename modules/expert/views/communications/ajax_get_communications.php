@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ProjectCommunications;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use app\models\CommunicationTypes;
@@ -7,6 +8,10 @@ use app\modules\expert\models\ConversationExpert;
 use yii\helpers\Url;
 use app\models\ExpertType;
 use app\models\CommunicationResponse;
+
+/**
+ * @var ProjectCommunications[] $communications
+ */
 
 ?>
 
@@ -22,55 +27,55 @@ use app\models\CommunicationResponse;
 
     <div class="row line_data_notifications">
         <div class="col-md-1 text-center">
-            <?= date('d.m.Y H:i',$communication->created_at); ?>
+            <?= date('d.m.Y H:i',$communication->getCreatedAt()) ?>
         </div>
         <div class="col-md-9">
 
             <div>
-                <?= $communication->descriptionPattern; ?>
+                <?= $communication->getDescriptionPattern() ?>
             </div>
 
             <?php if ($communication->isNeedShowButtonAnswer()) : ?>
                 <div class="notification-response">
                     Чтобы ответить на уведомление, нажмите <?= Html::button('ПРОДОЛЖИТЬ', [
-                        'id' => 'notification_response-'.$communication->id,
+                        'id' => 'notification_response-'.$communication->getId(),
                         'class' => 'btn btn-default link-notification-response',
                         'style' => ['border-radius' => '8px'],
-                    ]);?>
+                    ]) ?>
                 </div>
             <?php endif; ?>
 
             <?php if ($communication->isNeedReadButton()) : ?>
                 <div class="read-notification">
                     Чтобы отметить уведомление как прочитанное, нажмите <?= Html::button('OK', [
-                        'id' => 'read_notification-'.$communication->id,
+                        'id' => 'read_notification-'.$communication->getId(),
                         'class' => 'btn btn-default link-read-notification',
                         'style' => ['border-radius' => '8px'],
-                    ]);?>
+                    ]) ?>
                 </div>
             <?php endif; ?>
 
             <?php if ($responsive = $communication->responsiveCommunication) : ?>
-                <?php if ($responsive->type == CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
+                <?php if ($responsive->getType() === CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) : ?>
                     <div>
                         <b>Ответ: </b>
-                        <?= FormCreateCommunicationResponse::getAnswers()[$responsive->communicationResponse->answer]; ?>
+                        <?= FormCreateCommunicationResponse::getAnswers()[$responsive->communicationResponse->getAnswer()] ?>
                     </div>
-                    <?php if ($responsive->communicationResponse->answer == CommunicationResponse::POSITIVE_RESPONSE) : ?>
+                    <?php if ($responsive->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) : ?>
                         <div>
                             <b>Указанные типы экпертной деятельности: </b>
-                            <?= ExpertType::getContent($responsive->communicationResponse->expert_types); ?>
+                            <?= ExpertType::getContent($responsive->communicationResponse->getExpertTypes()) ?>
                         </div>
                     <?php endif; ?>
                     <div>
                         <b>Комментарий: </b>
-                        <?= $responsive->communicationResponse->comment; ?>
+                        <?= $responsive->communicationResponse->getComment() ?>
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
 
 
-            <?php if ($communication->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
+            <?php if ($communication->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) : ?>
 
                 <div class="conversation-exist">
 
@@ -78,10 +83,10 @@ use app\models\CommunicationResponse;
 
                     Трекер проекта:
                     <span class="bolder">
-                        <?= $admin->username; ?>
+                        <?= $admin->getUsername() ?>
                     </span>
 
-                    <?php if (ConversationExpert::isExist($communication->expert->id, $admin->id)) : ?>
+                    <?php if (ConversationExpert::isExist($communication->expert->getId(), $admin->getId())) : ?>
 
                         <div>В сообщениях создана беседа с трекером.</div>
 
@@ -92,13 +97,13 @@ use app\models\CommunicationResponse;
                             <?= Html::a('OK',
                                 Url::to([
                                     '/expert/message/create-expert-conversation',
-                                    'user_id' => $admin->id,
-                                    'expert_id' => $communication->expert->id
+                                    'user_id' => $admin->getId(),
+                                    'expert_id' => $communication->expert->getId()
                                 ]), [
-                                    'id' => 'create_conversation-'.$communication->id,
+                                    'id' => 'create_conversation-'.$communication->getId(),
                                     'class' => 'btn btn-default link-create-conversation',
                                     'style' => ['border-radius' => '8px']
-                                ]);?>
+                                ]) ?>
                         </div>
 
                     <?php endif; ?>
@@ -108,10 +113,10 @@ use app\models\CommunicationResponse;
 
         </div>
         <div class="col-md-1 text-center">
-            <?= $communication->notificationStatus; ?>
+            <?= $communication->getNotificationStatus() ?>
         </div>
         <div class="col-md-1 text-center">
-            <?= $communication->accessStatus; ?>
+            <?= $communication->getAccessStatus() ?>
         </div>
     </div>
 

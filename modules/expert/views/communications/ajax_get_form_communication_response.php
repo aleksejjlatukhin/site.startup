@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ProjectCommunications;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
@@ -7,6 +8,11 @@ use app\models\CommunicationTypes;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use app\models\ExpertType;
+
+/**
+ * @var FormCreateCommunicationResponse $model
+ * @var ProjectCommunications $communication
+ */
 
 ?>
 
@@ -38,10 +44,10 @@ use app\models\ExpertType;
         'id' => 'formCreateResponseCommunication',
         'action' => Url::to([
             '/expert/communications/send',
-            'adressee_id' => $communication->sender_id,
-            'project_id' => $communication->project_id,
+            'adressee_id' => $communication->getSenderId(),
+            'project_id' => $communication->getProjectId(),
             'type' => CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE,
-            'triggered_communication_id' => $communication->id
+            'triggered_communication_id' => $communication->getId()
         ]),
         'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
@@ -54,12 +60,12 @@ use app\models\ExpertType;
             ])->widget(Select2::class, [
                 'data' => FormCreateCommunicationResponse::getAnswers(),
                 'options' => [
-                    'id' => 'communication_response_answer-' . $communication->id,
+                    'id' => 'communication_response_answer-' . $communication->getId(),
                     'class' => 'communication-response-answer'
                 ],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12 communication-response-expert-types-block">
@@ -68,7 +74,7 @@ use app\models\ExpertType;
             ])->widget(Select2::class, [
                 'data' => ExpertType::getListTypes($communication->expert),
                 'options' => [
-                    'id' => 'communication_response_expert_types-' . $communication->id,
+                    'id' => 'communication_response_expert_types-' . $communication->getId(),
                     'class' => 'communication-response-expert-types',
                     'multiple' => true
                 ],
@@ -78,7 +84,7 @@ use app\models\ExpertType;
                     'selectOptions' => ['class' => 'text-success'],
                     'unselectOptions' => ['class' => 'text-danger'],
                 ]
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -89,7 +95,7 @@ use app\models\ExpertType;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="col-md-12">
@@ -107,10 +113,10 @@ use app\models\ExpertType;
                     'margin-left' => '20px',
                     'margin-bottom' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
             <?= Html::button('Отмена', [
-                'id' => 'cancel_create_response_communication-'.$communication->project_id,
+                'id' => 'cancel_create_response_communication-'.$communication->getProjectId(),
                 'class' => 'btn btn-default pull-right cancel-create-response-communication',
                 'style' => [
                     'display' => 'flex',
@@ -121,7 +127,7 @@ use app\models\ExpertType;
                     'border-radius' => '8px',
                     'margin-bottom' => '10px'
                 ]
-            ]); ?>
+            ]) ?>
 
         </div>
 

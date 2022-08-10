@@ -13,10 +13,10 @@ use yii\base\Model;
  * Class FormUpdateProblem
  * @package app\models\forms
  *
- * @property int $id                                            Идентификатор из таб. problems
- * @property mixed $_expectedResultsInterview                   Вопросы для проверки и ответы на них (интервью с ожидаемыми результатами)
- * @property string $description                                Описание проблемы
- * @property int $indicator_positive_passage                    Показатель положительного прохождения теста
+ * @property int $id                                                                    Идентификатор из таб. problems
+ * @property ExpectedResultsInterviewConfirmProblem[] $_expectedResultsInterview        Вопросы для проверки и ответы на них (интервью с ожидаемыми результатами)
+ * @property string $description                                                        Описание проблемы
+ * @property int $indicator_positive_passage                                            Показатель положительного прохождения теста
  */
 class FormUpdateProblem extends Model
 {
@@ -32,7 +32,7 @@ class FormUpdateProblem extends Model
      * @param Problems $problem
      * @param array $config
      */
-    public function __construct(Problems $problem, $config = [])
+    public function __construct(Problems $problem, array $config = [])
     {
         $this->setId($problem->getId());
         $this->setDescription($problem->getDescription());
@@ -46,7 +46,7 @@ class FormUpdateProblem extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['indicator_positive_passage'], 'integer'],
@@ -59,7 +59,7 @@ class FormUpdateProblem extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Описание гипотезы проблемы сегмента',
@@ -72,7 +72,7 @@ class FormUpdateProblem extends Model
      * Редактирование данных гипотезы проблемы
      * @return bool
      */
-    public function update()
+    public function update(): bool
     {
         $model = Problems::findOne($this->getId());
         $model->setDescription($this->getDescription());
@@ -91,9 +91,9 @@ class FormUpdateProblem extends Model
 
     /**
      * @param $query
-     * @param $problemId
+     * @param int $problemId
      */
-    private function saveExpectedResultsInterview ($query, $problemId)
+    private function saveExpectedResultsInterview ($query, int $problemId): void
     {
         $expectedResultsInterview = ExpectedResultsInterviewConfirmProblem::findAll(['problem_id' => $problemId]);
 
@@ -117,14 +117,13 @@ class FormUpdateProblem extends Model
                     if (($i+1) <= count($expectedResultsInterview)) {
                         $expectedResultsInterview[$i]->setQuestion($q['question']);
                         $expectedResultsInterview[$i]->setAnswer($q['answer']);
-                        $expectedResultsInterview[$i]->save();
                     } else {
                         $expectedResultsInterview[$i] = new ExpectedResultsInterviewConfirmProblem();
                         $expectedResultsInterview[$i]->setQuestion($q['question']);
                         $expectedResultsInterview[$i]->setAnswer($q['answer']);
                         $expectedResultsInterview[$i]->setProblemId($problemId);
-                        $expectedResultsInterview[$i]->save();
                     }
+                    $expectedResultsInterview[$i]->save();
                 }
 
             } else {
@@ -141,7 +140,7 @@ class FormUpdateProblem extends Model
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -149,23 +148,24 @@ class FormUpdateProblem extends Model
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return mixed
+     * @return ExpectedResultsInterviewConfirmProblem[]
      */
-    public function getExpectedResultsInterview()
+    public function getExpectedResultsInterview(): array
     {
         return $this->_expectedResultsInterview;
     }
 
     /**
-     * @param mixed $expectedResultsInterview
+     * @param ExpectedResultsInterviewConfirmProblem[] $expectedResultsInterview
+     * @return void
      */
-    public function setExpectedResultsInterview($expectedResultsInterview)
+    public function setExpectedResultsInterview(array $expectedResultsInterview): void
     {
         $this->_expectedResultsInterview = $expectedResultsInterview;
     }
@@ -173,7 +173,7 @@ class FormUpdateProblem extends Model
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -181,7 +181,7 @@ class FormUpdateProblem extends Model
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -189,7 +189,7 @@ class FormUpdateProblem extends Model
     /**
      * @return int
      */
-    public function getIndicatorPositivePassage()
+    public function getIndicatorPositivePassage(): int
     {
         return $this->indicator_positive_passage;
     }
@@ -197,7 +197,7 @@ class FormUpdateProblem extends Model
     /**
      * @param int $indicator_positive_passage
      */
-    public function setIndicatorPositivePassage($indicator_positive_passage)
+    public function setIndicatorPositivePassage(int $indicator_positive_passage): void
     {
         $this->indicator_positive_passage = $indicator_positive_passage;
     }

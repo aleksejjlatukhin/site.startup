@@ -7,6 +7,11 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\select2\Select2;
 
+/**
+ * @var User $user
+ * @var User[] $admins
+ */
+
 ?>
 
 <style>
@@ -24,7 +29,7 @@ use kartik\select2\Select2;
 </style>
 
 
-<?php if ($user->status === User::STATUS_DELETED) : ?>
+<?php if ($user->getStatus() === User::STATUS_DELETED) : ?>
 
     <h4 class="row text-center">Невозможно изменить трекера заблокированному пользователю.</h4>
 
@@ -48,7 +53,7 @@ use kartik\select2\Select2;
                     'options' => ['id' => 'selectAddAdminToUser'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]); ?>
+                ]) ?>
             </div>
             <div class="col-md-2"></div>
         </div>

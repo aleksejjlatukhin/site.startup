@@ -3,11 +3,18 @@
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
+use app\models\Projects;
+use app\models\Authors;
+
+/**
+ * @var Projects $model
+ * @var Authors[] $workers
+ */
 
 ?>
 
 <div class="text-center">
-    <?= Html::a('Скачать исходные данные по проекту', ['/projects/mpdf-project', 'id' => $model->id], [
+    <?= Html::a('Скачать исходные данные по проекту', ['/projects/mpdf-project', 'id' => $model->getId()], [
         'class' => 'export_link_hypothesis_for_user', 'target' => '_blank', 'title' => 'Скачать в pdf',
     ]); ?>
 </div>
@@ -16,7 +23,7 @@ use yii\helpers\Html;
 
     <?php $form = ActiveForm::begin([
         'id' => 'project_update_form',
-        'action' => Url::to(['projects/update', 'id' => $model->id]),
+        'action' => Url::to(['projects/update', 'id' => $model->getId()]),
         'options' => ['enctype' => 'multipart/form-data', 'class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -128,7 +135,7 @@ use yii\helpers\Html;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
             </div>
 
             <div class="row" style="margin-bottom: 20px;">
@@ -146,19 +153,19 @@ use yii\helpers\Html;
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-3">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения патента</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения патента</label>' ?>
                     <?= \kartik\date\DatePicker::widget([
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[patent_date]',
-                        'value' => $model->patent_date == null ? null : date('d.m.Y', $model->patent_date),
+                        'value' => empty($model->patent_date) ? null : date('d.m.Y', $model->patent_date),
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
                             'format' => 'dd.mm.yyyy'
                         ],
                         'options' => [
-                            'id' => "patent_date-$model->id",
+                            'id' => "patent_date-" . $model->getId(),
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
@@ -166,7 +173,7 @@ use yii\helpers\Html;
                         'pluginEvents' => [
                                 "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
                         ],
-                    ]);?>
+                    ]) ?>
 
                 </div>
             </div>
@@ -184,11 +191,11 @@ use yii\helpers\Html;
 
             <div class="container-authors"><!-- widgetContainer -->
 
-                <div class="item-authors item-authors-<?=$model->id;?> panel-body" style="padding: 0;"><!-- widgetBody -->
+                <div class="item-authors item-authors-<?=$model->getId() ?> panel-body" style="padding: 0;"><!-- widgetBody -->
 
                     <?php foreach ($workers as $i => $worker): ?>
 
-                        <div class="row row-author row-author-<?= $model->id . '_' . $i;?>" style="margin-bottom: 15px;">
+                        <div class="row row-author row-author-<?= $model->getId() . '_' . $i ?>" style="margin-bottom: 15px;">
 
                             <?= $form->field($worker, "[$i]fio", [
                                 'template' => '<div class="col-md-12" style="padding-left: 20px; margin-top: 15px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -199,7 +206,7 @@ use yii\helpers\Html;
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => '',
                                 'autocomplete' => 'off'
-                            ]); ?>
+                            ]) ?>
 
                             <?= $form->field($worker, "[$i]role", [
                                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -210,7 +217,7 @@ use yii\helpers\Html;
                                 'class' => 'style_form_field_respond form-control',
                                 'placeholder' => '',
                                 'autocomplete' => 'off'
-                            ]); ?>
+                            ]) ?>
 
                             <?= $form->field($worker, "[$i]experience", [
                                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -222,12 +229,12 @@ use yii\helpers\Html;
                                 'placeholder' => '',
                             ]) ?>
 
-                            <?php if ($i != 0) : ?>
+                            <?php if ($i !== 0) : ?>
 
                                 <div class="col-md-12">
 
                                     <?= Html::button('Удалить автора', [
-                                        'id' => 'remove-author-' . $model->id . '_' . $i . '-' . $worker->id,
+                                        'id' => 'remove-author-' . $model->getId() . '_' . $i . '-' . $worker->getId(),
                                         'class' => "remove-author btn btn-default",
                                         'style' => [
                                             'display' => 'flex',
@@ -240,7 +247,7 @@ use yii\helpers\Html;
                                             'font-size' => '24px',
                                             'border-radius' => '8px',
                                         ]
-                                    ]); ?>
+                                    ]) ?>
                                 </div>
 
                             <?php endif; ?>
@@ -255,7 +262,7 @@ use yii\helpers\Html;
 
 
             <?= Html::button('Добавить автора', [
-                'id' => 'add_author-' . $model->id,
+                'id' => 'add_author-' . $model->getId(),
                 'class' => "btn btn-default add_author",
                 'style' => [
                     'display' => 'flex',
@@ -270,7 +277,7 @@ use yii\helpers\Html;
                     'border-radius' => '8px',
                     'margin-right' => '5px',
                 ]
-            ]);?>
+            ]) ?>
 
         </div>
     </div>
@@ -335,14 +342,14 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[register_date]',
-                        'value' => $model->register_date == null ? null : date('d.m.Y', $model->register_date),
+                        'value' => empty($model->register_date) ? null : date('d.m.Y', $model->register_date),
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
                             'format' => 'dd.mm.yyyy',
                         ],
                         'options' => [
-                            'id' => "register_date-$model->id",
+                            'id' => "register_date-" . $model->getId(),
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
@@ -350,7 +357,7 @@ use yii\helpers\Html;
                         'pluginEvents' => [
                             "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
                         ],
-                    ]);?>
+                    ]) ?>
 
                 </div>
             </div>
@@ -427,16 +434,16 @@ use yii\helpers\Html;
                     'template' => '<div class="col-md-12" style="padding-top: 7px; padding-left: 20px;">{label}<div style="font-weight: 400;font-size: 13px; margin-top: -5px; margin-bottom: 5px;">(укажите значение от 50 000 до 100 млн.)</div></div><div class="col-md-3">{input}</div><div class="col-md-9"></div>'
                 ])->textInput([
                     'type' => 'number',
-                    'id' => 'invest_amount-' . $model->id,
+                    'id' => 'invest_amount-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);?>
+                ]) ?>
             </div>
 
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-md-12">
 
-                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения инвестиций</label>';?>
+                    <?= '<label class="control-label" style="padding-left: 5px;">Дата получения инвестиций</label>' ?>
 
                 </div>
                 <div class="col-md-3">
@@ -445,14 +452,14 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[invest_date]',
-                        'value' => $model->invest_date == null ? null : date('d.m.Y', $model->invest_date),
+                        'value' => empty($model->invest_date) ? null : date('d.m.Y', $model->invest_date),
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
                             'format' => 'dd.mm.yyyy',
                         ],
                         'options' => [
-                            'id' => "invest_date-$model->id",
+                            'id' => "invest_date-" . $model->getId(),
                             'class' => 'text-center style_form_field_respond form-control',
                             'style' => ['padding-right' => '20px'],
                             'placeholder' => 'Выберите дату',
@@ -460,7 +467,7 @@ use yii\helpers\Html;
                         'pluginEvents' => [
                             "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
                         ],
-                    ]);?>
+                    ]) ?>
 
                 </div>
 
@@ -502,7 +509,7 @@ use yii\helpers\Html;
                         'type' => 2,
                         'removeButton' => false,
                         'name' => 'Projects[date_of_announcement]',
-                        'value' => $model->date_of_announcement == null ? null : date('d.m.Y', $model->date_of_announcement),
+                        'value' => empty($model->date_of_announcement) ? null : date('d.m.Y', $model->date_of_announcement),
                         'readonly' => true,
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -517,7 +524,7 @@ use yii\helpers\Html;
                         'pluginEvents' => [
                             "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
                         ],
-                    ]);?>
+                    ]) ?>
 
                 </div>
 
@@ -586,10 +593,10 @@ use yii\helpers\Html;
                     <div class="block_all_files" style="padding-left: 5px;">
                         <?php if (!empty($model->preFiles)){
                             foreach ($model->preFiles as $file){
-                                $filename = $file->file_name;
-                                if(mb_strlen($filename) > 35){ $filename = mb_substr($file->file_name, 0, 35) . '...'; }
+                                $filename = $file->getFileName();
+                                if(mb_strlen($filename) > 35){ $filename = mb_substr($file->getFileName(), 0, 35) . '...'; }
                                 echo '<div style="display: flex; margin: 2px 0; align-items: center;" class="one_block_file-'.$file->id.'">' .
-                                    Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>'. Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) .'</div></div>', ['download', 'id' => $file->id], [
+                                    Html::a('<div style="display:flex; width: 100%; justify-content: space-between;"><div>' . $filename . '</div><div>'. Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px']]) .'</div></div>', ['download', 'id' => $file->getId()], [
                                         'title' => 'Скачать файл',
                                         'target' => '_blank',
                                         'class' => 'btn btn-default prefiles',
@@ -606,10 +613,10 @@ use yii\helpers\Html;
                                             'margin-right' => '5px',
                                         ]
                                     ]) . ' ' .
-                                    Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px', 'height' => '29px']]), ['delete-file', 'id' => $file->id], [
+                                    Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px', 'height' => '29px']]), ['delete-file', 'id' => $file->getId()], [
                                         'title' => 'Удалить файл',
                                         'class' => 'delete_file',
-                                        'id' => 'delete_file-' . $file->id,
+                                        'id' => 'delete_file-' . $file->getId(),
                                         'style' => ['display' => 'flex', 'margin-left' => '15px'],
                                     ])
                                     . '</div>';

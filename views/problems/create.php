@@ -1,10 +1,19 @@
 <?php
 
+use app\models\ConfirmSegment;
+use app\models\forms\FormCreateProblem;
+use app\models\RespondsSegment;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use kartik\select2\Select2;
 use app\models\Problems;
+
+/**
+ * @var ConfirmSegment $confirmSegment
+ * @var FormCreateProblem $model
+ * @var RespondsSegment[] $responds
+ */
 
 ?>
 
@@ -49,7 +58,7 @@ use app\models\Problems;
         </div>
 
 
-        <? //Список респондентов(представителей сегмента) и их вариантов проблем ?>
+        <!--Список респондентов(представителей сегмента) и их вариантов проблем-->
         <div class="all_responds_problems row container-fluid" style="margin: 0;">
 
             <?php foreach ($responds as $respond) : ?>
@@ -59,26 +68,26 @@ use app\models\Problems;
                     <div class="col-md-4 block_respond_problem_column">
 
                         <?php
-                        $respond_name = $respond->name;
+                        $respond_name = $respond->getName();
                         if (mb_strlen($respond_name) > 30) {
                             $respond_name = mb_substr($respond_name, 0, 30) . '...';
                         }
                         ?>
-                        <?= Html::a('<div title="'.$respond->name.'">' . $respond_name . '</div>', ['/problems/get-interview-respond', 'id' => $respond->id], [
+                        <?= Html::a('<div title="'.$respond->getName().'">' . $respond_name . '</div>', ['/problems/get-interview-respond', 'id' => $respond->getId()], [
                             'class' => 'get_interview_respond',
-                        ]); ?>
+                        ]) ?>
 
                     </div>
 
                     <div class="col-md-8 block_respond_problem_column">
 
                         <?php
-                        $interview_result = $respond->interview->result;
+                        $interview_result = $respond->interview->getResult();
                         if (mb_strlen($interview_result) > 70) {
                             $interview_result = mb_substr($interview_result, 0, 70) . '...';
                         }
                         ?>
-                        <?= '<div title="'.$respond->interview->result.'">' . $interview_result . '</div>'; ?>
+                        <?= '<div title="'.$respond->interview->getResult().'">' . $interview_result . '</div>' ?>
 
                     </div>
 
@@ -92,7 +101,7 @@ use app\models\Problems;
 
             <?php $form = ActiveForm::begin([
                 'id' => 'hypothesisCreateForm',
-                'action' => Url::to(['/problems/create', 'id' => $confirmSegment->id]),
+                'action' => Url::to(['/problems/create', 'id' => $confirmSegment->getId()]),
                 'options' => ['class' => 'g-py-15 hypothesisCreateForm'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
@@ -102,7 +111,7 @@ use app\models\Problems;
 
                 <div class="col-md-12">
 
-                    <? $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
+                    <?php $placeholder = 'Напишите описание гипотезы проблемы сегмента. Примеры: 
 - отсутствие путеводителя по комерциализации результатов интеллектуальной деятельности, 
 - отсутствие необходимой информации по патентованию...' ?>
 
@@ -125,8 +134,7 @@ use app\models\Problems;
                         'options' => ['id' => 'indicator_positive_passage'],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]);
-                    ?>
+                    ]) ?>
 
                 </div>
 
@@ -145,7 +153,7 @@ use app\models\Problems;
                                     'placeholder' => 'Напишите вопрос',
                                     'id' => '_expectedResults_question-0',
                                     'class' => 'style_form_field_respond form-control',
-                                ]); ?>
+                                ]) ?>
 
                             </div>
 
@@ -158,7 +166,7 @@ use app\models\Problems;
                                     'placeholder' => 'Напишите ответ',
                                     'id' => '_expectedResults_answer-0',
                                     'class' => 'style_form_field_respond form-control',
-                                ]); ?>
+                                ]) ?>
 
                             </div>
 
@@ -183,7 +191,7 @@ use app\models\Problems;
                             'border-radius' => '8px',
                             'margin-right' => '5px',
                         ]
-                    ]);?>
+                    ]) ?>
                 </div>
 
             </div>

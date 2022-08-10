@@ -17,9 +17,10 @@ use Yii;
  * Class FormExpertiseSingleAnswer
  * @package app\models\forms\expertise
  *
- * @property $checkbox              Оценка выбранная экспертом
- * @property $answerOptions         Объект stdClass с вариантами ответов
- * @property $comment               Комментарий к ответу в экспертизе
+ * @property $checkbox                      Оценка выбранная экспертом
+ * @property $answerOptions                 Объект stdClass с вариантами ответов
+ * @property string $comment                Комментарий к ответу в экспертизе
+ * @property Expertise $_expertise          Объект экспертизы
  */
 class FormExpertiseSingleAnswer extends Model
 {
@@ -56,12 +57,12 @@ class FormExpertiseSingleAnswer extends Model
      * @param Expertise $expertise
      * @param array $config
      */
-    public function __construct(Expertise $expertise, $config = [])
+    public function __construct(Expertise $expertise, array $config = [])
     {
-        $this->_expertise = $expertise;
+        $this->setExpertise($expertise);
         $this->setAnswerOptions();
-        $this->checkbox = $this->_expertise->getEstimation();
-        $this->comment = $this->_expertise->getComment();
+        $this->setCheckbox($expertise->getEstimation());
+        $this->setComment($expertise->getComment());
 
         parent::__construct($config);
     }
@@ -79,23 +80,40 @@ class FormExpertiseSingleAnswer extends Model
     /**
      * Установить массив с вариантами ответов
      */
-    public function setAnswerOptions()
+    public function setAnswerOptions(): void
     {
         // Установить путь к файлу с вариантами ответов для формы
         $filename = StageExpertise::getList()[$this->_expertise->getStage()] . '.json';
 
-        if (TypesExpertAssessment::getValue($this->_expertise->getTypeExpert()) == TypesExpertAssessment::ASSESSMENT_TECHNOLOGICAL_LEVEL) {
+        /** @var string $filePath */
+        if (TypesExpertAssessment::getValue($this->getExpertise()->getTypeExpert()) === TypesExpertAssessment::ASSESSMENT_TECHNOLOGICAL_LEVEL) {
             $filePath = Yii::getAlias('@dirDataFormExpertise') . '/assessmentTechnologicalLevel/' . $filename;
-        } elseif (TypesExpertAssessment::getValue($this->_expertise->getTypeExpert()) == TypesExpertAssessment::ASSESSMENT_CONSUMER_SETTINGS) {
+        } elseif (TypesExpertAssessment::getValue($this->getExpertise()->getTypeExpert()) === TypesExpertAssessment::ASSESSMENT_CONSUMER_SETTINGS) {
             $filePath = Yii::getAlias('@dirDataFormExpertise') . '/assessmentConsumerSettings/' . $filename;
         }
 
         // Получить содержимое файла
-        /** @var string $filePath */
         if ($filePath) {
             $file = file_get_contents($filePath);
-            $this->answerOptions = json_decode($file);
+            $this->answerOptions = json_decode($file, true);
         }
+    }
+
+    /**
+     * @return Expertise
+     */
+    public function getExpertise(): Expertise
+    {
+        return $this->_expertise;
+    }
+
+    /**
+     * @param Expertise $expertise
+     * @return void
+     */
+    private function setExpertise(Expertise $expertise): void
+    {
+        $this->_expertise = $expertise;
     }
 
     /**
@@ -103,7 +121,7 @@ class FormExpertiseSingleAnswer extends Model
      *
      * @return string
      */
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
@@ -113,15 +131,32 @@ class FormExpertiseSingleAnswer extends Model
      *
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment(string $comment): void
     {
         $this->comment = $comment;
     }
 
     /**
+     * @param mixed $checkbox
+     * @return void
+     */
+    public function setCheckbox($checkbox): void
+    {
+        $this->checkbox = $checkbox;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCheckbox()
+    {
+        return $this->checkbox;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['comment'], 'string', 'max' => 2000],
@@ -133,7 +168,7 @@ class FormExpertiseSingleAnswer extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'checkbox' => 'Выберите один из вариантов ответа',
@@ -151,12 +186,14 @@ class FormExpertiseSingleAnswer extends Model
      * @param bool $completed
      * @return bool
      */
-    public function saveRecord($completed = false)
+    public function saveRecord(bool $completed = false): bool
     {
-        $this->_expertise->setEstimation($this->checkbox[0]);
-        $this->_expertise->setComment($this->comment);
-        $completed ? $this->_expertise->setCompleted() : false;
-        return $this->_expertise->saveRecord();
+        $this->getExpertise()->setEstimation($this->getCheckbox()[0]);
+        $this->getExpertise()->setComment($this->getComment());
+        if ($completed) {
+            $this->getExpertise()->setCompleted();
+        }
+        return $this->getExpertise()->saveRecord();
     }
 
 }

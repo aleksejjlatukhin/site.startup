@@ -5,6 +5,8 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -17,18 +19,20 @@ use yii\db\ActiveRecord;
  * @property int $client_id         идентификатор клиента
  * @property int $status            состояние активации клиента
  * @property int $created_at        дата создания записи
+ *
+ * @property Client $client         Организация
  */
 class ClientActivation extends ActiveRecord
 {
 
-    const ACTIVE = 789;
-    const NO_ACTIVE = 987;
+    public const ACTIVE = 789;
+    public const NO_ACTIVE = 987;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'client_activation';
     }
@@ -39,7 +43,7 @@ class ClientActivation extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getClient()
+    public function getClient(): ActiveQuery
     {
         return $this->hasOne(Client::class, ['id' => 'client_id']);
     }
@@ -51,17 +55,17 @@ class ClientActivation extends ActiveRecord
      * @param $clientId
      * @return int
      */
-    public static function getCurrentStatus($clientId)
+    public static function getCurrentStatus($clientId): int
     {
         $obj = self::find()->where(['client_id' => $clientId])->orderBy(['id' => SORT_DESC])->one();
-        return $obj->status;
+        return $obj->getStatus();
     }
 
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -70,7 +74,7 @@ class ClientActivation extends ActiveRecord
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
@@ -78,7 +82,7 @@ class ClientActivation extends ActiveRecord
     /**
      * @param int $client_id
      */
-    public function setClientId($client_id)
+    public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
     }
@@ -87,7 +91,7 @@ class ClientActivation extends ActiveRecord
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -96,7 +100,7 @@ class ClientActivation extends ActiveRecord
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -105,7 +109,7 @@ class ClientActivation extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['client_id'], 'required'],
@@ -124,12 +128,12 @@ class ClientActivation extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'attributes' => [ActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
+                'class' => TimestampBehavior::class,
+                'attributes' => [BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at']],
             ],
         ];
     }

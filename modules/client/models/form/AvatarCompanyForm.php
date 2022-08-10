@@ -33,7 +33,7 @@ class AvatarCompanyForm extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['clientId'], 'integer'],
@@ -48,7 +48,7 @@ class AvatarCompanyForm extends Model
      * @param int $clientId
      * @param array $config
      */
-    public function __construct($clientId, $config = [])
+    public function __construct($clientId, array $config = [])
     {
         $this->setClientId($clientId);
         parent::__construct($config);
@@ -61,14 +61,16 @@ class AvatarCompanyForm extends Model
      * @throws StaleObjectException
      * @throws \Throwable
      */
-    public function loadMinImage()
+    public function loadMinImage(): bool
     {
-        $clientSettings = ClientSettings::findOne(['client_id' => $this->clientId]);
+        $clientSettings = ClientSettings::findOne(['client_id' => $this->getClientId()]);
 
         if ($_POST['imageMin']) {
 
-            $path = UPLOAD . 'company-' . $this->clientId . '/avatar/';
-            if (!is_dir($path)) FileHelper::createDirectory($path);
+            $path = UPLOAD . 'company-' . $this->getClientId() . '/avatar/';
+            if (!is_dir($path)) {
+                FileHelper::createDirectory($path);
+            }
 
             $str = Yii::$app->security->generateRandomString(8);
             $file = 'avatar_' . $str . '_min.png';
@@ -96,7 +98,7 @@ class AvatarCompanyForm extends Model
                 // Редактирование аватарки
                 unlink($path . $clientSettings->getAvatarImage());
                 $clientSettings->setAvatarImage($file);
-                return $clientSettings->update() ? true : false;
+                return (bool)$clientSettings->update();
             }
         }
         return false;
@@ -106,10 +108,12 @@ class AvatarCompanyForm extends Model
      * @return array
      * @throws Exception
      */
-    public function loadMaxImage()
+    public function loadMaxImage(): array
     {
-        $path = UPLOAD . 'company-' . $this->clientId . '/avatar/';
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        $path = UPLOAD . 'company-' . $this->getClientId() . '/avatar/';
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         $uploadFile = $path . $_FILES['file']['name'];
         $arr = array();
@@ -130,16 +134,20 @@ class AvatarCompanyForm extends Model
      * @throws StaleObjectException
      * @throws \Throwable
      */
-    public function deleteOldAvatarImages ()
+    public function deleteOldAvatarImages(): bool
     {
-        $clientSettings = ClientSettings::findOne(['client_id' => $this->clientId]);
-        $path = UPLOAD . 'company-' . $this->clientId . '/avatar/';
+        $clientSettings = ClientSettings::findOne(['client_id' => $this->getClientId()]);
+        $path = UPLOAD . 'company-' . $this->getClientId() . '/avatar/';
 
-        if (is_file($path . $clientSettings->getAvatarMaxImage())) unlink($path . $clientSettings->getAvatarMaxImage());
-        if (is_file($path . $clientSettings->getAvatarImage())) unlink($path . $clientSettings->getAvatarImage());
+        if (is_file($path . $clientSettings->getAvatarMaxImage())) {
+            unlink($path . $clientSettings->getAvatarMaxImage());
+        }
+        if (is_file($path . $clientSettings->getAvatarImage())) {
+            unlink($path . $clientSettings->getAvatarImage());
+        }
 
-        $clientSettings->setAvatarMaxImage(null);
-        $clientSettings->setAvatarImage(null);
+        $clientSettings->setAvatarMaxImage();
+        $clientSettings->setAvatarImage();
         $clientSettings->update();
 
         return true;
@@ -149,10 +157,10 @@ class AvatarCompanyForm extends Model
     /**
      * @return bool
      */
-    public function deleteUnusedImage ()
+    public function deleteUnusedImage (): bool
     {
         if ($_POST['imageMax']) {
-            $path = UPLOAD . 'company-' . $this->clientId . '/avatar/';
+            $path = UPLOAD . 'company-' . $this->getClientId() . '/avatar/';
             unlink($path . $_POST['imageMax']);
             return true;
         }
@@ -163,7 +171,7 @@ class AvatarCompanyForm extends Model
     /**
      * @return int
      */
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->clientId;
     }
@@ -171,7 +179,7 @@ class AvatarCompanyForm extends Model
     /**
      * @param int $clientId
      */
-    public function setClientId($clientId)
+    public function setClientId(int $clientId): void
     {
         $this->clientId = $clientId;
     }
@@ -187,7 +195,7 @@ class AvatarCompanyForm extends Model
     /**
      * @param mixed $loadImage
      */
-    public function setLoadImage($loadImage)
+    public function setLoadImage($loadImage): void
     {
         $this->loadImage = $loadImage;
     }
@@ -195,7 +203,7 @@ class AvatarCompanyForm extends Model
     /**
      * @return string
      */
-    public function getImageMax()
+    public function getImageMax(): string
     {
         return $this->imageMax;
     }
@@ -203,7 +211,7 @@ class AvatarCompanyForm extends Model
     /**
      * @param string $imageMax
      */
-    public function setImageMax($imageMax)
+    public function setImageMax(string $imageMax): void
     {
         $this->imageMax = $imageMax;
     }

@@ -1,8 +1,15 @@
 <?php
 
+use app\models\ConfirmMvp;
+use app\models\forms\FormCreateBusinessModel;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var ConfirmMvp $confirmMvp
+ * @var FormCreateBusinessModel $model
+ */
 
 ?>
 
@@ -12,7 +19,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'hypothesisCreateForm',
-        'action' => Url::to(['/business-model/create', 'id' => $confirmMvp->id]),
+        'action' => Url::to(['/business-model/create', 'id' => $confirmMvp->getId()]),
         'options' => ['class' => 'g-py-15 hypothesisCreateForm'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -29,8 +36,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -42,8 +48,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -55,8 +60,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -68,8 +72,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -81,8 +84,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -94,8 +96,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 

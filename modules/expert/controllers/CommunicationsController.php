@@ -34,19 +34,18 @@ class CommunicationsController extends AppExpertController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $currentUser = User::findOne(Yii::$app->user->getId());
 
-        if ($action->id == 'notifications') {
+        if ($action->id === 'notifications') {
 
-            if (User::isUserExpert($currentUser->getUsername()) && $currentUser->getId() == Yii::$app->request->get('id')) {
+            if (User::isUserExpert($currentUser->getUsername()) && $currentUser->getId() === (int)Yii::$app->request->get('id')) {
 
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         } else{
             return parent::beforeAction($action);
@@ -62,7 +61,7 @@ class CommunicationsController extends AppExpertController
      * @param int $id
      * @return string
      */
-    public function actionNotifications($id)
+    public function actionNotifications(int $id): string
     {
         $user = User::findOne($id);
         // Проекты, по которым у эксперта есть коммуникации
@@ -87,7 +86,7 @@ class CommunicationsController extends AppExpertController
      * @param int $project_id
      * @return array|bool
      */
-    public function actionGetCommunications($project_id)
+    public function actionGetCommunications(int $project_id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -104,16 +103,16 @@ class CommunicationsController extends AppExpertController
      * @param int $project_id
      * @return array
      */
-    private function responseForGetCommunications($project_id)
+    private function responseForGetCommunications(int $project_id): array
     {
         $communications = ProjectCommunications::find()
             ->where(['project_id' => $project_id])
             ->andWhere(['not', ['type' => CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE]])
-            ->andWhere(['or', ['adressee_id' => Yii::$app->user->id], ['sender_id' => Yii::$app->user->id]])
+            ->andWhere(['or', ['adressee_id' => Yii::$app->user->getId()], ['sender_id' => Yii::$app->user->getId()]])
             ->orderBy('id DESC')
             ->all();
 
-        return $response = [
+        return [
             'renderAjax' => $this->renderAjax('ajax_get_communications', [
             'communications' => $communications])
         ];
@@ -130,7 +129,7 @@ class CommunicationsController extends AppExpertController
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionReadCommunication($id)
+    public function actionReadCommunication(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -150,7 +149,7 @@ class CommunicationsController extends AppExpertController
      * @throws StaleObjectException
      * @throws Throwable
      */
-    private function responseForReadCommunication($id)
+    private function responseForReadCommunication(int $id): array
     {
         $communication = ProjectCommunications::findOne($id);
         $communication->setStatusRead();
@@ -160,7 +159,7 @@ class CommunicationsController extends AppExpertController
         $countUnreadCommunications = $user->getCountUnreadCommunications();
         $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->getProjectId());
 
-        return $response = [
+        return [
             'project_id' => $communication->getProjectId(),
             'countUnreadCommunications' => $countUnreadCommunications,
             'countUnreadCommunicationsByProject' => $countUnreadCommunicationsByProject
@@ -175,7 +174,7 @@ class CommunicationsController extends AppExpertController
      * @param int $id
      * @return bool|array
      */
-    public function actionGetFormCommunicationResponse($id)
+    public function actionGetFormCommunicationResponse(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -205,7 +204,7 @@ class CommunicationsController extends AppExpertController
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionSend($adressee_id, $project_id, $type, $triggered_communication_id)
+    public function actionSend(int $adressee_id, int $project_id, int $type, int $triggered_communication_id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -216,34 +215,35 @@ class CommunicationsController extends AppExpertController
             if ($communication->save()) {
                 // Создаем объект содержащий ответ по созданной коммуникации
                 $communicationResponse = new FormCreateCommunicationResponse();
-                $communicationResponse->setCommunicationId($communication->id);
-                if ($communicationResponse->load(Yii::$app->request->post()) && $communicationResponse->create()) {
+                $communicationResponse->setCommunicationId($communication->getId());
+                if ($communicationResponse->load(Yii::$app->request->post())) {
+                    if ($communicationResponse->create()) {
+                        // Получаем коммуникацию, в ответ на которую была создана данная коммуникация
+                        $communicationAnswered = $communication->communicationAnswered;
 
-                    // Получаем коммуникацию, в ответ на которую была создана данная коммуникация
-                    $communicationAnswered = $communication->getCommunicationAnswered();
+                        // Если ответ эксперта отрицательный, то у коммуникации на которую была создана данная коммуникация
+                        // меняем у объекта доступа к проекту параметр cancel,
+                        // т.е. аннулируем доступ к проекту
+                        if ($communicationResponse->answer === CommunicationResponse::NEGATIVE_RESPONSE) {
+                            $communicationAnsweredAccessToProject = $communicationAnswered->userAccessToProject;
+                            $communicationAnsweredAccessToProject->setCancel();
+                            $communicationAnsweredAccessToProject->update();
+                        }
 
-                    // Если ответ эксперта отрицательный, то у коммуникации на которую была создана данная коммуникация
-                    // меняем у объекта доступа к проекту параметр cancel,
-                    // т.е. аннулируем доступ к проекту
-                    if ($communicationResponse->answer == CommunicationResponse::NEGATIVE_RESPONSE) {
-                        $communicationAnsweredAccessToProject = $communicationAnswered->userAccessToProject;
-                        $communicationAnsweredAccessToProject->setCancel();
-                        $communicationAnsweredAccessToProject->update();
+                        // Делаем коммуникацию прочитанной (отвеченной)
+                        $result_ReadCommunication = $this->responseForReadCommunication($communicationAnswered->getId());
+
+                        // Отправка письма админу организации на почту
+                        $this->sendCommunicationToEmail($communication);
+
+                        // Получить обновленные коммуникации
+                        $result_GetCommunications =  $this->actionGetCommunications($project_id);
+                        /** @var array $response */
+                        $response = array_merge($result_ReadCommunication, $result_GetCommunications);
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
                     }
-
-                    // Делаем коммуникацию прочитанной (отвеченной)
-                    $result_ReadCommunication = $this->responseForReadCommunication($communicationAnswered->id);
-
-                    // Отправка письма админу организации на почту
-                    $this->sendCommunicationToEmail($communication);
-
-                    // Получить обновленные коммуникации
-                    $result_GetCommunications =  $this->actionGetCommunications($project_id);
-
-                    $response = array_merge($result_ReadCommunication, $result_GetCommunications);
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
                 }
             }
         }
@@ -258,11 +258,9 @@ class CommunicationsController extends AppExpertController
      * @param ProjectCommunications $communication
      * @return bool
      */
-    public function sendCommunicationToEmail($communication)
+    public function sendCommunicationToEmail(ProjectCommunications $communication): bool
     {
-        /* @var $user User */
         $user = User::findOne($communication->getSenderId());
-        /* @var $admin User */
         $admin = User::findOne($communication->getAdresseeId());
 
         if ($user) {

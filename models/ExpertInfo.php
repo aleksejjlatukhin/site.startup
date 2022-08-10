@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  * @property string $education                          Образование эксперта
  * @property string $academic_degree                    Ученая степень эксперта
  * @property string $position                           Должность эксперта
- * @property string $type                               Тип эксперта
+ * @property string|array $type                         Тип эксперта
  * @property string $scope_professional_competence      Сфера профессиональной компетенции эксперта
  * @property string $publications                       Научные публикации эксперта
  * @property string $implemented_projects               Реализованные проекты эксперта
@@ -28,7 +28,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'expert_info';
     }
@@ -37,7 +37,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
@@ -53,7 +53,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'education' => 'Образование',
@@ -70,7 +70,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return int
      */
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->user_id;
     }
@@ -78,7 +78,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param int $user_id
      */
-    public function setUserId($user_id)
+    public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
@@ -86,7 +86,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getEducation()
+    public function getEducation(): string
     {
         return $this->education;
     }
@@ -94,7 +94,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $education
      */
-    public function setEducation($education)
+    public function setEducation(string $education): void
     {
         $this->education = $education;
     }
@@ -102,7 +102,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getAcademicDegree()
+    public function getAcademicDegree(): string
     {
         return $this->academic_degree;
     }
@@ -110,7 +110,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $academic_degree
      */
-    public function setAcademicDegree($academic_degree)
+    public function setAcademicDegree(string $academic_degree): void
     {
         $this->academic_degree = $academic_degree;
     }
@@ -118,7 +118,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getPosition()
+    public function getPosition(): string
     {
         return $this->position;
     }
@@ -126,13 +126,13 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $position
      */
-    public function setPosition($position)
+    public function setPosition(string $position): void
     {
         $this->position = $position;
     }
 
     /**
-     * @return string
+     * @return string|array
      */
     public function getType()
     {
@@ -140,9 +140,9 @@ class ExpertInfo extends ActiveRecord
     }
 
     /**
-     * @param string $type
+     * @param string|array $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -150,7 +150,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getScopeProfessionalCompetence()
+    public function getScopeProfessionalCompetence(): string
     {
         return $this->scope_professional_competence;
     }
@@ -158,7 +158,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $scope_professional_competence
      */
-    public function setScopeProfessionalCompetence($scope_professional_competence)
+    public function setScopeProfessionalCompetence(string $scope_professional_competence): void
     {
         $this->scope_professional_competence = $scope_professional_competence;
     }
@@ -166,7 +166,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getPublications()
+    public function getPublications(): string
     {
         return $this->publications;
     }
@@ -174,7 +174,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $publications
      */
-    public function setPublications($publications)
+    public function setPublications(string $publications): void
     {
         $this->publications = $publications;
     }
@@ -182,7 +182,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getImplementedProjects()
+    public function getImplementedProjects(): string
     {
         return $this->implemented_projects;
     }
@@ -190,7 +190,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $implemented_projects
      */
-    public function setImplementedProjects($implemented_projects)
+    public function setImplementedProjects(string $implemented_projects): void
     {
         $this->implemented_projects = $implemented_projects;
     }
@@ -198,7 +198,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @return string
      */
-    public function getRoleInImplementedProjects()
+    public function getRoleInImplementedProjects(): string
     {
         return $this->role_in_implemented_projects;
     }
@@ -206,7 +206,7 @@ class ExpertInfo extends ActiveRecord
     /**
      * @param string $role_in_implemented_projects
      */
-    public function setRoleInImplementedProjects($role_in_implemented_projects)
+    public function setRoleInImplementedProjects(string $role_in_implemented_projects): void
     {
         $this->role_in_implemented_projects = $role_in_implemented_projects;
     }

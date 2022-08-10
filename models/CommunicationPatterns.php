@@ -25,23 +25,23 @@ use Yii;
 class CommunicationPatterns extends ActiveRecord
 {
 
-    const ACTIVE = 123;
-    const NO_ACTIVE = 321;
-    const NOT_REMOTE = 0;
-    const REMOTE = 1;
+    public const ACTIVE = 123;
+    public const NO_ACTIVE = 321;
+    public const NOT_REMOTE = 0;
+    public const REMOTE = 1;
 
-    const COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE = 'Вы готовы провести экспертизу по проекту {{наименование проекта, ссылка на проект}} ? Для предварительной оценки Вам открыт доступ к проекту на 14 дней.';
-    const DEFAULT_USER_ACCESS_TO_PROJECT = 14;
-    const COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE = 'Произошли изменения в проекте {{наименование проекта}}. Приносим Вам свои извинения, запрос на экспертизу отозван.';
-    const COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT = 'Вы назначены на экспертизу по проекту {{наименование проекта, ссылка на проект}} по типам деятельности: {{список типов деятельности эксперта}}. Приступайте к экспертизе на этапе описания проекта. Внимание! В работе эксперта есть ограничение по времени, не более 7 дней для выставления экспертной оценки после уведомления о необходимости провести экспертизу для той или иной сущности на этапе проекта.';
-    const COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT = 'Вы не назначены на экспертизу по проекту {{наименование проекта}}. Приносим Вам свои извинения, запрос на экспертизу отозван.';
-    const COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT = 'Вы отозваны с экспертизы по проекту {{наименование проекта}}. Подробную информацию получите у администратора сайта Spaccel.ru';
+    public const COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE = 'Вы готовы провести экспертизу по проекту {{наименование проекта, ссылка на проект}} ? Для предварительной оценки Вам открыт доступ к проекту на 14 дней.';
+    public const DEFAULT_USER_ACCESS_TO_PROJECT = 14;
+    public const COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE = 'Произошли изменения в проекте {{наименование проекта}}. Приносим Вам свои извинения, запрос на экспертизу отозван.';
+    public const COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT = 'Вы назначены на экспертизу по проекту {{наименование проекта, ссылка на проект}} по типам деятельности: {{список типов деятельности эксперта}}. Приступайте к экспертизе на этапе описания проекта. Внимание! В работе эксперта есть ограничение по времени, не более 7 дней для выставления экспертной оценки после уведомления о необходимости провести экспертизу для той или иной сущности на этапе проекта.';
+    public const COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT = 'Вы не назначены на экспертизу по проекту {{наименование проекта}}. Приносим Вам свои извинения, запрос на экспертизу отозван.';
+    public const COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT = 'Вы отозваны с экспертизы по проекту {{наименование проекта}}. Подробную информацию получите у администратора сайта Spaccel.ru';
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'communication_patterns';
     }
@@ -50,7 +50,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['communication_type', 'initiator', 'is_active', 'project_access_period', 'created_at', 'updated_at', 'is_remote'], 'integer'],
@@ -75,7 +75,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'description' => 'Описание шаблона коммуникации',
@@ -87,7 +87,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -98,7 +98,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $communication_type
      */
-    public function setParams($communication_type)
+    public function setParams(int $communication_type): void
     {
         $this->setCommunicationType($communication_type);
         $this->setInitiator(Yii::$app->user->getId());
@@ -107,7 +107,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -115,7 +115,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getCommunicationType()
+    public function getCommunicationType(): int
     {
         return $this->communication_type;
     }
@@ -123,7 +123,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $communication_type
      */
-    public function setCommunicationType($communication_type)
+    public function setCommunicationType(int $communication_type): void
     {
         $this->communication_type = $communication_type;
     }
@@ -131,7 +131,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getInitiator()
+    public function getInitiator(): int
     {
         return $this->initiator;
     }
@@ -139,7 +139,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $initiator
      */
-    public function setInitiator($initiator)
+    public function setInitiator(int $initiator): void
     {
         $this->initiator = $initiator;
     }
@@ -147,7 +147,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getIsActive()
+    public function getIsActive(): int
     {
         return $this->is_active;
     }
@@ -155,7 +155,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $is_active
      */
-    public function setIsActive($is_active)
+    public function setIsActive(int $is_active): void
     {
         $this->is_active = $is_active;
     }
@@ -163,7 +163,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -171,7 +171,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -179,7 +179,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectAccessPeriod()
+    public function getProjectAccessPeriod(): int
     {
         return $this->project_access_period;
     }
@@ -187,7 +187,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $project_access_period
      */
-    public function setProjectAccessPeriod($project_access_period)
+    public function setProjectAccessPeriod(int $project_access_period): void
     {
         $this->project_access_period = $project_access_period;
     }
@@ -195,7 +195,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -203,7 +203,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }
@@ -211,7 +211,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @return int
      */
-    public function getIsRemote()
+    public function getIsRemote(): int
     {
         return $this->is_remote;
     }
@@ -219,7 +219,7 @@ class CommunicationPatterns extends ActiveRecord
     /**
      * @param int $is_remote
      */
-    public function setIsRemote($is_remote)
+    public function setIsRemote(int $is_remote): void
     {
         $this->is_remote = $is_remote;
     }

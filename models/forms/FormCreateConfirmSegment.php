@@ -31,14 +31,16 @@ class FormCreateConfirmSegment extends FormCreateConfirm
      * @param Segments $hypothesis
      * @param array $config
      */
-    public function __construct(Segments $hypothesis, $config = [])
+    public function __construct(Segments $hypothesis, array $config = [])
     {
         $this->setCreatorNewResponds();
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($hypothesis));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -50,19 +52,18 @@ class FormCreateConfirmSegment extends FormCreateConfirm
      * @param Segments $hypothesis
      * @return string
      */
-    public static function getCachePath(Segments $hypothesis)
+    public static function getCachePath(Segments $hypothesis): string
     {
         $project = $hypothesis->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$hypothesis->id.'/confirm/formCreateConfirm/';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$hypothesis->getId().'/confirm/formCreateConfirm/';
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['hypothesis_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
@@ -78,7 +79,7 @@ class FormCreateConfirmSegment extends FormCreateConfirm
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -95,7 +96,7 @@ class FormCreateConfirmSegment extends FormCreateConfirm
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create ()
+    public function create (): ConfirmSegment
     {
         $model = new ConfirmSegment();
         $model->setSegmentId($this->getHypothesisId());
@@ -121,7 +122,7 @@ class FormCreateConfirmSegment extends FormCreateConfirm
     /**
      * @return string
      */
-    public function getGreetingInterview()
+    public function getGreetingInterview(): string
     {
         return $this->greeting_interview;
     }
@@ -129,7 +130,7 @@ class FormCreateConfirmSegment extends FormCreateConfirm
     /**
      * @return string
      */
-    public function getViewInterview()
+    public function getViewInterview(): string
     {
         return $this->view_interview;
     }
@@ -137,7 +138,7 @@ class FormCreateConfirmSegment extends FormCreateConfirm
     /**
      * @return string
      */
-    public function getReasonInterview()
+    public function getReasonInterview(): string
     {
         return $this->reason_interview;
     }

@@ -1,11 +1,16 @@
 <?php
 
+use app\models\ConfirmProblem;
 use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Разработка гипотез ценностных предложений';
 $this->registerCssFile('@web/css/gcp-index-style.css');
 $this->registerCssFile('@web/css/methodological-guide-style.css');
+
+/**
+ * @var ConfirmProblem $confirmProblem
+ */
 
 ?>
 
@@ -21,9 +26,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить ценностное предложение</div></div>',
-                            ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->id],
+                            ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->getId()],
                             ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-left']
-                        ); ?>
+                        ) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -220,10 +225,10 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <p>
                     В 2012 году А. Остервальдер и его команда выпустили «Проектировщик ценностного предложения».
                     Эта работа охраняется авторским правом, и её можно использовать только со ссылкой на
-                    <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']); ?>
+                    <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']) ?>
                 </p>
 
-                <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']); ?></div>
+                <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']) ?></div>
 
                 <ul>
                     <li>
@@ -300,7 +305,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
         </div>
 
         <!--Модальные окна-->
-        <?= $this->render('modal'); ?>
+        <?= $this->render('modal') ?>
 
     <?php else : ?>
 
@@ -522,10 +527,10 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <p>
                     В 2012 году А. Остервальдер и его команда выпустили «Проектировщик ценностного предложения».
                     Эта работа охраняется авторским правом, и её можно использовать только со ссылкой на
-                    <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']); ?>
+                    <?= Html::a('www.businessmodelgeneration.com', 'https://www.strategyzer.com', ['target' => '_blank']) ?>
                 </p>
 
-                <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']); ?></div>
+                <div style="max-width: 700px;"><?= Html::img('/images/elements/chart_of_the_value_map.jpg', ['width' => '100%']) ?></div>
 
                 <ul>
                     <li>

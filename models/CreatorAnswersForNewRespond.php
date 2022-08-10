@@ -19,7 +19,7 @@ class CreatorAnswersForNewRespond extends Model
      * Создание пустых ответов на вопросы для нового респондента
      * @param RespondsInterface $respond
      */
-    public function create(RespondsInterface $respond)
+    public function create(RespondsInterface $respond): void
     {
         /**
          * @var ConfirmSegment|ConfirmProblem|ConfirmGcp|ConfirmMvp $confirm
@@ -43,13 +43,19 @@ class CreatorAnswersForNewRespond extends Model
      */
     private static function getCreateModel(ConfirmationInterface $confirm)
     {
-        if ($confirm->getStage() == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new AnswersQuestionsConfirmSegment();
-        } elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new AnswersQuestionsConfirmProblem();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return new AnswersQuestionsConfirmGcp();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return new AnswersQuestionsConfirmMvp();
         }
         return false;

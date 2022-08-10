@@ -4,7 +4,6 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
-use yii\db\ActiveRecord;
 
 /**
  * Форма для авторизации на сайте
@@ -29,7 +28,7 @@ class LoginForm extends Model
     /**
      * @return array the validation rules.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['identity', 'filter', 'filter' => 'trim'],
@@ -43,7 +42,7 @@ class LoginForm extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'identity' => 'Логин или адрес эл.почты',
@@ -56,7 +55,7 @@ class LoginForm extends Model
     /**
      * @param $attribute
      */
-    public function validatePassword($attribute)
+    public function validatePassword($attribute): void
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
@@ -71,42 +70,41 @@ class LoginForm extends Model
     /**
      * @return bool
      */
-    public function login()
+    public function login(): bool
     {
         if ($this->validate()) {
             $user = $this->getUser();
             if ($user) {
                 return Yii::$app->user->login($user, $this->isRememberMe() ? 3600 * 24 * 30 : 0);
-            }else{
-                return false;
             }
-        }else{
             return false;
         }
+        return false;
     }
 
 
     /**
-     * @return bool|User|ActiveRecord
+     * @return bool|User
      */
     public function getUser()
     {
-        if ($this->_user === false)
+        if ($this->_user === false) {
             $this->_user = User::findIdentityByUsernameOrEmail($this->identity);
+        }
         return $this->_user;
     }
 
 
     /**
      * Подтвреждение регистрации по email
-     * @param $user
+     * @param User $user
      * @return bool
      */
-    public function sendActivationEmail($user)
+    public function sendActivationEmail(User $user): bool
     {
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
             ->setFrom([Yii::$app->params['supportEmail'] => 'StartPool - Акселератор стартап-проектов'])
-            ->setTo($user->email)
+            ->setTo($user->getEmail())
             ->setSubject('Регистрация на сайте StartPool')
             ->send();
 
@@ -115,7 +113,7 @@ class LoginForm extends Model
     /**
      * @return string
      */
-    public function getIdentity()
+    public function getIdentity(): string
     {
         return $this->identity;
     }
@@ -123,7 +121,7 @@ class LoginForm extends Model
     /**
      * @param string $identity
      */
-    public function setIdentity($identity)
+    public function setIdentity(string $identity): void
     {
         $this->identity = $identity;
     }
@@ -131,7 +129,7 @@ class LoginForm extends Model
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -139,7 +137,7 @@ class LoginForm extends Model
     /**
      * @param string $password
      */
-    public function setPassword($password)
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
@@ -147,7 +145,7 @@ class LoginForm extends Model
     /**
      * @return bool
      */
-    public function isRememberMe()
+    public function isRememberMe(): bool
     {
         return $this->rememberMe;
     }
@@ -155,7 +153,7 @@ class LoginForm extends Model
     /**
      * @param bool $rememberMe
      */
-    public function setRememberMe($rememberMe)
+    public function setRememberMe(bool $rememberMe): void
     {
         $this->rememberMe = $rememberMe;
     }
@@ -163,7 +161,7 @@ class LoginForm extends Model
     /**
      * @param User|false $user
      */
-    public function setUser($user)
+    public function setUser($user): void
     {
         $this->_user = $user;
     }

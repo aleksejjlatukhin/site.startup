@@ -1,10 +1,17 @@
 <?php
 
+use app\models\forms\SendEmailForm;
+use app\models\LoginForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
 $this->title = 'Подтверждение регистрации';
+
+/**
+ * @var LoginForm $model_login
+ * @var SendEmailForm $model_send_email
+ */
 
 ?>
 <div class="site-activate-account">
@@ -113,7 +120,7 @@ $this->title = 'Подтверждение регистрации';
                             'onclick' => 'return false',
                             'class' => 'link_singup',
                             'id' => 'go_back_login_form',
-                        ]);?>
+                        ]) ?>
                     </div>
 
                 </div>
@@ -164,7 +171,7 @@ $this->title = 'Подтверждение регистрации';
                     <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
 
                     <div class="col-md-12 text-center">
-                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_to_back_login_form',]);?>
+                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_to_back_login_form']) ?>
                     </div>
 
                     <?php ActiveForm::end(); ?>
@@ -179,7 +186,7 @@ $this->title = 'Подтверждение регистрации';
                     <div class="col-md-12 text-center text" style="margin: 45px 0 0 0;"></div>
 
                     <div class="col-md-12 text-center link_back" style="position: absolute; bottom: 0; height: 45px;">
-                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go2_to_back_login_form',]);?>
+                        <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go2_to_back_login_form']) ?>
                     </div>
 
                 </div>
@@ -196,7 +203,7 @@ $this->title = 'Подтверждение регистрации';
                             'onclick' => 'return false',
                             'class' => 'link_singup',
                             'id' => 'go4_to_back_login_form',
-                        ]);?>
+                        ]) ?>
                     </div>
 
                 </div>

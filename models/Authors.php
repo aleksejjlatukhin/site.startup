@@ -16,6 +16,8 @@ use yii\db\ActiveRecord;
  * @property string $fio                        ФИО автора проекта
  * @property string $role                       Роль автора в проекте
  * @property string $experience                 Опыт работы автора проекта
+ *
+ * @property Projects $project                  Проект
  */
 class Authors extends ActiveRecord
 {
@@ -23,7 +25,7 @@ class Authors extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'authors';
     }
@@ -31,9 +33,10 @@ class Authors extends ActiveRecord
 
     /**
      * Получить объект проекта
+     *
      * @return ActiveQuery
      */
-    public function getProject()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
     }
@@ -42,7 +45,7 @@ class Authors extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['fio', 'role'], 'required'],
@@ -57,7 +60,7 @@ class Authors extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -83,7 +86,7 @@ class Authors extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -91,7 +94,7 @@ class Authors extends ActiveRecord
     /**
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -99,7 +102,7 @@ class Authors extends ActiveRecord
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -107,7 +110,7 @@ class Authors extends ActiveRecord
     /**
      * @return string
      */
-    public function getFio()
+    public function getFio(): string
     {
         return $this->fio;
     }
@@ -115,7 +118,7 @@ class Authors extends ActiveRecord
     /**
      * @param string $fio
      */
-    public function setFio($fio)
+    public function setFio(string $fio): void
     {
         $this->fio = $fio;
     }
@@ -123,7 +126,7 @@ class Authors extends ActiveRecord
     /**
      * @return string
      */
-    public function getRole()
+    public function getRole(): string
     {
         return $this->role;
     }
@@ -131,7 +134,7 @@ class Authors extends ActiveRecord
     /**
      * @param string $role
      */
-    public function setRole($role)
+    public function setRole(string $role): void
     {
         $this->role = $role;
     }
@@ -139,7 +142,7 @@ class Authors extends ActiveRecord
     /**
      * @return string
      */
-    public function getExperience()
+    public function getExperience(): string
     {
         return $this->experience;
     }
@@ -147,7 +150,7 @@ class Authors extends ActiveRecord
     /**
      * @param string $experience
      */
-    public function setExperience($experience)
+    public function setExperience(string $experience): void
     {
         $this->experience = $experience;
     }

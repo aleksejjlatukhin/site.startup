@@ -1,4 +1,6 @@
 <?php
+
+use app\models\SortForm;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 ?>
@@ -6,6 +8,11 @@ use kartik\select2\Select2;
 <?php
 
 $this->title = 'Портфель проектов';
+
+/**
+ * @var SortForm $sortModel
+ * @var array $show_count_projects
+ */
 
 ?>
 
@@ -21,7 +28,7 @@ $this->title = 'Портфель проектов';
     ?>
 
     <div class="row" style="display:flex; align-items: center;">
-        <div class="col-md-10" style="font-size: 32px; text-transform: uppercase;"><?= $this->title; ?></div>
+        <div class="col-md-10" style="font-size: 32px; text-transform: uppercase;"><?= $this->title ?></div>
         <div class="col-md-2">
             <div class="row pull-right select_count_projects">
 
@@ -36,7 +43,7 @@ $this->title = 'Портфель проектов';
                             'data' => $show_count_projects,
                             'options' => ['id' => 'field_count_projects',],
                             'hideSearch' => true, //Скрытие поиска
-                        ]);
+                        ])
                     ?>
                 </div>
 

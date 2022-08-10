@@ -14,13 +14,25 @@ use yii\db\ActiveRecord;
  * Class Client
  * @package app\models
  *
- * @property int $id                    идентификатор клиента
- * @property string $name               наименование клиента
- * @property string $fullname           полное наименование клиента
- * @property string $city               город клиента
- * @property string $description        описание клиента
- * @property int $created_at            дата регистраниции клиента
- * @property int $updated_at            дата редактирования клиента
+ * @property int $id                                                идентификатор клиента
+ * @property string $name                                           наименование клиента
+ * @property string $fullname                                       полное наименование клиента
+ * @property string $city                                           город клиента
+ * @property string $description                                    описание клиента
+ * @property int $created_at                                        дата регистраниции клиента
+ * @property int $updated_at                                        дата редактирования клиента
+ *
+ * @property ClientActivation[] $clientActivationRecords            Все записи по клиенту в таблице client_activation
+ * @property ClientSettings $settings                               Настройки организации
+ * @property ClientRatesPlan[] $clientRatesPlans                    Тарифные планы, назначаемые организации
+ * @property ClientUser[] $clientUsers                              Пользователи, привязанные к организации
+ * @property CustomerManager[] $customerManagers                    Менеджеры Spaccel, которые когда-либо были привязаны к организации
+ * @property CustomerTracker[] $customerTrackers                    Трекеры Spaccel, которые когда-либо были привязаны к организации
+ * @property int $countTrackers                                     Кол-во трекеров привязанных к данной организации
+ * @property int $countExperts                                      Кол-во экспертов привязанных к данной организации
+ * @property int $countUsers                                        Кол-во проектантов привязанных к данной организации
+ * @property int $countProjects                                     Кол-во проектов привязанных к данной организации
+ * @property CustomerExpert[] $customerExperts                      Эксперты Spaccel, которые когда-либо были привязаны к организации
  */
 class Client extends ActiveRecord
 {
@@ -28,7 +40,7 @@ class Client extends ActiveRecord
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'client';
     }
@@ -40,7 +52,7 @@ class Client extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getClientActivationRecords()
+    public function getClientActivationRecords(): ActiveQuery
     {
         return $this->hasMany(ClientActivation::class, ['client_id' => 'id']);
     }
@@ -50,12 +62,12 @@ class Client extends ActiveRecord
      * Найти последнюю (актуальную) запись по клиенту
      * в таблице client_activation
      *
-     * @return array|ActiveRecord|null
+     * @return ActiveRecord|null
      */
-    public function findClientActivation()
+    public function findClientActivation(): ?ActiveRecord
     {
         return ClientActivation::find()
-            ->where(['client_id' => $this->id])
+            ->where(['client_id' => $this->getId()])
             ->orderBy(['created_at' => SORT_DESC])
             ->one();
     }
@@ -66,9 +78,11 @@ class Client extends ActiveRecord
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
-        return $this->findClientActivation()->getStatus() == ClientActivation::ACTIVE;
+        /** @var ClientActivation $clientActivation */
+        $clientActivation = $this->findClientActivation();
+        return $clientActivation->getStatus() === ClientActivation::ACTIVE;
     }
 
 
@@ -77,13 +91,14 @@ class Client extends ActiveRecord
      *
      * @return array
      */
-    public static function findAllActiveClients()
+    public static function findAllActiveClients(): array
     {
         $clients = self::find()->all();
         $result = array();
 
         foreach ($clients as $client) {
-            if ($client->findClientActivation()->status == ClientActivation::ACTIVE) {
+            /** @var ClientActivation $clientActivation */
+            if (($clientActivation = $client->findClientActivation()) && $clientActivation->getStatus() === ClientActivation::ACTIVE) {
                 $result[] = $client;
             }
         }
@@ -96,18 +111,9 @@ class Client extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getSettings()
+    public function getSettings(): ActiveQuery
     {
         return $this->hasOne(ClientSettings::class, ['client_id' => 'id']);
-    }
-
-
-    /**
-     * @return ClientSettings|null
-     */
-    public function findSettings()
-    {
-        return ClientSettings::findOne(['client_id' => $this->id]);
     }
 
 
@@ -117,30 +123,21 @@ class Client extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getClientRatesPlans()
+    public function getClientRatesPlans(): ActiveQuery
     {
         return $this->hasMany(ClientRatesPlan::class, ['client_id' => 'id']);
     }
 
 
     /**
-     * @return ClientRatesPlan[]
-     */
-    public function findClientRatesPlans()
-    {
-        return ClientRatesPlan::findAll(['client_id' => $this->id]);
-    }
-
-
-    /**
      * Получить последний установленный тариф для организации(клиента)
      *
-     * @return array|ActiveRecord|null
+     * @return ActiveRecord|null
      */
-    public function findLastClientRatesPlan()
+    public function findLastClientRatesPlan(): ?ActiveRecord
     {
         return ClientRatesPlan::find()
-            ->where(['client_id' => $this->id])
+            ->where(['client_id' => $this->getId()])
             ->orderBy(['created_at' => SORT_DESC])
             ->one();
     }
@@ -152,7 +149,7 @@ class Client extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getClientUsers()
+    public function getClientUsers(): ActiveQuery
     {
         return $this->hasMany(ClientUser::class, ['client_id' => 'id']);
     }
@@ -161,36 +158,27 @@ class Client extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getCustomerManagers()
+    public function getCustomerManagers(): ActiveQuery
     {
         return $this->hasMany(CustomerManager::class, ['client_id' => 'id']);
     }
 
 
     /**
-     * @return ActiveRecord|array|null
+     * @return ActiveRecord|null
      */
-    public function findCustomerManager()
+    public function findCustomerManager(): ?ActiveRecord
     {
-        return CustomerManager::find()->where(['client_id' => $this->id])->orderBy(['created_at' => SORT_DESC])->one();
-    }
-
-
-    /**
-     * @return ActiveQuery
-     */
-    public function getCustomerTrackers()
-    {
-        return $this->hasMany(CustomerTracker::class, ['client_id' => 'id']);
+        return CustomerManager::find()->where(['client_id' => $this->getId()])->orderBy(['created_at' => SORT_DESC])->one();
     }
 
 
     /**
      * @return CustomerTracker|null
      */
-    public function findCustomerTrackers()
+    public function getCustomerTrackers(): ?CustomerTracker
     {
-        return CustomerTracker::findOne(['client_id' => $this->id, 'status' => CustomerTracker::ACTIVE]);
+        return CustomerTracker::findOne(['client_id' => $this->getId(), 'status' => CustomerTracker::ACTIVE]);
     }
 
 
@@ -198,13 +186,13 @@ class Client extends ActiveRecord
      * Получить количество трекеров,
      * зарегистрированных в данной организации
      *
-     * @return int|string
+     * @return int
      */
-    public function getCountTrackers()
+    public function getCountTrackers(): int
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_ADMIN])->count();
+            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_ADMIN])->count();
     }
 
 
@@ -212,13 +200,13 @@ class Client extends ActiveRecord
      * Получить количество экспертов,
      * зарегистрированных в данной организации
      *
-     * @return int|string
+     * @return int
      */
-    public function getCountExperts()
+    public function getCountExperts(): int
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_EXPERT])->count();
+            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_EXPERT])->count();
     }
 
 
@@ -232,7 +220,7 @@ class Client extends ActiveRecord
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_USER])->count();
+            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->count();
     }
 
 
@@ -242,11 +230,11 @@ class Client extends ActiveRecord
      *
      * @return int
      */
-    public function getCountProjects()
+    public function getCountProjects(): int
     {
         $users = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->id, 'role' => User::ROLE_USER])->all();
+            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->all();
 
         $arrayCountProjects = array();
         foreach ($users as $user) {
@@ -257,20 +245,11 @@ class Client extends ActiveRecord
 
 
     /**
-     * @return ActiveQuery
-     */
-    public function getCustomerExperts()
-    {
-        return $this->hasMany(CustomerExpert::class, ['client_id' => 'id']);
-    }
-
-
-    /**
      * @return CustomerExpert|null
      */
-    public function findCustomerExperts()
+    public function getCustomerExperts(): ?CustomerExpert
     {
-        return CustomerExpert::findOne(['client_id' => $this->id, 'status' => CustomerExpert::ACTIVE]);
+        return CustomerExpert::findOne(['client_id' => $this->getId(), 'status' => CustomerExpert::ACTIVE]);
     }
 
 
@@ -280,11 +259,11 @@ class Client extends ActiveRecord
      *
      * @return array|ActiveRecord[]
      */
-    public function findUsers()
+    public function findUsers(): array
     {
         return User::find()->with('clientUsers')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->id])->all();
+            ->where(['client_user.client_id' => $this->getId()])->all();
     }
 
 
@@ -293,7 +272,7 @@ class Client extends ActiveRecord
      *
      * @return bool
      */
-    public function checkingReadinessActivation()
+    public function checkingReadinessActivation(): bool
     {
         if ($this->findCustomerManager() && $this->findLastClientRatesPlan()) {
             return true;
@@ -308,7 +287,7 @@ class Client extends ActiveRecord
      * @param int $id
      * @return Client|null
      */
-    public static function findById($id)
+    public static function findById(int $id): ?Client
     {
         return self::findOne($id);
     }
@@ -317,7 +296,7 @@ class Client extends ActiveRecord
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -326,7 +305,7 @@ class Client extends ActiveRecord
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -335,7 +314,7 @@ class Client extends ActiveRecord
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -344,7 +323,7 @@ class Client extends ActiveRecord
     /**
      * @return string
      */
-    public function getFullname()
+    public function getFullname(): string
     {
         return $this->fullname;
     }
@@ -353,7 +332,7 @@ class Client extends ActiveRecord
     /**
      * @param string $fullname
      */
-    public function setFullname($fullname)
+    public function setFullname(string $fullname): void
     {
         $this->fullname = $fullname;
     }
@@ -362,7 +341,7 @@ class Client extends ActiveRecord
     /**
      * @return string
      */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
@@ -371,7 +350,7 @@ class Client extends ActiveRecord
     /**
      * @param string $city
      */
-    public function setCity($city)
+    public function setCity(string $city): void
     {
         $this->city = $city;
     }
@@ -380,7 +359,7 @@ class Client extends ActiveRecord
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -389,7 +368,7 @@ class Client extends ActiveRecord
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -398,7 +377,7 @@ class Client extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'fullname', 'city', 'description'], 'required'],
@@ -413,7 +392,7 @@ class Client extends ActiveRecord
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
@@ -424,7 +403,7 @@ class Client extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Наименование организации',
@@ -448,13 +427,29 @@ class Client extends ActiveRecord
 
 
     /**
-     * @return bool
+     * @return void
      */
-    private function createClientActivationDefault()
+    private function createClientActivationDefault(): void
     {
         $clientActivation = new ClientActivation();
         $clientActivation->setClientId($this->id);
-        return $clientActivation->save();
+        $clientActivation->save();
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt(): int
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedAt(): int
+    {
+        return $this->updated_at;
     }
 
 }

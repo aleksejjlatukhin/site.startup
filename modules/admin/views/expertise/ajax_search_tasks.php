@@ -1,6 +1,15 @@
 <?php
 
+use app\models\Projects;
+use yii\data\Pagination;
 use yii\helpers\Html;
+use yii\widgets\LinkPager;
+
+/**
+ * @var Projects[] $projects
+ * @var Pagination $pages
+ * @var bool $search
+ */
 
 ?>
 
@@ -8,18 +17,18 @@ use yii\helpers\Html;
 
     <?php foreach ($projects as $project) : ?>
 
-        <div id="expertise_task-<?= $project->id;?>">
+        <div id="expertise_task-<?= $project->getId() ?>">
 
             <div class="container-one_hypothesis">
 
                 <div class="col-md-9 col-lg-10">
                     <div class="project_name_table">
-                        <?= $project->project_name; ?> -<span class="project_fullname_text"><?= $project->project_fullname; ?></span>
+                        <?= $project->getProjectName() ?> -<span class="project_fullname_text"><?= $project->getProjectFullname() ?></span>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-lg-2 informationAboutAction">
-                    <b>Автор проекта:</b> <?= $project->user->username; ?>
+                    <b>Автор проекта:</b> <?= $project->user->getUsername() ?>
                 </div>
 
             </div>
@@ -29,16 +38,16 @@ use yii\helpers\Html;
                 <div class="block-links-menu-tasks">
                     <div class="row">
                         <div class="col-md-3 text-center">
-                            <?= Html::a('Сводная таблица проекта', ['/admin/expertise/get-project-summary-table', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
+                            <?= Html::a('Сводная таблица проекта', ['/admin/expertise/get-project-summary-table', 'id' => $project->getId()], ['class' => 'link-menu-tasks']) ?>
                         </div>
                         <div class="col-md-3 text-center">
-                            <?= Html::a('Поиск экспертов', ['/admin/expertise/get-search-form-experts', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
+                            <?= Html::a('Поиск экспертов', ['/admin/expertise/get-search-form-experts', 'id' => $project->getId()], ['class' => 'link-menu-tasks']) ?>
                         </div>
                         <div class="col-md-3 text-center">
-                            <?= Html::a('Коммуникации', ['/admin/communications/get-communications', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
+                            <?= Html::a('Коммуникации', ['/admin/communications/get-communications', 'id' => $project->getId()], ['class' => 'link-menu-tasks']) ?>
                         </div>
                         <div class="col-md-3 text-center">
-                            <?= Html::a('Экспертизы', ['/admin/expertise/get-expertise-by-project', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
+                            <?= Html::a('Экспертизы', ['/admin/expertise/get-expertise-by-project', 'id' => $project->getId()], ['class' => 'link-menu-tasks']) ?>
                         </div>
                     </div>
                 </div>
@@ -52,15 +61,19 @@ use yii\helpers\Html;
     <?php endforeach; ?>
 
     <div class="pagination-admin-projects-result">
-        <?= \yii\widgets\LinkPager::widget([
+        <?= LinkPager::widget([
             'pagination' => $pages,
             'activePageCssClass' => 'pagination_active_page',
             'options' => ['class' => 'admin-projects-result-pagin-list'],
-        ]); ?>
+        ]) ?>
     </div>
 
 <?php else : ?>
 
-    <h3 class="text-center">По вашему запросу ничего не найдено...</h3>
+    <?php if ($search) : ?>
+        <h3 class="text-center">По вашему запросу ничего не найдено...</h3>
+    <?php else : ?>
+        <h3 class="text-center">Пока нет проектов...</h3>
+    <?php endif; ?>
 
 <?php endif; ?>

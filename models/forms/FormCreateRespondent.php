@@ -21,7 +21,7 @@ use yii\base\Model;
  */
 abstract class FormCreateRespondent extends Model
 {
-    const CACHE_NAME = 'formCreateRespondCache';
+    public const CACHE_NAME = 'formCreateRespondCache';
 
     public $name;
     public $confirm_id;
@@ -32,7 +32,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
@@ -45,7 +45,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Фамилия, имя, отчество',
@@ -58,7 +58,7 @@ abstract class FormCreateRespondent extends Model
      * @param ConfirmationInterface $confirm
      * @return string
      */
-    abstract public static function getCachePath(ConfirmationInterface $confirm);
+    abstract public static function getCachePath(ConfirmationInterface $confirm): string;
 
     /**
      * Создать респондента
@@ -79,7 +79,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @param int $id
      */
-    public function setConfirmId($id)
+    public function setConfirmId(int $id): void
     {
         $this->confirm_id = $id;
     }
@@ -87,7 +87,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -95,7 +95,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -103,7 +103,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -111,7 +111,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @return CreatorAnswersForNewRespond
      */
-    public function getCreatorAnswers()
+    public function getCreatorAnswers(): CreatorAnswersForNewRespond
     {
         return $this->_creatorAnswers;
     }
@@ -119,7 +119,7 @@ abstract class FormCreateRespondent extends Model
     /**
      *
      */
-    public function setCreatorAnswers()
+    public function setCreatorAnswers(): void
     {
         $this->_creatorAnswers = new CreatorAnswersForNewRespond();
     }
@@ -127,7 +127,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -135,7 +135,7 @@ abstract class FormCreateRespondent extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -143,7 +143,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }
@@ -151,7 +151,7 @@ abstract class FormCreateRespondent extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }

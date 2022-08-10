@@ -3,7 +3,11 @@
 use yii\helpers\Html;
 use app\models\User;
 
-if ($user->status == User::STATUS_ACTIVE) {
+/**
+ * @var User $user
+ */
+
+if ($user->getStatus() === User::STATUS_ACTIVE) {
 
     echo '<p>Добрый день! '.Html::encode($user->getUsername()).', Ваш профиль на сайте активирован. </p>';
     echo '<p>Теперь Вы можете приступить к работе на нашем сайте. Для этого перейдите по ссылке ' .

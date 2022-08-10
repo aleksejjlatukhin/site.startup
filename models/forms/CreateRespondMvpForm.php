@@ -31,14 +31,16 @@ class CreateRespondMvpForm extends FormCreateRespondent
      * @param ConfirmMvp $confirm
      * @param array $config
      */
-    public function __construct(ConfirmMvp $confirm, $config = [])
+    public function __construct(ConfirmMvp $confirm, array $config = [])
     {
         $this->setCreatorAnswers();
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($confirm));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -51,17 +53,19 @@ class CreateRespondMvpForm extends FormCreateRespondent
      * @param ConfirmationInterface $confirm
      * @return string
      */
-    public static function getCachePath(ConfirmationInterface $confirm)
+    public static function getCachePath(ConfirmationInterface $confirm): string
     {
+        /**
+         * @var ConfirmMvp $confirm
+         */
         $mvp = Mvps::findOne($confirm->getMvpId());
         $gcp = Gcps::findOne($mvp->getGcpId());
         $problem = Problems::findOne($mvp->getProblemId());
         $segment = Segments::findOne($mvp->getSegmentId());
         $project = Projects::findOne($mvp->getProjectId());
         $user = User::findOne($project->getUserId());
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/confirm/formCreateRespond/';
-        return $cachePath;
     }
 
 
@@ -70,7 +74,7 @@ class CreateRespondMvpForm extends FormCreateRespondent
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create ()
+    public function create (): RespondsMvp
     {
         $model = new RespondsMvp();
         $model->setConfirmId($this->getConfirmId());
@@ -97,7 +101,7 @@ class CreateRespondMvpForm extends FormCreateRespondent
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

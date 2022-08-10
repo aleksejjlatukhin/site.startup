@@ -1,8 +1,13 @@
 <?php
 
+use app\models\Mvps;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var Mvps $model
+ */
 
 ?>
 
@@ -12,7 +17,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'hypothesisUpdateForm',
-        'action' => Url::to(['/mvps/update', 'id' => $model->id]),
+        'action' => Url::to(['/mvps/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15 hypothesisUpdateForm'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -35,8 +40,7 @@ use yii\helpers\Url;
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Примеры: презентация, макет, программное обеспечение, опытный образец, видео и т.д.',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
     </div>

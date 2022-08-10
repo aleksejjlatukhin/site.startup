@@ -24,15 +24,15 @@ class FormCreateAdminCompany extends Model
 
     public $email;
     public $username;
-    public $status;
-    public $confirm;
-    public $role;
+    public $status = User::STATUS_ACTIVE;
+    public $confirm = User::CONFIRM;
+    public $role = User::ROLE_ADMIN_COMPANY;
 
 
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['email', 'username'], 'required'],
@@ -41,6 +41,7 @@ class FormCreateAdminCompany extends Model
             ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
+            ['email', 'email'],
 
             ['confirm', 'default', 'value' => User::CONFIRM],
             ['confirm', 'in', 'range' => [User::CONFIRM]],
@@ -58,7 +59,7 @@ class FormCreateAdminCompany extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Email',
@@ -68,18 +69,12 @@ class FormCreateAdminCompany extends Model
 
 
     /**
-     * Собственное правило для поля username
-     * Переводим все логины в нижний регистр
-     * и сравниваем их с тем, что в форме
      * @param $attr
      */
-    public function uniqUsername($attr)
+    public function uniqUsername($attr): void
     {
-        $users = User::find()->all();
-        foreach ($users as $user){
-            if (mb_strtolower($this->username) === mb_strtolower($user->username)){
-                $this->addError($attr, 'Этот логин уже занят.');
-            }
+        if (User::findOne(['username' => $this->getUsername()])) {
+            $this->addError($attr, 'Этот логин уже занят.');
         }
     }
 
@@ -87,38 +82,33 @@ class FormCreateAdminCompany extends Model
     /**
      * @param $attr
      */
-    public function matchUsername($attr)
+    public function matchUsername($attr): void
     {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->getUsername())) {
             $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
         }
-        if (preg_match('/\s+/',$this->username)) {
+        if (preg_match('/\s+/',$this->getUsername())) {
             $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
 
 
     /**
-     * Собственное правило для поля email
-     * Переводим все email в нижний регистр и сравниваем их с тем, что в форме
      * @param $attr
      */
-    public function uniqEmail($attr)
+    public function uniqEmail($attr): void
     {
-        $users = User::find()->all();
-        foreach ($users as $user){
-            if ($this->email === $user->email){
-                $this->addError($attr, 'Эта почта уже зарегистрирована.');
-            }
+        if (User::findOne(['email' => $this->getEmail()])){
+            $this->addError($attr, 'Эта почта уже зарегистрирована.');
         }
     }
 
 
     /**
-     * @return User|bool|null
+     * @return User|null
      * @throws Exception
      */
-    public function create()
+    public function create(): ?User
     {
         $user = new User();
         $user->attributes = $this->attributes;
@@ -129,5 +119,85 @@ class FormCreateAdminCompany extends Model
             return $user;
         }
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfirm(): int
+    {
+        return $this->confirm;
+    }
+
+    /**
+     * @param int $confirm
+     */
+    public function setConfirm(int $confirm): void
+    {
+        $this->confirm = $confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRole(): int
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param int $role
+     */
+    public function setRole(int $role): void
+    {
+        $this->role = $role;
     }
 }

@@ -20,7 +20,7 @@ class CacheForm
      * @param $path
      * @param $name
      */
-    public function setCache($path, $name)
+    public function setCache($path, $name): void
     {
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
         $data = $_POST; //Массив, в который будем записывать в кэш
@@ -32,6 +32,7 @@ class CacheForm
 
     /**
      * Получить данные кэша
+     *
      * @param $path
      * @param $name
      * @return mixed
@@ -46,10 +47,11 @@ class CacheForm
 
     /**
      * Удалить данные кэша
+     *
      * @param $path
      * @throws ErrorException
      */
-    public function deleteCache($path)
+    public function deleteCache($path): void
     {
         if (file_exists($path)) {
             FileHelper::removeDirectory($path);

@@ -20,19 +20,19 @@ class CreatorNewRespondsOnConfirmFirstStep extends Model implements CreateRespon
      * @param ConfirmationInterface $confirm
      * @param FormCreateConfirm $form
      */
-    public function create(ConfirmationInterface $confirm, FormCreateConfirm $form)
+    public function create(ConfirmationInterface $confirm, FormCreateConfirm $form): void
     {
-        if ($confirm->stage == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             for ($i = 1; $i <= $form->count_respond; $i++) {
                 $newRespond[$i] = self::getCreateModel($confirm);
-                $newRespond[$i]->setConfirmId($confirm->id);
+                $newRespond[$i]->setConfirmId($confirm->getId());
                 $newRespond[$i]->setName('Респондент ' . $i);
                 $newRespond[$i]->save();
             }
         } else {
             for ($i = ++$form->count_respond; $i < array_sum([$form->count_respond, $form->add_count_respond]); $i++ ) {
                 $newRespond[$i] = self::getCreateModel($confirm);
-                $newRespond[$i]->setConfirmId($confirm->id);
+                $newRespond[$i]->setConfirmId($confirm->getId());
                 $newRespond[$i]->setName('Респондент ' . $i);
                 $newRespond[$i]->save();
             }
@@ -46,13 +46,19 @@ class CreatorNewRespondsOnConfirmFirstStep extends Model implements CreateRespon
      */
     private static function getCreateModel(ConfirmationInterface $confirm)
     {
-        if ($confirm->getStage() == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new RespondsSegment();
-        } elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new RespondsProblem();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return new RespondsGcp();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return new RespondsMvp();
         }
         return false;

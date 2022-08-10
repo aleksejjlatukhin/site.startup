@@ -19,31 +19,42 @@ use yii\helpers\Html;
  * Class ProjectCommunications
  * @package app\models
  *
- * @property int $id                                Идентификатор коммуникации
- * @property int $sender_id                         Идентификатор отправителя коммуникации из таб.User
- * @property int $adressee_id                       Идентификатор получателя коммуникации из таб.User
- * @property int $type                              Тип коммуникации
- * @property int $project_id                        Идентификатор проекта, по которому отправлена коммуникация
- * @property int $status                            Статус коммуникации
- * @property int $pattern_id                        Идентификатор шаблона коммуникации
- * @property int $triggered_communication_id        Идентификатор коммуникации в ответ, на которую была создана данная коммуникация
- * @property int $cancel                            Параметр аннулирования коммуникации
- * @property int $created_at                        Дата создания коммуникации
- * @property int $updated_at                        Дата обновления коммуникации
+ * @property int $id                                            Идентификатор коммуникации
+ * @property int $sender_id                                     Идентификатор отправителя коммуникации из таб.User
+ * @property int $adressee_id                                   Идентификатор получателя коммуникации из таб.User
+ * @property int $type                                          Тип коммуникации
+ * @property int $project_id                                    Идентификатор проекта, по которому отправлена коммуникация
+ * @property int $status                                        Статус коммуникации
+ * @property int $pattern_id                                    Идентификатор шаблона коммуникации
+ * @property int|null $triggered_communication_id               Идентификатор коммуникации в ответ, на которую была создана данная коммуникация
+ * @property int $cancel                                        Параметр аннулирования коммуникации
+ * @property int $created_at                                    Дата создания коммуникации
+ * @property int $updated_at                                    Дата обновления коммуникации
+ *
+ * @property UserAccessToProjects $userAccessToProject          объект доступа пользователя к проекту по коммуникации
+ * @property CommunicationResponse $communicationResponse       объект ответа по коммуникации
+ * @property ProjectCommunications $responsiveCommunication     объект ответной коммуникации, т.е. обращение от коммуникации на которую ответили, а запрос на поиск коммуникации, которой ответили
+ * @property ProjectCommunications $communicationAnswered       коммуникация на которую, была создана ответная коммуникация, запрос выполняется от ответной коммуникации
+ * @property User $expert                                       эксперт
+ * @property Projects $project                                  объект проекта, по которому создана коммуникация
+ * @property CommunicationPatterns $pattern                     шаблон коммуникации
+ * @property TypesAccessToExpertise $typesAccessToExpertise     типы экспертиз назначенных эксперту по данной коммуникации
+ * @property string $accessStatus                               Статус доступа к проекту
+ * @property string $notificationStatus                         Тип (статус) уведомления для эксперта
  */
 class ProjectCommunications extends ActiveRecord implements CommunicationsInterface
 {
 
-    const CANCEL_TRUE = 1111;
-    const CANCEL_FALSE = 2222;
-    const READ = 1000;
-    const NO_READ = 500;
+    public const CANCEL_TRUE = 1111;
+    public const CANCEL_FALSE = 2222;
+    public const READ = 1000;
+    public const NO_READ = 500;
 
 
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'project_communications';
     }
@@ -55,7 +66,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ActiveQuery
      */
-    public function getUserAccessToProject()
+    public function getUserAccessToProject(): ActiveQuery
     {
         return $this->hasOne(UserAccessToProjects::class, ['communication_id' => 'id']);
     }
@@ -67,7 +78,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ActiveQuery
      */
-    public function getCommunicationResponse()
+    public function getCommunicationResponse(): ActiveQuery
     {
         return $this->hasOne(CommunicationResponse::class, ['communication_id' => 'id']);
     }
@@ -80,9 +91,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ProjectCommunications|null
      */
-    public function getResponsiveCommunication()
+    public function getResponsiveCommunication(): ?ProjectCommunications
     {
-        return self::findOne(['triggered_communication_id' => $this->id]);
+        return self::findOne(['triggered_communication_id' => $this->getId()]);
     }
 
 
@@ -93,9 +104,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ProjectCommunications|null
      */
-    public function getCommunicationAnswered()
+    public function getCommunicationAnswered(): ?ProjectCommunications
     {
-        return self::findOne(['id' => $this->triggered_communication_id]);
+        return self::findOne(['id' => $this->getTriggeredCommunicationId()]);
     }
 
 
@@ -105,12 +116,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return User|null
      */
-    public function getExpert()
+    public function getExpert(): ?User
     {
-        if ($this->type == CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            $expert = User::findOne($this->sender_id);
+        if ($this->getType() === CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            $expert = User::findOne($this->getSenderId());
         } else {
-            $expert = User::findOne($this->adressee_id);
+            $expert = User::findOne($this->getAdresseeId());
         }
         return $expert;
     }
@@ -122,20 +133,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ActiveQuery
      */
-    public function getProject()
+    public function getProject(): ActiveQuery
     {
         return $this->hasOne(Projects::class, ['id' => 'project_id']);
-    }
-
-
-    /**
-     * Поиск проекта, по которому создана коммуникация
-     *
-     * @return Projects|null
-     */
-    public function findProject()
-    {
-        return Projects::findOne($this->project_id);
     }
 
 
@@ -145,7 +145,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return ActiveQuery
      */
-    public function getPattern()
+    public function getPattern(): ActiveQuery
     {
         return $this->hasOne(CommunicationPatterns::class, ['id' => 'pattern_id']);
     }
@@ -155,22 +155,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * Получить объект содержащий
      * типы экспертиз назначенных
      * эксперту по данной коммуникации
+     *
      * @return ActiveQuery
      */
-    public function getTypesAccessToExpertise()
+    public function getTypesAccessToExpertise(): ActiveQuery
     {
         return $this->hasOne(TypesAccessToExpertise::class, ['communication_id' => 'id']);
-    }
-
-    /**
-     * Найти объект содержащий
-     * типы экспертиз назначенных
-     * эксперту по данной коммуникации
-     * @return TypesAccessToExpertise|null
-     */
-    public function findTypesAccessToExpertise()
-    {
-        return TypesAccessToExpertise::findOne(['communication_id' => $this->getId()]);
     }
 
 
@@ -181,37 +171,44 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param bool $isSendEmail
      * @return string
      */
-    public function getDescriptionPattern($isSendEmail = false)
+    public function getDescriptionPattern(bool $isSendEmail = false): string
     {
         $projectName_search = '{{наименование проекта}}';
-        $projectName_replace = '«' . $this->project->project_name . '»';
+        $projectName_replace = '«' . $this->project->getProjectName() . '»';
         $linkProjectName_search = '{{наименование проекта, ссылка на проект}}';
-        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->user_id, 'project_id' => $this->project->id]);
-        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->user_id, 'project_id' => $this->project->id])) : $linkProjectName_replace;
+        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()]);
+        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()])) : $linkProjectName_replace;
         $pattern = $this->pattern;
 
         if ($pattern) {
 
-            $description = $pattern->description;
+            $description = $pattern->getDescription();
 
-            if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
                 return str_replace($linkProjectName_search, $linkProjectName_replace, $description);
-            } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-                return str_replace($projectName_search, $projectName_replace, $description);
-            } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
-                $typesAccessToExpertise_search = '{{список типов деятельности эксперта}}';
-                $typesAccessToExpertise_replace = ExpertType::getContent($this->findTypesAccessToExpertise()->types);
-                return str_replace($linkProjectName_search, $linkProjectName_replace, str_replace($typesAccessToExpertise_search, $typesAccessToExpertise_replace, $description));
-            } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
-                return str_replace($projectName_search, $projectName_replace, $description);
-            } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+            }
+
+            if ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
                 return str_replace($projectName_search, $projectName_replace, $description);
             }
 
-        } else {
+            if ($this->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                $typesAccessToExpertise_search = '{{список типов деятельности эксперта}}';
+                $typesAccessToExpertise_replace = ExpertType::getContent($this->typesAccessToExpertise->getTypes());
+                return str_replace($linkProjectName_search, $linkProjectName_replace, str_replace($typesAccessToExpertise_search, $typesAccessToExpertise_replace, $description));
+            }
 
-            return $this->getDefaultPattern($isSendEmail);
+            if ($this->getType() === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
+                return str_replace($projectName_search, $projectName_replace, $description);
+            }
+
+            if ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+                return str_replace($projectName_search, $projectName_replace, $description);
+            }
+
         }
+
+        return $this->getDefaultPattern($isSendEmail);
     }
 
 
@@ -222,34 +219,42 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param bool $isSendEmail
      * @return string
      */
-    public function getDefaultPattern($isSendEmail = false)
+    public function getDefaultPattern(bool $isSendEmail = false): string
     {
         $projectName_search = '{{наименование проекта}}';
-        $projectName_replace = '«' . $this->project->project_name . '»';
+        $projectName_replace = '«' . $this->project->getProjectName() . '»';
         $linkProjectName_search = '{{наименование проекта, ссылка на проект}}';
-        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->user_id, 'project_id' => $this->project->id]);
-        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->user_id, 'project_id' => $this->project->id])) : $linkProjectName_replace;
+        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()]);
+        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()])) : $linkProjectName_replace;
 
-        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE;
             return str_replace($linkProjectName_search, $linkProjectName_replace, $defaultPattern);
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+        }
+
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE;
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+        }
+
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
             $typesAccessToExpertise_search = '{{список типов деятельности эксперта}}';
-            $typesAccessToExpertise_replace = ExpertType::getContent($this->findTypesAccessToExpertise()->types);
+            $typesAccessToExpertise_replace = ExpertType::getContent($this->typesAccessToExpertise->getTypes());
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_APPOINTS_EXPERT_PROJECT;
             return str_replace($linkProjectName_search, $linkProjectName_replace, str_replace($typesAccessToExpertise_search, $typesAccessToExpertise_replace, $defaultPattern));
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
+        }
+
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT;
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+        }
+
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT;
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
 
@@ -259,26 +264,30 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return string
      */
-    public function getAccessStatus()
+    public function getAccessStatus(): string
     {
-        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            if ($this->userAccessToProject->cancel == UserAccessToProjects::CANCEL_TRUE) {
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($this->userAccessToProject->getCancel() === UserAccessToProjects::CANCEL_TRUE) {
                 return '<div class="text-danger">Закрыт</div>';
-            } else {
-                return '<div class="text-success">Открыт до ' . date('d.m.Y H:i', $this->userAccessToProject->date_stop) . '</div>';
             }
-        } elseif (in_array($this->type, [CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
-            CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT, CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT])) {
-            return '<div class="text-danger">Закрыт</div>';
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
-            if ($this->userAccessToProject->cancel == UserAccessToProjects::CANCEL_TRUE) {
-                return '<div class="text-danger">Закрыт</div>';
-            } else {
-                return '<div class="text-success">Бессрочный</div>';
-            }
-        } else {
-            return '';
+
+            return '<div class="text-success">Открыт до ' . date('d.m.Y H:i', $this->userAccessToProject->date_stop) . '</div>';
         }
+
+        if (in_array($this->getType(), [CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
+            CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT, CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT], false)) {
+            return '<div class="text-danger">Закрыт</div>';
+        }
+
+        if ($this->type === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+            if ($this->userAccessToProject->getCancel() === UserAccessToProjects::CANCEL_TRUE) {
+                return '<div class="text-danger">Закрыт</div>';
+            }
+
+            return '<div class="text-success">Бессрочный</div>';
+        }
+
+        return '';
     }
 
 
@@ -288,34 +297,39 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return string
      */
-    public function getNotificationStatus()
+    public function getNotificationStatus(): string
     {
-        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            if ($this->cancel == self::CANCEL_TRUE) {
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($this->getCancel() === self::CANCEL_TRUE) {
                 return '<div class="text-success">Запрос о готовности провести экспертизу</div>';
-            } elseif ($this->status == self::READ) {
+            }
+            if ($this->getStatus() === self::READ) {
                 return '<div class="text-success">Ответ получен</div>';
-            } elseif ($this->status == self::NO_READ && time() < $this->userAccessToProject->date_stop) {
+            }
+            if ($this->getStatus() === self::NO_READ && time() < $this->userAccessToProject->getDateStop()) {
                 return '<div class="text-warning">Требуется ответ</div>';
-            } elseif ($this->status == self::NO_READ && time() > $this->userAccessToProject->date_stop) {
+            }
+            if ($this->getStatus() === self::NO_READ && time() > $this->userAccessToProject->getDateStop()) {
                 return '<div class="text-danger">Просрочена дата ответа</div>';
             }
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+        } elseif ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
             return '<div class="text-danger">Запрос отозван</div>';
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+        } elseif ($this->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
             return '<div class="text-success">Назначен(-а) на проект</div>';
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
+        } elseif ($this->getType() === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
             return '<div class="text-danger">Отказано в назначении на проект</div>';
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+        } elseif ($this->getType() === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
             return '<div class="text-danger">Отозван(-а) с проекта</div>';
         }
+
+        return '';
     }
 
 
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['sender_id', 'adressee_id', 'type', 'project_id', 'status', 'pattern_id', 'triggered_communication_id', 'cancel', 'created_at', 'updated_at'], 'integer'],
@@ -337,7 +351,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -353,7 +367,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param int $project_id
      * @return bool
      */
-    public static function isNeedAskExpert($expert_id, $project_id)
+    public static function isNeedAskExpert(int $expert_id, int $project_id): bool
     {
         $communications = self::find()->where(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
         $existCommunications = $communications->all();
@@ -363,43 +377,46 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             // коммуникаций по данному проекту
             return true;
 
-        } else {
-
-            $lastCommunication = $communications->orderBy('id DESC')->one();
-
-            if (in_array($lastCommunication->type, [
-                CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
-                CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
-                CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT
-            ])) {
-                // Если у эксперта последняя коммуникая по проекту соответствует типам
-                // "отмена запроса", "отказано в назначении на проект", "отозван с проекта"
-                return true;
-
-            } elseif ($lastCommunication->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
-                && $lastCommunication->userAccessToProject->date_stop < time()) {
-                // Последняя коммуникация эксперта по проекту "запрос эксперту о готовности
-                // провести экспертизу" и время доступа к проекту закончилось
-                return true;
-            }
-            elseif ($lastCommunication->type == CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE
-                && $lastCommunication->communicationResponse->answer == CommunicationResponse::NEGATIVE_RESPONSE) {
-                // Последняя коммуникая, отрицательный ответ эксперта на запрос о готовности провести экспертизу
-                return true;
-            }
-            return false;
         }
+
+        /** @var self $lastCommunication */
+        $lastCommunication = $communications->orderBy('id DESC')->one();
+
+        if (in_array($lastCommunication->getType(), [
+            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
+            CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
+            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT
+        ], false)) {
+            // Если у эксперта последняя коммуникая по проекту соответствует типам
+            // "отмена запроса", "отказано в назначении на проект", "отозван с проекта"
+            return true;
+
+        }
+
+        if ($lastCommunication->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
+            && $lastCommunication->userAccessToProject->getDateStop() < time()) {
+            // Последняя коммуникация эксперта по проекту "запрос эксперту о готовности
+            // провести экспертизу" и время доступа к проекту закончилось
+            return true;
+        }
+
+        if ($lastCommunication->getType() === CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE
+            && $lastCommunication->communicationResponse->getAnswer() === CommunicationResponse::NEGATIVE_RESPONSE) {
+            // Последняя коммуникая, отрицательный ответ эксперта на запрос о готовности провести экспертизу
+            return true;
+        }
+        return false;
     }
 
 
     /**
      * Проверка доступа к проведению экспертизы
      *
-     * @param $expert_id
-     * @param $project_id
+     * @param int $expert_id
+     * @param int $project_id
      * @return bool
      */
-    public static function checkOfAccessToCarryingExpertise($expert_id, $project_id)
+    public static function checkOfAccessToCarryingExpertise(int $expert_id, int $project_id): bool
     {
         $communications = self::find()->where(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
         $existCommunications = $communications->all();
@@ -409,13 +426,14 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             // коммуникаций по данному проекту
             return false;
 
-        } else {
-            $lastCommunication = $communications->orderBy('id DESC')->one();
-            if ($lastCommunication->type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
-                return true;
-            }
-            return false;
         }
+
+        /** @var self $lastCommunication */
+        $lastCommunication = $communications->orderBy('id DESC')->one();
+        if ($lastCommunication->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -425,11 +443,11 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return bool
      */
-    public function isNeedShowButtonAnswer()
+    public function isNeedShowButtonAnswer(): bool
     {
-        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE &&
-            $this->cancel == self::CANCEL_FALSE && $this->status == self::NO_READ &&
-            time() < $this->userAccessToProject->date_stop) {
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE &&
+            $this->getCancel() === self::CANCEL_FALSE && $this->getStatus() === self::NO_READ &&
+            time() < $this->userAccessToProject->getDateStop()) {
             return true;
         }
         return false;
@@ -442,20 +460,22 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return bool
      */
-    public function isNeedReadButton()
+    public function isNeedReadButton(): bool
     {
-        if ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            if ($this->status == self::NO_READ and time() > $this->userAccessToProject->date_stop) {
-                return true;
-            } elseif ($this->status == self::NO_READ and $this->cancel == self::CANCEL_TRUE) {
+        if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($this->getStatus() === self::NO_READ && time() > $this->userAccessToProject->getDateStop()) {
                 return true;
             }
-        } elseif (!in_array($this->type, [CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE, CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE])) {
-            if ($this->status == self::NO_READ) {
+
+            if ($this->getStatus() === self::NO_READ && $this->getCancel() === self::CANCEL_TRUE) {
                 return true;
             }
-        } elseif ($this->type == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE &&
-            ($this->cancel == self::CANCEL_TRUE && $this->status == self::NO_READ || time() > $this->userAccessToProject->date_stop)) {
+        } elseif (!in_array($this->getType(), [CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE, CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE], false)) {
+            if ($this->getStatus() === self::NO_READ) {
+                return true;
+            }
+        } elseif ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE &&
+            ($this->getCancel() === self::CANCEL_TRUE && $this->getStatus() === self::NO_READ || time() > $this->userAccessToProject->getDateStop())) {
             return true;
         }
         return false;
@@ -467,23 +487,21 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param int $project_id
      * @param int $type
      */
-    public function setParams($adressee_id, $project_id, $type)
+    public function setParams(int $adressee_id, int $project_id, int $type): void
     {
-        $this->setSenderId(Yii::$app->user->id);
+        $this->setSenderId(Yii::$app->user->getId());
         $this->setAdresseeId($adressee_id);
         $this->setProjectId($project_id);
         $this->setType($type);
 
-        $pattern = CommunicationPatterns::find()
-            ->select(['id'])
-            ->where([
+        $pattern = CommunicationPatterns::findOne([
             'communication_type' => $type,
             'is_active' => CommunicationPatterns::ACTIVE,
-            'is_remote' => CommunicationPatterns::NOT_REMOTE])
-            ->one();
+            'is_remote' => CommunicationPatterns::NOT_REMOTE
+            ]);
 
         if ($pattern) {
-            $this->setPatternId($pattern->id);
+            $this->setPatternId($pattern->getId());
         }
     }
 
@@ -493,9 +511,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * для создания данной коммуникации, т.е. данная коммуникация
      * является ответом для триггерной коммуникации
      *
-     * @param $id
+     * @param int|null $id
      */
-    public function setTriggeredCommunicationId($id)
+    public function setTriggeredCommunicationId(int $id = null): void
     {
         $this->triggered_communication_id = $id;
     }
@@ -504,7 +522,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * Установить параметр
      * аннулирования коммуникации
      */
-    public function setCancel()
+    public function setCancel(): void
     {
         $this->cancel = self::CANCEL_TRUE;
     }
@@ -514,7 +532,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * Установить параметр
      * прочтения коммуникации
      */
-    public function setStatusRead()
+    public function setStatusRead(): void
     {
         $this->status = self::READ;
     }
@@ -525,7 +543,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return int
      */
-    public function getAdresseeId()
+    public function getAdresseeId(): int
     {
         return $this->adressee_id;
     }
@@ -534,7 +552,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $adressee_id
      */
-    public function setAdresseeId($adressee_id)
+    public function setAdresseeId(int $adressee_id): void
     {
         $this->adressee_id = $adressee_id;
     }
@@ -545,7 +563,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return int
      */
-    public function getSenderId()
+    public function getSenderId(): int
     {
         return $this->sender_id;
     }
@@ -554,7 +572,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $sender_id
      */
-    public function setSenderId($sender_id)
+    public function setSenderId(int $sender_id): void
     {
         $this->sender_id = $sender_id;
     }
@@ -565,7 +583,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -576,7 +594,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      *
      * @return int
      */
-    public function getProjectId()
+    public function getProjectId(): int
     {
         return $this->project_id;
     }
@@ -585,7 +603,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $project_id
      */
-    public function setProjectId($project_id)
+    public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
     }
@@ -594,7 +612,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
@@ -603,7 +621,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $type
      */
-    public function setType($type)
+    public function setType(int $type): void
     {
         $this->type = $type;
     }
@@ -612,7 +630,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -621,7 +639,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -630,7 +648,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getPatternId()
+    public function getPatternId(): int
     {
         return $this->pattern_id;
     }
@@ -639,7 +657,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @param int $pattern_id
      */
-    public function setPatternId($pattern_id)
+    public function setPatternId(int $pattern_id): void
     {
         $this->pattern_id = $pattern_id;
     }
@@ -647,7 +665,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getTriggeredCommunicationId()
+    public function getTriggeredCommunicationId(): int
     {
         return $this->triggered_communication_id;
     }
@@ -655,7 +673,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getCancel()
+    public function getCancel(): int
     {
         return $this->cancel;
     }
@@ -663,7 +681,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -671,7 +689,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

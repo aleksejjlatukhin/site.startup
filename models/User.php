@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace app\models;
 
@@ -20,39 +20,64 @@ use Yii;
  * Class User
  * @package app\models
  *
- * @property int $id                                Идентификатор пользователя
- * @property string $email                          Адрес эл. почты пользователя
- * @property string $username                       Логин пользователя
- * @property string $password_hash                  Хэшированный пароль пользователя хранится в бд
- * @property string $password                       Пароль пользователя не хранится в бд
- * @property string $avatar_max_image               Название загруженного файла с аватаром пользователя
- * @property string $avatar_image                   Название сформированного файла с аватаром пользователя
- * @property string $auth_key                       Ключ авторизации пользователя (пока не используется)
- * @property string $secret_key                     Секретный ключ для подтверждения регистрации (ограничен по времени действия)
- * @property int $role                              Проектная роль пользователя
- * @property int $status                            Статус пользователя
- * @property int $confirm                           Подтверждена ли регистрация пользователя
- * @property int $id_admin                          Поле для привязки проектанта к трекеру
- * @property int $created_at                        Дата регистрации пользователя
- * @property int $updated_at                        Дата обновления пользователя (его данных)
+ * @property int $id                                            Идентификатор пользователя
+ * @property string $email                                      Адрес эл. почты пользователя
+ * @property string $username                                   Логин пользователя
+ * @property string $password_hash                              Хэшированный пароль пользователя хранится в бд
+ * @property string $password                                   Пароль пользователя не хранится в бд
+ * @property string $avatar_max_image                           Название загруженного файла с аватаром пользователя
+ * @property string $avatar_image                               Название сформированного файла с аватаром пользователя
+ * @property string $auth_key                                   Ключ авторизации пользователя (пока не используется)
+ * @property string $secret_key                                 Секретный ключ для подтверждения регистрации (ограничен по времени действия)
+ * @property int $role                                          Проектная роль пользователя
+ * @property int $status                                        Статус пользователя
+ * @property int $confirm                                       Подтверждена ли регистрация пользователя
+ * @property int $id_admin                                      Поле для привязки проектанта к трекеру
+ * @property int $created_at                                    Дата регистрации пользователя
+ * @property int $updated_at                                    Дата обновления пользователя (его данных)
+ *
+ * @property Projects[] $projects                               Проекты пользователя
+ * @property ExpertInfo $expertInfo                             Информация о пользователе с ролью "Эксперт"
+ * @property KeywordsExpert $keywords                           Ключевые слова о деятельности эксперта
+ * @property UserAccessToProjects[] $userAccessToProjects       Все записи о доступе пользователя (эксперта) к проектам
+ * @property ClientUser $clientUser                             Связь пользователя и оргранизации
+ * @property CustomerManager[] $customerManagers                Связь пользователя с ролью Менеджер от Spaccel с организациями, к которым он привязан
+ * @property CustomerTracker[] $customerTrackers                Связь пользователя с ролью Трекер от Spaccel с организациями, к которым он привязан
+ * @property CustomerExpert[] $customerExperts                  Связь пользователя с ролью Эксперт от Spaccel с организациями, к которым он привязан
+ * @property CheckingOnlineUser $checkingOnline                 Проверка пользователя на статус онлайн
+ * @property bool|string $checkOnline                           Получить статус пользователя онлайн или время посл.активности
+ * @property User $mainAdmin                                    Получить объект главного админа или админа организации
+ * @property User $admin                                        Получить объект трекера
+ * @property User $development                                  Получить объект техподдержки
+ * @property bool|int $countUnreadMessages                      Получить кол-во непрочитанных сообщений пользователя
+ * @property bool|int $countUnreadCommunications                Получить кол-во непрочитанных уведомлений пользователя
+ * @property bool|int $countUnreadMessagesFromAdmin             Получить кол-во непрочитанных сообщений проектанта от трекера
+ * @property bool|int $countUnreadMessagesFromDev               Получить кол-во непрочитанных сообщений пользователя от техподдержки
+ * @property bool|int $countUnreadMessagesFromMainAdmin         Получить кол-во непрочитанных сообщений трекера или менеджера от админа
+ * @property bool|int $countUnreadMessagesExpertFromMainAdmin   Получить кол-во непрочитанных сообщений эксперта от админа
+ * @property bool|int $countUnreadMessagesFromUser              Получить кол-во непрочитанных сообщений от проектанта трекеру, где проектант является отправителем
+ * @property bool|int $countUnreadMessagesDevelopmentFromUser   Получить кол-во непрочитанных сообщений от пользователя техподдержке, где пользователь является отправителем
+ * @property bool|int $countUnreadMessagesMainAdminFromAdmin    Получить кол-во непрочитанных сообщений от трекера админу, где трекер является отправителем
+ * @property bool|int $countUnreadMessagesMainAdminFromExpert   Получить кол-во непрочитанных сообщений от эксперта админу, где эксперт является отправителем
+ * @property bool|int $countUnreadMessagesMainAdminFromManager  Получить кол-во непрочитанных сообщений от менеджера админу, где менеджер является отправителем
  */
 class User extends ActiveRecord implements IdentityInterface
 {
 
-    const STATUS_DELETED = 0; // Заблокирован
-    const STATUS_NOT_ACTIVE = 1; // Не активирован
-    const STATUS_ACTIVE = 10; // Активирован
+    public const STATUS_DELETED = 0; // Заблокирован
+    public const STATUS_NOT_ACTIVE = 1; // Не активирован
+    public const STATUS_ACTIVE = 10; // Активирован
 
-    const ROLE_USER = 10;           // Роль проектанта
-    const ROLE_ADMIN = 20;          // Роль трекера
-    const ROLE_ADMIN_COMPANY = 25;  // Роль администратора организации
-    const ROLE_MAIN_ADMIN = 30;     // Роль гл.администратора платформы
-    const ROLE_EXPERT = 40;         // Роль эксперта
-    const ROLE_MANAGER = 50;        // Роль менеждера по клиентам (организациям) от платформы
-    const ROLE_DEV = 100;           // Роль тех.поддержки
+    public const ROLE_USER = 10;           // Роль проектанта
+    public const ROLE_ADMIN = 20;          // Роль трекера
+    public const ROLE_ADMIN_COMPANY = 25;  // Роль администратора организации
+    public const ROLE_MAIN_ADMIN = 30;     // Роль гл.администратора платформы
+    public const ROLE_EXPERT = 40;         // Роль эксперта
+    public const ROLE_MANAGER = 50;        // Роль менеждера по клиентам (организациям) от платформы
+    public const ROLE_DEV = 100;           // Роль тех.поддержки
 
-    const CONFIRM = 20; // Регистрация подтверждена
-    const NOT_CONFIRM = 10; // Регистрация не подтверждена
+    public const CONFIRM = 20; // Регистрация подтверждена
+    public const NOT_CONFIRM = 10; // Регистрация не подтверждена
 
     public $password;
 
@@ -60,7 +85,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user';
     }
@@ -69,7 +94,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['username', 'email', 'password', 'avatar_max_image', 'avatar_image'], 'filter', 'filter' => 'trim'],
@@ -91,7 +116,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'username' => 'Логин',
@@ -123,7 +148,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class
@@ -133,9 +158,10 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Получить все проекты пользователя
+     *
      * @return ActiveQuery
      */
-    public function getProjects()
+    public function getProjects(): ActiveQuery
     {
         return $this->hasMany(Projects::class, ['user_id' => 'id']);
     }
@@ -144,9 +170,10 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Получить подробную
      * информацию o эсперте
+     *
      * @return ActiveQuery
      */
-    public function getExpertInfo()
+    public function getExpertInfo(): ActiveQuery
     {
         return $this->hasOne(ExpertInfo::class, ['user_id' => 'id']);
     }
@@ -155,9 +182,10 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Получить ключевые слова
      * о деятельности эксперта
+     *
      * @return ActiveQuery
      */
-    public function getKeywords()
+    public function getKeywords(): ActiveQuery
     {
         return $this->hasOne(KeywordsExpert::class, ['expert_id' => 'id']);
     }
@@ -169,9 +197,9 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return ActiveQuery
      */
-    public function getUserAccessToProject()
+    public function getUserAccessToProjects(): ActiveQuery
     {
-        return $this->hasOne(UserAccessToProjects::class, ['user_id' => 'id']);
+        return $this->hasMany(UserAccessToProjects::class, ['user_id' => 'id']);
     }
 
 
@@ -179,23 +207,22 @@ class User extends ActiveRecord implements IdentityInterface
      * Получить объект доступа класса UserAccessToProjects
      * стороннего пользователя к конкретному проекту
      *
-     * @param $id
+     * @param int $id
      * @return array|ActiveRecord|null
      */
-    public function findUserAccessToProject($id)
+    public function findUserAccessToProject(int $id)
     {
-        $access = UserAccessToProjects::find()
-            ->where(['user_id' => $this->id])
+        return UserAccessToProjects::find()
+            ->where(['user_id' => $this->getId()])
             ->andWhere(['project_id' => $id])
             ->orderBy('id DESC')
             ->one();
-
-        return $access;
     }
 
 
     /**
      * Аутентификация пользователей
+     *
      * @param int|string $id
      * @return User|IdentityInterface|null
      */
@@ -219,10 +246,11 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Находит пользователя по имени и возвращает объект найденного пользователя
-     * @param $username
+     *
+     * @param string $username
      * @return User|null
      */
-    public static function findByUsername($username)
+    public static function findByUsername(string $username): ?User
     {
         return static::findOne(['username' => $username]);
     }
@@ -230,39 +258,39 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Находит пользователя по емайл
-     * @param $email
+     *
+     * @param string $email
      * @return User|null
      */
-    public static function findByEmail($email)
+    public static function findByEmail(string $email): ?User
     {
-        return static::findOne([
-            'email' => $email
-        ]);
+        return static::findOne(['email' => $email]);
     }
 
 
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function getAuthKey()
+    public function getAuthKey(): string
     {
         return $this->auth_key;
     }
 
 
     /**
-     * @inheritdoc
+     * @param string $authKey
+     * @return bool
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
         return $this->auth_key === $authKey;
     }
@@ -271,10 +299,11 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Сравнивает полученный пароль с паролем в поле password_hash, для текущего пользователя, в таблице user.
      * Вызываеться из модели LoginForm.
-     * @param $password
+     *
+     * @param string $password
      * @return bool
      */
-    public function validatePassword($password)
+    public function validatePassword(string $password): bool
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
@@ -284,9 +313,10 @@ class User extends ActiveRecord implements IdentityInterface
      * Генерирует случайную строку из 32 шестнадцатеричных символов и присваивает (при записи) полученное значение полю auth_key
      * таблицы user для нового пользователя.
      * Вызываеться из модели RegForm.
+     *
      * @throws Exception
      */
-    public function generateAuthKey()
+    public function generateAuthKey(): void
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
@@ -296,10 +326,11 @@ class User extends ActiveRecord implements IdentityInterface
      * Генерирует хеш из введенного пароля и присваивает (при записи)
      * полученное значение полю password_hash таблицы user для нового пользователя.
      * Вызываеться из модели SingupForm.
-     * @param $password
+     *
+     * @param string $password
      * @throws Exception
      */
-    public function setPassword($password)
+    public function setPassword(string $password): void
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
@@ -308,10 +339,11 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Поиск пользователя по переданному секретному ключу
      * для смены пароля через почту
-     * @param $key
+     *
+     * @param string $key
      * @return User|null
      */
-    public static function findBySecretKey($key)
+    public static function findBySecretKey(string $key): ?User
     {
         if (!static::isSecretKeyExpire($key)) {
             return null;
@@ -325,9 +357,10 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Генерация секретного ключа
      * для смены пароля через почту
+     *
      * @throws Exception
      */
-    public function generateSecretKey()
+    public function generateSecretKey(): void
     {
         $this->secret_key = Yii::$app->security->generateRandomString() . '_' . time();
     }
@@ -337,7 +370,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Удаление секретного ключа
      * для смены пароля через почту
      */
-    public function removeSecretKey()
+    public function removeSecretKey(): void
     {
         $this->secret_key = null;
     }
@@ -345,10 +378,11 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Проверка срока действия секретного ключ
-     * @param $key
+     *
+     * @param string $key
      * @return bool
      */
-    public static function isSecretKeyExpire($key)
+    public static function isSecretKeyExpire(string $key): bool
     {
         if (empty($key)) {
             return false;
@@ -363,18 +397,15 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Поиск пользователя по email или login
-     * @param $identity
-     * @return bool|User|ActiveRecord
+     *
+     * @param string $identity
+     * @return User|bool
      */
-    public static function findIdentityByUsernameOrEmail($identity)
+    public static function findIdentityByUsernameOrEmail(string $identity)
     {
-        $users = self::find()->all();
-        foreach ($users as $user) {
-            if (($identity == $user->username) || ($identity == $user->email)){
-                return $user;
-            }
-        }
-        return false;
+        /** @var User $user */
+        $user = self::find()->where(['or', ['email' => $identity], ['username' => $identity]])->one();
+        return $user ?: false;
     }
 
 
@@ -384,83 +415,45 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return ActiveQuery
      */
-    public function getClientUser()
+    public function getClientUser(): ActiveQuery
     {
         return $this->hasOne(ClientUser::class, ['user_id' => 'id']);
     }
 
 
     /**
-     * Поиск записи в таблице client_user
-     * по данному пользователю
-     *
-     * @return ClientUser|null
-     */
-    public function findClientUser()
-    {
-        return ClientUser::findOne(['user_id' => $this->getId()]);
-    }
-
-
-    /**
      * @return ActiveQuery
      */
-    public function getCustomerManagersByUserId()
+    public function getCustomerManagers(): ActiveQuery
     {
         return $this->hasMany(CustomerManager::class, ['user_id' => 'id']);
     }
 
 
     /**
-     * @return CustomerManager|null
-     */
-    public function findCustomerManagersByUserId()
-    {
-        return CustomerManager::findOne(['user_id' => $this->id]);
-    }
-
-
-    /**
      * @return ActiveQuery
      */
-    public function getCustomerTrackersByUserId()
+    public function getCustomerTrackers(): ActiveQuery
     {
         return $this->hasMany(CustomerTracker::class, ['user_id' => 'id']);
     }
 
 
     /**
-     * @return CustomerTracker|null
-     */
-    public function findCustomerTrackersByUserId()
-    {
-        return CustomerTracker::findOne(['user_id' => $this->id, 'status' => CustomerTracker::ACTIVE]);
-    }
-
-
-    /**
      * @return ActiveQuery
      */
-    public function getCustomerExpertsByUserId()
+    public function getCustomerExperts(): ActiveQuery
     {
         return $this->hasMany(CustomerExpert::class, ['user_id' => 'id']);
     }
 
 
     /**
-     * @return CustomerExpert|null
-     */
-    public function findCustomerExpertsByUserId()
-    {
-        return CustomerExpert::findOne(['user_id' => $this->id, 'status' => CustomerExpert::ACTIVE]);
-    }
-
-
-    /**
      * Получить объект проверки статуса онлайн
+     *
      * @return ActiveQuery
      */
-    public function getCheckingOnline()
+    public function getCheckingOnline(): ActiveQuery
     {
         return $this->hasOne(CheckingOnlineUser::class, ['user_id' => 'id']);
     }
@@ -469,11 +462,13 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Получить статус пользователя онлайн или время посл.активности
      *
-     * @return bool
+     * @return bool|string
      */
     public function getCheckOnline()
     {
-        if ($checkingOnline = $this->checkingOnline) return $checkingOnline->isOnline();
+        if ($checkingOnline = $this->checkingOnline) {
+            return $checkingOnline->isOnline();
+        }
         return false;
     }
 
@@ -483,14 +478,12 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return User|null
      */
-    public function getMainAdmin ()
+    public function getMainAdmin(): ?User
     {
         if ($this->role !== self::ROLE_ADMIN_COMPANY) {
-            /** @var ClientUser $clientUser */
-            $clientUser = $this->clientUser;
             $mainAdminId = ClientSettings::find()
                 ->select('admin_id')
-                ->where(['client_id' => $clientUser->getClientId()])
+                ->where(['client_id' => $this->clientUser->getClientId()])
                 ->one();
 
             return self::findOne($mainAdminId);
@@ -504,7 +497,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return bool|ActiveQuery
      */
-    public function getAdmin ()
+    public function getAdmin()
     {
         if ($this->role === self::ROLE_USER) {
             return $this->hasOne(self::class, ['id' => 'id_admin']);
@@ -518,9 +511,9 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return User|null
      */
-    public function getDevelopment ()
+    public function getDevelopment(): ?User
     {
-        return User::findOne(['role' => User::ROLE_DEV]);
+        return static::findOne(['role' => static::ROLE_DEV]);
     }
 
 
@@ -529,15 +522,15 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return bool
      */
-    public function sendEmailUserStatus()
+    public function sendEmailUserStatus(): bool
     {
         /* @var $user User */
-        $user = User::findOne(['email' => $this->email]);
+        $user = static::findOne(['email' => $this->email]);
 
         if($user){
             return Yii::$app->mailer->compose('change-status', ['user' => $user])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-                ->setTo($this->email)
+                ->setTo($this->getEmail())
                 ->setSubject('Изменение Вашего статуса на сайте Spaccel.ru')
                 ->send();
         }
@@ -550,18 +543,18 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return ConversationDevelopment|null
      */
-    public function createConversationDevelopment ()
+    public function createConversationDevelopment(): ?ConversationDevelopment
     {
-        $con = ConversationDevelopment::findOne(['user_id' => $this->id]);
+        $con = ConversationDevelopment::findOne(['user_id' => $this->getId()]);
 
         if (!$con) {
             $conversation = new ConversationDevelopment();
-            $conversation->setUserId($this->id);
-            $conversation->setDevId($this->getDevelopment()->id);
+            $conversation->setUserId($this->getId());
+            $conversation->setDevId($this->development->getId());
             return $conversation->save() ? $conversation : null;
-        }else{
-            return $con;
         }
+
+        return $con;
     }
 
 
@@ -570,22 +563,22 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return ConversationMainAdmin|null
      */
-    public function createConversationMainAdmin ()
+    public function createConversationMainAdmin(): ?ConversationMainAdmin
     {
-        $mainAdmin = $this->getMainAdmin();
+        $mainAdmin = $this->mainAdmin;
         $con = ConversationMainAdmin::findOne([
-            'main_admin_id' => $mainAdmin->id,
-            'admin_id' => $this->id
+            'main_admin_id' => $mainAdmin->getId(),
+            'admin_id' => $this->getId()
         ]);
 
         if (!$con) {
             $conversation = new ConversationMainAdmin();
-            $conversation->setAdminId($this->id);
+            $conversation->setAdminId($this->getId());
             $conversation->setMainAdminId($mainAdmin->getId());
             return $conversation->save() ? $conversation : null;
-        }else{
-            return $con;
         }
+
+        return $con;
     }
 
 
@@ -595,18 +588,18 @@ class User extends ActiveRecord implements IdentityInterface
      * @param User $user
      * @return ConversationAdmin|null
      */
-    public function createConversationAdmin ($user)
+    public function createConversationAdmin(User $user): ?ConversationAdmin
     {
-        $con = ConversationAdmin::findOne(['user_id' => $user->id]);
+        $con = ConversationAdmin::findOne(['user_id' => $user->getId()]);
 
         if (!$con) {
             $conversation = new ConversationAdmin();
             $conversation->setUserId($user->getId());
             $conversation->setAdminId($user->getIdAdmin());
             return $conversation->save() ? $conversation : null;
-        }else{
-            return $con;
         }
+
+        return $con;
     }
 
 
@@ -618,9 +611,9 @@ class User extends ActiveRecord implements IdentityInterface
      * @param User $expert
      * @return ConversationExpert|null
      */
-    public static function createConversationExpert ($user, $expert)
+    public static function createConversationExpert(User $user, User $expert): ?ConversationExpert
     {
-        $con = ConversationExpert::findOne(['user_id' => $user->id, 'expert_id' => $expert->id]);
+        $con = ConversationExpert::findOne(['user_id' => $user->getId(), 'expert_id' => $expert->getId()]);
 
         if (!$con) {
             $conversation = new ConversationExpert();
@@ -628,9 +621,9 @@ class User extends ActiveRecord implements IdentityInterface
             $conversation->setExpertId($expert->getId());
             $conversation->setRole($user->getRole());
             return $conversation->save() ? $conversation : null;
-        }else{
-            return $con;
         }
+
+        return $con;
 
     }
 
@@ -641,16 +634,15 @@ class User extends ActiveRecord implements IdentityInterface
      * @param User $user
      * @return bool
      */
-    public function sendEmailAdmin($user)
+    public function sendEmailAdmin(User $user): bool
     {
         if($user) {
 
-            /** @var User $admin*/
-            $admin = $user->getMainAdmin();
+            $admin = $user->mainAdmin;
 
             return Yii::$app->mailer->compose('signup-admin', ['user' => $user])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-                ->setTo([$admin->email])
+                ->setTo([$admin->getEmail()])
                 ->setSubject('Регистрация нового пользователя на сайте Spaccel.ru')
                 ->send();
         }
@@ -662,49 +654,49 @@ class User extends ActiveRecord implements IdentityInterface
      * Общее кол-во непрочитанных
      * сообщений пользователя
      *
-     * @return bool|int|string
+     * @return bool|int
      */
     public function getCountUnreadMessages()
     {
         $count = 0;
 
-        if (self::isUserSimple($this->username)) {
+        if (self::isUserSimple($this->getUsername())) {
 
-            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
         }
-        elseif (self::isUserAdmin($this->username)) {
+        elseif (self::isUserAdmin($this->getUsername())) {
 
-            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesAdmin + $countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
         }
-        elseif (self::isUserMainAdmin($this->username) || self::isUserAdminCompany($this->username)) {
+        elseif (self::isUserMainAdmin($this->getUsername()) || self::isUserAdminCompany($this->getUsername())) {
 
-            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert + $countUnreadMessagesManager);
         }
-        elseif (self::isUserDev($this->username)) {
+        elseif (self::isUserDev($this->getUsername())) {
 
-            $count = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
         }
-        elseif (self::isUserExpert($this->username)) {
+        elseif (self::isUserExpert($this->getUsername())) {
 
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesExpert + $countUnreadMessagesDev);
         }
-        elseif (self::isUserManager($this->username)) {
+        elseif (self::isUserManager($this->getUsername())) {
 
-            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesManager + $countUnreadMessagesDev);
         }
 
@@ -716,28 +708,28 @@ class User extends ActiveRecord implements IdentityInterface
      * Общее кол-во непрочитанных
      * уведомлений пользователя
      *
-     * @return bool|int|string
+     * @return bool|int
      */
     public function getCountUnreadCommunications()
     {
         $count = 0;
 
-        if (self::isUserExpert($this->username)) {
+        if (self::isUserExpert($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
         }
-        elseif (self::isUserMainAdmin($this->username) || self::isUserAdminCompany($this->username)) {
+        elseif (self::isUserMainAdmin($this->getUsername()) || self::isUserAdminCompany($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
         }
-        elseif (self::isUserAdmin($this->username)) {
+        elseif (self::isUserAdmin($this->getUsername())) {
 
             $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
             $count += $countDuplicateCommunications;
         }
-        elseif (self::isUserSimple($this->username)) {
+        elseif (self::isUserSimple($this->getUsername())) {
 
             $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
             $count += $countDuplicateCommunications;
@@ -755,11 +747,11 @@ class User extends ActiveRecord implements IdentityInterface
      * @param int $id
      * @return bool|int|string
      */
-    public function getCountUnreadCommunicationsByProject($id)
+    public function getCountUnreadCommunicationsByProject(int $id)
     {
         $count = 0;
 
-        if (self::isUserExpert($this->username)) {
+        if (self::isUserExpert($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()
                 ->where([
@@ -770,7 +762,7 @@ class User extends ActiveRecord implements IdentityInterface
 
             $count += $countUnreadProjectCommunications;
         }
-        elseif (self::isUserMainAdmin($this->username)) {
+        elseif (self::isUserMainAdmin($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()
                 ->where([
@@ -787,16 +779,17 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @return bool|int|string
-     * Кол-во непрочитанных сообщений от трекера
+     * Кол-во непрочитанных сообщений проектанта от трекера
+     *
+     * @return bool|int
      */
-    public function getCountUnreadMessagesFromAdmin ()
+    public function getCountUnreadMessagesFromAdmin()
     {
         $count = 0;
 
-        if (self::isUserSimple($this->username)) {
+        if (self::isUserSimple($this->getUsername())) {
 
-            $count = MessageAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $count = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -804,170 +797,177 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @return bool|int|string
      * Кол-во непрочитанных сообщений от Техподдержки
-     */
-    public function getCountUnreadMessagesFromDev ()
-    {
-        $count = MessageDevelopment::find()->where(['adressee_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     * Кол-во непрочитанных сообщений от главного админа
-     */
-    public function getCountUnreadMessagesFromMainAdmin ()
-    {
-        $count = 0;
-
-        if (self::isUserAdmin($this->username)) {
-
-            $count = MessageMainAdmin::find()->where(['adressee_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-        }
-
-        elseif (self::isUserManager($this->username)) {
-
-            $count = MessageManager::find()->where(['sender_id' => $this->mainAdmin->id, 'adressee_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     * Кол-во непрочитанных сообщений от главного админа для эксперта
-     */
-    public function getCountUnreadMessagesExpertFromMainAdmin ()
-    {
-        $count = 0;
-
-        if (self::isUserExpert($this->username)) {
-
-            $count = MessageExpert::find()->where(['sender_id' => $this->mainAdmin->id, 'adressee_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     * Кол-во непрочитанных сообщений пользователя,
-     * где он является отправителем
-     */
-    public function getCountUnreadMessagesFromUser ()
-    {
-        $count = 0;
-
-        if (self::isUserSimple($this->username)) {
-
-            $count = MessageAdmin::find()->where(['sender_id' => $this->id, 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     */
-    public function getCountUnreadMessagesDevelopmentFromUser ()
-    {
-        $count = MessageDevelopment::find()->where(['sender_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     * Кол-во непрочитанных сообщений гл.алдминистратора,
-     * где он является отправителем
-     */
-    public function getCountUnreadMessagesMainAdminFromAdmin ()
-    {
-        $count = 0;
-
-        if (self::isUserAdmin($this->username)) {
-
-            $count = MessageMainAdmin::find()->where(['sender_id' => $this->id, 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
      *
-     * Кол-во непрочитанных сообщений эксперта,
-     * где он является отправителем для админа организации
+     * @return bool|int
      */
-    public function getCountUnreadMessagesMainAdminFromExpert ()
+    public function getCountUnreadMessagesFromDev()
     {
-        $count = 0;
-
-        if (self::isUserExpert($this->username)) {
-
-            $count = MessageExpert::find()->where(['adressee_id' => $this->mainAdmin->id, 'sender_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * @return bool|int|string
-     *
-     * Кол-во непрочитанных сообщений менеджера,
-     * где он является отправителем для админа Spaccel
-     */
-    public function getCountUnreadMessagesMainAdminFromManager ()
-    {
-        $count = 0;
-
-        if (self::isUserManager($this->username)) {
-
-            $count = MessageManager::find()->where(['adressee_id' => $this->mainAdmin->id, 'sender_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
-        }
-
-        return ($count > 0) ? $count : false;
-    }
-
-
-    /**
-     * Кол-во непрочитанных сообщений от менеджера
-     * для пользователя, у которого id => $userId
-     *
-     * @param int $userId
-     * @return bool|int|string
-     */
-    public function getCountUnreadMessagesFromManager($userId)
-    {
-        $count = 0;
-
-        if (self::isUserManager($this->username)) {
-
-            $count = MessageManager::find()->where(['adressee_id' => $userId, 'sender_id' => $this->id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
-        }
-
+        $count = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
         return ($count > 0) ? $count : false;
     }
 
 
     /**
      * Кол-во непрочитанных сообщений
-     * от пользователя для эксперта
+     * менеджера или трекера от админа
      *
-     * @param $id
-     * @return bool|int|string
+     * @return bool|int
      */
-    public function getCountUnreadMessagesUserFromExpert($id)
+    public function getCountUnreadMessagesFromMainAdmin()
+    {
+        $count = 0;
+
+        if (self::isUserAdmin($this->getUsername())) {
+
+            $count = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        elseif (self::isUserManager($this->getUsername())) {
+
+            $count = MessageManager::find()->where(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений эксперта от админа
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesExpertFromMainAdmin ()
+    {
+        $count = 0;
+
+        if (self::isUserExpert($this->getUsername())) {
+
+            $count = MessageExpert::find()->where(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений от проектанта трекеру,
+     * где проектант является отправителем
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesFromUser()
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->getUsername())) {
+
+            $count = MessageAdmin::find()->where(['sender_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений от пользователя техподдержке,
+     * где пользователь является отправителем
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesDevelopmentFromUser()
+    {
+        $count = MessageDevelopment::find()->where(['sender_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений от трекера админу,
+     * где он является отправителем
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesMainAdminFromAdmin()
+    {
+        $count = 0;
+
+        if (self::isUserAdmin($this->getUsername())) {
+
+            $count = MessageMainAdmin::find()->where(['sender_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений эксперта,
+     * где он является отправителем для админа
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesMainAdminFromExpert()
+    {
+        $count = 0;
+
+        if (self::isUserExpert($this->getUsername())) {
+
+            $count = MessageExpert::find()->where(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений менеджера,
+     * где он является отправителем для админа Spaccel
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesMainAdminFromManager()
+    {
+        $count = 0;
+
+        if (self::isUserManager($this->username)) {
+
+            $count = MessageManager::find()->where(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений пользователя от менеджера
+     *
+     * @param int $userId
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesFromManager(int $userId)
+    {
+        $count = 0;
+
+        if (self::isUserManager($this->getUsername())) {
+
+            $count = MessageManager::find()->where(['adressee_id' => $userId, 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных сообщений эксперта от пользователя
+     *
+     * @param int $id
+     * @return bool|int
+     */
+    public function getCountUnreadMessagesUserFromExpert(int $id)
     {
 
-        $count = MessageExpert::find()->where(['adressee_id' => $id, 'sender_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        $count = MessageExpert::find()->where(['adressee_id' => $id, 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -977,13 +977,13 @@ class User extends ActiveRecord implements IdentityInterface
      * Кол-во непрочитанных сообщений
      * от эксперта для пользователя
      *
-     * @param $id
-     * @return bool|int|string
+     * @param int $id
+     * @return bool|int
      */
-    public function getCountUnreadMessagesExpertFromUser($id)
+    public function getCountUnreadMessagesExpertFromUser(int $id)
     {
 
-        $count = MessageExpert::find()->where(['adressee_id' => $this->id, 'sender_id' => $id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        $count = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -993,13 +993,13 @@ class User extends ActiveRecord implements IdentityInterface
      * Количество непрочитанных сообщений у менеджера от пользователя
      * (админа организации, трекера или админа Spaccel)
      *
-     * @param $id
-     * @return bool|int|string
+     * @param int $id
+     * @return bool|int
      */
-    public function getCountUnreadMessagesManager($id)
+    public function getCountUnreadMessagesManager(int $id)
     {
 
-        $count = MessageManager::find()->where(['adressee_id' => $this->id, 'sender_id' => $id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        $count = MessageManager::find()->where(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -1007,137 +1007,127 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Проверка на пользователя
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isUserSimple($username)
+    public static function isUserSimple(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_USER, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_USER, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на трекера
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isUserAdmin($username)
+    public static function isUserAdmin(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на Главного Админа
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isUserMainAdmin($username)
+    public static function isUserMainAdmin(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_MAIN_ADMIN, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_MAIN_ADMIN, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на Эксперта
      *
-     * @param $username
+     * @param string $username
      * @return bool
      */
-    public static function isUserExpert($username)
+    public static function isUserExpert(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_EXPERT, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_EXPERT, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на Техподдержку
      *
-     * @param $username
+     * @param string $username
      * @return bool
      */
-    public static function isUserDev($username)
+    public static function isUserDev(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_DEV, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_DEV, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на менеджера по клиентам
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isUserManager($username)
+    public static function isUserManager(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_MANAGER, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_MANAGER, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на администратора организации
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isUserAdminCompany($username)
+    public static function isUserAdminCompany(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN_COMPANY, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_ADMIN_COMPANY, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Проверка на Статус
-     * @param $username
+     *
+     * @param string $username
      * @return bool
      */
-    public static function isActiveStatus($username)
+    public static function isActiveStatus(string $username): bool
     {
-        if (static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]))
-        {
+        if (static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE])) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -1145,7 +1135,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -1153,7 +1143,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -1161,39 +1151,39 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param string $username
      */
-    public function setUsername($username)
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAvatarMaxImage()
+    public function getAvatarMaxImage(): ?string
     {
         return $this->avatar_max_image;
     }
 
     /**
-     * @param string $avatar_max_image
+     * @param string|null $avatar_max_image
      */
-    public function setAvatarMaxImage($avatar_max_image)
+    public function setAvatarMaxImage(?string $avatar_max_image = null): void
     {
         $this->avatar_max_image = $avatar_max_image;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAvatarImage()
+    public function getAvatarImage(): ?string
     {
         return $this->avatar_image;
     }
 
     /**
-     * @param string $avatar_image
+     * @param string|null $avatar_image
      */
-    public function setAvatarImage($avatar_image)
+    public function setAvatarImage(?string $avatar_image = null): void
     {
         $this->avatar_image = $avatar_image;
     }
@@ -1201,35 +1191,28 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return int
      */
-    public function getRole()
+    public function getRole(): int
     {
         return $this->role;
     }
 
-    public function getTextRole()
+    public function getTextRole(): string
     {
         switch ($this->getRole()) {
             case self::ROLE_USER:
                 return 'проектант';
-                break;
             case self::ROLE_ADMIN:
                 return 'трекер';
-                break;
             case self::ROLE_ADMIN_COMPANY:
                 return 'адм.организации';
-                break;
             case self::ROLE_MAIN_ADMIN:
                 return 'адм.платформы';
-                break;
             case self::ROLE_EXPERT:
                 return 'эксперт';
-                break;
             case self::ROLE_MANAGER:
                 return 'менеджер';
-                break;
             case self::ROLE_DEV:
                 return 'тех.поддержка';
-                break;
             default:
                 return '';
         }
@@ -1238,7 +1221,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param int $role
      */
-    public function setRole($role)
+    public function setRole(int $role): void
     {
         $this->role = $role;
     }
@@ -1246,7 +1229,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -1254,7 +1237,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -1262,7 +1245,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return int
      */
-    public function getConfirm()
+    public function getConfirm(): int
     {
         return $this->confirm;
     }
@@ -1270,15 +1253,15 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param int $confirm
      */
-    public function setConfirm($confirm)
+    public function setConfirm(int $confirm): void
     {
         $this->confirm = $confirm;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getIdAdmin()
+    public function getIdAdmin(): ?int
     {
         return $this->id_admin;
     }
@@ -1286,7 +1269,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param int $id_admin
      */
-    public function setIdAdmin($id_admin)
+    public function setIdAdmin(int $id_admin): void
     {
         $this->id_admin = $id_admin;
     }
@@ -1294,7 +1277,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return int
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): int
     {
         return $this->created_at;
     }
@@ -1302,7 +1285,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return int
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): int
     {
         return $this->updated_at;
     }

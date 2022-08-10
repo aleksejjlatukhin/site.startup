@@ -39,7 +39,7 @@ class SingupForm extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
@@ -78,7 +78,7 @@ class SingupForm extends Model
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Email',
@@ -95,7 +95,7 @@ class SingupForm extends Model
      * Согласие на обработку данных
      * @param $attr
      */
-    public function existAgree($attr)
+    public function existAgree($attr): void
     {
         if ($this->exist_agree != 1){
             $this->addError($attr, 'Необходимо принять пользовательское соглашение');
@@ -104,20 +104,13 @@ class SingupForm extends Model
 
 
     /**
-     * Собственное правило для поля username
-     * Переводим все логины в нижний регистр
-     * и сравниваем их с тем, что в форме
      * @param $attr
      */
-    public function uniqUsername($attr)
+    public function uniqUsername($attr): void
     {
-        $users = User::find()->all();
-
-        foreach ($users as $user){
-            if (mb_strtolower($this->username) === mb_strtolower($user->username)){
-                $this->uniq_username = false;
-                $this->addError($attr, 'Этот логин уже занят.');
-            }
+        if (User::findOne(['username' => $this->getUsername()])) {
+            $this->uniq_username = false;
+            $this->addError($attr, 'Этот логин уже занят.');
         }
     }
 
@@ -125,14 +118,14 @@ class SingupForm extends Model
     /**
      * @param $attr
      */
-    public function matchUsername($attr)
+    public function matchUsername($attr): void
     {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->getUsername())) {
             $this->match_username = false;
             $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
         }
 
-        if (preg_match('/\s+/',$this->username)) {
+        if (preg_match('/\s+/',$this->getUsername())) {
             $this->match_username = false;
             $this->addError($attr, 'Не допускается использование пробелов');
         }
@@ -140,19 +133,13 @@ class SingupForm extends Model
 
 
     /**
-     * Собственное правило для поля email
-     * Переводим все email в нижний регистр и сравниваем их с тем, что в форме
      * @param $attr
      */
-    public function uniqEmail($attr)
+    public function uniqEmail($attr): void
     {
-        $users = User::find()->all();
-
-        foreach ($users as $user){
-            if ($this->email === $user->email){
-                $this->uniq_email = false;
-                $this->addError($attr, 'Эта почта уже зарегистрирована.');
-            }
+        if (User::findOne(['email' => $this->getEmail()])) {
+            $this->uniq_email = false;
+            $this->addError($attr, 'Эта почта уже зарегистрирована.');
         }
     }
 
@@ -166,12 +153,12 @@ class SingupForm extends Model
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->setUsername($this->username);
-            $user->setEmail($this->email);
-            $user->setStatus($this->status);
-            $user->setConfirm($this->confirm);
-            $user->setRole($this->role);
-            $user->setPassword($this->password);
+            $user->setUsername($this->getUsername());
+            $user->setEmail($this->getEmail());
+            $user->setStatus($this->getStatus());
+            $user->setConfirm($this->getConfirm());
+            $user->setRole($this->getRole());
+            $user->setPassword($this->getPassword());
             $user->generateAuthKey();
 
             if($this->scenario === 'emailActivation') {
@@ -186,16 +173,114 @@ class SingupForm extends Model
 
     /**
      * Подтвреждение регистрации по email
-     * @param $user
+     * @param User $user
      * @return bool
      */
-    public function sendActivationEmail($user)
+    public function sendActivationEmail(User $user): bool
     {
         return Yii::$app->mailer->compose('activationEmail', ['user' => $user])
             ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-            ->setTo($this->email)
+            ->setTo($this->getEmail())
             ->setSubject('Регистрация на сайте Spaccel.ru')
             ->send();
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     * @return SingupForm
+     */
+    public function setEmail(string $email): SingupForm
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword(string $password): void
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConfirm(): int
+    {
+        return $this->confirm;
+    }
+
+    /**
+     * @param int $confirm
+     */
+    public function setConfirm(int $confirm): void
+    {
+        $this->confirm = $confirm;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRole(): int
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param int $role
+     */
+    public function setRole(int $role): void
+    {
+        $this->role = $role;
     }
 
 }

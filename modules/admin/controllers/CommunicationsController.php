@@ -3,7 +3,6 @@
 
 namespace app\modules\admin\controllers;
 
-
 use app\models\CommunicationPatterns;
 use app\models\CommunicationTypes;
 use app\models\DuplicateCommunications;
@@ -22,7 +21,12 @@ use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
 
-
+/**
+ * Контроллер с методами для настройки и получения информации о коммуникациях
+ *
+ * Class CommunicationsController
+ * @package app\modules\admin\controllers
+ */
 class CommunicationsController extends AppAdminController
 {
 
@@ -30,7 +34,7 @@ class CommunicationsController extends AppAdminController
      * Количество уведомлений
      * на странице
      */
-    const NOTIFICATIONS_PAGE_SIZE = 20;
+    public const NOTIFICATIONS_PAGE_SIZE = 20;
 
 
     public $layout = '@app/modules/admin/views/layouts/users';
@@ -42,29 +46,27 @@ class CommunicationsController extends AppAdminController
      * @throws BadRequestHttpException
      * @throws HttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
 
-        if ($action->id == 'settings') {
+        if ($action->id === 'settings') {
 
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
 
-        }elseif ($action->id == 'notifications') {
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
-            if ((User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                || User::isUserAdmin(Yii::$app->user->identity['username'])) && (Yii::$app->user->getId() == Yii::$app->request->get('id'))) {
+        }elseif ($action->id === 'notifications') {
+
+            if ((User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username']))
+                && (Yii::$app->user->getId() === (int)Yii::$app->request->get('id'))) {
 
                 return parent::beforeAction($action);
-
-            }else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
             }
+
+            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
 
         } else{
             return parent::beforeAction($action);
@@ -79,7 +81,7 @@ class CommunicationsController extends AppAdminController
      *
      * @return string
      */
-    public function actionSettings()
+    public function actionSettings(): string
     {
 
         // Форма шаблона коммуникации
@@ -87,9 +89,9 @@ class CommunicationsController extends AppAdminController
         // Список для выбора срока доступа к проекту
         $selection_project_access_period = array_combine(range(1,30), range(1,30));
         foreach ($selection_project_access_period as $k => $item) {
-            if (in_array($item, [1, 21])) {
+            if (in_array($item, [1, 21], false)) {
                 $selection_project_access_period[$k] = $item . ' день';
-            } elseif (in_array($item, [2, 3, 4, 22, 23, 24])) {
+            } elseif (in_array($item, [2, 3, 4, 22, 23, 24], false)) {
                 $selection_project_access_period[$k] = $item . ' дня';
             } else {
                 $selection_project_access_period[$k] = $item . ' дней';
@@ -99,35 +101,35 @@ class CommunicationsController extends AppAdminController
         // Шаблоны коммуникации о готовности эксперта провести экспертизу
         $patternsCommunicationsAboutReadinessConductExpertise = CommunicationPatterns::find()
             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отмена запроса о готовности эксперта провести экспертизу
         $patternsCommunicationsWithdrawsRequestAboutReadinessConductExpertise = CommunicationPatterns::find()
             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации назначение экперта на проект
         $patternsCommunicationsAppointsExpertProject = CommunicationPatterns::find()
             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отказ эксперту в назначении на проект
         $patternsCommunicationsDoesNotAppointsExpertProject = CommunicationPatterns::find()
             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отзыв эксперта с проекта
         $patternsCommunicationsWithdrawsExpertFromProject = CommunicationPatterns::find()
             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT])
-            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
@@ -146,10 +148,11 @@ class CommunicationsController extends AppAdminController
 
     /**
      * Создание нового шаблона коммуникации
-     * @param $communicationType
+     *
+     * @param int $communicationType
      * @return array|bool
      */
-    public function actionCreatePattern($communicationType)
+    public function actionCreatePattern(int $communicationType)
     {
         $formPattern = new CommunicationPatterns();
 
@@ -159,11 +162,11 @@ class CommunicationsController extends AppAdminController
 
                 if ($formPattern->save()) {
 
-                    if ($communicationType == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($communicationType === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $patternsCommunicationsAboutReadinessConductExpertise = CommunicationPatterns::find()
                             ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
-                            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+                            ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                             ->orderBy('id DESC')
                             ->all();
 
@@ -173,20 +176,19 @@ class CommunicationsController extends AppAdminController
                         Yii::$app->response->data = $response;
                         return $response;
 
-                    } else {
-
-                        $patterns = CommunicationPatterns::find()
-                            ->where(['communication_type' => $communicationType])
-                            ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
-                            ->orderBy('id DESC')
-                            ->all();
-
-                        $response = ['renderAjax' => $this->renderAjax('ajax_patterns', [
-                            'patterns' => $patterns, 'communicationType' => $communicationType])];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
                     }
+
+                    $patterns = CommunicationPatterns::find()
+                        ->where(['communication_type' => $communicationType])
+                        ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+                        ->orderBy('id DESC')
+                        ->all();
+
+                    $response = ['renderAjax' => $this->renderAjax('ajax_patterns', [
+                        'patterns' => $patterns, 'communicationType' => $communicationType])];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
                 }
             }
         }
@@ -197,19 +199,20 @@ class CommunicationsController extends AppAdminController
     /**
      * Получить представление
      * одного шалона
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function getViewOnePattern($id)
+    public function getViewOnePattern(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
             // Список для выбора срока доступа к проекту
             $selection_project_access_period = array_combine(range(1,30), range(1,30));
             foreach ($selection_project_access_period as $k => $item) {
-                if (in_array($item, [1, 21])) {
+                if (in_array($item, [1, 21], false)) {
                     $selection_project_access_period[$k] = $item . ' день';
-                } elseif (in_array($item, [2, 3, 4, 22, 23, 24])) {
+                } elseif (in_array($item, [2, 3, 4, 22, 23, 24], false)) {
                     $selection_project_access_period[$k] = $item . ' дня';
                 } else {
                     $selection_project_access_period[$k] = $item . ' дней';
@@ -231,10 +234,11 @@ class CommunicationsController extends AppAdminController
     /**
      * Отмена редактирования
      * шаблона коммуникации
-     * @param $id
+     *
+     * @param int $id
      * @return array|bool
      */
-    public function actionCancelEditPattern($id)
+    public function actionCancelEditPattern(int $id)
     {
         return $this->getViewOnePattern($id);
     }
@@ -243,11 +247,12 @@ class CommunicationsController extends AppAdminController
     /**
      * Получить форму редактирования
      * шаблона коммуникации
-     * @param $id
-     * @param $communicationType
+     *
+     * @param int $id
+     * @param int $communicationType
      * @return array|bool
      */
-    public function actionGetFormUpdateCommunicationPattern($id, $communicationType)
+    public function actionGetFormUpdateCommunicationPattern(int $id, int $communicationType)
     {
         if (Yii::$app->request->isAjax) {
 
@@ -255,9 +260,9 @@ class CommunicationsController extends AppAdminController
             // Список для выбора срока доступа к проекту
             $selection_project_access_period = array_combine(range(1,30), range(1,30));
             foreach ($selection_project_access_period as $k => $item) {
-                if (in_array($item, [1, 21])) {
+                if (in_array($item, [1, 21], false)) {
                     $selection_project_access_period[$k] = $item . ' день';
-                } elseif (in_array($item, [2, 3, 4, 22, 23, 24])) {
+                } elseif (in_array($item, [2, 3, 4, 22, 23, 24], false)) {
                     $selection_project_access_period[$k] = $item . ' дня';
                 } else {
                     $selection_project_access_period[$k] = $item . ' дней';
@@ -277,13 +282,14 @@ class CommunicationsController extends AppAdminController
     /**
      * Редактирование
      * шаблона коммуникации
-     * @param $id
-     * @param $communicationType
+     *
+     * @param int $id
+     * @param int $communicationType
      * @return array|bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionUpdatePattern($id, $communicationType)
+    public function actionUpdatePattern(int $id, int $communicationType)
     {
         $formPattern = new FormUpdateCommunicationPattern($id, $communicationType);
 
@@ -301,37 +307,38 @@ class CommunicationsController extends AppAdminController
      * Активация шаблона
      * коммуникации
      *
-     * @param $id
-     * @param $communicationType
+     * @param int $id
+     * @param int $communicationType
      * @return bool|array
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionActivatePattern($id, $communicationType)
+    public function actionActivatePattern(int $id, int $communicationType)
     {
         if(Yii::$app->request->isAjax) {
 
+            /** @var CommunicationPatterns[] $patternsActive */
             $patternsActive = CommunicationPatterns::find()
                 ->where(['communication_type' => $communicationType, 'is_active' => CommunicationPatterns::ACTIVE])
-                ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+                ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                 ->all();
 
             foreach ($patternsActive as $item) {
-                $item->is_active = CommunicationPatterns::NO_ACTIVE;
+                $item->setIsActive(CommunicationPatterns::NO_ACTIVE);
                 $item->update(true, ['is_active']);
             }
 
             $patternActivate = CommunicationPatterns::findOne($id);
-            $patternActivate->is_active = CommunicationPatterns::ACTIVE;
+            $patternActivate->setIsActive(CommunicationPatterns::ACTIVE);
             $patternActivate->update(true, ['is_active']);
 
             $patterns = CommunicationPatterns::find()
                 ->where(['communication_type' => $communicationType])
-                ->andWhere(['initiator' => Yii::$app->user->id, 'is_remote' => CommunicationPatterns::NOT_REMOTE])
+                ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                 ->orderBy('id DESC')
                 ->all();
 
-            if ($communicationType == CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            if ($communicationType === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                 $response = ['renderAjax' => $this->renderAjax('ajax_patterns_carce', [
                     'patternsCARCE' => $patterns])];
@@ -339,14 +346,13 @@ class CommunicationsController extends AppAdminController
                 Yii::$app->response->data = $response;
                 return $response;
 
-            } else {
-
-                $response = ['renderAjax' => $this->renderAjax('ajax_patterns', [
-                    'patterns' => $patterns, 'communicationType' => $communicationType])];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
             }
+
+            $response = ['renderAjax' => $this->renderAjax('ajax_patterns', [
+                'patterns' => $patterns, 'communicationType' => $communicationType])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
         }
         return false;
     }
@@ -356,18 +362,18 @@ class CommunicationsController extends AppAdminController
      * Деактивация шаблона
      * коммуникации
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionDeactivatePattern($id)
+    public function actionDeactivatePattern(int $id)
     {
         $pattern = CommunicationPatterns::findOne($id);
 
         if(Yii::$app->request->isAjax) {
 
-            $pattern->is_active = CommunicationPatterns::NO_ACTIVE;
+            $pattern->setIsActive(CommunicationPatterns::NO_ACTIVE);
             $pattern->update(true, ['is_active']);
             return $this->getViewOnePattern($id);
 
@@ -380,18 +386,18 @@ class CommunicationsController extends AppAdminController
      * Удаление шаблона
      * коммуникации из списка
      *
-     * @param $id
+     * @param int $id
      * @return bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionDeletePattern($id)
+    public function actionDeletePattern(int $id): bool
     {
         $pattern = CommunicationPatterns::findOne($id);
 
         if(Yii::$app->request->isAjax) {
 
-            $pattern->is_remote = CommunicationPatterns::REMOTE;
+            $pattern->setIsRemote(CommunicationPatterns::REMOTE);
             $pattern->update(true, ['is_remote']);
             return true;
         }
@@ -406,12 +412,12 @@ class CommunicationsController extends AppAdminController
      * @param int $adressee_id
      * @param int $project_id
      * @param int $type
-     * @param null|int $triggered_communication_id
+     * @param int|null $triggered_communication_id
      * @return array|bool
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function actionSend($adressee_id, $project_id, $type, $triggered_communication_id = null)
+    public function actionSend(int $adressee_id, int $project_id, int $type, int $triggered_communication_id = null)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -428,11 +434,12 @@ class CommunicationsController extends AppAdminController
 
                     $result_ReadCommunication = [];
 
-                    if ($type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                    if ($type === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         // Тип коммуникации "отмена запроса о готовности провести экспертизу"
 
                         // Устанавливаем параметр аннулирования предыдущей коммуникации
+                        /** @var ProjectCommunications $communicationCanceled */
                         $communicationCanceled = ProjectCommunications::find()
                             ->where([
                                 'adressee_id' => $adressee_id,
@@ -449,7 +456,7 @@ class CommunicationsController extends AppAdminController
                         $communicationCanceledUserAccessToProject->setCancel();
                         $communicationCanceledUserAccessToProject->update();
 
-                    } elseif ($type == CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($type === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         // Тип коммуникации "назначение эксперта на проект"
 
@@ -467,14 +474,14 @@ class CommunicationsController extends AppAdminController
                         DuplicateCommunications::create($communication, $communication->project->user, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
                         DuplicateCommunications::create($communication, $communication->project->user->admin, TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT);
 
-                    } elseif ($type == CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
+                    } elseif ($type === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
 
                         // Тип коммуникации "отказ в проведении экспертизы"
 
                         // Прочтение коммуникации на которое поступил ответ
                         $result_ReadCommunication = $this->responseForReadCommunication($triggered_communication_id);
 
-                    } elseif ($type == CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
+                    } elseif ($type === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT) {
 
                         // Тип коммуникации "отозвать эксперта с проекта"
 
@@ -503,10 +510,10 @@ class CommunicationsController extends AppAdminController
      * Получить форму выбора типов
      * эксперта при назначении на проект
      *
-     * @param $id
+     * @param int $id
      * @return array|bool
      */
-    public function actionGetFormTypesExpert($id)
+    public function actionGetFormTypesExpert(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -525,10 +532,10 @@ class CommunicationsController extends AppAdminController
      * Получить коммуникации
      * по проекту
      *
-     * @param $id
+     * @param int $id
      * @return bool|array
      */
-    public function actionGetCommunications($id)
+    public function actionGetCommunications(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -556,15 +563,15 @@ class CommunicationsController extends AppAdminController
      * @param ProjectCommunications $communication
      * @return bool
      */
-    public function sendCommunicationToEmail($communication)
+    public function sendCommunicationToEmail(ProjectCommunications $communication): bool
     {
         /* @var $user User */
-        $user = User::findOne($communication->adressee_id);
+        $user = User::findOne($communication->getAdresseeId());
 
         if ($user) {
             return Yii::$app->mailer->compose('communications__FromMainAdminToExpert', ['user' => $user, 'communication' => $communication])
                 ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-                ->setTo($user->email)
+                ->setTo($user->getEmail())
                 ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
                 ->send();
         }
@@ -579,9 +586,9 @@ class CommunicationsController extends AppAdminController
      *
      * @param int $id
      * @param int $page
-     * @return string
+     * @return string|Response
      */
-    public function actionNotifications($id, $page = 1)
+    public function actionNotifications(int $id, int $page = 1)
     {
         $pageSize = self::NOTIFICATIONS_PAGE_SIZE;
 
@@ -602,7 +609,9 @@ class CommunicationsController extends AppAdminController
                 'pages' => $pages,
             ]);
 
-        } elseif (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
+        }
+
+        if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
             $query_communications = ProjectCommunications::find()
                 ->where(['adressee_id' => $id])
@@ -633,7 +642,7 @@ class CommunicationsController extends AppAdminController
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionReadCommunication($id)
+    public function actionReadCommunication(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -652,7 +661,7 @@ class CommunicationsController extends AppAdminController
      * @throws StaleObjectException
      * @throws Throwable
      */
-    private function responseForReadCommunication($id)
+    private function responseForReadCommunication(int $id): array
     {
         $communication = ProjectCommunications::findOne($id);
         $communication->setStatusRead();
@@ -662,7 +671,7 @@ class CommunicationsController extends AppAdminController
         $countUnreadCommunications = $user->getCountUnreadCommunications();
         $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->getProjectId());
 
-        return $response = [
+        return [
             'project_id' => $communication->getProjectId(),
             'countUnreadCommunications' => $countUnreadCommunications,
             'countUnreadCommunicationsByProject' => $countUnreadCommunicationsByProject
@@ -680,7 +689,7 @@ class CommunicationsController extends AppAdminController
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionReadDuplicateCommunication($id)
+    public function actionReadDuplicateCommunication(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
@@ -690,10 +699,10 @@ class CommunicationsController extends AppAdminController
 
             $user = User::findOne($communication->getAdresseeId());
             $countUnreadCommunications = $user->getCountUnreadCommunications();
-            $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->getSource()->getProjectId());
+            $countUnreadCommunicationsByProject = $user->getCountUnreadCommunicationsByProject($communication->source->getProjectId());
 
             $response = [
-                'project_id' => $communication->getSource()->getProjectId(),
+                'project_id' => $communication->source->getProjectId(),
                 'countUnreadCommunications' => $countUnreadCommunications,
                 'countUnreadCommunicationsByProject' => $countUnreadCommunicationsByProject
             ];

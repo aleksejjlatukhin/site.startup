@@ -1,11 +1,21 @@
 <?php
 
+use app\models\Projects;
+use app\modules\admin\models\form\SearchForm;
+use yii\data\Pagination;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
 $this->title = 'Назначение экспертов на проекты';
 $this->registerCssFile('@web/css/expertise-tasks-style.css');
+
+/**
+ * @var Projects[] $projects
+ * @var Pagination $pages
+ * @var SearchForm $searchForm
+ */
+
 ?>
 
 
@@ -32,7 +42,7 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
         <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
             'class' => 'link_to_instruction_page open_modal_instruction_page',
             'title' => 'Инструкция', 'onclick' => 'return false'
-        ]); ?>
+        ]) ?>
 
     </div>
 
@@ -53,7 +63,7 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
                 'border-radius' => '8px',
                 'margin-bottom' => '15px'
             ],
-        ]);?>
+        ]) ?>
 
     </div>
 
@@ -73,7 +83,7 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
                 'border-radius' => '8px',
                 'margin-bottom' => '15px'
             ],
-        ]);?>
+        ]) ?>
 
     </div>
 
@@ -94,8 +104,7 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
                 'class' => 'style_form_field_respond',
                 'minlength' => 5,
                 'autocomplete' => 'off'])
-            ->label(false);
-        ?>
+            ->label(false) ?>
 
         <?php ActiveForm::end(); ?>
 
@@ -103,66 +112,10 @@ $this->registerCssFile('@web/css/expertise-tasks-style.css');
 
     <div class="col-md-12 expertise-tasks-content">
 
-        <?php if ($projects) : ?>
-
-            <?php foreach ($projects as $project) : ?>
-
-                <div id="expertise_task-<?= $project->id;?>">
-
-                    <div class="container-one_hypothesis">
-
-                        <div class="col-md-9 col-lg-10">
-                            <div class="project_name_table">
-                                <?= $project->project_name; ?> -<span class="project_fullname_text"><?= $project->project_fullname; ?></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 col-lg-2 informationAboutAction">
-                            <b>Автор проекта:</b> <?= $project->user->username; ?>
-                        </div>
-
-                    </div>
-
-                    <div class="hereAddDataOfProject">
-                        <!--Меню по экспертизам проекта-->
-                        <div class="block-links-menu-tasks">
-                            <div class="row">
-                                <div class="col-md-3 text-center">
-                                    <?= Html::a('Сводная таблица проекта', ['/client/expertise/get-project-summary-table', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
-                                </div>
-                                <div class="col-md-3 text-center">
-                                    <?= Html::a('Поиск экспертов', ['/client/expertise/get-search-form-experts', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
-                                </div>
-                                <div class="col-md-3 text-center">
-                                    <?= Html::a('Коммуникации', ['/client/communications/get-communications', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
-                                </div>
-                                <div class="col-md-3 text-center">
-                                    <?= Html::a('Экспертизы', ['/client/expertise/get-expertise-by-project', 'id' => $project->id], ['class' => 'link-menu-tasks']); ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--Блок для вывода контента меню-->
-                        <div class="block-tasks-content"></div>
-                    </div>
-
-                </div>
-
-            <?php endforeach; ?>
-
-            <div class="pagination-admin-projects-result">
-                <?= \yii\widgets\LinkPager::widget([
-                    'pagination' => $pages,
-                    'activePageCssClass' => 'pagination_active_page',
-                    'options' => ['class' => 'admin-projects-result-pagin-list'],
-                ]); ?>
-            </div>
-
-        <?php else : ?>
-
-            <h3 class="text-center">Пока нет проектов...</h3>
-
-        <?php endif; ?>
+        <?= $this->render('ajax_search_tasks', [
+            'projects' => $projects,
+            'pages' => $pages
+        ]) ?>
 
     </div>
 

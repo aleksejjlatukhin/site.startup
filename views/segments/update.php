@@ -1,15 +1,20 @@
 <?php
 
+use app\models\forms\FormUpdateSegment;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use app\models\Segments;
 
+/**
+ * @var FormUpdateSegment $model
+ */
+
 ?>
 
 <div class="text-center">
-    <?= Html::a('Скачать исходные данные по сегменту', ['/segments/mpdf-segment', 'id' => $model->id], [
+    <?= Html::a('Скачать исходные данные по сегменту', ['/segments/mpdf-segment', 'id' => $model->getId()], [
         'class' => 'export_link_hypothesis_for_user', 'target' => '_blank', 'title' => 'Скачать в pdf',
     ]); ?>
 </div>
@@ -18,7 +23,7 @@ use app\models\Segments;
 
     <?php $form = ActiveForm::begin([
         'id' => 'hypothesisUpdateForm',
-        'action' => Url::to(['/segments/update', 'id' => $model->id]),
+        'action' => Url::to(['/segments/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -33,8 +38,7 @@ use app\models\Segments;
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
             'autocomplete' => 'off'
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
@@ -47,8 +51,7 @@ use app\models\Segments;
             'maxlength' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
@@ -65,18 +68,17 @@ use app\models\Segments;
             'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12 type_of_interaction">{input}</div>'
         ])->label('Вид информационного и экономического взаимодействия между субъектами рынка *')->widget(Select2::class, [
             'data' => $list_of_interactions,
-            'options' => ['id' => 'type-interaction-' . $model->id],
+            'options' => ['id' => 'type-interaction-' . $model->getId()],
             'hideSearch' => true, //Скрытие поиска
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
 
-    <?php if ($model->type_of_interaction_between_subjects == Segments::TYPE_B2C) : ?>
+    <?php if ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) : ?>
 
 
-        <div class="form-update-template-b2c-<?= $model->id; ?>">
+        <div class="form-update-template-b2c-<?= $model->getId() ?>">
 
             <div class="row" style="margin-bottom: 10px;">
 
@@ -87,7 +89,7 @@ use app\models\Segments;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
             </div>
 
@@ -101,7 +103,7 @@ use app\models\Segments;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
             </div>
 
@@ -110,8 +112,8 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var age_from = 'input#age_from-<?= $model->id; ?>';
-                    var age_to = 'input#age_to-<?= $model->id; ?>';
+                    var age_from = 'input#age_from-<?= $model->getId() ?>';
+                    var age_to = 'input#age_to-<?= $model->getId() ?>';
 
                     //Изменение местоположения ползунка при вводе данных в первый элемент Input
                     $(age_from).change(function () {
@@ -171,21 +173,20 @@ use app\models\Segments;
                 ])->label('<div>Возраст потребителя *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 0 до 100)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'age_from-' . $model->id,
+                        'id' => 'age_from-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
                 <?= $form->field($model, 'age_to', [
                     'template' => '<div class="col-md-4">{input}</div>'
                 ])->label(false)->textInput([
                     'type' => 'number',
-                    'id' => 'age_to-' . $model->id,
+                    'id' => 'age_to-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -212,7 +213,7 @@ use app\models\Segments;
                         ],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]);
+                    ])
                 ?>
 
             </div>
@@ -236,12 +237,12 @@ use app\models\Segments;
                         'data' => $list_education,
                         'pluginOptions' => ['allowClear' => true],
                         'options' => [
-                            'id' => 'education_of_consumer-' . $model->id,
+                            'id' => 'education_of_consumer-' . $model->getId(),
                             'placeholder' => 'Выберите уровень образования потребителя',
                         ],
                         'disabled' => false,  //Сделать поле неактивным
                         'hideSearch' => true, //Скрытие поиска
-                    ]);
+                    ])
                 ?>
 
             </div>
@@ -251,8 +252,8 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var income_from = 'input#income_from-<?= $model->id; ?>';
-                    var income_to = 'input#income_to-<?= $model->id; ?>';
+                    var income_from = 'input#income_from-<?= $model->getId() ?>';
+                    var income_to = 'input#income_to-<?= $model->getId() ?>';
 
                     //Изменение местоположения ползунка при вводе данных в первый элемент Input
                     $(income_from).change(function () {
@@ -312,21 +313,20 @@ use app\models\Segments;
                 ])->label('<div>Доход потребителя (руб./мес.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 5 000 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'income_from-' . $model->id,
+                        'id' => 'income_from-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
                 <?= $form->field($model, 'income_to', [
                     'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
                 ])->label(false)->textInput([
                     'type' => 'number',
-                    'id' => 'income_to-' . $model->id,
+                    'id' => 'income_to-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -335,8 +335,8 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var quantity_from = 'input#quantity_from-<?= $model->id; ?>';
-                    var quantity_to = 'input#quantity_to-<?= $model->id; ?>';
+                    var quantity_from = 'input#quantity_from-<?= $model->getId() ?>';
+                    var quantity_to = 'input#quantity_to-<?= $model->getId() ?>';
 
                     //Изменение местоположения ползунка при вводе данных в первый элемент Input
                     $(quantity_from).change(function () {
@@ -396,21 +396,20 @@ use app\models\Segments;
                 ])->label('<div>Потенциальное количество<br>потребителей (тыс. чел.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'quantity_from-' . $model->id,
+                        'id' => 'quantity_from-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
                 <?= $form->field($model, 'quantity_to', [
                     'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
                 ])->label(false)->textInput([
                     'type' => 'number',
-                    'id' => 'quantity_to-' . $model->id,
+                    'id' => 'quantity_to-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -419,7 +418,7 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var market_volume_b2c = 'input#market_volume_b2c-<?= $model->id; ?>';
+                    var market_volume_b2c = 'input#market_volume_b2c-<?= $model->getId() ?>';
 
                     $(market_volume_b2c).change(function () {
                         var value = $(market_volume_b2c).val();
@@ -449,10 +448,10 @@ use app\models\Segments;
                 ])->label('<div>Платежеспособность (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'market_volume_b2c-' . $model->id,
+                        'id' => 'market_volume_b2c-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
             </div>
@@ -462,7 +461,7 @@ use app\models\Segments;
 
     <?php else : ?>
 
-        <div class="form-update-template-b2b-<?= $model->id; ?>">
+        <div class="form-update-template-b2b-<?= $model->getId() ?>">
 
 
             <div class="row" style="margin-bottom: 10px;">
@@ -474,7 +473,7 @@ use app\models\Segments;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
             </div>
 
@@ -488,7 +487,7 @@ use app\models\Segments;
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
             </div>
 
@@ -502,8 +501,7 @@ use app\models\Segments;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -517,8 +515,7 @@ use app\models\Segments;
                     'maxlength' => true,
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -527,8 +524,8 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var quantity_from_b2b = 'input#quantity_from_b2b-<?= $model->id; ?>';
-                    var quantity_to_b2b = 'input#quantity_to_b2b-<?= $model->id; ?>';
+                    var quantity_from_b2b = 'input#quantity_from_b2b-<?= $model->getId() ?>';
+                    var quantity_to_b2b = 'input#quantity_to_b2b-<?= $model->getId() ?>';
 
                     //Изменение местоположения ползунка при вводе данных в первый элемент Input
                     $(quantity_from_b2b).change(function () {
@@ -588,21 +585,20 @@ use app\models\Segments;
                 ])->label('<div>Потенциальное количество<br>представителей сегмента (ед.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'quantity_from_b2b-' . $model->id,
+                        'id' => 'quantity_from_b2b-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
                 <?= $form->field($model, 'quantity_to_b2b', [
                     'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
                 ])->label(false)->textInput([
                     'type' => 'number',
-                    'id' => 'quantity_to_b2b-' . $model->id,
+                    'id' => 'quantity_to_b2b-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -611,8 +607,8 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var income_from_b2b = 'input#income_from_b2b-<?= $model->id; ?>';
-                    var income_to_b2b = 'input#income_to_b2b-<?= $model->id; ?>';
+                    var income_from_b2b = 'input#income_from_b2b-<?= $model->getId() ?>';
+                    var income_to_b2b = 'input#income_to_b2b-<?= $model->getId() ?>';
 
                     //Изменение местоположения ползунка при вводе данных в первый элемент Input
                     $(income_from_b2b).change(function () {
@@ -672,21 +668,20 @@ use app\models\Segments;
                 ])->label('<div>Доход предприятия (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'income_from_b2b-' . $model->id,
+                        'id' => 'income_from_b2b-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
                 <?= $form->field($model, 'income_company_to', [
                     'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
                 ])->label(false)->textInput([
                     'type' => 'number',
-                    'id' => 'income_to_b2b-' . $model->id,
+                    'id' => 'income_to_b2b-' . $model->getId(),
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-                ?>
+                ]) ?>
 
             </div>
 
@@ -695,7 +690,7 @@ use app\models\Segments;
 
                 $( function() {
 
-                    var market_volume_b2b = 'input#market_volume_b2b-<?= $model->id; ?>';
+                    var market_volume_b2b = 'input#market_volume_b2b-<?= $model->getId() ?>';
 
                     $(market_volume_b2b).change(function () {
                         var value = $(market_volume_b2b).val();
@@ -724,10 +719,10 @@ use app\models\Segments;
                 ])->label('<div>Платежеспособность (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
                     ->textInput([
                         'type' => 'number',
-                        'id' => 'market_volume_b2b-' . $model->id,
+                        'id' => 'market_volume_b2b-' . $model->getId(),
                         'class' => 'style_form_field_respond form-control',
                         'autocomplete' => 'off'
-                    ]);
+                    ])
                 ?>
 
             </div>
@@ -746,8 +741,7 @@ use app\models\Segments;
             'rows' => 1,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 

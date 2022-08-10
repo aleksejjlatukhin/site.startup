@@ -1,5 +1,10 @@
 <?php
 
+use app\models\ConfirmSegment;
+use app\models\forms\FormCreateConfirmProblem;
+use app\models\Problems;
+use app\models\Projects;
+use app\models\Segments;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
@@ -7,6 +12,15 @@ use yii\helpers\Url;
 
 $this->title = 'Подтверждение гипотезы проблемы сегмента';
 $this->registerCssFile('@web/css/confirm-problem-create-style.css');
+
+/**
+ * @var FormCreateConfirmProblem $model
+ * @var Problems $problem
+ * @var ConfirmSegment $confirmSegment
+ * @var Segments $segment
+ * @var Projects $project
+ */
+
 ?>
 <div class="problem-confirm-create">
 
@@ -14,22 +28,22 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name">
             <span>Проект:</span>
-            <?= $project->project_name; ?>
+            <?= $project->getProjectName() ?>
         </div>
 
-        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->id], [
+        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openAllInformationProject link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openReportProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openResultTableProject link_in_the_header text-center',
         ]) ?>
 
@@ -39,19 +53,19 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
     <div class="row navigation_blocks">
 
         <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segments/index', 'id' => $project->id],
+            ['/segments/index', 'id' => $project->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <?= Html::a('<div class="stage_number">2</div><div>Подтверждение гипотез целевых сегментов</div>',
-            ['/confirm-segment/view', 'id' => $confirmSegment->id],
+            ['/confirm-segment/view', 'id' => $confirmSegment->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <?= Html::a('<div class="stage_number">3</div><div>Генерация гипотез проблем сегментов</div>',
-            ['/problems/index', 'id' => $confirmSegment->id],
+            ['/problems/index', 'id' => $confirmSegment->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
         <div class="active_navigation_block navigation_block">
             <div class="stage_number">4</div>
@@ -91,35 +105,35 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
         <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
 
             <?php
-            $segment_name = $segment->name;
+            $segment_name = $segment->getName();
             if (mb_strlen($segment_name) > 15){
                 $segment_name = mb_substr($segment_name, 0, 15) . '...';
             }
 
-            $problem_description = $problem->description;
+            $problem_description = $problem->getDescription();
             if (mb_strlen($problem_description) > 50){
                 $problem_description = mb_substr($problem_description, 0, 50) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_max_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']) ?>
 
             <?php
-            $problem_description = $problem->description;
+            $problem_description = $problem->getDescription();
             if (mb_strlen($problem_description) > 100){
                 $problem_description = mb_substr($problem_description, 0, 100) . '...';
             }
             ?>
 
-            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']); ?>
+            <?= Html::a('Сегмент: <div>' . $segment_name . '</div> / Проблема: <div>' . $problem_description . '</div><span class="arrow_link"><span></span><span><span></span>', ['#'], ['id' => 'view_desc_stage_width_min_1900', 'onclick' => 'return false', 'class' => 'view_block_description view_desc_stage']) ?>
 
         </div>
 
-        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
+        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
@@ -128,9 +142,9 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
     <div class="row block_description_stage">
         <div>Наименование сегмента:</div>
-        <div><?= $segment->name;?></div>
+        <div><?= $segment->getName() ?></div>
         <div>Формулировка проблемы:</div>
-        <div><?= $problem->description;?></div>
+        <div><?= $problem->getDescription() ?></div>
     </div>
 
 
@@ -139,15 +153,15 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
             'class' => 'link_create_interview link_active_create_interview col-xs-12 col-lg-4',
-        ]); ?>
+        ]) ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 2</div><div class="link_create_interview-text_right">Сформировать список вопросов</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-lg-4 show_modal_next_step_error',
-        ]); ?>
+        ]) ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-lg-4 show_modal_next_step_error',
-        ]); ?>
+        ]) ?>
 
     </div>
 
@@ -162,7 +176,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                 <div class="col-md-12" style="padding: 5px 0 0 0;">
                     <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-problem/get-instruction-step-one'],[
                         'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-                    ]); ?>
+                    ]) ?>
                 </div>
 
             </div>
@@ -173,37 +187,37 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                     <div class="row">
                         <div class="col-md-12">Цель проекта</div>
-                        <div class="col-md-12"><?= $project->purpose_project;?></div>
+                        <div class="col-md-12"><?= $project->getPurposeProject() ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Приветствие в начале встречи</div>
-                        <div class="col-md-12"><?= $confirmSegment->greeting_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->getGreetingInterview() ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Информация о вас для респондентов</div>
-                        <div class="col-md-12"><?= $confirmSegment->view_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->getViewInterview() ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                        <div class="col-md-12"><?= $confirmSegment->reason_interview; ?></div>
+                        <div class="col-md-12"><?= $confirmSegment->getReasonInterview() ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Формулировка проблемы, которую проверяем</div>
-                        <div class="col-md-12"><?= $problem->description;?></div>
+                        <div class="col-md-12"><?= $problem->getDescription() ?></div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Показатель положительного прохождения теста</div>
-                        <div class="col-md-12">К = <?= $problem->indicator_positive_passage; ?> %</div>
+                        <div class="col-md-12">К = <?= $problem->getIndicatorPositivePassage() ?> %</div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">Вопросы для проверки гипотезы проблемы и ответы на них:</div>
-                        <div class="col-md-12"><?= $problem->getListExpectedResultsInterview(); ?></div>
+                        <div class="col-md-12"><?= $problem->getListExpectedResultsInterview() ?></div>
                     </div>
 
                 </div>
@@ -212,7 +226,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
 
                 $form = ActiveForm::begin([
                     'id' => 'new_confirm_problem',
-                    'action' => Url::to(['/confirm-problem/save-confirm', 'id' => $problem->id]),
+                    'action' => Url::to(['/confirm-problem/save-confirm', 'id' => $problem->getId()]),
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
@@ -231,7 +245,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                             'placeholder' => '',
                             'required' => true,
                             'class' => 'style_form_field_respond form-control',
-                        ]);
+                        ])
                     ?>
 
                 </div>
@@ -248,7 +262,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_respond',
                             'autocomplete' => 'off'
-                        ]);
+                        ])
                     ?>
 
                 </div>
@@ -280,7 +294,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_add_count_respond',
                             'autocomplete' => 'off'
-                        ]);
+                        ])
                     ?>
 
                 </div>
@@ -296,7 +310,7 @@ $this->registerCssFile('@web/css/confirm-problem-create-style.css');
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_positive',
                             'autocomplete' => 'off'
-                        ]);
+                        ])
                     ?>
 
                 </div>

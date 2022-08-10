@@ -25,7 +25,7 @@ use yii\base\Model;
 abstract class FormCreateConfirm extends Model
 {
 
-    const CACHE_NAME = 'formCreateConfirmCache';
+    public const CACHE_NAME = 'formCreateConfirmCache';
 
     public $hypothesis_id;
     public $count_respond;
@@ -40,7 +40,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['count_respond', 'count_positive'], 'required'],
@@ -55,7 +55,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return int
      */
-    public function getHypothesisId()
+    public function getHypothesisId(): int
     {
         return $this->hypothesis_id;
     }
@@ -63,7 +63,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @param int $hypothesis_id
      */
-    public function setHypothesisId($hypothesis_id)
+    public function setHypothesisId(int $hypothesis_id): void
     {
         $this->hypothesis_id = $hypothesis_id;
     }
@@ -71,7 +71,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return int
      */
-    public function getCountRespond()
+    public function getCountRespond(): int
     {
         return $this->count_respond;
     }
@@ -79,7 +79,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @param int $count_respond
      */
-    public function setCountRespond($count_respond)
+    public function setCountRespond(int $count_respond): void
     {
         $this->count_respond = $count_respond;
     }
@@ -87,7 +87,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return int
      */
-    public function getCountPositive()
+    public function getCountPositive(): int
     {
         return $this->count_positive;
     }
@@ -95,7 +95,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @param int $count_positive
      */
-    public function setCountPositive($count_positive)
+    public function setCountPositive(int $count_positive): void
     {
         $this->count_positive = $count_positive;
     }
@@ -103,15 +103,15 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return int
      */
-    public function getAddCountRespond()
+    public function getAddCountRespond(): int
     {
-        return $this->add_count_respond;
+        return $this->add_count_respond ?: 0;
     }
 
     /**
      * @param int $add_count_respond
      */
-    public function setAddCountRespond($add_count_respond)
+    public function setAddCountRespond(int $add_count_respond): void
     {
         $this->add_count_respond = $add_count_respond;
     }
@@ -119,7 +119,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return CreatorRespondsFromAgentsOnConfirmFirstStep
      */
-    public function getCreatorResponds()
+    public function getCreatorResponds(): CreatorRespondsFromAgentsOnConfirmFirstStep
     {
         return $this->_creatorResponds;
     }
@@ -127,7 +127,7 @@ abstract class FormCreateConfirm extends Model
     /**
      *
      */
-    public function setCreatorResponds()
+    public function setCreatorResponds(): void
     {
         $this->_creatorResponds = new CreatorRespondsFromAgentsOnConfirmFirstStep();
     }
@@ -135,7 +135,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return CreatorNewRespondsOnConfirmFirstStep
      */
-    public function getCreatorNewResponds()
+    public function getCreatorNewResponds(): CreatorNewRespondsOnConfirmFirstStep
     {
         return $this->_creatorNewResponds;
     }
@@ -143,7 +143,7 @@ abstract class FormCreateConfirm extends Model
     /**
      *
      */
-    public function setCreatorNewResponds()
+    public function setCreatorNewResponds(): void
     {
         $this->_creatorNewResponds = new CreatorNewRespondsOnConfirmFirstStep();
     }
@@ -151,7 +151,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return CacheForm
      */
-    public function getCacheManager()
+    public function getCacheManager(): CacheForm
     {
         return $this->_cacheManager;
     }
@@ -159,7 +159,7 @@ abstract class FormCreateConfirm extends Model
     /**
      *
      */
-    public function setCacheManager()
+    public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
     }
@@ -167,7 +167,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @param string $cachePath
      */
-    public function setCachePathForm($cachePath)
+    public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
     }
@@ -175,7 +175,7 @@ abstract class FormCreateConfirm extends Model
     /**
      * @return string
      */
-    public function getCachePathForm()
+    public function getCachePathForm(): string
     {
         return $this->cachePath;
     }

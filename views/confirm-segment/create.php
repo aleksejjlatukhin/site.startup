@@ -1,11 +1,22 @@
 <?php
 
+use app\models\forms\FormCreateConfirmSegment;
+use app\models\Projects;
+use app\models\Segments;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 
 $this->title = 'Подтверждение гипотезы целевого сегмента';
 $this->registerCssFile('@web/css/confirm-segments-create-style.css');
+
+/**
+ * @var FormCreateConfirmSegment $model
+ * @var Segments $segment
+ * @var Projects $project
+ */
+
 ?>
 
 <div class="segment-confirm-create">
@@ -15,22 +26,22 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
         <div class="col-xs-12 col-md-12 col-lg-4 project_name">
             <span>Проект:</span>
-            <?= $project->project_name; ?>
+            <?= $project->getProjectName() ?>
         </div>
 
-        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->id], [
+        <?= Html::a('Данные проекта', ['/projects/show-all-information', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openAllInformationProject link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->id], [
+        <?= Html::a('Протокол проекта', ['/projects/report', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openReportProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->id], [
+        <?= Html::a('Трэкшн карта проекта', ['/projects/show-roadmap', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openRoadmapProject link_in_the_header text-center',
         ]) ?>
 
-        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->id], [
+        <?= Html::a('Сводная таблица проекта', ['/projects/result', 'id' => $project->getId()], [
             'class' => 'col-xs-12 col-sm-3 col-md-3 col-lg-2 openResultTableProject link_in_the_header text-center',
         ]) ?>
 
@@ -40,9 +51,9 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
     <div class="row navigation_blocks">
 
         <?= Html::a('<div class="stage_number">1</div><div>Генерация гипотез целевых сегментов</div>',
-            ['/segments/index', 'id' => $project->id],
+            ['/segments/index', 'id' => $project->getId()],
             ['class' => 'passive_navigation_block navigation_block']
-        ) ;?>
+        ) ?>
 
 
         <div class="active_navigation_block navigation_block">
@@ -92,14 +103,14 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
         <div class="col-xs-12 col-md-12 col-lg-8 stage_name_row">
             <span>Сегмент:</span>
-            <?= $segment->name; ?>
+            <?= $segment->getName() ?>
         </div>
 
-        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->id], [
+        <?= Html::a('Данные сегмента', ['/segments/show-all-information', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openAllInformationSegment link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->id], [
+        <?= Html::a('Трэкшн карта сегмента', ['/segments/show-roadmap', 'id' => $segment->getId()], [
             'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-2 openRoadmapSegment link_in_the_header text-center',
         ]) ?>
 
@@ -110,15 +121,15 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 1</div><div class="link_create_interview-text_right">Заполнить исходные данные подтверждения</div></div>', [
             'class' => 'link_create_interview link_active_create_interview col-xs-12 col-lg-4',
-        ]); ?>
+        ]) ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 2</div><div class="link_create_interview-text_right">Сформировать список вопросов</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-lg-4 show_modal_next_step_error',
-        ]); ?>
+        ]) ?>
 
         <?= Html::button('<div class="link_create_interview-block_text"><div class="link_create_interview-text_left">Шаг 3</div><div class="link_create_interview-text_right">Заполнить информацию о респондентах и интервью</div></div>', [
             'class' => 'link_create_interview link_passive_create_interview col-xs-12 col-lg-4 show_modal_next_step_error',
-        ]); ?>
+        ]) ?>
 
     </div>
 
@@ -131,7 +142,7 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                 <div class="col-md-12" style="padding: 5px 0 0 0;">
                     <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-segment/get-instruction-step-one'],[
                         'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-                    ]); ?>
+                    ]) ?>
                 </div>
 
             </div>
@@ -145,21 +156,19 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                     </div>
 
                     <div class="col-md-12">
-                        <?= $project->purpose_project;?>
+                        <?= $project->getPurposeProject() ?>
                     </div>
 
                 </div>
 
                 <?php
-
                 $form = ActiveForm::begin([
                     'id' => 'new_confirm_segment',
-                    'action' => \yii\helpers\Url::to(['/confirm-segment/save-confirm', 'id' => $segment->id]),
+                    'action' => Url::to(['/confirm-segment/save-confirm', 'id' => $segment->getId()]),
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
                 ]);
-
                 ?>
 
 
@@ -175,8 +184,7 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                         'required' => true,
                         'placeholder' => $placeholder,
                         'class' => 'style_form_field_respond form-control',
-                    ]);
-                    ?>
+                    ]) ?>
 
                 </div>
 
@@ -192,14 +200,13 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                         'required' => true,
                         'placeholder' => $placeholder,
                         'class' => 'style_form_field_respond form-control',
-                    ]);
-                    ?>
+                    ]) ?>
 
                 </div>
 
                 <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
-                    <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
+                    <?php $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
 
                     <?= $form->field($model, 'reason_interview', [
                         'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
@@ -209,8 +216,7 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                         'required' => true,
                         'placeholder' => $placeholder,
                         'class' => 'style_form_field_respond form-control',
-                    ]);
-                    ?>
+                    ]) ?>
 
                 </div>
 
@@ -225,7 +231,7 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_respond',
                             'autocomplete' => 'off'
-                        ]);
+                        ])
                     ?>
 
                 </div>
@@ -241,7 +247,7 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                             'class' => 'style_form_field_respond form-control',
                             'id' => 'confirm_count_positive',
                             'autocomplete' => 'off'
-                        ]);
+                        ])
                     ?>
 
                 </div>

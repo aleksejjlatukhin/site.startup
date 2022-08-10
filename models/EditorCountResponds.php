@@ -8,7 +8,10 @@ use app\models\forms\CreateRespondSegmentForm;
 use app\models\forms\CreateRespondGcpForm;
 use app\models\forms\CreateRespondMvpForm;
 use app\models\interfaces\ConfirmationInterface;
+use app\models\interfaces\RespondsInterface;
+use yii\base\ErrorException;
 use yii\base\Model;
+use yii\web\NotFoundHttpException;
 
 /**
  * Редактор количества респондентов на этапах подтверждения гипотез
@@ -21,10 +24,13 @@ class EditorCountResponds extends Model
 
     /**
      * @param ConfirmationInterface $confirm
+     * @return void
+     * @throws ErrorException
+     * @throws NotFoundHttpException
      */
-    public function edit(ConfirmationInterface $confirm)
+    public function edit(ConfirmationInterface $confirm): void
     {
-
+        /** @var RespondsInterface[] $responds */
         $responds = $confirm->responds;
         $countResponds = count($responds);
 
@@ -32,7 +38,7 @@ class EditorCountResponds extends Model
             for ($count = $countResponds; $count < $confirm->getCountRespond(); $count++ )
             {
                 $newRespond[$count] = self::getCreateForm($confirm);
-                $newRespond[$count]->setConfirmId($confirm->id);
+                $newRespond[$count]->setConfirmId($confirm->getId());
                 $newRespond[$count]->setName('Респондент ' . ($count+1));
                 $newRespond[$count]->create();
             }
@@ -40,7 +46,9 @@ class EditorCountResponds extends Model
             $minus = $countResponds - $confirm->getCountRespond();
             $responds = array_reverse($responds);
             foreach ($responds as $i => $respond) {
-                if ($i < $minus) $respond->delete();
+                if ($i < $minus) {
+                    $respond->delete();
+                }
             }
         }
 
@@ -53,13 +61,19 @@ class EditorCountResponds extends Model
      */
     private static function getCreateForm(ConfirmationInterface $confirm)
     {
-        if ($confirm->getStage() == StageConfirm::STAGE_CONFIRM_SEGMENT) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_SEGMENT) {
             return new CreateRespondSegmentForm($confirm);
-        } elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new CreateRespondProblemForm($confirm);
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return new CreateRespondGcpForm($confirm);
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return new CreateRespondMvpForm($confirm);
         }
         return false;

@@ -1,9 +1,19 @@
 <?php
 
+use app\models\ConfirmGcp;
+use app\models\forms\FormUpdateConfirmGcp;
+use app\models\Gcps;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use app\models\User;
+
+/**
+ * @var ConfirmGcp $model
+ * @var Gcps $gcp
+ * @var FormUpdateConfirmGcp $formUpdateConfirmGcp
+ */
 
 ?>
 
@@ -15,12 +25,12 @@ use app\models\User;
         <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-gcp/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                 <?= Html::button('Редактировать', [
                     'id' => 'show_form_update_data',
@@ -46,38 +56,38 @@ use app\models\User;
 
         <div class="row">
             <div class="col-md-12">Цель проекта</div>
-            <div class="col-md-12"><?= $gcp->project->purpose_project;?></div>
+            <div class="col-md-12"><?= $gcp->project->getPurposeProject() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Приветствие в начале встречи</div>
-            <div class="col-md-12"><?= $gcp->segment->confirm->greeting_interview; ?></div>
+            <div class="col-md-12"><?= $gcp->segment->confirm->getGreetingInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Информация о вас для респондентов</div>
-            <div class="col-md-12"><?= $gcp->segment->confirm->view_interview; ?></div>
+            <div class="col-md-12"><?= $gcp->segment->confirm->getViewInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-            <div class="col-md-12"><?= $gcp->segment->confirm->reason_interview; ?></div>
+            <div class="col-md-12"><?= $gcp->segment->confirm->getReasonInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Формулировка ценностного предложения, которое проверяем</div>
-            <div class="col-md-12"><?= $gcp->description;?></div>
+            <div class="col-md-12"><?= $gcp->getDescription() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Количество респондентов, подтвердивших проблему:
-                <span><?= $model->count_respond; ?></span>
+                <span><?= $model->getCountRespond() ?></span>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Необходимое количество респондентов, подтверждающих ценностное предложение:
-                <span><?= $model->count_positive; ?></span>
+                <span><?= $model->getCountPositive() ?></span>
             </div>
         </div>
 
@@ -90,7 +100,7 @@ use app\models\User;
     <?php
     $form = ActiveForm::begin([
         'id' => 'update_data_confirm',
-        'action' => Url::to(['/confirm-gcp/update', 'id' => $formUpdateConfirmGcp->id]),
+        'action' => Url::to(['/confirm-gcp/update', 'id' => $formUpdateConfirmGcp->getId()]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -102,7 +112,7 @@ use app\models\User;
         <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-gcp/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
@@ -118,7 +128,7 @@ use app\models\User;
                     'font-size' => '24px',
                     'border-radius' => '8px',
                 ]
-            ])?>
+            ]) ?>
 
             <?= Html::submitButton('Сохранить', [
                 'class' => 'btn btn-success',
@@ -143,27 +153,27 @@ use app\models\User;
 
             <div class="row">
                 <div class="col-md-12">Цель проекта</div>
-                <div class="col-md-12"><?= $gcp->project->purpose_project;?></div>
+                <div class="col-md-12"><?= $gcp->project->getPurposeProject() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Приветствие в начале встречи</div>
-                <div class="col-md-12"><?= $gcp->segment->confirm->greeting_interview; ?></div>
+                <div class="col-md-12"><?= $gcp->segment->confirm->getGreetingInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Информация о вас для респондентов</div>
-                <div class="col-md-12"><?= $gcp->segment->confirm->view_interview; ?></div>
+                <div class="col-md-12"><?= $gcp->segment->confirm->getViewInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-                <div class="col-md-12"><?= $gcp->segment->confirm->reason_interview; ?></div>
+                <div class="col-md-12"><?= $gcp->segment->confirm->getReasonInterview() ?></div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">Формулировка ценностного предложения, которое проверяем</div>
-                <div class="col-md-12"><?= $gcp->description;?></div>
+                <div class="col-md-12"><?= $gcp->getDescription() ?></div>
             </div>
 
         </div>
@@ -179,7 +189,7 @@ use app\models\User;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>
@@ -195,7 +205,7 @@ use app\models\User;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_positive',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>

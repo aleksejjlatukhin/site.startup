@@ -17,14 +17,14 @@ use yii\web\UploadedFile;
  * Class FormCreateMessageMainAdmin
  * @package app\modules\admin\models\form
  *
- * @property $description                   Текст сообщения
- * @property $conversation_id               Идентификатор беседы
- * @property $sender_id                     Идентификатор отправителя
- * @property $adressee_id                   Идентификатор получателя
- * @property $message_files                 Файлы прикрепленные к сообщению
- * @property $category                      Категория сообщений, указывается для сохранения файлов в нужной дирректории
- * @property $message_id                    Идентификатор сообщения
- * @property $server_file                   Сгенерированное имя прикрепленного файла и сохраненного на сервере и записанного в таблицу message_files
+ * @property string $description                        Текст сообщения
+ * @property int $conversation_id                       Идентификатор беседы
+ * @property int $sender_id                             Идентификатор отправителя
+ * @property int $adressee_id                           Идентификатор получателя
+ * @property UploadedFile[] $message_files              Файлы прикрепленные к сообщению
+ * @property int $category                              Категория сообщений, указывается для сохранения файлов в нужной дирректории
+ * @property int $message_id                            Идентификатор сообщения
+ * @property string $server_file                        Сгенерированное имя прикрепленного файла и сохраненного на сервере и записанного в таблицу message_files
  */
 class FormCreateMessageMainAdmin extends Model
 {
@@ -42,7 +42,7 @@ class FormCreateMessageMainAdmin extends Model
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['description'], 'filter', 'filter' => 'trim'],
@@ -59,19 +59,21 @@ class FormCreateMessageMainAdmin extends Model
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function create()
+    public function create(): MessageMainAdmin
     {
         $model = new MessageMainAdmin();
-        $model->description = $this->description;
-        $model->conversation_id = $this->conversation_id;
-        $model->sender_id = $this->sender_id;
-        $model->adressee_id = $this->adressee_id;
+        $model->setDescription($this->getDescription());
+        $model->setConversationId($this->getConversationId());
+        $model->setSenderId($this->getSenderId());
+        $model->setAdresseeId($this->getAdresseeId());
         if ($model->save()) {
 
             //Загрузка презентационных файлов
-            $this->message_id = $model->id;
-            $this->message_files = UploadedFile::getInstances($this, 'message_files');
-            if ($this->message_files) $this->uploadMessageFiles();
+            $this->setMessageId($model->getId());
+            $this->setMessageFiles(UploadedFile::getInstances($this, 'message_files'));
+            if ($this->getMessageFiles()) {
+                $this->uploadMessageFiles();
+            }
 
             return $model;
         }
@@ -81,18 +83,21 @@ class FormCreateMessageMainAdmin extends Model
 
 
     /**
-     * @return bool
+     * @return void
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    private function uploadMessageFiles(){
+    private function uploadMessageFiles(): void
+    {
 
-        $path = UPLOAD.'/user-'.$this->sender_id.'/messages/category-'.$this->category.'/message-'.$this->message_id.'/';
-        if (!is_dir($path)) FileHelper::createDirectory($path);
+        $path = UPLOAD.'/user-'.$this->getSenderId().'/messages/category-'.$this->getCategory().'/message-'.$this->getMessageId().'/';
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path);
+        }
 
         if($this->validate()){
 
-            foreach($this->message_files as $file){
+            foreach($this->getMessageFiles() as $file){
 
                 $filename = Yii::$app->getSecurity()->generateRandomString(15);
 
@@ -101,10 +106,10 @@ class FormCreateMessageMainAdmin extends Model
                     $file->saveAs($path . $filename . '.' . $file->extension);
 
                     $messageFile = new MessageFiles();
-                    $messageFile->file_name = $file;
-                    $messageFile->server_file = $filename . '.' . $file->extension;
-                    $messageFile->message_id = $this->message_id;
-                    $messageFile->category = $this->category;
+                    $messageFile->setFileName($file);
+                    $messageFile->setServerFile($filename . '.' . $file->extension);
+                    $messageFile->setMessageId($this->getMessageId());
+                    $messageFile->setCategory($this->getCategory());
                     $messageFile->save(false);
 
                 }catch (Exception $e){
@@ -112,10 +117,143 @@ class FormCreateMessageMainAdmin extends Model
                     throw new NotFoundHttpException('Невозможно загрузить файл!');
                 }
             }
-            return true;
-        }else{
-            return false;
         }
-
     }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConversationId(): int
+    {
+        return $this->conversation_id;
+    }
+
+
+    /**
+     * @param int $conversation_id
+     */
+    public function setConversationId(int $conversation_id): void
+    {
+        $this->conversation_id = $conversation_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSenderId(): int
+    {
+        return $this->sender_id;
+    }
+
+
+    /**
+     * @param int $sender_id
+     */
+    public function setSenderId(int $sender_id): void
+    {
+        $this->sender_id = $sender_id;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAdresseeId(): int
+    {
+        return $this->adressee_id;
+    }
+
+
+    /**
+     * @param int $adressee_id
+     */
+    public function setAdresseeId(int $adressee_id): void
+    {
+        $this->adressee_id = $adressee_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategory(): int
+    {
+        return $this->category;
+    }
+
+    /**
+     * @return void
+     * @param int $category
+     */
+    public function setCategory(int $category): void
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMessageId(): int
+    {
+        return $this->message_id;
+    }
+
+    /**
+     * @return void
+     * @param int $message_id
+     */
+    public function setMessageId(int $message_id): void
+    {
+        $this->message_id = $message_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerFile(): string
+    {
+        return $this->server_file;
+    }
+
+    /**
+     * @return void
+     * @param string $server_file
+     */
+    public function setServerFile(string $server_file): void
+    {
+        $this->server_file = $server_file;
+    }
+
+    /**
+     * @return UploadedFile[]
+     */
+    public function getMessageFiles(): array
+    {
+        return $this->message_files;
+    }
+
+    /**
+     * @param UploadedFile[] $message_files
+     * @return void
+     */
+    public function setMessageFiles(array $message_files): void
+    {
+        $this->message_files = $message_files;
+    }
+
 }

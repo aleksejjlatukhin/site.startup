@@ -16,13 +16,17 @@ use yii\helpers\FileHelper;
  * Class RespondsMvp
  * @package app\models
  *
- * @property int $id                        Идентификатор записи в таб. responds_mvp
- * @property int $confirm_id                Идентификатор записи в таб. confirm_mvp
- * @property string $name                   ФИО респондента
- * @property string $info_respond           Данные респондента
- * @property string $email                  Эл.почта респондента
- * @property int $date_plan                 Плановая дата интервью
- * @property string $place_interview        Место проведения интервью
+ * @property int $id                                Идентификатор записи в таб. responds_mvp
+ * @property int $confirm_id                        Идентификатор записи в таб. confirm_mvp
+ * @property string $name                           ФИО респондента
+ * @property string $info_respond                   Данные респондента
+ * @property string $email                          Эл.почта респондента
+ * @property int $date_plan                         Плановая дата интервью
+ * @property string $place_interview                Место проведения интервью
+ *
+ * @property ConfirmMvp $confirm                    Подтверждение Mvp-продукта
+ * @property InterviewConfirmMvp $interview         Информация о проведении интервью
+ * @property AnswersQuestionsConfirmMvp[] $answers  Ответы на вопросы интервью
  */
 class RespondsMvp extends ActiveRecord implements RespondsInterface
 {
@@ -30,7 +34,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'responds_mvp';
     }
@@ -38,9 +42,9 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * Получить интевью респондента
      *
-     * @return mixed|ActiveQuery
+     * @return ActiveQuery
      */
-    public function getInterview()
+    public function getInterview(): ActiveQuery
     {
         return $this->hasOne(InterviewConfirmMvp::class, ['respond_id' => 'id']);
     }
@@ -48,36 +52,28 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * Получить модель подтверждения
      *
-     * @return mixed|ActiveQuery
+     * @return ActiveQuery
      */
-    public function getConfirm()
+    public function getConfirm(): ActiveQuery
     {
         return $this->hasOne(ConfirmMvp::class, ['id' => 'confirm_id']);
     }
 
     /**
-     * @return ConfirmMvp|null
-     */
-    public function findConfirm()
-    {
-        return ConfirmMvp::findOne($this->getConfirmId());
-    }
-
-    /**
      * Получить ответы респондента на вопросы
      *
-     * @return mixed|ActiveQuery
+     * @return ActiveQuery
      */
-    public function getAnswers()
+    public function getAnswers(): ActiveQuery
     {
         return $this->hasMany(AnswersQuestionsConfirmMvp::class, ['respond_id' => 'id']);
     }
 
     /**
      * @param array $params
-     * @return mixed|void
+     * @return void
      */
-    public function setParams(array $params)
+    public function setParams(array $params): void
     {
         $this->setInfoRespond($params['info_respond']);
         $this->setPlaceInterview($params['place_interview']);
@@ -87,7 +83,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['confirm_id', 'name'], 'required'],
@@ -103,7 +99,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Респондент',
@@ -137,43 +133,45 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     }
 
     /**
-     * Удаление связанных данных
-     * по событию EVENT_AFTER_DELETE
-     *
-     * @throws Throwable
+     * @return void
      * @throws ErrorException
-     * @throws StaleObjectException
      */
-    private function deleteDataRespond()
+    private function deleteDataRespond(): void
     {
-        $descInterview = InterviewConfirmMvp::findOne(['respond_id' => $this->getId()]);
-        $answers = AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->getId()]);
         $confirm = ConfirmMvp::findOne($this->getConfirmId());
         $mvp = Mvps::findOne($confirm->getMvpId());
         $gcp = Gcps::findOne($mvp->getGcpId());
         $problem = Problems::findOne($mvp->getProblemId());
         $segment = Segments::findOne($mvp->getSegmentId());
-        $project = Projects::findOne($mvp->getProblem());
+        $project = Projects::findOne($mvp->getProjectId());
         $user = User::findOne($project->getUserId());
 
         //Удаление интервью респондента
-        if ($descInterview) $descInterview->delete();
+        if (InterviewConfirmMvp::findOne(['respond_id' => $this->getId()])) {
+            InterviewConfirmMvp::deleteAll(['respond_id' => $this->getId()]);
+        }
         //Удаление ответов респондента на вопросы интервью
-        foreach ($answers as $answer) $answer->delete();
+        if (AnswersQuestionsConfirmMvp::findAll(['respond_id' => $this->getId()])) {
+            AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $this->getId()]);
+        }
         //Удаление дирректории респондента
         $del_dir = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/problems/problem-'.$problem->getId().
             '/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/interviews/respond-'.$this->getId();
-        if (file_exists($del_dir)) FileHelper::removeDirectory($del_dir);
+        if (file_exists($del_dir)) {
+            FileHelper::removeDirectory($del_dir);
+        }
         //Удаление кэша для форм респондента
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/confirm/interviews/respond-'.$this->getId();
-        if (file_exists($cachePathDelete)) FileHelper::removeDirectory($cachePathDelete);
+        if (file_exists($cachePathDelete)) {
+            FileHelper::removeDirectory($cachePathDelete);
+        }
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -181,7 +179,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param int $confirmId
      */
-    public function setConfirmId($confirmId)
+    public function setConfirmId(int $confirmId): void
     {
         $this->confirm_id = $confirmId;
     }
@@ -189,7 +187,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @return int
      */
-    public function getConfirmId()
+    public function getConfirmId(): int
     {
         return $this->confirm_id;
     }
@@ -197,7 +195,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -205,7 +203,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -213,7 +211,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getInfoRespond()
+    public function getInfoRespond(): string
     {
         return $this->info_respond;
     }
@@ -221,7 +219,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param string $info_respond
      */
-    public function setInfoRespond($info_respond)
+    public function setInfoRespond(string $info_respond): void
     {
         $this->info_respond = $info_respond;
     }
@@ -229,7 +227,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -237,15 +235,15 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDatePlan()
+    public function getDatePlan(): ?int
     {
         return $this->date_plan;
     }
@@ -253,7 +251,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param int $datePlan
      */
-    public function setDatePlan($datePlan)
+    public function setDatePlan(int $datePlan): void
     {
         $this->date_plan = $datePlan;
     }
@@ -261,7 +259,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @return string
      */
-    public function getPlaceInterview()
+    public function getPlaceInterview(): string
     {
         return $this->place_interview;
     }
@@ -269,7 +267,7 @@ class RespondsMvp extends ActiveRecord implements RespondsInterface
     /**
      * @param string $place_interview
      */
-    public function setPlaceInterview($place_interview)
+    public function setPlaceInterview(string $place_interview): void
     {
         $this->place_interview = $place_interview;
     }

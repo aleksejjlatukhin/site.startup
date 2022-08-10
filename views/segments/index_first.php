@@ -1,11 +1,16 @@
 <?php
 
+use app\models\Projects;
 use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Генерация гипотез целевых сегментов';
 $this->registerCssFile('@web/css/segments-index-style.css');
 $this->registerCssFile('@web/css/methodological-guide-style.css');
+
+/**
+ * @var Projects $project
+ */
 
 ?>
 
@@ -20,9 +25,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             <div class="row container-fluid">
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->id],
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
                             ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-left']
-                        ); ?>
+                        ) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -195,7 +200,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
         </div>
 
         <!--Модальные окна-->
-        <?= $this->render('modal'); ?>
+        <?= $this->render('modal') ?>
 
     <?php else : ?>
 

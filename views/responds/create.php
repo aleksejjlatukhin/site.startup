@@ -1,15 +1,22 @@
 <?php
 
+use app\models\forms\FormCreateRespondent;
+use app\models\interfaces\ConfirmationInterface;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var ConfirmationInterface $confirm
+ * @var FormCreateRespondent $model
+ */
 
 ?>
 
 <?php
 $form = ActiveForm::begin([
     'id' => 'new_respond_form',
-    'action' => Url::to(['/responds/create', 'stage' => $confirm->stage, 'id' => $confirm->id]),
+    'action' => Url::to(['/responds/create', 'stage' => $confirm->getStage(), 'id' => $confirm->getId()]),
     'options' => ['class' => 'g-py-15'],
     'errorCssClass' => 'u-has-error-v1',
     'successCssClass' => 'u-has-success-v1-1',

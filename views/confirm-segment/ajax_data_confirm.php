@@ -1,9 +1,19 @@
 <?php
 
+use app\models\ConfirmSegment;
+use app\models\forms\FormUpdateConfirmSegment;
+use app\models\Projects;
+use app\models\StatusConfirmHypothesis;
 use yii\widgets\ActiveForm;
 use app\models\User;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
+/**
+ * @var FormUpdateConfirmSegment $formUpdateConfirmSegment
+ * @var ConfirmSegment $model
+ * @var Projects $project
+*/
 
 ?>
 
@@ -15,12 +25,12 @@ use yii\helpers\Url;
         <div class="col-sm-12 col-md-9" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-segment/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-3" style="padding: 0;">
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $segment->exist_confirm === null) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $model->segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                 <?= Html::button('Редактировать', [
                     'id' => 'show_form_update_data',
@@ -47,33 +57,33 @@ use yii\helpers\Url;
 
         <div class="row">
             <div class="col-md-12">Цель проекта</div>
-            <div class="col-md-12"><?= $project->purpose_project;?></div>
+            <div class="col-md-12"><?= $project->getPurposeProject() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Приветствие в начале встречи</div>
-            <div class="col-md-12"><?= $model->greeting_interview; ?></div>
+            <div class="col-md-12"><?= $model->getGreetingInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Информация о вас для респондентов</div>
-            <div class="col-md-12"><?= $model->view_interview; ?></div>
+            <div class="col-md-12"><?= $model->getViewInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
-            <div class="col-md-12"><?= $model->reason_interview; ?></div>
+            <div class="col-md-12"><?= $model->getReasonInterview() ?></div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Планируемое количество респондентов:
-                <span><?= $model->count_respond; ?></span>
+                <span><?= $model->getCountRespond() ?></span>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-12">Необходимое количество респондентов, соответствующих сегменту:
-                <span><?= $model->count_positive; ?></span>
+                <span><?= $model->getCountPositive() ?></span>
             </div>
         </div>
 
@@ -86,7 +96,7 @@ use yii\helpers\Url;
     <?php
     $form = ActiveForm::begin([
         'id' => 'update_data_interview',
-        'action' => Url::to(['/confirm-segment/update', 'id' => $model->id]),
+        'action' => Url::to(['/confirm-segment/update', 'id' => $model->getId()]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -99,7 +109,7 @@ use yii\helpers\Url;
         <div class="col-sm-12 col-md-6" style="padding: 5px 0 0 0;">
             <?= Html::a('Исходные данные подтверждения' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-segment/get-instruction-step-one'],[
                 'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-            ]); ?>
+            ]) ?>
         </div>
 
         <div class="block-buttons-update-data-confirm col-sm-12 col-md-6" style="padding: 0;">
@@ -115,7 +125,7 @@ use yii\helpers\Url;
                     'font-size' => '24px',
                     'border-radius' => '8px',
                 ]
-            ])?>
+            ]) ?>
 
             <?= Html::submitButton('Сохранить', [
                 'class' => 'btn btn-success',
@@ -145,7 +155,7 @@ use yii\helpers\Url;
             </div>
 
             <div class="col-md-12">
-                <?= $project->purpose_project;?>
+                <?= $project->getPurposeProject() ?>
             </div>
 
         </div>
@@ -153,7 +163,7 @@ use yii\helpers\Url;
 
         <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
-            <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
+            <?php $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
 
             <?= $form->field($formUpdateConfirmSegment, 'greeting_interview', [
                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
@@ -163,14 +173,13 @@ use yii\helpers\Url;
                 'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
         <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
-            <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+            <?php $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
 
             <?= $form->field($formUpdateConfirmSegment, 'view_interview', [
                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
@@ -180,14 +189,13 @@ use yii\helpers\Url;
                 'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
         <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
 
-            <? $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
+            <?php $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
 
             <?= $form->field($formUpdateConfirmSegment, 'reason_interview', [
                 'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
@@ -197,8 +205,7 @@ use yii\helpers\Url;
                 'maxlength' => true,
                 'required' => true,
                 'class' => 'style_form_field_respond form-control',
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
@@ -213,7 +220,7 @@ use yii\helpers\Url;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_respond',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>
@@ -229,7 +236,7 @@ use yii\helpers\Url;
                     'class' => 'style_form_field_respond form-control',
                     'id' => 'confirm_count_positive',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>

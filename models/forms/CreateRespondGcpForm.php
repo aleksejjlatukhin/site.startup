@@ -30,14 +30,16 @@ class CreateRespondGcpForm extends FormCreateRespondent
      * @param ConfirmGcp $confirm
      * @param array $config
      */
-    public function __construct(ConfirmGcp $confirm, $config = [])
+    public function __construct(ConfirmGcp $confirm, array $config = [])
     {
         $this->setCreatorAnswers();
         $this->setCacheManager();
         $this->setCachePathForm(self::getCachePath($confirm));
         if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), self::CACHE_NAME)) {
             $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) $this[$key] = $value;
+            foreach ($cache[$className] as $key => $value) {
+                $this[$key] = $value;
+            }
         }
 
         parent::__construct($config);
@@ -50,16 +52,18 @@ class CreateRespondGcpForm extends FormCreateRespondent
      * @param ConfirmationInterface $confirm
      * @return string
      */
-    public static function getCachePath(ConfirmationInterface $confirm)
+    public static function getCachePath(ConfirmationInterface $confirm): string
     {
+        /**
+         * @var ConfirmGcp $confirm
+         */
         $gcp = Gcps::findOne($confirm->getGcpId());
         $problem = Problems::findOne($gcp->getProblemId());
         $segment = Segments::findOne($gcp->getSegmentId());
         $project = Projects::findOne($gcp->getProjectId());
         $user = User::findOne($project->getUserId());
-        $cachePath = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/confirm/formCreateRespond/';
-        return $cachePath;
     }
 
 
@@ -68,7 +72,7 @@ class CreateRespondGcpForm extends FormCreateRespondent
      * @throws NotFoundHttpException
      * @throws ErrorException
      */
-    public function create ()
+    public function create (): RespondsGcp
     {
         $model = new RespondsGcp();
         $model->setConfirmId($this->getConfirmId());
@@ -95,7 +99,7 @@ class CreateRespondGcpForm extends FormCreateRespondent
 
         foreach ($models as $item){
 
-            if (mb_strtolower(str_replace(' ', '', $this->getName())) == mb_strtolower(str_replace(' ', '',$item->getName()))){
+            if (mb_strtolower(str_replace(' ', '', $this->getName())) === mb_strtolower(str_replace(' ', '',$item->getName()))){
 
                 $this->addError($attr, 'Респондент с таким именем «'. $this->getName() .'» уже существует!');
             }

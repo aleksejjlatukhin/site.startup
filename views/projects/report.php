@@ -1,6 +1,12 @@
 <?php
 
+use app\models\Segments;
+use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
+
+/**
+ * @var Segments[] $segments
+ */
 
 ?>
 
@@ -37,57 +43,57 @@ use yii\helpers\Html;
 
         <div class="stage_data_string">
 
-            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title'); ?></div>
+            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title') ?></div>
 
-            <?php if (mb_strlen($segment->name) > 50) : ?>
+            <?php if (mb_strlen($segment->getName()) > 50) : ?>
 
-                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->name; ?>">
-                    <?= Html::a(mb_substr($segment->name, 0, 50) . '...', ['/segments/index', 'id' => $segment->projectId],
-                        ['class' => 'link_for_description_stage']); ?>
+                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->getName() ?>">
+                    <?= Html::a(mb_substr($segment->getName(), 0, 50) . '...', ['/segments/index', 'id' => $segment->getProjectId()],
+                        ['class' => 'link_for_description_stage']) ?>
                 </div>
 
             <?php else : ?>
 
                 <div class="column_description_of_segment column_block_text_max_1800">
-                    <?= Html::a($segment->name, ['/segments/index', 'id' => $segment->projectId],
-                        ['class' => 'link_for_description_stage']); ?>
+                    <?= Html::a($segment->getName(), ['/segments/index', 'id' => $segment->getProjectId()],
+                        ['class' => 'link_for_description_stage']) ?>
                 </div>
 
             <?php endif; ?>
 
 
             <div class="column_description_of_segment column_block_text_min_1800">
-                <?= Html::a($segment->name, ['/segments/index', 'id' => $segment->projectId],
-                    ['class' => 'link_for_description_stage']); ?>
+                <?= Html::a($segment->getName(), ['/segments/index', 'id' => $segment->getProjectId()],
+                    ['class' => 'link_for_description_stage']) ?>
             </div>
 
 
-            <div class="column_stage_confirm"><?= $segment->confirm->count_respond; ?></div>
+            <div class="column_stage_confirm"><?= $segment->confirm->getCountRespond() ?></div>
 
-            <div class="column_stage_confirm"><?= $segment->confirm->count_positive; ?></div>
+            <div class="column_stage_confirm"><?= $segment->confirm->getCountPositive() ?></div>
 
-            <div class="column_stage_confirm"><?= $segment->confirm->countConfirmMembers; ?></div>
+            <div class="column_stage_confirm"><?= $segment->confirm->getCountConfirmMembers() ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->confirm->countDescInterviewsOfModel - $segment->confirm->countConfirmMembers); ?></div>
+            <div class="column_stage_confirm"><?= ($segment->confirm->getCountDescInterviewsOfModel() - $segment->confirm->getCountConfirmMembers()) ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->confirm->count_respond - $segment->confirm->countDescInterviewsOfModel); ?></div>
+            <div class="column_stage_confirm"><?= ($segment->confirm->getCountRespond() - $segment->confirm->getCountDescInterviewsOfModel()) ?></div>
 
             <div class="column_stage_confirm">
 
-                <?php if ($segment->exist_confirm === 1) : ?>
+                <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
-                <?php elseif ($segment->exist_confirm === null) : ?>
+                <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
+                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
-                <?php elseif ($segment->exist_confirm === 0) : ?>
+                <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                 <?php endif; ?>
 
@@ -102,29 +108,29 @@ use yii\helpers\Html;
 
         <div class="stage_data_string">
 
-            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title'); ?></div>
+            <div class="column_title_of_segment"><?= $segment->propertyContainer->getProperty('title') ?></div>
 
 
-            <?php if (mb_strlen($segment->name) > 50) : ?>
+            <?php if (mb_strlen($segment->getName()) > 50) : ?>
 
-                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->name; ?>">
-                    <?= Html::a(mb_substr($segment->name, 0, 50) . '...', ['/segments/index', 'id' => $segment->projectId],
-                        ['class' => 'link_for_description_stage']); ?>
+                <div class="column_description_of_segment column_block_text_max_1800" title="<?= $segment->getName() ?>">
+                    <?= Html::a(mb_substr($segment->getName(), 0, 50) . '...', ['/segments/index', 'id' => $segment->getProjectId()],
+                        ['class' => 'link_for_description_stage']) ?>
                 </div>
 
             <?php else : ?>
 
                 <div class="column_description_of_segment column_block_text_max_1800">
-                    <?= Html::a($segment->name, ['/segments/index', 'id' => $segment->projectId],
-                        ['class' => 'link_for_description_stage']); ?>
+                    <?= Html::a($segment->getName(), ['/segments/index', 'id' => $segment->getProjectId()],
+                        ['class' => 'link_for_description_stage']) ?>
                 </div>
 
             <?php endif; ?>
 
 
             <div class="column_description_of_segment column_block_text_min_1800">
-                <?= Html::a($segment->name, ['/segments/index', 'id' => $segment->projectId],
-                    ['class' => 'link_for_description_stage']); ?>
+                <?= Html::a($segment->getName(), ['/segments/index', 'id' => $segment->getProjectId()],
+                    ['class' => 'link_for_description_stage']) ?>
             </div>
 
 
@@ -136,7 +142,7 @@ use yii\helpers\Html;
 
             <div class="column_stage_confirm">
                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                    ['/confirm-segment/create', 'id' => $segment->id], ['title' => 'Создать подтверждение']); ?>
+                    ['/confirm-segment/create', 'id' => $segment->getId()], ['title' => 'Создать подтверждение']) ?>
             </div>
 
             <div class="column_stage_confirm"></div>
@@ -153,69 +159,69 @@ use yii\helpers\Html;
 
             <div class="stage_data_string">
 
-                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title'); ?></div>
+                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title') ?></div>
 
 
-                <?php if (mb_strlen($problem->description) > 100) : ?>
+                <?php if (mb_strlen($problem->getDescription()) > 100) : ?>
 
-                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->description; ?>">
-                        <?= Html::a(mb_substr($problem->description, 0, 100) . '...', ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->getDescription() ?>">
+                        <?= Html::a(mb_substr($problem->getDescription(), 0, 100) . '...', ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php else : ?>
 
                     <div class="column_description_of_stage column_block_text_max_1800">
-                        <?= Html::a($problem->description, ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                        <?= Html::a($problem->getDescription(), ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php endif; ?>
 
 
-                <?php if (mb_strlen($problem->description) > 130) : ?>
+                <?php if (mb_strlen($problem->getDescription()) > 130) : ?>
 
-                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->description; ?>">
-                        <?= Html::a(mb_substr($problem->description, 0, 130) . '...', ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->getDescription() ?>">
+                        <?= Html::a(mb_substr($problem->getDescription(), 0, 130) . '...', ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php else : ?>
 
                     <div class="column_description_of_stage column_block_text_min_1800">
-                        <?= Html::a($problem->description, ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                        <?= Html::a($problem->getDescription(), ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php endif; ?>
 
 
-                <div class="column_stage_confirm"><?= $problem->confirm->count_respond; ?></div>
+                <div class="column_stage_confirm"><?= $problem->confirm->getCountRespond() ?></div>
 
-                <div class="column_stage_confirm"><?= $problem->confirm->count_positive; ?></div>
+                <div class="column_stage_confirm"><?= $problem->confirm->getCountPositive() ?></div>
 
-                <div class="column_stage_confirm"><?= $problem->confirm->countConfirmMembers; ?></div>
+                <div class="column_stage_confirm"><?= $problem->confirm->getCountConfirmMembers() ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->countDescInterviewsOfModel - $problem->confirm->countConfirmMembers); ?></div>
+                <div class="column_stage_confirm"><?= ($problem->confirm->getCountDescInterviewsOfModel() - $problem->confirm->getCountConfirmMembers()) ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->count_respond - $problem->confirm->countDescInterviewsOfModel); ?></div>
+                <div class="column_stage_confirm"><?= ($problem->confirm->getCountRespond() - $problem->confirm->getCountDescInterviewsOfModel()) ?></div>
 
                 <div class="column_stage_confirm">
 
-                    <?php if ($problem->exist_confirm === 1) : ?>
+                    <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
-                    <?php elseif ($problem->exist_confirm === null) : ?>
+                    <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
+                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
-                    <?php elseif ($problem->exist_confirm === 0) : ?>
+                    <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                     <?php endif; ?>
 
@@ -230,38 +236,38 @@ use yii\helpers\Html;
 
             <div class="stage_data_string">
 
-                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title'); ?></div>
+                <div class="column_title_of_stage"><?= $problem->propertyContainer->getProperty('title') ?></div>
 
 
-                <?php if (mb_strlen($problem->description) > 100) : ?>
+                <?php if (mb_strlen($problem->getDescription()) > 100) : ?>
 
-                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->description; ?>">
-                        <?= Html::a(mb_substr($problem->description, 0, 100) . '...', ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                    <div class="column_description_of_stage column_block_text_max_1800" title="<?= $problem->getDescription() ?>">
+                        <?= Html::a(mb_substr($problem->getDescription(), 0, 100) . '...', ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php else : ?>
 
                     <div class="column_description_of_stage column_block_text_max_1800">
-                        <?= Html::a($problem->description, ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                        <?= Html::a($problem->getDescription(), ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php endif; ?>
 
 
-                <?php if (mb_strlen($problem->description) > 130) : ?>
+                <?php if (mb_strlen($problem->getDescription()) > 130) : ?>
 
-                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->description; ?>">
-                        <?= Html::a(mb_substr($problem->description, 0, 130) . '...', ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                    <div class="column_description_of_stage column_block_text_min_1800" title="<?= $problem->getDescription() ?>">
+                        <?= Html::a(mb_substr($problem->getDescription(), 0, 130) . '...', ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php else : ?>
 
                     <div class="column_description_of_stage column_block_text_min_1800">
-                        <?= Html::a($problem->description, ['/problems/index/', 'id' => $problem->confirmSegmentId],
-                            ['class' => 'link_for_description_stage']); ?>
+                        <?= Html::a($problem->getDescription(), ['/problems/index/', 'id' => $problem->getConfirmSegmentId()],
+                            ['class' => 'link_for_description_stage']) ?>
                     </div>
 
                 <?php endif; ?>
@@ -275,7 +281,7 @@ use yii\helpers\Html;
 
                 <div class="column_stage_confirm">
                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-problem/create', 'id' => $problem->id], ['title' => 'Создать подтверждение']); ?>
+                        ['/confirm-problem/create', 'id' => $problem->getId()], ['title' => 'Создать подтверждение']) ?>
                 </div>
 
                 <div class="column_stage_confirm"></div>
@@ -292,69 +298,69 @@ use yii\helpers\Html;
 
                     <div class="stage_data_string">
 
-                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title'); ?></div>
+                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title') ?></div>
 
 
-                        <?php if (mb_strlen($gcp->description) > 100) : ?>
+                        <?php if (mb_strlen($gcp->getDescription()) > 100) : ?>
 
-                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->description; ?>">
-                                <?= Html::a(mb_substr($gcp->description, 0, 100) . '...', ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->getDescription() ?>">
+                                <?= Html::a(mb_substr($gcp->getDescription(), 0, 100) . '...', ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php else : ?>
 
                             <div class="column_description_of_stage column_block_text_max_1800">
-                                <?= Html::a($gcp->description, ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                                <?= Html::a($gcp->getDescription(), ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php endif; ?>
 
 
-                        <?php if (mb_strlen($gcp->description) > 130) : ?>
+                        <?php if (mb_strlen($gcp->getDescription()) > 130) : ?>
 
-                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->description; ?>">
-                                <?= Html::a(mb_substr($gcp->description, 0, 130) . '...', ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->getDescription() ?>">
+                                <?= Html::a(mb_substr($gcp->getDescription(), 0, 130) . '...', ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php else : ?>
 
                             <div class="column_description_of_stage column_block_text_min_1800">
-                                <?= Html::a($gcp->description, ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                                <?= Html::a($gcp->getDescription(), ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php endif; ?>
 
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->count_respond; ?></div>
+                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountRespond() ?></div>
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->count_positive; ?></div>
+                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountPositive() ?></div>
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->countConfirmMembers; ?></div>
+                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountConfirmMembers() ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->countDescInterviewsOfModel - $gcp->confirm->countConfirmMembers); ?></div>
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->getCountDescInterviewsOfModel() - $gcp->confirm->getCountConfirmMembers()) ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->count_respond - $gcp->confirm->countDescInterviewsOfModel); ?></div>
+                        <div class="column_stage_confirm"><?= ($gcp->confirm->getCountRespond() - $gcp->confirm->getCountDescInterviewsOfModel()) ?></div>
 
                         <div class="column_stage_confirm">
 
-                            <?php if ($gcp->exist_confirm === 1) : ?>
+                            <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
-                            <?php elseif ($gcp->exist_confirm === null) : ?>
+                            <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
-                            <?php elseif ($gcp->exist_confirm === 0) : ?>
+                            <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                             <?php endif; ?>
 
@@ -369,37 +375,37 @@ use yii\helpers\Html;
 
                     <div class="stage_data_string">
 
-                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title'); ?></div>
+                        <div class="column_title_of_stage"><?= $gcp->propertyContainer->getProperty('title') ?></div>
 
-                        <?php if (mb_strlen($gcp->description) > 100) : ?>
+                        <?php if (mb_strlen($gcp->getDescription()) > 100) : ?>
 
-                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->description; ?>">
-                                <?= Html::a(mb_substr($gcp->description, 0, 100) . '...', ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                            <div class="column_description_of_stage column_block_text_max_1800" title="<?= $gcp->getDescription() ?>">
+                                <?= Html::a(mb_substr($gcp->getDescription(), 0, 100) . '...', ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php else : ?>
 
                             <div class="column_description_of_stage column_block_text_max_1800">
-                                <?= Html::a($gcp->description, ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                                <?= Html::a($gcp->getDescription(), ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php endif; ?>
 
 
-                        <?php if (mb_strlen($gcp->description) > 130) : ?>
+                        <?php if (mb_strlen($gcp->getDescription()) > 130) : ?>
 
-                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->description; ?>">
-                                <?= Html::a(mb_substr($gcp->description, 0, 130) . '...', ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                            <div class="column_description_of_stage column_block_text_min_1800" title="<?= $gcp->getDescription() ?>">
+                                <?= Html::a(mb_substr($gcp->getDescription(), 0, 130) . '...', ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php else : ?>
 
                             <div class="column_description_of_stage column_block_text_min_1800">
-                                <?= Html::a($gcp->description, ['/gcps/index', 'id' => $gcp->confirmProblemId],
-                                    ['class' => 'link_for_description_stage']); ?>
+                                <?= Html::a($gcp->getDescription(), ['/gcps/index', 'id' => $gcp->getConfirmProblemId()],
+                                    ['class' => 'link_for_description_stage']) ?>
                             </div>
 
                         <?php endif; ?>
@@ -413,7 +419,7 @@ use yii\helpers\Html;
 
                         <div class="column_stage_confirm">
                             <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                ['/confirm-gcp/create', 'id' => $gcp->id], ['title' => 'Создать подтверждение']); ?>
+                                ['/confirm-gcp/create', 'id' => $gcp->getId()], ['title' => 'Создать подтверждение']) ?>
                         </div>
 
                         <div class="column_stage_confirm"></div>
@@ -430,88 +436,87 @@ use yii\helpers\Html;
 
                         <div class="stage_data_string">
 
-                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title'); ?></div>
+                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title') ?></div>
 
 
-                            <?php if (mb_strlen($mvp->description) > 100) : ?>
+                            <?php if (mb_strlen($mvp->getDescription()) > 100) : ?>
 
-                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->description; ?>">
-                                    <?= Html::a(mb_substr($mvp->description, 0, 100) . '...', ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->getDescription() ?>">
+                                    <?= Html::a(mb_substr($mvp->getDescription(), 0, 100) . '...', ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php else : ?>
 
                                 <div class="column_description_of_stage column_block_text_max_1800">
-                                    <?= Html::a($mvp->description, ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                    <?= Html::a($mvp->getDescription(), ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php endif; ?>
 
 
-                            <?php if (mb_strlen($mvp->description) > 130) : ?>
+                            <?php if (mb_strlen($mvp->getDescription()) > 130) : ?>
 
-                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->description; ?>">
-                                    <?= Html::a(mb_substr($mvp->description, 0, 130) . '...', ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->getDescription() ?>">
+                                    <?= Html::a(mb_substr($mvp->getDescription(), 0, 130) . '...', ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php else : ?>
 
                                 <div class="column_description_of_stage column_block_text_min_1800">
-                                    <?= Html::a($mvp->description, ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                    <?= Html::a($mvp->getDescription(), ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php endif; ?>
 
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->count_respond; ?></div>
+                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountRespond() ?></div>
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->count_positive; ?></div>
+                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountPositive() ?></div>
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->countConfirmMembers; ?></div>
+                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountConfirmMembers() ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->countDescInterviewsOfModel - $mvp->confirm->countConfirmMembers); ?></div>
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->getCountDescInterviewsOfModel() - $mvp->confirm->getCountConfirmMembers()) ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->count_respond - $mvp->confirm->countDescInterviewsOfModel); ?></div>
+                            <div class="column_stage_confirm"><?= ($mvp->confirm->getCountRespond() - $mvp->confirm->getCountDescInterviewsOfModel()) ?></div>
 
                             <div class="column_stage_confirm">
 
-                                <?php if ($mvp->exist_confirm === 1) : ?>
+                                <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
-                                <?php elseif ($mvp->exist_confirm === null) : ?>
+                                <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Продолжить подтверждение']); ?>
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
-                                <?php elseif ($mvp->exist_confirm === 0) : ?>
+                                <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->id], ['title' => 'Посмотреть подтверждение']); ?>
+                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                                 <?php endif; ?>
 
                             </div>
 
                             <!--Бизнес модели-->
-                            <?php if ($mvp->businessModel) : ?>
-
-                                <div class="column_stage_confirm">
-                                    <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
-                                        ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Посмотреть бизнес-модель']);?>
-                                </div>
-
-                            <?php elseif (empty($mvp->businessModel) && $mvp->exist_confirm === 1) : ?>
+                            <?php if (!$mvp->businessModel && $mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                 <div class="column_stage_confirm">
                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                        ['/business-model/index', 'id' => $mvp->confirm->id], ['title'=> 'Создать бизнес-модель']);
-                                    ?>
+                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Создать бизнес-модель']) ?>
+                                </div>
+
+                            <?php elseif ($mvp->businessModel) : ?>
+
+                                <div class="column_stage_confirm">
+                                    <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
+                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
                                 </div>
 
                             <?php else : ?>
@@ -527,38 +532,38 @@ use yii\helpers\Html;
 
                         <div class="stage_data_string">
 
-                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title'); ?></div>
+                            <div class="column_title_of_stage"><?= $mvp->propertyContainer->getProperty('title') ?></div>
 
 
-                            <?php if (mb_strlen($mvp->description) > 100) : ?>
+                            <?php if (mb_strlen($mvp->getDescription()) > 100) : ?>
 
-                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->description; ?>">
-                                    <?= Html::a(mb_substr($mvp->description, 0, 100) . '...', ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                <div class="column_description_of_stage column_block_text_max_1800" title="<?= $mvp->getDescription() ?>">
+                                    <?= Html::a(mb_substr($mvp->getDescription(), 0, 100) . '...', ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php else : ?>
 
                                 <div class="column_description_of_stage column_block_text_max_1800">
-                                    <?= Html::a($mvp->description, ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                    <?= Html::a($mvp->getDescription(), ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php endif; ?>
 
 
-                            <?php if (mb_strlen($mvp->description) > 130) : ?>
+                            <?php if (mb_strlen($mvp->getDescription()) > 130) : ?>
 
-                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->description; ?>">
-                                    <?= Html::a(mb_substr($mvp->description, 0, 130) . '...', ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                <div class="column_description_of_stage column_block_text_min_1800" title="<?= $mvp->getDescription() ?>">
+                                    <?= Html::a(mb_substr($mvp->getDescription(), 0, 130) . '...', ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php else : ?>
 
                                 <div class="column_description_of_stage column_block_text_min_1800">
-                                    <?= Html::a($mvp->description, ['/mvps/index', 'id' => $mvp->confirmGcpId],
-                                        ['class' => 'link_for_description_stage']); ?>
+                                    <?= Html::a($mvp->getDescription(), ['/mvps/index', 'id' => $mvp->getConfirmGcpId()],
+                                        ['class' => 'link_for_description_stage']) ?>
                                 </div>
 
                             <?php endif; ?>
@@ -572,7 +577,7 @@ use yii\helpers\Html;
 
                             <div class="column_stage_confirm">
                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-mvp/create', 'id' => $mvp->id], ['title' => 'Создать подтверждение']); ?>
+                                    ['/confirm-mvp/create', 'id' => $mvp->getId()], ['title' => 'Создать подтверждение']) ?>
                             </div>
 
                             <div class="column_stage_confirm"></div>
@@ -587,7 +592,3 @@ use yii\helpers\Html;
     <?php endforeach;?>
 
 </div>
-
-
-
-

@@ -14,6 +14,12 @@ use yii\web\NotFoundHttpException;
  *
  * FormCreateCommunicationResponse
  * @package app\modules\expert\models\form
+ *
+ * @property int $communication_id                          Идентификатор коммуникации, к которой будет присоединен ответ
+ * @property int $answer                                    Ответ на предложение провести экспертизу
+ * @property array|null $expert_types                       Типы деятельности эксперта, по которым он готов провести экспертизу
+ * @property string $comment                                Комментарий к ответу
+ * @property CommunicationResponse $_model                  Объект ответа, который будет сохранен
  */
 class FormCreateCommunicationResponse extends Model
 {
@@ -38,7 +44,7 @@ class FormCreateCommunicationResponse extends Model
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['answer', 'communication_id'], 'integer'],
@@ -53,7 +59,7 @@ class FormCreateCommunicationResponse extends Model
     }
 
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'answer' => 'Дайте ответ на вопрос',
@@ -69,7 +75,7 @@ class FormCreateCommunicationResponse extends Model
      *
      * @return array
      */
-    public static function getAnswers()
+    public static function getAnswers(): array
     {
         return [
             CommunicationResponse::POSITIVE_RESPONSE => 'Готов(-а) провести экспертизу проекта',
@@ -84,7 +90,7 @@ class FormCreateCommunicationResponse extends Model
      *
      * @param int $id
      */
-    public function setCommunicationId($id)
+    public function setCommunicationId(int $id): void
     {
         $this->communication_id = $id;
     }
@@ -96,10 +102,12 @@ class FormCreateCommunicationResponse extends Model
      * @return bool
      * @throws NotFoundHttpException
      */
-    public function create()
+    public function create(): bool
     {
-        $this->_model->setParams($this->answer, $this->comment, $this->communication_id, $this->expert_types);
-        if ($this->_model->save()) return true;
-        throw new NotFoundHttpException('Неудалось сохранить сегмент');
+        $this->_model->setParams($this->answer, $this->comment, $this->communication_id, $this->expert_types ?: null);
+        if ($this->_model->save()) {
+            return true;
+        }
+        throw new NotFoundHttpException('Неудалось сохранить ответ');
     }
 }

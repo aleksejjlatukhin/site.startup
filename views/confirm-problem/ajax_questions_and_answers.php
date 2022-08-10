@@ -1,6 +1,13 @@
 <?php
 
+use app\models\AnswersQuestionsConfirmProblem;
+use app\models\QuestionsConfirmProblem;
 use app\models\QuestionStatus;
+
+/**
+ * @var QuestionsConfirmProblem[] $questions
+ * @var AnswersQuestionsConfirmProblem $answer
+ */
 
 ?>
 
@@ -12,13 +19,13 @@ use app\models\QuestionStatus;
     <div class="row container-fluid question-container">
         <div class="col-md-12">
 
-            Вопрос <?= ($i+1);?>: <span><?= $question->title; ?></span>
+            Вопрос <?= ($i+1) ?>: <span><?= $question->getTitle() ?></span>
 
-            <?php if ($question->status === QuestionStatus::STATUS_NOT_STAR) : ?>
+            <?php if ($question->getStatus() === QuestionStatus::STATUS_NOT_STAR) : ?>
                 <div class="star-passive" title="Значимость вопроса">
                     <div class="star"></div>
                 </div>
-            <?php elseif ($question->status === QuestionStatus::STATUS_ONE_STAR) : ?>
+            <?php elseif ($question->getStatus() === QuestionStatus::STATUS_ONE_STAR) : ?>
                 <div class="star-passive" title="Значимость вопроса">
                     <div class="star active"></div>
                 </div>
@@ -29,10 +36,11 @@ use app\models\QuestionStatus;
 
     <?php foreach ($question->answers as $answer) : ?>
 
-    <div class="row container-fluid answer-container">
-        <div class="col-md-4 col-lg-3 respond-block"><?= $answer->respond->name; ?></div>
-        <div class="col-md-8 col-lg-9"><?= $answer->answer; ?></div>
-    </div>
+        <div class="row container-fluid answer-container">
+            <div class="col-md-4 col-lg-3 respond-block"><?= $answer->respond->getName() ?></div>
+            <div class="col-md-8 col-lg-9"><?= $answer->getAnswer() ?></div>
+        </div>
+
     <?php endforeach; ?>
 
 <?php endforeach; ?>

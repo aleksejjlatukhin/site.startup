@@ -19,19 +19,25 @@ use yii\db\ActiveRecord;
  * @property string $greeting_interview             Приветствие в начале встречи
  * @property string $view_interview                 Информация о вас для респондентов
  * @property string $reason_interview               Причина и тема (что побудило) для проведения исследования
- * @property int $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property string $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ *
+ * @property Segments $segment                      Сегмент
+ * @property QuestionsConfirmSegment[] $questions   Вопросы, привязанные к подтверждению
+ * @property RespondsSegment[] $responds            Респонденты, привязанные к подтверждению
+ * @property Problems[] $problems                   Проблемы
+ * @property Segments $hypothesis                   Гипотеза, к которой относится подтверждение
  */
 class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 {
 
-    const STAGE = 2;
-    const LIMIT_COUNT_RESPOND = 100;
+    public const STAGE = 2;
+    public const LIMIT_COUNT_RESPOND = 100;
 
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'confirm_segment';
     }
@@ -40,7 +46,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return int
      */
-    public function getStage()
+    public function getStage(): int
     {
         return self::STAGE;
     }
@@ -48,61 +54,46 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Проверка на ограничение кол-ва респондентов
+     *
      * @return bool
      */
-    public function checkingLimitCountRespond()
+    public function checkingLimitCountRespond(): bool
     {
-        if ($this->getCountRespond() < self::LIMIT_COUNT_RESPOND) return true;
-        else return false;
+        if ($this->getCountRespond() < self::LIMIT_COUNT_RESPOND) {
+            return true;
+        }
+        return false;
     }
 
 
     /**
      * Получить объект текущего сегмента
+     *
      * @return ActiveQuery
      */
-    public function getSegment()
+    public function getSegment(): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
 
 
     /**
-     * Поиск текущего сегмент
-     * @return Segments|null
-     */
-    public function findSegment()
-    {
-        return Segments::findOne($this->getSegmentId());
-    }
-
-
-    /**
      * Получить вопросы привязанные к подтверждению
+     *
      * @return ActiveQuery
      */
-    public function getQuestions()
+    public function getQuestions(): ActiveQuery
     {
         return $this->hasMany(QuestionsConfirmSegment::class, ['confirm_id' => 'id']);
     }
 
 
     /**
-     * Найти вопросы привязанные к подтверждению
-     *
-     * @return QuestionsConfirmSegment[]
-     */
-    public function findQuestions()
-    {
-        return QuestionsConfirmSegment::findAll(['confirm_id' => $this->getId()]);
-    }
-
-
-    /**
      * Получить респондентов привязанных к подтверждению
+     *
      * @return ActiveQuery
      */
-    public function getResponds()
+    public function getResponds(): ActiveQuery
     {
         return $this->hasMany(RespondsSegment::class, ['confirm_id' => 'id']);
     }
@@ -110,9 +101,10 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Получить все проблемы по данному сегменту
+     *
      * @return ActiveQuery
      */
-    public function getProblems()
+    public function getProblems(): ActiveQuery
     {
         return $this->hasMany(Problems::class, ['basic_confirm_id' => 'id']);
     }
@@ -121,7 +113,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param array $params
      */
-    public function setParams(array $params)
+    public function setParams(array $params): void
     {
         $this->setGreetingInterview($params['greeting_interview']);
         $this->setViewInterview($params['view_interview']);
@@ -133,7 +125,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
      * Получить гипотезу подтверждения
      * @return ActiveQuery
      */
-    public function getHypothesis()
+    public function getHypothesis(): ActiveQuery
     {
         return $this->hasOne(Segments::class, ['id' => 'segment_id']);
     }
@@ -142,7 +134,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['segment_id', 'count_respond', 'count_positive', 'greeting_interview', 'view_interview', 'reason_interview'], 'required'],
@@ -163,7 +155,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'count_respond' => 'Количество респондентов',
@@ -194,19 +186,25 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Список вопросов, который будет показан для добавления нового вопроса
+     *
      * @return array
      */
-    public function queryQuestionsGeneralList()
+    public function queryQuestionsGeneralList(): array
     {
         $user = $this->segment->project->user;
         $questions = array(); // Добавляем в массив вопросы уже привязанные к данной программе
-        foreach ($this->questions as $question) $questions[] = $question['title'];
+        foreach ($this->questions as $question) {
+            $questions[] = $question->getTitle();
+        }
 
+        /**
+         * @var AllQuestionsConfirmSegment[] $attachQuestions
+         */
         // Вопросы, предлагаемые по-умолчанию на данном этапе
         $defaultQuestions = AllQuestionsConfirmSegment::defaultListQuestions();
         // Вопросы, которые когда-либо добавлял пользователь на данном этапе
         $attachQuestions = AllQuestionsConfirmSegment::find()
-            ->where(['user_id' => $user->id])
+            ->where(['user_id' => $user->getId()])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
@@ -214,11 +212,13 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
 
         $qs = array(); // Добавляем в массив вопросы, предлагаемые по-умолчанию на данном этапе
-        foreach ($defaultQuestions as $question) $qs[] = $question['title'];
+        foreach ($defaultQuestions as $question) {
+            $qs[] = $question['title'];
+        }
         // Убираем из списка вопросов, которые когда-либо добавлял пользователь на данном этапе
         // вопросы, которые совпадают  с вопросами по-умолчанию
         foreach ($attachQuestions as $key => $queryQuestion) {
-            if (in_array($queryQuestion['title'], $qs)) {
+            if (in_array($queryQuestion['title'], $qs, false)) {
                 unset($attachQuestions[$key]);
             }
         }
@@ -226,7 +226,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         //Убираем из списка для добавления вопросов, вопросы уже привязанные к данной программе
         $queryQuestions = array_merge($defaultQuestions, $attachQuestions);
         foreach ($queryQuestions as $key => $queryQuestion) {
-            if (in_array($queryQuestion['title'], $questions)) {
+            if (in_array($queryQuestion['title'], $questions, false)) {
                 unset($queryQuestions[$key]);
             }
         }
@@ -238,7 +238,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return bool
      */
-    public function getButtonMovingNextStage()
+    public function getButtonMovingNextStage(): bool
     {
 
         $count_interview = RespondsSegment::find()->with('interview')
@@ -249,11 +249,11 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])->count();
 
-        if ((count($this->responds) == $count_interview && $this->getCountPositive() <= $count_positive) || (!empty($this->problems))) {
+        if ($this->problems || (count($this->responds) === $count_interview && $this->getCountPositive() <= $count_positive)) {
             return true;
-        }else {
-            return false;
         }
+
+        return false;
     }
 
 
@@ -263,10 +263,12 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        $count = RespondsSegment::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
-            ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
-
-        return $count;
+        return RespondsSegment::find()
+            ->where(['confirm_id' => $this->getId()])
+            ->andWhere(['not', ['info_respond' => '']])
+            ->andWhere(['not', ['date_plan' => null]])
+            ->andWhere(['not', ['place_interview' => '']])
+            ->count();
     }
 
 
@@ -276,11 +278,10 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует интервью
-        $count = RespondsSegment::find()->with('interview')
+        return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
-
-        return $count;
+            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])
+            ->count();
     }
 
 
@@ -290,11 +291,10 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function getCountConfirmMembers()
     {
         // Кол-во представителей сегмента
-        $count = RespondsSegment::find()->with('interview')
+        return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])->count();
-
-        return $count;
+            ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])
+            ->count();
     }
 
 
@@ -303,19 +303,18 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
      * кэша данного подтверждения
      * @return string
      */
-    public function getCachePath()
+    public function getCachePath(): string
     {
         $segment = $this->segment;
         $project = $segment->project;
         $user = $project->user;
-        $cachePath = '../runtime/cache/forms/user-'.$user->id.'/projects/project-'.$project->id.'/segments/segment-'.$segment->id.'/confirm';
-        return $cachePath;
+        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm';
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -323,7 +322,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param int $id
      */
-    public function setSegmentId($id)
+    public function setSegmentId(int $id): void
     {
         $this->segment_id = $id;
     }
@@ -332,7 +331,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return int
      */
-    public function getSegmentId()
+    public function getSegmentId(): int
     {
         return $this->segment_id;
     }
@@ -340,9 +339,9 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
     /**
      * Параметр разрешения экспертизы
-     * @return int
+     * @return string
      */
-    public function getEnableExpertise()
+    public function getEnableExpertise(): string
     {
         return $this->enable_expertise;
     }
@@ -351,7 +350,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      *  Установить разрешение на экспертизу
      */
-    public function setEnableExpertise()
+    public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
     }
@@ -359,7 +358,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return int
      */
-    public function getCountRespond()
+    public function getCountRespond(): int
     {
         return $this->count_respond;
     }
@@ -367,7 +366,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param int $count
      */
-    public function setCountRespond($count)
+    public function setCountRespond(int $count): void
     {
         $this->count_respond = $count;
     }
@@ -375,7 +374,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return int
      */
-    public function getCountPositive()
+    public function getCountPositive(): int
     {
         return $this->count_positive;
     }
@@ -383,7 +382,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param int $count
      */
-    public function setCountPositive($count)
+    public function setCountPositive(int $count): void
     {
         $this->count_positive = $count;
     }
@@ -391,7 +390,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return string
      */
-    public function getGreetingInterview()
+    public function getGreetingInterview(): string
     {
         return $this->greeting_interview;
     }
@@ -399,7 +398,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param string $greeting_interview
      */
-    public function setGreetingInterview($greeting_interview)
+    public function setGreetingInterview(string $greeting_interview): void
     {
         $this->greeting_interview = $greeting_interview;
     }
@@ -407,7 +406,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return string
      */
-    public function getViewInterview()
+    public function getViewInterview(): string
     {
         return $this->view_interview;
     }
@@ -415,7 +414,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param string $view_interview
      */
-    public function setViewInterview($view_interview)
+    public function setViewInterview(string $view_interview): void
     {
         $this->view_interview = $view_interview;
     }
@@ -423,7 +422,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @return string
      */
-    public function getReasonInterview()
+    public function getReasonInterview(): string
     {
         return $this->reason_interview;
     }
@@ -431,7 +430,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     /**
      * @param string $reason_interview
      */
-    public function setReasonInterview($reason_interview)
+    public function setReasonInterview(string $reason_interview): void
     {
         $this->reason_interview = $reason_interview;
     }

@@ -6,6 +6,7 @@ namespace app\models;
 use app\models\forms\FormCreateConfirm;
 use app\models\interfaces\ConfirmationInterface;
 use app\models\interfaces\CreateRespondsOnConfirmFirstStepInterface;
+use app\models\interfaces\RespondsInterface;
 use yii\base\Model;
 
 /**
@@ -20,16 +21,19 @@ class CreatorRespondsFromAgentsOnConfirmFirstStep extends Model implements Creat
      * @param ConfirmationInterface $confirm
      * @param FormCreateConfirm $form
      */
-    public function create(ConfirmationInterface $confirm, FormCreateConfirm $form)
+    public function create(ConfirmationInterface $confirm, FormCreateConfirm $form): void
     {
+        /**
+         * @var RespondsInterface $respond
+         */
         foreach ($confirm->hypothesis->respondsAgents as $respond) {
             $respondConfirm = self::getCreateModel($confirm);
-            $respondConfirm->setConfirmId($confirm->id);
-            $respondConfirm->setName($respond->name);
+            $respondConfirm->setConfirmId($confirm->getId());
+            $respondConfirm->setName($respond->getName());
             $respondConfirm->setParams([
-                'info_respond' => $respond->info_respond,
-                'place_interview' =>$respond->place_interview,
-                'email' => $respond->email]);
+                'info_respond' => $respond->getInfoRespond(),
+                'place_interview' =>$respond->getPlaceInterview(),
+                'email' => $respond->getEmail()]);
             $respondConfirm->save();
         }
     }
@@ -41,11 +45,15 @@ class CreatorRespondsFromAgentsOnConfirmFirstStep extends Model implements Creat
      */
     private static function getCreateModel(ConfirmationInterface $confirm)
     {
-        if($confirm->getStage() == StageConfirm::STAGE_CONFIRM_PROBLEM) {
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_PROBLEM) {
             return new RespondsProblem();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_GCP) {
+        }
+
+        if ($confirm->getStage() === StageConfirm::STAGE_CONFIRM_GCP) {
             return new RespondsGcp();
-        }elseif($confirm->getStage() == StageConfirm::STAGE_CONFIRM_MVP) {
+        }
+
+        if($confirm->getStage() === StageConfirm::STAGE_CONFIRM_MVP) {
             return new RespondsMvp();
         }
         return false;

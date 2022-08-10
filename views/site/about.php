@@ -4,6 +4,7 @@
 
 use app\models\User;
 use yii\helpers\Html;
+use yii\web\View;
 
 $this->title = 'О сервисе';
 
@@ -29,7 +30,7 @@ $this->title = 'О сервисе';
                     <div style="float: left;">
                         <iframe style="padding: 0px 15px 0px 0;" src="https://www.youtube.com/embed/ML8-APvnv0A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         <div class="text-center">
-                            <?= Html::a('Скачать презентацию', ['/site/download-presentation']); ?>
+                            <?= Html::a('Скачать презентацию', ['/site/download-presentation']) ?>
                         </div>
                     </div>
                     <p>- Вы привлекаете инвестиции, и инвесторам нужно больше доказательств того, что вы решаете реальную проблему.</p>
@@ -324,6 +325,6 @@ $script = "
     //Установка Simple ScrollBar
     const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 ";
-$position = \yii\web\View::POS_READY;
+$position = View::POS_READY;
 $this->registerJs($script, $position);
 ?>

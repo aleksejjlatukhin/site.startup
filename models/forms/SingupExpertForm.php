@@ -24,7 +24,7 @@ use yii\base\Exception;
  * @property string $education
  * @property string $academic_degree
  * @property string $position
- * @property string $type
+ * @property array $type
  * @property string $scope_professional_competence
  * @property string $publications
  * @property string $implemented_projects
@@ -92,7 +92,7 @@ class SingupExpertForm extends SingupForm
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
@@ -132,7 +132,7 @@ class SingupExpertForm extends SingupForm
     /**
      * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Email',
@@ -163,12 +163,12 @@ class SingupExpertForm extends SingupForm
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->setUsername($this->username);
-            $user->setEmail($this->email);
-            $user->setStatus($this->status);
-            $user->setConfirm($this->confirm);
-            $user->setRole($this->role);
-            $user->setPassword($this->password);
+            $user->setUsername($this->getUsername());
+            $user->setEmail($this->getEmail());
+            $user->setStatus($this->getStatus());
+            $user->setConfirm($this->getConfirm());
+            $user->setRole($this->getRole());
+            $user->setPassword($this->getPassword());
             $user->generateAuthKey();
 
             if($this->scenario === 'emailActivation') {
@@ -178,19 +178,19 @@ class SingupExpertForm extends SingupForm
             if ($user->save()) {
 
                 // Сохраняем ключевые слова
-                KeywordsExpert::create($user->id, $this->keywords);
+                KeywordsExpert::create($user->getId(), $this->getKeywords());
 
                 // Сохраняем информацию о эксперте
                 $expertInfo = new ExpertInfo();
                 $expertInfo->setUserId($user->getId());
-                $expertInfo->setEducation($this->education);
-                $expertInfo->setAcademicDegree($this->academic_degree);
-                $expertInfo->setPosition($this->position);
-                $expertInfo->setType(implode('|', $this->type));
-                $expertInfo->setScopeProfessionalCompetence($this->scope_professional_competence);
-                $expertInfo->setPublications($this->publications);
-                $expertInfo->setImplementedProjects($this->implemented_projects);
-                $expertInfo->setRoleInImplementedProjects($this->role_in_implemented_projects);
+                $expertInfo->setEducation($this->getEducation());
+                $expertInfo->setAcademicDegree($this->getAcademicDegree());
+                $expertInfo->setPosition($this->getPosition());
+                $expertInfo->setType(implode('|', $this->getType()));
+                $expertInfo->setScopeProfessionalCompetence($this->getScopeProfessionalCompetence());
+                $expertInfo->setPublications($this->getPublications());
+                $expertInfo->setImplementedProjects($this->getImplementedProjects());
+                $expertInfo->setRoleInImplementedProjects($this->getRoleInImplementedProjects());
 
                 if ($expertInfo->save()) {
                     return $user;
@@ -198,5 +198,149 @@ class SingupExpertForm extends SingupForm
             }
         }
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEducation(): string
+    {
+        return $this->education;
+    }
+
+    /**
+     * @param string $education
+     */
+    public function setEducation(string $education): void
+    {
+        $this->education = $education;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcademicDegree(): string
+    {
+        return $this->academic_degree;
+    }
+
+    /**
+     * @param string $academic_degree
+     */
+    public function setAcademicDegree(string $academic_degree): void
+    {
+        $this->academic_degree = $academic_degree;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosition(): string
+    {
+        return $this->position;
+    }
+
+    /**
+     * @param string $position
+     */
+    public function setPosition(string $position): void
+    {
+        $this->position = $position;
+    }
+
+    /**
+     * @return array
+     */
+    public function getType(): array
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param array $type
+     */
+    public function setType(array $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopeProfessionalCompetence(): string
+    {
+        return $this->scope_professional_competence;
+    }
+
+    /**
+     * @param string $scope_professional_competence
+     */
+    public function setScopeProfessionalCompetence(string $scope_professional_competence): void
+    {
+        $this->scope_professional_competence = $scope_professional_competence;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublications(): string
+    {
+        return $this->publications;
+    }
+
+    /**
+     * @param string $publications
+     */
+    public function setPublications(string $publications): void
+    {
+        $this->publications = $publications;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImplementedProjects(): string
+    {
+        return $this->implemented_projects;
+    }
+
+    /**
+     * @param string $implemented_projects
+     */
+    public function setImplementedProjects(string $implemented_projects): void
+    {
+        $this->implemented_projects = $implemented_projects;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoleInImplementedProjects(): string
+    {
+        return $this->role_in_implemented_projects;
+    }
+
+    /**
+     * @param string $role_in_implemented_projects
+     */
+    public function setRoleInImplementedProjects(string $role_in_implemented_projects): void
+    {
+        $this->role_in_implemented_projects = $role_in_implemented_projects;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeywords(): string
+    {
+        return $this->keywords;
+    }
+
+    /**
+     * @param string $keywords
+     */
+    public function setKeywords(string $keywords): void
+    {
+        $this->keywords = $keywords;
     }
 }

@@ -1,18 +1,27 @@
 <?php
 
+use app\models\forms\UpdateFormRespond;
+use app\models\interfaces\ConfirmationInterface;
+use app\models\StatusConfirmHypothesis;
 use app\models\User;
+use kartik\date\DatePicker;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+
+/**
+ * @var ConfirmationInterface $confirm
+ * @var UpdateFormRespond $model
+*/
 
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->exist_confirm === null) :?>
+<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) :?>
 
 
     <?php $form = ActiveForm::begin([
         'id' => 'formUpdateRespond',
-        'action' => '/responds/update?stage='.$confirm->stage.'&id='.$model->id,
+        'action' => '/responds/update?stage='.$confirm->getStage().'&id='.$model->getId(),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',
@@ -39,7 +48,7 @@ use yii\helpers\Html;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'ivanov@gmail.com',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
@@ -51,7 +60,7 @@ use yii\helpers\Html;
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Кто? Откуда? Чем занимается?',
-            ]); ?>
+            ]) ?>
 
             <?= $form->field($model, 'place_interview', ['template' => '<div style="padding-left: 15px;">{label}</div><div>{input}</div>'])->textInput([
                 'maxlength' => true,
@@ -59,18 +68,18 @@ use yii\helpers\Html;
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => 'Организация, адрес',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
         <div class="col-xs-12 col-sm-6 col-md-4">
 
-            <?= '<label class="control-label" style="padding-left: 15px;">Плановая дата интервью</label>';?>
-            <?= \kartik\date\DatePicker::widget([
+            <?= '<label class="control-label" style="padding-left: 15px;">Плановая дата интервью</label>' ?>
+            <?= DatePicker::widget([
                 'type' => 2,
                 'removeButton' => false,
                 'name' => explode('\\', get_class($model))[3].'[date_plan]',
-                'value' => $model->date_plan == null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
+                'value' => $model->date_plan === null ? date('d.m.Y') : date('d.m.Y', $model->date_plan),
                 'readonly' => true,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -83,7 +92,7 @@ use yii\helpers\Html;
                 'pluginEvents' => [
                     "hide" => "function(e) {e.preventDefault(); e.stopPropagation();}",
                 ],
-            ]);?>
+            ]) ?>
 
         </div>
 
@@ -115,18 +124,18 @@ use yii\helpers\Html;
     <div class="row" style="margin-top: -20px;">
         <div class="col-md-8">
             <div style="font-size: 24px;">
-                <?= $model->name; ?>
+                <?= $model->getName() ?>
             </div>
-            <?= $model->info_respond; ?>
+            <?= $model->info_respond ?>
         </div>
         <div class="col-md-4" style="padding-top: 5px;">
             <div class="bolder">E-mail:</div>
-            <?= $model->email; ?>
+            <?= $model->getEmail() ?>
             <div class="bolder">Место проведения интервью</div>
-            <?= $model->place_interview; ?>
+            <?= $model->getPlaceInterview() ?>
             <div class="bolder">Плановая дата интервью:</div>
-            <?php if ($model->date_plan != null) : ?>
-                <?= date('d.m.Y', $model->date_plan); ?>
+            <?php if ($model->getDatePlan()) : ?>
+                <?= date('d.m.Y', $model->getDatePlan()) ?>
             <?php endif; ?>
         </div>
     </div>

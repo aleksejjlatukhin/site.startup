@@ -1,13 +1,19 @@
 <?php
 
+use app\models\forms\FormCreateSegment;
+use app\models\Projects;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use app\models\Segments;
 
-?>
+/**
+ * @var Projects $project
+ * @var FormCreateSegment $model
+ */
 
+?>
 
 <style>
     .select2-container--krajee .select2-selection {
@@ -28,7 +34,7 @@ use app\models\Segments;
 
     <?php $form = ActiveForm::begin([
         'id' => 'hypothesisCreateForm',
-        'action' => Url::to(['/segments/create', 'id' => $project->id]),
+        'action' => Url::to(['/segments/create', 'id' => $project->getId()]),
         'options' => ['class' => 'g-py-15'],
         'errorCssClass' => 'u-has-error-v1',
         'successCssClass' => 'u-has-success-v1-1',

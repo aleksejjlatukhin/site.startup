@@ -1,19 +1,26 @@
 <?php
 
+use app\models\User;
+use app\modules\admin\models\ConversationManager;
 use yii\helpers\Html;
+
+/**
+ * @var ConversationManager $conversationAdminMain
+ * @var User $manager
+ */
 
 ?>
 
 <!--Проверка существования аватарки-->
-<?php if ($conversationAdminMain->user->avatar_image) : ?>
-    <?= Html::img('/web/upload/user-'.$conversationAdminMain->user->id.'/avatar/'.$conversationAdminMain->user->avatar_image, ['class' => 'user_picture']); ?>
+<?php if ($conversationAdminMain->user->getAvatarImage()) : ?>
+    <?= Html::img('/web/upload/user-'.$conversationAdminMain->getUserId().'/avatar/'.$conversationAdminMain->user->getAvatarImage(), ['class' => 'user_picture']) ?>
 <?php else : ?>
-    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']); ?>
+    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
 <?php endif; ?>
 
 <!--Кол-во непрочитанных сообщений от главного админа-->
 <?php if ($manager->countUnreadMessagesFromMainAdmin) : ?>
-    <div class="countUnreadMessagesSender active"><?= $manager->countUnreadMessagesFromMainAdmin; ?></div>
+    <div class="countUnreadMessagesSender active"><?= $manager->countUnreadMessagesFromMainAdmin ?></div>
 <?php else : ?>
     <div class="countUnreadMessagesSender"></div>
 <?php endif; ?>
@@ -33,7 +40,7 @@ use yii\helpers\Html;
 
         <div class="col-xs-4 text-right">
             <?php if ($conversationAdminMain->lastMessage) : ?>
-                <?= date('d.m.y H:i', $conversationAdminMain->lastMessage->created_at); ?>
+                <?= date('d.m.y H:i', $conversationAdminMain->lastMessage->getCreatedAt()) ?>
             <?php endif; ?>
         </div>
     </div>
@@ -41,15 +48,15 @@ use yii\helpers\Html;
     <?php if ($conversationAdminMain->lastMessage) : ?>
         <div class="block_bottom_exist_message">
 
-            <?php if ($conversationAdminMain->lastMessage->sender->avatar_image) : ?>
-                <?= Html::img('/web/upload/user-'.$conversationAdminMain->lastMessage->sender->id.'/avatar/'.$conversationAdminMain->lastMessage->sender->avatar_image, ['class' => 'icon_sender_last_message']); ?>
+            <?php if ($conversationAdminMain->lastMessage->sender->getAvatarImage()) : ?>
+                <?= Html::img('/web/upload/user-'.$conversationAdminMain->lastMessage->getSenderId().'/avatar/'.$conversationAdminMain->lastMessage->sender->getAvatarImage(), ['class' => 'icon_sender_last_message']) ?>
             <?php else : ?>
-                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']); ?>
+                <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'icon_sender_last_message_default']) ?>
             <?php endif; ?>
 
             <div>
-                <?php if ($conversationAdminMain->lastMessage->description) : ?>
-                    <?= $conversationAdminMain->lastMessage->description; ?>
+                <?php if ($conversationAdminMain->lastMessage->getDescription()) : ?>
+                    <?= $conversationAdminMain->lastMessage->getDescription() ?>
                 <?php else : ?>
                     ...
                 <?php endif; ?>
