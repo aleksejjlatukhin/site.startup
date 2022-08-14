@@ -11,6 +11,7 @@ use app\models\ConfirmSegment;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateMvp;
 use app\models\Gcps;
+use app\models\PatternHttpException;
 use app\models\Problems;
 use app\models\Projects;
 use app\models\Segments;
@@ -56,16 +57,13 @@ class MvpsController extends AppUserPartController
             $model = Mvps::findOne((int)Yii::$app->request->get('id'));
             $project = Projects::findOne($model->getProjectId());
 
-            /*Ограничение доступа к проэктам пользователя*/
-
             if ($project->getUserId() === $currentUser->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа к данному действию.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
 
@@ -73,31 +71,31 @@ class MvpsController extends AppUserPartController
             $gcp = Gcps::findOne($confirmGcp->getGcpId());
             $project = Projects::findOne($gcp->getProjectId());
 
-            /*Ограничение доступа к проэктам пользователя*/
-
             if ($project->getUserId() === $currentUser->getId()){
-
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа к данному действию.');
+            PatternHttpException::noAccess();
 
         }elseif (in_array($action->id, ['index', 'mpdf-table-mvps'])){
 
             $confirmGcp = ConfirmGcp::findOne((int)Yii::$app->request->get('id'));
+            if (!$confirmGcp) {
+                PatternHttpException::noData();
+            }
+
             $gcp = Gcps::findOne($confirmGcp->getGcpId());
             $project = Projects::findOne($gcp->getProjectId());
 
-            /*Ограничение доступа к проэктам пользователя*/
             if (($project->getUserId() === $currentUser->getId())){
-
                 return parent::beforeAction($action);
+            }
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
-
+            if (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
                 return parent::beforeAction($action);
+            }
 
-            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+            if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
                 $modelClientUser = $project->user->clientUser;
 
@@ -109,12 +107,12 @@ class MvpsController extends AppUserPartController
                     return parent::beforeAction($action);
                 }
 
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                PatternHttpException::noAccess();
+            }
 
-            } elseif (User::isUserExpert($currentUser->getUsername())) {
+            if (User::isUserExpert($currentUser->getUsername())) {
 
                 $expert = User::findOne(Yii::$app->user->getId());
-
                 $userAccessToProject = $expert->findUserAccessToProject($project->getId());
 
                 /** @var UserAccessToProjects $userAccessToProject */
@@ -127,29 +125,26 @@ class MvpsController extends AppUserPartController
                         if ($responsiveCommunication) {
 
                             if ($responsiveCommunication->communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
-
                                 return parent::beforeAction($action);
                             }
 
                         } elseif (time() < $userAccessToProject->getDateStop()) {
-
                             return parent::beforeAction($action);
                         }
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
 
                     } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
-
                         return parent::beforeAction($action);
 
                     } else {
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
                     }
                 } else{
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    PatternHttpException::noAccess();
                 }
 
             } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                PatternHttpException::noAccess();
             }
 
         }else{

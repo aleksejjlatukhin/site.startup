@@ -7,6 +7,7 @@ use app\models\Client;
 use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationAdmin;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\admin\models\ConversationManager;
 use Yii;
@@ -47,39 +48,38 @@ class UsersController extends AppAdminController
                     $client = Client::findOne((int)Yii::$app->request->get('id'));
 
                     if ($currentClientUser->getClientId() === $client->getId()) {
-
                         return parent::beforeAction($action);
-
                     }
 
                     if ($client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
-
                         return parent::beforeAction($action);
-
                     }
 
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    PatternHttpException::noAccess();
                 }
 
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif (in_array($action->id, ['status-update', 'add-admin'])) {
 
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif ($action->id === 'group') {
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
+
             $clientUser = $user->clientUser;
             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
             $admin = User::findOne($clientSettings->getAdminId());
@@ -96,7 +96,7 @@ class UsersController extends AppAdminController
                 }
 
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
             return parent::beforeAction($action);

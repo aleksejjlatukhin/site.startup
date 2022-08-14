@@ -7,6 +7,7 @@ use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\Roadmap;
 use app\models\Segments;
@@ -43,14 +44,15 @@ class ProfileController extends AppUserPartController
         if (in_array($action->id, ['index', 'result', 'roadmap', 'report', 'presentation'])) {
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
 
             if ($currentUser->getId() === $user->getId()) {
-
                 return parent::beforeAction($action);
             }
 
             if (User::isUserAdmin($currentUser->getUsername()) && $user->getIdAdmin() === $currentUser->getId()) {
-
                 return parent::beforeAction($action);
             }
 
@@ -66,7 +68,7 @@ class ProfileController extends AppUserPartController
                     return parent::beforeAction($action);
                 }
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }else{
             return parent::beforeAction($action);
         }

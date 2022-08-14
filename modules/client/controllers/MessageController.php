@@ -7,6 +7,7 @@ use app\models\forms\FormCreateMessageDevelopment;
 use app\models\MessageAdmin;
 use app\models\MessageDevelopment;
 use app\models\MessageFiles;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\admin\models\ConversationMainAdmin;
 use app\modules\admin\models\ConversationManager;
@@ -46,6 +47,10 @@ class MessageController extends AppClientController
             if (!Yii::$app->request->get('type')) {
 
                 $conversation = ConversationMainAdmin::findOne((int)Yii::$app->request->get('id'));
+                if (!$conversation) {
+                    PatternHttpException::noData();
+                }
+
                 if (in_array($user->getId(), [$conversation->getAdminId(), $conversation->getMainAdminId()], true)){
                     // ОТКЛЮЧАЕМ CSRF
                     $this->enableCsrfValidation = false;
@@ -55,23 +60,31 @@ class MessageController extends AppClientController
             elseif (Yii::$app->request->get('type') === 'manager') {
 
                 $conversation = ConversationManager::findOne((int)Yii::$app->request->get('id'));
+                if (!$conversation) {
+                    PatternHttpException::noData();
+                }
+
                 if (in_array($user->getId(), [$conversation->getUserId(), $conversation->getManagerId()], true)){
                     // ОТКЛЮЧАЕМ CSRF
                     $this->enableCsrfValidation = false;
                     return parent::beforeAction($action);
                 }
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'technical-support'){
 
             $conversation = ConversationDevelopment::findOne((int)Yii::$app->request->get('id'));
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+
             if (in_array($user->getId(), [$conversation->getUserId(), $conversation->getDevId()], true)){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }
         elseif ($action->id === 'index') {
@@ -90,7 +103,7 @@ class MessageController extends AppClientController
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         else{
             return parent::beforeAction($action);

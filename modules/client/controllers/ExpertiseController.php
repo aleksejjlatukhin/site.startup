@@ -5,6 +5,7 @@ namespace app\modules\client\controllers;
 
 use app\models\ClientUser;
 use app\models\EnableExpertise;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\User;
 use app\modules\admin\models\form\SearchForm;
@@ -40,7 +41,7 @@ class ExpertiseController extends AppClientController
             if (User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
             return parent::beforeAction($action);

@@ -6,6 +6,7 @@ namespace app\modules\expert\controllers;
 
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
+use app\models\PatternHttpException;
 use app\models\ProjectCommunications;
 use app\models\Projects;
 use app\models\User;
@@ -39,13 +40,18 @@ class CommunicationsController extends AppExpertController
         $currentUser = User::findOne(Yii::$app->user->getId());
 
         if ($action->id === 'notifications') {
+            
+            $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
 
-            if (User::isUserExpert($currentUser->getUsername()) && $currentUser->getId() === (int)Yii::$app->request->get('id')) {
+            if (User::isUserExpert($currentUser->getUsername()) && $currentUser->getId() === $user->getId()) {
 
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
             return parent::beforeAction($action);

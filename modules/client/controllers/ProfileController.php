@@ -5,6 +5,7 @@ namespace app\modules\client\controllers;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use Throwable;
 use Yii;
@@ -26,12 +27,21 @@ class ProfileController extends AppClientController
      */
     public function beforeAction($action): bool
     {
+        $currentUser = User::findOne(Yii::$app->user->getId());
+        $currentClientId = $currentUser->clientUser->getClientId();
+
         if ($action->id === 'index') {
             $admin = User::findOne((int)Yii::$app->request->get('id'));
-            if (User::isUserAdminCompany(Yii::$app->user->identity['username']) || $admin->getId() === Yii::$app->user->getId()) {
+            if (!$admin) {
+                PatternHttpException::noData();
+            }
+
+            $clientId = $admin->clientUser->getClientId();
+
+            if ((User::isUserAdminCompany($currentUser->getUsername()) && $clientId === $currentClientId) || $admin->getId() === $currentUser->getId()) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }else{
             return parent::beforeAction($action);
         }

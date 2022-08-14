@@ -6,6 +6,7 @@ use app\models\ClientSettings;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use Throwable;
 use Yii;
@@ -33,6 +34,10 @@ class ProfileController extends AppAdminController
         if ($action->id === 'index') {
 
             $admin = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$admin) {
+                PatternHttpException::noData();
+            }
+
             $adminClientUser = $admin->clientUser;
 
             if ($currentClientUser->getClientId() === $adminClientUser->getClientId() && ($admin->getId() === $currentUser->getId() || User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username']))) {
@@ -44,7 +49,7 @@ class ProfileController extends AppAdminController
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }else{
             return parent::beforeAction($action);

@@ -5,6 +5,7 @@ namespace app\modules\admin\controllers;
 
 use app\models\Client;
 use app\models\ClientRatesPlan;
+use app\models\PatternHttpException;
 use app\models\RatesPlan;
 use app\models\User;
 use app\modules\admin\models\form\FormCreateRatesPlan;
@@ -35,7 +36,7 @@ class RatesPlansController extends AppAdminController
             return parent::beforeAction($action);
         }
 
-        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+        PatternHttpException::noAccess();
     }
 
     /**

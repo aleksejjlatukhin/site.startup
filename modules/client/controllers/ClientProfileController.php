@@ -4,6 +4,7 @@ namespace app\modules\client\controllers;
 
 use app\models\Client;
 use app\models\ClientSettings;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\client\models\form\AvatarCompanyForm;
 use app\modules\client\models\form\FormUpdateClient;
@@ -37,7 +38,7 @@ class ClientProfileController extends AppClientController
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         } else {
             return parent::beforeAction($action);
         }

@@ -12,6 +12,7 @@ use app\models\InterviewConfirmGcp;
 use app\models\InterviewConfirmMvp;
 use app\models\InterviewConfirmProblem;
 use app\models\InterviewConfirmSegment;
+use app\models\PatternHttpException;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\RespondsProblem;
@@ -54,15 +55,14 @@ class InterviewsController extends AppUserPartController
             $confirm = $respond->confirm;
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
+            
             if (($project->getUserId() === Yii::$app->user->getId())){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
 
@@ -70,18 +70,16 @@ class InterviewsController extends AppUserPartController
             $confirm = $respond->confirm;
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
+            
             if ($project->getUserId() === Yii::$app->user->getId()){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }else{
-
             return parent::beforeAction($action);
         }
 
@@ -210,16 +208,15 @@ class InterviewsController extends AppUserPartController
      */
     public function actionCreate(int $stage, int $id)
     {
-        $respond = self::getRespond($stage, $id);
-        $model = self::getCreateModel($stage);
-        $model->setRespondId($id);
-        $confirm = $respond->confirm;
-        $answers = $respond->answers;
-
         if(Yii::$app->request->isAjax) {
-
+            
+            $respond = self::getRespond($stage, $id);
+            $model = self::getCreateModel($stage);
+            $model->setRespondId($id);
+            $confirm = $respond->confirm;
+            $answers = $respond->answers;
+            
             if ($model->load(Yii::$app->request->post())) {
-
                 if (Model::loadMultiple($answers, Yii::$app->request->post())) {
                     if (Model::validateMultiple($answers)) {
                         foreach ($answers as $answer) {
@@ -252,12 +249,12 @@ class InterviewsController extends AppUserPartController
      */
     public function actionGetDataUpdateForm(int $stage, int $id)
     {
-        $model = self::findModel($stage, $id);
-        $respond = $model->respond;
-        $confirm = $respond->confirm;
-        $hypothesis = $confirm->hypothesis;
-
         if(Yii::$app->request->isAjax) {
+            
+            $model = self::findModel($stage, $id);
+            $respond = $model->respond;
+            $confirm = $respond->confirm;
+            $hypothesis = $confirm->hypothesis;
 
             $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'confirm' => $confirm, 'hypothesis' => $hypothesis])];
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -277,12 +274,13 @@ class InterviewsController extends AppUserPartController
      */
     public function actionUpdate(int $stage, int $id)
     {
-        $model = self::findModel($stage, $id);
-        $respond = $model->respond;
-        $confirm = $respond->confirm;
-        $answers = $respond->answers;
-
         if(Yii::$app->request->isAjax) {
+            
+            $model = self::findModel($stage, $id);
+            $respond = $model->respond;
+            $confirm = $respond->confirm;
+            $answers = $respond->answers;
+        
             if ($model->load(Yii::$app->request->post())) {
                 if (Model::loadMultiple($answers, Yii::$app->request->post())) {
                     if (Model::validateMultiple($answers)) {

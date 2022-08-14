@@ -9,6 +9,7 @@ use app\models\ConfirmProblem;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateQuestion;
 use app\models\ConfirmSegment;
+use app\models\PatternHttpException;
 use app\models\QuestionsConfirmGcp;
 use app\models\QuestionsConfirmMvp;
 use app\models\QuestionsConfirmProblem;
@@ -46,15 +47,13 @@ class QuestionsController extends AppUserPartController
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            /*Ограничение доступа к проэктам пользователя*/
             if ($project->getUserId() === Yii::$app->user->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif (in_array($action->id, ['delete', 'update'])){
 
@@ -63,15 +62,13 @@ class QuestionsController extends AppUserPartController
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            /*Ограничение доступа к проэктам пользователя*/
             if ($project->getUserId() === Yii::$app->user->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }else{
             return parent::beforeAction($action);
@@ -119,12 +116,12 @@ class QuestionsController extends AppUserPartController
      */
     public function actionGetFormUpdate(int $stage, int $id)
     {
-        $model = self::getModel($stage, $id);
-        $form = new FormUpdateQuestion($model);
-        $confirm = $form->confirm;
-        $questions = $confirm->questions;
-
         if(Yii::$app->request->isAjax) {
+
+            $model = self::getModel($stage, $id);
+            $form = new FormUpdateQuestion($model);
+            $confirm = $form->confirm;
+            $questions = $confirm->questions;
 
             $response = [
                 'ajax_questions_confirm' => $this->renderAjax('list_questions', ['questions' => $questions]),

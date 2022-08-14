@@ -8,6 +8,7 @@ use app\models\ConversationDevelopment;
 use app\models\forms\FormCreateMessageDevelopment;
 use app\models\MessageDevelopment;
 use app\models\MessageFiles;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\admin\models\ConversationMainAdmin;
 use app\modules\admin\models\ConversationManager;
@@ -41,21 +42,28 @@ class MessageController extends AppExpertController
         if ($action->id === 'view'){
 
             $conversation = ConversationExpert::findOne((int)Yii::$app->request->get('id'));
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+            
             $expert = $conversation->expert;
             $user = $conversation->user;
-
-            // Ограничение доступа
+            
             if (in_array($currentUser->getId(), [$expert->getId(), $user->getId()], true)) {
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'technical-support'){
 
             $conversation = ConversationDevelopment::findOne((int)Yii::$app->request->get('id'));
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+
             $user = $conversation->user;
             $development = $conversation->development;
 
@@ -66,11 +74,14 @@ class MessageController extends AppExpertController
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'index') {
 
             $expert = User::findOne(['id' => (int)Yii::$app->request->get('id'), 'role' => User::ROLE_EXPERT]);
+            if (!$expert) {
+                PatternHttpException::noData();
+            }
 
             // Ограничение доступа
             if ($expert->getId() === $currentUser->getId()){
@@ -79,7 +90,7 @@ class MessageController extends AppExpertController
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         else{
             return parent::beforeAction($action);

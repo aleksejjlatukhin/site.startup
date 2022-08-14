@@ -5,6 +5,7 @@ namespace app\controllers;
 
 
 use app\models\DuplicateCommunications;
+use app\models\PatternHttpException;
 use app\models\User;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -28,13 +29,17 @@ class CommunicationsController extends AppUserPartController
 
         if ($action->id === 'notifications') {
 
+            $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
+            
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-                || (Yii::$app->user->getId() === (int)Yii::$app->request->get('id'))) {
-
+                || (Yii::$app->user->getId() === $user->getId())) {
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
             return parent::beforeAction($action);

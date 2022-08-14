@@ -3,6 +3,7 @@
 namespace app\modules\client\controllers;
 
 use app\models\ClientSettings;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\SortForm;
 use app\models\User;
@@ -27,18 +28,22 @@ class ProjectsController extends AppClientController
             if (User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'group') {
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
+
             $clientUser = $user->clientUser;
             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
 
             if ($user->getId() === Yii::$app->user->getId() || (User::isUserAdminCompany(Yii::$app->user->identity['username']) && $clientSettings->getAdminId() === Yii::$app->user->getId())) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }else{
             return parent::beforeAction($action);
         }

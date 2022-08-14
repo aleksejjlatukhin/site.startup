@@ -9,6 +9,7 @@ use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationDevelopment;
 use app\models\CustomerManager;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\admin\models\form\FormCreateAdminCompany;
 use app\modules\admin\models\form\FormCreateClient;
@@ -46,7 +47,7 @@ class ClientsController extends AppAdminController
             return parent::beforeAction($action);
         }
 
-        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+        PatternHttpException::noAccess();
     }
 
 

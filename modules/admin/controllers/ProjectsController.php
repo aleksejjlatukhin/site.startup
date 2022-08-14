@@ -4,7 +4,7 @@ namespace app\modules\admin\controllers;
 
 use app\models\Client;
 use app\models\ClientSettings;
-use app\models\ClientUser;
+use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\SortForm;
 use app\models\User;
@@ -37,18 +37,19 @@ class ProjectsController extends AppAdminController
         if ($action->id === 'index') {
 
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
-
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'group') {
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
 
             if ($user->getId() === $currentUser->getId()) {
-
                 return parent::beforeAction($action);
             }
 
@@ -57,39 +58,37 @@ class ProjectsController extends AppAdminController
                 $modelClientUser = $user->clientUser;
 
                 if ($currentClientUser->getClientId() === $modelClientUser->getClientId()) {
-
                     return parent::beforeAction($action);
                 }
 
                 if ($modelClientUser->client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
-
                     return parent::beforeAction($action);
                 }
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif ($action->id === 'client') {
 
             $client = Client::findOne((int)Yii::$app->request->get('id'));
+            if (!$client) {
+                PatternHttpException::noData();
+            }
 
             if (User::isUserDev($currentUser->getUsername()) || User::isUserMainAdmin($currentUser->getUsername())) {
 
                 if ($currentClientUser->getClientId() === $client->getId()) {
-
                     return parent::beforeAction($action);
                 }
 
                 if ($client->settings->getAccessAdmin() === ClientSettings::ACCESS_ADMIN_TRUE) {
-
                     return parent::beforeAction($action);
                 }
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
-
             return parent::beforeAction($action);
         }
 

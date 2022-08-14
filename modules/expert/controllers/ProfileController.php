@@ -7,6 +7,7 @@ namespace app\modules\expert\controllers;
 use app\models\ClientSettings;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\modules\expert\models\form\ProfileExpertForm;
 use Throwable;
@@ -37,17 +38,16 @@ class ProfileController extends AppExpertController
         if ($action->id === 'index') {
 
             $expert = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$expert) {
+                PatternHttpException::noData();
+            }
 
             if ($expert->getId() === $currentUser->getId()) {
-
                 return parent::beforeAction($action);
-
             }
 
             if (User::isUserAdmin($currentUser->getUsername()) && $expert->getIdAdmin() === $currentUser->getId()) {
-
                 return parent::beforeAction($action);
-
             }
 
             if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
@@ -63,7 +63,7 @@ class ProfileController extends AppExpertController
                 }
 
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }else{
             return parent::beforeAction($action);
         }

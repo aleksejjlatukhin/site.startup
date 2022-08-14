@@ -6,6 +6,7 @@ namespace app\modules\admin\controllers;
 use app\models\CommunicationPatterns;
 use app\models\CommunicationTypes;
 use app\models\DuplicateCommunications;
+use app\models\PatternHttpException;
 use app\models\ProjectCommunications;
 use app\models\TypesAccessToExpertise;
 use app\models\TypesDuplicateCommunication;
@@ -52,21 +53,24 @@ class CommunicationsController extends AppAdminController
         if ($action->id === 'settings') {
 
             if (User::isUserDev(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
-
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'notifications') {
 
-            if ((User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username']))
-                && (Yii::$app->user->getId() === (int)Yii::$app->request->get('id'))) {
+            $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
 
+            if ((User::isUserMainAdmin(Yii::$app->user->identity['username']) || User::isUserAdmin(Yii::$app->user->identity['username']))
+                && (Yii::$app->user->getId() === $user->getId())) {
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } else{
             return parent::beforeAction($action);

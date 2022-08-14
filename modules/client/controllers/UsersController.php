@@ -8,6 +8,7 @@ use app\models\ClientRatesPlan;
 use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationAdmin;
+use app\models\PatternHttpException;
 use app\models\User;
 use Yii;
 use yii\data\Pagination;
@@ -34,7 +35,7 @@ class UsersController extends AppClientController
             if (User::isUserAdminCompany(Yii::$app->user->identity['username'])) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif (in_array($action->id, ['status-update', 'add-admin'])) {
 
@@ -44,18 +45,22 @@ class UsersController extends AppClientController
                 }
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif ($action->id === 'group') {
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
+            if (!$user) {
+                PatternHttpException::noData();
+            }
+
             $clientUser = $user->clientUser;
             $clientSettings = ClientSettings::findOne(['client_id' => $clientUser->getClientId()]);
 
             if ($user->getId() === Yii::$app->user->getId() || (User::isUserAdminCompany(Yii::$app->user->identity['username']) && Yii::$app->user->getId() === $clientSettings->getAdminId())) {
                 return parent::beforeAction($action);
             }
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }else{
             return parent::beforeAction($action);

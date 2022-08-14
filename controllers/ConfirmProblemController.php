@@ -11,6 +11,7 @@ use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmProblem;
+use app\models\PatternHttpException;
 use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmProblem;
@@ -59,19 +60,22 @@ class ConfirmProblemController extends AppUserPartController
         if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
 
             $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
+            if (!$confirm) {
+                PatternHttpException::noData();
+            }
+
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            /*Ограничение доступа к проэктам пользователя*/
-            if (($project->getUserId() === $currentUser->getId())){
-
+            if (($project->getUserId() === $currentUser->getId())) {
                 return parent::beforeAction($action);
+            }
 
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
-
+            if (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
                 return parent::beforeAction($action);
-
-            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+            } 
+            
+            if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
                 $modelClientUser = $project->user->clientUser;
 
@@ -83,9 +87,10 @@ class ConfirmProblemController extends AppUserPartController
                     return parent::beforeAction($action);
                 }
 
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-
-            } elseif (User::isUserExpert($currentUser->getUsername())) {
+                PatternHttpException::noAccess();
+            } 
+            
+            if (User::isUserExpert($currentUser->getUsername())) {
 
                 $expert = User::findOne(Yii::$app->user->getId());
 
@@ -109,21 +114,21 @@ class ConfirmProblemController extends AppUserPartController
 
                             return parent::beforeAction($action);
                         }
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
 
                     } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
                     } else {
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
                     }
                 } else{
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    PatternHttpException::noAccess();
                 }
 
             } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                PatternHttpException::noAccess();
             }
 
         }elseif (in_array($action->id, ['update', 'delete'])){
@@ -131,61 +136,62 @@ class ConfirmProblemController extends AppUserPartController
             $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
+            
             if ($project->getUserId() === $currentUser->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
 
             $hypothesis = Problems::findOne((int)Yii::$app->request->get('id'));
+            if (!$hypothesis) {
+                PatternHttpException::noData();
+            }
             $project = $hypothesis->project;
-
-            /*Ограничение доступа к проэктам пользователя*/
+            
             if ($project->getUserId() === $currentUser->getId()){
-
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'save-confirm'){
 
             $hypothesis = Problems::findOne((int)Yii::$app->request->get('id'));
             $project = $hypothesis->project;
 
-            /*Ограничение доступа к проэктам пользователя*/
+            
             if ($project->getUserId() === $currentUser->getId()){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         } elseif ($action->id === 'add-questions'){
 
             $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
+            if (!$confirm) {
+                PatternHttpException::noData();
+            }
+
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            /*Ограничение доступа к проэктам пользователя*/
             if (($project->getUserId() === $currentUser->getId())){
-
                 return parent::beforeAction($action);
-
-            } elseif (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
-
+            } 
+            
+            if (User::isUserAdmin($currentUser->getUsername()) && $project->user->getIdAdmin() === $currentUser->getId()) {
                 return parent::beforeAction($action);
-
-            } elseif (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
+            } 
+            
+            if (User::isUserMainAdmin($currentUser->getUsername()) || User::isUserDev($currentUser->getUsername()) || User::isUserAdminCompany($currentUser->getUsername())) {
 
                 $modelClientUser = $project->user->clientUser;
 
@@ -197,9 +203,10 @@ class ConfirmProblemController extends AppUserPartController
                     return parent::beforeAction($action);
                 }
 
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
-
-            } elseif (User::isUserExpert($currentUser->getUsername())) {
+                PatternHttpException::noAccess();
+            } 
+            
+            if (User::isUserExpert($currentUser->getUsername())) {
 
                 $expert = User::findOne(Yii::$app->user->getId());
 
@@ -223,21 +230,21 @@ class ConfirmProblemController extends AppUserPartController
 
                             return parent::beforeAction($action);
                         }
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
 
                     } elseif ($userAccessToProject->getCommunicationType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
 
                         return parent::beforeAction($action);
 
                     } else {
-                        throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                        PatternHttpException::noAccess();
                     }
                 } else{
-                    throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                    PatternHttpException::noAccess();
                 }
 
             } else{
-                throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+                PatternHttpException::noAccess();
             }
 
         } else{

@@ -8,6 +8,7 @@ use app\models\forms\FormCreateMessageAdmin;
 use app\models\forms\FormCreateMessageDevelopment;
 use app\models\MessageDevelopment;
 use app\models\MessageFiles;
+use app\models\PatternHttpException;
 use app\models\User;
 use app\models\ConversationAdmin;
 use app\modules\admin\models\ConversationMainAdmin;
@@ -46,61 +47,64 @@ class MessageController extends AppUserPartController
         if ($action->id === 'view'){
 
             $conversation = ConversationAdmin::findOne((int)Yii::$app->request->get('id'));
-
-            // Ограничение доступа
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+            
             if (($conversation->user->getId() === Yii::$app->user->getId()) || ($conversation->admin->getId() === Yii::$app->user->getId())){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'technical-support'){
 
             $conversation = ConversationDevelopment::findOne((int)Yii::$app->request->get('id'));
-
-            // Ограничение доступа
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+            
             if (($conversation->user->getId() === Yii::$app->user->getId()) || ($conversation->development->getId() === Yii::$app->user->getId())){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'expert'){
 
             $conversation = ConversationExpert::findOne((int)Yii::$app->request->get('id'));
-
-            // Ограничение доступа
+            if (!$conversation) {
+                PatternHttpException::noData();
+            }
+            
             if (($conversation->user->getId() === Yii::$app->user->getId()) || ($conversation->expert->getId() === Yii::$app->user->getId())){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         elseif ($action->id === 'index'){
 
             $user = User::findOne((int)Yii::$app->request->get('id'));
-
-            // Ограничение доступа
+            if (!$user) {
+                PatternHttpException::noData();
+            }
+            
             if (($user->getId() === Yii::$app->user->getId())){
-
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
         }
         else{
-
             return parent::beforeAction($action);
         }
 

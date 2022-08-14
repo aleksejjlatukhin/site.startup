@@ -21,6 +21,7 @@ use app\models\forms\UpdateRespondProblemForm;
 use app\models\forms\UpdateRespondGcpForm;
 use app\models\forms\UpdateRespondMvpForm;
 use app\models\forms\UpdateRespondSegmentForm;
+use app\models\PatternHttpException;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\RespondsProblem;
@@ -63,14 +64,13 @@ class RespondsController extends AppUserPartController
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            // Ограничение доступа к проэктам пользователя
             if ($project->getUserId() === Yii::$app->user->getId()){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
 
@@ -78,14 +78,13 @@ class RespondsController extends AppUserPartController
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
-            // Ограничение доступа к проэктам пользователя
             if ($project->getUserId() === Yii::$app->user->getId()){
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
             }
 
-            throw new HttpException(200, 'У Вас нет доступа по данному адресу.');
+            PatternHttpException::noAccess();
 
         }else{
             return parent::beforeAction($action);
