@@ -18,26 +18,36 @@ $this->registerCssFile('@web/css/profile-data-style.css');
 
     <div class="row profile_menu">
 
-        <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
+        <?= Html::a('Проекты', ['/projects/index', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
+        <?= Html::a('Сводные таблицы', ['/projects/results', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
+        <?= Html::a('Трэкшн карты', ['/projects/roadmaps', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
+        <?= Html::a('Протоколы', ['/projects/reports', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
+        <?= Html::a('Презентации', ['/projects/presentations', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 
+    </div>
+
+    <div class="container-fluid row">
+        <div class="row" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
+            <div class="col-md-3" style="padding: 2px 0;">
+                <?= Html::a('Презентации' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+                    'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция', 'onclick' => 'return false;'
+                ]) ?>
+            </div>
+        </div>
     </div>
 
     <?php if ($projects) : ?>

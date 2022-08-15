@@ -157,7 +157,7 @@ class ProjectsController extends AppUserPartController
 
             PatternHttpException::noAccess();
 
-        }elseif ($action->id === 'index'){
+        }elseif (in_array($action->id, ['index', 'results'])){
 
             $model = User::findOne((int)Yii::$app->request->get('id'));
             if (!$model) {
@@ -676,7 +676,7 @@ class ProjectsController extends AppUserPartController
      * @param int $id
      * @return array|bool
      */
-    public function actionShowAllInformation (int $id)
+    public function actionShowAllInformation(int $id)
     {
         $project = Projects::findOne($id);
 
@@ -698,7 +698,7 @@ class ProjectsController extends AppUserPartController
      * @param int $id
      * @return array|bool
      */
-    public function actionShowRoadmap (int $id)
+    public function actionShowRoadmap(int $id)
     {
         $project = Projects::findOne($id);
         $roadmaps = [];
@@ -723,9 +723,73 @@ class ProjectsController extends AppUserPartController
 
     /**
      * @param int $id
+     * @return string
+     */
+    public function actionResults(int $id): string
+    {
+        $user = User::findOne($id);
+        $projects = Projects::findAll(['user_id' => $id]);
+
+        return $this->render('results', [
+            'user' => $user,
+            'projects' => $projects,
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionRoadmaps(int $id): string
+    {
+        $user = User::findOne($id);
+        $projects = Projects::findAll(['user_id' => $id]);
+
+        return $this->render('roadmaps', [
+            'user' => $user,
+            'projects' => $projects,
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionReports(int $id): string
+    {
+        $user = User::findOne($id);
+        $projects = Projects::findAll(['user_id' => $id]);
+
+        return $this->render('reports', [
+            'user' => $user,
+            'projects' => $projects,
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionPresentations(int $id): string
+    {
+        $user = User::findOne($id);
+        $projects = Projects::findAll(['user_id' => $id]);
+
+        return $this->render('presentations', [
+            'user' => $user,
+            'projects' => $projects,
+        ]);
+    }
+
+
+    /**
+     * @param int $id
      * @return array|bool
      */
-    public function actionResult (int $id)
+    public function actionResult(int $id)
     {
         $project = Projects::findOne($id);
         $segments = Segments::findAll(['project_id' => $id]);
@@ -748,7 +812,7 @@ class ProjectsController extends AppUserPartController
      * @param int $id
      * @return array|bool
      */
-    public function actionReport (int $id)
+    public function actionReport(int $id)
     {
         $project = Projects::findOne($id);
         $segments = Segments::findAll(['project_id' => $id]);

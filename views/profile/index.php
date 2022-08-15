@@ -23,29 +23,29 @@ $this->registerCssFile('@web/css/profile-style.css');
 
     <?php if (User::isActiveStatus(Yii::$app->user->identity['username'])) : ?>
 
-        <div class="row profile_menu">
-
-            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-        </div>
+<!--        <div class="row profile_menu">-->
+<!---->
+<!--            --><?php //echo Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--        </div>-->
 
     <?php endif; ?>
 

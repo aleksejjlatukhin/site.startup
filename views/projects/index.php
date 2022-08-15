@@ -25,6 +25,30 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 ?>
 <div class="projects-index">
 
+    <div class="row project_menu">
+
+        <?= Html::a('Проекты', ['/projects/index', 'id' => $user->getId()], [
+            'class' => 'link_in_the_header',
+        ]) ?>
+
+        <?= Html::a('Сводные таблицы', ['/projects/results', 'id' => $user->getId()], [
+            'class' => 'link_in_the_header',
+        ]) ?>
+
+        <?= Html::a('Трэкшн карты', ['/projects/roadmaps', 'id' => $user->getId()], [
+            'class' => 'link_in_the_header',
+        ]) ?>
+
+        <?= Html::a('Протоколы', ['/projects/reports', 'id' => $user->getId()], [
+            'class' => 'link_in_the_header',
+        ]) ?>
+
+        <?= Html::a('Презентации', ['/projects/presentations', 'id' => $user->getId()], [
+            'class' => 'link_in_the_header',
+        ]) ?>
+
+    </div>
+
     <div class="container-fluid container-data row">
 
         <div class="row row_header_data_generation" style="margin-top: 10px;">
@@ -32,7 +56,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
             <div class="col-md-3" style="padding: 2px 0;">
                 <?= Html::a('Проекты' . Html::img('/images/icons/icon_report_next.png'), ['/projects/get-instruction'],[
                     'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
-                ]); ?>
+                ]) ?>
             </div>
 
             <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
@@ -157,7 +181,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
                 <?= $form->field($new_author, "[0]role", [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -168,7 +192,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     'class' => 'style_form_field_respond form-control',
                     'placeholder' => '',
                     'autocomplete' => 'off'
-                ]); ?>
+                ]) ?>
 
                 <?= $form->field($new_author, "[0]experience", [
                     'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12" style="margin-bottom: 15px;">{input}</div>'
@@ -195,7 +219,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                             'font-size' => '24px',
                             'border-radius' => '8px',
                         ]
-                    ]); ?>
+                    ]) ?>
                 </div>
             </div>
         </div>
@@ -205,7 +229,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
     </div>
 
     <!--Модальные окна-->
-    <?= $this->render('modal'); ?>
+    <?= $this->render('modal') ?>
 
 </div>
 

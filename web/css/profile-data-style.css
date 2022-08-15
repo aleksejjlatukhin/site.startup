@@ -84,6 +84,7 @@
 
     .link_in_the_header {
         display: block;
-        text-align: center;
+        text-align: left;
+        padding-left: 25px;
     }
 }

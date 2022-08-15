@@ -4,7 +4,7 @@ use app\models\Projects;
 use yii\helpers\Html;
 use app\models\User;
 
-$this->title = 'Трэкшн карты';
+$this->title = 'Протоколы';
 $this->registerCssFile('@web/css/profile-data-style.css');
 
 /**
@@ -14,30 +14,40 @@ $this->registerCssFile('@web/css/profile-data-style.css');
 
 ?>
 
-    <div class="profile-roadmap">
+    <div class="profile-result">
 
         <div class="row profile_menu">
 
-            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
+            <?= Html::a('Проекты', ['/projects/index', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
+            <?= Html::a('Сводные таблицы', ['/projects/results', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
+            <?= Html::a('Трэкшн карты', ['/projects/roadmaps', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
+            <?= Html::a('Протоколы', ['/projects/reports', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
-            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
+            <?= Html::a('Презентации', ['/projects/presentations', 'id' => $user->getId()], [
                 'class' => 'link_in_the_header',
             ]) ?>
 
+        </div>
+
+        <div class="container-fluid row">
+            <div class="row" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
+                <div class="col-md-3" style="padding: 2px 0;">
+                    <?= Html::a('Протоколы' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+                        'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция', 'onclick' => 'return false;'
+                    ]) ?>
+                </div>
+            </div>
         </div>
 
         <?php if ($projects) : ?>
@@ -55,7 +65,7 @@ $this->registerCssFile('@web/css/profile-data-style.css');
                         </div>
 
                         <div class="col-md-4 informationAboutAction">
-                            Посмотреть дорожную карту проекта
+                            Посмотреть протокол проекта
                         </div>
 
                     </div>
@@ -94,4 +104,4 @@ $this->registerCssFile('@web/css/profile-data-style.css');
 
 
     <!--Подключение скриптов-->
-<?php $this->registerJsFile('@web/js/profile_roadmap.js'); ?>
+<?php $this->registerJsFile('@web/js/profile_report.js'); ?>

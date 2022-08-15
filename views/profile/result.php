@@ -26,7 +26,7 @@ $this->registerCssFile('@web/css/profile-data-style.css');
             'class' => 'link_in_the_header',
         ]) ?>
 
-        <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
+        <?= Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
             'class' => 'link_in_the_header',
         ]) ?>
 

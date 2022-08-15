@@ -46,52 +46,52 @@ $this->registerCssFile('@web/css/message-view.css');
 
     <div class="row profile_menu">
 
-        <div class="link_open_and_close_menu_profile">Открыть меню профиля</div>
-
-        <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
-
-        <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
-
-        <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
-
-        <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
-
-        <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+<!--        <div class="link_open_and_close_menu_profile">Открыть меню профиля</div>-->
+<!---->
+<!--        --><?php //echo Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
+//            'class' => 'link_in_the_header',
+//        ]) ?>
+<!---->
+<!--        --><?php //echo Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
+//            'class' => 'link_in_the_header',
+//        ]) ?>
+<!---->
+<!--        --><?php //echo Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
+//            'class' => 'link_in_the_header',
+//        ]) ?>
+<!---->
+<!--        --><?php //echo Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
+//            'class' => 'link_in_the_header',
+//        ]) ?>
+<!---->
+<!--        --><?php //echo Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
+//            'class' => 'link_in_the_header',
+//        ]) ?>
 
     </div>
 
     <div class="row">
         <div class="col-sm-6 col-lg-4 hide_block_menu_profile">
 
-            <?= Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Дорожные карты', ['/profile/roadmap', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
-
-            <?= Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
-                'class' => 'link_in_the_header',
-            ]) ?>
+<!--            --><?php //echo Html::a('Данные пользователя', ['/profile/index', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Сводные таблицы', ['/profile/result', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Трэкшн карты', ['/profile/roadmap', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Протоколы', ['/profile/report', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
+<!---->
+<!--            --><?php //echo Html::a('Презентации', ['/profile/presentation', 'id' => $user->getId()], [
+//                'class' => 'link_in_the_header',
+//            ]) ?>
 
         </div>
     </div>
