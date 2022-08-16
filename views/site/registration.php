@@ -32,7 +32,7 @@ $this->registerCssFile('@web/css/registration.css');
             ]); ?>
 
                 <?= $form->field($formClientAndRole, 'clientId', [
-                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт</div><div>{input}</div>'
+                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт *</div><div>{input}</div>'
                 ])->widget(Select2::class, [
                     'data' => $dataClients,
                     'options' => [

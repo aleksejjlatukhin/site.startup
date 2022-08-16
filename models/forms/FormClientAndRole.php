@@ -53,4 +53,15 @@ class FormClientAndRole extends Model
     {
         return $this->role;
     }
+
+    /**
+     * @return array
+     */
+    public function attributeLabels(): array
+    {
+        return [
+            'clientId' => 'Организация, к которой будет привязан Ваш аккаунт *',
+            'role' => 'Проектная роль пользователя *',
+        ];
+    }
 }

@@ -95,7 +95,7 @@ class SingupExpertForm extends SingupForm
     public function rules(): array
     {
         return [
-            [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
+            [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['email', 'username', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
@@ -105,7 +105,6 @@ class SingupExpertForm extends SingupForm
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
             [['email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
             [['scope_professional_competence', 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'string', 'max' => 2000],
-            ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
 
@@ -135,21 +134,21 @@ class SingupExpertForm extends SingupForm
     public function attributeLabels(): array
     {
         return [
-            'email' => 'Email',
-            'username' => 'Логин',
-            'password' => 'Пароль',
-            'rememberMe' => 'Запомнить',
-            'role' => 'Проектная роль пользователя',
+            'email' => 'Email *',
+            'username' => 'Логин *',
+            'password' => 'Пароль *',
+            'rememberMe' => 'Запомнить *',
+            'role' => 'Проектная роль пользователя *',
             'exist_agree' => '',
-            'education' => 'Образование',
-            'academic_degree' => 'Ученая степень',
-            'position' => 'Должность',
-            'type' => 'Тип',
-            'scope_professional_competence' => 'Сфера профессиональной компетенции',
-            'publications' => 'Научные публикации',
-            'implemented_projects' => 'Реализованные проекты',
-            'role_in_implemented_projects' => 'Роль в реализованных проектах',
-            'keywords' => 'Ключевые слова'
+            'education' => 'Образование *',
+            'academic_degree' => 'Ученая степень *',
+            'position' => 'Должность *',
+            'type' => 'Тип *',
+            'scope_professional_competence' => 'Сфера профессиональной компетенции *',
+            'publications' => 'Научные публикации *',
+            'implemented_projects' => 'Реализованные проекты *',
+            'role_in_implemented_projects' => 'Роль в реализованных проектах *',
+            'keywords' => 'Ключевые слова *'
         ];
     }
 

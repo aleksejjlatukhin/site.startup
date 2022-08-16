@@ -136,9 +136,11 @@ class SiteController extends AppUserPartController
                     Yii::$app->response->data = $response;
                     return $response;
 
-                } elseif ($_POST['FormClientAndRole']['role']) {
+                }
 
-                    $role = $_POST['FormClientAndRole']['role'];
+                if ($_POST['FormClientAndRole']['role']) {
+
+                    $role = (int)$_POST['FormClientAndRole']['role'];
                     $formRegistration = new SingupForm();
                     $formRegistration->role = $role;
 
@@ -192,6 +194,8 @@ class SiteController extends AppUserPartController
 
             if ($model->load(Yii::$app->request->post())) {
 
+                $model->setUsername($model->getEmail());
+
                 if ($model->validate()) {
 
                     if ($user = $model->singup()) {
@@ -237,14 +241,6 @@ class SiteController extends AppUserPartController
 
                     if ($model->uniq_email === false) {
                         $response['error_uniq_email'] = true;
-                    }
-
-                    if ($model->uniq_username === false) {
-                        $response['error_uniq_username'] = true;
-                    }
-
-                    if ($model->match_username === false) {
-                        $response['error_match_username'] = true;
                     }
 
                     if ($model->exist_agree != 1) {

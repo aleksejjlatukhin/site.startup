@@ -42,12 +42,11 @@ class SingupForm extends Model
     public function rules(): array
     {
         return [
-            [['exist_agree', 'uniq_username', 'match_username', 'uniq_email'],'boolean'],
+            [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['email', 'username', 'password'], 'required'],
             [['username', 'email', 'password'], 'trim'],
             [['email'], 'string', 'max' => 255],
-            ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
 
@@ -81,11 +80,11 @@ class SingupForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'email' => 'Email',
-            'username' => 'Логин',
-            'password' => 'Пароль',
+            'email' => 'Email *',
+            'username' => 'Логин *',
+            'password' => 'Пароль *',
             'rememberMe' => 'Запомнить',
-            'role' => 'Проектная роль пользователя',
+            'role' => 'Проектная роль пользователя *',
             'exist_agree' => ''
         ];
     }
@@ -111,23 +110,6 @@ class SingupForm extends Model
         if (User::findOne(['username' => $this->getUsername()])) {
             $this->uniq_username = false;
             $this->addError($attr, 'Этот логин уже занят.');
-        }
-    }
-
-
-    /**
-     * @param $attr
-     */
-    public function matchUsername($attr): void
-    {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->getUsername())) {
-            $this->match_username = false;
-            $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
-        }
-
-        if (preg_match('/\s+/',$this->getUsername())) {
-            $this->match_username = false;
-            $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
 

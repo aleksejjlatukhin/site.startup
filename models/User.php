@@ -102,12 +102,11 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'email'], 'required'],
             [['role', 'status', 'confirm', 'id_admin'], 'integer'],
             ['email', 'email'],
-            ['username', 'match', 'pattern' => '/[a-z]+/i', 'message' => '{attribute} должен содержать только латиницу!'],
-            ['username', 'string', 'min' => 3, 'max' => 32],
+            ['username', 'string', 'min' => 3, 'max' => 255],
             ['password', 'string', 'min' => 6, 'max' => 32],
             ['password', 'required', 'on' => 'create'],
-            ['username', 'unique', 'message' => 'Этот логин уже занят.'],
-            ['email', 'unique', 'message' => 'Эта почта уже зарегистрирована.'],
+            ['username', 'unique', 'message' => 'Этот логин уже занят'],
+            ['email', 'unique', 'message' => 'Эта почта уже зарегистрирована'],
             ['secret_key', 'unique'],
         ];
     }

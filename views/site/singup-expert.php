@@ -34,7 +34,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'email', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email *</div><div>{input}</div>'
     ])->textInput([
         'type' => 'email',
         'required' => true,
@@ -45,20 +45,8 @@ $form = ActiveForm::begin([
     ]);
 
 
-    echo $form->field($formRegistration, 'username', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Логин</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 32,
-        'minlength' => 3,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => 'Введите от 3 до 32 символов',
-        'autocomplete' => 'off'
-    ]);
-
-
     echo $form->field($formRegistration, 'password', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль *</div><div>{input}</div>'
     ])->passwordInput([
         'maxlength' => 32,
         'minlength' => 6,
@@ -70,7 +58,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'education', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Образование</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Образование *</div><div>{input}</div>'
     ])->textInput([
         'maxlength' => true,
         'minlength' => 2,
@@ -82,7 +70,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'academic_degree', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Ученая степень, звание</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Ученая степень, звание *</div><div>{input}</div>'
     ])->textInput([
         'maxlength' => true,
         'minlength' => 2,
@@ -94,7 +82,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'position', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Должность</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Должность *</div><div>{input}</div>'
     ])->textInput([
         'maxlength' => true,
         'minlength' => 2,
@@ -106,7 +94,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'type', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Тип экпертной деятельности</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Тип экпертной деятельности *</div><div>{input}</div>'
     ])->widget(Select2::class, [
         'data' => ExpertType::getListTypes(),
         'options' => [
@@ -125,7 +113,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'scope_professional_competence', [
-            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Сфера профессиональной компетенции</div><div>{input}</div>'
+            'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Сфера профессиональной компетенции *</div><div>{input}</div>'
         ])->textarea([
             'row' => 2,
             'maxlength' => true,
@@ -138,7 +126,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'publications', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Научные публикации</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Научные публикации *</div><div>{input}</div>'
     ])->textarea([
         'row' => 2,
         'maxlength' => true,
@@ -151,7 +139,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'implemented_projects', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Реализованные проекты</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Реализованные проекты *</div><div>{input}</div>'
     ])->textarea([
         'row' => 2,
         'maxlength' => true,
@@ -164,7 +152,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'role_in_implemented_projects', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Роль в реализованных проектах</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Роль в реализованных проектах *</div><div>{input}</div>'
     ])->textarea([
         'row' => 2,
         'maxlength' => true,
@@ -177,7 +165,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'keywords', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Ключевые слова</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Ключевые слова *</div><div>{input}</div>'
     ])->textarea([
         'row' => 2,
         'maxlength' => true,

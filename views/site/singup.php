@@ -25,7 +25,7 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'email', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Email *</div><div>{input}</div>'
     ])->textInput([
         'type' => 'email',
         'required' => true,
@@ -36,20 +36,8 @@ $form = ActiveForm::begin([
     ]);
 
 
-    echo $form->field($formRegistration, 'username', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Логин</div><div>{input}</div>'
-    ])->textInput([
-        'maxlength' => 32,
-        'minlength' => 3,
-        'required' => true,
-        'class' => 'style_form_field_respond form-control',
-        'placeholder' => 'Введите от 3 до 32 символов',
-        'autocomplete' => 'off'
-    ]);
-
-
     echo $form->field($formRegistration, 'password', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль *</div><div>{input}</div>'
     ])->passwordInput([
         'maxlength' => 32,
         'minlength' => 6,

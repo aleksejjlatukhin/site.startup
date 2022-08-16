@@ -16,7 +16,7 @@ $(body).on('change', '#formClientAndRole_clientId', function(){
         cache: false,
         success: function(response){
 
-            if ($(window).width() > 1000 && $(window).width() < 1700) {
+            if ($(window).width() > 1500 && $(window).width() < 1700) {
                 $('.wrap').css('margin-bottom', '0');
             } else {
                 $('.wrap').css('margin-bottom', '20px');
@@ -76,22 +76,14 @@ $(body).on('beforeSubmit', '#form_user_singup', function(e){
         success: function(response){
 
             if(response.error_uniq_email) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - почтовый адрес уже зарегистрирован;<\/h4>');
-            }
-
-            if(response.error_uniq_username) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин уже зарегистрирован;<\/h4>');
-            }
-
-            if(response.error_match_username) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - логин должен содержать только латинские символы и цыфры, не допускается использование пробелов;<\/h4>');
+                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - почтовый адрес уже зарегистрирован<\/h4>');
             }
 
             if(response.error_exist_agree) {
-                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - необходимо согласие с настоящей Политикой конфиденциальности и условиями обработки персональных данных;<\/h4>');
+                error_user_singup_modal.append('<\h4 style=\"color: #F2F2F2; padding: 0 30px;\"> - необходимо согласие с настоящей Политикой конфиденциальности и условиями обработки персональных данных<\/h4>');
             }
 
-            if(response.error_uniq_email || response.error_uniq_username || response.error_exist_agree || response.error_match_username) {
+            if(response.error_uniq_email || response.error_exist_agree) {
                 $(body).append($('#error_user_singup').first());
                 $('#error_user_singup').modal('show');
             }

@@ -20,7 +20,7 @@ use kartik\select2\Select2;
 ]); ?>
 
 <?= $form->field($formClientAndRole, 'clientId', [
-    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт</div><div>{input}</div>'
+    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт *</div><div>{input}</div>'
 ])->widget(Select2::class, [
     'data' => $dataClients,
     'options' => ['id' => 'formClientAndRole_clientId', 'placeholder' => 'Выберите организацию, к которой будет привязан Ваш аккаунт'],
@@ -29,7 +29,7 @@ use kartik\select2\Select2;
 ]) ?>
 
 <?= $form->field($formClientAndRole, 'role', [
-    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя</div><div>{input}</div>'
+    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя *</div><div>{input}</div>'
 ])->widget(Select2::class, [
     'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт', User::ROLE_MANAGER => 'Менеджер'],
     'options' => ['id' => 'formClientAndRole_role', 'placeholder' => 'Выберите проектную роль пользователя'],
