@@ -155,13 +155,16 @@ class ClientsController extends AppAdminController
     {
         $formCreateAdminCompany = new FormCreateAdminCompany();
         $formCreateClient = new FormCreateClient();
-        if ($formCreateAdminCompany->validate() && $formCreateAdminCompany->load(Yii::$app->request->post())) {
-            foreach ($formCreateAdminCompany->attributes as $k => $value) {
-                $formCreateClient->adminCompany .= $k . 'abracadabraKey:' . $value . 'abracadabraValue';
+        if ($formCreateAdminCompany->load(Yii::$app->request->post())) {
+            $formCreateAdminCompany->setUsername($formCreateAdminCompany->getEmail());
+            if ($formCreateAdminCompany->validate()) {
+                foreach ($formCreateAdminCompany->attributes as $k => $value) {
+                    $formCreateClient->adminCompany .= $k . 'abracadabraKey:' . $value . 'abracadabraValue';
+                }
+                return $this->render('create_2', [
+                    'formCreateClient' => $formCreateClient
+                ]);
             }
-            return $this->render('create_2', [
-                'formCreateClient' => $formCreateClient
-            ]);
         }
         if ($formCreateClient->validate() && $formCreateClient->load(Yii::$app->request->post())) {
 

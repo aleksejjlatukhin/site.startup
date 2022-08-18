@@ -54,7 +54,7 @@ $this->registerCssFile('@web/css/profile-style.css');
 
         <div class="col-md-12 col-lg-4">
 
-            <?php if ($user['avatar_image']) : ?>
+            <?php if ($user->getAvatarImage()) : ?>
 
                 <?= Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'avatar_image']) ?>
 

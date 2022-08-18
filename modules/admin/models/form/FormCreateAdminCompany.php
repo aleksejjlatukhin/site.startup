@@ -38,7 +38,6 @@ class FormCreateAdminCompany extends Model
             [['email', 'username'], 'required'],
             [['username', 'email'], 'trim'],
             [['email'], 'string', 'max' => 255],
-            ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
             ['email', 'email'],
@@ -75,20 +74,6 @@ class FormCreateAdminCompany extends Model
     {
         if (User::findOne(['username' => $this->getUsername()])) {
             $this->addError($attr, 'Этот логин уже занят.');
-        }
-    }
-
-
-    /**
-     * @param $attr
-     */
-    public function matchUsername($attr): void
-    {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->getUsername())) {
-            $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
-        }
-        if (preg_match('/\s+/',$this->getUsername())) {
-            $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
 
