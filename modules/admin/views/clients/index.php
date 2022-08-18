@@ -131,7 +131,7 @@ $this->registerCssFile('@web/css/clients-index-style.css');
                     <?php
                     /** @var CustomerManager $customerManager */
                     $customerManager = $client->findCustomerManager();
-                    $manager = $customerManager->user;
+                    $customerManager ? $manager = $customerManager->user : $manager = null;
                     ?>
                     <?php if ($manager) : ?>
                         <?= Html::a($manager->getUsername(), ['/admin/clients/get-list-managers', 'clientId' => $client->getId()], [
