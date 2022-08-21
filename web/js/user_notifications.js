@@ -15,6 +15,7 @@ $(body).on('click', '.link-read-notification', function (e) {
         method: 'POST',
         cache: false,
         success: function(response){
+            $(container).parent().find('.notification_no_read-description').css('font-weight', 400);
             $(container).hide();
             // Меняем в шапке сайта в иконке количество непрочитанных коммуникаций
             var blockCountUnreadCommunications = $(body).find('.countUnreadCommunications');

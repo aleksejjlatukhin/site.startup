@@ -1,8 +1,8 @@
 <?php
 
 use app\models\Authors;
+use app\models\forms\SearchForm;
 use app\models\Projects;
-use app\models\SortForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
@@ -16,7 +16,7 @@ use app\models\ProjectSort;
  * @var User $user
  * @var Projects[] $models
  * @var Authors $new_author
- * @var SortForm $sortModel
+ * @var SearchForm $searchForm
 */
 
 $this->title = 'Проекты';
@@ -24,6 +24,10 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
 ?>
 <div class="projects-index">
+
+    <div class="row">
+        <div class="col-xs-12 header-title-mobile"><?= $this->title ?></div>
+    </div>
 
     <div class="row project_menu">
 
@@ -61,60 +65,27 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
             <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
+            <div class="col-md-6 search_block_desktop">
+
                 <?php
                 $form = ActiveForm::begin([
-                    'id' => 'sorting_projects',
+                    'id' => 'search_projects',
                     'options' => ['class' => 'g-py-15'],
                     'errorCssClass' => 'u-has-error-v1',
                     'successCssClass' => 'u-has-success-v1-1',
                 ]); ?>
 
-                <?php
-                $listFields = ProjectSort::getListFields();
-                $listFields = ArrayHelper::map($listFields,'id', 'name');
-                ?>
-
-
-
-                <div class="col-md-3">
-
-                    <?= $form->field($sortModel, 'field',
-                        ['template' => '<div>{input}</div>'])
-                        ->widget(Select2::class, [
-                            'data' => $listFields,
-                            'options' => [
-                                'id' => 'listFields',
-                                'placeholder' => 'Выберите данные для сортировки'
-                            ],
-                            'hideSearch' => true, //Скрытие поиска
-                        ])
-                    ?>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <?= $form->field($sortModel, 'type',
-                        ['template' => '<div>{input}</div>'])
-                        ->widget(DepDrop::class, [
-                            'type' => DepDrop::TYPE_SELECT2,
-                            'select2Options' => [
-                                'pluginOptions' => ['allowClear' => false],
-                                'hideSearch' => true,
-                            ],
-                            'options' => ['id' => 'listType', 'placeholder' => 'Выберите тип сортировки'],
-                            'pluginOptions' => [
-                                'placeholder' => false,
-                                'hideSearch' => true,
-                                'depends' => ['listFields'],
-                                'nameParam' => 'name',
-                                'url' => Url::to(['/projects/list-type-sort'])
-                            ]
-                        ])
-                    ?>
-                </div>
+                    <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                        ->textInput([
+                            'class' => 'style_form_field_respond form-control',
+                            'placeholder' => 'поиск проекта',
+                            'minlength' => 5,
+                            'autocomplete' => 'off'])
+                        ->label(false) ?>
 
                 <?php ActiveForm::end(); ?>
+
+            </div>
 
             <?php else : ?>
 
@@ -134,7 +105,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         </div>
 
         <!--Заголовки для списка проектов-->
-        <div class="row" style="display: flex; align-items: center; margin: 0 0 10px 0; padding: 10px;">
+        <div class="row headers_for_list_projects">
 
             <div class="col-lg-3 header_data_hypothesis">
                 <div class="">Проект</div>
@@ -152,6 +123,67 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 Создан / Изменен
             </div>
 
+        </div>
+
+        <div class="row row_header_data_generation_mobile">
+
+            <div class="col-xs-8">
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
+                        ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus']
+                    ) ?>
+
+                <?php endif; ?>
+            </div>
+
+            <div class="col-xs-4">
+
+                <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                        Url::to('/projects/get-instruction'), [
+                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                            'title' => 'Инструкция', 'style' => ['margin-left' => '10px']
+                        ]) ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_green_search.png'), ['#'], [
+                            'class' => 'link_show_search_field_mobile show_search_projects pull-right',
+                            'title' => 'Поиск проектов'
+                    ]) ?>
+
+                <?php else : ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                        Url::to('/projects/get-instruction'), [
+                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                            'title' => 'Инструкция'
+                        ]) ?>
+
+                <?php endif; ?>
+
+            </div>
+        </div>
+
+        <div class="row search_block_mobile">
+            <div class="col-xs-12">
+                <?php $form = ActiveForm::begin([
+                    'id' => 'search_projects_mobile',
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]); ?>
+
+                <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                    ->textInput([
+                        'class' => 'style_form_field_respond form-control',
+                        'placeholder' => 'поиск проекта',
+                        'minlength' => 5,
+                        'autocomplete' => 'off'])
+                    ->label(false) ?>
+
+                <?php ActiveForm::end(); ?>
+            </div>
         </div>
 
         <div class="block_all_projects_user">

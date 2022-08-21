@@ -28,13 +28,24 @@ $this->title = 'Главная';
 
         <div class="content_main_page">
 
+            <div class="content_main_page_block_text_mobile">
+
+                <div>
+                    <h1 class="top_title_main_page">Акселератор<br>стартап-проектов</h1>
+                </div>
+
+                <div>
+                    <div class="bottom_title_main_page">Customer Development<br><span>ШАГ</span> ЗА <span>ШАГОМ</span></div>
+                </div>
+
+            </div>
 
             <?php if (Yii::$app->user->isGuest) : ?>
 
 
                 <div class="row style_form_login">
 
-                    <div class="col-md-12 text-center" style="font-size: 20px; margin: 25px 0 45px 0;">Добро пожаловать!</div>
+                    <div class="col-md-12 text-center hello-text">Добро пожаловать!</div>
 
                     <?php $form = ActiveForm::begin([
                         'id' => 'login_user_form',
@@ -46,39 +57,31 @@ $this->title = 'Главная';
 
                     <div class="col-md-12">
 
-                        <?= $form->field($model_login, 'identity', ['template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Логин или email</div><div>{input}</div>'])
+                        <?= $form->field($model_login, 'identity', ['template' => '<div class="style-label">Логин</div><div>{input}</div>'])
                             ->label('Логин')
                             ->textInput([
                                 'maxlength' => true,
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
-                                'placeholder' => 'Введите логин или email',
+                                'placeholder' => '',
                                 'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-12" style="margin-top: 20px;">
 
-                        <?= $form->field($model_login, 'password', ['template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Пароль</div><div>{input}</div>'])
+                        <?= $form->field($model_login, 'password', ['template' => '<div class="style-label">Пароль</div><div>{input}</div>'])
                             ->passwordInput([
                                 'required' => true,
                                 'class' => 'style_form_field_respond form-control',
-                                'placeholder' => 'Введите пароль',
+                                'placeholder' => '',
                                 'autocomplete' => 'off'
                             ]) ?>
 
                     </div>
 
-                    <div class="col-md-12" style="margin-top: 5px;">
-
-                        <?= $form->field($model_login, 'rememberMe', [
-                            'template' => "{input}{label}"
-                        ])->checkbox(['checked' => true, 'class' => 'custom-checkbox'],false)->label('Запомнить меня') ?>
-
-                    </div>
-
-                    <div class="col-md-12 text-center" style="margin-top: 5px;">
+                    <div class="col-md-12 text-center" style="margin-top: 30px;">
                         <?= Html::submitButton('Войти', [
                             'class' => 'btn btn-default',
                             'name' => 'login-button',
@@ -88,13 +91,15 @@ $this->title = 'Главная';
                                 'border-radius' => '8px',
                                 'width' => '140px',
                                 'height' => '40px',
-                                'font-size' => '16px',
-                                'font-weight' => '700'
+                                'font-size' => '18px',
+                                'font-weight' => '700',
+                                'text-transform' => 'uppercase',
+                                'padding-top' => '9px'
                             ]
                         ]) ?>
                     </div>
 
-                    <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
+                    <div class="col-md-12 text-center" style="margin-top: 17px; margin-bottom: 10px; font-size: 14px;">или</div>
 
                     <div class="col-md-12 text-center">
                         <?= Html::a('Зарегистрироваться',['/site/registration'], [
@@ -231,7 +236,7 @@ $this->title = 'Главная';
             <?php endif;?>
 
 
-            <div class="content_main_page_block_text">
+            <div class="content_main_page_block_text_desktop">
 
                 <div>
                     <h1 class="top_title_main_page">Акселератор стартап-проектов</h1>

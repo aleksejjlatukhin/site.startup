@@ -1,10 +1,14 @@
 .projects-index {
 
 }
+body > .wrap {
+    background: #F2F2F2;
+}
+
 
 .container-data {
     padding: 10px 15px 30px 15px;
-    background: #FFFFFF;
+    background: #F2F2F2;
     min-height: calc(100vh - 200px);
 }
 
@@ -100,6 +104,17 @@
     padding: 14px 15px;
 }
 
+.row.headers_for_list_projects {
+    display: flex;
+    align-items: center;
+    margin: 0 0 10px 0;
+    padding: 10px;
+}
+
+.search_block_mobile {
+    display: none;
+}
+
 @media screen and (min-width: 1140px) {
 
     .project_menu {
@@ -131,4 +146,114 @@
 .link_in_the_header:focus {
     color: #ffffff;
     text-decoration: none;
+}
+
+@media screen and (max-width: 480px) {
+
+    .container-data {
+        padding-bottom: 0;
+    }
+
+    .project_menu {
+        display: none;
+    }
+    .row_header_data_generation {
+        display: none;
+    }
+    .row.headers_for_list_projects {
+        display: none;
+    }
+
+    .new_hypothesis_link_plus {
+        font-size: 18px;
+    }
+    .search_block_desktop {
+        display: none;
+    }
+
+    .block_all_projects_user {
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+
+    .row .container-one_hypothesis {
+        margin: 5px 0; padding: 0;
+    }
+    .container-one_hypothesis {
+        padding: 10px;
+        min-height: 60px;
+        border-radius: 0;
+    }
+
+    .project_name_table {
+        font-size: 28px;
+        padding: 10px 0 5px 0;
+    }
+
+    .project_description_text {
+        font-size: 16px;
+        padding: 0 0 10px 0;
+    }
+
+    .header_table_project_mobile {
+        color: #C7C7C7;
+        font-size: 16px;
+    }
+
+    .text_14_table_project {
+        font-size: 16px;
+        padding: 3px 0 10px 0;
+    }
+
+    .part_project_table_desktop {
+        display: none;
+    }
+    .part_project_table_mobile {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .project_dates_mobile {
+        display: flex;
+        padding: 5px 0 20px 0;
+    }
+    .project_dates_mobile > div:nth-child(1) {
+        padding-left: 15px;
+        padding-right: 30px;
+    }
+
+    .project_created_at,
+    .project_updated_at {
+        display: flex;
+        font-size: 16px;
+    }
+    .project_created_at > div:nth-child(1),
+    .project_updated_at > div:nth-child(1) {
+        color: #C7C7C7;
+        padding-right: 10px;
+    }
+
+    .project_buttons_mobile {
+        display:flex;
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 481px) {
+
+    .row_header_data_generation_mobile {
+        display: none;
+    }
+
+    .header_table_project_mobile {
+        display: none;
+    }
+
+    .part_project_table_mobile {
+        display: none;
+    }
+
+    .project_dates_mobile {
+        display: none;
+    }
 }

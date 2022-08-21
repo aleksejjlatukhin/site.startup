@@ -8,6 +8,12 @@ body {
     font-family: 'RobotoCondensed-Light', serif;
     font-size: 16px;
     padding-right: 0 !important;
+    background-color: #F2F2F2;
+}
+
+.nav-bar-menu-desktop,
+.nav-bar-menu-mobile {
+    margin-bottom: -20px;
 }
 
 .shared-container {
@@ -25,7 +31,7 @@ body {
 }
 
 /*Фон главного меню*/
-#main_menu_user {
+#main_menu_user, #main_menu_user_mobile {
     background-color: #4F4F4F;
     border-color: #4F4F4F;
 }
@@ -77,7 +83,8 @@ body {
 .navbar-header-content {
     display:flex;
     padding-top: 20px;
-    color: #ffffff;
+    color: #F2F2F2;
+    font-family: 'RobotoCondensed-Light', serif;
 }
 
 
@@ -243,4 +250,67 @@ body::-webkit-scrollbar {
 /* Убираем стрелочку у иконки профиля */
 .caret {
     display: none;
+}
+
+@media screen and (max-width: 480px) {
+
+    body {
+        font-size: 14px;
+    }
+    .nav-bar-menu-desktop {
+        display: none;
+    }
+
+    .navbar-fixed-top .navbar-collapse,
+    .navbar-fixed-bottom .navbar-collapse {
+        max-height: 100%;
+    }
+
+    a.font_nav_menu_brand.navbar-brand {
+        display: none;
+    }
+
+    .navbar-header-content {
+        padding-left: 20px;
+    }
+
+    .font_nav_menu_link {
+        padding-right: 0;
+    }
+    .layout-brand-label, .footer_desktop {
+        display: none;
+    }
+
+    .link_nav_bar_menu_mobile {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 28px;
+        font-family: 'RobotoCondensed-Light', serif;
+        font-weight: 700;
+    }
+    #main_menu_user_mobile-collapse > ul.navbar-nav.navbar-right.font_nav_menu_link.nav:first-child {
+        margin-top: 50px;
+    }
+
+    .contacts_mobile {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+        font-size: 18px;
+    }
+}
+
+@media screen and (min-width: 481px) {
+
+    .nav-bar-menu-mobile {
+        display: none;
+    }
+
+    .footer_mobile {
+        display: none;
+    }
+
+    .contacts_mobile {
+        display: none;
+    }
 }

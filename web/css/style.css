@@ -1020,16 +1020,22 @@ a.button_next_page_masseges:focus {
 ---Начало---
 */
 .style_form_field_respond {
-    height: 40px;
-    border-radius: 12px;
-    border: 1px solid #828282;
+    height: 45px;
+    border-radius: 8px;
+    border: 1px solid #4F4F4F;
     width: 100%;
     padding-left: 15px;
     padding-right: 15px;
 }
 
 .form-control{
+    font-size: 20px;
+}
+
+.style-label {
     font-size: 16px;
+    padding-left: 5px;
+    padding-bottom: 5px;
 }
 /*Стили для полей форм
 ---Конец---
@@ -1119,56 +1125,196 @@ div.style_form_field_questions {
 /*Стили для главной страницы
 ---Начало---
 */
-.background_for_main_page {
-    background-image: url("../images/backgrounds/background_for_login_page.png");
-    min-height: 100%;
-    min-width: 300px;
-    width: 100%;
-    height: auto;
-    position: absolute;
-    top: 20px;
-    left: 0;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-attachment: fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+
+@media screen and (max-width: 480px) {
+
+    .background_for_main_page {
+        background-image: url("../images/backgrounds/background_for_login_page_mobile.png");
+        min-height: 100%;
+        min-width: 300px;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .content_main_page {
+        position:fixed;
+        top: 15%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .top_line_text_main_page {
+        display: none;
+    }
+
+    .style_form_login {
+        background: #707F99;
+        width: 280px;
+        min-width: 280px;
+        color: #ffffff;
+        height: 400px;
+        border-radius: 16px;
+        padding: 0;
+        margin-top: 15%;
+    }
+    .style_form_login > .hello-text{
+        font-size: 20px;
+        margin: 20px 0 30px 0;
+    }
+
+    .content_main_page_block_text_desktop {
+        display: none;
+    }
+
+    .content_main_page_block_text_mobile {
+        width: 100%;
+        font-family: 'RobotoCondensed-Bold', serif;
+        color: #FFFFFF;
+        text-transform: uppercase;
+    }
+    .content_main_page_block_text_mobile > div {
+        display:flex;
+        width: 100%;
+        margin: 0 auto;
+        justify-content: center;
+    }
+    .content_main_page_block_text_mobile > div > .top_title_main_page {
+        font-size: 36px;
+        line-height: 42px;
+        text-align: center;
+        margin-top: 0;
+    }
+    .content_main_page_block_text_mobile > div > .bottom_title_main_page {
+        font-size: 28px;
+        line-height: 32px;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .content_main_page_block_text_mobile > div > .bottom_title_main_page > span {
+        color:#7F9FC5;
+    }
 }
 
-.top_line_text_main_page {
-    margin: 60px 0 0 0;
-    padding: 0;
-}
-.top_line_text_main_page > div {
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    text-transform: uppercase;
-    min-height: 60px;
-    height: 100%;
-    background: #E0E0E0;
-}
-
-.content_main_page {
-    position:fixed;
-    top: 20%;
-    display:flex;
-    width: 100%;
+@media screen and (max-width: 480px) and (max-height: 830px) {
+    .content_main_page {
+        top: 10%;
+    }
+    .content_main_page_block_text_mobile > div > .top_title_main_page {
+        font-size: 28px;
+        line-height: 28px;
+    }
+    .content_main_page_block_text_mobile > div > .bottom_title_main_page {
+        font-size: 24px;
+        line-height: 24px;
+        margin-top: 10px;
+    }
+    .style_form_login {
+        margin-top: 5%;
+    }
 }
 
-.style_form_login {
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
+@media screen and (min-width: 481px) {
+
+    .background_for_main_page {
+        background-image: url("../images/backgrounds/background_for_login_page.png");
+        min-height: 100%;
+        min-width: 300px;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .content_main_page {
+        position:fixed;
+        top: 20%;
+        display:flex;
+        width: 100%;
+    }
+
+    .style_form_login {
+        background: #707F99;
+        width: 340px;
+        min-width: 280px;
+        color: #ffffff;
+        height: 440px;
+        border-radius: 16px;
+        padding: 0;
+        margin-left: 60px;
+        margin-top: 10px;
+    }
+    .style_form_login > .hello-text{
+        font-size: 20px;
+        margin: 20px 0 30px 0;
+    }
+
+    .top_line_text_main_page {
+        margin: 60px 0 0 0;
+        padding: 0;
+    }
+    .top_line_text_main_page > div {
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        text-transform: uppercase;
+        min-height: 60px;
+        height: 100%;
+        background: #E0E0E0;
+    }
+
+    .content_main_page_block_text_mobile {
+        display: none;
+    }
+
+    .content_main_page_block_text_desktop {
+        width: 100%;
+        font-family: 'RobotoCondensed-Bold', serif;
+        color: #4F4F4F;
+        text-transform: uppercase;
+    }
+    .content_main_page_block_text_desktop > div {
+        display:flex;
+        width: 100%;
+        margin: 0 auto;
+        justify-content: center;
+    }
+    .content_main_page_block_text_desktop > div > .top_title_main_page {
+        font-size: 52px;
+        line-height: 61px;
+        width: 530px;
+        text-align: center;
+        margin-top: 0;
+    }
+    .content_main_page_block_text_desktop > div > .bottom_title_main_page {
+        font-size: 36px;
+        width: 453px;
+        line-height: 42px;
+        text-align: center;
+    }
+    .content_main_page_block_text_desktop > div > .bottom_title_main_page > span {
+        color:#707F99;
+    }
 }
 
 .style_error_not_user {
@@ -1251,43 +1397,11 @@ div.style_form_field_questions {
     margin-top: 10px;
 }
 
-.content_main_page_block_text {
-    width: 100%;
-    font-family: 'RobotoCondensed-Bold', serif;
-    color: #4F4F4F;
-    text-transform: uppercase;
-}
-
-.content_main_page_block_text > div {
-    display:flex;
-    width: 100%;
-    margin: 0 auto;
-    justify-content: center;
-}
-
-.top_title_main_page {
-    font-size: 52px;
-    line-height: 61px;
-    width: 530px;
-    text-align: center;
-    margin-top: 0;
-}
-
-.bottom_title_main_page {
-    font-size: 36px;
-    width: 453px;
-    line-height: 42px;
-    text-align: center;
-}
-
-.bottom_title_main_page > span {
-    color:#707F99;
-}
-
 .link_singup {
     color: #ffffff;
     font-weight: 700;
     text-decoration: none;
+    font-size: 16px;
 }
 .link_singup:hover {
     color: #ffffff;
@@ -1416,7 +1530,7 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
 ---Начало---
 */
 
-.top_line_text_about_page {
+.top_line_text_about_page,.bottom_line_text_about_page {
     margin: 0;
     padding: 0;
     display:flex;
@@ -1431,7 +1545,7 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
 
 .block_middle_content_about_page {
     margin: 0;
-    padding: 50px 40px;
+    padding: 50px 15px;
     font-size: 18px;
     display: flex;
     background: #F2F2F2;
@@ -1454,6 +1568,14 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
     line-height: 21px;
 }
 
+.about_page_media_desktop {
+    float: left;
+    padding-top: 15px;
+}
+.about_page_media_desktop > iframe {
+    padding: 0 15px 0 0;
+}
+
 @media screen and (min-width: 1600px) {
 
     .text_block_about_page > div {
@@ -1463,6 +1585,10 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
 
 .text_block_about_page > div > p{
     margin: 0;
+}
+
+.site-about {
+    margin-bottom: -20px;
 }
 
 .site-about > .navigation_blocks > .navigation_block {
@@ -2826,6 +2952,178 @@ a.link_to_instruction_page_in_modal img {
     padding-left: 10px;
     margin-bottom: 5px;
 }
+
+a.link_to_instruction_page_mobile img,
+a.link_show_search_field_mobile img {
+    width: 36px;
+}
 /* Стили для ссылкок на показ инструкции по разработке проекта
 ---Конец---
+*/
+
+
+/* Общие стили для разных страниц mobile/desktop 
+--Начало--
+*/
+@media screen and (max-width: 480px) {
+    
+    .header-title-mobile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 40px;
+        background-color: #52BE7F;
+        font-family: 'RobotoCondensed-Light', serif;
+        font-weight: 700;
+        color: #FFFFFF;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    /* Страница - О сервисе */
+    .top_line_text_about_page {
+        padding-top: 40px;
+        text-align: center;
+        font-family: 'RobotoCondensed-Bold', serif;
+        font-size: 18px;
+        color: #4F4F4F;
+        text-transform: uppercase;
+        background: #F2F2F2;
+    }
+
+    .block_middle_content_about_page {
+        padding: 0 15px;
+    }
+
+    .text_block_about_page {
+        font-size: 14px;
+        padding: 0;
+    }
+    .text_block_about_page > div {
+        margin: 0;
+        padding: 0;
+    }
+    .text_block_about_page > div > p {
+        padding-top: 10px;
+    }
+
+    .about_page_media_mobile {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0 20px 0;
+    }
+    .about_page_media_desktop {
+        display: none;
+    }
+
+    .image-tech-meeting-flatlay {
+        display: none;
+    }
+
+    .bottom_line_text_about_page {
+        padding: 40px 5px;
+        text-align: center;
+        font-family: 'RobotoCondensed-Light', serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: #4F4F4F;
+        text-transform: uppercase;
+        background: #F2F2F2;
+    }
+
+    /* Карусель на странице "О сервисе" */
+    .navigation_blocks {
+        display: none;
+    }
+    .nav_blocks_mobile {
+        background: #F2F2F2;
+    }
+    .navigation_blocks_mobile{
+        height: 100%;
+        margin: 3px;
+        border: 1px solid #C1C1C1;
+        border-radius: 8px;
+    }
+
+    .navigation_block_top_mobile {
+        background: #7F9FC5; /* Old browsers */
+        background: -moz-linear-gradient(top,  #7F9FC5 0%, #7F9FC5 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top,  #7F9FC5 0%,#7F9FC5 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom,  #7F9FC5 0%,#7F9FC5 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7F9FC5', endColorstr='#7F9FC5',GradientType=0 ); /* IE6-9 */
+        color: #ffffff;
+        overflow: hidden;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        border: 0;
+        outline: none;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+        height: 80px;
+    }
+    .navigation_block_top_mobile-text_left {
+        width: 100px;
+        text-align: center;
+        font-size: 48px;
+        font-weight: 700;
+    }
+    .navigation_block_top_mobile-text_right {
+        width: 100%;
+        line-height: 23px;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .navigation_block_bottom_mobile {
+        padding: 20px 40px 70px 40px;
+        border-radius: 0 0 8px 8px;
+        word-break: normal;
+        word-wrap: normal;
+        overflow-wrap: normal;
+    }
+
+    .site_about_block_button_create_project_desktop {
+        display: none;
+    }
+    .site_about_block_button_create_project_mobile {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    /* Значек кол-ва непрочитанных сообщений */
+    .countUnreadMessages {
+        bottom: 7px;
+        left: unset;
+        right: 26%;
+    }
+    /* Значек кол-ва непрочитанных уведомлений */
+    .countUnreadCommunications {
+        bottom: 7px;
+        left: unset;
+        right: 25%;
+    }
+}
+
+@media screen and (min-width: 481px) {
+    
+    .header-title-mobile {
+        display: none;
+    }
+    .nav_blocks_mobile {
+        display: none;
+    }
+    .about_page_media_mobile {
+        display: none;
+    }
+
+    .site_about_block_button_create_project_mobile {
+        display: none;
+    }
+}
+/* Общие стили для разных страниц mobile/desktop
+--Конец--
 */

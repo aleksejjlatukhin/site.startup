@@ -8,6 +8,7 @@ use app\models\DuplicateCommunications;
 use app\models\PatternHttpException;
 use app\models\User;
 use Throwable;
+use yii\data\Pagination;
 use yii\db\StaleObjectException;
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -56,13 +57,14 @@ class CommunicationsController extends AppUserPartController
      */
     public function actionNotifications(int $id): string
     {
-        $communications = DuplicateCommunications::find()
-            ->where(['adressee_id' => $id])
-            ->orderBy('id DESC')
-            ->all();
+        $query = DuplicateCommunications::find()->where(['adressee_id' => $id])->orderBy('id DESC');
+        $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => 20]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $communications = $query->offset($pages->offset)->limit(20)->all();
 
         return $this->render('notifications', [
             'communications' => $communications,
+            'pages' => $pages
         ]);
     }
 

@@ -508,10 +508,12 @@ class SiteController extends AppUserPartController
      */
     public function actionAbout(): string
     {
-        /*Подключение шаблона администратора в пользовательской части*/
-        if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
-            || User::isUserDev(Yii::$app->user->identity['username'])){
-            $this->layout = '@app/modules/admin/views/layouts/base';
+        // Подключение шаблона администратора в пользовательской части
+        if (!Yii::$app->user->isGuest) {
+            if (User::isUserAdmin(Yii::$app->user->identity['username']) || User::isUserMainAdmin(Yii::$app->user->identity['username'])
+                || User::isUserDev(Yii::$app->user->identity['username'])){
+                $this->layout = '@app/modules/admin/views/layouts/base';
+            }
         }
 
         return $this->render('about');

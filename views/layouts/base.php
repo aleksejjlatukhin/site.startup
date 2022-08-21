@@ -40,12 +40,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
         <div class="wrap" id="identifying_recipient_new_message-<?= $user_id ?>">
 
-            <div style="margin-bottom: -20px;">
+            <div class="nav-bar-menu-desktop">
 
                 <?php
                 NavBar::begin([
                     'id' => 'main_menu_user',
-                    'brandLabel' => Yii::$app->name = 'Spaccel',
+                    'brandLabel' => Yii::$app->name = '<div class="layout-brand-label">Spaccel</div>',
                     'brandUrl' => Yii::$app->homeUrl,
                     'brandOptions' => ['class' => 'font_nav_menu_brand'],
                     'options' => [
@@ -92,6 +92,46 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
             </div>
 
+            <div class="nav-bar-menu-mobile">
+
+                <?php
+                NavBar::begin([
+                    'id' => 'main_menu_user_mobile',
+                    'options' => ['class' => 'navbar-inverse navbar-fixed-top'],
+                    'renderInnerContainer' => false,
+                    'headerContent' => !Yii::$app->user->isGuest ? ('<div class="navbar-header-content">' . $user->getTextRole() . ': ' . (mb_strlen($user->getUsername()) > 12 ? mb_substr($user->getUsername(), 0, 10) . '...' : $user->getUsername()) . '</div>') : (''),
+                ]);
+
+                echo Nav::widget([
+                    'options' => ['class' => 'navbar-nav navbar-right font_nav_menu_link'],
+                    'items' => [
+
+                        !Yii::$app->user->isGuest ? ([
+                            'label' => $user->countUnreadCommunications ? '<div class="link_nav_bar_menu_mobile">Уведомления</div><div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>'
+                                : '<div class="link_nav_bar_menu_mobile">Уведомления</div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
+                        ]) : (''),
+
+                        !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Проекты</div>', 'url' => ['/projects/index', 'id' => $user->getId()]]) : (''),
+
+                        !Yii::$app->user->isGuest ? (
+                        ['label' => $user->countUnreadMessages ? '<div class="link_nav_bar_menu_mobile">Сообщения</div><div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>'
+                            : '<div class="link_nav_bar_menu_mobile">Сообщения</div>', 'url' => ['/message/index', 'id' => $user->getId()]]) : '',
+
+                        !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Методическое руководство</div>', 'url' => ['/site/methodological-guide']]) : '',
+
+                        ['label' => '<div class="link_nav_bar_menu_mobile">О сервисе</div>', 'url' => ['/about']],
+
+                        !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Мой профиль</div>', 'url' => Url::to(['/site/profile', 'id' => $user->getId()])]) : (''),
+                        !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Выход</div>', 'url' => Url::to(['/site/logout'])]) : (''),
+
+                        ['label' => '<div class="contacts_mobile"><div>+7 930 690 06 44</div><div>spaccel@mail.ru</div></div>']
+                    ],
+                    'encodeLabels' => false,
+                ]);
+                NavBar::end();
+                ?>
+
+            </div>
 
             <div class="container-fluid">
 
@@ -103,12 +143,15 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
         <footer class="footer">
             <div class="container-fluid">
-                <div class="row">
+                <div class="row footer_desktop">
                     <div class="col-xs-7 col-sm-9 col-lg-10">&copy; СТАРТПУЛ, <?= date('Y') ?></div>
                     <div class="col-xs-5 col-sm-3 col-lg-2">
                         <div>тел: +7 930 690 06 44</div>
                         <div>e-mail: spaccel@mail.ru</div>
                     </div>
+                </div>
+                <div class="row footer_mobile pull-right">
+                    <div class="col-xs-12">&copy; СТАРТПУЛ, <?= date('Y') ?></div>
                 </div>
             </div>
         </footer>

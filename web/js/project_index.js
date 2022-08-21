@@ -58,6 +58,15 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 });
 
 
+// Показать форму поиска проектов
+$(body).on('click', '.show_search_projects', function (e) {
+
+    $('.search_block_mobile').toggle('display');
+    e.preventDefault();
+    return false;
+});
+
+
 //Отслеживаем изменения в форме создания проекта и записываем их в кэш
 $(body).on('change', 'form#project_create_form', function(){
 
@@ -277,15 +286,9 @@ $(body).on('beforeSubmit', '#project_update_form', function(e){
 // При нажатии на иконку разрешить экспертизу
 $(body).on('click', '.link-enable-expertise', function (e) {
 
-    var formData = new FormData();
-    formData.append('type_sort_id', $('#listType').val());
-
     $.ajax({
         url: $(this).attr('href'),
         method: 'POST',
-        processData: false,
-        contentType: false,
-        data:  formData,
         cache: false,
         success: function(response){
 
@@ -528,36 +531,4 @@ $(body).on('click', '.remove-author', function(){
     }
 
     $(hypothesis_update_modal).find('.row-author-' + numberId).remove();
-});
-
-
-
-//Сортировка проектов
-$('#listType').change(function(){
-
-    var current_url = window.location.href;
-    current_url = current_url.split('=');
-    var current_id = current_url[1];
-
-    var select_value = $('#listType').val();
-
-    if (select_value !== null) {
-
-        var url = '/projects/sorting-models?current_id=' + current_id + '&type_sort_id=' + select_value;
-
-        $.ajax({
-            url: url,
-            method: 'POST',
-            cache: false,
-            success: function(response){
-
-                $('.block_all_projects_user').html(response.renderAjax);
-
-            },
-            error: function(){
-                alert('Ошибка');
-            }
-        });
-    }
-
 });

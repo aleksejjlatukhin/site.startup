@@ -204,3 +204,9 @@ table tr td {
         width: 40%;
     }
 }
+
+@media screen and (max-width: 480px) {
+    h2.main-header {
+        display: none;
+    }
+}

@@ -9,12 +9,12 @@ use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
+use app\models\forms\SearchForm;
 use app\models\PatternHttpException;
 use app\models\PreFiles;
 use app\models\ProjectSort;
 use app\models\Roadmap;
 use app\models\Segments;
-use app\models\SortForm;
 use app\models\User;
 use app\models\UserAccessToProjects;
 use kartik\mpdf\Pdf;
@@ -258,16 +258,27 @@ class ProjectsController extends AppUserPartController
         $user = User::findOne($id);
         $condition = $project_id ? ['user_id' => $id, 'id' => $project_id] : ['user_id' => $id];
         $models = Projects::findAll($condition);
+        $searchForm = new SearchForm();
 
         if (!$models) {
             return $this->redirect(['/projects/instruction', 'id' => $id]);
+        }
+
+        if ($searchForm->load(Yii::$app->request->post())) {
+
+            $models = Projects::find()
+                ->where($condition)
+                ->andWhere(['or',
+                    ['like', 'project_name', $searchForm->search],
+                    ['like', 'project_fullname', $searchForm->search],
+                ])->all();
         }
 
         return $this->render('index', [
             'user' => $user,
             'models' => $models,
             'new_author' => new Authors(),
-            'sortModel' => new SortForm(),
+            'searchForm' => new SearchForm(),
         ]);
     }
 
@@ -394,29 +405,12 @@ class ProjectsController extends AppUserPartController
                         $cachePath = $model::getCachePath($user);
                         $model->_cacheManager->deleteCache(mb_substr($cachePath, 0, -1));
 
-                        //Проверка наличия сортировки
-                        $type_sort_id = $_POST['type_sort_id'];
-
-                        if ($type_sort_id !== '') {
-
-                            $sort = new ProjectSort();
-
-                            $response =  [
-                                'success' => true, 'count' => Projects::find()->where(['user_id' => $user->getId()])->count(),
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => $sort->fetchModels($user->getId(), $type_sort_id),
-                                ]),
-                            ];
-
-                        } else {
-
-                            $response =  [
-                                'success' => true,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => Projects::findAll(['user_id' => $user->getId()]),
-                                ]),
-                            ];
-                        }
+                        $response =  [
+                            'success' => true,
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Projects::findAll(['user_id' => $user->getId()]),
+                            ]),
+                        ];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;
@@ -582,29 +576,12 @@ class ProjectsController extends AppUserPartController
 
                     if ($model->updateProject()){
 
-                        //Проверка наличия сортировки
-                        $type_sort_id = $_POST['type_sort_id'];
-
-                        if ($type_sort_id !== '') {
-
-                            $sort = new ProjectSort();
-
-                            $response =  [
-                                'success' => true,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => $sort->fetchModels($user->getId(), $type_sort_id),
-                                ]),
-                            ];
-
-                        } else {
-
-                            $response =  [
-                                'success' => true,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => Projects::findAll(['user_id' => $user->getId()]),
-                                ]),
-                            ];
-                        }
+                        $response =  [
+                            'success' => true,
+                            'renderAjax' => $this->renderAjax('_index_ajax', [
+                                'models' => Projects::findAll(['user_id' => $user->getId()]),
+                            ]),
+                        ];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;
@@ -642,27 +619,11 @@ class ProjectsController extends AppUserPartController
                 // ToDo: Если на проект назначены эксперты отправить им уведомление о том,
                 // ToDo: что проектант разрешил экспертизу по этапу проекта, а так же уведомление трекеру
 
-                //Проверка наличия сортировки
-                $type_sort_id = $_POST['type_sort_id'];
-
-                if ($type_sort_id !== '') {
-
-                    $sort = new ProjectSort();
-
-                    $response = [
-                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'models' => $sort->fetchModels($project->getUserId(), $type_sort_id),
-                        ]),
-                    ];
-
-                } else {
-
-                    $response = [
-                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'models' => Projects::findAll(['user_id' => $project->getUserId()]),
-                        ]),
-                    ];
-                }
+                $response = [
+                    'renderAjax' => $this->renderAjax('_index_ajax', [
+                        'models' => Projects::findAll(['user_id' => $project->getUserId()]),
+                    ]),
+                ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;

@@ -6,23 +6,16 @@ var body = $('body');
 var user_id = window.location.search.split('=')[1];
 var delete_unused_image = true; // Проверка на необходимость удалить неиспользованное загруженное фото
 
-// Скрыть просмотр профиля и показать форму редактирования профиля
-$(body).on('click', '#show_form_update_data', function () {
-    $('.view_user_form').hide();
-    $('.update_user_form').show();
-});
-
-// Скрыть просмотр профиля и показать форму изменения пароля
+// Скрыть редактирование профиля и показать форму изменения пароля
 $(body).on('click', '#show_form_change_password', function () {
-    $('.view_user_form').hide();
+    $('.update_user_form').hide();
     $('.change_password_content').show();
 });
 
 // Скрыть все формы и показать просмотр профиля
-$(body).on('click', '.show_form_view_data', function () {
-    $('.update_user_form').hide();
+$(body).on('click', '.show_form_update_profile', function () {
     $('.change_password_content').hide();
-    $('.view_user_form').show();
+    $('.update_user_form').show();
 });
 
 // Сохранение формы редактирования профиля
@@ -44,27 +37,21 @@ $(body).on('beforeSubmit', '#update_data_profile', function(e){
 
             if (response.error_uniq_email) {
                 $(modal_error).modal('show');
-                $(modal_error).find('.modal-body').append('<h4> - почтовый адрес уже зарегистрирован;</h4>');
+                $(modal_error).find('.modal-body').append('<h4> - почтовый адрес уже зарегистрирован</h4>');
             }
             if (response.error_uniq_username) {
                 $(modal_error).modal('show');
-                $(modal_error).find('.modal-body').html('<h4> - логин уже зарегистрирован;</h4>');
-            }
-            if (response.error_match_username) {
-                $(modal_error).modal('show');
-                $(modal_error).find('.modal-body').append('<h4> - логин должен содержать только латинские символы и цыфры, не допускается использование пробелов;</h4>');
+                $(modal_error).find('.modal-body').html('<h4> - логин уже зарегистрирован</h4>');
             }
             if (response.error_send_email) {
                 $(modal_error).modal('show');
-                $(modal_error).find('.modal-body').append('<h4> - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;</h4>');
+                $(modal_error).find('.modal-body').append('<h4> - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес</h4>');
             }
             if (response.success) {
-                // Скрыть форму редактирования профиля и показать просмотр профиля
-                $('.show_form_view_data').trigger('click');
-                // Обновляем контент страницы
-                $('.data_user_content').html(response.renderAjax);
                 // Меняем название ссылки выхода
                 $('a[href^=\'/logout\']').find('span').html('Выход (' + response.user.username + ')');
+                var navbarHeaderContent = $('body').find('.navbar-header-content').html();
+                $('body').find('.navbar-header-content').html(navbarHeaderContent.split(':')[0] + ': ' + response.user.username);
             }
 
         }, error: function(){

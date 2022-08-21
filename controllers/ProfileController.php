@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\ClientSettings;
-use app\models\ClientUser;
 use app\models\forms\AvatarForm;
 use app\models\forms\PasswordChangeForm;
 use app\models\forms\ProfileForm;
@@ -132,30 +131,15 @@ class ProfileController extends AppUserPartController
         if (Yii::$app->request->isAjax) {
 
             $model = new ProfileForm($id);
-
             if ($model->load(Yii::$app->request->post())){
-
                 if ($model->validate()) {
-
                     if ($model->update()){
-
                         if ($model->checking_mail_sending) {
-
-                            $user = User::findOne($id);
-
-                            $response = [
-                                'success' => true, 'user' => User::findOne($id),
-                                'renderAjax' => $this->renderAjax('ajax_data_profile', [
-                                    'user' => $user, 'profile' => new ProfileForm($id),
-                                    'passwordChangeForm' => new PasswordChangeForm($user), 'avatarForm' => new AvatarForm($id),
-                                ]),
-                            ];
+                            $response = ['success' => true, 'user' => User::findOne($id)];
                             Yii::$app->response->format = Response::FORMAT_JSON;
                             Yii::$app->response->data = $response;
                             return $response;
-
                         }
-
                         //Письмо с уведомлением не отправлено
                         $response = ['error_send_email' => true];
                         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -167,7 +151,6 @@ class ProfileController extends AppUserPartController
 
                     $response = [
                         'error_uniq_email' => false,
-                        'error_match_username' => false,
                         'error_uniq_username' => false,
                     ];
 
@@ -177,10 +160,6 @@ class ProfileController extends AppUserPartController
 
                     if ($model->uniq_username === false) {
                         $response['error_uniq_username'] = true;
-                    }
-
-                    if ($model->match_username === false) {
-                        $response['error_match_username'] = true;
                     }
 
                     Yii::$app->response->format = Response::FORMAT_JSON;

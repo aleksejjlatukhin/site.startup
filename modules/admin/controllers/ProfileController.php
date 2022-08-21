@@ -172,10 +172,6 @@ class ProfileController extends AppAdminController
                         $response['error_uniq_username'] = true;
                     }
 
-                    if ($model->match_username === false) {
-                        $response['error_match_username'] = true;
-                    }
-
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;

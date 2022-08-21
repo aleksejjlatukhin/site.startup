@@ -33,6 +33,10 @@ use app\models\StageExpertise;
 
         <div class="col-lg-3">
 
+            <div class="header_table_project_mobile">
+                Результат интеллектуальной деятельности
+            </div>
+
             <div class="text_14_table_project" title="<?= $model->getRid() ?>">
                 <?= $model->getRid() ?>
             </div>
@@ -41,13 +45,17 @@ use app\models\StageExpertise;
 
         <div class="col-lg-2">
 
+            <div class="header_table_project_mobile">
+                Базовая технология
+            </div>
+
             <div class="text_14_table_project" title="<?= $model->getTechnology() ?>">
                 <?= $model->getTechnology() ?>
             </div>
 
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-4 part_project_table_desktop">
 
             <div style="display:flex; align-items: center; justify-content: space-between; padding-right: 15px;">
 
@@ -73,7 +81,7 @@ use app\models\StageExpertise;
                                 'font-size' => '18px',
                                 'border-radius' => '8px',
                             ]
-                        ]); ?>
+                        ]) ?>
 
                     <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
@@ -90,7 +98,7 @@ use app\models\StageExpertise;
                                 'font-size' => '18px',
                                 'border-radius' => '8px',
                             ]
-                        ]); ?>
+                        ]) ?>
 
                     <?php endif; ?>
 
@@ -102,7 +110,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-enable-expertise',
                                 'style' => ['margin-left' => '20px'],
                                 'title' => 'Разрешить экспертизу',
-                            ]); ?>
+                            ]) ?>
 
                         <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
@@ -110,7 +118,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-get-list-expertise',
                                 'style' => ['margin-left' => '20px'],
                                 'title' => 'Смотреть экспертизу',
-                            ]); ?>
+                            ]) ?>
 
                         <?php endif; ?>
 
@@ -118,12 +126,12 @@ use app\models\StageExpertise;
                             'class' => 'update-hypothesis',
                             'style' => ['margin-left' => '10px'],
                             'title' => 'Редактировать',
-                        ]); ?>
+                        ]) ?>
 
                         <?= Html::a(Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '24px']]),['/projects/delete', 'id' => $model->getId()], [
                             'class' => 'delete_hypothesis',
                             'title' => 'Удалить',
-                        ]); ?>
+                        ]) ?>
 
                     <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
@@ -134,7 +142,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-enable-expertise',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Экспертиза не разрешена',
-                            ]); ?>
+                            ]) ?>
 
                         <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
 
@@ -142,7 +150,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-get-list-expertise',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Экспертиза',
-                            ]); ?>
+                            ]) ?>
 
                         <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
 
@@ -150,7 +158,7 @@ use app\models\StageExpertise;
                                 'onclick' => 'return false;',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Экспертиза не доступна',
-                            ]); ?>
+                            ]) ?>
 
                         <?php endif; ?>
 
@@ -158,7 +166,7 @@ use app\models\StageExpertise;
                             'class' => 'openAllInformationProject',
                             'style' => ['margin-left' => '8px'],
                             'title' => 'Смотреть описание проекта',
-                        ]); ?>
+                        ]) ?>
 
                     <?php else : ?>
 
@@ -169,7 +177,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-enable-expertise',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Экспертиза не разрешена',
-                            ]); ?>
+                            ]) ?>
 
                         <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
@@ -177,7 +185,7 @@ use app\models\StageExpertise;
                                 'class' => 'link-get-list-expertise',
                                 'style' => ['margin-left' => '30px'],
                                 'title' => 'Смотреть экспертизу',
-                            ]); ?>
+                            ]) ?>
 
                         <?php endif; ?>
 
@@ -185,12 +193,88 @@ use app\models\StageExpertise;
                             'class' => 'openAllInformationProject',
                             'style' => ['margin-left' => '8px'],
                             'title' => 'Смотреть описание проекта',
-                        ]); ?>
+                        ]) ?>
 
                     <?php endif; ?>
 
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-4 part_project_table_mobile">
+
+            <div class="project_dates_mobile">
+                <div class="project_created_at">
+                    <div>Создан:</div>
+                    <div><?= date('d.m.y', $model->getCreatedAt()) ?></div>
+                </div>
+                <div class="project_updated_at">
+                    <div>Изменен:</div>
+                    <div><?= date('d.m.y', $model->getUpdatedAt()) ?></div>
+                </div>
+            </div>
+
+            <div class="project_buttons_mobile">
+
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                        <?= Html::a('Запросить экспертизу', ['/projects/enable-expertise', 'id' => $model->getId()], [
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '50%',
+                                'height' => '36px',
+                                'background' => '#F5A4A4',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '0',
+                                'font-size' => '18px',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                        <?= Html::a('См. экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '50%',
+                                'height' => '36px',
+                                'background' => '#7F9FC5',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '0',
+                                'font-size' => '18px',
+                            ],
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                    <?= Html::a('Редактировать', ['/projects/get-hypothesis-to-update', 'id' => $model->getId()], [
+                        'class' => 'btn btn-default update-hypothesis',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '50%',
+                            'height' => '36px',
+                            'background' => '#4F4F4F',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '0',
+                            'font-size' => '18px',
+                        ],
+                    ]) ?>
+                <?php endif; ?>
+
+            </div>
+        </div>
+
     </div>
 <?php endforeach;?>

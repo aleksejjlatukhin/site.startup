@@ -24,7 +24,6 @@ class ProfileForm extends Model
     public $username;
     public $email;
     public $uniq_username = true;
-    public $match_username = true;
     public $uniq_email = true;
     public $checking_mail_sending = true;
 
@@ -35,11 +34,10 @@ class ProfileForm extends Model
     public function rules(): array
     {
         return [
-            [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
+            [['uniq_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
             [['username', 'email'], 'required'],
             [['username', 'email'], 'trim'],
             [['email'], 'string', 'max' => 255],
-            ['username', 'matchUsername'],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
         ];
@@ -93,23 +91,6 @@ class ProfileForm extends Model
                 $this->uniq_username = false;
                 $this->addError($attr, 'Этот логин уже занят.');
             }
-        }
-    }
-
-
-    /**
-     * @param $attr
-     */
-    public function matchUsername($attr): void
-    {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
-            $this->match_username = false;
-            $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
-        }
-
-        if (preg_match('/\s+/',$this->username)) {
-            $this->match_username = false;
-            $this->addError($attr, 'Не допускается использование пробелов');
         }
     }
 
