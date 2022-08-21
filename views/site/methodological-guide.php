@@ -9,7 +9,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <div class="methodological-guide">
 
     <div class="row">
-        <div class="col-xs-12 header-title-mobile"><?= $this->title ?></div>
+        <div class="col-xs-12 header-title-mobile">Методическое руководство</div>
     </div>
 
     <h2 class="main-header"><?= $this->title ?></h2>
