@@ -33,6 +33,7 @@ class LoginForm extends Model
         return [
             ['identity', 'filter', 'filter' => 'trim'],
             ['identity', 'required'],
+            ['identity', 'string'],
             ['rememberMe', 'boolean'],
             ['password', 'validatePassword'],
         ];
@@ -88,8 +89,8 @@ class LoginForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false) {
-            $this->_user = User::findIdentityByUsernameOrEmail($this->identity);
+        if (($this->_user === false) && $user = User::findIdentityByUsernameOrEmail($this->identity)) {
+            $this->_user = $user;
         }
         return $this->_user;
     }

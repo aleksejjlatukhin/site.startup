@@ -312,7 +312,7 @@ class SiteController extends AppUserPartController
                 $user = $model->getUser();
 
                 //Если пользователь не подтвердил регистрацию и ввел верно пароль
-                if ($user->getConfirm() === User::NOT_CONFIRM && $user->validatePassword($model->getPassword()) === true) {
+                if ($user && $user->getConfirm() === User::NOT_CONFIRM && $user->validatePassword($model->getPassword()) === true) {
 
                     //Если ключ активации регистрационной ссылки просрочен, то отправить новое письмо
                     if ($user::isSecretKeyExpire($user->secret_key) < time()) {
