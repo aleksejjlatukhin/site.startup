@@ -114,9 +114,9 @@ $this->title = 'Главная';
 
                 <div class="row style_error_not_user">
 
-                    <div class="col-md-12 text-center" style="font-size: 20px; margin: 25px 0 45px 0;">Не верный ввод!</div>
+                    <div class="col-md-12 text-center top-text">Не верный ввод!</div>
 
-                    <div class="col-md-12 text-center" style=" margin: 45px 0 70px 0;">Поля логин и пароль введены не верно или несоответствуют друг другу.</div>
+                    <div class="col-md-12 text-center text-content">Поля логин и пароль введены не верно или несоответствуют друг другу.</div>
 
                     <div class="col-md-12 text-center" style="margin-top: 30px;">
 
@@ -129,14 +129,16 @@ $this->title = 'Главная';
                                 'border-radius' => '8px',
                                 'width' => '170px',
                                 'height' => '40px',
-                                'font-size' => '16px',
-                                'font-weight' => '700'
+                                'font-size' => '18px',
+                                'font-weight' => '700',
+                                'text-transform' => 'uppercase',
+                                'padding-top' => '9px'
                             ]
                         ]) ?>
 
                     </div>
 
-                    <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
+                    <div class="col-md-12 text-center" style="margin-top: 17px; margin-bottom: 10px; font-size: 14px;">или</div>
 
                     <div class="col-md-12 text-center">
                         <?= Html::a('Вернуться назад',['#'], [
@@ -151,9 +153,9 @@ $this->title = 'Главная';
 
                 <div class="row style_go_password_recovery_for_email">
 
-                    <div class="col-md-12 text-center" style="font-size: 20px; margin: 25px 0 45px 0;">Восстановление пароля</div>
+                    <div class="col-md-12 text-center top-text">Восстановление пароля</div>
 
-                    <div class="col-md-12 text-center" style="margin: 45px 0 15px 0;">Введите адрес электронной почты (указанный при регистрации)</div>
+                    <div class="col-md-12 text-center text-content">Введите адрес электронной почты (указанный при регистрации)</div>
 
                     <?php $form = ActiveForm::begin([
                         'id' => 'form_send_email',
@@ -174,7 +176,7 @@ $this->title = 'Главная';
 
                     </div>
 
-                    <div class="col-md-12 text-center" style="margin-top: 45px;">
+                    <div class="col-md-12 text-center" style="margin-top: 58px;">
 
                         <?= Html::submitButton('Отправить', [
                             'class' => 'btn btn-default',
@@ -185,14 +187,16 @@ $this->title = 'Главная';
                                 'border-radius' => '8px',
                                 'width' => '170px',
                                 'height' => '40px',
-                                'font-size' => '16px',
-                                'font-weight' => '700'
+                                'font-size' => '18px',
+                                'font-weight' => '700',
+                                'text-transform' => 'uppercase',
+                                'padding-top' => '9px'
                             ]
                         ]) ?>
 
                     </div>
 
-                    <div class="col-md-12 text-center" style="margin-top: 15px; margin-bottom: 5px;">или</div>
+                    <div class="col-md-12 text-center" style="margin-top: 17px; margin-bottom: 10px; font-size: 14px;"">или</div>
 
                     <div class="col-md-12 text-center">
                         <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go_to_back_login_form']) ?>
@@ -205,11 +209,11 @@ $this->title = 'Главная';
 
                 <div class="row style_answer_for_password_recovery">
 
-                    <div class="col-md-12 text-center title" style="font-size: 20px; margin: 25px 0 45px 0;"></div>
+                    <div class="col-md-12 text-center title top-text"></div>
 
-                    <div class="col-md-12 text-center text" style="margin: 45px 0 0 0;"></div>
+                    <div class="col-md-12 text-center text text-content"></div>
 
-                    <div class="col-md-12 text-center link_back" style="position: absolute; bottom: 0; height: 45px;">
+                    <div class="col-md-12 text-center link_back">
                         <?= Html::a('Вернуться назад',['#'], ['onclick' => 'return false', 'class' => 'link_singup', 'id' => 'go2_to_back_login_form']) ?>
                     </div>
 

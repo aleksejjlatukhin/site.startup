@@ -1159,7 +1159,12 @@ div.style_form_field_questions {
         display: none;
     }
 
-    .style_form_login {
+    .style_form_login,
+    .style_error_not_user,
+    .style_go_password_recovery_for_email,
+    .style_answer_for_password_recovery,
+    .style_password_recovery_for_email,
+    .style_form_reset_password {
         background: #707F99;
         width: 280px;
         min-width: 280px;
@@ -1205,6 +1210,52 @@ div.style_form_field_questions {
     .content_main_page_block_text_mobile > div > .bottom_title_main_page > span {
         color:#7F9FC5;
     }
+
+    .style_error_not_user,
+    .style_go_password_recovery_for_email,
+    .style_answer_for_password_recovery {
+        display: none;
+    }
+
+    .style_error_not_user > .top-text,
+    .style_go_password_recovery_for_email > .top-text,
+    .style_answer_for_password_recovery > .top-text,
+    .style_form_reset_password > .top-text {
+        font-size: 20px;
+        margin: 20px 0 50px 0;
+    }
+    .style_error_not_user > .text-content {
+        font-size: 16px;
+        margin: 85px 0 70px 0;
+    }
+
+    .style_go_password_recovery_for_email > .text-content {
+        font-size: 16px;
+        margin: 60px 0 15px 0;
+    }
+
+    .style_answer_for_password_recovery > .text-content {
+        font-size: 16px;
+        margin: 112px 0 130px 0;
+    }
+
+    .style_password_recovery_for_email > .top-text {
+        font-size: 20px;
+        margin: 20px 0 20px 0;
+    }
+    .style_password_recovery_for_email > .text-content {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .style_password_recovery_for_email > .text-bottom {
+        font-size: 16px;
+        margin: 5px 0 30px 0;
+    }
+
+    .style_form_reset_password > .text-content {
+        font-size: 16px;
+        margin: 100px 0 10px 0;
+    }
 }
 
 @media screen and (max-width: 480px) and (max-height: 830px) {
@@ -1220,7 +1271,12 @@ div.style_form_field_questions {
         line-height: 24px;
         margin-top: 10px;
     }
-    .style_form_login {
+    .style_form_login,
+    .style_error_not_user,
+    .style_go_password_recovery_for_email,
+    .style_answer_for_password_recovery,
+    .style_password_recovery_for_email,
+    .style_form_reset_password {
         margin-top: 5%;
     }
 }
@@ -1252,7 +1308,12 @@ div.style_form_field_questions {
         width: 100%;
     }
 
-    .style_form_login {
+    .style_form_login,
+    .style_error_not_user,
+    .style_go_password_recovery_for_email,
+    .style_answer_for_password_recovery,
+    .style_password_recovery_for_email,
+    .style_form_reset_password {
         background: #707F99;
         width: 340px;
         min-width: 280px;
@@ -1315,72 +1376,50 @@ div.style_form_field_questions {
     .content_main_page_block_text_desktop > div > .bottom_title_main_page > span {
         color:#707F99;
     }
-}
 
-.style_error_not_user {
-    display: none;
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
-}
+    .style_error_not_user,
+    .style_go_password_recovery_for_email,
+    .style_answer_for_password_recovery {
+        display: none;
+    }
 
-.style_go_password_recovery_for_email {
-    display: none;
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
-}
+    .style_error_not_user > .top-text,
+    .style_go_password_recovery_for_email > .top-text,
+    .style_answer_for_password_recovery > .top-text,
+    .style_password_recovery_for_email > .top-text,
+    .style_form_reset_password > .top-text {
+        font-size: 20px;
+        margin: 20px 0 50px 0;
+    }
+    .style_error_not_user > .text-content {
+        font-size: 16px;
+        margin: 63px 0 45px 0;
+    }
 
-.style_password_recovery_for_email {
-    position: relative;
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
-}
+    .style_go_password_recovery_for_email > .text-content {
+        font-size: 16px;
+        margin: 22px 0 15px 0;
+    }
 
-.style_answer_for_password_recovery {
-    display: none;
-    position: relative;
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
-}
+    .style_answer_for_password_recovery > .text-content {
+        font-size: 16px;
+        margin: 95px 0 130px 0;
+    }
 
-.style_form_reset_password {
-    position: relative;
-    background: #707F99;
-    width: 340px;
-    min-width: 280px;
-    color: #ffffff;
-    height: 440px;
-    border-radius: 16px;
-    padding: 0;
-    margin-left: 60px;
-    margin-top: 10px;
+    .style_password_recovery_for_email > .text-content {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .style_password_recovery_for_email > .text-bottom {
+        font-size: 16px;
+        margin: 5px 0 30px 0;
+    }
+
+    .style_form_reset_password > .text-content {
+        font-size: 16px;
+        margin: 80px 0 10px 0;
+    }
 }
 
 .style_error_not_confirm_singup {
