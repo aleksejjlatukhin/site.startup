@@ -2116,6 +2116,286 @@ a.link_in_column_result_table:focus {
         width: 80px;
     }
 }
+
+/* Для мобильной версии */
+
+@media screen and (max-width: 480px) {
+
+    .projectsResultMobile {
+        position: relative;
+    }
+    .projectsResultMobile > .block-project-name {
+        display: block;
+        margin: 20px auto;
+    }
+    .projectsResultMobile > .block-project-name > div {
+        display: inline-flex;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 5px;
+        align-items: center;
+        justify-content: center;
+        background: #D9D9D9;
+        border: 4px solid #4F4F4F;
+        border-radius: 4px;
+        min-width: 45%;
+        min-height: 40px;
+        font-size: 14px;
+    }
+
+    .projectsResultMobile .line-project {
+        border: 2px solid #4F4F4F;
+        position: absolute;
+        top: 35px;
+    }
+
+    .projectsResultMobile > .block-segment-margin {
+        margin-top: 20px;
+        margin-left: 7%;
+    }
+    .projectsResultMobile > .block-segment-margin > .block-segment {
+        position: relative;
+        display: block;
+        width: 40%;
+    }
+    .block-segment > .line-segment {
+        border: 1px solid #4F4F4F;
+        position: absolute;
+        left: 25%;
+    }
+
+    .block-segment .line-content {
+        position: absolute;
+        top: 15px;
+        border: 1px solid #4F4F4F;
+        left: -19%;
+        width: 19%;
+    }
+
+    .projectsResultMobile .block-problem-margin {
+        margin-top: 20px;
+        margin-left: 20%;
+    }
+    .block-problem-margin > .block-problem {
+        display: block;
+        width: 50%;
+    }
+    .block-problem > .line-problem {
+        border: 1px solid #4F4F4F;
+        position: absolute;
+        left: 35%;
+    }
+    .block-problem .line-content {
+        position: absolute;
+        top: 15px;
+        border: 1px solid #4F4F4F;
+        left: -25%;
+        width: 25%;
+    }
+
+    .projectsResultMobile .block-gcp-margin {
+        margin-top: 20px;
+        margin-left: 25%;
+    }
+    .block-gcp-margin > .block-gcp {
+        display: block;
+        width: 67%;
+    }
+    .block-gcp .line-content {
+        position: absolute;
+        top: 15px;
+        border: 1px solid #4F4F4F;
+        left: -25%;
+        width: 25%;
+    }
+    .block-gcp > .line-gcp {
+        border: 1px solid #4F4F4F;
+        position: absolute;
+        left: 53%;
+    }
+
+    .projectsResultMobile .block-mvp-margin {
+        margin-top: 20px;
+        margin-left: 33%;
+    }
+    .block-mvp-margin > .block-mvp {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+    .block-mvp .line-content {
+        position: absolute;
+        top: 15px;
+        border: 1px solid #4F4F4F;
+        left: -26%;
+        width: 26%;
+    }
+    .block-mvp > .line-mvp {
+        border: 1px solid #4F4F4F;
+        position: absolute;
+        left: 25%;
+        top: 100%;
+        height: 71%;
+    }
+
+    .projectsResultMobile .block-business-model-margin {
+        margin-top: 20px;
+        margin-left: 50%;
+    }
+    .block-business-model-margin > .block-business-model {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+    .block-business-model .line-content {
+        position: absolute;
+        top: 38px;
+        border: 1px solid #4F4F4F;
+        left: -50%;
+        width: 50%;
+    }
+
+    .projectsResultMobile .content {
+        position: relative;
+        border-width: 0 1px 1px 1px;
+        border-style: solid;
+        border-color: #4F4F4F;
+        border-radius: 0 0 4px 4px;
+        width: 100%;
+        min-height: 40px;
+    }
+    .projectsResultMobile .truncate-text {
+        overflow: hidden;
+        max-height: 40px;
+        width: inherit;
+        font-size: 12px;
+        padding: 3px;
+    }
+    .projectsResultMobile .content-bottom-incomplete,
+    .projectsResultMobile .content-bottom-complete,
+    .projectsResultMobile .content-bottom-not_completed {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 20px;
+        width: inherit;
+    }
+    .projectsResultMobile .content-bottom-incomplete > .date-created_at {
+        display: flex;
+        flex-grow: 1;
+        font-size: 10px;
+        justify-content: center;
+    }
+    .projectsResultMobile .content-bottom-complete > .date-created_at,
+    .projectsResultMobile .content-bottom-not_completed > .date-created_at {
+        display: flex;
+        font-size: 10px;
+        justify-content: center;
+        width: 50%;
+    }
+    .projectsResultMobile .content-bottom-incomplete > .block-button-confirm {
+        display: flex;
+        width: 50%;
+    }
+    .projectsResultMobile .content-bottom-complete > .date-confirm,
+    .projectsResultMobile .content-bottom-not_completed > .date-confirm {
+        display: flex;
+        font-size: 10px;
+        justify-content: center;
+        width: 50%;
+        font-weight: 700;
+    }
+
+    .link-confirm-result-mobile {
+        display: flex;
+        padding: 3px;
+        align-items: center;
+        border: 1px solid #4F4F4F;
+        border-radius: 4px 4px 0 0;
+        width: 100%;
+        height: 20px;
+        color: #FFFFFF;
+        font-size: 12px;
+        text-decoration: none;
+    }
+    .bg-grey {
+        background: #d9d9d9;
+    }
+    .bg-green {
+        background: #52BE7F;
+    }
+    .bg-red {
+        background: #F5A4A4;
+    }
+    .color-red {
+        color: #F5A4A4;
+    }
+
+    .button-confirm-result-mobile {
+        display: flex;
+        width: 100%;
+        height: 20px;
+        background: #7f9fc5;
+        color: #FFFFFF;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0 0 4px 0;
+        border-width: 1px 0 0 1px;
+        border-style: solid;
+        border-color: #4F4F4F;
+        font-size: 10px;
+        text-decoration: none;
+    }
+    .button-confirm-result-mobile:focus {
+        color: #FFFFFF;
+        text-decoration: none;
+    }
+
+    .button-business-model-result-mobile {
+        display: flex;
+        text-align: center;
+        padding: 3px;
+        align-items: center;
+        background: #52BE7F;
+        border: 1px solid #4F4F4F;
+        border-radius: 4px 4px 0 0;
+        width: 100%;
+        height: 40px;
+        color: #FFFFFF;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+    .button-close-result-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #F5A4A4;
+        color: #ffffff;
+        width: 140px;
+        height: 40px;
+        font-size: 16px;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding-top: 9px;
+        border-radius: 8px;
+        margin-top: 28px;
+    }
+    .button-business-model-result-mobile:focus,
+    .button-close-result-mobile:focus {
+        color: #FFFFFF;
+        text-decoration: none;
+    }
+}
+
+@media screen and (min-width: 481px) {
+
+    .projectsResultMobile,
+    .button-close-result-mobile {
+        display: none;
+    }
+}
+
 /* Стилизация сводной таблицы проекта
 ---Конец---
 */
@@ -3164,5 +3444,71 @@ a.link_show_search_field_mobile img {
     }
 }
 /* Общие стили для разных страниц mobile/desktop
+--Конец--
+*/
+
+
+/* Общие стили для разных страниц
+--Начало--
+*/
+
+.header_hypothesis_first_index {
+    display: flex;
+    text-align: center;
+    background: #52BE7F;
+    font-size: 24px;
+    color: #FFFFFF;
+    font-weight: 700;
+    margin: 0 -15px 20px -15px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.header_hypothesis_modal {
+    text-align: center;
+    background: #52BE7F;
+    font-size: 24px;
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.modal-header > .close {
+    font-size: 32px;
+}
+
+.pl-20 {
+    padding-left: 20px;
+}
+.pl-5 {
+    padding-left: 5px;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+@media screen and (max-width: 480px) {
+    .desktop-mb-15 {
+        margin-bottom: 0;
+    }
+    .mobile-mt-15 {
+        margin-top: 15px;
+    }
+    .header_hypothesis_first_index {
+        padding: 7px;
+    }
+}
+
+@media screen and (min-width: 481px) {
+    .desktop-mb-15 {
+        margin-bottom: 15px;
+    }
+    .mobile-mt-15 {
+        margin-top: 0;
+    }
+}
+
+/* Общие стили для разных страниц
 --Конец--
 */

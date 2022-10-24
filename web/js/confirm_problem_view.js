@@ -41,6 +41,9 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
         cache: false,
         success: function(response){
 
+            if ($(modal).find('.modal-header').find('.modal-header-text-append').length === 0) {
+                $(modal).find('.modal-header').append('<div class="modal-header-text-append">Этап 4. Подтверждение гипотез проблем сегментов</div>');
+            }
             $(modal).find('.modal-body').html(response);
             $(modal).modal('show');
         },

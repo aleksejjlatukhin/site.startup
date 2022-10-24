@@ -746,6 +746,24 @@ class ProjectsController extends AppUserPartController
     }
 
 
+    public function actionGetPresentation(int $id)
+    {
+        $project = Projects::findOne($id);
+
+        if(Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_presentation_ajax', ['project' => $project]),
+                'project' => $project,
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
     /**
      * @param int $id
      * @return array|bool
@@ -766,6 +784,22 @@ class ProjectsController extends AppUserPartController
             return $response;
         }
         return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionResultMobile(int $id): string
+    {
+        $project = Projects::findOne($id);
+        $segments = $project->segments;
+
+        return $this->render('result-mobile', [
+            'project' => $project,
+            'segments' => $segments
+        ]);
     }
 
 
@@ -1148,11 +1182,11 @@ class ProjectsController extends AppUserPartController
 
 
     /**
-     * @param int $id
+     * @param int|string $id
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionDeleteAuthor(int $id): void
+    public function actionDeleteAuthor($id): void
     {
         $model = Authors::findOne($id);
 

@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -10,11 +11,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
     <div class="methodological-guide">
 
-        <h3 class="header-text"><span>Этап 8. Подтверждение MVP</span></h3>
-
         <div class="container-list">
 
-            <h3><span class="bold blue">Шаг 1. Подготовка к тестированию</span></h3>
+            <h3><span class="bold">Шаг 1. Подготовка к тестированию</span></h3>
 
             <p>
                 По сути это должна быть презентация вашего продукта, и она может быть проведена публично, когда вы собираете свою целевую аудиторию в одном месте одновременно.
@@ -59,12 +58,12 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ol>
             </div>
 
-            <div class="bold blue">
+            <div class="bold">
                 ВАЖНО! На этом этапе, возможно, у вас уже появится проект устройства, метода решения проблемы. Если это так, то необходимо подписать
                 NDA (соглашение о конфиденциальности) с каждым респондентом, кому собираетесь сообщить о вашем проекте.
             </div>
 
-            <div class="bold blue">
+            <div class="bold">
                 Помните, что после первого публичного раскрытия по законодательству РФ у вас есть только 6 (шесть) месяцев на подачу заявки для регистрации приоритета
                 на объект интеллектуальной собственности. По истечении этого срока статус новизны вашего решения может быть утрачен.
             </div>
@@ -81,7 +80,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="container-list">
 
-            <h3><span class="bold blue">Шаг 1. Подготовка к тестированию</span></h3>
+            <h3><span class="bold">Шаг 1. Подготовка к тестированию</span></h3>
 
             <div class="simple-block">
                 <p>
@@ -107,7 +106,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <p>
                 По сути это должна быть презентация вашего продукта, и она может быть проведена публично, когда вы собираете свою целевую аудиторию в одном месте одновременно.
@@ -152,12 +151,12 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ol>
             </div>
 
-            <div class="bold blue">
+            <div class="bold">
                 ВАЖНО! На этом этапе, возможно, у вас уже появится проект устройства, метода решения проблемы. Если это так, то необходимо подписать
                 NDA (соглашение о конфиденциальности) с каждым респондентом, кому собираетесь сообщить о вашем проекте.
             </div>
 
-            <div class="bold blue">
+            <div class="bold">
                 Помните, что после первого публичного раскрытия по законодательству РФ у вас есть только 6 (шесть) месяцев на подачу заявки для регистрации приоритета
                 на объект интеллектуальной собственности. По истечении этого срока статус новизны вашего решения может быть утрачен.
             </div>
@@ -167,3 +166,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

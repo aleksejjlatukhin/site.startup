@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -9,8 +10,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Генерация гипотез целевых сегментов</span></h3>
 
         <div class="container-list">
 
@@ -115,7 +114,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
                 <p><span class="bold">Важно!</span> Характеристика – это всегда факт. Это или есть, или нет</p><br>
                 <p class="bold">Рекомендации по заполнению информации по сегментам – генерация сегментов.</p>
-                <p class="bold blue">
+                <p class="bold">
                     Старайтесь выбирать сначала не больше трех сегментов, которые вас интересуют с точки зрения платежеспособности,
                     возможной (по вашему мнению) востребованности будущих или уже имеющихся продуктов, разработанных с использованием
                     базовой технологии. В процессе выполнения следующего этапа - Этап 2 «Подтверждение гипотез целевых сегментов»,
@@ -168,7 +167,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     или промышленного образца.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Таким образом, для того, чтобы найти свой рынок, независимо от: отношения к ИС, полноты информации о рынке необходимо
                     первоначальное (стартовое) описание сегмента, корректность описания которого вы будете проверять на последующем этапе.
                 </p>
@@ -225,7 +224,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="simple-block">
                 <p>
@@ -328,7 +327,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
                 <p><span class="bold">Важно!</span> Характеристика – это всегда факт. Это или есть, или нет</p><br>
                 <p class="bold">Рекомендации по заполнению информации по сегментам – генерация сегментов.</p>
-                <p class="bold blue">
+                <p class="bold">
                     Старайтесь выбирать сначала не больше трех сегментов, которые вас интересуют с точки зрения платежеспособности,
                     возможной (по вашему мнению) востребованности будущих или уже имеющихся продуктов, разработанных с использованием
                     базовой технологии. В процессе выполнения следующего этапа - Этап 2 «Подтверждение гипотез целевых сегментов»,
@@ -381,7 +380,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     или промышленного образца.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Таким образом, для того, чтобы найти свой рынок, независимо от: отношения к ИС, полноты информации о рынке необходимо
                     первоначальное (стартовое) описание сегмента, корректность описания которого вы будете проверять на последующем этапе.
                 </p>
@@ -393,3 +392,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

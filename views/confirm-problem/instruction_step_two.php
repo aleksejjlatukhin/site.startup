@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -9,8 +10,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Этап 4. Подтверждение гипотез проблем сегментов</span></h3>
 
         <div class="container-list">
 
@@ -27,7 +26,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <br>
 
-            <p class="bold blue">Общий материал перед этапом.</p>
+            <p class="bold">Общий материал перед этапом.</p>
 
             <div class="bold">Подтверждение гипотез проблем сегментов выполняется с помощью проблемного интервью (ПИ).</div>
 
@@ -87,7 +86,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <br>
 
-            <p class="bold blue ">
+            <p class="bold">
                 На Этапе 4 в отличие от Этапа 2 проблемное интервью преследует цель получить более точные(!) и короткие(!)
                 ответы респондентов, которые могут сравниваться с ответами других респондентов. В списке вопросов должны
                 содержаться 1-2 вопроса, которые сформулированы так, что ответы на них можно однозначно трактовать, существует
@@ -127,7 +126,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p>Лучше вопросы разбить на три группы:</p>
 
-            <p class="blue bold">1 блок. Описание клиента.</p>
+            <p class="bold">1 блок. Описание клиента.</p>
 
             <div>
                 Для определения соответствия респондента сформулированной гипотезе необходимо, чтобы в списке задаваемых вопросов
@@ -165,7 +164,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p class="bold blue">2 блок. Опыт клиента.</p>
+            <p class="bold">2 блок. Опыт клиента.</p>
 
             <p>Клиент должен рассказать о своем опыте.</p>
 
@@ -180,7 +179,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p class="bold blue">3 блок. Потребительский опыт.</p>
+            <p class="bold">3 блок. Потребительский опыт.</p>
 
             <p class="bold">Пример:</p>
 
@@ -207,7 +206,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="container-list">
 
-            <h3><span class="bold blue">Шаг 2. Подготовка списка вопросов</span></h3>
+            <h3><span class="bold">Шаг 2. Подготовка списка вопросов</span></h3>
 
             <div class="simple-block">
                 <p>
@@ -236,7 +235,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="simple-block">
                 <p>
@@ -251,7 +250,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <br>
 
-            <p class="bold blue ">
+            <p class="bold">
                 На Этапе 4 в отличие от Этапа 2 проблемное интервью преследует цель получить более точные(!) и короткие(!)
                 ответы респондентов, которые могут сравниваться с ответами других респондентов. В списке вопросов должны
                 содержаться 1-2 вопроса, которые сформулированы так, что ответы на них можно однозначно трактовать, существует
@@ -291,7 +290,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p>Лучше вопросы разбить на три группы:</p>
 
-            <p class="blue bold">1 блок. Описание клиента.</p>
+            <p class="bold">1 блок. Описание клиента.</p>
 
             <div>
                 Для определения соответствия респондента сформулированной гипотезе необходимо, чтобы в списке задаваемых вопросов
@@ -329,7 +328,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p class="bold blue">2 блок. Опыт клиента.</p>
+            <p class="bold">2 блок. Опыт клиента.</p>
 
             <p>Клиент должен рассказать о своем опыте.</p>
 
@@ -344,7 +343,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p class="bold blue">3 блок. Потребительский опыт.</p>
+            <p class="bold">3 блок. Потребительский опыт.</p>
 
             <p class="bold">Пример:</p>
 
@@ -364,3 +363,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

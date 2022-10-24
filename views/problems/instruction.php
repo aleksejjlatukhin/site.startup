@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -9,8 +10,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Генерация гипотез проблем сегментов</span></h3>
 
         <div class="container-list">
 
@@ -66,7 +65,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ol>
             </div>
 
-            <p class="bold blue">
+            <p class="bold">
                 Сформулируйте гипотезы проблемы для проверки. Правильная гипотеза (потребности, проблемы) состоит из: предположения,
                 действия для проверки, метрики результата и вывода.
             </p>
@@ -89,13 +88,13 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 в оригинале.
             </p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Важно! Если вы видите, что обозначенные респондентами потребности и проблемы отличаются, значит, выбранный вами сегмент имеет
                 слишком широкий охват и его необходимо сузить. Выделить какие-то более мелкие группы по возрасту, по профессии, соц. статусу,
                 по образованию и т.д.
             </p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Генерируйте новые сегменты до тех пор, пока при тестировании (валидации) не увидите в них (респондентах) общие черты.
             </p>
 
@@ -131,7 +130,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="simple-block">
                 <p>
@@ -185,7 +184,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ol>
             </div>
 
-            <p class="bold blue">
+            <p class="bold">
                 Сформулируйте гипотезы проблемы для проверки. Правильная гипотеза (потребности, проблемы) состоит из: предположения,
                 действия для проверки, метрики результата и вывода.
             </p>
@@ -208,13 +207,13 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 в оригинале.
             </p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Важно! Если вы видите, что обозначенные респондентами потребности и проблемы отличаются, значит, выбранный вами сегмент имеет
                 слишком широкий охват и его необходимо сузить. Выделить какие-то более мелкие группы по возрасту, по профессии, соц. статусу,
                 по образованию и т.д.
             </p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Генерируйте новые сегменты до тех пор, пока при тестировании (валидации) не увидите в них (респондентах) общие черты.
             </p>
 
@@ -223,3 +222,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

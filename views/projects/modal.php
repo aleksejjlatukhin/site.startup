@@ -11,9 +11,8 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Формулировка проекта' . Html::img('/images/icons/icon_report_next.png'), ['/projects/get-instruction'],[
-    'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => '<div>Новый проект</div>',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]);
 ?>
 
@@ -28,9 +27,8 @@ Modal::end();
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Редактирование проекта' . Html::img('/images/icons/icon_report_next.png'), ['/projects/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => '<div>Редактирование проекта</div>',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]);
 ?>
 

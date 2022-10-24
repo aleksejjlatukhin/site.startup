@@ -20,7 +20,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="methodological-guide">
 
-            <h3 class="header-text"><span>Разработка бизнес-модели</span></h3>
+            <div class="header_hypothesis_first_index">Разработка бизнес-модели</div>
 
             <div class="row container-fluid">
                 <div class="col-md-12">
@@ -110,7 +110,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     </ul>
                 </div>
 
-                <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+                <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
                 <p>Целью, а также заключительным этапом работы в рамках нашего Акселератора является генерация Бизнес-модели. Мы предлагаем
                     использовать Канву бизнес-модели (англ. Business model canvas), разработанную авторами Александром Остервальдером и Ивом Пинье.</p>

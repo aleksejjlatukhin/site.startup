@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -9,8 +10,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Разработка MVP</span></h3>
 
         <div class="container-list">
 
@@ -88,7 +87,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <p>
                 Концепция MVP (Minimum Viable Product) применяется, чтобы минимизировать рыночные риски и используется для создания любого типа продукта.
@@ -137,3 +136,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

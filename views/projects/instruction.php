@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -10,8 +11,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Формулировка проекта</span></h3>
 
         <div class="container-list">
 
@@ -53,20 +52,20 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             </div>
 
             <p>
-                <span class="bold blue">
+                <span class="bold">
                     Право на использование базовой технологии
                 </span>
                 (способа) - имеется. Это означает, что вы правообладатель интеллектуальной собственности (<span class="bold">ИС</span>) или обладаете лицензионным
                 соглашением (с исключительным или неисключительным правом) на использование интеллектуальной собственности.
             </p>
 
-            <p><span class="bold blue">Наличие образца/продукта</span> &#8212; <span class="bold">нет</span>.</p>
+            <p><span class="bold">Наличие образца/продукта</span> &#8212; <span class="bold">нет</span>.</p>
 
             <p>
-                <span class="bold blue">Цель проекта:</span> Найти применение ИС в реальном секторе экономики или других сферах деятельности человека (например, социальная сфера).
+                <span class="bold">Цель проекта:</span> Найти применение ИС в реальном секторе экономики или других сферах деятельности человека (например, социальная сфера).
             </p>
 
-            <p><span class="bold blue">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
+            <p><span class="bold">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
 
             <div class="container-text">
                 <ul>
@@ -81,7 +80,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             </div>
 
             <p>
-                <span class="bold blue">Пример проекта:</span>
+                <span class="bold">Пример проекта:</span>
                 Есть идея использовать технологию, имеющуюся в вашем распоряжении, для конкурентного решения конкретной задачи,
                 воплощенной в конкретном устройстве или материале для конкретного рыночного сегмента, а именно:
             </p>
@@ -103,9 +102,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <p class="bold"><span>В.</span>Бизнес проект:</p>
             </div>
 
-            <p><span class="bold blue">Право на использование базовой технологии</span> (способа) - отсутствует. Более того идея бизнеса не предусматривает наличие ИС.</p>
-            <p><span class="bold blue">Цель проекта:</span> Разработать продукт (услугу), который будет востребован целевым сегментом рынка.</p>
-            <p><span class="bold blue">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
+            <p><span class="bold">Право на использование базовой технологии</span> (способа) - отсутствует. Более того идея бизнеса не предусматривает наличие ИС.</p>
+            <p><span class="bold">Цель проекта:</span> Разработать продукт (услугу), который будет востребован целевым сегментом рынка.</p>
+            <p><span class="bold">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
 
             <div class="container-text">
                 <ul>
@@ -114,7 +113,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p><span class="bold blue">Пример проекта:</span> Организация сети проката скутеров для отдыхающих в парках; организация культурных программ в домах отдыха.</p>
+            <p><span class="bold">Пример проекта:</span> Организация сети проката скутеров для отдыхающих в парках; организация культурных программ в домах отдыха.</p>
 
         </div>
 
@@ -175,7 +174,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 сегмента, то целями могут быть разработка мероприятий по продвижению, рекламных слоганов, текстов презентаций и т.д.
             </p>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="simple-block">
                 <p>
@@ -215,20 +214,20 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             </div>
 
             <p>
-                <span class="bold blue">
+                <span class="bold">
                     Право на использование базовой технологии
                 </span>
                 (способа) - имеется. Это означает, что вы правообладатель интеллектуальной собственности (<span class="bold">ИС</span>) или обладаете лицензионным
                 соглашением (с исключительным или неисключительным правом) на использование интеллектуальной собственности.
             </p>
 
-            <p><span class="bold blue">Наличие образца/продукта</span> &#8212; <span class="bold">нет</span>.</p>
+            <p><span class="bold">Наличие образца/продукта</span> &#8212; <span class="bold">нет</span>.</p>
 
             <p>
-                <span class="bold blue">Цель проекта:</span> Найти применение ИС в реальном секторе экономики или других сферах деятельности человека (например, социальная сфера).
+                <span class="bold">Цель проекта:</span> Найти применение ИС в реальном секторе экономики или других сферах деятельности человека (например, социальная сфера).
             </p>
 
-            <p><span class="bold blue">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
+            <p><span class="bold">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
 
             <div class="container-text">
                 <ul>
@@ -243,7 +242,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             </div>
 
             <p>
-                <span class="bold blue">Пример проекта:</span>
+                <span class="bold">Пример проекта:</span>
                 Есть идея использовать технологию, имеющуюся в вашем распоряжении, для конкурентного решения конкретной задачи,
                 воплощенной в конкретном устройстве или материале для конкретного рыночного сегмента, а именно:
             </p>
@@ -265,9 +264,9 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 <p class="bold"><span>В.</span>Бизнес проект:</p>
             </div>
 
-            <p><span class="bold blue">Право на использование базовой технологии</span> (способа) - отсутствует. Более того идея бизнеса не предусматривает наличие ИС.</p>
-            <p><span class="bold blue">Цель проекта:</span> Разработать продукт (услугу), который будет востребован целевым сегментом рынка.</p>
-            <p><span class="bold blue">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
+            <p><span class="bold">Право на использование базовой технологии</span> (способа) - отсутствует. Более того идея бизнеса не предусматривает наличие ИС.</p>
+            <p><span class="bold">Цель проекта:</span> Разработать продукт (услугу), который будет востребован целевым сегментом рынка.</p>
+            <p><span class="bold">Задачи</span>, которые необходимо решить для достижения поставленной цели:</p>
 
             <div class="container-text">
                 <ul>
@@ -276,10 +275,34 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <p><span class="bold blue">Пример проекта:</span> Организация сети проката скутеров для отдыхающих в парках; организация культурных программ в домах отдыха.</p>
+            <p><span class="bold">Пример проекта:</span> Организация сети проката скутеров для отдыхающих в парках; организация культурных программ в домах отдыха.</p>
 
         </div>
 
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

@@ -65,6 +65,21 @@ body > .wrap {
     background: #7F9FC5;
 }
 
+.form-create-project,
+.form-update-project {
+    overflow: hidden;
+    padding-top: 20px;
+}
+
+.form-create-project .section_title,
+.form-update-project .section_title {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 30px;
+    text-transform: uppercase;
+}
+
 @media screen and (min-width: 1250px) {
 
     .container-one_hypothesis {

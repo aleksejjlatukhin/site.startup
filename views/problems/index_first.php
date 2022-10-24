@@ -23,7 +23,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="methodological-guide">
 
-            <h3 class="header-text"><span>Генерация гипотез проблем сегментов</span></h3>
+            <div class="header_hypothesis_first_index">Генерация гипотез проблем сегментов</div>
 
             <div class="row container-fluid">
                 <div class="col-md-12">
@@ -90,7 +90,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     </ol>
                 </div>
 
-                <p class="bold blue">
+                <p class="bold">
                     Сформулируйте гипотезы проблемы для проверки. Правильная гипотеза (потребности, проблемы) состоит из: предположения,
                     действия для проверки, метрики результата и вывода.
                 </p>
@@ -113,13 +113,13 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     в оригинале.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Важно! Если вы видите, что обозначенные респондентами потребности и проблемы отличаются, значит, выбранный вами сегмент имеет
                     слишком широкий охват и его необходимо сузить. Выделить какие-то более мелкие группы по возрасту, по профессии, соц. статусу,
                     по образованию и т.д.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Генерируйте новые сегменты до тех пор, пока при тестировании (валидации) не увидите в них (респондентах) общие черты.
                 </p>
 
@@ -218,7 +218,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     </ul>
                 </div>
 
-                <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+                <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
                 <div class="simple-block">
                     <p>
@@ -272,7 +272,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     </ol>
                 </div>
 
-                <p class="bold blue">
+                <p class="bold">
                     Сформулируйте гипотезы проблемы для проверки. Правильная гипотеза (потребности, проблемы) состоит из: предположения,
                     действия для проверки, метрики результата и вывода.
                 </p>
@@ -295,13 +295,13 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     в оригинале.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Важно! Если вы видите, что обозначенные респондентами потребности и проблемы отличаются, значит, выбранный вами сегмент имеет
                     слишком широкий охват и его необходимо сузить. Выделить какие-то более мелкие группы по возрасту, по профессии, соц. статусу,
                     по образованию и т.д.
                 </p>
 
-                <p class="bold blue">
+                <p class="bold">
                     Генерируйте новые сегменты до тех пор, пока при тестировании (валидации) не увидите в них (респондентах) общие черты.
                 </p>
 

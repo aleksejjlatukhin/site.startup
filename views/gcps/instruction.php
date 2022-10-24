@@ -11,8 +11,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
     <div class="methodological-guide">
 
-        <h3 class="header-text"><span>Разработка гипотез ценностных предложений</span></h3>
-
         <div class="container-list">
 
             <div class="simple-block">
@@ -44,7 +42,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p class="bold">2. Быстрое представление возможностей с помощью шаблона.</p>
 
-            <p class="blue">
+            <p>
                 <span class="bold">Наш</span> _(товар/услуга) <span class="bold">помогает</span> (потребительскому сегменту), <span class="bold">которые хотят</span> (выполнить задачу),
                 <span class="bold">так, что</span> (снижает, избавляет(проблему)) <span class="bold">и</span> (увеличивает, позволяет (выгоду)) <span class="bold">в отличии от</span> (конкурирующее ЦП).
             </p>
@@ -117,7 +115,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </li>
             </ol>
 
-            <p class="blue"><span class="bold">Совет</span> &#8212; четко определять проблему. Например, если говорят «потеря времени», то через какое количество времени он будет считать, что это потеря времени.</p>
+            <p><span class="bold">Совет</span> &#8212; четко определять проблему. Например, если говорят «потеря времени», то через какое количество времени он будет считать, что это потеря времени.</p>
 
             <div class="bold">Наводящие вопросы <span class="normal">для формулирования потенциальных проблем потребителя:</span></div>
 
@@ -170,7 +168,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 необходимо ---- не помешает.
             </p>
 
-            <p class="blue">
+            <p>
                 <span class="bold">Необходимо точно определять выгоду!</span>
                 Если просят сделать лучше, то, что конкретно. Эксплуатационные качества, какие, на сколько они выше значения X?
             </p>
@@ -313,7 +311,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="simple-block">
                 <p>
@@ -344,7 +342,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p class="bold">2. Быстрое представление возможностей с помощью шаблона.</p>
 
-            <p class="blue">
+            <p>
                 <span class="bold">Наш</span> _(товар/услуга) <span class="bold">помогает</span> (потребительскому сегменту), <span class="bold">которые хотят</span> (выполнить задачу),
                 <span class="bold">так, что</span> (снижает, избавляет(проблему)) <span class="bold">и</span> (увеличивает, позволяет (выгоду)) <span class="bold">в отличии от</span> (конкурирующее ЦП).
             </p>
@@ -417,7 +415,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </li>
             </ol>
 
-            <p class="blue"><span class="bold">Совет</span> &#8212; четко определять проблему. Например, если говорят «потеря времени», то через какое количество времени он будет считать, что это потеря времени.</p>
+            <p><span class="bold">Совет</span> &#8212; четко определять проблему. Например, если говорят «потеря времени», то через какое количество времени он будет считать, что это потеря времени.</p>
 
             <div class="bold">Наводящие вопросы <span class="normal">для формулирования потенциальных проблем потребителя:</span></div>
 
@@ -470,7 +468,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 необходимо ---- не помешает.
             </p>
 
-            <p class="blue">
+            <p>
                 <span class="bold">Необходимо точно определять выгоду!</span>
                 Если просят сделать лучше, то, что конкретно. Эксплуатационные качества, какие, на сколько они выше значения X?
             </p>
@@ -586,3 +584,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

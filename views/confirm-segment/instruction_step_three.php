@@ -1,6 +1,7 @@
 <?php
 
 use app\models\User;
+use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/methodological-guide-style.css');
 
@@ -9,8 +10,6 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
     <div class="methodological-guide">
-
-        <h3 class="header-text"><span>Этап 2. Подтверждение гипотез целевых сегментов</span></h3>
 
         <div class="container-list">
 
@@ -32,14 +31,14 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <br>
 
-            <p class="bold blue">
+            <p class="bold">
                 ВАЖНО! Необходимо очень качественно выполнить все три шага этого этапа! Следование рекомендациям, которые вы найдете в
                 начале каждого шага, значительно поможет достичь цели этапа и открыть уникальные аспекты рынка, на основе которых можно
                 построить эффективный бизнес или создать социальную услугу. Будьте уверены, формальное выполнение заданий в каждом этапе,
                 каждом шаге приведут к безрезультатной трате времени.
             </p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Готовьте каждое интервью тщательно, анализируйте результаты собеседования с каждым респондентом.
                 Не проводите интервью с родственниками, знакомыми и друзьями.
             </p>
@@ -123,7 +122,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p>Ролевые статусы  b&b: для каждого статуса должен быть интерес. Следует не бояться отходить от сценария, если респондент вас туда (разумно) тянет.</p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Важно! Вопросы, предлагаемые для интервью, нужны для того, чтобы разговорить респондента. Но при этом разговор нельзя пускать на
                 самотек. Необходимо отмечать, когда собеседник начинает говорить о том, какие цели или задачи ему необходимо решить – это потребности,
                 которые у него есть. Как он эти потребности удовлетворяет? Если вы видите (из разговора), что удовлетворение каких-то потребностей
@@ -196,7 +195,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="container-list">
 
-            <h3><span class="bold blue">Шаг 3. Проведение интервью</span></h3>
+            <h3><span class="bold">Шаг 3. Проведение интервью</span></h3>
 
             <div class="simple-block">
                 <p>
@@ -235,7 +234,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </ul>
             </div>
 
-            <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+            <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
             <div class="bold">Задача:</div>
             <div class="container-text">
@@ -293,7 +292,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <p>Ролевые статусы  b&b: для каждого статуса должен быть интерес. Следует не бояться отходить от сценария, если респондент вас туда (разумно) тянет.</p>
 
-            <p class="bold blue">
+            <p class="bold">
                 Важно! Вопросы, предлагаемые для интервью, нужны для того, чтобы разговорить респондента. Но при этом разговор нельзя пускать на
                 самотек. Необходимо отмечать, когда собеседник начинает говорить о том, какие цели или задачи ему необходимо решить – это потребности,
                 которые у него есть. Как он эти потребности удовлетворяет? Если вы видите (из разговора), что удовлетворение каких-то потребностей
@@ -359,3 +358,27 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
     </div>
 
 <?php endif; ?>
+
+<div class="row">
+    <div class="col-md-12" style="display:flex;justify-content: center;">
+        <?= Html::button('Закрыть', [
+            'onclick' => 'return $(".modal_instruction_page").modal("hide");',
+            'class' => 'btn btn-default',
+            'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'background' => '#F5A4A4',
+                'color' => '#ffffff',
+                'width' => '140px',
+                'height' => '40px',
+                'font-size' => '16px',
+                'text-transform' => 'uppercase',
+                'font-weight' => '700',
+                'padding-top' => '9px',
+                'border-radius' => '8px',
+                'margin-top' => '28px'
+            ]
+        ]) ?>
+    </div>
+</div>

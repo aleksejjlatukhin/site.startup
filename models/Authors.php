@@ -65,7 +65,7 @@ class Authors extends ActiveRecord
         return [
             'id' => 'ID',
             'project_id' => 'Project ID',
-            'fio' => 'Фамилия, имя, отчество',
+            'fio' => 'Фамилия, имя, отчество автора проекта',
             'role' => 'Роль в проекте',
             'experience' => 'Опыт работы',
         ];

@@ -7,10 +7,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
 use yii\widgets\ActiveForm;
-use kartik\select2\Select2;
-use kartik\depdrop\DepDrop;
-use yii\helpers\ArrayHelper;
-use app\models\ProjectSort;
 
 /**
  * @var User $user
@@ -244,11 +240,14 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                             'display' => 'flex',
                             'align-items' => 'center',
                             'justify-content' => 'center',
-                            'background' => '#E0E0E0',
+                            'background' => '#707F99',
                             'color' => '#FFFFFF',
                             'width' => '200px',
                             'height' => '40px',
-                            'font-size' => '24px',
+                            'font-size' => '16px',
+                            'text-transform' => 'uppercase',
+                            'font-weight' => '700',
+                            'padding-top' => '9px',
                             'border-radius' => '8px',
                         ]
                     ]) ?>

@@ -20,7 +20,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="methodological-guide">
 
-            <h3 class="header-text"><span>Разработка MVP</span></h3>
+            <div class="header_hypothesis_first_index">Разработка MVP</div>
 
             <div class="row container-fluid">
                 <div class="col-md-12">
@@ -112,7 +112,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                     </ul>
                 </div>
 
-                <h4><span class="bold blue"><u>Информация, полученная Проектантом:</u></span></h4>
+                <h4><span class="bold"><u>Информация, полученная Проектантом:</u></span></h4>
 
                 <p>
                     Концепция MVP (Minimum Viable Product) применяется, чтобы минимизировать рыночные риски и используется для создания любого типа продукта.
