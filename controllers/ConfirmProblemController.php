@@ -488,11 +488,11 @@ class ConfirmProblemController extends AppUserPartController
         $model = ConfirmProblem::findOne($id);
         $formCreateGcp = new FormCreateGcp($model->hypothesis);
 
-        $count_descInterview = RespondsProblem::find()->with('interview')
+        $count_descInterview = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsProblem::find()->with('interview')
+        $count_positive = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 
@@ -535,11 +535,11 @@ class ConfirmProblemController extends AppUserPartController
         $model = ConfirmProblem::findOne($id);
         $problem = $model->problem;
 
-        $count_descInterview = RespondsProblem::find()->with('interview')
+        $count_descInterview = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsProblem::find()->with('interview')
+        $count_positive = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 

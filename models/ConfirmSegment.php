@@ -241,11 +241,11 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function getButtonMovingNextStage(): bool
     {
 
-        $count_interview = RespondsSegment::find()->with('interview')
+        $count_interview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
-        $count_positive = RespondsSegment::find()->with('interview')
+        $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])->count();
 

@@ -222,11 +222,11 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
      */
     public function getButtonMovingNextStage(): bool
     {
-        $count_interview = RespondsGcp::find()->with('interview')
+        $count_interview = (int)RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
             ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
-        $count_positive = RespondsGcp::find()->with('interview')
+        $count_positive = (int)RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
             ->where(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 

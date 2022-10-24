@@ -223,11 +223,11 @@ class ConfirmProblem extends ActiveRecord implements ConfirmationInterface
     public function getButtonMovingNextStage(): bool
     {
 
-        $count_interview = RespondsProblem::find()->with('interview')
+        $count_interview = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
-        $count_positive = RespondsProblem::find()->with('interview')
+        $count_positive = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
             ->where(['confirm_id' => $this->getId(), 'interview_confirm_problem.status' => '1'])->count();
 

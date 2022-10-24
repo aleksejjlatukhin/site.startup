@@ -368,13 +368,14 @@ class SegmentsController extends AppUserPartController
                     if ($model->create()) {
 
                         $type_sort_id = $_POST['type_sort_id'];
+                        $count = Segments::find()->where(['project_id' => $id])->count();
 
-                        if ($type_sort_id !== '') {
+                        if ($count > 1 && $type_sort_id !== '') {
 
                             $sort = new SegmentSort();
 
                             $response =  [
-                                'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
+                                'success' => true, 'count' => $count,
                                 'renderAjax' => $this->renderAjax('_index_ajax', [
                                     'models' => $sort->fetchModels($id, $type_sort_id),
                                 ]),
@@ -386,7 +387,7 @@ class SegmentsController extends AppUserPartController
                         }
 
                         $response =  [
-                            'success' => true, 'count' => Segments::find()->where(['project_id' => $id])->count(),
+                            'success' => true, 'count' => $count,
                             'renderAjax' => $this->renderAjax('_index_ajax', [
                                 'models' => Segments::findAll(['project_id' => $id]),
                             ]),

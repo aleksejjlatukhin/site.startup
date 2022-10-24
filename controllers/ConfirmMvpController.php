@@ -514,11 +514,11 @@ class ConfirmMvpController extends AppUserPartController
         $model = ConfirmMvp::findOne($id);
         $formCreateBusinessModel = new FormCreateBusinessModel($model->hypothesis);
 
-        $count_descInterview = RespondsMvp::find()->with('interview')
+        $count_descInterview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
-        $count_positive = RespondsMvp::find()->with('interview')
+        $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
 
@@ -558,11 +558,11 @@ class ConfirmMvpController extends AppUserPartController
         $model = ConfirmMvp::findOne($id);
         $mvp = $model->mvp;
 
-        $count_descInterview = RespondsMvp::find()->with('interview')
+        $count_descInterview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
-        $count_positive = RespondsMvp::find()->with('interview')
+        $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
 

@@ -246,7 +246,7 @@ class GcpsController extends AppUserPartController
 
             $confirmProblem = ConfirmProblem::findOne($id);
             $model = new FormCreateGcp($confirmProblem->hypothesis);
-            $model->basic_confirm_id = $id;
+            $model->setBasicConfirmId($id);
 
             if ($model->load(Yii::$app->request->post())) {
                 if ($model->create()) {

@@ -111,7 +111,7 @@ class FormCreateMvp extends Model
         $mvp->setGcpId($gcp->getId());
         $mvp->setBasicConfirmId($this->getBasicConfirmId());
         $mvp->setDescription($this->getDescription());
-        $last_model_number = explode(' ',$last_model->getTitle())[1];
+        $last_model_number = $last_model ? explode(' ',$last_model->getTitle())[1] : 0;
         $mvp->setTitle('MVP ' . ($last_model_number + 1));
 
         if ($mvp->save()){

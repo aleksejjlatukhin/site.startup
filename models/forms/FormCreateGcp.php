@@ -117,7 +117,7 @@ class FormCreateGcp extends Model
         $gcp->setSegmentId($segment->getId());
         $gcp->setProblemId($problem->getId());
         $gcp->setBasicConfirmId($this->getBasicConfirmId());
-        $last_model_number = explode(' ',$last_model->getTitle())[1];
+        $last_model_number = $last_model ? explode(' ',$last_model->getTitle())[1] : 0;
         $gcp->setTitle('ГЦП ' . ($last_model_number + 1));
 
         $gcp->description = 'Наш продукт ' . mb_strtolower($this->getGood()) . ' ';

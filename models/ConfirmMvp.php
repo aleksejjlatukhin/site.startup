@@ -221,11 +221,11 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
      */
     public function getButtonMovingNextStage(): bool
     {
-        $count_interview = RespondsMvp::find()->with('interview')
+        $count_interview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
-        $count_positive = RespondsMvp::find()->with('interview')
+        $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
             ->where(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
 

@@ -247,9 +247,9 @@ class InterviewConfirmGcp extends ActiveRecord
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getInterviewFile(): string
+    public function getInterviewFile(): ?string
     {
         return $this->interview_file;
     }

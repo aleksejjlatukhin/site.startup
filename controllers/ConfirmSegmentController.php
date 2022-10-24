@@ -453,11 +453,11 @@ class ConfirmSegmentController extends AppUserPartController
         $model = ConfirmSegment::findOne($id);
         $formCreateProblem = new FormCreateProblem($model->hypothesis);
 
-        $count_descInterview = RespondsSegment::find()->with('interview')
+        $count_descInterview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
-        $count_positive = RespondsSegment::find()->with('interview')
+        $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
 
@@ -498,11 +498,11 @@ class ConfirmSegmentController extends AppUserPartController
         $model = ConfirmSegment::findOne($id);
         $segment = $model->segment;
 
-        $count_descInterview = RespondsSegment::find()->with('interview')
+        $count_descInterview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
-        $count_positive = RespondsSegment::find()->with('interview')
+        $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
             ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
 

@@ -245,7 +245,7 @@ class ProblemsController extends AppUserPartController
 
             $confirmSegment = ConfirmSegment::findOne($id);
             $model = new FormCreateProblem($confirmSegment->hypothesis);
-            $model->basic_confirm_id = $id;
+            $model->setBasicConfirmId($id);
 
             if ($model->load(Yii::$app->request->post())) {
                 if ($model->create()){

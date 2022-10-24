@@ -121,7 +121,7 @@ class FormCreateProblem extends Model
         $problem->setBasicConfirmId($this->getBasicConfirmId());
         $problem->setDescription($this->getDescription());
         $problem->setIndicatorPositivePassage($this->getIndicatorPositivePassage());
-        $last_model_number = explode(' ',$last_model->getTitle())[1];
+        $last_model_number = $last_model ? explode(' ',$last_model->getTitle())[1] : 0;
         $problem->setTitle('ГПС ' . ($last_model_number + 1));
 
         $className = explode('\\', self::class)[3];
