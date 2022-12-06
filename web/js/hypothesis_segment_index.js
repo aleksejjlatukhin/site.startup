@@ -6,7 +6,7 @@ $(document).ready(function() {
     // Проверка установленного значения B2C/B2B
     setInterval(function(){
 
-        if($('#select2-type-interaction-container').html() === 'Коммерческие взаимоотношения между организацией и частным потребителем (B2C)'){
+        if($('#select2-type-interaction-container').html() === 'B2C'){
 
             $('.form-template-b2b').hide();
             $('.form-template-b2c').show();
@@ -102,6 +102,24 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
 
             $(hypothesis_create_modal).modal('show');
             $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+
+            // Расчет платежеспособности B2C
+            var incomeFrom = parseInt($("input#income_from").val());
+            var incomeTo = parseInt($("input#income_to").val());
+            var quantity = parseInt($("input#quantity").val());
+            if (incomeFrom > 0 && incomeTo > 0 && quantity > 0) {
+                var res = ((incomeFrom + incomeTo) * 6) * quantity / 1000000;
+                $("input#market_volume_b2c").val(Math.round(res));
+            }
+
+            // Расчет платежеспособности B2B
+            var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+            var incomeToB2B = parseInt($("input#income_to_b2b").val());
+            var quantityB2B = parseInt($("input#quantity_b2b").val());
+            if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                $("input#market_volume_b2b").val(Math.round(resB2B));
+            }
         }
     });
 
@@ -114,7 +132,7 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
 //Сохранение новой гипотезы из формы
 $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
-    var data = $(this).serialize() + '&type_sort_id=' + $('#listType').val();
+    var data = $(this).serialize();
     var url = $(this).attr('action');
     var id = url.split('=')[1];
 
@@ -215,7 +233,7 @@ $(body).on('click', '#button_confirm_closing_modal', function (e) {
 //Редактирование гипотезы целевого сегмента
 $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 
-    var data = $(this).serialize() + '&type_sort_id=' + $('#listType').val();
+    var data = $(this).serialize();
     var url = $(this).attr('action');
 
     $.ajax({
@@ -259,15 +277,9 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
 // При нажатии на иконку разрешить экспертизу
 $(body).on('click', '.link-enable-expertise', function (e) {
 
-    var formData = new FormData();
-    formData.append('type_sort_id', $('#listType').val());
-
     $.ajax({
         url: $(this).attr('href'),
         method: 'POST',
-        processData: false,
-        contentType: false,
-        data:  formData,
         cache: false,
         success: function(response){
 
@@ -280,28 +292,11 @@ $(body).on('click', '.link-enable-expertise', function (e) {
 });
 
 
-//Сортировка сегментов
-$(body).on('change', '#listType', function(){
+// Показать форму поиска сегментов
+$(body).on('click', '.show_search_segments', function (e) {
 
-    var current_url = window.location.href;
-    current_url = current_url.split('=');
-    var current_id = current_url[1];
-
-    var select_value = $('#listType').val();
-
-    if (select_value !== '') {
-
-        var url = '/segments/sorting-models?current_id=' + current_id + '&type_sort_id=' + select_value;
-
-        $.ajax({
-            url: url,
-            method: 'POST',
-            cache: false,
-            success: function(response){
-
-                $('.block_all_hypothesis').html(response.renderAjax);
-            }
-        });
-    }
-
+    $('.search_block_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
+    e.preventDefault();
+    return false;
 });

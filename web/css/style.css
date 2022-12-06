@@ -311,13 +311,13 @@ PRELOADER
     position: absolute;
     bottom: -2px;
     left: 47px;
-    background: #ff5349;
+    background: #FF5C5C;
     justify-content: center;
     align-items: center;
     font-size: 12px;
     color: #ffffff;
-    box-shadow: inset rgba(0,0,0,.6) 2px 1px 6px;
     border-radius: 50%;
+    border: 1px solid #FFFFFF;
 }
 .countUnreadMessages.active,
 .countUnreadCommunications.active {
@@ -340,13 +340,13 @@ PRELOADER
     position: absolute;
     bottom: 22px;
     left: 56px;
-    background: #ff5349;
+    background: #FF5C5C;
     justify-content: center;
     align-items: center;
     font-size: 12px;
     color: #ffffff;
-    box-shadow: inset rgba(0,0,0,.6) 0 0 4px;
     border-radius: 50%;
+    border: 1px solid #FFFFFF;
 }
 .countUnreadMessagesSender.active {
     opacity: 1;
@@ -366,14 +366,14 @@ PRELOADER
     min-width: 20px;
     min-height: 20px;
     opacity: 0;
-    background: #ff5349;
+    background: #FF5C5C;
     justify-content: center;
     align-items: center;
     font-size: 12px;
     color: #ffffff;
-    box-shadow: inset rgba(0,0,0,.6) 2px 1px 6px;
     border-radius: 50%;
     margin-right: 15px;
+    border: 1px solid #FFFFFF;
 }
 .countUnreadCommunicationsByProject.active {
     opacity: 1;
@@ -1527,7 +1527,7 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
     float: right;
 }
 
-@media screen and (max-width: 470px) {
+@media screen and (max-width: 480px) {
     .star-link {
         position: center;
         margin: 0;
@@ -1551,12 +1551,30 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
     clip-path: polygon(50% 0%, 66% 27%, 98% 35%, 76% 57%, 79% 91%, 50% 78%, 21% 91%, 24% 57%, 2% 35%, 32% 27%);
 }
 
-.star-link > .star:hover, .star.active {
-    background: linear-gradient(to bottom, rgba(224, 194, 75, 1) 0%, rgba(207, 125, 0, 1) 100%);
+.star-link > .star.active {
+    background: #52BE7F;
 }
 
-.star-link > .star:hover:before, .star.active:before {
-    background: linear-gradient(to bottom, rgba(243, 212, 85, 1) 0%, rgba(238, 164, 0, 1) 100%);
+.star-link > .star.active:before {
+    background: #52BE7F;
+}
+
+.star-passive > .star.active {
+    background: #52BE7F;
+}
+
+.star-passive > .star.active:before {
+    background: #52BE7F;
+}
+
+@media screen and (min-width: 481px) {
+    .star-link > .star:hover {
+        background: #52BE7F;
+    }
+
+    .star-link > .star:hover:before {
+        background: #52BE7F;
+    }
 }
 
 /*
@@ -1823,7 +1841,57 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
     color: #EB5757;
     text-decoration: none;
 }
-
+/* для мобильной версии */
+.roadmap-mobile {
+    margin-top: 20px;
+    font-size: 12px;
+    border-top: 1px solid #4F4F4F;
+    border-right: 1px solid #4F4F4F;
+    border-left: 1px solid #4F4F4F;
+    border-radius: 8px 8px 0 0;
+}
+.roadmap-mobile-header-segment {
+    height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+    background: #52BE7F;
+    color: #FFFFFF;
+}
+.roadmap-mobile-header-segment:nth-child(1) {
+    border-radius: 8px 8px 0 0;
+}
+.roadmap-mobile-header-segment .col-xs-8 {
+    height: inherit;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+}
+.roadmap-mobile-header-segment .col-xs-4 {
+    line-height: 30px;
+    padding: 0 10px 0 0;
+    text-align: right;
+}
+.roadmap-mobile-header-column {
+    height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+}
+.roadmap-mobile-header-column div {
+    line-height: 30px;
+    font-weight: 700;
+    padding: 0;
+}
+.roadmap-mobile-simple-column {
+    height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+}
+.roadmap-mobile-simple-column .col-xs-4 {
+    line-height: 30px;
+    padding: 0;
+}
+.roadmap-mobile-simple-column .col-xs-4:nth-child(1) {
+    padding: 0 0 0 10px;
+}
 /*Стили для дорожной карты
 ---Конец---
 */
@@ -1880,21 +1948,72 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
 */
 
 
+/* Стили для стрелок перехода на другой этап на мобильной версии
+---Начало---
+*/
+@media screen and (max-width: 480px) {
+    .arrow_links_router_mobile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .arrow_link_router_mobile_left img,
+    .arrow_link_router_mobile_right img,
+    .arrow_link_router_mobile_left a,
+    .arrow_link_router_mobile_right a {
+        width: 20px;
+    }
+    .arrow_link_router_mobile_right img {
+        transform: rotate(180deg);
+    }
+    .arrow_links_router_mobile .text-stage {
+        font-weight: 700;
+        font-size: 16px;
+    }
+}
+
+@media screen and (min-width: 481px) {
+    .arrow_links_router_mobile {
+        display: none;
+    }
+}
+/* Стили для стрелок перехода на другой этап на мобильной версии
+---Конец---
+*/
+
+
 /* Стилизация модального окна для удаления гипотезы
 ---Начало---
 */
 #delete_hypothesis_modal .modal-header {
-    background-color: #707F99;
+    background-color: #F5A4A4;
     color: #ffffff;
     border-radius: 5px 5px 0 0;
 }
 #delete_hypothesis_modal .modal-body {
-    background-color: #F2F2F2;
-    color: #4F4F4F;
+    background-color: #F5A4A4;
+    color: #FFFFFF;
+}
+#delete_hypothesis_modal .modal-body .modal-main-content {
+    font-size: 28px;
+    font-weight: 700;
 }
 #delete_hypothesis_modal .modal-footer {
-    background-color: #707F99;
+    background-color: #F5A4A4;
     border-radius: 0 0 5px 5px;
+}
+#delete_hypothesis_modal .modal-footer .button-cancel {
+    background-color: #52BE7F;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #ffffff;
+}
+#delete_hypothesis_modal .modal-footer .button-remove {
+    background-color: #4F4F4F;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #ffffff;
 }
 /* Стилизация модального окна для удаления гипотезы
 ---Конец---
@@ -2349,6 +2468,9 @@ a.link_in_column_result_table:focus {
     .button-confirm-result-mobile:focus {
         color: #FFFFFF;
         text-decoration: none;
+    }
+    .button-confirm-result-mobile.disabled {
+        opacity: 0.65;
     }
 
     .button-business-model-result-mobile {
@@ -3046,10 +3168,161 @@ a.link_for_description_stage:focus {
     }
 }
 
+/* В мобильной версии */
+
+.report-mobile {
+    font-size: 12px;
+}
+.report-mobile-header-segment {
+    height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+    color: #FFFFFF;
+    border-radius: 8px 8px 0 0;
+}
+.report-mobile-header-hypothesis {
+    height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+}
+.report-mobile-header-mvp {
+    height: 30px;
+}
+.one-report-mobile {
+    margin-top: 20px;
+    border-top: 1px solid #4F4F4F;
+    border-left: 1px solid #4F4F4F;
+    border-right: 1px solid #4F4F4F;
+    border-radius: 8px 8px 0 0;
+}
+.report-mobile-bg-green {
+    background: #52BE7F;
+}
+.report-mobile-bg-grey {
+    background: #C6C6C6;
+}
+.report-mobile-bg-red {
+    background: #F5A4A4;
+}
+.report-mobile-header-segment .col-xs-8 {
+    height: inherit;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+}
+.report-mobile-header-segment .col-xs-4 {
+    height: inherit;
+    line-height: 30px;
+    padding: 0 10px 0 0;
+    text-align: right;
+}
+.report-mobile-header-hypothesis .col-xs-12 {
+    height: inherit;
+    overflow: hidden;
+    line-height: 30px;
+    padding: 0 0 0 10px;
+}
+.report-mobile-header-mvp .col-xs-9 {
+    height: inherit;
+    overflow: hidden;
+    line-height: 30px;
+    padding: 0 10px 0 10px;
+    border-bottom: 1px solid #4F4F4F;
+}
+.report-mobile-header-mvp .col-xs-3 {
+    height: inherit;
+    line-height: 30px;
+    padding: 0;
+    text-align: center;
+    border-left: 1px solid #4F4F4F;
+    border-bottom: 1px solid #4F4F4F;
+}
+a.link-stage-report-mobile{
+    text-transform: none;
+    border-bottom: none;
+}
+a.link-stage-report-mobile.white {
+    color: #FFFFFF;
+}
+a.link-stage-report-mobile.black {
+    color: #4F4F4F;
+}
+.col-xs-12.report-mobile-header-columns {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-top: 5px;
+}
+.col-xs-12.report-mobile-value-columns {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    width: 100%;
+    padding-top: 3px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #4F4F4F;
+    font-weight: 700;
+}
+.col-xs-12.report-mobile-header-columns div,
+.col-xs-12.report-mobile-value-columns div {
+    width: 20%;
+    text-align: center;
+}
 /*Стили для таблицы - Протокол проекта
 ---Конец---
 */
 
+
+/*Стили для страницы
+презентации проекта в моб.версии
+---Начало---
+*/
+.presentation-mobile {
+    font-size: 12px;
+}
+.presentation-mobile-one-stage {
+    margin-top: 20px;
+    border-top: 1px solid #4F4F4F;
+    border-left: 1px solid #4F4F4F;
+    border-right: 1px solid #4F4F4F;
+    border-radius: 8px 8px 0 0;
+}
+.presentation-mobile-header-stage {
+    height: 30px;
+    line-height: 30px;
+    background: #52BE7F;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 14px;
+    border-bottom: 1px solid #4F4F4F;
+    border-radius: 8px 8px 0 0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.presentation-mobile-title-row {
+    height: 30px;
+    line-height: 30px;
+    font-weight: 700;
+    border-bottom: 1px solid #4F4F4F;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.presentation-mobile-simple-row {
+    padding-top: 6px;
+    min-height: 30px;
+    border-bottom: 1px solid #4F4F4F;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.presentation-mobile-simple-row a {
+    text-transform: none;
+    border-bottom: none;
+    color: #4F4F4F;
+}
+/*Стили для страницы
+презентации проекта в моб.версии
+---Конец---
+*/
 
 /*Стили для всплывающих модальных окон
 ---Начало---
@@ -3234,6 +3507,60 @@ a.export_link_hypothesis_for_user:focus {
 ---Конец---
 */
 
+
+/* Стили для контейнеров гипотез на индексных страницах в мобильной версии
+--Начало--
+*/
+@media screen and (max-width: 480px) {
+    .row .container-one_hypothesis_mobile {
+        margin: 5px 0;
+        padding: 0;
+    }
+    .container-one_hypothesis_mobile {
+        background: #707F99;
+        color: #FFFFFF;
+        padding: 10px;
+        min-height: 60px;
+        border-radius: 0;
+    }
+    .container-one_hypothesis_mobile:hover {
+        background: #7F9FC5;
+        transition: .3s;
+    }
+
+    .container-one_hypothesis_mobile:focus {
+        background: #7F9FC5;
+    }
+    .hypothesis_title_mobile {
+        font-size: 28px;
+        font-weight: 700;
+        padding: 10px 0 5px 0;
+        overflow: hidden;
+        max-height: 50px;
+        margin-bottom: 15px;
+    }
+    .header_table_hypothesis_mobile {
+        color: #C7C7C7;
+        font-size: 16px;
+        font-weight: 700;
+        padding-right: 10px;
+    }
+    .text_14_table_hypothesis {
+        font-size: 16px;
+        padding-top: 3px;
+        overflow: hidden;
+        max-height: 50px;
+    }
+    .hypothesis_buttons_mobile {
+        display:flex;
+        width: 100%;
+    }
+}
+/* Стили для контейнеров гипотез на индексных страницах в мобильной версии
+--Конец--
+*/
+
+
 /* Стили для ссылкок на показ инструкции по разработке проекта
 ---Начало---
 */
@@ -3276,8 +3603,81 @@ a.link_to_instruction_page_mobile img,
 a.link_show_search_field_mobile img {
     width: 36px;
 }
+a.link_cancel_search_field_mobile img {
+    width: 32px;
+    margin-top: 5px;
+}
+.add_respond_block_mobile,
+.search_block_mobile {
+    display: none;
+}
 /* Стили для ссылкок на показ инструкции по разработке проекта
 ---Конец---
+*/
+
+
+/* Стили для пунктира обозначающего этапы проекта в мобильной версии
+--Начало--
+*/
+@media screen and (max-width: 480px) {
+    .arrow_stages_project_mobile {
+        display: flex;
+        margin-top: -15px;
+        margin-bottom: 15px;
+    }
+    .arrow_stages_project_mobile .item-stage {
+        width: 10.1%;
+        height: 4px;
+        border-radius: 4px;
+        margin-right: 0.5%;
+        margin-left: 0.5%;
+    }
+    .arrow_stages_project_mobile .item-stage.active {
+        background: #F5A4A4;
+    }
+    .arrow_stages_project_mobile .item-stage.passive {
+        background: #D9D9D9;
+    }
+}
+@media screen and (min-width: 481px) {
+    .arrow_stages_project_mobile {
+        display: none;
+    }
+}
+/* Стили для пунктира обозначающего этапы проекта в мобильной версии
+--Конец--
+*/
+
+
+/* Стили для пунктира обозначающего этапы подтверждения гипотезы в мобильной версии
+--Начало--
+*/
+@media screen and (max-width: 480px) {
+    .arrow_stages_confirm_hypothesis_mobile {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    .arrow_stages_confirm_hypothesis_mobile .item-stage {
+        width: 32.3%;
+        height: 4px;
+        border-radius: 4px;
+        margin-right: 0.5%;
+        margin-left: 0.5%;
+    }
+    .arrow_stages_confirm_hypothesis_mobile .item-stage.active {
+        background: #F5A4A4;
+    }
+    .arrow_stages_confirm_hypothesis_mobile .item-stage.passive {
+        background: #D9D9D9;
+    }
+}
+@media screen and (min-width: 481px) {
+    .arrow_stages_confirm_hypothesis_mobile {
+        display: none;
+    }
+}
+/* Стили для пунктира обозначающего этапы подтверждения гипотезы в мобильной версии
+--Конец--
 */
 
 
@@ -3291,7 +3691,7 @@ a.link_show_search_field_mobile img {
         justify-content: center;
         align-items: center;
         width: 100%;
-        height: 40px;
+        min-height: 40px;
         background-color: #52BE7F;
         font-family: 'RobotoCondensed-Light', serif;
         font-weight: 700;
@@ -3413,17 +3813,37 @@ a.link_show_search_field_mobile img {
         margin-bottom: 10px;
     }
 
+    /* Значек существования непрочитанных сообщений или коммуникаций */
+    .existUnreadMessagesOrCommunications.active {
+        opacity: 1;
+    }
+    .existUnreadMessagesOrCommunications {
+        z-index: 9999;
+        top: 20px;
+        right: 11%;
+        display: flex;
+        min-width: 15px;
+        min-height: 15px;
+        opacity: 0;
+        position: absolute;
+        background: #FF5C5C;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        border-radius: 50%;
+        border: 1px solid #FFFFFF;
+    }
     /* Значек кол-ва непрочитанных сообщений */
     .countUnreadMessages {
         bottom: 7px;
         left: unset;
-        right: 26%;
+        right: 15%;
     }
     /* Значек кол-ва непрочитанных уведомлений */
     .countUnreadCommunications {
         bottom: 7px;
         left: unset;
-        right: 25%;
+        right: 15%;
     }
 }
 
@@ -3451,18 +3871,47 @@ a.link_show_search_field_mobile img {
 /* Общие стили для разных страниц
 --Начало--
 */
-
-.header_hypothesis_first_index {
+.text-block-not-expertise-mobile {
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-align: center;
+}
+.header-title-confirm-hypothesis-mobile {
     display: flex;
+    text-align: center;
+    background: #707F99;
+    font-size: 24px;
+    color: #FFFFFF;
+    font-weight: 700;
+    margin: 0 -15px 5px -15px;
+    height: 48px;
+    justify-content: center;
+}
+
+.header_hypothesis_first_index,
+.header-title-index-mobile {
+    display: flex;
+    flex-direction: column;
+    position: relative;
     text-align: center;
     background: #52BE7F;
     font-size: 24px;
     color: #FFFFFF;
     font-weight: 700;
     margin: 0 -15px 20px -15px;
-    min-height: 40px;
+    height: 48px;
     align-items: center;
     justify-content: center;
+}
+.project-menu-mobile {
+    display: none;
+    margin: -20px -15px 20px -15px;
+    background: #52BE7F;
+}
+.project-menu-mobile .project_buttons_mobile {
+    display:flex;
+    width: 100%;
 }
 
 .header_hypothesis_modal {
@@ -3477,36 +3926,217 @@ a.link_show_search_field_mobile img {
     font-size: 32px;
 }
 
+.p-0 {
+    padding: 0;
+}
+.pl-10 {
+    padding-left: 10px;
+}
+.pl-15 {
+    padding-left: 15px;
+}
 .pl-20 {
     padding-left: 20px;
+}
+.pl-25 {
+    padding-left: 25px;
 }
 .pl-5 {
     padding-left: 5px;
 }
+.pr-5 {
+    padding-right: 5px;
+}
+.pr-10 {
+    padding-right: 10px;
+}
+.pt-2 {
+    padding-top: 2px;
+}
+.pt-5 {
+    padding-top: 5px;
+}
+.pt-20 {
+    padding-top: 20px;
+}
+.pb-2 {
+    padding-bottom: 2px;
+}
+.pb-3 {
+    padding-bottom: 3px;
+}
+.pb-5 {
+    padding-bottom: 5px;
+}
 
+.mr-25 {
+    margin-right: 25px;
+}
+.mt-10 {
+    margin-top: 10px;
+}
+.mt-15 {
+    margin-top: 15px;
+}
+.mb-5 {
+    margin-bottom: 5px;
+}
+.mb-10 {
+    margin-bottom: 10px;
+}
+.mb-15 {
+    margin-bottom: 15px;
+}
 .mt-30 {
     margin-top: 30px;
 }
 
+.display-flex {
+    display: flex;
+}
+.align-items-center {
+    align-items: center;
+}
+.block_all_responds {
+    margin-bottom: 90px;
+}
+
 @media screen and (max-width: 480px) {
+    .desktop-mt--15 {
+        margin-top: 0;
+    }
+    .desktop-mt-15 {
+        margin-top: 0;
+    }
     .desktop-mb-15 {
         margin-bottom: 0;
+    }
+    .mobile-mb-10 {
+        margin-bottom: 10px;
+    }
+    .mobile-mb-15 {
+        margin-bottom: 15px;
+    }
+    .mobile-mt-10 {
+        margin-top: 10px;
     }
     .mobile-mt-15 {
         margin-top: 15px;
     }
-    .header_hypothesis_first_index {
+    .mobile-mt-20 {
+        margin-top: 20px;
+    }
+    .desktop-pl-15 {
+        padding-left: 0;
+    }
+    .desktop-pr-15 {
+        padding-right: 0;
+    }
+    .header_hypothesis_first_index,
+    .header-title-index-mobile,
+    .header-title-mobile,
+    .header-title-confirm-hypothesis-mobile {
         padding: 7px;
+    }
+    .project_info_data,
+    .segment_info_data,
+    .row_header_data_generation,
+    .all_headers_data_hypothesis,
+    .information_status_confirm,
+    .hypothesis_table_desktop {
+        display: none;
+    }
+    .hypothesis_table_mobile {
+        display: block;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+    .confirm-create-button-instruction-mobile {
+        display:flex;
+        justify-content: center;
+        margin-top: -20px;
+    }
+    .confirm-hypothesis-add-questions-mobile,
+    .confirm-hypothesis-view-mobile {
+        display: block;
+    }
+    .block_all_responds {
+        margin-top: 10px;
+    }
+    .confirm-view-bottom-report-desktop {
+        display: none;
+    }
+    .header_hypothesis_first_index {
+        display: none;
+    }
+    .table_responds_to_confirm_segment_desktop {
+        display: none;
+    }
+    .block-link-create-interview {
+        display: none;
     }
 }
 
 @media screen and (min-width: 481px) {
+    .desktop-pt-5 {
+        padding-top: 5px;
+    }
+    .desktop-pb-5 {
+        padding-bottom: 5px;
+    }
+    .desktop-mt--15 {
+        margin-top: -15px;
+    }
+    .desktop-mt-15 {
+        margin-top: 15px;
+    }
     .desktop-mb-15 {
         margin-bottom: 15px;
+    }
+    .mobile-mb-15 {
+        margin-bottom: 0;
     }
     .mobile-mt-15 {
         margin-top: 0;
     }
+    .mobile-mt-20 {
+        margin-top: 0;
+    }
+    .desktop-pl-15 {
+        padding-left: 15px;
+    }
+    .desktop-pr-15 {
+        padding-right: 15px;
+    }
+    .header-title-confirm-hypothesis-mobile,
+    .header-title-index-mobile,
+    .hypothesis_table_mobile {
+        display: none;
+    }
+    .hypothesis_table_desktop {
+        display: block;
+    }
+    .project-menu-mobile {
+        display: none;
+    }
+    .confirm-create-button-instruction-mobile,
+    .confirm-hypothesis-add-questions-mobile,
+    .confirm-hypothesis-view-mobile {
+        display: none;
+    }
+    .confirm-view-bottom-report-mobile {
+        display: none;
+    }
+}
+
+.confirm-hypothesis-step-one-mobile,
+.confirm-hypothesis-step-two-mobile,
+.confirm-hypothesis-step-three-mobile {
+    display: none;
+}
+
+.select2-container--krajee .select2-results__option[aria-selected] {
+    font-size: 20px;
 }
 
 /* Общие стили для разных страниц

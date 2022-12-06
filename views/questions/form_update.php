@@ -44,22 +44,27 @@ use yii\helpers\Html;
                 'margin-bottom' => '15px',
                 'margin-right' => '5px',
                 'height' => '40px',
-                'padding-top' => '7px',
-                'padding-bottom' => '4px',
                 'border-radius' => '8px',
+                'text-transform' => 'uppercase',
+                'font-size' => '16px',
+                'font-weight' => '700',
             ]
         ]) ?>
 
         <?= Html::submitButton('Сохранить', [
-            'class' => 'btn btn-lg btn-success col-xs-6 col-sm-2 col-lg-1',
+            'class' => 'btn btn-lg btn-default col-xs-6 col-sm-2 col-lg-1',
             'style' => [
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
                 'margin-bottom' => '15px',
-                'margin-left' => '5px',
-                'background' => '#52BE7F',
+                'background' => '#7F9FC5',
                 'height' => '40px',
-                'padding-top' => '4px',
-                'padding-bottom' => '4px',
                 'border-radius' => '8px',
+                'text-transform' => 'uppercase',
+                'font-size' => '16px',
+                'color' => '#FFFFFF',
+                'font-weight' => '700',
             ]
         ]) ?>
 

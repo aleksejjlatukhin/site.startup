@@ -65,6 +65,7 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 $(body).on('click', '.show_search_projects', function (e) {
 
     $('.search_block_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
     e.preventDefault();
     return false;
 });

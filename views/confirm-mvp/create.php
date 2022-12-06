@@ -32,6 +32,135 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
 ?>
 <div class="confirm-mvp-create">
 
+    <div class="header-title-index-mobile">
+        <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+        <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+            <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+            <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+        </div>
+    </div>
+
+    <div class="project-menu-mobile">
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 0 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 0 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 10px 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 10px 1%',
+                ],
+            ]) ?>
+
+        </div>
+    </div>
+
+    <div class="arrow_stages_project_mobile">
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                Url::to(['/mvps/index', 'id' => $confirmGcp->getId()])) ?>
+        </div>
+        <div class="text-stage">8/9. Подтверждение MVP</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
+
+    <div class="header-title-confirm-hypothesis-mobile">
+        <div style="overflow: hidden; max-width: 90%;">Продукт: <?= $gcp->getTitle() ?></div>
+    </div>
+
+    <div class="arrow_stages_confirm_hypothesis_mobile">
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+        <div class="text-stage">1/3. Заполнить исходные данные подтверждения</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
+
     <div class="row project_info_data">
 
 
@@ -189,6 +318,29 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
     </div>
 
 
+    <div class="confirm-create-button-instruction-mobile">
+        <?= Html::a('Инструкция',
+            ['/confirm-mvp/get-instruction-step-one'],[
+                'class' => 'btn btn-default open_modal_instruction_page',
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#F5A4A4',
+                    'color' => '#ffffff',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '16px',
+                    'text-transform' => 'uppercase',
+                    'font-weight' => '700',
+                    'padding-top' => '9px',
+                    'border-radius' => '8px',
+                    'margin-top' => '28px'
+                ]
+            ]) ?>
+    </div>
+
+
     <div class="row">
 
         <div class="container-fluid container-data">
@@ -244,11 +396,11 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
                 ?>
 
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row desktop-pt-5 desktop-pb-5 mobile-mt-10">
 
                     <?= $form->field($model, 'count_respond', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div style="padding-top: 5px;">Количество респондентов, подтвердивших ценностное предложение</div>')
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10 pl-20">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div style="padding-top: 5px;">Количество респондентов, подтвердивших ЦП</div>')
                         ->textInput([
                             'type' => 'number',
                             'readonly' => true,
@@ -260,12 +412,12 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row desktop-pt-5 desktop-pb-5 mobile-mt-20">
 
                     <?php $btnContent = '<div class="changeBtnContent">Добавить новых респондентов</div><div style="font-weight: 400;font-size: 13px;">(Общее количечество респондентов - от 1 до 100)</div>'; ?>
 
                     <?= $form->field($model, 'add_count_respond', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10 pl-20">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
                     ])->label(Html::button($btnContent, [
                         'id' => 'switch_add_count_respond',
                         'class' => 'btn btn-default',
@@ -291,11 +443,11 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
 
                 </div>
 
-                <div class="row">
+                <div class="row mobile-mt-10">
 
                     <?= $form->field($model, 'count_positive', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('<div style="padding-top: 5px;">Необходимое количество респондентов, подтверждающих продукт (MVP)</div>')
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10 pl-20">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('<div style="padding-top: 5px;">Необходимое количество респондентов, подтверждающих MVP</div>')
                         ->textInput([
                             'type' => 'number',
                             'required' => true,
@@ -307,21 +459,27 @@ $this->registerCssFile('@web/css/confirm-mvp-create-style.css');
                 </div>
 
 
-                <div class="form-group">
-                    <?= Html::submitButton('Далее', [
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#52BE7F',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                            'margin-top' => '20px'
-                        ],
-                        'class' => 'btn btn-lg btn-success pull-right',
-                    ]) ?>
+                <div class="form-group row">
+                    <div class="col-md-12" style="display:flex;justify-content: center;">
+                        <?= Html::submitButton('Сохранить', [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#7F9FC5',
+                                'color' => '#ffffff',
+                                'width' => '180px',
+                                'height' => '40px',
+                                'font-size' => '16px',
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px',
+                                'border-radius' => '8px',
+                                'margin-top' => '28px'
+                            ]
+                        ]) ?>
+                    </div>
                 </div>
 
 

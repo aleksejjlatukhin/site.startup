@@ -4,8 +4,10 @@ use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\EnableExpertise;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmMvp;
+use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\Mvps;
 use app\models\Problems;
@@ -37,6 +39,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
  * @var QuestionsConfirmMvp[] $questions
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
+ * @var SearchForm $searchForm
  */
 
 ?>
@@ -478,6 +481,301 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
             <div class="content_responds_ajax"></div>
 
         </div>
+    </div>
+</div>
+
+
+<div class="confirm-hypothesis-view-mobile">
+    <div class="header-title-index-mobile">
+        <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+        <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+            <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+            <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+        </div>
+    </div>
+
+    <div class="project-menu-mobile">
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 0 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 0 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 10px 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 10px 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+    </div>
+
+    <div class="arrow_stages_project_mobile">
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                Url::to(['/mvps/index', 'id' => $confirmGcp->getId()])) ?>
+        </div>
+        <div class="text-stage">8/9. Подтверждение MVP</div>
+        <div class="arrow_link_router_mobile_right">
+            <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED && $mvp->confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
+                <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                    Url::to(['/business-model/index', 'id' => $model->getId()])) ?>
+            <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED): ?>
+                <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+            <?php else: ?>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                    <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                        Url::to(['/confirm-mvp/moving-next-stage', 'id' => $model->getId()]), [
+                            'id' => 'button_MovingNextStage']) ?>
+                <?php else: ?>
+                    <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="header-title-confirm-hypothesis-mobile">
+        <div style="overflow: hidden; max-width: 90%;">Продукт: <?= $mvp->getTitle() ?></div>
+    </div>
+
+    <!--ШАГ 1-->
+    <div class="confirm-stage-mobile confirm-hypothesis-step-one-mobile">
+
+        <div class="arrow_stages_confirm_hypothesis_mobile">
+            <div class="item-stage active"></div>
+            <div class="item-stage passive"></div>
+            <div class="item-stage passive"></div>
+        </div>
+
+        <div class="arrow_links_router_mobile">
+            <div class="arrow_link_router_mobile_left">
+                <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+            </div>
+            <div class="text-stage">1/3. Заполнить исходные данные подтверждения</div>
+            <div class="arrow_link_router_mobile_right">
+                <?= Html::img('@web/images/icons/arrow_left_active.png', [
+                    'class' => 'open-confirm-hypothesis-step-two-mobile']) ?>
+            </div>
+        </div>
+
+        <div class="row block-ajax-data-confirm">
+            <?= $this->render('ajax_data_confirm', [
+                'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
+                'model' => $model,
+                'mvp' => $mvp,
+            ]) ?>
+        </div>
+
+    </div>
+
+    <!--ШАГ 2-->
+    <div class="confirm-stage-mobile confirm-hypothesis-step-two-mobile">
+
+        <div class="arrow_stages_confirm_hypothesis_mobile">
+            <div class="item-stage passive"></div>
+            <div class="item-stage active"></div>
+            <div class="item-stage passive"></div>
+        </div>
+
+        <div class="arrow_links_router_mobile">
+            <div class="arrow_link_router_mobile_left">
+                <?= Html::img('@web/images/icons/arrow_left_active.png', [
+                    'class' => 'open-confirm-hypothesis-step-one-mobile']) ?>
+            </div>
+            <div class="text-stage">2/3. Сформировать список вопросов</div>
+            <div class="arrow_link_router_mobile_right">
+                <?= Html::img('@web/images/icons/arrow_left_active.png', [
+                    'class' => 'open-confirm-hypothesis-step-three-mobile']) ?>
+            </div>
+        </div>
+
+        <div class="row container-fluid">
+            <div class="col-xs-12" style="padding: 0;">
+                <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                    Url::to('/confirm-mvp/get-instruction-step-two'), [
+                        'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                        'title' => 'Инструкция', 'style' => ['margin-left' => '10px', 'margin-top' => '5px']
+                    ]) ?>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                    <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить вопрос</div></div>', ['#'],
+                        ['class' => 'add_new_question_button', 'id' => 'buttonAddQuestion']
+                    ) ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?= $this->render('form_questions', [
+            'questions' => $questions,
+            'mvp' => $mvp,
+            'queryQuestions' => $queryQuestions,
+            'model' => $model,
+            'newQuestion' => $newQuestion,
+        ]) ?>
+
+    </div>
+
+    <!--ШАГ 3-->
+    <div class="confirm-stage-mobile confirm-hypothesis-step-three-mobile">
+
+        <div class="arrow_stages_confirm_hypothesis_mobile">
+            <div class="item-stage passive"></div>
+            <div class="item-stage passive"></div>
+            <div class="item-stage active"></div>
+        </div>
+
+        <div class="arrow_links_router_mobile">
+            <div class="arrow_link_router_mobile_left">
+                <?= Html::img('@web/images/icons/arrow_left_active.png', [
+                    'class' => 'open-confirm-hypothesis-step-two-mobile']) ?>
+            </div>
+            <div class="text-stage">3/3. Заполнить информацию</div>
+            <div class="arrow_link_router_mobile_right">
+                <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+            </div>
+        </div>
+
+        <div class="row row_header_data_generation_mobile">
+            <div class="col-xs-8">
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                    <?=  Html::a( '<div style="display:flex; align-items: center; padding: 5px 0;"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить респондента</div></div>', ['/responds/get-data-create-form', 'stage' => $model->getStage() , 'id' => $model->getId(), 'isMobile' => true],
+                        ['class' => 'link_add_respond_text show_add_respond']
+                    ) ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="col-xs-4">
+
+                <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                        Url::to('/confirm-mvp/get-instruction-step-three'),[
+                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                            'title' => 'Инструкция', 'style' => ['margin-left' => '10px', 'margin-top' => '5px']
+                        ]) ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_green_search.png'), ['#'], [
+                        'class' => 'link_show_search_field_mobile show_search_responds pull-right',
+                        'title' => 'Поиск респондентов', 'style' => ['margin-top' => '5px']
+                    ]) ?>
+
+                <?php else : ?>
+
+                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                        Url::to(['/confirm-mvp/get-instruction-step-three'],[
+                            'class' => 'link_to_instruction_page open_modal_instruction_page',
+                            'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
+                        ])) ?>
+
+                <?php endif; ?>
+
+            </div>
+        </div>
+
+        <div class="row search_block_mobile">
+            <div class="col-xs-10">
+                <?php $form = ActiveForm::begin([
+                    'id' => 'search_responds_mobile',
+                    'options' => ['class' => 'g-py-15'],
+                    'errorCssClass' => 'u-has-error-v1',
+                    'successCssClass' => 'u-has-success-v1-1',
+                ]); ?>
+
+                <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                    ->textInput([
+                        'id' => 'search_input_responds_mobile',
+                        'class' => 'style_form_field_respond form-control',
+                        'placeholder' => 'поиск респондента',
+                        'minlength' => 5,
+                        'autocomplete' => 'off'])
+                    ->label(false) ?>
+
+                <?php ActiveForm::end(); ?>
+            </div>
+            <div class="col-xs-2 pull-right">
+                <?= Html::a(Html::img('@web/images/icons/cancel_danger.png'), ['#'], ['class' => 'link_cancel_search_field_mobile show_search_responds']) ?>
+            </div>
+        </div>
+
+        <div class="row add_respond_block_mobile"></div>
+
+        <!--renderAjax /respond/get-query-responds-->
+        <div class="content_responds_ajax"></div>
+
     </div>
 </div>
 

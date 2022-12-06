@@ -18,13 +18,17 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
 <div class="projects-index">
 
+    <div class="row mobile-mb-15">
+        <div class="col-xs-12 header-title-mobile"><?= $this->title ?></div>
+    </div>
+
     <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
         <div class="methodological-guide">
 
-            <div class="header_hypothesis_first_index">Формулировка проекта</div>
+            <div class="header_hypothesis_first_index">Проекты</div>
 
-            <div class="row container-fluid">
+            <div class="row desktop-pl-15 desktop-pr-15">
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
@@ -35,6 +39,8 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
             </div>
 
             <div class="container-list">
+
+                <p class="bold">Формулировка проекта</p>
 
                 <div class="simple-block">
                     <p>

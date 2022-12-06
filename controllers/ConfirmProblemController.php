@@ -6,11 +6,13 @@ use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmSegment;
+use app\models\EnableExpertise;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmProblem;
 use app\models\forms\FormCreateGcp;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmProblem;
+use app\models\forms\SearchForm;
 use app\models\PatternHttpException;
 use app\models\Problems;
 use app\models\Projects;
@@ -290,6 +292,10 @@ class ConfirmProblemController extends AppUserPartController
 
         $model->setCountRespond($count_represent_segment);
 
+        if ($problem->getEnableExpertise() === EnableExpertise::OFF) {
+            return $this->redirect(['/problems/index', 'id' => $confirmSegment->getId()]);
+        }
+
         if ($problem->confirm){ //Если у проблемы создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $problem->confirm->getId()]);
         }
@@ -428,6 +434,7 @@ class ConfirmProblemController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
         ]);
     }
 

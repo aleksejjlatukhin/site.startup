@@ -91,17 +91,20 @@ use app\models\QuestionStatus;
                             ->fileInput([
                                 'id' => 'descInterviewUpdateFile', 'class' => 'sr-only'
                             ])->label('Выберите файл',[
-                                'class'=>'btn btn-default',
+                                'class'=>'btn btn-success',
                                 'style' => [
                                     'display' => 'flex',
                                     'align-items' => 'center',
                                     'color' => '#FFFFFF',
                                     'justify-content' => 'center',
-                                    'background' => '#707F99',
+                                    'background' => '#52BE7F',
                                     'width' => '180px',
                                     'height' => '40px',
-                                    'font-size' => '24px',
+                                    'font-size' => '16px',
                                     'border-radius' => '8px',
+                                    'text-transform' => 'uppercase',
+                                    'font-weight' => '700',
+                                    'padding-top' => '9px'
                                 ],
                             ]) ?>
 
@@ -118,20 +121,21 @@ use app\models\QuestionStatus;
 
                         <?= Html::a('Скачать файл', ['/interviews/download', 'stage' => $confirm->getStage(), 'id' => $model->getId()], [
                             'target' => '_blank',
-                            'class' => 'btn btn-default interview_file_update',
+                            'class' => 'btn btn-success interview_file_update',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'color' => '#FFFFFF',
                                 'justify-content' => 'center',
-                                'background' => '#707F99',
-                                'width' => '170px',
+                                'background' => '#52BE7F',
+                                'width' => '180px',
                                 'height' => '40px',
-                                'text-align' => 'left',
-                                'font-size' => '24px',
+                                'font-size' => '16px',
                                 'border-radius' => '8px',
-                                'margin-right' => '5px',
-                            ]
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px'
+                            ],
 
                         ]) . ' ' . Html::a('Удалить файл', ['/interviews/delete-file', 'stage' => $confirm->getStage(), 'id' => $model->getId()], [
                             'id' => 'link_delete_file',
@@ -144,8 +148,11 @@ use app\models\QuestionStatus;
                                 'color' => '#FFFFFF',
                                 'width' => '170px',
                                 'height' => '40px',
-                                'font-size' => '24px',
+                                'font-size' => '16px',
                                 'border-radius' => '8px',
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px'
                             ]
                         ]) ?>
 
@@ -167,17 +174,20 @@ use app\models\QuestionStatus;
                         ->fileInput([
                             'id' => 'descInterviewUpdateFile', 'class' => 'sr-only'
                         ])->label('Выберите файл',[
-                            'class'=>'btn btn-default',
+                            'class'=>'btn btn-success',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'color' => '#FFFFFF',
                                 'justify-content' => 'center',
-                                'background' => '#707F99',
+                                'background' => '#52BE7F',
                                 'width' => '180px',
                                 'height' => '40px',
-                                'font-size' => '24px',
+                                'font-size' => '16px',
                                 'border-radius' => '8px',
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px'
                             ],
                         ]) ?>
 
@@ -280,19 +290,23 @@ use app\models\QuestionStatus;
 
         <?php endif; ?>
 
-        <div class="form-group col-xs-12">
+        <div class="form-group col-xs-12" style="display: flex; justify-content: center;">
             <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
+                'class' => 'btn btn-default',
                 'style' => [
                     'display' => 'flex',
                     'align-items' => 'center',
                     'justify-content' => 'center',
-                    'background' => '#52BE7F',
-                    'width' => '140px',
+                    'margin-bottom' => '15px',
+                    'background' => '#7F9FC5',
+                    'width' => '180px',
                     'height' => '40px',
-                    'font-size' => '24px',
                     'border-radius' => '8px',
-                    'margin-top' => '28px'
+                    'text-transform' => 'uppercase',
+                    'font-size' => '16px',
+                    'color' => '#FFFFFF',
+                    'font-weight' => '700',
+                    'padding-top' => '9px'
                 ]
             ]) ?>
         </div>
@@ -353,20 +367,21 @@ use app\models\QuestionStatus;
 
                         <?= Html::a('Скачать файл', ['/interviews/download', 'stage' => $confirm->getStage(), 'id' => $model->getId()], [
                             'target' => '_blank',
-                            'class' => 'btn btn-default interview_file_update',
+                            'class' => 'btn btn-success interview_file_update',
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'color' => '#FFFFFF',
                                 'justify-content' => 'center',
-                                'background' => '#707F99',
-                                'width' => '170px',
+                                'background' => '#52BE7F',
+                                'width' => '180px',
                                 'height' => '40px',
-                                'text-align' => 'left',
-                                'font-size' => '24px',
+                                'font-size' => '16px',
                                 'border-radius' => '8px',
-                                'margin-right' => '5px',
-                            ]
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px'
+                            ],
                         ]) ?>
 
                     </div>

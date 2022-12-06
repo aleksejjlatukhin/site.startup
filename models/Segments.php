@@ -29,8 +29,7 @@ use yii\helpers\FileHelper;
  * @property int $education_of_consumer                             Образование потребителя
  * @property int $income_from                                       Доход потребителя "от"
  * @property int $income_to                                         Доход потребителя "до"
- * @property int $quantity_from                                     Потенциальное количество потребителей "от"
- * @property int $quantity_to                                       Потенциальное количество потребителей "до"
+ * @property int $quantity                                          Потенциальное количество потребителей
  * @property int $market_volume                                     Объем рынка
  * @property string $company_products                               Продукция / услуги предприятия
  * @property string $company_partner                                Партнеры предприятия
@@ -168,7 +167,7 @@ class Segments extends ActiveRecord
             [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm'], 'integer'],
             [['age_from', 'age_to'], 'integer'],
             [['income_from', 'income_to'], 'integer'],
-            [['quantity_from', 'quantity_to'], 'integer'],
+            [['quantity'], 'integer'],
             [['market_volume'], 'integer'],
             [['add_info'], 'string'],
             [['name',], 'string', 'min' => 2, 'max' => 65],
@@ -191,14 +190,14 @@ class Segments extends ActiveRecord
         return [
             'name' => 'Наименование сегмента',
             'description' => 'Краткое описание сегмента',
-            'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
+            'type_of_interaction_between_subjects' => 'Тип взаимодействия с потребителями',
             'field_of_activity' => 'Сфера деятельности потребителя',
             'sort_of_activity' => 'Вид / специализация деятельности потребителя',
             'age_from' => 'Возраст потребителя',
             'gender_consumer' => 'Пол потребителя',
             'education_of_consumer' => 'Образование потребителя',
             'income_from' => 'Доход потребителя (тыс. руб./мес.)',
-            'quantity_from' => 'Потенциальное количество потребителей (тыс. чел.)',
+            'quantity' => 'Потенциальное количество потребителей',
             'market_volume' => 'Объем рынка (млн. руб./год)',
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
@@ -511,33 +510,17 @@ class Segments extends ActiveRecord
     /**
      * @return int
      */
-    public function getQuantityFrom(): int
+    public function getQuantity(): int
     {
-        return $this->quantity_from;
+        return $this->quantity;
     }
 
     /**
-     * @param int $quantity_from
+     * @param int $quantity
      */
-    public function setQuantityFrom(int $quantity_from): void
+    public function setQuantity(int $quantity): void
     {
-        $this->quantity_from = $quantity_from;
-    }
-
-    /**
-     * @return int
-     */
-    public function getQuantityTo(): int
-    {
-        return $this->quantity_to;
-    }
-
-    /**
-     * @param int $quantity_to
-     */
-    public function setQuantityTo(int $quantity_to): void
-    {
-        $this->quantity_to = $quantity_to;
+        $this->quantity = $quantity;
     }
 
     /**

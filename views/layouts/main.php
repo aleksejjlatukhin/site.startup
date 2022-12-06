@@ -92,11 +92,17 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
             <div class="nav-bar-menu-mobile">
 
                 <?php
+                $existUnreadBlock = '<div class="existUnreadMessagesOrCommunications"></div>';
+                if (($user->countUnreadCommunications + $user->countUnreadMessages) > 0) {
+                    $existUnreadBlock = '<div class="existUnreadMessagesOrCommunications active"></div>';
+                } ?>
+
+                <?php
                 NavBar::begin([
                     'id' => 'main_menu_user_mobile',
                     'options' => ['class' => 'navbar-inverse navbar-fixed-top'],
                     'renderInnerContainer' => false,
-                    'headerContent' => !Yii::$app->user->isGuest ? ('<div class="navbar-header-content">' . $user->getTextRole() . ': ' . (mb_strlen($user->getUsername()) > 12 ? mb_substr($user->getUsername(), 0, 10) . '...' : $user->getUsername()) . '</div>') : (''),
+                    'headerContent' => !Yii::$app->user->isGuest ? ('<div class="navbar-header-content">' . $user->getTextRole() . ': ' . (mb_strlen($user->getUsername()) > 12 ? mb_substr($user->getUsername(), 0, 10) . '...' : $user->getUsername()) . '</div>' . $existUnreadBlock) : (''),
                 ]);
 
                 echo Nav::widget([
@@ -105,14 +111,14 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                         !Yii::$app->user->isGuest ? ([
                             'label' => $user->countUnreadCommunications ? '<div class="link_nav_bar_menu_mobile">Уведомления</div><div class="countUnreadCommunications active">' . $user->countUnreadCommunications . '</div>'
-                                : '<div class="link_nav_bar_menu_mobile">Уведомления</div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
+                                : '<div class="link_nav_bar_menu_mobile">Уведомления</div><div class="countUnreadCommunications"></div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
                         ]) : (''),
 
                         !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Проекты</div>', 'url' => ['/projects/index', 'id' => $user->getId()]]) : (''),
 
                         !Yii::$app->user->isGuest ? (
                         ['label' => $user->countUnreadMessages ? '<div class="link_nav_bar_menu_mobile">Сообщения</div><div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>'
-                            : '<div class="link_nav_bar_menu_mobile">Сообщения</div>', 'url' => ['/message/index', 'id' => $user->getId()]]) : '',
+                            : '<div class="link_nav_bar_menu_mobile">Сообщения</div><div class="countUnreadMessages"></div>', 'url' => ['/message/index', 'id' => $user->getId()]]) : '',
 
                         !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Методическое руководство</div>', 'url' => ['/site/methodological-guide']]) : '',
 
@@ -230,24 +236,23 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
             'class' => 'delete_hypothesis_modal',
         ],
         'size' => 'modal-md',
-        'header' => '<h3 class="text-center header-update-modal">Выберите действие</h3>',
         'footer' => '<div class="text-center">'.
 
             Html::a('Отмена', ['#'],[
-                'class' => 'btn btn-default',
+                'class' => 'btn btn-default button-cancel',
                 'style' => ['width' => '120px'],
                 'onclick' => "$('#delete_hypothesis_modal').modal('hide'); return false;"
             ]).
 
-            Html::a('Ок', ['#'],[
-                'class' => 'btn btn-default',
+            Html::a('Удалить', ['#'],[
+                'class' => 'btn btn-default button-remove',
                 'style' => ['width' => '120px'],
                 'id' => "confirm_delete_hypothesis",
             ]).
 
             '</div>'
     ]); ?>
-    <h4 class="text-center"></h4>
+    <div class="text-center modal-main-content"></div>
     <!--Контент добавляется через Ajax-->
     <?php Modal::end(); ?>
 

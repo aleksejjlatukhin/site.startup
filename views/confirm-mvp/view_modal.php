@@ -17,7 +17,7 @@ Modal::begin([
     'options' => ['id' => 'respondCreate_modal'],
     'size' => 'modal-md',
     'header' => '<h3 class="text-center">Добавить респондента</h3>',
-    'headerOptions' => ['class' => 'style_header_modal_form'],
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 
 <!--Контент загружается через Ajax-->
@@ -29,9 +29,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'respond_update_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Сведения о респонденте' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-three'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
+    'header' => 'Сведения о респонденте',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 
 <!--Контент загружается через Ajax-->
@@ -43,9 +42,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'create_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Внесите результаты интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-three'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
+    'header' => 'Внесите результаты интервью',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 
 <!--Контент загружается через Ajax-->
@@ -57,9 +55,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['id' => 'update_descInterview_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Результаты интервью' . Html::img('/images/icons/icon_report_next.png'), ['/confirm-mvp/get-instruction-step-three'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
+    'header' => 'Результаты интервью',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 
 <!--Контент загружается через Ajax-->

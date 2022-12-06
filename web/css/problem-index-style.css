@@ -247,3 +247,30 @@
         padding-bottom: 15px;
     }
 }
+
+@media screen and (max-width: 480px) {
+    .new_hypothesis_link_plus {
+        font-size: 18px;
+    }
+    .container-fluid.block-button-new-problem {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .row_header_data_generation,
+    .headers_data_hypothesis {
+        display: none;
+    }
+    .container-data {
+        background-color: #F2F2F2;
+    }
+}
+
+@media screen and (min-width: 481px) {
+
+    .row_header_data_generation_mobile {
+        display: none;
+    }
+    body .simplebar-content {
+        background: #FFFFFF;
+    }
+}

@@ -4,6 +4,7 @@ use app\models\ConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use yii\helpers\Html;
 use app\models\User;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 $this->title = 'Генерация гипотез проблем сегмента';
@@ -15,6 +16,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
  * @var FormCreateProblem $formModel
  */
 
+$project = $confirmSegment->hypothesis->project;
 ?>
 
 <div class="generation-problem-index">
@@ -25,7 +27,116 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
             <div class="header_hypothesis_first_index">Генерация гипотез проблем сегментов</div>
 
-            <div class="row container-fluid">
+            <div class="header-title-index-mobile">
+                <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+                <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+                    <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+                    <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+                </div>
+            </div>
+
+            <div class="project-menu-mobile">
+                <div class="project_buttons_mobile">
+
+                    <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 1% 0 2%',
+                        ],
+                    ]) ?>
+
+                    <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 2% 0 1%',
+                        ],
+                    ]) ?>
+
+                </div>
+
+                <div class="project_buttons_mobile">
+
+                    <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 1% 10px 2%',
+                        ],
+                    ]) ?>
+
+                    <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                        'class' => 'btn btn-default',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 2% 10px 1%',
+                        ],
+                    ]) ?>
+
+                </div>
+            </div>
+
+            <div class="arrow_stages_project_mobile">
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage active"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+                <div class="item-stage passive"></div>
+            </div>
+
+            <div class="arrow_links_router_mobile">
+                <div class="arrow_link_router_mobile_left">
+                    <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                        Url::to(['/confirm-segment/view', 'id' => $confirmSegment->getId()])) ?>
+                </div>
+                <div class="text-stage">3/9. Генерация гипотез проблем сегментов</div>
+                <div class="arrow_link_router_mobile_right">
+                    <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+                </div>
+            </div>
+
+            <div class="row container-fluid block-button-new-problem">
                 <div class="col-md-12">
                     <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проблему</div></div>',
@@ -138,45 +249,48 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
                 <div class="row container-fluid rowExpectedResults rowExpectedResults-" style="margin-bottom: 15px;">
 
-                    <div class="col-md-6 field-EXR">
+                    <div class="col-xs-6 field-EXR">
 
                         <?= $form->field($formModel, "_expectedResultsInterview[0][question]", ['template' => '{input}'])->textarea([
-                            'rows' => 2,
+                            'rows' => 3,
                             'maxlength' => true,
                             'required' => true,
-                            'placeholder' => 'Напишите вопрос',
+                            'placeholder' => 'Вопрос',
                             'id' => '_expectedResults_question-',
                             'class' => 'style_form_field_respond form-control',
                         ]) ?>
 
                     </div>
 
-                    <div class="col-md-6 field-EXR">
+                    <div class="col-xs-6 field-EXR">
 
                         <?= $form->field($formModel, "_expectedResultsInterview[0][answer]", ['template' => '{input}'])->textarea([
-                            'rows' => 2,
+                            'rows' => 3,
                             'maxlength' => true,
                             'required' => true,
-                            'placeholder' => 'Напишите ответ',
+                            'placeholder' => 'Ответ',
                             'id' => '_expectedResults_answer-',
                             'class' => 'style_form_field_respond form-control',
                         ]) ?>
 
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-xs-12">
 
-                        <?= Html::button('Удалить вопрос/ответ', [
+                        <?= Html::button('Удалить вопрос', [
                             'id' => 'remove-expectedResults-',
                             'class' => "remove-expectedResults btn btn-default",
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'justify-content' => 'center',
-                                'width' => '170px',
+                                'width' => '180px',
                                 'height' => '40px',
                                 'font-size' => '16px',
                                 'border-radius' => '8px',
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px'
                             ]
                         ]) ?>
                     </div>

@@ -11,9 +11,8 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Генерация гипотезы сегмента' . Html::img('/images/icons/icon_report_next.png'), ['/segments/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => '<div>Новый сегмент</div>',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]);
 ?>
 
@@ -29,9 +28,8 @@ Modal::end();
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Редактирование сегмента' . Html::img('/images/icons/icon_report_next.png'), ['/segments/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => '<div>Редактирование сегмента</div>',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]);
 ?>
 
@@ -68,7 +66,7 @@ Modal::begin([
 ?>
 
 <h4 class="text-center" style="color: #F2F2F2; padding: 0 30px;">
-    Для сохранения формы сегмента необходимо<br>заполнить все поля со знаком *
+    Для сохранения формы сегмента необходимо<br>заполнить все поля
 </h4>
 
 <?php

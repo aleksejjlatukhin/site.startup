@@ -113,6 +113,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 Modal::begin([
     'options' => ['class' => 'modal_instruction_page'],
     'size' => 'modal-lg',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент добавляется через Ajax-->
 <?php Modal::end(); ?>

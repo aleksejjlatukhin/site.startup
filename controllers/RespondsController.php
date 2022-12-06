@@ -201,16 +201,17 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isMobile
      * @return array|bool
      */
-    public function actionGetDataCreateForm(int $stage, int $id)
+    public function actionGetDataCreateForm(int $stage, int $id, bool $isMobile = false)
     {
         $confirm = self::getConfirm($stage, $id);
         $model = self::getCreateModel($stage, $confirm);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('create', ['confirm' => $confirm, 'model' => $model])];
+            $response = ['renderAjax' => $this->renderAjax('create', ['confirm' => $confirm, 'model' => $model, 'isMobile' => $isMobile])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -393,16 +394,15 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
-     * @param int $page
+     * @param string $search
+     * @param bool $isMobile
      * @return array|bool
      */
-    public function actionGetQueryResponds(int $stage, int $id, int $page)
+    public function actionGetQueryResponds(int $stage, int $id, string $search = '', bool $isMobile = false)
     {
         $confirm = self::getConfirm($stage, $id);
-        $queryResponds = self::getQueryModels($stage, $id);
-        $pagesResponds = new Pagination(['totalCount' => $queryResponds->count(), 'page' => ($page - 1), 'pageSize' => 10]);
-        $pagesResponds->pageSizeParam = false; //убираем параметр $per-page
-        $responds = $queryResponds->offset($pagesResponds->offset)->limit(10)->all();
+        $queryResponds = self::getQueryModels($stage, $id, $search);
+        $responds = $queryResponds->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -410,19 +410,19 @@ class RespondsController extends AppUserPartController
 
             if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmSegment', [
-                    'confirm' => $confirm, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmProblem', [
-                    'confirm' => $confirm, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmGcp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmMvp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'pagesResponds' => $pagesResponds])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
             }
 
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -521,24 +521,33 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param string $search
      * @return bool|ActiveQuery
      */
-    private static function getQueryModels(int $stage, int $id)
+    private static function getQueryModels(int $stage, int $id, string $search)
     {
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return RespondsSegment::find()->where(['confirm_id' => $id]);
+            return RespondsSegment::find()
+                ->where(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return RespondsProblem::find()->where(['confirm_id' => $id]);
+            return RespondsProblem::find()
+                ->where(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-            return RespondsGcp::find()->where(['confirm_id' => $id]);
+            return RespondsGcp::find()
+                ->where(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-            return RespondsMvp::find()->where(['confirm_id' => $id]);
+            return RespondsMvp::find()
+                ->where(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]);
         }
         return false;
     }

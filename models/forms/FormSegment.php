@@ -28,10 +28,8 @@ use yii\base\Model;
  * @property int $income_to                                         Доход потребителя "до"
  * @property int $income_company_from                               Доход предприятия "от"
  * @property int $income_company_to                                 Доход предприятия "до"
- * @property int $quantity_from                                     Потенциальное количество потребителей "от"
- * @property int $quantity_to                                       Потенциальное количество потребителей "до"
- * @property int $quantity_from_b2b                                 Потенциальное количество предприятий "от"
- * @property int $quantity_to_b2b                                   Потенциальное количество предприятий "до"
+ * @property int $quantity                                          Потенциальное количество потребителей
+ * @property int $quantity_b2b                                      Потенциальное количество предприятий
  * @property int $market_volume_b2c                                 Объем рынка b2c
  * @property int $market_volume_b2b                                 Объем рынка b2b
  * @property string $company_products                               Продукция / услуги предприятия
@@ -55,10 +53,8 @@ abstract class FormSegment extends Model
     public $income_to;
     public $income_company_from;
     public $income_company_to;
-    public $quantity_from;
-    public $quantity_to;
-    public $quantity_from_b2b;
-    public $quantity_to_b2b;
+    public $quantity;
+    public $quantity_b2b;
     public $gender_consumer;
     public $education_of_consumer;
     public $market_volume_b2c;
@@ -95,10 +91,10 @@ abstract class FormSegment extends Model
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
             [['add_info'], 'string'],
             [['age_from', 'age_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '100'],
-            [['income_from', 'income_to'], 'integer', 'integerOnly' => TRUE, 'min' => '5000', 'max' => '1000000'],
+            [['income_from', 'income_to'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
             [['income_company_from', 'income_company_to'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
-            [['quantity_from', 'quantity_to', 'quantity_from_b2b', 'quantity_to_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
-            [['market_volume_b2c', 'market_volume_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
+            [['quantity', 'quantity_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
+            [['market_volume_b2c', 'market_volume_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000000'],
             [['project_id', 'gender_consumer', 'education_of_consumer'], 'integer'],
             ['type_of_interaction_between_subjects', 'in', 'range' => [
                 Segments::TYPE_B2C,
@@ -116,7 +112,7 @@ abstract class FormSegment extends Model
         return [
             'name' => 'Наименование сегмента',
             'description' => 'Краткое описание сегмента',
-            'type_of_interaction_between_subjects' => 'Вид информационного и экономического взаимодействия между субъектами рынка',
+            'type_of_interaction_between_subjects' => 'Тип взаимодействия с потребителями',
             'field_of_activity_b2c' => 'Сфера деятельности потребителя',
             'field_of_activity_b2b' => 'Сфера деятельности предприятия',
             'sort_of_activity_b2c' => 'Вид / специализация деятельности потребителя',
@@ -127,10 +123,8 @@ abstract class FormSegment extends Model
             'income_to' => 'Доход потребителя',
             'income_company_from' => 'Доход предприятия',
             'income_company_to' => 'Доход предприятия',
-            'quantity_from' => 'Потенциальное количество потребителей',
-            'quantity_to' => 'Потенциальное количество потребителей',
-            'quantity_from_b2b' => 'Потенциальное количество представителей сегмента',
-            'quantity_to_b2b' => 'Потенциальное количество представителей сегмента',
+            'quantity' => 'Потенциальное количество потребителей',
+            'quantity_b2b' => 'Потенциальное количество представителей сегмента',
             'gender_consumer' => 'Пол потребителя',
             'education_of_consumer' => 'Образование потребителя',
             'market_volume_b2c' => 'Объем рынка (млн. руб./год)',
@@ -400,65 +394,33 @@ abstract class FormSegment extends Model
     /**
      * @return int
      */
-    public function getQuantityFrom(): int
+    public function getQuantity(): int
     {
-        return $this->quantity_from;
+        return $this->quantity;
     }
 
     /**
-     * @param int $quantity_from
+     * @param int $quantity
      */
-    public function setQuantityFrom(int $quantity_from): void
+    public function setQuantity(int $quantity): void
     {
-        $this->quantity_from = $quantity_from;
-    }
-
-    /**
-     * @return int
-     */
-    public function getQuantityTo(): int
-    {
-        return $this->quantity_to;
-    }
-
-    /**
-     * @param int $quantity_to
-     */
-    public function setQuantityTo(int $quantity_to): void
-    {
-        $this->quantity_to = $quantity_to;
+        $this->quantity = $quantity;
     }
 
     /**
      * @return int
      */
-    public function getQuantityFromB2b(): int
+    public function getQuantityB2b(): int
     {
-        return $this->quantity_from_b2b;
+        return $this->quantity_b2b;
     }
 
     /**
-     * @param int $quantity_from_b2b
+     * @param int $quantity_b2b
      */
-    public function setQuantityFromB2b(int $quantity_from_b2b): void
+    public function setQuantityB2b(int $quantity_b2b): void
     {
-        $this->quantity_from_b2b = $quantity_from_b2b;
-    }
-
-    /**
-     * @return int
-     */
-    public function getQuantityToB2b(): int
-    {
-        return $this->quantity_to_b2b;
-    }
-
-    /**
-     * @param int $quantity_to_b2b
-     */
-    public function setQuantityToB2b(int $quantity_to_b2b): void
-    {
-        $this->quantity_to_b2b = $quantity_to_b2b;
+        $this->quantity_b2b = $quantity_b2b;
     }
 
     /**

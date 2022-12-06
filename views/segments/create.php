@@ -17,15 +17,19 @@ use app\models\Segments;
 
 <style>
     .select2-container--krajee .select2-selection {
-        font-size: 16px;
-        height: 40px;
+        font-size: 20px;
+        height: 45px;
         padding-left: 15px;
-        padding-top: 8px;
+        padding-top: 7px;
         padding-bottom: 15px;
-        border-radius: 12px;
+        border: 1px solid #4F4F4F;
+        border-radius: 8px;
     }
     .select2-container--krajee .select2-selection--single .select2-selection__arrow {
-        height: 39px;
+        height: 44px;
+    }
+    .select2-container--krajee .select2-selection__clear {
+        top: 0.9rem;
     }
 </style>
 
@@ -40,90 +44,77 @@ use app\models\Segments;
         'successCssClass' => 'u-has-success-v1-1',
     ]); ?>
 
-    <div class="row" style="margin-bottom: 10px;">
+    <div class="row desktop-mb-15">
 
         <?= $form->field($model, 'name', [
-            'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-5">{input}</div>'
-        ])->label('Наименование сегмента *')->textInput([
+            'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-5">{input}</div>'
+        ])->label('Наименование сегмента')->textInput([
             'maxlength' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
             'autocomplete' => 'off'
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
-    <div class="row" style="margin-bottom: 15px;">
+    <div class="row desktop-mb-15">
 
         <?= $form->field($model, 'description', [
-            'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-        ])->label('Краткое описание сегмента *')->textarea([
+            'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+        ])->label('Краткое описание сегмента')->textarea([
             'rows' => 1,
             'maxlength' => true,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
-    <div class="row" style="margin-bottom: 10px;">
-
-        <?php
-        $list_of_interactions = [
-            Segments::TYPE_B2C => 'Коммерческие взаимоотношения между организацией и частным потребителем (B2C)',
-            Segments::TYPE_B2B => 'Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)'
-        ];
-        ?>
+    <div class="row desktop-mb-15">
 
         <?= $form->field($model, 'type_of_interaction_between_subjects', [
-            'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12 type_of_interaction">{input}</div>'
-        ])->label('Вид информационного и экономического взаимодействия между субъектами рынка *')->widget(Select2::class, [
-            'data' => $list_of_interactions,
+            'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12 type_of_interaction">{input}</div>'
+        ])->label('Тип взаимодействия с потребителями')->widget(Select2::class, [
+            'data' => [Segments::TYPE_B2C => 'B2C', Segments::TYPE_B2B => 'B2B'],
             'options' => ['id' => 'type-interaction'],
             'hideSearch' => true, //Скрытие поиска
-        ]); ?>
+        ]) ?>
 
     </div>
 
 
     <div class="form-template-b2c">
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'field_of_activity_b2c', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Сфера деятельности потребителя *')->textInput([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Сфера деятельности потребителя')->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row mb-15">
 
             <?= $form->field($model, 'sort_of_activity_b2c', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Вид / специализация деятельности потребителя *')->textInput([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Вид / специализация деятельности потребителя')->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
-
 
         <script>
 
             $( function() {
 
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
                 $("input#age_from").change(function () {
                     var value1 = $("input#age_from").val();
                     var value2 = $("input#age_to").val();
@@ -146,7 +137,6 @@ use app\models\Segments;
                     }
                 });
 
-                //Изменение местоположения ползунка при вводе данных во второй элемент Input
                 $("input#age_to").change(function () {
                     var value1 = $("input#age_from").val();
                     var value2 = $("input#age_to").val();
@@ -172,35 +162,32 @@ use app\models\Segments;
             } );
         </script>
 
-
-        <div class="row" style="margin-bottom: 10px; margin-top: -10px;">
+        <div class="row mb-15">
 
             <?= $form->field($model, 'age_from', [
-                'template' => '<div class="col-md-4" style="margin-top: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-top: 15px;">{input}</div>'
-            ])->label('<div>Возраст потребителя *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 0 до 100)</div>')
+                'template' => '<div class="col-xs-6 col-md-4 pl-20" style="">{label}</div>
+                <div class="col-xs-3 col-md-4">{input}</div>'
+            ])->label('<div>Возраст потребителя</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от и до)</div>')
                 ->textInput([
                     'type' => 'number',
                     'id' => 'age_from',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
             <?= $form->field($model, 'age_to', [
-                'template' => '<div class="col-md-4">{input}</div>'
+                'template' => '<div class="col-xs-3 col-md-4" style="margin-top: -15px;">{input}</div>'
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'age_to',
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row desktop-mb-15">
 
             <?php
             $list_gender = [
@@ -211,22 +198,20 @@ use app\models\Segments;
             ?>
 
             <?= $form->field($model, 'gender_consumer', [
-                'template' => '<div class="col-md-4" style="padding-left: 20px;">{label}</div><div class="col-md-8">{input}</div>'
-            ])->label('<div>Пол потребителя *</div><div style="font-weight: 400;font-size: 13px;padding-bottom: 10px;">(укажите нужное значение)</div>')
+                'template' => '<div class="col-md-4 pl-20">{label}</div><div class="col-md-8">{input}</div>'
+            ])->label('Пол потребителя')
                 ->widget(Select2::class, [
                     'data' => $list_gender,
-
                     'pluginOptions' => ['allowClear' => true],
                     'options' => ['placeholder' => 'Выберите пол потребителя'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]);
+                ])
             ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row mb-15">
 
             <?php
             $list_education = [
@@ -238,30 +223,28 @@ use app\models\Segments;
             ?>
 
             <?= $form->field($model, 'education_of_consumer', [
-                'template' => '<div class="col-md-4" style="padding-left: 20px;">{label}</div><div class="col-md-8">{input}</div>'
-            ])->label('<div>Образование потребителя *</div><div style="font-weight: 400;font-size: 13px;padding-bottom: 10px;">(укажите нужное значение)</div>')
+                'template' => '<div class="col-md-4 pl-20">{label}</div><div class="col-md-8">{input}</div>'
+            ])->label('Образование потребителя')
                 ->widget(Select2::class, [
                     'data' => $list_education,
                     'pluginOptions' => ['allowClear' => true],
                     'options' => ['placeholder' => 'Выберите уровень образования потребителя'],
                     'disabled' => false,  //Сделать поле неактивным
                     'hideSearch' => true, //Скрытие поиска
-                ]);
+                ])
             ?>
 
         </div>
-
 
         <script>
 
             $( function() {
 
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
                 $("input#income_from").change(function () {
                     var value1 = $("input#income_from").val();
                     var value2 = $("input#income_to").val();
                     var valueMax = 1000000;
-                    var valueMin = 5000;
+                    var valueMin = 0;
 
                     if (parseInt(value1) > parseInt(value2)){
                         value1 = value2;
@@ -277,14 +260,22 @@ use app\models\Segments;
                         value1 = valueMin;
                         $("input#income_from").val(value1);
                     }
+
+                    // Расчет платежеспособности
+                    var incomeFrom = parseInt($("input#income_from").val());
+                    var incomeTo = parseInt($("input#income_to").val());
+                    var quantity = parseInt($("input#quantity").val());
+                    if (incomeFrom > 0 && incomeTo > 0 && quantity > 0) {
+                        var res = ((incomeFrom + incomeTo) * 6) * quantity / 1000000;
+                        $("input#market_volume_b2c").val(Math.round(res));
+                    }
                 });
 
-                //Изменение местоположения ползунка при вводе данных во второй элемент Input
                 $("input#income_to").change(function () {
                     var value1 = $("input#income_from").val();
                     var value2 = $("input#income_to").val();
                     var valueMax = 1000000;
-                    var valueMin = 5000;
+                    var valueMin = 0;
 
                     if (parseInt(value1) > parseInt(value2)){
                         value2 = value1;
@@ -300,312 +291,219 @@ use app\models\Segments;
                         value2 = valueMin;
                         $("input#income_to").val(value2);
                     }
+
+                    // Расчет платежеспособности
+                    var incomeFrom = parseInt($("input#income_from").val());
+                    var incomeTo = parseInt($("input#income_to").val());
+                    var quantity = parseInt($("input#quantity").val());
+                    if (incomeFrom > 0 && incomeTo > 0 && quantity > 0) {
+                        var res = ((incomeFrom + incomeTo) * 6) * quantity / 1000000;
+                        $("input#market_volume_b2c").val(Math.round(res));
+                    }
                 });
 
             } );
         </script>
 
-
-        <div class="row" style="margin-bottom: 10px; margin-top: 0;">
+        <div class="row">
 
             <?= $form->field($model, 'income_from', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div>'
-            ])->label('<div>Доход потребителя (руб./мес.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 5 000 до 1 000 000)</div>')
+                'template' => '<div class="col-xs-12 col-md-4 pl-20">{label}</div>
+                <div class="col-xs-6 col-md-4" style="margin-bottom: 30px;">{input}</div>'
+            ])->label('<div>Доход потребителя, руб./мес.</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от и до)</div>')
                 ->textInput([
                     'type' => 'number',
                     'id' => 'income_from',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
             <?= $form->field($model, 'income_to', [
-                'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
+                'template' => '<div class="col-xs-6 col-md-4 desktop-mt--15">{input}</div>'
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'income_to',
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]);
-            ?>
+            ]) ?>
 
         </div>
-
 
         <script>
 
             $( function() {
 
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
-                $("input#quantity_from").change(function () {
-                    var value1 = $("input#quantity_from").val();
-                    var value2 = $("input#quantity_to").val();
-                    var valueMax = 1000000;
-                    var valueMin = 1;
-
-                    if (parseInt(value1) > parseInt(value2)){
-                        value1 = value2;
-                        $("input#quantity_from").val(value1);
-                    }
-
-                    if (parseInt(value1) > parseInt(valueMax)){
-                        value1 = valueMax;
-                        $("input#quantity_from").val(value1);
-                    }
-
-                    if (parseInt(value1) < parseInt(valueMin)){
-                        value1 = valueMin;
-                        $("input#quantity_from").val(value1);
-                    }
-                });
-
-                //Изменение местоположения ползунка при вводе данных во второй элемент Input
-                $("input#quantity_to").change(function () {
-                    var value1 = $("input#quantity_from").val();
-                    var value2 = $("input#quantity_to").val();
-                    var valueMax = 1000000;
-                    var valueMin = 1;
-
-                    if (parseInt(value1) > parseInt(value2)){
-                        value2 = value1;
-                        $("input#quantity_to").val(value2);
-                    }
-
-                    if (parseInt(value2) > parseInt(valueMax)){
-                        value2 = valueMax;
-                        $("input#quantity_to").val(value2);
-                    }
-
-                    if (parseInt(value2) < parseInt(valueMin)){
-                        value2 = valueMin;
-                        $("input#quantity_to").val(value2);
-                    }
-                });
-
-            } );
-        </script>
-
-
-        <div class="row" style="margin-bottom: 10px; margin-top: -10px;">
-
-            <?= $form->field($model, 'quantity_from', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div>'
-            ])->label('<div>Потенциальное количество<br>потребителей (тыс. чел.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
-                ->textInput([
-                    'type' => 'number',
-                    'id' => 'quantity_from',
-                    'class' => 'style_form_field_respond form-control',
-                    'autocomplete' => 'off'
-                ]);
-            ?>
-
-            <?= $form->field($model, 'quantity_to', [
-                'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
-            ])->label(false)->textInput([
-                'type' => 'number',
-                'id' => 'quantity_to',
-                'class' => 'style_form_field_respond form-control',
-                'autocomplete' => 'off'
-            ]);
-            ?>
-
-        </div>
-
-
-        <script>
-
-            $( function() {
-
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
-                $("input#market_volume_b2c").change(function () {
-                    var value = $("input#market_volume_b2c").val();
+                $("input#quantity").change(function () {
+                    var value = $("input#quantity").val();
                     var valueMax = 1000000;
                     var valueMin = 1;
 
                     if (parseInt(value) > parseInt(valueMax)){
                         value = valueMax;
-                        $("input#market_volume_b2c").val(value);
+                        $("input#quantity").val(value);
                     }
 
                     if (parseInt(value) < parseInt(valueMin)){
                         value = valueMin;
-                        $("input#market_volume_b2c").val(value);
+                        $("input#quantity").val(value);
+                    }
+
+                    // Расчет платежеспособности
+                    var incomeFrom = parseInt($("input#income_from").val());
+                    var incomeTo = parseInt($("input#income_to").val());
+                    var quantity = parseInt($("input#quantity").val());
+                    if (incomeFrom > 0 && incomeTo > 0 && quantity > 0) {
+                        var res = ((incomeFrom + incomeTo) * 6) * quantity / 1000000;
+                        $("input#market_volume_b2c").val(Math.round(res));
                     }
                 });
             } );
         </script>
 
+        <div class="row desktop-mb-15">
 
-        <div class="row" style="margin-bottom: 10px; margin-top: -10px;">
+            <?= $form->field($model, 'quantity', [
+                'template' => '<div class="col-md-4 pl-20">{label}</div>
+                <div class="col-md-8">{input}</div>'
+            ])->label('Потенциальное количество потребителей, чел.')
+                ->textInput([
+                    'type' => 'number',
+                    'id' => 'quantity',
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'
+                ])
+            ?>
+
+        </div>
+
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'market_volume_b2c', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div><div class="col-md-4" style="font-size: 14px; color: #999;">Платежеспособность целевого сегмента рассчитывается, как доход потребителя за год умноженный на количество потребителей</div>'
-            ])->label('<div>Платежеспособность (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
+                'template' => '<div class="col-md-4 pl-20">{label}</div>
+                <div class="col-md-8">{input}</div>'
+            ])->label('Платежеспособность, млн руб. в год')
                 ->textInput([
+                    'disabled' => true,
                     'type' => 'number',
                     'id' => 'market_volume_b2c',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>
 
     </div>
 
-
     <div class="form-template-b2b" style="display: none;">
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'field_of_activity_b2b', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Сфера деятельности предприятия *')->textInput([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Сфера деятельности предприятия')->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'sort_of_activity_b2b', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Вид / специализация деятельности предприятия *')->textInput([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Вид / специализация деятельности предприятия')->textInput([
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
                 'autocomplete' => 'off'
-            ]); ?>
+            ]) ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 15px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'company_products', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Продукция / услуги предприятия *')->textarea([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Продукция / услуги предприятия')->textarea([
                 'rows' => 1,
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
 
         </div>
 
-
-        <div class="row" style="margin-bottom: 15px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'company_partner', [
-                'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Партнеры предприятия *')->textarea([
+                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
+            ])->label('Партнеры предприятия')->textarea([
                 'rows' => 1,
                 'maxlength' => true,
                 'class' => 'style_form_field_respond form-control',
                 'placeholder' => '',
-            ]); ?>
+            ]) ?>
 
         </div>
-
 
         <script>
 
             $( function() {
 
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
-                $("input#quantity_from_b2b").change(function () {
-                    var value1 = $("input#quantity_from_b2b").val();
-                    var value2 = $("input#quantity_to_b2b").val();
-                    var valueMax = 1000000;
+                $("input#quantity_b2b").change(function () {
+                    var value = $("input#quantity_b2b").val();
+                    var valueMax = 10000;
                     var valueMin = 1;
 
-                    if (parseInt(value1) > parseInt(value2)){
-                        value1 = value2;
-                        $("input#quantity_from_b2b").val(value1);
+                    if (parseInt(value) > parseInt(valueMax)){
+                        value = valueMax;
+                        $("input#quantity_b2b").val(value);
                     }
 
-                    if (parseInt(value1) > parseInt(valueMax)){
-                        value1 = valueMax;
-                        $("input#quantity_from_b2b").val(value1);
+                    if (parseInt(value) < parseInt(valueMin)){
+                        value = valueMin;
+                        $("input#quantity_b2b").val(value);
                     }
 
-                    if (parseInt(value1) < parseInt(valueMin)){
-                        value1 = valueMin;
-                        $("input#quantity_from_b2b").val(value1);
-                    }
-                });
-
-                //Изменение местоположения ползунка при вводе данных во второй элемент Input
-                $("input#quantity_to_b2b").change(function () {
-                    var value1 = $("input#quantity_from_b2b").val();
-                    var value2 = $("input#quantity_to_b2b").val();
-                    var valueMax = 1000000;
-                    var valueMin = 1;
-
-                    if (parseInt(value1) > parseInt(value2)){
-                        value2 = value1;
-                        $("input#quantity_to_b2b").val(value2);
-                    }
-
-                    if (parseInt(value2) > parseInt(valueMax)){
-                        value2 = valueMax;
-                        $("input#quantity_to_b2b").val(value2);
-                    }
-
-                    if (parseInt(value2) < parseInt(valueMin)){
-                        value2 = valueMin;
-                        $("input#quantity_to_b2b").val(value2);
+                    // Расчет платежеспособности
+                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
+                    var quantityB2B = parseInt($("input#quantity_b2b").val());
+                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                        $("input#market_volume_b2b").val(Math.round(resB2B));
                     }
                 });
-
             } );
         </script>
 
+        <div class="row mb-15">
 
-        <div class="row" style="margin-bottom: 15px;">
-
-            <?= $form->field($model, 'quantity_from_b2b', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div>'
-            ])->label('<div>Потенциальное количество<br>представителей сегмента (ед.) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
+            <?= $form->field($model, 'quantity_b2b', [
+                'template' => '<div class="col-xs-8 pl-20">{label}</div><div class="col-xs-4">{input}</div>'
+            ])->label('Потенциальное количество представителей сегмента, ед.')
                 ->textInput([
                     'type' => 'number',
-                    'id' => 'quantity_from_b2b',
+                    'id' => 'quantity_b2b',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
-            ?>
-
-            <?= $form->field($model, 'quantity_to_b2b', [
-                'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
-            ])->label(false)->textInput([
-                'type' => 'number',
-                'id' => 'quantity_to_b2b',
-                'class' => 'style_form_field_respond form-control',
-                'autocomplete' => 'off'
-            ]);
+                ])
             ?>
 
         </div>
-
 
         <script>
 
             $( function() {
 
-                //Изменение местоположения ползунка при вводе данных в первый элемент Input
                 $("input#income_from_b2b").change(function () {
                     var value1 = $("input#income_from_b2b").val();
                     var value2 = $("input#income_to_b2b").val();
-                    var valueMax = 1000000;
+                    var valueMax = 10000;
                     var valueMin = 1;
 
                     if (parseInt(value1) > parseInt(value2)){
@@ -622,13 +520,21 @@ use app\models\Segments;
                         value1 = valueMin;
                         $("input#income_from_b2b").val(value1);
                     }
+
+                    // Расчет платежеспособности
+                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
+                    var quantityB2B = parseInt($("input#quantity_b2b").val());
+                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                        $("input#market_volume_b2b").val(Math.round(resB2B));
+                    }
                 });
 
-                //Изменение местоположения ползунка при вводе данных во второй элемент Input
                 $("input#income_to_b2b").change(function () {
                     var value1 = $("input#income_from_b2b").val();
                     var value2 = $("input#income_to_b2b").val();
-                    var valueMax = 1000000;
+                    var valueMax = 10000;
                     var valueMin = 1;
 
                     if (parseInt(value1) > parseInt(value2)){
@@ -645,108 +551,97 @@ use app\models\Segments;
                         value2 = valueMin;
                         $("input#income_to_b2b").val(value2);
                     }
+
+                    // Расчет платежеспособности
+                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
+                    var quantityB2B = parseInt($("input#quantity_b2b").val());
+                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                        $("input#market_volume_b2b").val(Math.round(resB2B));
+                    }
                 });
 
             } );
         </script>
 
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row">
 
             <?= $form->field($model, 'income_company_from', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div>'
-            ])->label('<div>Доход предприятия (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
+                'template' => '<div class="col-xs-12 col-md-4 pl-20">{label}</div>
+                <div class="col-xs-6 col-md-4 mb-15">{input}</div>'
+            ])->label('<div>Доход предприятия, млн руб. в год</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от и до)</div>')
                 ->textInput([
                     'type' => 'number',
                     'id' => 'income_from_b2b',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
             <?= $form->field($model, 'income_company_to', [
-                'template' => '<div class="col-md-4" style="margin-top: -15px;">{input}</div>'
+                'template' => '<div class="col-xs-6 col-md-4 desktop-mt--15">{input}</div>'
             ])->label(false)->textInput([
                 'type' => 'number',
                 'id' => 'income_to_b2b',
                 'class' => 'style_form_field_respond form-control',
                 'autocomplete' => 'off'
-            ]);
-            ?>
+            ]) ?>
 
         </div>
 
-
-        <script>
-
-            $( function() {
-
-                $("input#market_volume_b2b").change(function () {
-                    var value = $("input#market_volume_b2b").val();
-                    var valueMax = 1000000;
-                    var valueMin = 1;
-
-                    if (parseInt(value) > parseInt(valueMax)){
-                        value = valueMax;
-                        $("input#market_volume_b2b").val(value);
-                    }
-
-                    if (parseInt(value) < parseInt(valueMin)){
-                        value = valueMin;
-                        $("input#market_volume_b2b").val(value);
-                    }
-                });
-
-            } );
-        </script>
-
-
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row desktop-mb-15">
 
             <?= $form->field($model, 'market_volume_b2b', [
-                'template' => '<div class="col-md-4" style="margin-bottom: 10px; padding-left: 20px;">{label}</div>
-                <div class="col-md-4" style="margin-bottom: 30px;">{input}</div><div class="col-md-4" style="font-size: 14px; color: #999;">Платежеспособность целевого сегмента рассчитывается, как доход предприятия за год умноженный на количество представителей сегмента</div>'
-            ])->label('<div>Платежеспособность (млн. руб./год) *</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от 1 до 1 000 000)</div>')
+                'template' => '<div class="col-md-4 pl-20">{label}</div>
+                <div class="col-md-8">{input}</div>'
+            ])->label('<div>Платежеспособность, млн. руб. в год</div>')
                 ->textInput([
+                    'disabled' => true,
                     'type' => 'number',
                     'id' => 'market_volume_b2b',
                     'class' => 'style_form_field_respond form-control',
                     'autocomplete' => 'off'
-                ]);
+                ])
             ?>
 
         </div>
 
     </div>
 
-
-    <div class="row" style="margin-bottom: 15px;">
+    <div class="row mb-15">
 
         <?= $form->field($model, 'add_info', [
-            'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+            'template' => '<div class="col-xs-12 pl-20">{label}</div><div class="col-xs-12">{input}</div>'
         ])->textarea([
             'rows' => 1,
             'class' => 'style_form_field_respond form-control',
             'placeholder' => '',
-        ]);
-        ?>
+        ]) ?>
 
     </div>
 
-    <div class="form-group row container-fluid">
-        <?= Html::submitButton('Сохранить', [
-            'class' => 'btn btn-success pull-right',
-            'style' => [
-                'color' => '#FFFFFF',
-                'background' => '#52BE7F',
-                'padding' => '0 7px',
-                'width' => '140px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px',
-            ]
-        ]) ?>
+    <div class="form-group row">
+        <div class="col-md-12" style="display:flex;justify-content: center;">
+            <?= Html::submitButton('Сохранить', [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#7F9FC5',
+                    'color' => '#ffffff',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '16px',
+                    'text-transform' => 'uppercase',
+                    'font-weight' => '700',
+                    'padding-top' => '9px',
+                    'border-radius' => '8px',
+                    'margin-top' => '28px'
+                ]
+            ]) ?>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

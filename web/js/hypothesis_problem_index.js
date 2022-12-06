@@ -412,9 +412,10 @@ $(body).on('click', '.remove-expectedResults', function(){
     var arrId = clickId.split('-');
     var numberId = arrId[2];
 
-    if(arrId[3]) {
+    if(arrId[3] || arrId[4]) {
 
-        var expectedResultId = arrId[3];
+        var expectedResultId;
+        arrId[4] ? expectedResultId = arrId[4] : expectedResultId = arrId[3];
         var url = '/problems/delete-expected-results-interview?id=' + expectedResultId;
 
         $.ajax({

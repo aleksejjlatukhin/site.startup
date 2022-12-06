@@ -305,19 +305,32 @@ class Projects extends ActiveRecord
 
     /**
      * Показать авторов проекта
+     * @param bool $mobile
      * @return string
      */
-    public function showListAuthors(): string
+    public function showListAuthors(bool $mobile = false): string
     {
         $string = '';
         $j = 0;
-        foreach ($this->authors as $author) {
+        foreach ($this->authors as $k => $author) {
 
             $j++;
-            $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$j.'</div>';
-            $string .= '<div>ФИО: ' . $author->getFio() . '</div>';
-            $string .= '<div>Роль в проекте: ' . $author->getRole() . '</div>';
-            $string .= '<div>Опыт работы: ' . $author->getExperience() . '</div></div>';
+            if (!$mobile) {
+                $string .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$j.'</div>';
+                $string .= '<div>ФИО: ' . $author->getFio() . '</div>';
+                $string .= '<div>Роль в проекте: ' . $author->getRole() . '</div>';
+                $string .= '<div>Опыт работы: ' . $author->getExperience() . '</div></div>';
+            } else {
+                $string .= '<div class="presentation-mobile-title-row">Сотрудник '.$j.'</div>';
+                $string .= '<div class="presentation-mobile-simple-row">' . $author->getFio() . '</div>';
+                $string .= '<div class="presentation-mobile-title-row">Роль в проекте</div>';
+                $string .= '<div class="presentation-mobile-simple-row">' . $author->getRole() . '</div>';
+                $string .= '<div class="presentation-mobile-title-row">Опыт работы</div>';
+                $string .= '<div class="presentation-mobile-simple-row">' . $author->getExperience() . '</div>';
+                if ($j !== count($this->authors)) {
+                    $string .= '<div class="presentation-mobile-simple-row"></div>';
+                }
+            }
 
         }
         return $string;

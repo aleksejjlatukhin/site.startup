@@ -62,7 +62,7 @@
     border-radius: 36px;
 }
 .block_for_buttons_avatar_image {
-    opacity: 0;
+    opacity: 0.7;
     position: absolute;
     bottom: 0;
     width: 320px;

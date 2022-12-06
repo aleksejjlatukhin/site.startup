@@ -125,7 +125,6 @@ a.view_block_description > div {
 .form-update-data-confirm {
     padding: 10px 15px 30px 15px;
     background: #F2F2F2;
-    display: none;
     min-height: calc(100vh - 330px);
     margin-bottom: -20px;
 }
@@ -296,3 +295,29 @@ input#update_text_question_confirm {
 /*Стили для формы редактирования вопроса
 ---Конец---
 */
+
+@media screen and (max-width: 480px) {
+
+    .confirm-mvp-add_questions,
+    .row_header_data {
+        display: none;
+    }
+    .row .container-fluid {
+        padding-right: 7px;
+        padding-left: 7px;
+    }
+    .add_new_question_button {
+        font-size: 18px;
+    }
+    .col-xs-12.string_question {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .delete_question_link {
+        max-width: 125px;
+    }
+    .form-newQuestion-panel {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+}

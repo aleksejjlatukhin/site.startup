@@ -73,17 +73,20 @@ use app\models\QuestionStatus;
                 ->fileInput([
                     'id' => 'descInterviewCreateFile', 'class' => 'sr-only'
                 ])->label('Выберите файл',[
-                    'class'=>'btn btn-default',
+                    'class'=>'btn btn-success',
                     'style' => [
                         'display' => 'flex',
                         'align-items' => 'center',
                         'color' => '#FFFFFF',
                         'justify-content' => 'center',
-                        'background' => '#707F99',
+                        'background' => '#52BE7F',
                         'width' => '180px',
                         'height' => '40px',
-                        'font-size' => '24px',
+                        'font-size' => '16px',
                         'border-radius' => '8px',
+                        'text-transform' => 'uppercase',
+                        'font-weight' => '700',
+                        'padding-top' => '9px'
                     ],
                 ]) ?>
 
@@ -183,19 +186,23 @@ use app\models\QuestionStatus;
 
     <?php endif; ?>
 
-    <div class="form-group col-xs-12">
+    <div class="form-group col-xs-12" style="display: flex; justify-content: center;">
         <?= Html::submitButton('Сохранить', [
-            'class' => 'btn btn-success pull-right',
+            'class' => 'btn btn-default',
             'style' => [
                 'display' => 'flex',
                 'align-items' => 'center',
                 'justify-content' => 'center',
-                'background' => '#52BE7F',
-                'width' => '140px',
+                'margin-bottom' => '15px',
+                'background' => '#7F9FC5',
+                'width' => '180px',
                 'height' => '40px',
-                'font-size' => '24px',
                 'border-radius' => '8px',
-                'margin-top' => '28px'
+                'text-transform' => 'uppercase',
+                'font-size' => '16px',
+                'color' => '#FFFFFF',
+                'font-weight' => '700',
+                'padding-top' => '9px'
             ]
         ]) ?>
     </div>

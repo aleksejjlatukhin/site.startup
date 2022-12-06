@@ -21,6 +21,135 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
 <div class="segment-confirm-create">
 
+    <div class="header-title-index-mobile">
+        <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+        <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+            <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+            <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+        </div>
+    </div>
+
+    <div class="project-menu-mobile">
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 0 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 0 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 10px 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 10px 1%',
+                ],
+            ]) ?>
+
+        </div>
+    </div>
+
+    <div class="arrow_stages_project_mobile">
+        <div class="item-stage passive"></div>
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                Url::to(['/segments/index', 'id' => $project->getId()])) ?>
+        </div>
+        <div class="text-stage">2/9. Подтверждение гипотез целевых сегментов</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
+
+    <div class="header-title-confirm-hypothesis-mobile">
+        <div style="overflow: hidden; max-width: 90%;">Сегмент: <?= $segment->getName() ?></div>
+    </div>
+
+    <div class="arrow_stages_confirm_hypothesis_mobile">
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+        <div class="text-stage">1/3. Заполнить исходные данные подтверждения</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
+
 
     <div class="row project_info_data">
 
@@ -133,6 +262,28 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
     </div>
 
+    <div class="confirm-create-button-instruction-mobile">
+        <?= Html::a('Инструкция',
+            ['/confirm-segment/get-instruction-step-one'],[
+                'class' => 'btn btn-default open_modal_instruction_page',
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#F5A4A4',
+                    'color' => '#ffffff',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '16px',
+                    'text-transform' => 'uppercase',
+                    'font-weight' => '700',
+                    'padding-top' => '9px',
+                    'border-radius' => '8px',
+                    'margin-top' => '28px'
+                ]
+            ]) ?>
+    </div>
+
     <div class="row">
 
         <div class="container-fluid container-data">
@@ -149,9 +300,9 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
             <div class="container-fluid">
 
-                <div class="row" style="padding-top: 20px; padding-bottom: 5px; padding-left: 5px;">
+                <div class="row pt-20 pb-5 pl-5">
 
-                    <div class="col-md-12" style="font-weight: 700;">
+                    <div class="col-md-12 bolder">
                         Цель проекта
                     </div>
 
@@ -172,14 +323,14 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                 ?>
 
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row pt-5 pb-5">
 
-                    <? $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
+                    <?php $placeholder = 'Написать разумное обоснование, почему вы проводите это интервью, чтобы респондент поверил вам и начал говорить с вами открыто, не зажато.' ?>
 
                     <?= $form->field($model, 'greeting_interview', [
-                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                        'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
                     ])->textarea([
-                        'rows' => 1,
+                        'rows' => 3,
                         'maxlength' => true,
                         'required' => true,
                         'placeholder' => $placeholder,
@@ -188,14 +339,14 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row pt-5 pb-5">
 
-                    <? $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
+                    <?php $placeholder = 'Фраза, которая соответствует статусу респондента и настраивает на нужную волну сотрудничества.' ?>
 
                     <?= $form->field($model, 'view_interview', [
-                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                        'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
                     ])->textarea([
-                        'rows' => 1,
+                        'rows' => 3,
                         'maxlength' => true,
                         'required' => true,
                         'placeholder' => $placeholder,
@@ -204,14 +355,14 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row pt-5 pb-5">
 
                     <?php $placeholder = 'Фраза, которая описывает, чем занимается интервьюер' ?>
 
                     <?= $form->field($model, 'reason_interview', [
-                        'template' => '<div class="col-md-12" style="padding-left: 20px;">{label}</div><div class="col-md-12">{input}</div>'
+                        'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
                     ])->textarea([
-                        'rows' => 1,
+                        'rows' => 3,
                         'maxlength' => true,
                         'required' => true,
                         'placeholder' => $placeholder,
@@ -220,10 +371,10 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
 
                 </div>
 
-                <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
+                <div class="row pt-5 pb-5">
 
                     <?= $form->field($model, 'count_respond', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10 pl-20">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
                     ])->label('<div>Планируемое количество респондентов</div><div style="font-weight: 400;font-size: 13px;">(укажите значение в диапазоне от 1 до 100)</div>')
                         ->textInput([
                             'type' => 'number',
@@ -239,8 +390,8 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                 <div class="row">
 
                     <?= $form->field($model, 'count_positive', [
-                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10" style="padding-left: 20px;">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
-                    ])->label('Необходимое количество респондентов, соответствующих сегменту')
+                        'template' => '<div class="col-xs-12 col-sm-9 col-md-10 pl-20">{label}</div><div class="col-xs-12 col-sm-3 col-md-2">{input}</div>'
+                    ])->label('Необходимое количество респондентов, соотв. сегменту')
                         ->textInput([
                             'type' => 'number',
                             'required' => true,
@@ -253,21 +404,27 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
                 </div>
 
 
-                <div class="form-group">
-                    <?= Html::submitButton('Далее', [
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#52BE7F',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                            'margin-top' => '20px'
-                        ],
-                        'class' => 'btn btn-lg btn-success pull-right',
-                    ]) ?>
+                <div class="form-group row">
+                    <div class="col-md-12" style="display:flex;justify-content: center;">
+                        <?= Html::submitButton('Сохранить', [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#7F9FC5',
+                                'color' => '#ffffff',
+                                'width' => '180px',
+                                'height' => '40px',
+                                'font-size' => '16px',
+                                'text-transform' => 'uppercase',
+                                'font-weight' => '700',
+                                'padding-top' => '9px',
+                                'border-radius' => '8px',
+                                'margin-top' => '28px'
+                            ]
+                        ]) ?>
+                    </div>
                 </div>
 
                 <?php
@@ -279,8 +436,6 @@ $this->registerCssFile('@web/css/confirm-segments-create-style.css');
         </div>
 
     </div>
-
-
 
     <?php
     // Модальное окно - Запрет на следующий шаг

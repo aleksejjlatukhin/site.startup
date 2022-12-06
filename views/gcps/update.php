@@ -28,7 +28,7 @@ use yii\helpers\Url;
             <div class="col-md-12">
 
                 <?= $form->field($model, 'description', ['template' => '<div style="padding-left: 5px;">{label}</div><div>{input}</div>'])->label('Описание гипотезы ценностного предложения')->textarea([
-                    'rows' => 4,
+                    'rows' => 8,
                     'maxlength' => true,
                     'required' => true,
                     'class' => 'style_form_field_respond form-control',
@@ -37,17 +37,23 @@ use yii\helpers\Url;
             </div>
         </div>
 
-        <div class="form-group row container-fluid">
+        <div class="form-group row container-fluid" style="display: flex; justify-content: center; margin-top: 20px;">
             <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
+                'class' => 'btn btn-default pull-right',
                 'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#52BE7F',
-                    'padding' => '0 7px',
-                    'width' => '140px',
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'margin-bottom' => '15px',
+                    'background' => '#7F9FC5',
+                    'width' => '180px',
                     'height' => '40px',
-                    'font-size' => '24px',
                     'border-radius' => '8px',
+                    'text-transform' => 'uppercase',
+                    'font-size' => '16px',
+                    'color' => '#FFFFFF',
+                    'font-weight' => '700',
+                    'padding-top' => '9px'
                 ]
             ]) ?>
         </div>

@@ -7,11 +7,13 @@ use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\EnableExpertise;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmGcp;
 use app\models\forms\FormCreateMvp;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmGcp;
+use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\PatternHttpException;
 use app\models\Problems;
@@ -288,6 +290,9 @@ class ConfirmGcpController extends AppUserPartController
 
         $model->setCountRespond($count_represent_problem);
 
+        if ($gcp->getEnableExpertise() === EnableExpertise::OFF) {
+            return $this->redirect(['/gcps/index', 'id' => $confirmProblem->getId()]);
+        }
 
         if ($confirm = $gcp->confirm){
             //Если у ГЦП создана программа подтверждения, то перейти на страницу подтверждения
@@ -441,6 +446,7 @@ class ConfirmGcpController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
         ]);
     }
 

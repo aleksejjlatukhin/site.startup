@@ -18,7 +18,7 @@ use yii\helpers\Html;
         <tr>
             <td class="block_problem_title" colspan="2">Обознач.</td>
             <td class="block_problem_description">Описание гипотезы проблемы сегмента</td>
-            <td class="block_problem_params">Показатель положительного прохождения теста</td>
+            <td class="block_problem_params">Показатель прохождения теста</td>
             <td class="block_problem_date">Дата создания</td>
             <td class="block_problem_date">Дата подтв.</td>
         </tr>

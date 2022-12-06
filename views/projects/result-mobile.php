@@ -1,5 +1,6 @@
 <?php
 
+use app\models\EnableExpertise;
 use app\models\Gcps;
 use app\models\Mvps;
 use app\models\Problems;
@@ -45,10 +46,17 @@ $this->title = 'Сводная таблица проекта'
 
                     <div class="block-segment">
 
-                        <?= Html::a('ГЦС ' . ($number_segment + 1), [
-                            '/confirm-segment/create', 'id' => $segment->getId()],[
-                            'class' => 'link-confirm-result-mobile bg-grey'
-                        ]) ?>
+                        <?php if ($segment->getEnableExpertise() === EnableExpertise::ON) : ?>
+                            <?= Html::a('ГЦС ' . ($number_segment + 1), [
+                                '/confirm-segment/create', 'id' => $segment->getId()],[
+                                'class' => 'link-confirm-result-mobile bg-grey'
+                            ]) ?>
+                        <?php else: ?>
+                            <?= Html::a('ГЦС ' . ($number_segment + 1), [
+                                '/segments/index', 'id' => $segment->getProjectId()],[
+                                'class' => 'link-confirm-result-mobile bg-grey'
+                            ]) ?>
+                        <?php endif; ?>
 
                         <div class="content">
                             <div class="truncate-text">
@@ -63,9 +71,16 @@ $this->title = 'Сводная таблица проекта'
                                 </div>
 
                                 <div class="block-button-confirm">
-                                    <?= Html::a('Подтвердить', ['/confirm-segment/create', 'id' => $segment->getId()], [
-                                        'class' => 'button-confirm-result-mobile'
-                                    ]) ?>
+                                    <?php if ($segment->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                        <?= Html::a('Подтвердить', ['/confirm-segment/create', 'id' => $segment->getId()], [
+                                            'class' => 'button-confirm-result-mobile'
+                                        ]) ?>
+                                    <?php else: ?>
+                                        <?= Html::a('Подтвердить', ['#'], [
+                                            'class' => 'button-confirm-result-mobile disabled',
+                                            'onclick' => 'return false;'
+                                        ]) ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -140,13 +155,19 @@ $this->title = 'Сводная таблица проекта'
 
                             <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
-
                                 <div class="block-problem segment-number-<?= $number_segment ?>">
 
-                                    <?= Html::a('ГПС ' . ($number_segment + 1) . '.' . ($number_problem + 1), [
-                                        '/confirm-problem/create', 'id' => $problem->getId()],[
-                                        'class' => 'link-confirm-result-mobile bg-grey'
-                                    ]) ?>
+                                    <?php if ($problem->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                        <?= Html::a('ГПС ' . ($number_segment + 1) . '.' . ($number_problem + 1), [
+                                            '/confirm-problem/create', 'id' => $problem->getId()],[
+                                            'class' => 'link-confirm-result-mobile bg-grey'
+                                        ]) ?>
+                                    <?php else: ?>
+                                        <?= Html::a('ГПС ' . ($number_segment + 1) . '.' . ($number_problem + 1), [
+                                            '/problems/index', 'id' => $problem->getBasicConfirmId()],[
+                                            'class' => 'link-confirm-result-mobile bg-grey'
+                                        ]) ?>
+                                    <?php endif; ?>
 
                                     <div class="content">
                                         <div class="truncate-text">
@@ -161,9 +182,16 @@ $this->title = 'Сводная таблица проекта'
                                             </div>
 
                                             <div class="block-button-confirm">
-                                                <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $problem->getId()], [
-                                                    'class' => 'button-confirm-result-mobile'
-                                                ]) ?>
+                                                <?php if ($problem->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                                    <?= Html::a('Подтвердить', ['/confirm-problem/create', 'id' => $problem->getId()], [
+                                                        'class' => 'button-confirm-result-mobile'
+                                                    ]) ?>
+                                                <?php else: ?>
+                                                    <?= Html::a('Подтвердить', ['#'], [
+                                                        'class' => 'button-confirm-result-mobile disabled',
+                                                        'onclick' => 'return false;'
+                                                    ]) ?>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -240,10 +268,17 @@ $this->title = 'Сводная таблица проекта'
 
                                             <div class="block-gcp problem-number-<?= $number_segment . '-' . $number_problem ?>">
 
-                                                <?= Html::a('ГЦП ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1), [
-                                                    '/confirm-gcp/create', 'id' => $gcp->getId()],[
-                                                    'class' => 'link-confirm-result-mobile bg-grey'
-                                                ]) ?>
+                                                <?php if ($gcp->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                                    <?= Html::a('ГЦП ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1), [
+                                                        '/confirm-gcp/create', 'id' => $gcp->getId()],[
+                                                        'class' => 'link-confirm-result-mobile bg-grey'
+                                                    ]) ?>
+                                                <?php else: ?>
+                                                    <?= Html::a('ГЦП ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1), [
+                                                        '/gcps/index', 'id' => $gcp->getBasicConfirmId()],[
+                                                        'class' => 'link-confirm-result-mobile bg-grey'
+                                                    ]) ?>
+                                                <?php endif; ?>
 
                                                 <div class="content">
                                                     <div class="truncate-text">
@@ -258,9 +293,16 @@ $this->title = 'Сводная таблица проекта'
                                                         </div>
 
                                                         <div class="block-button-confirm">
-                                                            <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $gcp->getId()], [
-                                                                'class' => 'button-confirm-result-mobile'
-                                                            ]) ?>
+                                                            <?php if ($gcp->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                                                <?= Html::a('Подтвердить', ['/confirm-gcp/create', 'id' => $gcp->getId()], [
+                                                                    'class' => 'button-confirm-result-mobile'
+                                                                ]) ?>
+                                                            <?php else: ?>
+                                                                <?= Html::a('Подтвердить', ['#'], [
+                                                                    'class' => 'button-confirm-result-mobile disabled',
+                                                                    'onclick' => 'return false;'
+                                                                ]) ?>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -337,10 +379,17 @@ $this->title = 'Сводная таблица проекта'
 
                                                         <div class="block-mvp gcp-number-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?>">
 
-                                                            <?= Html::a('MVP ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1) . '.' . ($number_mvp + 1), [
-                                                                '/confirm-mvp/create', 'id' => $mvp->getId()],[
-                                                                'class' => 'link-confirm-result-mobile bg-grey'
-                                                            ]) ?>
+                                                            <?php if ($mvp->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                                                <?= Html::a('MVP ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1) . '.' . ($number_mvp + 1), [
+                                                                    '/confirm-mvp/create', 'id' => $mvp->getId()],[
+                                                                    'class' => 'link-confirm-result-mobile bg-grey'
+                                                                ]) ?>
+                                                            <?php else: ?>
+                                                                <?= Html::a('MVP ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1) . '.' . ($number_mvp + 1), [
+                                                                    '/mvps/index', 'id' => $mvp->getBasicConfirmId()],[
+                                                                    'class' => 'link-confirm-result-mobile bg-grey'
+                                                                ]) ?>
+                                                            <?php endif; ?>
 
                                                             <div class="content">
                                                                 <div class="truncate-text">
@@ -355,9 +404,16 @@ $this->title = 'Сводная таблица проекта'
                                                                     </div>
 
                                                                     <div class="block-button-confirm">
-                                                                        <?= Html::a('Подтвердить', ['/confirm-mvp/create', 'id' => $mvp->getId()], [
-                                                                            'class' => 'button-confirm-result-mobile'
-                                                                        ]) ?>
+                                                                        <?php if ($mvp->getEnableExpertise() === EnableExpertise::ON) : ?>
+                                                                            <?= Html::a('Подтвердить', ['/confirm-mvp/create', 'id' => $mvp->getId()], [
+                                                                                'class' => 'button-confirm-result-mobile'
+                                                                            ]) ?>
+                                                                        <?php else: ?>
+                                                                            <?= Html::a('Подтвердить', ['#'], [
+                                                                                'class' => 'button-confirm-result-mobile disabled',
+                                                                                'onclick' => 'return false;'
+                                                                            ]) ?>
+                                                                        <?php endif; ?>
                                                                     </div>
                                                                 </div>
                                                             </div>

@@ -3,6 +3,7 @@
 use app\models\ConfirmMvp;
 use yii\helpers\Html;
 use app\models\User;
+use yii\helpers\Url;
 
 $this->title = 'Генерация бизнес-модели';
 $this->registerCssFile('@web/css/business-model-index-style.css');
@@ -12,9 +13,120 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
  * @var ConfirmMvp $confirmMvp
  */
 
+$project = $confirmMvp->hypothesis->project;
+
 ?>
 
 <div class="business-model-index">
+
+    <div class="header-title-index-mobile">
+        <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+        <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+            <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+            <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+        </div>
+    </div>
+
+    <div class="project-menu-mobile">
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 0 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 0 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 10px 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 10px 1%',
+                ],
+            ]) ?>
+
+        </div>
+    </div>
+
+    <div class="arrow_stages_project_mobile">
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage active"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                Url::to(['/confirm-mvp/view', 'id' => $confirmMvp->getId()])) ?>
+        </div>
+        <div class="text-stage">9/9. Разработка бизнес-модели</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
 
     <?php if (!User::isUserAdmin(Yii::$app->user->identity['username'])) : ?>
 
@@ -87,7 +199,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
 
         <div class="methodological-guide">
 
-            <h3 class="header-text"><span>Разработка бизнес-модели</span></h3>
+            <div class="header_hypothesis_first_index">Разработка бизнес-модели</div>
 
             <div class="container-list">
 

@@ -97,6 +97,12 @@
     background: #E0E0E0;
 }
 
+.segment-form-create,
+.segment-update-form {
+    overflow: hidden;
+    padding-top: 20px;
+}
+
 @media screen and (min-width: 1250px) {
 
     .container-one_hypothesis {
@@ -200,5 +206,27 @@
 
     .new_segment_link_block {
         padding-left: 20px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .new_hypothesis_link_plus {
+        font-size: 18px;
+    }
+    .search_block_desktop {
+        display: none;
+    }
+    .container-data {
+        background-color: #F2F2F2;
+    }
+}
+
+@media screen and (min-width: 481px) {
+
+    .row_header_data_generation_mobile {
+        display: none;
+    }
+    body .simplebar-content {
+        background: #FFFFFF;
     }
 }

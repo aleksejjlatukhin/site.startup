@@ -8,11 +8,13 @@ use app\models\CommunicationTypes;
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\EnableExpertise;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateBusinessModel;
 use app\models\forms\FormCreateConfirmMvp;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmMvp;
+use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\PatternHttpException;
 use app\models\Problems;
@@ -292,6 +294,10 @@ class ConfirmMvpController extends AppUserPartController
 
         $model->setCountRespond($count_represent_gcp);
 
+        if ($mvp->getEnableExpertise() === EnableExpertise::OFF) {
+            return $this->redirect(['/mvps/index', 'id' => $confirmGcp->getId()]);
+        }
+
         if ($mvp->confirm){
             //Если у MVP создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $mvp->confirm->getId()]);
@@ -454,6 +460,7 @@ class ConfirmMvpController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
         ]);
     }
 

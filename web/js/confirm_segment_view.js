@@ -1,32 +1,50 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+const confirmId = (window.location.search).split('?id=')[1];
+var body = $('body');
 
 //Выполнить при загрузке страницы
-$(document).ready(function() {
+$(document).ready(function () {
+    if ($(window).width() <= '480') {
+        $('.interview-view').remove();
+        $('.confirm-hypothesis-step-three-mobile').toggle('display')
+    } else {
+        $('.confirm-hypothesis-view-mobile').remove()
+    }
 
-    var id = (window.location.search).split('?id=')[1];
-    var url = '/responds/get-query-responds?stage=2&id=' + id + '&page=1';
+    getQueryResponds()
+});
 
-    //Загружаем данные респондентов (Шаг 3)
+$(window).resize(function () {
+    if ($(window).width() <= '480' && $('.interview-view').length > 0) {
+        location.reload();
+        $('.interview-view').remove();
+    } else if ($(window).width() > '480' && $('.confirm-hypothesis-view-mobile').length > 0) {
+        location.reload();
+        $('.confirm-hypothesis-view-mobile').remove();
+    }
+});
+
+// Получение списка респондентов
+function getQueryResponds() {
+    if ($(window).width() <= '480') {
+        var url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true';
+    } else {
+        var url = '/responds/get-query-responds?stage=2&id=' + confirmId;
+    }
     $.ajax({
-
         url: url,
         method: 'POST',
         cache: false,
         success: function(response){
-
-            $('.content_responds_ajax').html(response.ajax_data_responds);
-        },
-        error: function(){
-            alert('Ошибка');
+            if ($(window).width() <= '480') {
+                $('.confirm-hypothesis-step-three-mobile > .content_responds_ajax').html(response.ajax_data_responds);
+            } else {
+                $('.content_responds_ajax').html(response.ajax_data_responds);
+            }
         }
     });
-
-});
-
-
-var body = $('body');
-var id_page = window.location.search.split('=')[1];
+}
 
 
 // Показать инструкцию для стадии разработки
@@ -58,30 +76,6 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 });
 
 
-//Постраничная навигация
-$(body).on('click', '.pagination-responds-confirm .responds-confirm-pagin-list li a', function(e){
-
-    var url = $(this).attr('href');
-
-    $.ajax({
-
-        url: url,
-        method: 'POST',
-        cache: false,
-        success: function(response){
-
-            $('.content_responds_ajax').html(response.ajax_data_responds);
-            simpleBar.getScrollElement().scrollBy({top: $('.top_slide_pagination_responds').offset().top, behavior: 'smooth'});
-        },
-        error: function(){
-            alert('Ошибка');
-        }
-    });
-
-    e.preventDefault();
-    return false;
-});
-
 //Возвращение скролла первого модального окна после закрытия
 $('#confirm_closing_update_modal').on('hidden.bs.modal', function(){
     $(body).addClass('modal-open');
@@ -91,64 +85,21 @@ $('#error_respond_modal').on('hidden.bs.modal', function(){
 });
 
 
-//При нажатии на кнопку редактировать(Шаг 1)
-//показываем форму редактирования и скрываем вид просмотра
-$(body).on('click', '#show_form_update_data', function(){
-    $('.form-view-data-confirm').hide();
-    $('.form-update-data-confirm').show();
-});
-
-//При нажатии на кнопку просмотр(Шаг 1)
-//скрываем форму редактирования и показываем вид просмотра
-$(body).on('click', '#show_form_view_data', function(){
-    $('.form-update-data-confirm').hide();
-    $('.form-view-data-confirm').show();
-});
-
-
-
 //Редактирование исходных даннных подтверждения (Шаг 1)
 $(body).on('beforeSubmit', '#update_data_interview', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
-    var id = (window.location.search).split('?id=')[1];
 
     $.ajax({
-
         url: url,
         method: 'POST',
         data: data,
         cache: false,
         success: function(response){
-
             if (response.success) {
-
-                //Обновление данных в режиме просмотра (Шаг 1)
-                $('#step_one').html(response.ajax_data_confirm);
-
-                //Вызов события клика на кнопку просмотра
-                //для перхода в режим просмотра (Шаг 1)
-                $('.form-update-data-confirm').hide();
-                $('.form-view-data-confirm').show();
-
-                //Загружаем данные респондентов (Шаг 3)
-                $.ajax({
-
-                    url: '/responds/get-query-responds?stage=2&id=' + id + '&page=1',
-                    method: 'POST',
-                    cache: false,
-                    success: function(response){
-
-                        $('.content_responds_ajax').html(response.ajax_data_responds);
-                    },
-                    error: function(){
-                        alert('Ошибка');
-                    }
-                });
+                getQueryResponds()
             }
-        }, error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -478,7 +429,7 @@ $(body).on('change', 'input#confirm_count_positive', function () {
 //Отслеживаем изменения в форме создания респондента и записываем их в кэш
 $(body).on('change', 'form#new_respond_form', function(){
 
-    var url = '/responds/save-cache-creation-form?stage=2&id=' + id_page;
+    var url = '/responds/save-cache-creation-form?stage=2&id=' + confirmId;
     var data = $(this).serialize();
     $.ajax({
         url: url,
@@ -487,6 +438,22 @@ $(body).on('change', 'form#new_respond_form', function(){
         cache: false,
         error: function(){
             alert('Ошибка');
+        }
+    });
+});
+
+
+//Поиск респондентов в мобильной версии
+$(body).on('change', 'input#search_input_responds_mobile', function () {
+    var search = $('input#search_input_responds_mobile').val();
+    var url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&search=' + search + '&isMobile=true';
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+            $('.confirm-hypothesis-step-three-mobile > .content_responds_ajax').html(response.ajax_data_responds);
         }
     });
 });
@@ -508,12 +475,28 @@ $(body).on('click', '#showRespondCreateForm', function(e){
 
             $(respondCreate_modal).find('.modal-body').html(response.renderAjax);
             $(respondCreate_modal).modal('show');
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
+    e.preventDefault();
+    return false;
+});
+//В мобильной версии
+$(body).on('click', '.show_add_respond', function(e){
+
+    $('.add_respond_block_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
+    if ($(this).hasClass('link_add_respond_text')) {
+        var url = $(this).attr('href');
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                $('.add_respond_block_mobile').html(response.renderAjax);
+            }
+        });
+    }
     e.preventDefault();
     return false;
 });
@@ -539,26 +522,20 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 
                 if (!response.error) {
 
-                    //Загружаем данные респондентов (Шаг 3)
-                    $.ajax({
-
-                        url: '/responds/get-query-responds?stage=2&id=' + response.confirm_id + '&page=' + response.page,
-                        method: 'POST',
-                        cache: false,
-                        success: function(response){
-
-                            $('.content_responds_ajax').html(response.ajax_data_responds);
-                            simpleBar.getScrollElement().scrollBy({top: $('.container-one_respond:last').offset().top, behavior: 'smooth'});
-                        },
-                        error: function(){
-                            alert('Ошибка');
-                        }
-                    });
+                    getQueryResponds()
 
                     //Закрываем окно создания нового респондента
-                    $('#respondCreate_modal').modal('hide');
-                    //Обновление данных подтверждения (Шаг 1)
-                    $('#step_one').html(response.ajax_data_confirm);
+                    if ($(window).width() <= '480') {
+                        $('.confirm-hypothesis-step-one-mobile > .block-ajax-data-confirm').html(response.ajax_data_confirm);
+                        $('.add_respond_block_mobile').toggle('display');
+                        $('.row_header_data_generation_mobile').toggle('display');
+                        simpleBar.getScrollElement().scrollBy({top: $('.container-one_hypothesis_mobile:last').offset().top, behavior: 'smooth'});
+                    } else {
+                        $('#respondCreate_modal').modal('hide');
+                        //Обновление данных подтверждения (Шаг 1)
+                        $('#step_one').html(response.ajax_data_confirm);
+                        simpleBar.getScrollElement().scrollBy({top: $('.container-one_respond:last').offset().top, behavior: 'smooth'});
+                    }
 
                 } else {
 
@@ -648,8 +625,6 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
-    var page = $('li.pagination_active_page a').html();
-    if (!!!page) page = 1; //Проверка на то, что переменная как определена undefined и является ложью
     var error_respond_modal = $('#error_respond_modal');
     $(body).append($(error_respond_modal).first());
 
@@ -662,21 +637,7 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
 
             if (!response.error) {
 
-                //Загружаем данные респондентов (Шаг 3)
-                $.ajax({
-
-                    url: '/responds/get-query-responds?stage=2&id=' + response.confirm_id + '&page=' + page,
-                    method: 'POST',
-                    cache: false,
-                    success: function(response){
-
-                        $('.content_responds_ajax').html(response.ajax_data_responds);
-                    },
-                    error: function(){
-                        alert('Ошибка');
-                    }
-                });
-
+                getQueryResponds()
                 //Закрываем окно редактирования
                 if (catchChange === true) catchChange = false;
                 $('#respond_update_modal').modal('hide');
@@ -688,9 +649,6 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 $(error_respond_modal).find('.modal-body h4').html('Респондент с таким именем уже есть.<br>Имя респондента должно быть уникальным.');
                 $(error_respond_modal).modal('show');
             }
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -745,9 +703,6 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
 
                         $(create_descInterview_modal).find('.modal-body').html(response.renderAjax);
                         $(create_descInterview_modal).modal('show');
-                    },
-                    error: function(){
-                        alert('Ошибка');
                     }
                 });
 
@@ -758,9 +713,6 @@ $(body).on('click', '.showDescInterviewCreateForm', function(e){
                 $(error_respond_modal).find('.modal-body h4').html('Для перехода к созданию интервью, необходимо заполнить вводные данные по всем заданным респондентам.');
                 $(error_respond_modal).modal('show');
             }
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -782,8 +734,6 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 
     var data = new FormData(this);
     var url = $(this).attr('action');
-    var page = $('li.pagination_active_page a').html();
-    if (!!!page) page = 1; //Проверка на то, что переменная как определена undefined и является ложью
 
     $.ajax({
 
@@ -795,26 +745,9 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
         cache: false,
         success: function(response){
 
-            //Загружаем данные респондентов (Шаг 3)
-            $.ajax({
-
-                url: '/responds/get-query-responds?stage=2&id=' + response.confirm_id + '&page=' + page,
-                method: 'POST',
-                cache: false,
-                success: function(response){
-
-                    $('.content_responds_ajax').html(response.ajax_data_responds);
-                },
-                error: function(){
-                    alert('Ошибка');
-                }
-            });
-
+            getQueryResponds()
             //Закрываем модальное окно с формой
             $('#create_descInterview_modal').modal('hide');
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -840,9 +773,6 @@ $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
             $(update_descInterview_modal).find('.modal-body').html(response.renderAjax);
             $(update_descInterview_modal).modal('show');
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -881,8 +811,6 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
 
     var data = new FormData(this);
     var url = $(this).attr('action');
-    var page = $('li.pagination_active_page a').html();
-    if (!!!page) page = 1; //Проверка на то, что переменная как определена undefined и является ложью
 
     $.ajax({
 
@@ -894,27 +822,10 @@ $(body).on('beforeSubmit', '#formUpdateDescInterview', function(e){
         cache: false,
         success: function(response){
 
-            //Загружаем данные респондентов (Шаг 3)
-            $.ajax({
-
-                url: '/responds/get-query-responds?stage=2&id=' + response.confirm_id + '&page=' + page,
-                method: 'POST',
-                cache: false,
-                success: function(response){
-
-                    $('.content_responds_ajax').html(response.ajax_data_responds);
-                },
-                error: function(){
-                    alert('Ошибка');
-                }
-            });
-
+            getQueryResponds();
             //Закрываем модальное окно с формой
             if (catchChange === true) catchChange = false;
             $('#update_descInterview_modal').modal('hide');
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -984,12 +895,6 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
 
     var url = $(this).attr('href');
     var count_respond = $('.block_all_responds').children('.container-one_respond').length;
-    var page = $('li.pagination_active_page a').html();
-    if (!!!page){
-        page = 1;
-    } else if (Number(count_respond) === 1){
-        page = Number(page) - 1;
-    }
     var error_respond_modal = $('#error_respond_modal');
     $(body).append($(error_respond_modal).first());
 
@@ -1023,25 +928,16 @@ $(body).on('click', '#confirm-delete-respond', function(e) {
             }
             else if (response.success) {
 
-                //Загружаем данные респондентов (Шаг 3)
-                $.ajax({
-
-                    url: '/responds/get-query-responds?stage=2&id=' + response.confirm_id + '&page=' + page,
-                    method: 'POST',
-                    cache: false,
-                    success: function(response){
-
-                        $('.content_responds_ajax').html(response.ajax_data_responds);
-                    },
-                    error: function(){
-                        alert('Ошибка');
-                    }
-                });
+                getQueryResponds();
 
                 //Закрываем окно подтверждения
                 $('#delete-respond-modal').modal('hide');
                 //Обновление данных подтверждения (Шаг 1)
-                $('#step_one').html(response.ajax_data_confirm);
+                if ($(window).width() <= '480') {
+                    $('.confirm-hypothesis-step-one-mobile > .block-ajax-data-confirm').html(response.ajax_data_confirm);
+                } else {
+                    $('#step_one').html(response.ajax_data_confirm);
+                }
             }
         },
         error: function(){
@@ -1155,6 +1051,15 @@ $(body).on('click', '.openTableQuestionsAndAnswers', function (e) {
         }
     });
 
+    e.preventDefault();
+    return false;
+});
+
+
+$(body).on('click', '.show_search_responds', function (e) {
+
+    $('.search_block_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
     e.preventDefault();
     return false;
 });

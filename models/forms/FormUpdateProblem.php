@@ -16,7 +16,7 @@ use yii\base\Model;
  * @property int $id                                                                    Идентификатор из таб. problems
  * @property ExpectedResultsInterviewConfirmProblem[] $_expectedResultsInterview        Вопросы для проверки и ответы на них (интервью с ожидаемыми результатами)
  * @property string $description                                                        Описание проблемы
- * @property int $indicator_positive_passage                                            Показатель положительного прохождения теста
+ * @property int $indicator_positive_passage                                            Показатель прохождения теста
  */
 class FormUpdateProblem extends Model
 {
@@ -63,7 +63,7 @@ class FormUpdateProblem extends Model
     {
         return [
             'description' => 'Описание гипотезы проблемы сегмента',
-            'indicator_positive_passage' => 'Показатель положительного прохождения теста',
+            'indicator_positive_passage' => 'Показатель прохождения теста',
         ];
     }
 

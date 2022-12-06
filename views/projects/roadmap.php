@@ -62,7 +62,7 @@ $content .= '<div class="content_roadmap">
                             </div>
 
                             <div class="roadmap_block_stage text-center">
-                                <div>Разработка ГMVP</div>
+                                <div>Разработка MVP</div>
                                 <div>
                                     <div>План</div>
                                     <div>Факт</div>
@@ -70,7 +70,7 @@ $content .= '<div class="content_roadmap">
                             </div>
 
                             <div class="roadmap_block_stage text-center">
-                                <div>Подтверждение ГMVP</div>
+                                <div>Подтверждение MVP</div>
                                 <div>
                                     <div>План</div>
                                     <div>Факт</div>

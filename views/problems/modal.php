@@ -10,9 +10,8 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal',],
     'size' => 'modal-lg',
-    'header' => Html::a('Генерация гипотезы проблемы сегмента' . Html::img('/images/icons/icon_report_next.png'), ['/problems/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => 'Новая проблема',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
@@ -24,9 +23,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Редактирование проблемы: <span></span>' . Html::img('/images/icons/icon_report_next.png'), ['/problems/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => 'Редактирование проблемы',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
@@ -55,8 +53,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['class' => 'respond_positive_view_modal',],
     'size' => 'modal-lg',
-    'header' => '<div style="font-size: 28px; font-weight: 700;">Информация о интервью</div>',
-    'headerOptions' => ['class' => 'style_header_modal_form', 'style' => ['text-align' => 'center']]
+    'header' => 'Информация о интервью',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>

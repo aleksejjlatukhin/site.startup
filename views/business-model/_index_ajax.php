@@ -8,6 +8,7 @@ use app\models\Segments;
 use app\models\User;
 use app\models\EnableExpertise;
 use app\models\StageExpertise;
+use yii\helpers\Url;
 
 /**
  * @var BusinessModel $model
@@ -18,7 +19,7 @@ use app\models\StageExpertise;
 ?>
 
 
-<div class="row" style="margin: 0;">
+<div class="row business-model-block-buttons-desktop" style="margin: 0;">
 
     <div class="col-lg-3" style="padding-top: 17px; padding-bottom: 17px;">
         <?= Html::a('Бизнес-модель' . Html::img('/images/icons/icon_report_next.png'), ['/business-model/get-instruction'],[
@@ -28,18 +29,23 @@ use app\models\StageExpertise;
 
     <div class="col-lg-9" style="padding-top: 17px; padding-bottom: 17px;">
 
-        <?= Html::a('Скачать', ['/business-model/mpdf-business-model', 'id' => $model->id],[
-            'class' => 'btn btn-default pull-right',
+        <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
+            'class' => 'btn btn-success pull-right',
             'title' => 'Скачать бизнес-модель',
             'target' => '_blank',
             'style' => [
-                'color' => '#FFFFFF',
-                'background' => '#669999',
-                'padding' => '0 7px',
-                'width' => '190px',
+                'display' => 'flex',
+                'align-items' => 'center',
+                'justify-content' => 'center',
+                'padding' => '2px 7px 0 7px',
+                'width' => '220px',
                 'height' => '40px',
-                'font-size' => '24px',
                 'border-radius' => '8px',
+                'background' => '#52BE7F',
+                'text-transform' => 'uppercase',
+                'font-size' => '16px',
+                'color' => '#FFFFFF',
+                'font-weight' => '700',
             ],
         ]) ?>
 
@@ -49,45 +55,60 @@ use app\models\StageExpertise;
                 'class' => 'btn btn-default update-hypothesis pull-right',
                 'title' => 'Редактировать бизнес-модель',
                 'style' => [
-                    'color' => '#FFFFFF',
-                    'background' => '#C2C2C2',
-                    'padding' => '0 7px',
-                    'width' => '190px',
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'padding' => '2px 7px 0 7px',
+                    'width' => '220px',
                     'height' => '40px',
-                    'font-size' => '24px',
                     'border-radius' => '8px',
+                    'background' => '#7F9FC5',
+                    'text-transform' => 'uppercase',
+                    'font-size' => '16px',
+                    'color' => '#FFFFFF',
+                    'font-weight' => '700',
                 ],
             ]) ?>
 
             <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
 
-                <?=  Html::a( 'Экспертиза',
+                <?=  Html::a( 'Разрешить экспертизу',
                     ['/business-model/enable-expertise', 'id' => $model->getId()], [
-                        'class' => 'btn btn-warning link-enable-expertise pull-right',
-                        'title' => 'Разрешить экспертизу',
+                        'class' => 'btn btn-default link-enable-expertise pull-right',
                         'style' => [
-                            'padding' => '0 7px',
-                            'width' => '190px',
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'padding' => '2px 7px 0 7px',
+                            'width' => '220px',
                             'height' => '40px',
-                            'font-size' => '24px',
                             'border-radius' => '8px',
+                            'background' => '#4F4F4F',
+                            'text-transform' => 'uppercase',
+                            'font-size' => '16px',
+                            'color' => '#FFFFFF',
+                            'font-weight' => '700',
                         ]
                     ]) ?>
 
             <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
-                <?=  Html::a( 'Экспертиза',
+                <?=  Html::a( 'Смотреть экспертизу',
                     ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
                         'class' => 'btn btn-default link-get-list-expertise pull-right',
-                        'title' => 'Смотреть экспертизу',
                         'style' => [
-                            'color' => '#FFFFFF',
-                            'background' => '#52BE7F',
-                            'padding' => '0 7px',
-                            'width' => '190px',
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'padding' => '2px 7px 0 7px',
+                            'width' => '220px',
                             'height' => '40px',
-                            'font-size' => '24px',
                             'border-radius' => '8px',
+                            'background' => '#4F4F4F',
+                            'text-transform' => 'uppercase',
+                            'font-size' => '16px',
+                            'color' => '#FFFFFF',
+                            'font-weight' => '700',
                         ],
                     ]) ?>
 
@@ -97,18 +118,22 @@ use app\models\StageExpertise;
 
             <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
 
-                <?=  Html::a( 'Экспертиза', ['#'], [
+                <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
                     'onclick' => 'return false;',
                     'class' => 'btn btn-default pull-right',
-                    'title' => 'Экспертиза не разрешена',
                     'style' => [
-                        'color' => '#FFFFFF',
-                        'background' => '#f5a4a4',
-                        'padding' => '0 7px',
-                        'width' => '190px',
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'padding' => '2px 7px 0 7px',
+                        'width' => '220px',
                         'height' => '40px',
-                        'font-size' => '24px',
                         'border-radius' => '8px',
+                        'background' => '#4F4F4F',
+                        'text-transform' => 'uppercase',
+                        'font-size' => '16px',
+                        'color' => '#FFFFFF',
+                        'font-weight' => '700',
                     ]
                 ]) ?>
 
@@ -117,15 +142,19 @@ use app\models\StageExpertise;
                 <?=  Html::a( 'Экспертиза',
                     ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
                         'class' => 'btn btn-default link-get-list-expertise pull-right',
-                        'title' => 'Экспертиза',
                         'style' => [
-                            'color' => '#FFFFFF',
-                            'background' => '#52BE7F',
-                            'padding' => '0 7px',
-                            'width' => '190px',
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'padding' => '2px 7px 0 7px',
+                            'width' => '220px',
                             'height' => '40px',
-                            'font-size' => '24px',
                             'border-radius' => '8px',
+                            'background' => '#4F4F4F',
+                            'text-transform' => 'uppercase',
+                            'font-size' => '16px',
+                            'color' => '#FFFFFF',
+                            'font-weight' => '700',
                         ]
                     ]) ?>
 
@@ -135,18 +164,22 @@ use app\models\StageExpertise;
 
             <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
 
-                <?=  Html::a( 'Экспертиза', ['#'], [
+                <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
                     'onclick' => 'return false;',
                     'class' => 'btn btn-default pull-right',
-                    'title' => 'Экспертиза не разрешена',
                     'style' => [
-                        'color' => '#FFFFFF',
-                        'background' => '#f5a4a4',
-                        'padding' => '0 7px',
-                        'width' => '190px',
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'padding' => '2px 7px 0 7px',
+                        'width' => '220px',
                         'height' => '40px',
-                        'font-size' => '24px',
                         'border-radius' => '8px',
+                        'background' => '#4F4F4F',
+                        'text-transform' => 'uppercase',
+                        'font-size' => '16px',
+                        'color' => '#FFFFFF',
+                        'font-weight' => '700',
                     ]
                 ]) ?>
 
@@ -155,15 +188,19 @@ use app\models\StageExpertise;
                 <?=  Html::a( 'Экспертиза',
                     ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
                         'class' => 'btn btn-default link-get-list-expertise pull-right',
-                        'title' => 'Экспертиза',
                         'style' => [
-                            'color' => '#FFFFFF',
-                            'background' => '#52BE7F',
-                            'padding' => '0 7px',
-                            'width' => '190px',
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'padding' => '2px 7px 0 7px',
+                            'width' => '220px',
                             'height' => '40px',
-                            'font-size' => '24px',
                             'border-radius' => '8px',
+                            'background' => '#4F4F4F',
+                            'text-transform' => 'uppercase',
+                            'font-size' => '16px',
+                            'color' => '#FFFFFF',
+                            'font-weight' => '700',
                         ]
                     ]) ?>
 
@@ -252,8 +289,7 @@ use app\models\StageExpertise;
             <?= $segment->getDescription() ?>
 
             <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
-            <?= ' от ' . number_format($segment->getQuantityFrom() * 1000, 0, '', ' ') .
-            ' до ' . number_format($segment->getQuantityTo() * 1000, 0, '', ' ') . ' человек' ?>
+            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
 
             <div class="mini_header_desc_block">Объем рынка:</div>
             <?= number_format($segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>
@@ -281,6 +317,204 @@ use app\models\StageExpertise;
             <div><?= $model->getRevenue() ?></div>
         </div>
 
+    </div>
+
+</div>
+
+
+<div class="row container-fluid blocks_business_model_mobile">
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Ключевые партнеры</div>
+        <div class="content_property"><?= $model->getPartners() ?></div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Ключевые направления</div>
+        <div class="content_property">
+            <div class="mini_header_desc_block">Тип взаимодейстивия с рынком:</div>
+            <?php
+            if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) {
+                echo 'В2С (бизнес-клиент)';
+            } else {
+                echo 'B2B (бизнес-бизнес)';
+            }
+            ?>
+
+            <div class="mini_header_desc_block">Сфера деятельности:</div>
+            <?= $segment->getFieldOfActivity() ?>
+
+            <div class="mini_header_desc_block">Вид / специализация деятельности:</div>
+            <?= $segment->getSortOfActivity() ?>
+        </div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Ключевые ресурсы</div>
+        <div class="content_property"><?= $model->getResources() ?></div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Ценностное предложение</div>
+        <div class="content_property"><?= $gcp->getDescription() ?></div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Взаимоотношения с клиентами</div>
+        <div class="content_property"><?= $model->getRelations() ?></div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Каналы коммуникации и сбыта</div>
+        <div class="content_property"><?= $model->getRelations() ?></div>
+    </div>
+
+    <div class="col-xs-12 block_property_business_model">
+        <div class="header_blue_property">Потребительский сегмент</div>
+        <div class="content_property">
+            <div>
+                <span class="mini_header_desc_block">Наименование:</span>
+                <?= $segment->getName() ?>
+            </div>
+            <div>
+                <span class="mini_header_desc_block">Краткое описание:</span>
+                <?= $segment->getDescription() ?>
+            </div>
+            <div>
+                <span class="mini_header_desc_block">Потенциальное количество потребителей:</span>
+                <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
+            </div>
+            <div>
+                <span class="mini_header_desc_block">Объем рынка:</span>
+                <?= number_format($segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-6 block_property_business_model">
+        <div class="header_red_property">Структура издержек</div>
+        <div class="content_property"><?= $model->getCost() ?></div>
+    </div>
+
+    <div class="col-xs-6 block_property_business_model">
+        <div class="header_green_property">Потоки поступления доходов</div>
+        <div class="content_property"><?= $model->getRevenue() ?></div>
+    </div>
+
+    <div class="col-xs-12 business-model-block-buttons-mobile">
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+            <div class="hypothesis_buttons_mobile">
+
+                <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default update-hypothesis',
+                    'style' => [
+                        'display' => 'flex',
+                        'width' => '50%',
+                        'height' => '36px',
+                        'background' => '#7F9FC5',
+                        'color' => '#FFFFFF',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'border-radius' => '0',
+                        'border' => '1px solid #ffffff',
+                        'font-size' => '18px',
+                        'margin' => '10px 0 0 0',
+                    ],
+                ]) ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                    <?= Html::a('Запросить экспертизу', ['/business-model/enable-expertise', 'id' => $model->getId()], [
+                        'class' => 'btn btn-default link-enable-expertise',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '50%',
+                            'height' => '36px',
+                            'background' => '#4F4F4F',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 0 0 0',
+                        ],
+                    ]) ?>
+
+                <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                    <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                        'class' => 'btn btn-default link-get-list-expertise',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '50%',
+                            'height' => '36px',
+                            'background' => '#4F4F4F',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 0 0 0',
+                        ],
+                    ]) ?>
+
+                <?php endif; ?>
+
+            </div>
+
+        <?php else: ?>
+
+            <div class="hypothesis_buttons_mobile">
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                    <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                        'class' => 'btn btn-default link-get-list-expertise',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '100%',
+                            'height' => '36px',
+                            'background' => '#4F4F4F',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 0 0 0',
+                        ],
+                    ]) ?>
+
+                <?php endif; ?>
+
+            </div>
+
+        <?php endif; ?>
+
+        <div class="hypothesis_buttons_mobile">
+
+            <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
+                'class' => 'btn btn-success',
+                'target' => '_blank',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '100%',
+                    'height' => '36px',
+                    'background' => '#52BE7F',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 0 0 0',
+                ]
+            ]) ?>
+
+        </div>
     </div>
 
 </div>

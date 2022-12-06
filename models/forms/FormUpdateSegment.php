@@ -44,8 +44,7 @@ class FormUpdateSegment extends FormSegment
             $this->setEducationOfConsumer($model->getEducationOfConsumer());
             $this->setIncomeFrom($model->getIncomeFrom());
             $this->setIncomeTo($model->getIncomeTo());
-            $this->setQuantityFrom($model->getQuantityFrom());
-            $this->setQuantityTo($model->getQuantityTo());
+            $this->setQuantity($model->getQuantity());
             $this->setMarketVolumeB2c($model->getMarketVolume());
 
         }elseif ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
@@ -53,8 +52,7 @@ class FormUpdateSegment extends FormSegment
             $this->setFieldOfActivityB2b($model->getFieldOfActivity());
             $this->setSortOfActivityB2b($model->getSortOfActivity());
             $this->setCompanyProducts($model->getCompanyProducts());
-            $this->setQuantityFromB2b($model->getQuantityFrom());
-            $this->setQuantityToB2b($model->getQuantityTo());
+            $this->setQuantityB2b($model->getQuantity());
             $this->setCompanyPartner($model->getCompanyPartner());
             $this->setIncomeCompanyFrom($model->getIncomeFrom());
             $this->setIncomeCompanyTo($model->getIncomeTo());
@@ -77,8 +75,7 @@ class FormUpdateSegment extends FormSegment
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2c)
                 && !empty($this->sort_of_activity_b2c) && !empty($this->age_from) && !empty($this->age_to)
                 && !empty($this->gender_consumer) && !empty($this->education_of_consumer) && !empty($this->income_from)
-                && !empty($this->income_to) && !empty($this->quantity_from) && !empty($this->quantity_to)
-                && !empty($this->market_volume_b2c)) {
+                && !empty($this->income_to) && !empty($this->quantity)) {
 
                 return true;
             }
@@ -89,8 +86,7 @@ class FormUpdateSegment extends FormSegment
 
             if (!empty($this->name) && !empty($this->description) && !empty($this->field_of_activity_b2b)
                 && !empty($this->sort_of_activity_b2b) && !empty($this->company_products) && !empty($this->company_partner)
-                && !empty($this->quantity_from_b2b) && !empty($this->quantity_to_b2b) && !empty($this->income_company_from)
-                && !empty($this->income_company_to) && !empty($this->market_volume_b2b)) {
+                && !empty($this->quantity_b2b) && !empty($this->income_company_from) && !empty($this->income_company_to)) {
 
                 return true;
             }
@@ -122,9 +118,8 @@ class FormUpdateSegment extends FormSegment
             $segment->setEducationOfConsumer($this->getEducationOfConsumer());
             $segment->setIncomeFrom($this->getIncomeFrom());
             $segment->setIncomeTo($this->getIncomeTo());
-            $segment->setQuantityFrom($this->getQuantityFrom());
-            $segment->setQuantityTo($this->getQuantityTo());
-            $segment->setMarketVolume($this->getMarketVolumeB2c());
+            $segment->setQuantity($this->getQuantity());
+            $segment->setMarketVolume(((($this->getIncomeFrom() + $this->getIncomeTo()) * 6) * $this->getQuantity()) / 1000000);
 
             if ($segment->save()) {
                 return $segment;
@@ -136,12 +131,11 @@ class FormUpdateSegment extends FormSegment
             $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
             $segment->setSortOfActivity($this->getSortOfActivityB2b());
             $segment->setCompanyProducts($this->getCompanyProducts());
-            $segment->setQuantityFrom($this->getQuantityFromB2b());
-            $segment->setQuantityTo($this->getQuantityToB2b());
+            $segment->setQuantity($this->getQuantityB2b());
             $segment->setCompanyPartner($this->getCompanyPartner());
             $segment->setIncomeFrom($this->getIncomeCompanyFrom());
             $segment->setIncomeTo($this->getIncomeCompanyTo());
-            $segment->setMarketVolume($this->getMarketVolumeB2b());
+            $segment->setMarketVolume((($this->getIncomeCompanyFrom() + $this->getIncomeCompanyTo()) / 2) * $this->getQuantityB2b());
 
             if ($segment->save()) {
                 return $segment;

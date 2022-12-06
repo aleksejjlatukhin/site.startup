@@ -17,7 +17,7 @@ use app\models\Segments;
 
     <?php if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) : ?>
 
-        <h4>Вид информационного и экономического взаимодействия между субъектами рынка</h4>
+        <h4>Тип взаимодействия с потребителями</h4>
         <div>Коммерческие взаимоотношения между организацией и частным потребителем (B2C)</div>
 
         <h4>Сфера деятельности потребителя</h4>
@@ -70,13 +70,12 @@ use app\models\Segments;
 
         <h4>Потенциальное количество потребителей</h4>
         <div>
-            <?= 'от ' . number_format($segment->getQuantityFrom() * 1000, 0, '', ' ') . ' до '
-            . number_format($segment->getQuantityTo() * 1000, 0, '', ' ') . ' человек' ?>
+            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
         </div>
 
     <?php elseif ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) : ?>
 
-        <h4>Вид информационного и экономического взаимодействия между субъектами рынка</h4>
+        <h4>Тип взаимодействия с потребителями</h4>
         <div>Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
         <h4>Сфера деятельности предприятия</h4>
@@ -93,8 +92,7 @@ use app\models\Segments;
 
         <h4>Потенциальное количество представителей сегмента</h4>
         <div>
-            <?= 'от ' . number_format($segment->getQuantityFrom(), 0, '', ' ') . ' до '
-            . number_format($segment->getQuantityTo(), 0, '', ' ') ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') ?>
         </div>
 
         <h4>Доход предприятия</h4>

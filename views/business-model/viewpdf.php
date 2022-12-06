@@ -58,8 +58,7 @@ $this->title = 'Бизнес-модель';
                 <?= $model->segment->getDescription() ?>
 
                 <div class="export_business_model_mini_header">Потенциальное количество потребителей:</div>
-                <?= ' от ' . number_format($model->segment->getQuantityFrom() * 1000, 0, '', ' ') .
-                ' до ' . number_format($model->segment->getQuantityTo() * 1000, 0, '', ' ') . ' человек' ?>
+                <?= number_format($model->segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
 
                 <div class="export_business_model_mini_header">Объем рынка:</div>
                 <?= number_format($model->segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>

@@ -20,6 +20,7 @@ setInterval(function(){
 
                 // Меняем в шапке сайта в иконке количество непрочитанных сообщений
                 var countUnreadMessages = $(body).find('.countUnreadMessages');
+                var existUnreadBlock = $(body).find('.existUnreadMessagesOrCommunications');
                 if (response.countUnreadMessages > 0) {
 
                     if ($(countUnreadMessages).hasClass('active')) {
@@ -28,9 +29,23 @@ setInterval(function(){
                         $(countUnreadMessages).addClass('active');
                         $(countUnreadMessages).html(response.countUnreadMessages);
                     }
+
+                    if (!$(existUnreadBlock).hasClass('active')) {
+                        $(existUnreadBlock).addClass('active');
+                    }
                 } else {
-                    if ($(countUnreadMessages).hasClass('active'))
+                    if ($(countUnreadMessages).hasClass('active')) {
                         $(countUnreadMessages).removeClass('active');
+                    }
+                    if (!$(body).find('.countUnreadCommunications').hasClass('active')) {
+                        if ($(existUnreadBlock).hasClass('active')) {
+                            $(existUnreadBlock).removeClass('active');
+                        }
+                    } else {
+                        if (!$(existUnreadBlock).hasClass('active')) {
+                            $(existUnreadBlock).addClass('active');
+                        }
+                    }
                 }
             }
         });

@@ -240,7 +240,7 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 'justify-content' => 'center',
                 'background' => '#F5A4A4',
                 'color' => '#ffffff',
-                'width' => '140px',
+                'width' => '180px',
                 'height' => '40px',
                 'font-size' => '16px',
                 'text-transform' => 'uppercase',

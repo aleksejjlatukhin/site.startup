@@ -56,20 +56,21 @@ use app\models\QuestionStatus;
 
                     <?= Html::a('Скачать файл', ['/interviews/download', 'stage' => StageConfirm::STAGE_CONFIRM_SEGMENT, 'id' => $interview->getId()], [
                         'target' => '_blank',
-                        'class' => "btn btn-default interview_file_view-" . $interview->getId(),
+                        'class' => "btn btn-success interview_file_view-" . $interview->getId(),
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
                             'color' => '#FFFFFF',
                             'justify-content' => 'center',
-                            'background' => '#707F99',
-                            'width' => '170px',
+                            'background' => '#52BE7F',
+                            'width' => '180px',
                             'height' => '40px',
-                            'text-align' => 'left',
-                            'font-size' => '24px',
+                            'font-size' => '16px',
                             'border-radius' => '8px',
-                            'margin-right' => '5px',
-                        ]
+                            'text-transform' => 'uppercase',
+                            'font-weight' => '700',
+                            'padding-top' => '9px'
+                        ],
 
                     ]) ?>
 

@@ -140,12 +140,12 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
                         Url::to('/projects/get-instruction'), [
                             'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                            'title' => 'Инструкция', 'style' => ['margin-left' => '10px']
+                            'title' => 'Инструкция', 'style' => ['margin-left' => '10px', 'margin-top' => '5px']
                         ]) ?>
 
                     <?= Html::a(Html::img('@web/images/icons/icon_green_search.png'), ['#'], [
                             'class' => 'link_show_search_field_mobile show_search_projects pull-right',
-                            'title' => 'Поиск проектов'
+                            'title' => 'Поиск проектов', 'style' => ['margin-top' => '5px']
                     ]) ?>
 
                 <?php else : ?>
@@ -153,7 +153,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
                         Url::to('/projects/get-instruction'), [
                             'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                            'title' => 'Инструкция'
+                            'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
                         ]) ?>
 
                 <?php endif; ?>
@@ -162,7 +162,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         </div>
 
         <div class="row search_block_mobile">
-            <div class="col-xs-12">
+            <div class="col-xs-10">
                 <?php $form = ActiveForm::begin([
                     'id' => 'search_projects_mobile',
                     'options' => ['class' => 'g-py-15'],
@@ -179,6 +179,9 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                     ->label(false) ?>
 
                 <?php ActiveForm::end(); ?>
+            </div>
+            <div class="col-xs-2 pull-right">
+                <?= Html::a(Html::img('@web/images/icons/cancel_danger.png'), ['#'], ['class' => 'link_cancel_search_field_mobile show_search_projects']) ?>
             </div>
         </div>
 

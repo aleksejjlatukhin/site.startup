@@ -208,4 +208,9 @@ table tr td {
     h2.main-header {
         display: none;
     }
+    .container-text,
+    .container-list {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }

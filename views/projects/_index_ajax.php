@@ -205,92 +205,92 @@ use app\models\StageExpertise;
 
             <div class="project_dates_mobile">
                 <div class="project_created_at">
-                    <div>Создан:</div>
+                    <div style="font-weight: 700;">Создан:</div>
                     <div><?= date('d.m.y', $model->getCreatedAt()) ?></div>
                 </div>
                 <div class="project_updated_at">
-                    <div>Изменен:</div>
+                    <div style="font-weight: 700;">Изменен:</div>
                     <div><?= date('d.m.y', $model->getUpdatedAt()) ?></div>
                 </div>
             </div>
 
+            <div class="project_buttons_mobile">
+
+                <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'width' => '47%',
+                        'height' => '36px',
+                        'background' => '#C6C6C6',
+                        'color' => '#FFFFFF',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'border-radius' => '0',
+                        'border' => '1px solid #ffffff',
+                        'font-size' => '18px',
+                        'margin' => '10px 1% 0 2%',
+                    ],
+                ]) ?>
+
+                <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'width' => '47%',
+                        'height' => '36px',
+                        'background' => '#C6C6C6',
+                        'color' => '#FFFFFF',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'border-radius' => '0',
+                        'border' => '1px solid #ffffff',
+                        'font-size' => '18px',
+                        'margin' => '10px 2% 0 1%',
+                    ],
+                ]) ?>
+
+            </div>
+
+            <div class="project_buttons_mobile">
+
+                <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'width' => '47%',
+                        'height' => '36px',
+                        'background' => '#C6C6C6',
+                        'color' => '#FFFFFF',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'border-radius' => '0',
+                        'border' => '1px solid #ffffff',
+                        'font-size' => '18px',
+                        'margin' => '10px 1% 20px 2%',
+                    ],
+                ]) ?>
+
+                <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'width' => '47%',
+                        'height' => '36px',
+                        'background' => '#C6C6C6',
+                        'color' => '#FFFFFF',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'border-radius' => '0',
+                        'border' => '1px solid #ffffff',
+                        'font-size' => '18px',
+                        'margin' => '10px 2% 20px 1%',
+                    ],
+                ]) ?>
+
+            </div>
+
             <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-                <div class="project_buttons_mobile">
-
-                    <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#C6C6C6',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 2px 0 4px',
-                        ],
-                    ]) ?>
-
-                    <?= Html::a('Трэкшн карта', ['/projects/show-roadmap', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default openRoadmapProject',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#C6C6C6',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 4px 0 2px',
-                        ],
-                    ]) ?>
-
-                </div>
-
-                <div class="project_buttons_mobile">
-
-                    <?= Html::a('Протокол', ['/projects/report', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default openReportProject',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#C6C6C6',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 2px 20px 4px',
-                        ],
-                    ]) ?>
-
-                    <?= Html::a('Презентации', ['/projects/get-presentation', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#C6C6C6',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 4px 20px 2px',
-                        ],
-                    ]) ?>
-
-                </div>
 
                 <div class="project_buttons_mobile">
 
@@ -298,7 +298,7 @@ use app\models\StageExpertise;
                         'class' => 'btn btn-default update-hypothesis',
                         'style' => [
                             'display' => 'flex',
-                            'width' => '50%',
+                            'width' => '47%',
                             'height' => '36px',
                             'background' => '#7F9FC5',
                             'color' => '#FFFFFF',
@@ -307,7 +307,7 @@ use app\models\StageExpertise;
                             'border-radius' => '0',
                             'border' => '1px solid #ffffff',
                             'font-size' => '18px',
-                            'margin' => '10px 2px 0 4px',
+                            'margin' => '10px 1% 0 2%',
                         ],
                     ]) ?>
 
@@ -317,7 +317,7 @@ use app\models\StageExpertise;
                             'class' => 'btn btn-default link-enable-expertise',
                             'style' => [
                                 'display' => 'flex',
-                                'width' => '50%',
+                                'width' => '47%',
                                 'height' => '36px',
                                 'background' => '#4F4F4F',
                                 'color' => '#FFFFFF',
@@ -326,7 +326,7 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '10px 4px 0 2px',
+                                'margin' => '10px 2% 0 1%',
                             ],
                         ]) ?>
 
@@ -336,7 +336,7 @@ use app\models\StageExpertise;
                             'class' => 'btn btn-default link-get-list-expertise',
                             'style' => [
                                 'display' => 'flex',
-                                'width' => '50%',
+                                'width' => '47%',
                                 'height' => '36px',
                                 'background' => '#4F4F4F',
                                 'color' => '#FFFFFF',
@@ -345,7 +345,7 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '10px 4px 0 2px',
+                                'margin' => '10px 2% 0 1%',
                             ],
                         ]) ?>
 
@@ -359,7 +359,7 @@ use app\models\StageExpertise;
                         'class' => 'btn btn-default delete_hypothesis',
                         'style' => [
                             'display' => 'flex',
-                            'width' => '50%',
+                            'width' => '47%',
                             'height' => '36px',
                             'background' => '#F5A4A4',
                             'color' => '#FFFFFF',
@@ -368,7 +368,7 @@ use app\models\StageExpertise;
                             'border-radius' => '0',
                             'border' => '1px solid #ffffff',
                             'font-size' => '18px',
-                            'margin' => '10px 2px 1px 4px',
+                            'margin' => '10px 1% 2% 2%',
                         ],
                     ]) ?>
 
@@ -380,7 +380,7 @@ use app\models\StageExpertise;
                             'class' => 'btn btn-default',
                             'style' => [
                                 'display' => 'flex',
-                                'width' => '50%',
+                                'width' => '47%',
                                 'height' => '36px',
                                 'background' => '#52BE7F',
                                 'color' => '#FFFFFF',
@@ -389,7 +389,7 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '10px 4px 1px 2px',
+                                'margin' => '10px 2% 2% 1%',
                             ]
                         ]) ?>
 
@@ -399,7 +399,7 @@ use app\models\StageExpertise;
                             'class' => 'btn btn-default',
                             'style' => [
                                 'display' => 'flex',
-                                'width' => '50%',
+                                'width' => '47%',
                                 'height' => '36px',
                                 'background' => '#52BE7F',
                                 'color' => '#FFFFFF',
@@ -408,13 +408,61 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '10px 4px 1px 2px',
+                                'margin' => '10px 2% 2% 1%',
                             ]
                         ]) ?>
 
                     <?php endif; ?>
 
                 </div>
+
+            <?php else: ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                    <div class="project_buttons_mobile">
+
+                        <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '0 1% 2% 2%',
+                            ],
+                        ]) ?>
+
+                        <?= Html::a('Работать далее', Url::to(['/segments/index', 'id' => $model->id]), [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '0 2% 2% 1%',
+                            ]
+                        ]) ?>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="text-block-not-expertise-mobile">Экспертиза не разрешена</div>
+
+                <?php endif; ?>
 
             <?php endif; ?>
 

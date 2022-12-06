@@ -10,9 +10,8 @@ use yii\helpers\Html;
 Modal::begin([
     'options' => ['class' => 'hypothesis_create_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Формулировка минимально жизнеспособного продукта' . Html::img('/images/icons/icon_report_next.png'), ['/mvps/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => 'Формулировка минимально жизнеспособного продукта',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>
@@ -23,9 +22,8 @@ Modal::begin([
 Modal::begin([
     'options' => ['class' => 'hypothesis_update_modal'],
     'size' => 'modal-lg',
-    'header' => Html::a('Редактирование продукта: <span></span>' . Html::img('/images/icons/icon_report_next.png'), ['/mvps/get-instruction'],[
-        'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page', 'title' => 'Инструкция']),
-    'headerOptions' => ['style' => ['text-align' => 'center']]
+    'header' => 'Редактирование продукта',
+    'headerOptions' => ['class' => 'header_hypothesis_modal']
 ]); ?>
 <!--Контент загружается через Ajax-->
 <?php Modal::end(); ?>

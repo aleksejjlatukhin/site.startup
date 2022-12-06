@@ -3,20 +3,24 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 
 var body = $('body');
 
-//При нажатии на кнопку редактировать(Шаг 1)
-//показываем форму редактирования и скрываем вид просмотра
-$(body).on('click', '#show_form_update_data', function(){
-    $('.form-view-data-confirm').hide();
-    $('.form-update-data-confirm').show();
+$(document).ready(function () {
+    if ($(window).width() <= '480') {
+        $('.confirm-problem-add-questions').remove();
+        $('.confirm-hypothesis-step-two-mobile').toggle('display')
+    } else {
+        $('.confirm-hypothesis-add-questions-mobile').remove();
+    }
 });
 
-//При нажатии на кнопку просмотр(Шаг 1)
-//скрываем форму редактирования и показываем вид просмотра
-$(body).on('click', '#show_form_view_data', function(){
-    $('.form-update-data-confirm').hide();
-    $('.form-view-data-confirm').show();
+$(window).resize(function () {
+    if ($(window).width() <= '480' && $('.confirm-problem-add-questions').length > 0) {
+        location.reload();
+        $('.confirm-problem-add-questions').remove();
+    } else if ($(window).width() > '480' && $('.confirm-hypothesis-add-questions-mobile').length > 0) {
+        location.reload();
+        $('.confirm-hypothesis-add-questions-mobile').remove();
+    }
 });
-
 
 // Показать инструкцию для стадии разработки
 $(body).on('click', '.open_modal_instruction_page', function (e) {
@@ -52,31 +56,7 @@ $(body).on('beforeSubmit', '#update_data_confirm', function(e){
 
     var data = $(this).serialize();
     var url = $(this).attr('action');
-
-    $.ajax({
-
-        url: url,
-        method: 'POST',
-        data: data,
-        cache: false,
-        success: function(response){
-
-            if (response.success) {
-
-                //Обновление данных в режиме просмотра (Шаг 1)
-                $('#step_one').html(response.ajax_data_confirm);
-
-                //Вызов события клика на кнопку просмотра
-                //для перехода в режим просмотра (Шаг 1)
-                $('.form-update-data-confirm').hide();
-                $('.form-view-data-confirm').show();
-
-            }
-        }, error: function(){
-            alert('Ошибка');
-        }
-    });
-
+    $.ajax({ url: url, method: 'POST', data: data, cache: false });
     e.preventDefault();
     return false;
 });

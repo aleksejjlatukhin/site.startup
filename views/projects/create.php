@@ -349,7 +349,7 @@ use yii\helpers\Html;
         <div class="col-md-5"></div>
     </div>
 
-    <div class="row desktop-mb-15">
+    <div class="row desktop-mb-15 mobile-mt-15">
         <?= $form->field($model, 'announcement_event', [
             'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
         ])->textInput([
@@ -386,7 +386,7 @@ use yii\helpers\Html;
         <div class="col-md-5"></div>
     </div>
 
-    <div class="container row mobile-mt-15">
+    <div class="container row mobile-mt-20">
         <div class="pull-left">
             <div class="add_files">
                 <div style="margin-top: -5px; padding-left: 5px;">
@@ -399,7 +399,6 @@ use yii\helpers\Html;
                     Превышено максимальное количество файлов для загрузки.
                 </div>
                 <div class="pl-5">
-                    <!--TODO: Скрыть эту кнопку, вывести стилизованную и по нажатии на новую кнопку триггерить нажатие по старой кнопке!!!-->
                     <?= $form->field($model, 'present_files[]', ['template' => "{label}\n{input}"])->fileInput(['multiple' => true])->label(false) ?>
                 </div>
             </div>
@@ -417,7 +416,7 @@ use yii\helpers\Html;
                     'justify-content' => 'center',
                     'background' => '#7F9FC5',
                     'color' => '#ffffff',
-                    'width' => '140px',
+                    'width' => '180px',
                     'height' => '40px',
                     'font-size' => '16px',
                     'text-transform' => 'uppercase',

@@ -29,7 +29,7 @@ use yii\helpers\Html;
 
     <?php if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C) : ?>
 
-        <div style="font-weight: 700;">Вид информационного и экономического взаимодействия между субъектами рынка</div>
+        <div style="font-weight: 700;">Тип взаимодействия с потребителями</div>
         <div style="margin-bottom: 10px;">Коммерческие взаимоотношения между организацией и частным потребителем (B2C)</div>
 
         <div style="font-weight: 700;">Сфера деятельности потребителя</div>
@@ -82,13 +82,12 @@ use yii\helpers\Html;
 
         <div style="font-weight: 700;">Потенциальное количество потребителей</div>
         <div style="margin-bottom: 10px;">
-            <?= 'от ' . number_format($segment->getQuantityFrom() * 1000, 0, '', ' ') . ' до '
-            . number_format($segment->getQuantityTo() * 1000, 0, '', ' ') . ' человек' ?>
+            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
         </div>
 
     <?php elseif ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) : ?>
 
-        <div style="font-weight: 700;">Вид информационного и экономического взаимодействия между субъектами рынка</div>
+        <div style="font-weight: 700;">Тип взаимодействия с потребителями</div>
         <div style="margin-bottom: 10px;">Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
         <div style="font-weight: 700;">Сфера деятельности предприятия</div>
@@ -105,8 +104,7 @@ use yii\helpers\Html;
 
         <div style="font-weight: 700;">Потенциальное количество представителей сегмента</div>
         <div style="margin-bottom: 10px;">
-            <?= 'от ' . number_format($segment->getQuantityFrom(), 0, '', ' ') . ' до '
-            . number_format($segment->getQuantityTo(), 0, '', ' ') ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') ?>
         </div>
 
         <div style="font-weight: 700;">Доход предприятия</div>

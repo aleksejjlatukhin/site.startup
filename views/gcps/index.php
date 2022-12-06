@@ -8,6 +8,7 @@ use app\models\Projects;
 use app\models\Segments;
 use yii\helpers\Html;
 use app\models\User;
+use yii\helpers\Url;
 
 $this->title = 'Разработка гипотез ценностных предложений';
 $this->registerCssFile('@web/css/gcp-index-style.css');
@@ -23,6 +24,115 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
 ?>
 <div class="gcp-index">
+
+    <div class="header-title-index-mobile">
+        <div style="overflow: hidden; max-width: 70%;">Проект: <?= $project->getProjectName() ?></div>
+        <div class="buttons-project-menu-mobile" style="position: absolute; right: 20px; top: 5px;">
+            <?= Html::img('@web/images/icons/icon-four-white-squares.png', ['class' => 'open-project-menu-mobile', 'style' => ['width' => '30px']]) ?>
+            <?= Html::img('@web/images/icons/icon-white-cross.png', ['class' => 'close-project-menu-mobile', 'style' => ['width' => '30px', 'display' => 'none']]) ?>
+        </div>
+    </div>
+
+    <div class="project-menu-mobile">
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Сводная таблица', ['/projects/result-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 0 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Трэкшн карта', ['/projects/roadmap-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 0 1%',
+                ],
+            ]) ?>
+
+        </div>
+
+        <div class="project_buttons_mobile">
+
+            <?= Html::a('Протокол', ['/projects/report-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 1% 10px 2%',
+                ],
+            ]) ?>
+
+            <?= Html::a('Презентация', ['/projects/presentation-mobile', 'id' => $project->getId()], [
+                'class' => 'btn btn-default',
+                'style' => [
+                    'display' => 'flex',
+                    'width' => '47%',
+                    'height' => '36px',
+                    'background' => '#7F9FC5',
+                    'color' => '#FFFFFF',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'border-radius' => '0',
+                    'border' => '1px solid #ffffff',
+                    'font-size' => '18px',
+                    'margin' => '10px 2% 10px 1%',
+                ],
+            ]) ?>
+
+        </div>
+    </div>
+
+    <div class="arrow_stages_project_mobile">
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage active"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+        <div class="item-stage passive"></div>
+    </div>
+
+    <div class="arrow_links_router_mobile">
+        <div class="arrow_link_router_mobile_left">
+            <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
+                Url::to(['/confirm-problem/view', 'id' => $confirmProblem->getId()])) ?>
+        </div>
+        <div class="text-stage">5/9. Разработка гипотез ценностных предложений</div>
+        <div class="arrow_link_router_mobile_right">
+            <?= Html::img('@web/images/icons/arrow_left_passive.png') ?>
+        </div>
+    </div>
 
     <div class="row project_info_data">
 
@@ -153,7 +263,7 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
     <div class="container-fluid container-data row">
 
-        <div class="row" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
+        <div class="row row_header_data_generation" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
 
             <div class="col-md-6" style="padding-top: 17px; padding-bottom: 17px;">
                 <?= Html::a('Ценностные предложения' . Html::img('/images/icons/icon_report_next.png'), ['/gcps/get-instruction'],[
@@ -170,6 +280,27 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
                 <?php endif; ?>
             </div>
 
+        </div>
+
+
+        <div class="row row_header_data_generation_mobile">
+            <div class="col-xs-9">
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новое ценностное предложение</div></div>',
+                        ['/confirm-problem/data-availability-for-next-step', 'id' => $confirmProblem->getId()],
+                        ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus']
+                    ) ?>
+
+                <?php endif; ?>
+            </div>
+            <div class="col-xs-3">
+                <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                    Url::to('/gcps/get-instruction'), [
+                        'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                        'title' => 'Инструкция'
+                    ]) ?>
+            </div>
         </div>
 
 

@@ -389,7 +389,7 @@ use app\models\Authors;
         <div class="col-md-5"></div>
     </div>
 
-    <div class="row desktop-mb-15">
+    <div class="row desktop-mb-15 mobile-mt-15">
         <?= $form->field($model, 'announcement_event', [
             'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
         ])->textInput([
@@ -431,7 +431,7 @@ use app\models\Authors;
         <div class="col-md-5"></div>
     </div>
 
-    <div class="container row">
+    <div class="container row mobile-mt-20">
         <div class="pull-left">
 
             <?php if (count($model->preFiles) < 5) : ?>
@@ -531,7 +531,7 @@ use app\models\Authors;
                     'justify-content' => 'center',
                     'background' => '#7F9FC5',
                     'color' => '#ffffff',
-                    'width' => '140px',
+                    'width' => '180px',
                     'height' => '40px',
                     'font-size' => '16px',
                     'text-transform' => 'uppercase',

@@ -120,3 +120,17 @@
         padding-bottom: 15px;
     }
 }
+
+@media screen and (max-width: 480px) {
+
+    .row_header_data,
+    .segment_info_data,
+    .block-link-create-interview {
+        display: none;
+    }
+
+    .row .container-fluid {
+        padding-right: 7px;
+        padding-left: 7px;
+    }
+}

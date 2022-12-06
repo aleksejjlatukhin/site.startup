@@ -8,6 +8,7 @@ use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateSegment;
 use app\models\forms\FormUpdateSegment;
+use app\models\forms\SearchForm;
 use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\Roadmap;
@@ -234,15 +235,23 @@ class SegmentsController extends AppUserPartController
     {
         $project = Projects::findOne($id);
         $models = Segments::findAll(['project_id' => $project->getId()]);
+        $searchForm = new SearchForm();
 
         if (!$models) {
             return $this->redirect(['/segments/instruction', 'id' => $id]);
         }
 
+        if ($searchForm->load(Yii::$app->request->post())) {
+            $models = Segments::find()
+                ->where(['project_id' => $project->getId()])
+                ->andWhere(['like', 'name', $searchForm->search])
+                ->all();
+        }
+
         return $this->render('index', [
             'project' => $project,
             'models' => $models,
-            'sortModel' => new SortForm(),
+            'searchForm' => new SearchForm(),
         ]);
     }
 
@@ -367,24 +376,7 @@ class SegmentsController extends AppUserPartController
 
                     if ($model->create()) {
 
-                        $type_sort_id = $_POST['type_sort_id'];
                         $count = Segments::find()->where(['project_id' => $id])->count();
-
-                        if ($count > 1 && $type_sort_id !== '') {
-
-                            $sort = new SegmentSort();
-
-                            $response =  [
-                                'success' => true, 'count' => $count,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => $sort->fetchModels($id, $type_sort_id),
-                                ]),
-                            ];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-
-                        }
 
                         $response =  [
                             'success' => true, 'count' => $count,
@@ -460,24 +452,6 @@ class SegmentsController extends AppUserPartController
 
                     if ($model->update()) {
 
-                        $type_sort_id = $_POST['type_sort_id'];
-
-                        if ($type_sort_id !== '') {
-
-                            $sort = new SegmentSort();
-
-                            $response =  [
-                                'success' => true,
-                                'renderAjax' => $this->renderAjax('_index_ajax', [
-                                    'models' => $sort->fetchModels($project->id, $type_sort_id),
-                                ]),
-                            ];
-                            Yii::$app->response->format = Response::FORMAT_JSON;
-                            Yii::$app->response->data = $response;
-                            return $response;
-
-                        }
-
                         $response =  [
                             'success' => true,
                             'renderAjax' => $this->renderAjax('_index_ajax', [
@@ -521,25 +495,6 @@ class SegmentsController extends AppUserPartController
             $segment = Segments::findOne($id);
             $segment->setEnableExpertise();
             if ($segment->save()) {
-
-                //Проверка наличия сортировки
-                $type_sort_id = $_POST['type_sort_id'];
-
-                if ($type_sort_id !== '') {
-
-                    $sort = new SegmentSort();
-
-                    $response = [
-                        'success' => true,
-                        'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'models' => $sort->fetchModels($segment->getProjectId(), $type_sort_id),
-                        ]),
-                    ];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-
-                }
 
                 $response = [
                     'success' => true,

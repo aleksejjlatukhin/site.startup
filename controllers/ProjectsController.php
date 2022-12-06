@@ -686,6 +686,24 @@ class ProjectsController extends AppUserPartController
      * @param int $id
      * @return string
      */
+    public function actionRoadmapMobile(int $id): string
+    {
+        $project = Projects::findOne($id);
+        $roadmaps = [];
+
+        foreach ($project->segments as $i => $segment){
+            $roadmaps[$i] = new Roadmap($segment->getId());
+        }
+
+        return $this->render('roadmap-mobile', [
+            'roadmaps' => $roadmaps]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
     public function actionResults(int $id): string
     {
         $user = User::findOne($id);
@@ -761,6 +779,18 @@ class ProjectsController extends AppUserPartController
             return $response;
         }
         return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionPresentationMobile(int $id): string
+    {
+        return $this->render('presentation-mobile', [
+            'project' => $this->findModel($id)]);
     }
 
 
@@ -843,6 +873,39 @@ class ProjectsController extends AppUserPartController
             return $response;
         }
         return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionReportMobile(int $id): string
+    {
+        $segments = Segments::findAll(['project_id' => $id]);
+
+        foreach ($segments as $s => $segment) {
+
+            $segment->propertyContainer->addProperty('title', 'ГЦС ' . ($s+1));
+
+            foreach ($segment->problems as $p => $problem) {
+
+                $problem->propertyContainer->addProperty('title', 'ГПС ' . ($s+1) . '.' . ($p+1));
+
+                foreach ($problem->gcps as $g => $gcp) {
+
+                    $gcp->propertyContainer->addProperty('title', 'ГЦП ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1));
+
+                    foreach ($gcp->mvps as $m => $mvp) {
+
+                        $mvp->propertyContainer->addProperty('title', 'MVP ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . '.' . ($m+1));
+                    }
+                }
+            }
+        }
+
+        return $this->render('report-mobile', [
+            'segments' => $segments]);
     }
 
 

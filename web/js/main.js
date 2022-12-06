@@ -219,13 +219,13 @@ $(document).on('click', 'body .delete_hypothesis', function(e) {
 
     switch (controller) {
         case 'projects':
-            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить проект «' + hypothesis_title + '» ?');
+            $(modal).find('.modal-body').find('.modal-main-content').html('Удалить проект «' + hypothesis_title + '» ?');
             break;
         case 'segment':
-            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить сегмент «' + hypothesis_title + '» ?');
+            $(modal).find('.modal-body').find('.modal-main-content').html('Удалить сегмент «' + hypothesis_title + '» ?');
             break;
         default:
-            $(modal).find('.modal-body').find('h4').html('Вы дейтвительно хотите удалить «' + hypothesis_title + '» ?');
+            $(modal).find('.modal-body').find('.modal-main-content').html('Удалить «' + hypothesis_title + '» ?');
     }
 
     $(modal).find('#confirm_delete_hypothesis').attr('href', url);
@@ -339,3 +339,56 @@ $(document).on('click', 'a.star-link', function (e) {
     e.preventDefault();
     return false;
 });
+
+
+/*
+Отслеживаем клик по иконке открытия меню проекта на этапах проекта в мобильной версии
+*/
+$(document).on('click', 'img.open-project-menu-mobile', function (e) {
+    $('img.open-project-menu-mobile').toggle('display');
+    $('img.close-project-menu-mobile').toggle('display');
+    $('.project-menu-mobile').toggle('display');
+    $('.arrow_stages_project_mobile').toggle('display');
+    $('.arrow_links_router_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
+    $('.hypothesis_table_mobile').css('margin-top', '-25px');
+});
+
+
+/*
+Отслеживаем клик по иконке закрытия меню проекта на этапах проекта в мобильной версии
+*/
+$(document).on('click', 'img.close-project-menu-mobile', function (e) {
+    $('img.close-project-menu-mobile').toggle('display');
+    $('img.open-project-menu-mobile').toggle('display');
+    $('.project-menu-mobile').toggle('display');
+    $('.arrow_stages_project_mobile').toggle('display');
+    $('.arrow_links_router_mobile').toggle('display');
+    $('.row_header_data_generation_mobile').toggle('display');
+    $('.hypothesis_table_mobile').css('margin-top', 0);
+});
+
+
+/*
+Переход на первый этап подтверждения гипотезы в собильной версии
+ */
+$(document).on('click', '.open-confirm-hypothesis-step-one-mobile', function (e) {
+    $(this).parents('.confirm-stage-mobile').toggle('display');
+    $('.confirm-hypothesis-step-one-mobile').toggle('display');
+})
+
+/*
+Переход на второй этап подтверждения гипотезы в собильной версии
+ */
+$(document).on('click', '.open-confirm-hypothesis-step-two-mobile', function (e) {
+    $(this).parents('.confirm-stage-mobile').toggle('display');
+    $('.confirm-hypothesis-step-two-mobile').toggle('display');
+})
+
+/*
+Переход на третий этап подтверждения гипотезы в собильной версии
+ */
+$(document).on('click', '.open-confirm-hypothesis-step-three-mobile', function (e) {
+    $(this).parents('.confirm-stage-mobile').toggle('display');
+    $('.confirm-hypothesis-step-three-mobile').toggle('display');
+})

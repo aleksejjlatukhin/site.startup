@@ -6,11 +6,13 @@ use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmSegment;
+use app\models\EnableExpertise;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmSegment;
 use app\models\forms\FormCreateProblem;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\FormUpdateConfirmSegment;
+use app\models\forms\SearchForm;
 use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\QuestionsConfirmSegment;
@@ -270,6 +272,10 @@ class ConfirmSegmentController extends AppUserPartController
         $project = Projects::findOne($segment->getProjectId());
         $model = new FormCreateConfirmSegment($segment);
 
+        if ($segment->getEnableExpertise() === EnableExpertise::OFF) {
+            return $this->redirect(['/segments/index', 'id' => $project->getId()]);
+        }
+
         if ($segment->confirm){ //Если у сегмента создана программа подтверждения, то перейти на страницу подтверждения
             return $this->redirect(['view', 'id' => $segment->confirm->getId()]);
         }
@@ -393,6 +399,7 @@ class ConfirmSegmentController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
         ]);
     }
 

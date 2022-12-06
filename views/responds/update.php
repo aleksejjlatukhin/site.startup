@@ -98,16 +98,19 @@ use yii\helpers\Html;
 
         <div class="form-group col-xs-12 col-sm-6 col-md-8" style="margin-top: 30px;">
             <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-success pull-right',
+                'class' => 'btn btn-default pull-right',
                 'style' => [
                     'display' => 'flex',
                     'align-items' => 'center',
                     'justify-content' => 'center',
-                    'background' => '#52BE7F',
-                    'width' => '140px',
+                    'background' => '#7F9FC5',
+                    'width' => '180px',
                     'height' => '40px',
-                    'font-size' => '24px',
                     'border-radius' => '8px',
+                    'text-transform' => 'uppercase',
+                    'font-size' => '16px',
+                    'color' => '#FFFFFF',
+                    'font-weight' => '700',
                 ]
 
             ]) ?>
