@@ -96,7 +96,7 @@ use yii\helpers\Html;
 
         </div>
 
-        <div class="form-group col-xs-12 col-sm-6 col-md-8" style="margin-top: 30px;">
+        <div class="form-group col-xs-12 col-sm-6 col-md-8" style="display: flex; justify-content: center; margin-top: 30px;">
             <?= Html::submitButton('Сохранить', [
                 'class' => 'btn btn-default pull-right',
                 'style' => [
