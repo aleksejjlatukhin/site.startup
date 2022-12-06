@@ -1968,6 +1968,10 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
         transform: rotate(180deg);
     }
     .arrow_links_router_mobile .text-stage {
+        text-align: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        line-height: 20px;
         font-weight: 700;
         font-size: 16px;
     }
