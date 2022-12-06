@@ -1892,6 +1892,14 @@ input[type="checkbox"].custom-checkbox:checked + label:before {
 .roadmap-mobile-simple-column .col-xs-4:nth-child(1) {
     padding: 0 0 0 10px;
 }
+@media screen and (max-width: 370px) {
+    .roadmap-mobile {
+        font-size: 10px;
+    }
+    .roadmap-mobile-header-segment .col-xs-8 {
+        font-size: 12px;
+    }
+}
 /*Стили для дорожной карты
 ---Конец---
 */
