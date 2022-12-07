@@ -360,7 +360,6 @@ $(document).on('click', 'img.open-project-menu-mobile', function (e) {
     $('.arrow_stages_project_mobile').toggle('display');
     $('.arrow_links_router_mobile').toggle('display');
     $('.row_header_data_generation_mobile').toggle('display');
-    $('.hypothesis_table_mobile').css('margin-top', '-25px');
 });
 
 
@@ -374,7 +373,6 @@ $(document).on('click', 'img.close-project-menu-mobile', function (e) {
     $('.arrow_stages_project_mobile').toggle('display');
     $('.arrow_links_router_mobile').toggle('display');
     $('.row_header_data_generation_mobile').toggle('display');
-    $('.hypothesis_table_mobile').css('margin-top', 0);
 });
 
 
