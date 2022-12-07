@@ -25,7 +25,7 @@ use yii\helpers\Html;
  * @property int $type                                          Тип коммуникации
  * @property int $project_id                                    Идентификатор проекта, по которому отправлена коммуникация
  * @property int $status                                        Статус коммуникации
- * @property int $pattern_id                                    Идентификатор шаблона коммуникации
+ * @property int|null $pattern_id                               Идентификатор шаблона коммуникации
  * @property int|null $triggered_communication_id               Идентификатор коммуникации в ответ, на которую была создана данная коммуникация
  * @property int $cancel                                        Параметр аннулирования коммуникации
  * @property int $created_at                                    Дата создания коммуникации
@@ -646,9 +646,9 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getPatternId(): int
+    public function getPatternId(): ?int
     {
         return $this->pattern_id;
     }
