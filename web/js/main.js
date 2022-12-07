@@ -78,6 +78,15 @@ $(document).ready(function() {
 
 
 /*
+При вращении экрана всё скрываем
+*/
+window.addEventListener("orientationchange", function() {
+    if (window.orientation !== 0) $('html').hide();
+    else $('html').show();
+}, false);
+
+
+/*
 Вкладки на странице "Подтверждение"
 */
 function openCity(evt, cityName) {
