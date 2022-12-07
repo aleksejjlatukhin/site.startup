@@ -82,7 +82,7 @@ use yii\helpers\Html;
 
         <div style="font-weight: 700;">Потенциальное количество потребителей</div>
         <div style="margin-bottom: 10px;">
-            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') . ' человек' ?>
         </div>
 
     <?php elseif ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) : ?>
@@ -104,7 +104,7 @@ use yii\helpers\Html;
 
         <div style="font-weight: 700;">Потенциальное количество представителей сегмента</div>
         <div style="margin-bottom: 10px;">
-            <?= number_format($segment->getQuantity(), 0, '', ' ') ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') . ' ед.' ?>
         </div>
 
         <div style="font-weight: 700;">Доход предприятия</div>

@@ -70,7 +70,7 @@ use app\models\Segments;
 
         <h4>Потенциальное количество потребителей</h4>
         <div>
-            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') . ' человек' ?>
         </div>
 
     <?php elseif ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) : ?>
@@ -92,7 +92,7 @@ use app\models\Segments;
 
         <h4>Потенциальное количество представителей сегмента</h4>
         <div>
-            <?= number_format($segment->getQuantity(), 0, '', ' ') ?>
+            <?= number_format($segment->getQuantity(), 0, '', ' ') . ' ед.' ?>
         </div>
 
         <h4>Доход предприятия</h4>

@@ -60,6 +60,14 @@ $this->title = 'Бизнес-модель';
                 <div class="export_business_model_mini_header">Потенциальное количество потребителей:</div>
                 <?= number_format($model->segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
 
+                <?php if ($model->segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C): ?>
+                    <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
+                    <?= number_format($model->segment->getQuantity(), 0, '', ' ') . ' человек' ?>
+                <?php else: ?>
+                    <div class="mini_header_desc_block">Потенциальное количество представителей сегмента:</div>
+                    <?= number_format($model->segment->getQuantity(), 0, '', ' ') . ' ед.' ?>
+                <?php endif; ?>
+
                 <div class="export_business_model_mini_header">Объем рынка:</div>
                 <?= number_format($model->segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>
 

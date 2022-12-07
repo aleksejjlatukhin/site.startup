@@ -288,8 +288,13 @@ use yii\helpers\Url;
             <div class="mini_header_desc_block">Краткое описание:</div>
             <?= $segment->getDescription() ?>
 
-            <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
-            <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
+            <?php if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C): ?>
+                <div class="mini_header_desc_block">Потенциальное количество потребителей:</div>
+                <?= number_format($segment->getQuantity(), 0, '', ' ') . ' человек' ?>
+            <?php else: ?>
+                <div class="mini_header_desc_block">Потенциальное количество представителей сегмента:</div>
+                <?= number_format($segment->getQuantity(), 0, '', ' ') . ' ед.' ?>
+            <?php endif; ?>
 
             <div class="mini_header_desc_block">Объем рынка:</div>
             <?= number_format($segment->getMarketVolume() * 1000000, 0, '', ' ') . ' рублей' ?>
@@ -381,8 +386,13 @@ use yii\helpers\Url;
                 <?= $segment->getDescription() ?>
             </div>
             <div>
-                <span class="mini_header_desc_block">Потенциальное количество потребителей:</span>
-                <?= number_format($segment->getQuantity() * 1000, 0, '', ' ') . ' человек' ?>
+                <?php if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C): ?>
+                    <span class="mini_header_desc_block">Потенциал. кол-во потребителей:</span>
+                    <?= number_format($segment->getQuantity(), 0, '', ' ') . ' человек' ?>
+                <?php else: ?>
+                    <span class="mini_header_desc_block">Потенциал. кол-во представителей сегмента:</span>
+                    <?= number_format($segment->getQuantity(), 0, '', ' ') . ' ед.' ?>
+                <?php endif; ?>
             </div>
             <div>
                 <span class="mini_header_desc_block">Объем рынка:</span>
