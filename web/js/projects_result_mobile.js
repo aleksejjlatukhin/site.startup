@@ -8,7 +8,7 @@ $(document).ready(function() {
     var heightLineProject = blockLastSegment.offset().top - blockProjectsResultMobile.offset().top - blockProjectName.css('height').split('px')[0] + 42;
     $(body).find('.line-project').css('height', heightLineProject);
 
-    $(body).find('.line-segment').each(function (s, elemLineSegment) {
+    $(body).find('.block-segment').each(function (s, elemLineSegment) {
         // Устанавливаем высоту линий сегментов
         if ($('.line-segment').hasClass('line-segment-' + s)) {
             var blockCurrentSegment = $('.block-segment-' + s);
@@ -19,7 +19,7 @@ $(document).ready(function() {
                 'height': heightLineSegment
             });
 
-            $('.line-problem').each(function (p, elemLineProblem) {
+            $('.block-problem').each(function (p, elemLineProblem) {
                 // Устанавливаем высоту линий ГПС
                 if ($('.line-problem').hasClass('line-problem-' + s + '-' + p)) {
                     var blockCurrentProblem = $('.block-problem-' + s + '-' + p);
@@ -28,16 +28,16 @@ $(document).ready(function() {
 
                     var minusTopLineProblem;
                     if (Number(blockCurrentProblem.css('height').split('px')[0]) > 70)
-                        minusTopLineProblem = 40;
+                        minusTopLineProblem = 48;
                     else
-                        minusTopLineProblem = 55;
+                        minusTopLineProblem = 65;
 
                     $('.line-problem.line-problem-' + s + '-' + p).css({
                         'top': blockCurrentProblem.offset().top - minusTopLineProblem,
                         'height': heightLineProblem
                     });
 
-                    $('.line-gcp').each(function (g, elemLineGcp) {
+                    $('.block-gcp').each(function (g, elemLineGcp) {
                         // Устанавливаем высоту линий ГЦП
                         if ($('.line-gcp').hasClass('line-gcp-' + s + '-' + p + '-' + g)) {
                             var blockCurrentGcp = $('.block-gcp-' + s + '-' + p + '-' + g);
@@ -46,14 +46,25 @@ $(document).ready(function() {
 
                             var minusTopLineGcp;
                             if (Number(blockCurrentGcp.css('height').split('px')[0]) > 70)
-                                minusTopLineGcp = 40;
+                                minusTopLineGcp = 48;
                             else
-                                minusTopLineGcp = 55;
+                                minusTopLineGcp = 65;
 
                             $('.line-gcp.line-gcp-' + s + '-' + p + '-' + g).css({
                                 'top': blockCurrentGcp.offset().top - minusTopLineGcp,
                                 'height': heightLineGcp
                             });
+
+                            $('.block-mvp').each(function (m, elemLineMvp) {
+                                // Устанавливаем высоту линий MVP
+                                if ($('.line-mvp').hasClass('line-mvp-' + s + '-' + p + '-' + g + '-' + m)) {
+                                    var blockCurrentMvp = $('.block-mvp-' + s + '-' + p + '-' + g + '-' + m);
+                                    if (Number(blockCurrentMvp.css('height').split('px')[0]) < 70) {
+                                        var lineMvp = $('.line-mvp.line-mvp-' + s + '-' + p + '-' + g + '-' + m);
+                                        $(lineMvp).css('height', '92%');
+                                    }
+                                }
+                            })
                         }
                     })
                 }
