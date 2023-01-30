@@ -92,6 +92,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                         ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messager', 'title' => 'Проекты']), 'url' => ['/client/projects/index']],
                         ['label' => Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messager', 'title' => 'Пользователи']), 'url' => ['/client/users/index']],
                         ['label' => Html::img('/images/icons/icon_expertise.png', ['class' => 'icon_messager', 'title' => 'Экспертизы']), 'url' => ['/client/expertise/index']],
+                        ['label' => Html::img('/images/icons/icon_external_data_entry.png', ['class' => 'icon_messager', 'title' => 'Ввод внешних данных']), 'url' => ['/client/external/index']],
 
                         [
                             'label' => $user->getAvatarImage() ? Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'icon_user_avatar user_profile_picture'])

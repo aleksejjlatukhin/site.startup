@@ -109,6 +109,17 @@ $selection_list = [ClientSettings::ACCESS_ADMIN_TRUE => 'Доступ разре
             </div>
         <?php endif; ?>
 
+        <div class="col-lg-12 mt-15">
+            <div>
+                <span class="pl-10">Разрешен доступ к общим спискам запросов B2B компаний:</span>
+                <span class="pl-5"><?php $accessGeneralWishList = $client->isAccessGeneralWishList() ? 'Да' : 'Нет' ?><?= $accessGeneralWishList ?></span>
+            </div>
+            <div>
+                <span class="pl-10">Разрешен доступ к вашим спискам запросов B2B компаний:</span>
+                <span class="pl-5"><?php $accessMyWishList = $client->isAccessMyWishList() ? 'Да' : 'Нет' ?><?= $accessMyWishList ?></span>
+            </div>
+        </div>
+
     </div>
 
     <div class="view_client_form row">

@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -33,6 +34,7 @@ use yii\db\ActiveRecord;
  * @property int $countUsers                                        Кол-во проектантов привязанных к данной организации
  * @property int $countProjects                                     Кол-во проектов привязанных к данной организации
  * @property CustomerExpert[] $customerExperts                      Эксперты Spaccel, которые когда-либо были привязаны к организации
+ * @property CustomerWishList[] $customerWishLists                  Доступы организаций к спискам запросов компаний B2B сегмента
  */
 class Client extends ActiveRecord
 {
@@ -278,6 +280,139 @@ class Client extends ActiveRecord
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Получить списки запросов компаний B2B сегмента
+     *
+     * @return WishList[]
+     */
+    public function findWishLists(): array
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+
+        if (User::isUserMainAdmin($user->getUsername())) {
+            $customers = CustomerWishList::find()
+                ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->distinct('client_id')
+                ->all();
+
+            $clientIds = [];
+            foreach ($customers as $customer) {
+                /** @var CustomerWishList $customer */
+                if (!$customer->getDeletedAt()) {
+                    $clientIds[] = $customer->getClientId();
+                }
+            }
+
+            if ($clientIds) {
+                array_unshift($clientIds, $this->getId());
+                return WishList::find()
+                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['not', ['completed_at' => null]])
+                    ->all();
+            }
+
+            return WishList::find()
+                ->where(['client_id' => $this->getId()])
+                ->andWhere(['not', ['completed_at' => null]])
+                ->all();
+        }
+
+        if (User::isUserAdminCompany($user->getUsername())) {
+            $clientSpaccel = $user->mainAdmin->clientUser->client;
+            $customer = CustomerWishList::find()
+                ->where([
+                    'client_id' => $clientSpaccel->getId(),
+                    'customer_id' => $this->getId(),
+                    'deleted_at' => null
+                ])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+
+            /** @var CustomerWishList|null $customer */
+            $existAccess = ($customer && !$customer->getDeletedAt());
+
+            if ($existAccess) {
+
+                $customers = CustomerWishList::find()
+                    ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
+                    ->orderBy(['created_at' => SORT_DESC])
+                    ->distinct('client_id')
+                    ->all();
+
+                $clientIds = [];
+                foreach ($customers as $customer) {
+                    /** @var CustomerWishList $customer */
+                    if (!$customer->getDeletedAt()) {
+                        $clientIds[] = $customer->getClientId();
+                    }
+                }
+
+                array_unshift($clientIds, $this->getId(), $clientSpaccel->getId());
+                return WishList::find()
+                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['not', ['completed_at' => null]])
+                    ->all();
+            }
+
+            return WishList::find()
+                ->where(['client_id' => $this->getId()])
+                ->andWhere(['not', ['completed_at' => null]])
+                ->all();
+        }
+
+        return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccessGeneralWishList(): bool
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+        $clientSpaccel = $user->mainAdmin->clientUser->client;
+        /** @var CustomerWishList|null $record */
+        $record = CustomerWishList::find()
+            ->where([
+                'client_id' => $clientSpaccel->getId(),
+                'customer_id' => $this->getId(),
+            ])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
+
+        return ($record && !$record->getDeletedAt());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAccessMyWishList(): bool
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+        $clientSpaccel = $user->mainAdmin->clientUser->client;
+        /** @var CustomerWishList|null $record */
+        $record = CustomerWishList::find()
+            ->where([
+                'client_id' => $this->getId(),
+                'customer_id' => $clientSpaccel->getId(),
+            ])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
+
+        return ($record && !$record->getDeletedAt());
+    }
+
+    /**
+     * Получить доступы организаций к спискам запросов компаний B2B сегмента
+     *
+     * @return ActiveQuery
+     */
+    public function getCustomerWishLists(): ActiveQuery
+    {
+        return $this->hasMany(CustomerWishList::class, ['client_id' => 'id']);
     }
 
 

@@ -9,8 +9,10 @@ use app\models\ClientSettings;
 use app\models\ClientUser;
 use app\models\ConversationDevelopment;
 use app\models\CustomerManager;
+use app\models\CustomerWishList;
 use app\models\PatternHttpException;
 use app\models\User;
+use app\modules\admin\models\form\FormChangeAccessWishList;
 use app\modules\admin\models\form\FormCreateAdminCompany;
 use app\modules\admin\models\form\FormCreateClient;
 use yii\base\Exception;
@@ -252,11 +254,90 @@ class ClientsController extends AppAdminController
     {
         $client = Client::findById($id);
         $clientSettings = ClientSettings::findOne(['client_id' => $id]);
+        $formChangeAccessWishList = new FormChangeAccessWishList($client);
 
         return $this->render('view', [
             'client' => $client,
             'clientSettings' => $clientSettings,
+            'formChangeAccessWishList' => $formChangeAccessWishList
         ]);
+    }
+
+    public function actionChangeAccessWishList(int $id)
+    {
+        $client = Client::findOne($id);
+        $accessGeneralWishList = $client->isAccessGeneralWishList();
+        $accessMyWishList = $client->isAccessMyWishList();
+
+        if ($_POST['FormChangeAccessWishList']) {
+
+            $user = User::findOne(Yii::$app->user->getId());
+            $clientSpaccel = $user->mainAdmin->clientUser->client;
+            $post_accessGeneralWishList = $_POST['FormChangeAccessWishList']['accessGeneralWishList'] === '1';
+            $post_accessMyWishList =  $_POST['FormChangeAccessWishList']['accessMyWishList'] === '1';
+
+            try {
+                if ($accessGeneralWishList !== $post_accessGeneralWishList) {
+
+                    /** @var CustomerWishList|null $record */
+                    $record = CustomerWishList::find()
+                        ->where([
+                            'client_id' => $clientSpaccel->getId(),
+                            'customer_id' => $client->getId(),
+                        ])
+                        ->orderBy(['created_at' => SORT_DESC])
+                        ->one();
+
+                    if ($post_accessGeneralWishList) {
+                        if ($record) {
+                            $record->setDeletedAt(time());
+                            $record->save();
+                        }
+                        $newRecord = new CustomerWishList();
+                        $newRecord->setClientId($clientSpaccel->getId());
+                        $newRecord->setCustomerId($client->getId());
+                        $newRecord->save();
+                    } else {
+                        if ($record) {
+                            $record->setDeletedAt(time());
+                            $record->save();
+                        }
+                    }
+                }
+                if ($accessMyWishList !== $post_accessMyWishList) {
+
+                    /** @var CustomerWishList|null $record */
+                    $record = CustomerWishList::find()
+                        ->where([
+                            'client_id' => $client->getId(),
+                            'customer_id' => $clientSpaccel->getId(),
+                        ])
+                        ->orderBy(['created_at' => SORT_DESC])
+                        ->one();
+
+                    if ($post_accessMyWishList) {
+                        if ($record) {
+                            $record->setDeletedAt(time());
+                            $record->save();
+                        }
+                        $newRecord = new CustomerWishList();
+                        $newRecord->setClientId($client->getId());
+                        $newRecord->setCustomerId($clientSpaccel->getId());
+                        $newRecord->save();
+                    } else {
+                        if ($record) {
+                            $record->setDeletedAt(time());
+                            $record->save();
+                        }
+                    }
+                }
+
+                return $this->redirect(['view', 'id' => $id]);
+
+            } catch (\Exception $exception) {
+                return false;
+            }
+        }
     }
 
 }
