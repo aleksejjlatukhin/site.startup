@@ -20,6 +20,10 @@ class m230105_103954_create_table_wish_list extends Migration
         $this->createTable('wish_list', [
             'id' => $this->primaryKey(11)->unsigned(),
             'client_id' => $this->integer(11)->notNull(),
+            'company_name' => $this->string(255)->notNull(),
+            'company_field_of_activity' => $this->string(255)->notNull(),
+            'company_sort_of_activity' => $this->string(255)->notNull(),
+            'company_products' => $this->text()->notNull(),
             'size' => $this->integer(11)->notNull(),
             'location_id' => $this->integer(11)->notNull(),
             'type_company' => $this->integer(11)->notNull(),

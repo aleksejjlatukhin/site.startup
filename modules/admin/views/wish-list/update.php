@@ -10,7 +10,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
-$this->title = 'Редактирование списка запросов B2B компаний';
+$this->title = 'Редактирование списка запросов B2B компании';
 $this->registerCssFile('@web/css/wish-list-style.css');
 
 /**
@@ -44,6 +44,56 @@ $this->registerCssFile('@web/css/wish-list-style.css');
         ]); ?>
 
         <div class="col-md-12">
+            <?= $form->field($model, 'company_name', [
+                'template' => '<div class="pl-5">{label}</div><div>{input}</div>',
+            ])->textInput([
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => '',
+                'autocomplete' => 'off'
+            ]) ?>
+        </div>
+
+        <div class="col-md-12">
+            <?= $form->field($model, 'company_field_of_activity', [
+                'template' => '<div class="pl-5">{label}</div><div>{input}</div>',
+            ])->textInput([
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => '',
+                'autocomplete' => 'off'
+            ]) ?>
+        </div>
+
+        <div class="col-md-12">
+            <?= $form->field($model, 'company_sort_of_activity', [
+                'template' => '<div class="pl-5">{label}</div><div>{input}</div>',
+            ])->textInput([
+                'maxlength' => true,
+                'required' => true,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => '',
+                'autocomplete' => 'off'
+            ]) ?>
+        </div>
+
+        <div class="col-md-12">
+
+            <?= $form->field($model, "company_products", ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'
+            ])->textarea([
+                'rows' => 1,
+                'maxlength' => true,
+                'required' => true,
+                'placeholder' => '',
+                'id' => 'wishListCreateForm_add_info',
+                'class' => 'style_form_field_respond form-control',
+            ]) ?>
+
+        </div>
+
+        <div class="col-md-12">
 
             <?= $form->field($model, 'size', [
                 'template' => '<div class="pl-5">{label}</div><div>{input}</div>',
@@ -64,7 +114,7 @@ $this->registerCssFile('@web/css/wish-list-style.css');
                 'data' => LocationWishList::getList(),
                 'options' => ['id' => 'wishListUpdateForm_location_id', 'placeholder' => 'Выберите нужное значение'],
                 'disabled' => false,  //Сделать поле неактивным
-                'hideSearch' => true, //Скрытие поиска
+                'hideSearch' => false, //Скрытие поиска
             ]) ?>
 
         </div>
@@ -91,20 +141,6 @@ $this->registerCssFile('@web/css/wish-list-style.css');
                 'options' => ['id' => 'wishListUpdateForm_type_production', 'placeholder' => 'Выберите нужное значение'],
                 'disabled' => false,  //Сделать поле неактивным
                 'hideSearch' => true, //Скрытие поиска
-            ]) ?>
-
-        </div>
-
-        <div class="col-md-12">
-
-            <?= $form->field($model, "add_info", ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'
-            ])->textarea([
-                'rows' => 3,
-                'maxlength' => true,
-                'required' => true,
-                'placeholder' => '',
-                'id' => 'wishListUpdateForm_add_info',
-                'class' => 'style_form_field_respond form-control',
             ]) ?>
 
         </div>
@@ -136,6 +172,20 @@ $this->registerCssFile('@web/css/wish-list-style.css');
                     'padding-top' => '9px'
                 ]
             ]) ?>
+        </div>
+
+        <div class="col-md-12 mt-10">
+
+            <?= $form->field($model, "add_info", ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'
+            ])->textarea([
+                'rows' => 3,
+                'maxlength' => true,
+                'required' => true,
+                'placeholder' => '',
+                'id' => 'wishListUpdateForm_add_info',
+                'class' => 'style_form_field_respond form-control',
+            ]) ?>
+
         </div>
 
         <div class="form-group col-md-12" style="display: flex; justify-content: center; margin-top: 20px;">

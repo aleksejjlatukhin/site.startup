@@ -13,6 +13,10 @@ use yii\base\Model;
  * Class FormCreateRatesPlan
  * @package app\modules\admin\models\form
  *
+ * @property string $company_name                                   наименование предприятия
+ * @property string $company_field_of_activity                      сфера деятельности предприятия
+ * @property string $company_sort_of_activity                       вид деятельности предприятия
+ * @property string $company_products                               продукция/услуги предприятия
  * @property integer $size                                          размер предприятия по количеству персонала
  * @property integer $location_id                                   идентификатор локации(города) предприятия
  * @property integer $type_company                                  тип предприятия
@@ -23,6 +27,10 @@ use yii\base\Model;
  */
 class FormCreateWishList extends Model
 {
+    public $company_name;
+    public $company_field_of_activity;
+    public $company_sort_of_activity;
+    public $company_products;
     public $size;
     public $location_id;
     public $type_company;
@@ -43,8 +51,10 @@ class FormCreateWishList extends Model
     public function rules(): array
     {
         return [
-            [['size', 'location_id', 'type_company', 'type_production', 'add_info'], 'required'],
-            [['add_info'], 'string', 'max' => 2000],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity', 'company_products', 'size', 'location_id', 'type_company', 'type_production', 'add_info'], 'required'],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity'], 'string', 'max' => 255],
+            [['company_products', 'add_info'], 'string', 'max' => 2000],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity', 'company_products', 'add_info'], 'trim'],
             [['size', 'location_id', 'type_company', 'type_production',], 'integer'],
         ];
     }
@@ -56,6 +66,10 @@ class FormCreateWishList extends Model
     public function attributeLabels(): array
     {
         return [
+            'company_name' => 'Наименование предприятия',
+            'company_field_of_activity' => 'Сфера деятельности предприятия',
+            'company_sort_of_activity' => 'Вид деятельности предприятия',
+            'company_products' => 'Продукция/услуги предприятия',
             'size' => 'Размер предприятия по количеству персонала',
             'location_id' => 'Локация предприятия (город)',
             'type_company' => 'Тип предприятия',
@@ -71,12 +85,80 @@ class FormCreateWishList extends Model
     {
         $user = User::findOne(Yii::$app->user->getId());
         $this->_model->setClientId($user->clientUser->getClientId());
+        $this->_model->setCompanyName($this->getCompanyName());
+        $this->_model->setCompanyFieldOfActivity($this->getCompanyFieldOfActivity());
+        $this->_model->setCompanySortOfActivity($this->getCompanySortOfActivity());
+        $this->_model->setCompanyProducts($this->getCompanyProducts());
         $this->_model->setSize($this->getSize());
         $this->_model->setLocationId($this->getLocationId());
         $this->_model->setTypeCompany($this->getTypeCompany());
         $this->_model->setTypeProduction($this->getTypeProduction());
         $this->_model->setAddInfo($this->getAddInfo());
         return $this->_model->save();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyName(): string
+    {
+        return $this->company_name;
+    }
+
+    /**
+     * @param string $company_name
+     */
+    public function setCompanyName(string $company_name): void
+    {
+        $this->company_name = $company_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyFieldOfActivity(): string
+    {
+        return $this->company_field_of_activity;
+    }
+
+    /**
+     * @param string $company_field_of_activity
+     */
+    public function setCompanyFieldOfActivity(string $company_field_of_activity): void
+    {
+        $this->company_field_of_activity = $company_field_of_activity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanySortOfActivity(): string
+    {
+        return $this->company_sort_of_activity;
+    }
+
+    /**
+     * @param string $company_sort_of_activity
+     */
+    public function setCompanySortOfActivity(string $company_sort_of_activity): void
+    {
+        $this->company_sort_of_activity = $company_sort_of_activity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyProducts(): string
+    {
+        return $this->company_products;
+    }
+
+    /**
+     * @param string $company_products
+     */
+    public function setCompanyProducts(string $company_products): void
+    {
+        $this->company_products = $company_products;
     }
 
     /**

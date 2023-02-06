@@ -50,24 +50,16 @@ $this->registerCssFile('@web/css/wish-list-style.css');
 
     <div class="row headers_wish_lists_new">
 
-        <div class="col-md-2">
-            Размер предприятия по количеству персонала
+        <div class="col-md-4">
+            Наименование предприятия
         </div>
 
-        <div class="col-md-2">
-            Локация предприятия (город)
-        </div>
-
-        <div class="col-md-2">
+        <div class="col-md-3">
             Тип предприятия
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-3">
             Тип производства
-        </div>
-
-        <div class="col-md-2">
-            Дата создания
         </div>
 
         <div class="col-md-2">

@@ -50,8 +50,10 @@ class LocationWishList extends ActiveRecord
      */
     public static function getList(): array
     {
-        $records = self::find()->all();
         $list = [];
+        $records = self::find()
+            ->orderBy('name ASC')
+            ->all();
 
         foreach ($records as $record) {
             /** @var self $record */

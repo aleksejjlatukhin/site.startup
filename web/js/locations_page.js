@@ -4,7 +4,7 @@ const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-contai
 var body = $('body');
 
 // Показать и скрыть форму создания локации
-$(body).on('click', '#showLocationToCreate', function () {
+$(body).on('click', '#showLocationToCreate', function (e) {
     $('.form_create_location').toggle('display');
     e.preventDefault();
     return false;

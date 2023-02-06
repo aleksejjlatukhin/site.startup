@@ -15,7 +15,10 @@ use yii\db\StaleObjectException;
  *
  * @property int $id                                        идентификатор записи
  * @property int $wish_list_id                              идентификатор списка запросов компаний B2B сегмента
+ * @property int $is_actual                                 показатель актуальности запроса
  * @property string $requirement                            Описание запроса
+ * @property string $expected_result                        Описание ожидаемого решения
+ * @property string $add_info                               Дополнительная информация
  *
  * @property WishList $wishList                             Список запросов компаний B2B сегмента
  * @property ReasonRequirementWishList[] $reasons           Причины запроса
@@ -30,16 +33,24 @@ class RequirementWishList extends ActiveRecord
         return 'requirement_wish_list';
     }
 
+    public const REQUIREMENT_ACTUAL = 5551098;
+    public const REQUIREMENT_NOT_ACTUAL = 7771035;
+
     /**
      * {@inheritdoc}
      */
     public function rules(): array
     {
         return [
-            [['wish_list_id', 'requirement'], 'required'],
-            [['requirement'], 'string', 'max' => 2000],
-            [['requirement'], 'trim'],
+            [['wish_list_id', 'requirement', 'expected_result'], 'required'],
+            [['requirement', 'expected_result', 'add_info'], 'string', 'max' => 2000],
+            [['requirement', 'expected_result', 'add_info'], 'trim'],
             [['wish_list_id'], 'integer'],
+            ['is_actual', 'default', 'value' => self::REQUIREMENT_ACTUAL],
+            ['is_actual', 'in', 'range' => [
+                self::REQUIREMENT_ACTUAL,
+                self::REQUIREMENT_NOT_ACTUAL,
+            ]],
         ];
     }
 
@@ -51,6 +62,8 @@ class RequirementWishList extends ActiveRecord
     {
         return [
             'requirement' => 'Описание запроса',
+            'expected_result' => 'Описание ожидаемого решения',
+            'add_info' => 'Дополнительная информация',
         ];
     }
 
@@ -82,6 +95,8 @@ class RequirementWishList extends ActiveRecord
             $model = new self();
             $model->setWishListId($id);
             $model->setRequirement($_POST['RequirementWishList']['requirement']);
+            $model->setExpectedResult($_POST['RequirementWishList']['expected_result']);
+            $model->setAddInfo($_POST['RequirementWishList']['add_info']);
             if ($model->save()) {
                 foreach ($_POST['RequirementWishList']['reasons'] as $reason) {
                     $newReason = new ReasonRequirementWishList();
@@ -104,6 +119,8 @@ class RequirementWishList extends ActiveRecord
         try {
 
             $this->setRequirement($_POST['RequirementWishList']['requirement']);
+            $this->setExpectedResult($_POST['RequirementWishList']['expected_result']);
+            $this->setAddInfo($_POST['RequirementWishList']['add_info']);
 
             if ($this->save()) {
                 $query = array_values($_POST['RequirementWishList']['reasons']);
@@ -184,6 +201,33 @@ class RequirementWishList extends ActiveRecord
     }
 
     /**
+     * @return int
+     */
+    public function getIsActual(): int
+    {
+        return $this->is_actual;
+    }
+
+    /**
+     * @param int $is_actual
+     */
+    public function setIsActual(int $is_actual): void
+    {
+        $this->is_actual = $is_actual;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsActualDesc(): string
+    {
+        if ($this->is_actual === self::REQUIREMENT_ACTUAL) {
+            return 'Да';
+        }
+        return 'Нет';
+    }
+
+    /**
      * @return string
      */
     public function getRequirement(): string
@@ -197,5 +241,37 @@ class RequirementWishList extends ActiveRecord
     public function setRequirement(string $requirement): void
     {
         $this->requirement = $requirement;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpectedResult(): string
+    {
+        return $this->expected_result;
+    }
+
+    /**
+     * @param string $expected_result
+     */
+    public function setExpectedResult(string $expected_result): void
+    {
+        $this->expected_result = $expected_result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddInfo(): string
+    {
+        return $this->add_info;
+    }
+
+    /**
+     * @param string $add_info
+     */
+    public function setAddInfo(string $add_info): void
+    {
+        $this->add_info = $add_info;
     }
 }

@@ -106,3 +106,12 @@
     border: none;
     margin-bottom: 0;
 }
+a.change-requirement-actual {
+    color: #ffffff;
+    border-bottom: 1px solid;
+    margin-left: 5px;
+}
+a.change-requirement-actual:hover,
+a.change-requirement-actual:focus {
+    text-decoration: none;
+}

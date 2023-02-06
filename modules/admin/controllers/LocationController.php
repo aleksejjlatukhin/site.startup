@@ -33,7 +33,7 @@ class LocationController extends AppAdminController
     public function actionIndex(): string
     {
         $models = LocationWishList::find()
-            ->orderBy('id DESC')
+            ->orderBy('name ASC')
             ->all();
 
         return $this->render('index', [
@@ -59,7 +59,7 @@ class LocationController extends AppAdminController
                             'success' => true,
                             'renderAjax' => $this->renderAjax('index_ajax', [
                                 'models' => LocationWishList::find()
-                                    ->orderBy('id DESC')
+                                    ->orderBy('name ASC')
                                     ->all()
                             ])
                         ];
@@ -120,7 +120,7 @@ class LocationController extends AppAdminController
                             'success' => true,
                             'renderAjax' => $this->renderAjax('index_ajax', [
                                 'models' => LocationWishList::find()
-                                    ->orderBy('id DESC')
+                                    ->orderBy('name ASC')
                                     ->all()
                             ])
                         ];

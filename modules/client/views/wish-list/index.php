@@ -1,14 +1,16 @@
 <?php
 
 use app\models\WishList;
+use yii\data\Pagination;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 $this->title = 'Списки запросов B2B компаний';
 $this->registerCssFile('@web/css/wish-list-style.css');
 
 /**
  * @var WishList[] $models
+ * @var Pagination $pages
+ * @var integer $clientId
  */
 
 ?>
@@ -51,35 +53,31 @@ $this->registerCssFile('@web/css/wish-list-style.css');
 
     <div class="row headers_wish_lists_new">
 
-        <div class="col-md-2">
-            Размер предприятия по количеству персонала
+        <div class="col-md-4">
+            Наименование предприятия
         </div>
 
-        <div class="col-md-2">
-            Локация предприятия (город)
-        </div>
-
-        <div class="col-md-2">
+        <div class="col-md-3">
             Тип предприятия
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-3">
             Тип производства
         </div>
 
         <div class="col-md-2">
-            Сформирован
-        </div>
-
-        <div class="col-md-2">
-            Организация
+            Акселератор
         </div>
 
     </div>
 
     <div class="block_all_wish_lists_new">
 
-        <?= $this->render('index_ajax', ['models' => $models]) ?>
+        <?= $this->render('index_ajax', [
+            'models' => $models,
+            'pages' => $pages,
+            'clientId' => $clientId
+        ]) ?>
 
     </div>
 

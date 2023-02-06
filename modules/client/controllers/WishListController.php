@@ -11,6 +11,7 @@ use app\modules\admin\models\form\FormCreateWishList;
 use app\modules\admin\models\form\FormUpdateWishList;
 use Throwable;
 use Yii;
+use yii\data\Pagination;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
@@ -33,14 +34,25 @@ class WishListController extends AppClientController
         PatternHttpException::noAccess();
     }
 
-    public function actionIndex(): string
+    /**
+     * @param int $page
+     * @return string
+     */
+    public function actionIndex(int $page = 1): string
     {
         $user = User::findOne(Yii::$app->user->getId());
         $client = $user->clientUser->client;
-        $models = $client->findWishLists();
+
+        $limit = 20;
+        $query = $client->findWishListsForPagination();
+        $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $limit]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $models = $query->offset($pages->offset)->limit($limit)->all();
 
         return $this->render('index', [
-            'models' => $models
+            'models' => $models,
+            'pages' => $pages,
+            'clientId' => $client->getId()
         ]);
     }
 
@@ -66,7 +78,7 @@ class WishListController extends AppClientController
     /**
      * @return string
      */
-    public function actionNew()
+    public function actionNew(): string
     {
         $user = User::findOne(Yii::$app->user->getId());
         $models = WishList::findAll(['completed_at' => null, 'client_id' => $user->clientUser->getClientId()]);
@@ -176,6 +188,34 @@ class WishListController extends AppClientController
         return $this->render('requirement_update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @param int $id
+     * @return array|false
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function actionChangeRequirementActual(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+            $model = RequirementWishList::findOne($id);
+            if ($model->getIsActual() === RequirementWishList::REQUIREMENT_ACTUAL) {
+                $model->setIsActual(RequirementWishList::REQUIREMENT_NOT_ACTUAL);
+            } else {
+                $model->setIsActual(RequirementWishList::REQUIREMENT_ACTUAL);
+            }
+            if ($model->update(false)) {
+                $response = [
+                    'success' => true,
+                    'result' => $model->getIsActualDesc()
+                ];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+            }
+        }
+        return false;
     }
 
     /**

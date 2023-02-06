@@ -29,6 +29,22 @@ $this->registerCssFile('@web/css/wish-list-style.css');
 <div class="container-fluid mt-15 pl-20 pr-20">
     <div class="row pl-5">
         <div class="col-md-12">
+            <span class="bolder">Наименование предприятия:</span>
+            <span><?= $model->wishList->getCompanyName() ?></span>
+        </div>
+        <div class="col-md-12">
+            <span class="bolder">Сфера деятельности предприятия:</span>
+            <span><?= $model->wishList->getCompanyFieldOfActivity() ?></span>
+        </div>
+        <div class="col-md-12">
+            <span class="bolder">Вид деятельности предприятия:</span>
+            <span><?= $model->wishList->getCompanySortOfActivity() ?></span>
+        </div>
+        <div class="col-md-12">
+            <span class="bolder">Продукция/услуги предприятия:</span>
+            <span><?= $model->wishList->getCompanyProducts() ?></span>
+        </div>
+        <div class="col-md-12">
             <span class="bolder">Размер предприятия по количеству персонала:</span>
             <span><?= $model->wishList->getSizeName() ?></span>
         </div>
@@ -66,10 +82,22 @@ $this->registerCssFile('@web/css/wish-list-style.css');
         <div class="col-xs-12">
 
             <?= $form->field($model, 'requirement', ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'])->textarea([
-                'rows' => 2,
+                'rows' => 1,
                 'maxlength' => true,
                 'required' => true,
                 'placeholder' => 'Введите запрос, который соответствует запросам B2B компаний выбранного сегмента',
+                'class' => 'style_form_field_respond form-control',
+            ]) ?>
+
+        </div>
+
+        <div class="col-xs-12">
+
+            <?= $form->field($model, 'expected_result', ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'])->textarea([
+                'rows' => 1,
+                'maxlength' => true,
+                'required' => true,
+                'placeholder' => 'Опишите ожидаемый результат',
                 'class' => 'style_form_field_respond form-control',
             ]) ?>
 
@@ -117,6 +145,17 @@ $this->registerCssFile('@web/css/wish-list-style.css');
                     'padding-top' => '9px'
                 ],
             ]) ?>
+        </div>
+
+        <div class="col-xs-12 mt-10">
+
+            <?= $form->field($model, 'add_info', ['template' => '<div class="pl-5">{label}</div><div>{input}</div>'])->textarea([
+                'rows' => 1,
+                'maxlength' => true,
+                'placeholder' => '',
+                'class' => 'style_form_field_respond form-control',
+            ]) ?>
+
         </div>
 
     </div>

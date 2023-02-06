@@ -49,8 +49,6 @@
     align-items: center;
     margin-left: 0;
     margin-right: 0;
-    /*border-bottom: 1px solid #cccccc;*/
-    /*padding: 15px 5px 15px 5px;*/
 }
 .row.data-location-style:last-child {
     border-bottom: none;

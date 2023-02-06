@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m230121_134223_create_table_client_location_wish_list
+ * Class m230121_134223_create_table_location_wish_list
  */
-class m230121_134223_create_table_client_location_wish_list extends Migration
+class m230121_134223_create_table_location_wish_list extends Migration
 {
     /**
      * {@inheritDoc}

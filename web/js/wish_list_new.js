@@ -15,7 +15,7 @@ $(body).on('click', '.delete-wish-list', function (e){
             if (response.success) {
                 $('.block_all_wish_lists_new').html(response.renderAjax);
             } else {
-                console.log(response.messageErrorr)
+                console.log(response.messageError)
             }
         }
     });
@@ -43,17 +43,18 @@ $(body).on('click', '.wish-list-complete', function (e) {
     return false;
 });
 
-$(body).on('click', '.one-wish_list_new', function (){
+$(body).on('click', '.one-wish_list_new .hide-show-ready-data', function (){
 
-    $(this).parent('.parent-wish_list_new').find('.one-wish_list_ready-data').toggle('display');
-    if ($(this).css('border-radius') === '12px') {
-        $(this).css({
+    var oneWishList = $(this).parent('.one-wish_list_new');
+    $(oneWishList).parent('.parent-wish_list_new').find('.one-wish_list_ready-data').toggle('display');
+    if ($(oneWishList).css('border-radius') === '12px') {
+        $(oneWishList).css({
             'border-radius': '12px 12px 0 0',
             'margin-bottom': '0',
             'background': '#7F9FC5'
         })
     } else {
-        $(this).css({
+        $(oneWishList).css({
             'border-radius': '12px',
             'margin-bottom': '5px',
             'background': '#707F99'

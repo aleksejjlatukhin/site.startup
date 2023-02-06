@@ -6,7 +6,6 @@ use Throwable;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\StaleObjectException;
 
 /**
  * Класс хранит информацию в бд о списках запросов компаний B2B сегмента
@@ -16,6 +15,10 @@ use yii\db\StaleObjectException;
  *
  * @property int $id                                    идентификатор записи
  * @property int $client_id                             идентификатор клиента
+ * @property string $company_name                       наименование предприятия
+ * @property string $company_field_of_activity          сфера деятельности предприятия
+ * @property string $company_sort_of_activity           вид деятельности предприятия
+ * @property string $company_products                   продукция/услуги предприятия
  * @property int $size                                  размер предприятия по количеству персонала
  * @property int $location_id                           идентификатор локации(города) предприятия
  * @property int $type_company                          тип предприятия
@@ -56,9 +59,10 @@ class WishList extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['size', 'location_id', 'type_company', 'type_production', 'add_info', 'client_id'], 'required'],
-            [['add_info'], 'string', 'max' => 2000],
-            [['add_info'], 'trim'],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity', 'company_products', 'size', 'location_id', 'type_company', 'type_production', 'add_info', 'client_id'], 'required'],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity'], 'string', 'max' => 255],
+            [['company_products', 'add_info'], 'string', 'max' => 2000],
+            [['company_name', 'company_field_of_activity', 'company_sort_of_activity', 'company_products', 'add_info'], 'trim'],
             [['size', 'location_id', 'type_company', 'type_production', 'client_id', 'completed_at'], 'integer'],
         ];
     }
@@ -70,6 +74,10 @@ class WishList extends ActiveRecord
     public function attributeLabels(): array
     {
         return [
+            'company_name' => 'Наименование предприятия',
+            'company_field_of_activity' => 'Сфера деятельности предприятия',
+            'company_sort_of_activity' => 'Вид деятельности предприятия',
+            'company_products' => 'Продукция/услуги предприятия',
             'size' => 'Размер предприятия по количеству персонала',
             'location_id' => 'Локация предприятия (город)',
             'type_company' => 'Тип предприятия',
@@ -152,6 +160,70 @@ class WishList extends ActiveRecord
     public function setClientId(int $client_id): void
     {
         $this->client_id = $client_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyName(): string
+    {
+        return $this->company_name;
+    }
+
+    /**
+     * @param string $company_name
+     */
+    public function setCompanyName(string $company_name): void
+    {
+        $this->company_name = $company_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyFieldOfActivity(): string
+    {
+        return $this->company_field_of_activity;
+    }
+
+    /**
+     * @param string $company_field_of_activity
+     */
+    public function setCompanyFieldOfActivity(string $company_field_of_activity): void
+    {
+        $this->company_field_of_activity = $company_field_of_activity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanySortOfActivity(): string
+    {
+        return $this->company_sort_of_activity;
+    }
+
+    /**
+     * @param string $company_sort_of_activity
+     */
+    public function setCompanySortOfActivity(string $company_sort_of_activity): void
+    {
+        $this->company_sort_of_activity = $company_sort_of_activity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyProducts(): string
+    {
+        return $this->company_products;
+    }
+
+    /**
+     * @param string $company_products
+     */
+    public function setCompanyProducts(string $company_products): void
+    {
+        $this->company_products = $company_products;
     }
 
     /**

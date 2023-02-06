@@ -368,6 +368,84 @@ class Client extends ActiveRecord
     }
 
     /**
+     * @return ActiveQuery|null
+     */
+    public function findWishListsForPagination(): ?ActiveQuery
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+
+        if (User::isUserMainAdmin($user->getUsername())) {
+            $customers = CustomerWishList::find()
+                ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->distinct('client_id')
+                ->all();
+
+            $clientIds = [];
+            foreach ($customers as $customer) {
+                /** @var CustomerWishList $customer */
+                if (!$customer->getDeletedAt()) {
+                    $clientIds[] = $customer->getClientId();
+                }
+            }
+
+            if ($clientIds) {
+                array_unshift($clientIds, $this->getId());
+                return WishList::find()
+                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['not', ['completed_at' => null]]);
+            }
+
+            return WishList::find()
+                ->where(['client_id' => $this->getId()])
+                ->andWhere(['not', ['completed_at' => null]]);
+        }
+
+        if (User::isUserAdminCompany($user->getUsername())) {
+            $clientSpaccel = $user->mainAdmin->clientUser->client;
+            $customer = CustomerWishList::find()
+                ->where([
+                    'client_id' => $clientSpaccel->getId(),
+                    'customer_id' => $this->getId(),
+                    'deleted_at' => null
+                ])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+
+            /** @var CustomerWishList|null $customer */
+            $existAccess = ($customer && !$customer->getDeletedAt());
+
+            if ($existAccess) {
+
+                $customers = CustomerWishList::find()
+                    ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
+                    ->orderBy(['created_at' => SORT_DESC])
+                    ->distinct('client_id')
+                    ->all();
+
+                $clientIds = [];
+                foreach ($customers as $customer) {
+                    /** @var CustomerWishList $customer */
+                    if (!$customer->getDeletedAt()) {
+                        $clientIds[] = $customer->getClientId();
+                    }
+                }
+
+                array_unshift($clientIds, $this->getId(), $clientSpaccel->getId());
+                return WishList::find()
+                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['not', ['completed_at' => null]]);
+            }
+
+            return WishList::find()
+                ->where(['client_id' => $this->getId()])
+                ->andWhere(['not', ['completed_at' => null]]);
+        }
+
+        return null;
+    }
+
+    /**
      * @return bool
      */
     public function isAccessGeneralWishList(): bool

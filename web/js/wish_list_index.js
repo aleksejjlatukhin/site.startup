@@ -19,3 +19,23 @@ $(body).on('click', '.one-wish_list_ready', function (){
         })
     }
 });
+
+$(body).on('click', '.change-requirement-actual', function (e){
+
+    var url = $(this).attr('href');
+    var parent = $(this).parent()
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+            if (response.success) {
+                $(parent).find('.isActual').html(response.result);
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+})

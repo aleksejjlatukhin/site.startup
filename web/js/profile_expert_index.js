@@ -6,23 +6,17 @@ var body = $('body');
 var user_id = window.location.search.split('=')[1];
 var delete_unused_image = true; // Проверка на необходимость удалить неиспользованное загруженное фото
 
-// Скрыть просмотр профиля и показать форму редактирования профиля
-$(body).on('click', '#show_form_update_data', function () {
-    $('.view_user_form').hide();
-    $('.update_user_form').show();
-});
-
-// Скрыть просмотр профиля и показать форму изменения пароля
+// Скрыть редактирование профиля и показать форму изменения пароля
 $(body).on('click', '#show_form_change_password', function () {
-    $('.view_user_form').hide();
+    console.log($('.update_user_form').html())
+    $('.update_user_form').hide();
     $('.change_password_content').show();
 });
 
 // Скрыть все формы и показать просмотр профиля
-$(body).on('click', '#show_form_view_data', function () {
-    $('.update_user_form').hide();
+$(body).on('click', '.show_form_update_profile', function () {
     $('.change_password_content').hide();
-    $('.view_user_form').show();
+    $('.update_user_form').show();
 });
 
 // Сохранение формы редактирования профиля
