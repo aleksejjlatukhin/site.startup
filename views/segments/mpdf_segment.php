@@ -78,6 +78,57 @@ use app\models\Segments;
         <h4>Тип взаимодействия с потребителями</h4>
         <div>Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
+        <?php if ($requirement = $segment->segmentRequirement->requirement): ?>
+
+            <?php $wishList = $requirement->wishList ?>
+
+            <div class="row mb-5">
+                <div class="col-md-12">
+                    <h4>Информация о выбранном запросе B2B компаний</h4>
+                </div>
+            </div>
+
+            <div class="info-requirement">
+
+                <h4>Запрос</h4>
+                <div><?= $requirement->getRequirement() ?></div>
+
+                <h4>Причины запроса</h4>
+                <?php foreach ($requirement->reasons as $reason): ?>
+                    <div>- <?= $reason->getReason() ?></div>
+                <?php endforeach; ?>
+
+                <h4>Ожидаемое решение</h4>
+                <div><?= $requirement->getExpectedResult() ?></div>
+
+                <?php if ($requirement->getAddInfo() !== ''): ?>
+                    <h4>Дополнительная информация о запросе</h4>
+                    <div><?= $requirement->getAddInfo() ?></div>
+                <?php endif; ?>
+
+                <h4>Наименование предприятия</h4>
+                <div><?= $wishList->getCompanyName() ?></div>
+
+                <h4>Тип предприятия</h4>
+                <div><?= $wishList->getTypeCompanyName() ?></div>
+
+                <h4>Тип производства</h4>
+                <div><?= $wishList->getTypeProductionName() ?></div>
+
+                <h4>Размер предприятия по количеству персонала</h4>
+                <div><?= $wishList->getSizeName() ?></div>
+
+                <h4>Локация предприятия</h4>
+                <div><?= $wishList->location->getName() ?></div>
+
+                <?php if ($wishList->getAddInfo() !== ''): ?>
+                    <h4>Дополнительная информация о предприятии</h4>
+                    <div><?= $wishList->getAddInfo() ?></div>
+                <?php endif; ?>
+            </div>
+
+        <?php endif; ?>
+
         <h4>Сфера деятельности предприятия</h4>
         <div><?= $segment->getFieldOfActivity() ?></div>
 

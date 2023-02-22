@@ -39,6 +39,7 @@ use yii\helpers\FileHelper;
  * @property int|null $time_confirm                                 Дата подверждения сегмента
  * @property int|null $exist_confirm                                Параметр факта подтверждения сегмента
  * @property string $enable_expertise                               Параметр разрешения на экспертизу по даному этапу
+ * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
  * @property PropertyContainer $propertyContainer                   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property Projects $project                                      Проект, к которому принадлежит сегмент
@@ -47,6 +48,7 @@ use yii\helpers\FileHelper;
  * @property Gcps[] $gcps                                           Гипотезы ценностных предложений
  * @property Mvps[] $mvps                                           Mvp-продукты
  * @property BusinessModel[] $businessModels                        Бизнес-модели
+ * @property SegmentRequirement $segmentRequirement                 Связь с запросом B2B компаний
  */
 class Segments extends ActiveRecord
 {
@@ -62,6 +64,9 @@ class Segments extends ActiveRecord
     public const SECONDARY_SPECIAL_EDUCATION = 100;
     public const HIGHER_INCOMPLETE_EDUCATION = 200;
     public const HIGHER_EDUCATION = 300;
+
+    public const NOT_USE_WISH_LIST = 0;
+    public const USE_WISH_LIST = 1;
 
     public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
@@ -153,6 +158,16 @@ class Segments extends ActiveRecord
     {
         return $this->hasMany(BusinessModel::class, ['segment_id' => 'id']);
     }
+
+
+    /**
+     * Получить связь с запросом B2B компаний
+     * @return ActiveQuery
+     */
+    public function getSegmentRequirement(): ActiveQuery
+    {
+        return $this->hasOne(SegmentRequirement::class, ['segment_id' => 'id']);
+    }
     
 
     /**
@@ -164,7 +179,7 @@ class Segments extends ActiveRecord
             [['name'], 'required'],
             [['created_at', 'updated_at', 'time_confirm'], 'integer'],
             [['name', 'field_of_activity', 'sort_of_activity', 'add_info', 'description'], 'trim'],
-            [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm'], 'integer'],
+            [['project_id', 'type_of_interaction_between_subjects', 'gender_consumer', 'education_of_consumer', 'exist_confirm', 'use_wish_list'], 'integer'],
             [['age_from', 'age_to'], 'integer'],
             [['income_from', 'income_to'], 'integer'],
             [['quantity'], 'integer'],
@@ -177,6 +192,10 @@ class Segments extends ActiveRecord
             ['enable_expertise', 'in', 'range' => [
                 EnableExpertise::OFF,
                 EnableExpertise::ON,
+            ]],
+            ['use_wish_list', 'in', 'range' => [
+                self::USE_WISH_LIST,
+                self::NOT_USE_WISH_LIST,
             ]],
         ];
     }
@@ -202,6 +221,7 @@ class Segments extends ActiveRecord
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
             'add_info' => 'Дополнительная информация',
+            'use_wish_list' => 'Использовать запросы B2B компаний'
         ];
     }
 
@@ -254,6 +274,7 @@ class Segments extends ActiveRecord
     public function deleteStage ()
     {
 
+        //TODO: Если это B2B сегмент, который имеет привязанные запросы, то удалять эту связь!!!
         if ($problems = $this->problems) {
             foreach ($problems as $problem) {
                 $problem->deleteStage();
@@ -651,5 +672,27 @@ class Segments extends ActiveRecord
         $this->propertyContainer = new PropertyContainer();
     }
 
+    /**
+     * @return int
+     */
+    public function getUseWishList(): int
+    {
+        return $this->use_wish_list;
+    }
 
+    /**
+     * @param int $use_wish_list
+     */
+    public function setUseWishList(int $use_wish_list): void
+    {
+        $this->use_wish_list = $use_wish_list;
+    }
+
+    /**
+     * @return void
+     */
+    public function changeUseWishList(): void
+    {
+        $this->use_wish_list = $this->use_wish_list === self::USE_WISH_LIST ? self::NOT_USE_WISH_LIST : self::USE_WISH_LIST;
+    }
 }

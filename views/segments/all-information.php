@@ -90,6 +90,73 @@ use yii\helpers\Html;
         <div style="font-weight: 700;">Тип взаимодействия с потребителями</div>
         <div style="margin-bottom: 10px;">Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
+        <?php if ($requirement = $segment->segmentRequirement->requirement): ?>
+
+            <?php $wishList = $requirement->wishList ?>
+
+            <div class="row mb-5">
+                <div class="col-md-12 bolder">Информация о выбранном запросе B2B компаний</div>
+            </div>
+
+            <div class="row mb-15" style="background: #F2F2F2; padding-top: 10px; padding-bottom: 10px; font-size: 14px;">
+                <div class="col-md-12">
+                    <div class="bolder">Запрос</div>
+                    <div><?= $requirement->getRequirement() ?></div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="bolder">Причины запроса</div>
+                    <?php foreach ($requirement->reasons as $reason): ?>
+                        <div>- <?= $reason->getReason() ?></div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="col-md-12">
+                    <div class="bolder">Ожидаемое решение</div>
+                    <div><?= $requirement->getExpectedResult() ?></div>
+                </div>
+
+                <?php if ($requirement->getAddInfo() !== ''): ?>
+                    <div class="col-md-12">
+                        <div class="bolder">Дополнительная информация о запросе</div>
+                        <div><?= $requirement->getAddInfo() ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <div class="col-md-12">
+                    <div class="bolder">Наименование предприятия</div>
+                    <div><?= $wishList->getCompanyName() ?></div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="bolder">Тип предприятия</div>
+                    <div><?= $wishList->getTypeCompanyName() ?></div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="bolder">Тип производства</div>
+                    <div><?= $wishList->getTypeProductionName() ?></div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="bolder">Размер предприятия по количеству персонала</div>
+                    <div><?= $wishList->getSizeName() ?></div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="bolder">Локация предприятия</div>
+                    <div><?= $wishList->location->getName() ?></div>
+                </div>
+
+                <?php if ($wishList->getAddInfo() !== ''): ?>
+                    <div class="col-md-12">
+                        <div class="bolder">Дополнительная информация о предприятии</div>
+                        <div><?= $wishList->getAddInfo() ?></div>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+        <?php endif; ?>
+
         <div style="font-weight: 700;">Сфера деятельности предприятия</div>
         <div style="margin-bottom: 10px;"><?= $segment->getFieldOfActivity() ?></div>
 

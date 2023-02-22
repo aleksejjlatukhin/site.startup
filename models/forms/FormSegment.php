@@ -3,6 +3,7 @@
 
 namespace app\models\forms;
 
+use app\models\RequirementWishList;
 use app\models\Segments;
 use yii\base\Model;
 
@@ -34,7 +35,10 @@ use yii\base\Model;
  * @property int $market_volume_b2b                                 Объем рынка b2b
  * @property string $company_products                               Продукция / услуги предприятия
  * @property string $company_partner                                Партнеры предприятия
- * @property string $add_info                                       Дополнительная информация
+ * @property string $add_info_b2c                                   Дополнительная информация b2c
+ * @property string $add_info_b2b                                   Дополнительная информация b2b
+ * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
+ * @property int|null $requirement_id                               Идентификатор запроса из виш-листа
  */
 abstract class FormSegment extends Model
 {
@@ -61,7 +65,10 @@ abstract class FormSegment extends Model
     public $market_volume_b2b;
     public $company_products;
     public $company_partner;
-    public $add_info;
+    public $add_info_b2c;
+    public $add_info_b2b;
+    public $use_wish_list;
+    public $requirement_id;
 
 
     /**
@@ -85,20 +92,24 @@ abstract class FormSegment extends Model
     {
         return [
             [['field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b'], 'string', 'max' => 255],
-            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'add_info', 'company_products', 'company_partner'], 'trim'],
+            [['name', 'description', 'field_of_activity_b2c', 'field_of_activity_b2b', 'sort_of_activity_b2c', 'sort_of_activity_b2b', 'add_info_b2c', 'add_info_b2b', 'company_products', 'company_partner'], 'trim'],
             ['name', 'string', 'min' => 2, 'max' => 65],
             ['name', 'uniqueName'],
             [['description', 'company_products', 'company_partner'], 'string', 'max' => 2000],
-            [['add_info'], 'string'],
+            [['add_info_b2c', 'add_info_b2b'], 'string'],
             [['age_from', 'age_to'], 'integer', 'integerOnly' => TRUE, 'min' => '0', 'max' => '100'],
             [['income_from', 'income_to'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
             [['income_company_from', 'income_company_to'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
             [['quantity', 'quantity_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000'],
             [['market_volume_b2c', 'market_volume_b2b'], 'integer', 'integerOnly' => TRUE, 'min' => '1', 'max' => '1000000000'],
-            [['project_id', 'gender_consumer', 'education_of_consumer'], 'integer'],
+            [['project_id', 'gender_consumer', 'education_of_consumer', 'use_wish_list', 'requirement_id'], 'integer'],
             ['type_of_interaction_between_subjects', 'in', 'range' => [
                 Segments::TYPE_B2C,
                 Segments::TYPE_B2B,
+            ]],
+            ['use_wish_list', 'in', 'range' => [
+                Segments::USE_WISH_LIST,
+                Segments::NOT_USE_WISH_LIST,
             ]],
         ];
     }
@@ -131,8 +142,18 @@ abstract class FormSegment extends Model
             'market_volume_b2b' => 'Объем рынка (млн. руб./год)',
             'company_products' => 'Продукция / услуги предприятия',
             'company_partner' => 'Партнеры предприятия',
-            'add_info' => 'Дополнительная информация',
+            'add_info_b2c' => 'Дополнительная информация',
+            'add_info_b2b' => 'Дополнительная информация',
+            'use_wish_list' => 'Использовать запросы B2B компаний',
         ];
+    }
+
+    /**
+     * @return RequirementWishList|null
+     */
+    public function findRequirement(): ?RequirementWishList
+    {
+        return RequirementWishList::findOne($this->getRequirementId());
     }
 
     /**
@@ -488,19 +509,67 @@ abstract class FormSegment extends Model
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getAddInfo(): string
+    public function getUseWishList(): int
     {
-        return $this->add_info;
+        return $this->use_wish_list;
     }
 
     /**
-     * @param string $add_info
+     * @param int $use_wish_list
      */
-    public function setAddInfo(string $add_info): void
+    public function setUseWishList(int $use_wish_list): void
     {
-        $this->add_info = $add_info;
+        $this->use_wish_list = $use_wish_list;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRequirementId(): ?int
+    {
+        return $this->requirement_id;
+    }
+
+    /**
+     * @param int|null $requirement_id
+     */
+    public function setRequirementId(?int $requirement_id): void
+    {
+        $this->requirement_id = $requirement_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddInfoB2c(): string
+    {
+        return $this->add_info_b2c;
+    }
+
+    /**
+     * @param string $add_info_b2c
+     */
+    public function setAddInfoB2c(string $add_info_b2c): void
+    {
+        $this->add_info_b2c = $add_info_b2c;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddInfoB2b(): string
+    {
+        return $this->add_info_b2b;
+    }
+
+    /**
+     * @param string $add_info_b2b
+     */
+    public function setAddInfoB2b(string $add_info_b2b): void
+    {
+        $this->add_info_b2b = $add_info_b2b;
     }
 
 }

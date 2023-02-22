@@ -7,10 +7,12 @@ use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateSegment;
+use app\models\forms\FormFilterRequirement;
 use app\models\forms\FormUpdateSegment;
 use app\models\forms\SearchForm;
 use app\models\PatternHttpException;
 use app\models\Projects;
+use app\models\RequirementWishList;
 use app\models\Roadmap;
 use app\models\User;
 use app\models\UserAccessToProjects;
@@ -24,6 +26,7 @@ use Yii;
 use app\models\Segments;
 use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
+use yii\data\Pagination;
 use yii\db\StaleObjectException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -332,12 +335,22 @@ class SegmentsController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool|null $useWishList
+     * @param int|null $requirementId
      * @return array|bool
      */
-    public function actionGetHypothesisToCreate (int $id)
+    public function actionGetHypothesisToCreate(int $id, bool $useWishList = null, int $requirementId = null)
     {
         $project = Projects::findOne($id);
-        $model = new FormCreateSegment($project);
+        $model = new FormCreateSegment($project, $useWishList, $requirementId);
+
+        if ($requirementId) {
+            $requirement = RequirementWishList::findOne($requirementId);
+            $wishList = $requirement->wishList;
+            $model->setFieldOfActivityB2b($wishList->getCompanyFieldOfActivity());
+            $model->setSortOfActivityB2b($wishList->getCompanySortOfActivity());
+            $model->setCompanyProducts($wishList->getCompanyProducts());
+        }
 
         if(Yii::$app->request->isAjax) {
 
@@ -346,6 +359,78 @@ class SegmentsController extends AppUserPartController
                     'model' => $model,
                     'project' => $project
                 ]),
+            ];
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $projectId
+     * @param int $page
+     * @return array|false
+     */
+    public function actionGetListRequirements(int $projectId, int $page = 1)
+    {
+        if(Yii::$app->request->isAjax) {
+
+            $user = User::findOne(Yii::$app->user->getId());
+            $client = $user->clientUser->client;
+            $wishLists = $client->findWishLists();
+            $wishListIds = array_column($wishLists, 'id');
+            $query = RequirementWishList::find()
+                ->leftJoin('wish_list', '`wish_list`.`id` = `requirement_wish_list`.`wish_list_id`')
+                ->where(['in', 'wish_list_id', $wishListIds])
+                ->andWhere(['is_actual' => RequirementWishList::REQUIREMENT_ACTUAL]);
+
+            $filters = new FormFilterRequirement();
+            if ($filters->load(Yii::$app->request->post())) {
+                if ($filters->getRequirement()) {
+                    $query = $query->andWhere(['like', 'requirement', $filters->getRequirement()]);
+                }
+                if ($filters->getReason()) {
+                    $query = $query->innerJoin('reason_requirement_wish_list', '`reason_requirement_wish_list`.`requirement_wish_list_id` = `requirement_wish_list`.`id`')
+                        ->andWhere(['like', 'reason_requirement_wish_list.reason', $filters->getReason()]);
+                }
+                if ($filters->getExpectedResult()) {
+                    $query = $query->andWhere(['like', 'expected_result', $filters->getExpectedResult()]);
+                }
+                if ($filters->getFieldOfActivity()) {
+                    $query = $query->andWhere(['like', 'wish_list.company_field_of_activity', $filters->getFieldOfActivity()]);
+                }
+                if ($filters->getSortOfActivity()) {
+                    $query = $query->andWhere(['like', 'wish_list.company_sort_of_activity', $filters->getSortOfActivity()]);
+                }
+                if ($filters->getSize()) {
+                    $query = $query->andWhere(['wish_list.size' => (int)$filters->getSize()]);
+                }
+                if ($filters->getLocationId()) {
+                    $query = $query->andWhere(['wish_list.location_id' => (int)$filters->getLocationId()]);
+                }
+                if ($filters->getTypeCompany()) {
+                    $query = $query->andWhere(['wish_list.type_company' => (int)$filters->getTypeCompany()]);
+                }
+                if ($filters->getTypeProduction()) {
+                    $query = $query->andWhere(['wish_list.type_production' => (int)$filters->getTypeProduction()]);
+                }
+            }
+
+            $limit = 20;
+            $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $limit]);
+            $pages->pageSizeParam = false; //убираем параметр $per-page
+            $requirements = $query->offset($pages->offset)->limit($limit)->all();
+
+            $response = [
+                'renderAjax' => $this->renderAjax('list_requirements', [
+                    'requirements' => $requirements,
+                    'projectId' => $projectId,
+                    'filters' => $filters,
+                    'pages' => $pages
+                ])
             ];
 
             Yii::$app->response->format = Response::FORMAT_JSON;

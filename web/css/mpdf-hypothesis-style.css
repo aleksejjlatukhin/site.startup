@@ -18,7 +18,13 @@
 }
 
 .segment-view-export {
+    font-size: 12px;
     padding: 5px 0;
+}
+.segment-view-export .info-requirement {
+    background: #F2F2F2;
+    padding: 5px 10px;
+    font-size: 11px;
 }
 .segment-view-export h4 {
     margin: 5px 0;

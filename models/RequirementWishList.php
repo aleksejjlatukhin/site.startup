@@ -86,6 +86,14 @@ class RequirementWishList extends ActiveRecord
     }
 
     /**
+     * @return ActiveQuery
+     */
+    public function SegmentRequirement(): ActiveQuery
+    {
+        return $this->hasOne(SegmentRequirement::class, ['requirement_id' => 'id']);
+    }
+
+    /**
      * @param int $id
      * @return bool|string
      */

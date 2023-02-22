@@ -115,3 +115,14 @@ a.change-requirement-actual:hover,
 a.change-requirement-actual:focus {
     text-decoration: none;
 }
+
+.requirement-filters,
+.buttonsFiltersForListRequirements,
+.addFiltersForListRequirements.disabled {
+    display: none;
+}
+
+.requirement-filters.active,
+.buttonsFiltersForListRequirements.active {
+    display: block;
+}

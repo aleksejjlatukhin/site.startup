@@ -291,8 +291,9 @@ class Client extends ActiveRecord
     public function findWishLists(): array
     {
         $user = User::findOne(Yii::$app->user->getId());
+        $mainAdmin = $user->mainAdmin;
 
-        if (User::isUserMainAdmin($user->getUsername())) {
+        if (User::isUserMainAdmin($mainAdmin->getUsername())) {
             $customers = CustomerWishList::find()
                 ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
                 ->orderBy(['created_at' => SORT_DESC])
@@ -321,8 +322,8 @@ class Client extends ActiveRecord
                 ->all();
         }
 
-        if (User::isUserAdminCompany($user->getUsername())) {
-            $clientSpaccel = $user->mainAdmin->clientUser->client;
+        if (User::isUserAdminCompany($mainAdmin->getUsername())) {
+            $clientSpaccel = $mainAdmin->clientUser->client;
             $customer = CustomerWishList::find()
                 ->where([
                     'client_id' => $clientSpaccel->getId(),

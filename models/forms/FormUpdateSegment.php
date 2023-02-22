@@ -24,14 +24,14 @@ class FormUpdateSegment extends FormSegment
      * @param int $id
      * @param array $config
      */
-    public function __construct($id, array $config = [])
+    public function __construct(int $id, array $config = [])
     {
         $model = Segments::findOne($id);
         $this->setId($id);
         $this->setProjectId($model->getProjectId());
         $this->setName($model->getName());
         $this->setDescription($model->getDescription());
-        $this->setAddInfo($model->getAddInfo());
+        $this->setUseWishList($model->getUseWishList());
         $this->setTypeOfInteractionBetweenSubjects($model->getTypeOfInteractionBetweenSubjects());
 
         if ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
@@ -46,9 +46,11 @@ class FormUpdateSegment extends FormSegment
             $this->setIncomeTo($model->getIncomeTo());
             $this->setQuantity($model->getQuantity());
             $this->setMarketVolumeB2c($model->getMarketVolume());
+            $this->setAddInfoB2c($model->getAddInfo());
 
         }elseif ($model->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
+            $this->setRequirementId($model->segmentRequirement ? $model->segmentRequirement->getRequirementId() : null);
             $this->setFieldOfActivityB2b($model->getFieldOfActivity());
             $this->setSortOfActivityB2b($model->getSortOfActivity());
             $this->setCompanyProducts($model->getCompanyProducts());
@@ -57,6 +59,7 @@ class FormUpdateSegment extends FormSegment
             $this->setIncomeCompanyFrom($model->getIncomeFrom());
             $this->setIncomeCompanyTo($model->getIncomeTo());
             $this->setMarketVolumeB2b($model->getMarketVolume());
+            $this->setAddInfoB2b($model->getAddInfo());
         }
 
         parent::__construct($config);
@@ -106,7 +109,6 @@ class FormUpdateSegment extends FormSegment
         $segment = Segments::findOne($this->getId());
         $segment->setName($this->getName());
         $segment->setDescription($this->getDescription());
-        $segment->setAddInfo($this->getAddInfo());
 
         if ($segment->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
 
@@ -120,6 +122,7 @@ class FormUpdateSegment extends FormSegment
             $segment->setIncomeTo($this->getIncomeTo());
             $segment->setQuantity($this->getQuantity());
             $segment->setMarketVolume(((($this->getIncomeFrom() + $this->getIncomeTo()) * 6) * $this->getQuantity()) / 1000000);
+            $segment->setAddInfo($this->getAddInfoB2c());
 
             if ($segment->save()) {
                 return $segment;
@@ -136,6 +139,7 @@ class FormUpdateSegment extends FormSegment
             $segment->setIncomeFrom($this->getIncomeCompanyFrom());
             $segment->setIncomeTo($this->getIncomeCompanyTo());
             $segment->setMarketVolume((($this->getIncomeCompanyFrom() + $this->getIncomeCompanyTo()) / 2) * $this->getQuantityB2b());
+            $segment->setAddInfo($this->getAddInfoB2b());
 
             if ($segment->save()) {
                 return $segment;

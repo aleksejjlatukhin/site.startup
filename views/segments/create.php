@@ -394,256 +394,55 @@ use app\models\Segments;
 
         </div>
 
+        <div class="row mb-15">
+
+            <?= $form->field($model, 'add_info_b2c', [
+                'template' => '<div class="col-xs-12 pl-20">{label}</div><div class="col-xs-12">{input}</div>'
+            ])->textarea([
+                'rows' => 1,
+                'class' => 'style_form_field_respond form-control',
+                'placeholder' => '',
+            ]) ?>
+
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-12" style="display:flex;justify-content: center;">
+                <?= Html::submitButton('Сохранить', [
+                    'id' => 'submit_segment_b2c',
+                    'class' => 'btn btn-default',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'background' => '#7F9FC5',
+                        'color' => '#ffffff',
+                        'width' => '180px',
+                        'height' => '40px',
+                        'font-size' => '16px',
+                        'text-transform' => 'uppercase',
+                        'font-weight' => '700',
+                        'padding-top' => '9px',
+                        'border-radius' => '8px',
+                        'margin-top' => '28px'
+                    ]
+                ]) ?>
+            </div>
+        </div>
+
     </div>
 
     <div class="form-template-b2b" style="display: none;">
 
-        <div class="row desktop-mb-15">
-
-            <?= $form->field($model, 'field_of_activity_b2b', [
-                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Сфера деятельности предприятия')->textInput([
-                'maxlength' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]) ?>
-
-        </div>
-
-        <div class="row desktop-mb-15">
-
-            <?= $form->field($model, 'sort_of_activity_b2b', [
-                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Вид / специализация деятельности предприятия')->textInput([
-                'maxlength' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-                'autocomplete' => 'off'
-            ]) ?>
-
-        </div>
-
-        <div class="row desktop-mb-15">
-
-            <?= $form->field($model, 'company_products', [
-                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Продукция / услуги предприятия')->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]) ?>
-
-        </div>
-
-        <div class="row desktop-mb-15">
-
-            <?= $form->field($model, 'company_partner', [
-                'template' => '<div class="col-md-12 pl-20">{label}</div><div class="col-md-12">{input}</div>'
-            ])->label('Партнеры предприятия')->textarea([
-                'rows' => 1,
-                'maxlength' => true,
-                'class' => 'style_form_field_respond form-control',
-                'placeholder' => '',
-            ]) ?>
-
-        </div>
-
-        <script>
-
-            $( function() {
-
-                $("input#quantity_b2b").change(function () {
-                    var value = $("input#quantity_b2b").val();
-                    var valueMax = 10000;
-                    var valueMin = 1;
-
-                    if (parseInt(value) > parseInt(valueMax)){
-                        value = valueMax;
-                        $("input#quantity_b2b").val(value);
-                    }
-
-                    if (parseInt(value) < parseInt(valueMin)){
-                        value = valueMin;
-                        $("input#quantity_b2b").val(value);
-                    }
-
-                    // Расчет платежеспособности
-                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
-                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
-                    var quantityB2B = parseInt($("input#quantity_b2b").val());
-                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
-                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
-                        $("input#market_volume_b2b").val(Math.round(resB2B));
-                    }
-                });
-            } );
-        </script>
-
-        <div class="row mb-15">
-
-            <?= $form->field($model, 'quantity_b2b', [
-                'template' => '<div class="col-xs-8 pl-20">{label}</div><div class="col-xs-4">{input}</div>'
-            ])->label('Потенциальное количество представителей сегмента, ед.')
-                ->textInput([
-                    'type' => 'number',
-                    'id' => 'quantity_b2b',
-                    'class' => 'style_form_field_respond form-control',
-                    'autocomplete' => 'off'
-                ])
-            ?>
-
-        </div>
-
-        <script>
-
-            $( function() {
-
-                $("input#income_from_b2b").change(function () {
-                    var value1 = $("input#income_from_b2b").val();
-                    var value2 = $("input#income_to_b2b").val();
-                    var valueMax = 10000;
-                    var valueMin = 1;
-
-                    if (parseInt(value1) > parseInt(value2)){
-                        value1 = value2;
-                        $("input#income_from_b2b").val(value1);
-                    }
-
-                    if (parseInt(value1) > parseInt(valueMax)){
-                        value1 = valueMax;
-                        $("input#income_from_b2b").val(value1);
-                    }
-
-                    if (parseInt(value1) < parseInt(valueMin)){
-                        value1 = valueMin;
-                        $("input#income_from_b2b").val(value1);
-                    }
-
-                    // Расчет платежеспособности
-                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
-                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
-                    var quantityB2B = parseInt($("input#quantity_b2b").val());
-                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
-                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
-                        $("input#market_volume_b2b").val(Math.round(resB2B));
-                    }
-                });
-
-                $("input#income_to_b2b").change(function () {
-                    var value1 = $("input#income_from_b2b").val();
-                    var value2 = $("input#income_to_b2b").val();
-                    var valueMax = 10000;
-                    var valueMin = 1;
-
-                    if (parseInt(value1) > parseInt(value2)){
-                        value2 = value1;
-                        $("input#income_to_b2b").val(value2);
-                    }
-
-                    if (parseInt(value2) > parseInt(valueMax)){
-                        value2 = valueMax;
-                        $("input#income_to_b2b").val(value2);
-                    }
-
-                    if (parseInt(value2) < parseInt(valueMin)){
-                        value2 = valueMin;
-                        $("input#income_to_b2b").val(value2);
-                    }
-
-                    // Расчет платежеспособности
-                    var incomeFromB2B = parseInt($("input#income_from_b2b").val());
-                    var incomeToB2B = parseInt($("input#income_to_b2b").val());
-                    var quantityB2B = parseInt($("input#quantity_b2b").val());
-                    if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
-                        var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
-                        $("input#market_volume_b2b").val(Math.round(resB2B));
-                    }
-                });
-
-            } );
-        </script>
-
-        <div class="row">
-
-            <?= $form->field($model, 'income_company_from', [
-                'template' => '<div class="col-xs-12 col-md-4 pl-20">{label}</div>
-                <div class="col-xs-6 col-md-4 mb-15">{input}</div>'
-            ])->label('<div>Доход предприятия, млн руб. в год</div><div style="font-weight: 400;font-size: 13px;">(укажите значения от и до)</div>')
-                ->textInput([
-                    'type' => 'number',
-                    'id' => 'income_from_b2b',
-                    'class' => 'style_form_field_respond form-control',
-                    'autocomplete' => 'off'
-                ])
-            ?>
-
-            <?= $form->field($model, 'income_company_to', [
-                'template' => '<div class="col-xs-6 col-md-4 desktop-mt--15">{input}</div>'
-            ])->label(false)->textInput([
-                'type' => 'number',
-                'id' => 'income_to_b2b',
-                'class' => 'style_form_field_respond form-control',
-                'autocomplete' => 'off'
-            ]) ?>
-
-        </div>
-
-        <div class="row desktop-mb-15">
-
-            <?= $form->field($model, 'market_volume_b2b', [
-                'template' => '<div class="col-md-4 pl-20">{label}</div>
-                <div class="col-md-8">{input}</div>'
-            ])->label('<div>Платежеспособность, млн. руб. в год</div>')
-                ->textInput([
-                    'disabled' => true,
-                    'type' => 'number',
-                    'id' => 'market_volume_b2b',
-                    'class' => 'style_form_field_respond form-control',
-                    'autocomplete' => 'off'
-                ])
-            ?>
-
-        </div>
-
-    </div>
-
-    <div class="row mb-15">
-
-        <?= $form->field($model, 'add_info', [
-            'template' => '<div class="col-xs-12 pl-20">{label}</div><div class="col-xs-12">{input}</div>'
-        ])->textarea([
-            'rows' => 1,
-            'class' => 'style_form_field_respond form-control',
-            'placeholder' => '',
+        <?= $this->render('create_b2b_ajax', [
+            'form' => $form,
+            'model' => $model
         ]) ?>
 
     </div>
 
-    <div class="form-group row">
-        <div class="col-md-12" style="display:flex;justify-content: center;">
-            <?= Html::submitButton('Сохранить', [
-                'class' => 'btn btn-default',
-                'style' => [
-                    'display' => 'flex',
-                    'align-items' => 'center',
-                    'justify-content' => 'center',
-                    'background' => '#7F9FC5',
-                    'color' => '#ffffff',
-                    'width' => '180px',
-                    'height' => '40px',
-                    'font-size' => '16px',
-                    'text-transform' => 'uppercase',
-                    'font-weight' => '700',
-                    'padding-top' => '9px',
-                    'border-radius' => '8px',
-                    'margin-top' => '28px'
-                ]
-            ]) ?>
-        </div>
-    </div>
-
     <?php ActiveForm::end(); ?>
+
+    <div class="row mb-15 list-requirements"></div>
 
 </div>

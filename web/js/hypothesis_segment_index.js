@@ -87,6 +87,87 @@ $(body).on('change', 'form#hypothesisCreateForm', function(){
 });
 
 
+//Отслеживаем изменения значения чекбокса use_wish_list в форме создания сегмента
+$(body).on('input', '#use_wish_list', function(){
+
+    var useWishListValue;
+    if ($('#use_wish_list:checked').val() == 1) {
+        useWishListValue = true;
+    } else {
+        useWishListValue = false;
+    }
+    var url = $('#showHypothesisToCreate').attr('href') + '&useWishList=' + useWishListValue;
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    $(body).append($(hypothesis_create_modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+
+            // Расчет платежеспособности B2B
+            var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+            var incomeToB2B = parseInt($("input#income_to_b2b").val());
+            var quantityB2B = parseInt($("input#quantity_b2b").val());
+            if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                $("input#market_volume_b2b").val(Math.round(resB2B));
+            }
+        }
+    });
+});
+
+
+// Отслеживаем выбор запроса b2b компании в форме создания сегмента
+$(body).on('click', '.select-requirement', function(e){
+
+    $('.form-create-segment-b2b-with-requirement').toggle('display');
+    var url = $(this).attr('href');
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    $(body).append($(hypothesis_create_modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(hypothesis_create_modal).find('.modal-body').html(response.renderAjax);
+            $('form#hypothesisCreateForm').trigger('change');
+
+            // Расчет платежеспособности B2B
+            var incomeFromB2B = parseInt($("input#income_from_b2b").val());
+            var incomeToB2B = parseInt($("input#income_to_b2b").val());
+            var quantityB2B = parseInt($("input#quantity_b2b").val());
+            if (incomeFromB2B > 0 && incomeToB2B > 0 && quantityB2B > 0) {
+                var resB2B = ((incomeFromB2B + incomeToB2B) / 2) * quantityB2B;
+                $("input#market_volume_b2b").val(Math.round(resB2B));
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+$(body).on('click', '.show-details-select-requirement', function(e){
+
+    $('.details-select-requirement').toggle('display');
+    if ($(this).text() === 'Подробнее о запросе') {
+        $(this).text('Скрыть детали запроса');
+    } else {
+        $(this).text('Подробнее о запросе');
+    }
+
+    e.preventDefault();
+    return false;
+});
+
+
 //При нажатии на кнопку новый сегмент
 $(body).on('click', '#showHypothesisToCreate', function(e){
 
@@ -128,6 +209,119 @@ $(body).on('click', '#showHypothesisToCreate', function(e){
 });
 
 
+// Показать/Скрыть список запросов b2b компаний в форме создания сегмента
+$(body).on('click', '#showListRequirements', function(e){
+
+    $('.form-create-segment-b2b-with-requirement').toggle('display');
+    var url = $(this).attr('href');
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    var listRequirements = $(hypothesis_create_modal).find('.modal-body').find('.list-requirements');
+
+    if ($(this).text() === 'Показать список запросов') {
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            success: function(response){
+                $(listRequirements).html(response.renderAjax);
+            }
+        });
+
+        $(this).text('Назад');
+        $(this).css('width', '100px');
+
+    } else {
+        $(listRequirements).html('');
+        $(this).text('Показать список запросов');
+        $(this).css('width', '240px');
+    }
+
+    e.preventDefault();
+    return false;
+});
+
+// Показать информацию о запросе b2b компании
+$(body).on('click', '.container-one_requirement', function(){
+    if ($(this).hasClass('active')) {
+        $(this).removeClass('active')
+    } else {
+        $(this).addClass('active')
+    }
+    $(this).find('.details-requirement').toggle('display');
+});
+
+//При нажатии на кнопку добавить фильтры по запросам B2B компаний
+$(body).on('click', '#addFiltersForListRequirements', function (){
+    $('.addFiltersForListRequirements').toggle('display');
+    $('.buttonsFiltersForListRequirements').toggle('display');
+    $('.requirement-filters').toggle('display');
+});
+
+//Применение фильтров по запросам B2B компаний
+$(body).on('beforeSubmit', 'form#filtersRequirement', function (e) {
+
+    var data = $(this).serialize();
+    var url = $(this).attr('action');
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    var listRequirements = $(hypothesis_create_modal).find('.modal-body').find('.list-requirements');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+            $(listRequirements).html(response.renderAjax);
+            $('#addFiltersForListRequirements').trigger('click');
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+// Сброс фильтров по запросам B2B компаний
+$(body).on('click', '#resetFiltersForListRequirements', function (e){
+
+    var url = $(this).attr('href');
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    var listRequirements = $(hypothesis_create_modal).find('.modal-body').find('.list-requirements');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+            $(listRequirements).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+//Пагинация списка запросов B2B компаний
+$(body).on('click', '.admin-projects-result-pagin-list li a', function (e){
+
+    var url = $(this).attr('href');
+    var data = $('form#filtersRequirement').serialize();
+    var hypothesis_create_modal = $('.hypothesis_create_modal');
+    var listRequirements = $(hypothesis_create_modal).find('.modal-body').find('.list-requirements');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+            $(listRequirements).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
 
 //Сохранение новой гипотезы из формы
 $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
@@ -176,7 +370,6 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
     e.preventDefault();
     return false;
 });
-
 
 
 //При нажатии на кнопку редактировать

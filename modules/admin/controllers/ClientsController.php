@@ -168,7 +168,7 @@ class ClientsController extends AppAdminController
                 ]);
             }
         }
-        if ($formCreateClient->validate() && $formCreateClient->load(Yii::$app->request->post())) {
+        if ($formCreateClient->load(Yii::$app->request->post())) {
 
             $attributesAdminCompany = array();
             $data = explode('abracadabraValue', $formCreateClient->adminCompany);

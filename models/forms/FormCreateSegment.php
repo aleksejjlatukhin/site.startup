@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\Projects;
+use app\models\SegmentRequirement;
 use app\models\Segments;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
@@ -24,18 +25,33 @@ class FormCreateSegment extends FormSegment
     /**
      * FormCreateSegment constructor.
      * @param Projects $project
+     * @param bool|null $useWishList
+     * @param int|null $requirementId
      * @param array $config
      */
-    public function __construct(Projects $project, array $config = [])
+    public function __construct(Projects $project, bool $useWishList = null, int $requirementId = null, array $config = [])
     {
+        $this->setProjectId($project->getId());
         $this->_cacheManager = new CacheForm();
         $this->cachePath = self::getCachePath($project);
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
             $className = explode('\\', self::class)[3];
             foreach ($cache[$className] as $key => $value) {
-                $this[$key] = $value;
+                if ($key === 'use_wish_list' && $useWishList !== null) {
+                    $this->setUseWishList($useWishList ? Segments::USE_WISH_LIST : Segments::NOT_USE_WISH_LIST);
+                } elseif ($key === 'requirement_id' && $requirementId !== null) {
+                    $this->setRequirementId($requirementId);
+                } else {
+                    $this[$key] = $value;
+                }
             }
+        } else {
+            $this->setUseWishList(Segments::NOT_USE_WISH_LIST);
+        }
+
+        if ($requirementId && !$this->getRequirementId()) {
+            $this->setRequirementId($requirementId);
         }
 
         parent::__construct($config);
@@ -101,10 +117,10 @@ class FormCreateSegment extends FormSegment
             $segment->setDescription($this->getDescription());
             $segment->setProjectId($this->getProjectId());
             $segment->setTypeOfInteractionBetweenSubjects($this->getTypeOfInteractionBetweenSubjects());
-            $segment->setAddInfo($this->getAddInfo());
 
             if ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2C){
 
+                $segment->setUseWishList(Segments::NOT_USE_WISH_LIST);
                 $segment->setFieldOfActivity($this->getFieldOfActivityB2c());
                 $segment->setSortOfActivity($this->getSortOfActivityB2c());
                 $segment->setAgeFrom($this->getAgeFrom());
@@ -115,6 +131,7 @@ class FormCreateSegment extends FormSegment
                 $segment->setIncomeTo($this->getIncomeTo());
                 $segment->setQuantity($this->getQuantity());
                 $segment->setMarketVolume(((($this->getIncomeFrom() + $this->getIncomeTo()) * 6) * $this->getQuantity()) / 1000000);
+                $segment->setAddInfo($this->getAddInfoB2c());
 
                 if ($segment->save()) {
                     $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
@@ -124,6 +141,7 @@ class FormCreateSegment extends FormSegment
 
             }elseif ($this->getTypeOfInteractionBetweenSubjects() === Segments::TYPE_B2B) {
 
+                $segment->setUseWishList($this->getUseWishList());
                 $segment->setFieldOfActivity($this->getFieldOfActivityB2b());
                 $segment->setSortOfActivity($this->getSortOfActivityB2b());
                 $segment->setCompanyProducts($this->getCompanyProducts());
@@ -132,8 +150,12 @@ class FormCreateSegment extends FormSegment
                 $segment->setIncomeFrom($this->getIncomeCompanyFrom());
                 $segment->setIncomeTo($this->getIncomeCompanyTo());
                 $segment->setMarketVolume((($this->getIncomeCompanyFrom() + $this->getIncomeCompanyTo()) / 2) * $this->getQuantityB2b());
+                $segment->setAddInfo($this->getAddInfoB2b());
 
                 if ($segment->save()) {
+                    if ($this->getRequirementId()) {
+                        SegmentRequirement::create($segment->getId(), $this->getRequirementId());
+                    }
                     $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
                     return $segment;
                 }

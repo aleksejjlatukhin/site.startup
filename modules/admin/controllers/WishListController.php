@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\forms\FormFilterRequirement;
 use app\models\PatternHttpException;
 use app\models\ReasonRequirementWishList;
 use app\models\RequirementWishList;
@@ -36,15 +37,83 @@ class WishListController extends AppAdminController
 
     /**
      * @param int $page
-     * @return string
+     * @return array|string
      */
-    public function actionIndex(int $page = 1): string
+    public function actionIndex(int $page = 1)
     {
         $user = User::findOne(Yii::$app->user->getId());
         $client = $user->clientUser->client;
 
         $limit = 20;
         $query = $client->findWishListsForPagination();
+        $filters = new FormFilterRequirement();
+
+        if(Yii::$app->request->isAjax) {
+
+            $queryRequirement = RequirementWishList::find();
+            if ($filters->load(Yii::$app->request->post())) {
+                if ($filters->getRequirement()) {
+                    $queryRequirement = $queryRequirement->andWhere(['like', 'requirement', $filters->getRequirement()]);
+                }
+                if ($filters->getReason()) {
+                    $queryRequirement = $queryRequirement->innerJoin('reason_requirement_wish_list', '`reason_requirement_wish_list`.`requirement_wish_list_id` = `requirement_wish_list`.`id`')
+                        ->andWhere(['like', 'reason_requirement_wish_list.reason', $filters->getReason()]);
+                }
+                if ($filters->getExpectedResult()) {
+                    $queryRequirement = $queryRequirement->andWhere(['like', 'requirement_wish_list.expected_result', $filters->getExpectedResult()]);
+                }
+                if ($filters->getFieldOfActivity()) {
+                    $query = $query->andWhere(['like', 'company_field_of_activity', $filters->getFieldOfActivity()]);
+                }
+                if ($filters->getSortOfActivity()) {
+                    $query = $query->andWhere(['like', 'company_sort_of_activity', $filters->getSortOfActivity()]);
+                }
+                if ($filters->getSize()) {
+                    $query = $query->andWhere(['size' => (int)$filters->getSize()]);
+                }
+                if ($filters->getLocationId()) {
+                    $query = $query->andWhere(['location_id' => (int)$filters->getLocationId()]);
+                }
+                if ($filters->getTypeCompany()) {
+                    $query = $query->andWhere(['type_company' => (int)$filters->getTypeCompany()]);
+                }
+                if ($filters->getTypeProduction()) {
+                    $query = $query->andWhere(['type_production' => (int)$filters->getTypeProduction()]);
+                }
+
+                $wishListIds = $queryRequirement
+                    ->select('requirement_wish_list.wish_list_id wish_list_id')
+                    ->distinct()
+                    ->asArray()
+                    ->all();
+
+                $resultWishListIds = [];
+                foreach ($wishListIds as $wishListId) {
+                    foreach ($wishListId as $item) {
+                        $resultWishListIds[] = $item;
+                    }
+                }
+
+                $query = $query->andWhere(['in', 'id', $resultWishListIds]);
+            }
+
+            $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $limit]);
+            $pages->pageSizeParam = false; //убираем параметр $per-page
+            $models = $query->offset($pages->offset)->limit($limit)->all();
+
+            $response = [
+                'renderAjax' => $this->renderAjax('index_ajax', [
+                    'models' => $models,
+                    'pages' => $pages,
+                    'clientId' => $client->getId()
+                ])
+            ];
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+
         $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $limit]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $models = $query->offset($pages->offset)->limit($limit)->all();
@@ -52,7 +121,8 @@ class WishListController extends AppAdminController
         return $this->render('index', [
             'models' => $models,
             'pages' => $pages,
-            'clientId' => $client->getId()
+            'clientId' => $client->getId(),
+            'filters' => $filters
         ]);
     }
 
