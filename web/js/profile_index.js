@@ -43,6 +43,10 @@ $(body).on('beforeSubmit', '#update_data_profile', function(e){
                 $(modal_error).modal('show');
                 $(modal_error).find('.modal-body').html('<h4> - логин уже зарегистрирован</h4>');
             }
+            if (response.error_match_username) {
+                $(modal_error).modal('show');
+                $(modal_error).find('.modal-body').html('<h4> - логин может содержать только латинские символы, цифры и специальные символы "@._-", так же не допускается использование пробелов;</h4>');
+            }
             if (response.error_send_email) {
                 $(modal_error).modal('show');
                 $(modal_error).find('.modal-body').append('<h4> - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес</h4>');

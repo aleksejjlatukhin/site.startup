@@ -24,6 +24,7 @@ class ProfileForm extends Model
     public $username;
     public $email;
     public $uniq_username = true;
+    public $match_username = true;
     public $uniq_email = true;
     public $checking_mail_sending = true;
 
@@ -34,11 +35,12 @@ class ProfileForm extends Model
     public function rules(): array
     {
         return [
-            [['uniq_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
+            [['uniq_username', 'match_username', 'uniq_email', 'checking_mail_sending'], 'boolean'],
             [['username', 'email'], 'required'],
             [['username', 'email'], 'trim'],
             [['email'], 'string', 'max' => 255],
             ['username', 'uniqUsername'],
+            ['username', 'matchUsername'],
             ['email', 'uniqEmail'],
         ];
     }
@@ -98,6 +100,23 @@ class ProfileForm extends Model
     /**
      * @param $attr
      */
+    public function matchUsername($attr): void
+    {
+        if (!preg_match('/^[a-zA-Z0-9@._-]+$/', $this->username)) {
+            $this->match_username = false;
+            $this->addError($attr, 'Логин может содержать только латинские символы, цифры и специальные символы "@._-"');
+        }
+
+        if (preg_match('/\s+/',$this->username)) {
+            $this->match_username = false;
+            $this->addError($attr, 'Не допускается использование пробелов');
+        }
+    }
+
+
+    /**
+     * @param $attr
+     */
     public function uniqEmail($attr): void
     {
         /** @var User[] $users */
@@ -140,18 +159,21 @@ class ProfileForm extends Model
      */
     public function update()
     {
-        if ($this->sendEmail()) {
+        $user = User::findOne($this->id);
+        if ($user->getEmail() !== $this->getEmail()) {
+            if ($this->sendEmail()) {
+                $user->setEmail($this->email);
+                $user->setUsername($this->username);
 
-            $user = User::findOne($this->id);
-            $user->setEmail($this->email);
-            $user->setUsername($this->username);
+                return $user->save() ? $user : null;
+            }
 
-            return $user->save() ? $user : null;
-
+            $this->checking_mail_sending = false;
+            return $this;
         }
 
-        $this->checking_mail_sending = false;
-        return  $this;
+        $user->setUsername($this->username);
+        return $user->save() ? $user : null;
     }
 
     /**

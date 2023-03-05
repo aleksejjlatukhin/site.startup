@@ -165,7 +165,7 @@ $(body).on('beforeSubmit', '#project_create_form', function(e){
             //Если данные загружены и проверены
             if(response.success){
 
-                if (response.count === '1') {
+                if (response.count === 1) {
                     $(hypothesis_create_modal).modal('hide');
                     location.href = '/projects/index?id=' + id;
                 } else {

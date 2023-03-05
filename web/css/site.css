@@ -82,7 +82,8 @@ body {
 
 .navbar-header-content {
     display:flex;
-    padding-top: 20px;
+    font-size: 24px;
+    padding-top: 12px;
     color: #F2F2F2;
     font-family: 'RobotoCondensed-Light', serif;
 }
@@ -271,6 +272,8 @@ body::-webkit-scrollbar {
     }
 
     .navbar-header-content {
+        font-size: 16px;
+        padding-top: 20px;
         padding-left: 20px;
     }
 

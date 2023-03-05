@@ -406,7 +406,7 @@ class ProjectsController extends AppUserPartController
                         $model->_cacheManager->deleteCache(mb_substr($cachePath, 0, -1));
 
                         $response =  [
-                            'success' => true,
+                            'success' => true, 'count' => (int)Projects::find()->where(['user_id' => $id])->count(),
                             'renderAjax' => $this->renderAjax('_index_ajax', [
                                 'models' => Projects::findAll(['user_id' => $user->getId()]),
                             ]),

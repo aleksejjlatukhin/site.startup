@@ -2,6 +2,7 @@
 
 namespace app\modules\client\controllers;
 
+use app\models\Client;
 use app\models\forms\FormFilterRequirement;
 use app\models\PatternHttpException;
 use app\models\ReasonRequirementWishList;
@@ -80,6 +81,15 @@ class WishListController extends AppClientController
                 if ($filters->getTypeProduction()) {
                     $query = $query->andWhere(['type_production' => (int)$filters->getTypeProduction()]);
                 }
+                if ($filters->getClientId()) {
+                    $query = $query->andWhere(['client_id' => (int)$filters->getClientId()]);
+                }
+                if ($filters->getStartDate()) {
+                    $query = $query->andWhere(['>=', 'completed_at', strtotime($filters->getStartDate())]);
+                }
+                if ($filters->getEndDate()) {
+                    $query = $query->andWhere(['<=', 'completed_at', strtotime($filters->getEndDate())]);
+                }
 
                 $wishListIds = $queryRequirement
                     ->select('requirement_wish_list.wish_list_id wish_list_id')
@@ -117,12 +127,16 @@ class WishListController extends AppClientController
         $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $limit]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $models = $query->offset($pages->offset)->limit($limit)->all();
+        $listClient = Client::find()
+            ->where(['in', 'id', array_column($models, 'client_id')])
+            ->all();
 
         return $this->render('index', [
             'models' => $models,
             'pages' => $pages,
             'clientId' => $client->getId(),
-            'filters' => $filters
+            'filters' => $filters,
+            'listClient' => $listClient
         ]);
     }
 

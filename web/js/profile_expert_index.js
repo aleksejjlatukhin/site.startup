@@ -46,19 +46,17 @@ $(body).on('beforeSubmit', '#update_data_profile', function(e){
             }
             if (response.error_match_username) {
                 $(modal_error).modal('show');
-                $(modal_error).find('.modal-body').append('<h4> - логин должен содержать только латинские символы и цыфры, не допускается использование пробелов;</h4>');
+                $(modal_error).find('.modal-body').append('<h4> - логин может содержать только латинские символы, цифры и специальные символы "@._-", так же не допускается использование пробелов;</h4>');
             }
             if (response.error_send_email) {
                 $(modal_error).modal('show');
                 $(modal_error).find('.modal-body').append('<h4> - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;</h4>');
             }
             if (response.success) {
-                // Скрыть форму редактирования профиля и показать просмотр профиля
-                $('#show_form_view_data').trigger('click');
-                // Обновляем контент страницы
-                $('.data_user_content').html(response.renderAjax);
                 // Меняем название ссылки выхода
                 $('a[href^=\'/logout\']').find('span').html('Выход (' + response.user.username + ')');
+                var navbarHeaderContent = $('body').find('.navbar-header-content').html();
+                $('body').find('.navbar-header-content').html(navbarHeaderContent.split(':')[0] + ': ' + response.user.username);
             }
 
         }, error: function(){

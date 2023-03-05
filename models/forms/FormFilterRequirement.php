@@ -15,10 +15,13 @@ use yii\base\Model;
  * @property string $expectedResult                      Ожидаемый результат
  * @property string $fieldOfActivity                     Сфера деятельности предприятия
  * @property string $sortOfActivity                      Вид деятельности предприятия
- * @property string $size                              Размер предприятия по количеству персонала
- * @property string $locationId                        Идентификатор локации предприятия
- * @property string $typeCompany                       Тип предприятия
- * @property string $typeProduction                    Тип производства
+ * @property string $size                                Размер предприятия по количеству персонала
+ * @property string $locationId                          Идентификатор локации предприятия
+ * @property string $typeCompany                         Тип предприятия
+ * @property string $typeProduction                      Тип производства
+ * @property string $clientId                            Идентификатор организации-акселератора
+ * @property string $startDate                           Дата начала периода (фильтр даты акселерации виш-листа)
+ * @property string $endDate                             Дата конца периода (фильтр даты акселерации виш-листа)
  */
 class FormFilterRequirement extends Model
 {
@@ -31,6 +34,9 @@ class FormFilterRequirement extends Model
     public $locationId;
     public $typeCompany;
     public $typeProduction;
+    public $clientId;
+    public $startDate;
+    public $endDate;
 
 
     /**
@@ -41,7 +47,7 @@ class FormFilterRequirement extends Model
         return [
             [['requirement', 'reason', 'expectedResult', 'fieldOfActivity', 'sortOfActivity'], 'string', 'max' => 255],
             [['requirement', 'reason', 'expectedResult', 'fieldOfActivity', 'sortOfActivity'], 'trim'],
-            [['size', 'locationId', 'typeCompany', 'typeProduction'], 'safe'],
+            [['size', 'locationId', 'typeCompany', 'typeProduction', 'clientId', 'startDate', 'endDate'], 'safe'],
         ];
     }
 
@@ -60,6 +66,9 @@ class FormFilterRequirement extends Model
             'locationId' => 'Локация предприятия',
             'typeCompany' => 'Тип предприятия',
             'typeProduction' => 'Тип производства',
+            'clientId' => 'Акселератор',
+            'startDate' => 'Дата начала периода',
+            'endDate' => 'Дата конца периода',
         ];
     }
 
@@ -133,5 +142,29 @@ class FormFilterRequirement extends Model
     public function getTypeProduction(): string
     {
         return $this->typeProduction;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientId(): string
+    {
+        return $this->clientId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStartDate(): string
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndDate(): string
+    {
+        return $this->endDate;
     }
 }

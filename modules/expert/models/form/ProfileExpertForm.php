@@ -199,9 +199,9 @@ class ProfileExpertForm extends  Model
      */
     public function matchUsername($attr): void
     {
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $this->username)) {
+        if (!preg_match('/^[a-zA-Z0-9@._-]+$/', $this->username)) {
             $this->match_username = false;
-            $this->addError($attr, 'Логин должен содержать только латинские символы и цыфры.');
+            $this->addError($attr, 'Логин может содержать только латинские символы, цифры и специальные символы "@._-"');
         }
 
         if (preg_match('/\s+/',$this->username)) {
@@ -256,36 +256,62 @@ class ProfileExpertForm extends  Model
      */
     public function update()
     {
-        if ($this->sendEmail()) {
+        $user = User::findOne($this->getId());
 
-            $user = User::findOne($this->getId());
-            $user->setEmail($this->getEmail());
-            $user->setUsername($this->getUsername());
+        if ($user->getEmail() !== $this->getEmail()) {
+            if ($this->sendEmail()) {
+                $user->setEmail($this->getEmail());
+                $user->setUsername($this->getUsername());
 
-            if ($user->save()) {
+                if ($user->save()) {
 
-                // Сохраняем ключевые слова
-                $user->keywords->edit($this->getKeywords());
-                // Сохраняем информацию о эксперте
-                $expertInfo = $user->expertInfo;
-                $expertInfo->setEducation($this->getEducation());
-                $expertInfo->setAcademicDegree($this->getAcademicDegree());
-                $expertInfo->setPosition($this->getPosition());
-                $expertInfo->setType(implode('|', $this->getType()));
-                $expertInfo->setScopeProfessionalCompetence($this->getScopeProfessionalCompetence());
-                $expertInfo->setPublications($this->getPublications());
-                $expertInfo->setImplementedProjects($this->getImplementedProjects());
-                $expertInfo->setRoleInImplementedProjects($this->getRoleInImplementedProjects());
+                    // Сохраняем ключевые слова
+                    $user->keywords->edit($this->getKeywords());
+                    // Сохраняем информацию о эксперте
+                    $expertInfo = $user->expertInfo;
+                    $expertInfo->setEducation($this->getEducation());
+                    $expertInfo->setAcademicDegree($this->getAcademicDegree());
+                    $expertInfo->setPosition($this->getPosition());
+                    $expertInfo->setType(implode('|', $this->getType()));
+                    $expertInfo->setScopeProfessionalCompetence($this->getScopeProfessionalCompetence());
+                    $expertInfo->setPublications($this->getPublications());
+                    $expertInfo->setImplementedProjects($this->getImplementedProjects());
+                    $expertInfo->setRoleInImplementedProjects($this->getRoleInImplementedProjects());
 
-                if ($expertInfo->save()) {
-                    return $user;
+                    if ($expertInfo->save()) {
+                        return $user;
+                    }
                 }
+            }
+
+            $this->checking_mail_sending = false;
+            return  $this;
+
+        }
+
+        $user->setUsername($this->getUsername());
+
+        if ($user->save()) {
+
+            // Сохраняем ключевые слова
+            $user->keywords->edit($this->getKeywords());
+            // Сохраняем информацию о эксперте
+            $expertInfo = $user->expertInfo;
+            $expertInfo->setEducation($this->getEducation());
+            $expertInfo->setAcademicDegree($this->getAcademicDegree());
+            $expertInfo->setPosition($this->getPosition());
+            $expertInfo->setType(implode('|', $this->getType()));
+            $expertInfo->setScopeProfessionalCompetence($this->getScopeProfessionalCompetence());
+            $expertInfo->setPublications($this->getPublications());
+            $expertInfo->setImplementedProjects($this->getImplementedProjects());
+            $expertInfo->setRoleInImplementedProjects($this->getRoleInImplementedProjects());
+
+            if ($expertInfo->save()) {
+                return $user;
             }
         }
 
-        $this->checking_mail_sending = false;
         return  $this;
-
     }
 
     /**

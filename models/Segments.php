@@ -273,8 +273,6 @@ class Segments extends ActiveRecord
      */
     public function deleteStage ()
     {
-
-        //TODO: Если это B2B сегмент, который имеет привязанные запросы, то удалять эту связь!!!
         if ($problems = $this->problems) {
             foreach ($problems as $problem) {
                 $problem->deleteStage();
@@ -305,6 +303,10 @@ class Segments extends ActiveRecord
         $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
         if (file_exists($cachePathDelete)) {
             FileHelper::removeDirectory($cachePathDelete);
+        }
+
+        if ($this->segmentRequirement) {
+            SegmentRequirement::deleteAll(['segment_id' => $this->getId()]);
         }
 
         // Удаление сегмента

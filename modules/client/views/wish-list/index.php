@@ -1,13 +1,16 @@
 <?php
 
+use app\models\Client;
 use app\models\forms\FormFilterRequirement;
 use app\models\LocationWishList;
 use app\models\SizesWishList;
 use app\models\TypesCompanyWishList;
 use app\models\TypesProductionWishList;
 use app\models\WishList;
+use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -20,6 +23,7 @@ $this->registerCssFile('@web/css/wish-list-style.css');
  * @var Pagination $pages
  * @var integer $clientId
  * @var FormFilterRequirement $filters
+ * @var Client[] $listClient
  */
 
 ?>
@@ -251,7 +255,58 @@ $this->registerCssFile('@web/css/wish-list-style.css');
                 ]) ?>
             </div>
 
+            <div class="col-md-6">
+                <?= $form->field($filters, 'clientId', [
+                    'template' => '<div class="pl-5">{label}</div><div>{input}</div>',
+                ])->widget(Select2::class, [
+                    'data' => ArrayHelper::map($listClient, 'id', 'name'),
+                    'options' => ['placeholder' => ''],
+                    'disabled' => false,  //Сделать поле неактивным
+                    'hideSearch' => true, //Скрытие поиска
+                ]) ?>
             </div>
+
+            <div class="col-md-3">
+                <?= '<label class="control-label pl-5">Начало периода</label>' ?>
+                <?= DatePicker::widget([
+                    'type' => 2,
+                    'removeButton' => false,
+                    'name' => 'FormFilterRequirement[startDate]',
+                    'readonly' => true,
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'dd.mm.yyyy',
+                    ],
+                    'options' => [
+                        'id' => "FormFilterRequirement_startDate",
+                        'class' => 'text-center style_form_field_respond form-control',
+                        'style' => ['padding-right' => '20px'],
+                        'placeholder' => 'Выберите дату',
+                    ]
+                ]) ?>
+            </div>
+
+            <div class="col-md-3">
+                <?= '<label class="control-label pl-5">Конец периода</label>' ?>
+                <?= DatePicker::widget([
+                    'type' => 2,
+                    'removeButton' => false,
+                    'name' => 'FormFilterRequirement[endDate]',
+                    'readonly' => true,
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'dd.mm.yyyy',
+                    ],
+                    'options' => [
+                        'id' => "FormFilterRequirement_endDate",
+                        'class' => 'text-center style_form_field_respond form-control',
+                        'style' => ['padding-right' => '20px'],
+                        'placeholder' => 'Выберите дату',
+                    ]
+                ]) ?>
+            </div>
+
+        </div>
 
         <?php ActiveForm::end(); ?>
 

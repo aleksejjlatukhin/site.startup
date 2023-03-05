@@ -89,3 +89,37 @@ $(body).on('click', '.admin-projects-result-pagin-list li a', function (e){
     e.preventDefault();
     return false;
 });
+
+// Отслеживаем выбор даты начала периода в фильтре даты создания виш-листов
+$(body).on('change', '#FormFilterRequirement_startDate', function () {
+
+    var startDate = $(this).val();
+    var endDate = $('#FormFilterRequirement_endDate').val();
+
+    if (endDate.toString().length > 0) {
+        var startDateArr = startDate.toString().split('.');
+        var endDateArr = endDate.toString().split('.');
+        var startDateModify = new Date(startDateArr[2] + '-' + startDateArr[1] + '-' + startDateArr[0]);
+        var endDateModify = new Date(endDateArr[2] + '-' + endDateArr[1] + '-' + endDateArr[0]);
+        if (startDateModify >= endDateModify) {
+            $('#FormFilterRequirement_endDate').val(null);
+        }
+    }
+});
+
+// Отслеживаем выбор даты конца периода в фильтре даты создания виш-листов
+$(body).on('change', '#FormFilterRequirement_endDate', function () {
+
+    var endDate = $(this).val();
+    var startDate = $('#FormFilterRequirement_startDate').val();
+
+    if (startDate.toString().length > 0) {
+        var startDateArr = startDate.toString().split('.');
+        var endDateArr = endDate.toString().split('.');
+        var startDateModify = new Date(startDateArr[2] + '-' + startDateArr[1] + '-' + startDateArr[0]);
+        var endDateModify = new Date(endDateArr[2] + '-' + endDateArr[1] + '-' + endDateArr[0]);
+        if (startDateModify >= endDateModify) {
+            $('#FormFilterRequirement_startDate').val(null);
+        }
+    }
+});

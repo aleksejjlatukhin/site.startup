@@ -152,6 +152,7 @@ class ProfileController extends AppUserPartController
                     $response = [
                         'error_uniq_email' => false,
                         'error_uniq_username' => false,
+                        'error_match_username' => false,
                     ];
 
                     if ($model->uniq_email === false) {
@@ -160,6 +161,10 @@ class ProfileController extends AppUserPartController
 
                     if ($model->uniq_username === false) {
                         $response['error_uniq_username'] = true;
+                    }
+
+                    if ($model->match_username === false) {
+                        $response['error_match_username'] = true;
                     }
 
                     Yii::$app->response->format = Response::FORMAT_JSON;
