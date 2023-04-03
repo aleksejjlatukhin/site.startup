@@ -304,16 +304,17 @@ class MvpsController extends AppUserPartController
      *
      * @param int $id
      * @return array|bool
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionEnableExpertise(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
             $mvp = Mvps::findOne($id);
-            $mvp->setEnableExpertise();
             $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
 
-            if ($mvp->save()) {
+            if ($mvp->allowExpertise()) {
 
                 $response = [
                     'renderAjax' => $this->renderAjax('_index_ajax', [

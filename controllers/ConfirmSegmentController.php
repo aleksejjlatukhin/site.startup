@@ -554,14 +554,12 @@ class ConfirmSegmentController extends AppUserPartController
 
         if ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
             return $this->redirect(['/segments/index', 'id' => $project->getId()]);
-
         }
 
         $segment->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
         $segment->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($segment->update() && $model->update()){
+        if ($model->allowExpertise($segment)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);
@@ -587,9 +585,8 @@ class ConfirmSegmentController extends AppUserPartController
 
         $segment->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
         $segment->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($segment->update() && $model->update()){
+        if ($model->allowExpertise($segment)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $segment->trigger(Segments::EVENT_CLICK_BUTTON_CONFIRM);

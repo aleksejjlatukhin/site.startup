@@ -175,6 +175,9 @@ class ExpertiseController extends AppUserPartController
                 $expertise->setUserId($project->getUserId());
                 $expertise->setTypeExpert($type);
                 $expertise->setCommunicationId($userAccessToProject->getCommunicationId());
+                $expertise->setEstimation('');
+                $expertise->setComment('');
+                $expertise->completed = Expertise::NO_COMPLETED;
             }
 
             $model = !isset($interfaces[ConfirmationInterface::class]) ? new FormExpertiseSingleAnswer($expertise) : new FormExpertiseManyAnswer($expertise);

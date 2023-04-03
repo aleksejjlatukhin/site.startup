@@ -30,7 +30,6 @@ use yii\data\Pagination;
 use yii\db\StaleObjectException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use app\models\SortForm;
 use app\models\SegmentSort;
 use yii\web\Response;
 
@@ -572,14 +571,15 @@ class SegmentsController extends AppUserPartController
      * Включить разрешение на экспертизу
      * @param int $id
      * @return array|bool
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionEnableExpertise(int $id)
     {
         if(Yii::$app->request->isAjax) {
 
             $segment = Segments::findOne($id);
-            $segment->setEnableExpertise();
-            if ($segment->save()) {
+            if ($segment->allowExpertise()) {
 
                 $response = [
                     'success' => true,

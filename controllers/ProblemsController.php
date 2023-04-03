@@ -332,16 +332,16 @@ class ProblemsController extends AppUserPartController
      * Включить разрешение на экспертизу
      * @param int $id
      * @return array|bool
+     * @throws StaleObjectException
+     * @throws Throwable
      */
     public function actionEnableExpertise(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
             $problem = Problems::findOne($id);
-            $problem->setEnableExpertise();
             $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
-
-            if ($problem->save()) {
+            if ($problem->allowExpertise()) {
 
                 $response = [
                     'renderAjax' => $this->renderAjax('_index_ajax', [

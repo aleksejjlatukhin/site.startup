@@ -619,7 +619,19 @@ class CommunicationsController extends AppAdminController
 
             $query_communications = ProjectCommunications::find()
                 ->where(['adressee_id' => $id])
-                ->andWhere(['type' => CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE])
+                ->andWhere(['in','type', [
+                    CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+                    CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE
+                ]])
                 ->orderBy('id DESC');
 
             $pages = new Pagination(['totalCount' => $query_communications->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);

@@ -297,13 +297,12 @@ class Client extends ActiveRecord
             $customers = CustomerWishList::find()
                 ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
                 ->orderBy(['created_at' => SORT_DESC])
-                ->distinct('client_id')
                 ->all();
 
             $clientIds = [];
             foreach ($customers as $customer) {
                 /** @var CustomerWishList $customer */
-                if (!$customer->getDeletedAt()) {
+                if (!$customer->getDeletedAt() && !in_array($customer->getClientId(), $clientIds, true)) {
                     $clientIds[] = $customer->getClientId();
                 }
             }
@@ -323,7 +322,8 @@ class Client extends ActiveRecord
         }
 
         if (User::isUserAdminCompany($mainAdmin->getUsername())) {
-            $clientSpaccel = $mainAdmin->clientUser->client;
+            $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+            $clientSpaccel = $mainAdminSpaccel->clientUser->client;
             $customer = CustomerWishList::find()
                 ->where([
                     'client_id' => $clientSpaccel->getId(),
@@ -341,13 +341,12 @@ class Client extends ActiveRecord
                 $customers = CustomerWishList::find()
                     ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
                     ->orderBy(['created_at' => SORT_DESC])
-                    ->distinct('client_id')
                     ->all();
 
                 $clientIds = [];
                 foreach ($customers as $customer) {
                     /** @var CustomerWishList $customer */
-                    if (!$customer->getDeletedAt()) {
+                    if (!$customer->getDeletedAt() && !in_array($customer->getClientId(), $clientIds, true)) {
                         $clientIds[] = $customer->getClientId();
                     }
                 }
@@ -379,13 +378,12 @@ class Client extends ActiveRecord
             $customers = CustomerWishList::find()
                 ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
                 ->orderBy(['created_at' => SORT_DESC])
-                ->distinct('client_id')
                 ->all();
 
             $clientIds = [];
             foreach ($customers as $customer) {
                 /** @var CustomerWishList $customer */
-                if (!$customer->getDeletedAt()) {
+                if (!$customer->getDeletedAt() && !in_array($customer->getClientId(), $clientIds, true)) {
                     $clientIds[] = $customer->getClientId();
                 }
             }
@@ -403,7 +401,8 @@ class Client extends ActiveRecord
         }
 
         if (User::isUserAdminCompany($user->getUsername())) {
-            $clientSpaccel = $user->mainAdmin->clientUser->client;
+            $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+            $clientSpaccel = $mainAdminSpaccel->clientUser->client;
             $customer = CustomerWishList::find()
                 ->where([
                     'client_id' => $clientSpaccel->getId(),
@@ -421,13 +420,12 @@ class Client extends ActiveRecord
                 $customers = CustomerWishList::find()
                     ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
                     ->orderBy(['created_at' => SORT_DESC])
-                    ->distinct('client_id')
                     ->all();
 
                 $clientIds = [];
                 foreach ($customers as $customer) {
                     /** @var CustomerWishList $customer */
-                    if (!$customer->getDeletedAt()) {
+                    if (!$customer->getDeletedAt() && !in_array($customer->getClientId(), $clientIds, true)) {
                         $clientIds[] = $customer->getClientId();
                     }
                 }
@@ -451,8 +449,8 @@ class Client extends ActiveRecord
      */
     public function isAccessGeneralWishList(): bool
     {
-        $user = User::findOne(Yii::$app->user->getId());
-        $clientSpaccel = $user->mainAdmin->clientUser->client;
+        $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+        $clientSpaccel = $mainAdminSpaccel->clientUser->client;
         /** @var CustomerWishList|null $record */
         $record = CustomerWishList::find()
             ->where([
@@ -470,8 +468,8 @@ class Client extends ActiveRecord
      */
     public function isAccessMyWishList(): bool
     {
-        $user = User::findOne(Yii::$app->user->getId());
-        $clientSpaccel = $user->mainAdmin->clientUser->client;
+        $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
+        $clientSpaccel = $mainAdminSpaccel->clientUser->client;
         /** @var CustomerWishList|null $record */
         $record = CustomerWishList::find()
             ->where([

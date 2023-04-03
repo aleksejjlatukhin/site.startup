@@ -621,14 +621,12 @@ class ConfirmMvpController extends AppUserPartController
 
         if ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
             return $this->redirect(['mvps/index', 'id' => $confirmGcp->getId()]);
-
         }
 
         $mvp->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
         $mvp->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($mvp->update() && $model->update()){
+        if ($model->allowExpertise($mvp)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);
@@ -655,9 +653,8 @@ class ConfirmMvpController extends AppUserPartController
 
         $mvp->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
         $mvp->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($mvp->update() && $model->update()){
+        if ($model->allowExpertise($mvp)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $mvp->trigger(Mvps::EVENT_CLICK_BUTTON_CONFIRM);

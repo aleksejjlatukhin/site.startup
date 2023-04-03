@@ -417,18 +417,20 @@ class BusinessModelController extends AppUserPartController
      * @param int $id
      * @return array|bool
      * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     * @throws \yii\db\StaleObjectException
      */
     public function actionEnableExpertise(int $id)
     {
         if (Yii::$app->request->isAjax) {
 
             $model = $this->findModel($id);
-            $model->setEnableExpertise();
             $confirmMvp = ConfirmMvp::findOne($model->getConfirmMvpId());
             $gcp = $model->gcp;
             $segment = $model->segment;
 
-            if ($model->save()) {
+            if ($model->allowExpertise()) {
 
                 $response = [
                     'renderAjax' => $this->renderAjax('_index_ajax', [

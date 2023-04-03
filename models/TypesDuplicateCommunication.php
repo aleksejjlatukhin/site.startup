@@ -31,6 +31,12 @@ class TypesDuplicateCommunication
      */
     public const EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE = 433;
 
+    /**
+     * Отправка уведомления трекеру о том,
+     * что проектант разрешил экпертизу по этапу проекта
+     */
+    public const USER_ALLOWED_EXPERTISE = 574;
+
 
     /**
      * Все типы дублирующих коммуникаций
@@ -42,7 +48,8 @@ class TypesDuplicateCommunication
         return [
             self::MAIN_ADMIN_TO_EXPERT,
             self::EXPERT_COMPLETED_EXPERTISE,
-            self::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE
+            self::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE,
+            self::USER_ALLOWED_EXPERTISE
         ];
     }
 }

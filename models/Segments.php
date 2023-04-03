@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Throwable;
+use Yii;
 use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -39,6 +40,7 @@ use yii\helpers\FileHelper;
  * @property int|null $time_confirm                                 Дата подверждения сегмента
  * @property int|null $exist_confirm                                Параметр факта подтверждения сегмента
  * @property string $enable_expertise                               Параметр разрешения на экспертизу по даному этапу
+ * @property int|null $enable_expertise_at                          Дата разрешения на экспертизу по даному этапу
  * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
  * @property PropertyContainer $propertyContainer                   Свойство для реализации шаблона 'контейнер свойств'
  *
@@ -265,6 +267,49 @@ class Segments extends ActiveRecord
         parent::init();
     }
 
+
+    /**
+     * Разрешение эксертизы и отправка уведомлений
+     * эксперту и трекеру (если на проект назначен экперт)
+     *
+     * @return bool
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function allowExpertise(): bool
+    {
+        $user = $this->project->user;
+        if ($expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getProjectId())) {
+            $transaction = Yii::$app->db->beginTransaction();
+
+            $communicationIds = [];
+            foreach ($expertIds as $i => $expertId) {
+                $communication = new ProjectCommunications();
+                $communication->setParams($expertId, $this->getProjectId(), CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE, $this->getId());
+                if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
+                    $communicationIds[] = $communication->getId();
+                } elseif ($communication->save()) {
+                    $communicationIds[] = $communication->getId();
+                }
+            }
+
+            if (count($communicationIds) === count($expertIds)) {
+                $this->setEnableExpertise();
+                if ($this->update()) {
+                    $transaction->commit();
+                    return true;
+                }
+            }
+
+            $transaction->rollBack();
+            return false;
+        }
+
+        $this->setEnableExpertise();
+        return (bool)$this->update();
+    }
+
+
     /**
      * @return false|int
      * @throws ErrorException
@@ -335,23 +380,6 @@ class Segments extends ActiveRecord
     public function setProjectId(int $project_id): void
     {
         $this->project_id = $project_id;
-    }
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return string
-     */
-    public function getEnableExpertise(): string
-    {
-        return $this->enable_expertise;
-    }
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise(): void
-    {
-        $this->enable_expertise = EnableExpertise::ON;
     }
 
     /**
@@ -696,5 +724,39 @@ class Segments extends ActiveRecord
     public function changeUseWishList(): void
     {
         $this->use_wish_list = $this->use_wish_list === self::USE_WISH_LIST ? self::NOT_USE_WISH_LIST : self::USE_WISH_LIST;
+    }
+
+    /**
+     * Параметр разрешения экспертизы
+     * @return string
+     */
+    public function getEnableExpertise(): string
+    {
+        return $this->enable_expertise;
+    }
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise(): void
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+        $this->setEnableExpertiseAt(time());
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEnableExpertiseAt(): ?int
+    {
+        return $this->enable_expertise_at;
+    }
+
+    /**
+     * @param int $enable_expertise_at
+     */
+    public function setEnableExpertiseAt(int $enable_expertise_at): void
+    {
+        $this->enable_expertise_at = $enable_expertise_at;
     }
 }

@@ -607,14 +607,12 @@ class ConfirmGcpController extends AppUserPartController
 
         if ($gcp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
             return $this->redirect(['/gcps/index', 'id' => $confirmProblem->getId()]);
-
         }
 
         $gcp->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
         $gcp->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($gcp->update() && $model->update()){
+        if ($model->allowExpertise($gcp)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);
@@ -641,9 +639,8 @@ class ConfirmGcpController extends AppUserPartController
 
         $gcp->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
         $gcp->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($gcp->update() && $model->update()){
+        if ($model->allowExpertise($gcp)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $gcp->trigger(Gcps::EVENT_CLICK_BUTTON_CONFIRM);

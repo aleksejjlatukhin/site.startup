@@ -43,6 +43,9 @@ class PatternsDescriptionDuplicateCommunication
             if ($type === TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT) {
                 return $model->getDescriptionDuplicateMainAdminToExpertCommunication($source, $adressee);
             }
+            if ($type === TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE) {
+                return $model->getDescriptionDuplicateUserAllowedExpertiseCommunication($source);
+            }
 
             if (is_a($expertise, Expertise::class)) {
 
@@ -98,6 +101,69 @@ class PatternsDescriptionDuplicateCommunication
                     . ') отозван эксперт ' . $source->expert->getUsername() . '.';
             }
         }
+        return $this->description;
+    }
+
+
+    /**
+     * Получить описание шаблона коммуникации для трекера о том,
+     * что проектант разрешил экспертизу по этапу проекта
+     *
+     * @param ProjectCommunications $source
+     * @return string
+     */
+    private function getDescriptionDuplicateUserAllowedExpertiseCommunication(ProjectCommunications $source): string
+    {
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::PROJECT)
+                . ': ' . Html::a($source->project->getProjectName(), ['/projects/index', 'id' => $source->project->getUserId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::SEGMENT)
+                . ': ' . Html::a($source->hypothesis->getName(), ['/segments/index', 'id' => $source->getProjectId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::CONFIRM_SEGMENT)
+                . ': ' . Html::a($source->hypothesis->segment->getName(), ['/confirm-segment/view', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::PROBLEM)
+                . ': ' . Html::a($source->hypothesis->getTitle(), ['/problems/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::CONFIRM_PROBLEM)
+                . ': ' . Html::a($source->hypothesis->problem->getTitle(), ['/confirm-problem/view', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::GCP)
+                . ': ' . Html::a($source->hypothesis->getTitle(), ['/gcps/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::CONFIRM_GCP)
+                . ': ' . Html::a($source->hypothesis->gcp->getTitle(), ['/confirm-gcp/view', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::MVP)
+                . ': ' . Html::a($source->hypothesis->getTitle(), ['/mvps/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::CONFIRM_MVP)
+                . ': ' . Html::a($source->hypothesis->mvp->getTitle(), ['/confirm-mvp/view', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::BUSINESS_MODEL)
+                . ': ' . Html::a($source->hypothesis->mvp->getTitle(), ['/business-model/index', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
         return $this->description;
     }
 

@@ -21,44 +21,48 @@ use yii\web\UploadedFile;
  * Class Projects
  * @package app\models
  *
- * @property int $id                                Идентификатор проекта
- * @property int $user_id                           Идентификатор проектанта в таб.User
- * @property int $created_at                        Дата создания проекта
- * @property int $updated_at                        Дата обновления проекта
- * @property string $project_fullname               Полное наименое проекта
- * @property string $project_name                   Короткое наименование проекта
- * @property string $description                    Описание проекта
- * @property string $purpose_project                Цель проекта
- * @property string $rid                            Результат интеллектуальной деятельности
- * @property string $patent_number                  Номер патента
- * @property int $patent_date                       Дата получения патента
- * @property string $patent_name                    Наименование патента
- * @property string $core_rid                       Суть результата интеллектуальной деятельности
- * @property string $technology                     Технология, на которой основан проект
- * @property string $layout_technology              Макет базовой технологии
- * @property string $register_name                  Зарегистрированное юр. лицо
- * @property int $register_date                     Дата регистрации юр. лица
- * @property string $site                           Адрес сайта
- * @property string $invest_name                    Инвестор
- * @property int $invest_date                       Дата получения инвестиций
- * @property int $invest_amount                     Сумма инвестиций
- * @property int $date_of_announcement              Дата анонсирования проекта
- * @property string $announcement_event             Мероприятие, на котором анонсирован проект
- * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
- * @property $present_files                         Поле для загрузки презентационных файлов
- * @property CacheForm $_cacheManager               Менеджер для кэширования
+ * @property int $id                                            Идентификатор проекта
+ * @property int $user_id                                       Идентификатор проектанта в таб.User
+ * @property int $created_at                                    Дата создания проекта
+ * @property int $updated_at                                    Дата обновления проекта
+ * @property string $project_fullname                           Полное наименое проекта
+ * @property string $project_name                               Короткое наименование проекта
+ * @property string $description                                Описание проекта
+ * @property string $purpose_project                            Цель проекта
+ * @property string $rid                                        Результат интеллектуальной деятельности
+ * @property string $patent_number                              Номер патента
+ * @property int $patent_date                                   Дата получения патента
+ * @property string $patent_name                                Наименование патента
+ * @property string $core_rid                                   Суть результата интеллектуальной деятельности
+ * @property string $technology                                 Технология, на которой основан проект
+ * @property string $layout_technology                          Макет базовой технологии
+ * @property string $register_name                              Зарегистрированное юр. лицо
+ * @property int $register_date                                 Дата регистрации юр. лица
+ * @property string $site                                       Адрес сайта
+ * @property string $invest_name                                Инвестор
+ * @property int $invest_date                                   Дата получения инвестиций
+ * @property int $invest_amount                                 Сумма инвестиций
+ * @property int $date_of_announcement                          Дата анонсирования проекта
+ * @property string $announcement_event                         Мероприятие, на котором анонсирован проект
+ * @property string $enable_expertise                           Параметр разрешения на экспертизу по даному этапу
+ * @property int|null $enable_expertise_at                      Дата разрешения на экспертизу по даному этапу
+ * @property $present_files                                     Поле для загрузки презентационных файлов
+ * @property CacheForm $_cacheManager                           Менеджер для кэширования
  *
- * @property User $user                             Проектант
- * @property Authors[] $authors                     Авторы проекта
- * @property Segments[] $segments                   Сегменты
- * @property Problems[] $problems                   Проблемы
- * @property Gcps[] $gcps                           Ценностные предложения
- * @property Mvps[] $mvps                           Mvp-продукты
- * @property BusinessModel[] $businessModels        Бизнес-модели
- * @property PreFiles[] $preFiles                   Презентационные файлы
+ * @property User $user                                         Проектант
+ * @property Authors[] $authors                                 Авторы проекта
+ * @property Segments[] $segments                               Сегменты
+ * @property Problems[] $problems                               Проблемы
+ * @property Gcps[] $gcps                                       Ценностные предложения
+ * @property Mvps[] $mvps                                       Mvp-продукты
+ * @property BusinessModel[] $businessModels                    Бизнес-модели
+ * @property PreFiles[] $preFiles                               Презентационные файлы
+ * @property ProjectCommunications[] $projectCommunications     Коммуникации админа организации и экспертов по проекту
  */
 class Projects extends ActiveRecord
 {
+    public const PERIOD_TARGET_DATE_FOR_APPOINT_EXPERT = 14*24*60*60;
+    public const PERIOD_TARGET_DATE_FOR_ASK_EXPERT = 7*24*60*60;
 
     public $present_files;
     public $_cacheManager;
@@ -193,22 +197,14 @@ class Projects extends ActiveRecord
 
 
     /**
-     * Параметр разрешения экспертизы
+     * Получить объект проекта,
+     * по которому создана коммуникация
      *
-     * @return string
+     * @return ActiveQuery
      */
-    public function getEnableExpertise(): string
+    public function getProjectCommunications(): ActiveQuery
     {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise(): void
-    {
-        $this->enable_expertise = EnableExpertise::ON;
+        return $this->hasMany(ProjectCommunications::class, ['project_id' => 'id']);
     }
 
 
@@ -455,6 +451,91 @@ class Projects extends ActiveRecord
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Разрешение эксертизы и отправка уведомлений
+     * админу организации и трекеру
+     *
+     * @return bool
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function allowExpertise(): bool
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        $user = $this->user;
+        $communication = new ProjectCommunications();
+        $communication->setParams($user->mainAdmin->getId(), $this->getId(), CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE, $this->getId());
+        if ($communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
+            $transaction->commit();
+            $this->setEnableExpertise();
+            if($this->update()) {
+                //$this->sendCommunicationToEmail($communication);
+                return true;
+            }
+        }
+
+        $transaction->rollBack();
+        return false;
+    }
+
+
+    /**
+     * Отправка письма с уведомлением о разрешении экпертизы
+     * по проекту на почту админу организации
+     *
+     * @param ProjectCommunications $communication
+     * @return bool
+     */
+    private function sendCommunicationToEmail(ProjectCommunications $communication): bool
+    {
+        /* @var $user User */
+        $user = User::findOne($communication->getAdresseeId());
+
+        if ($user) {
+            return Yii::$app->mailer->compose('communications__FromUserToMainAdmin', ['communication' => $communication])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
+                ->setTo($user->getEmail())
+                ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
+                ->send();
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param int $type
+     * @return ProjectCommunications|null
+     */
+    public function getLastProjectCommunicationByType(int $type): ?ProjectCommunications
+    {
+        /** @var $result ProjectCommunications|null */
+        $query = ProjectCommunications::find()
+            ->andWhere(['cancel' => ProjectCommunications::CANCEL_FALSE])
+            ->andWhere(['project_id' => $this->getId(), 'type' => $type]);
+
+        if ($type === CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+            $query->innerJoin('communication_response','`communication_response`.`communication_id` = `project_communications`.`id`')
+                ->andWhere(['communication_response.answer' => CommunicationResponse::POSITIVE_RESPONSE]);
+        }
+
+        if ($type === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+            $communications = $query->orderBy(['created_at' => SORT_DESC])->all();
+            $result = null;
+            foreach ($communications as $communication) {
+                /** @var ProjectCommunications $communication */
+                if (!$communication->responsiveCommunication && !$result) {
+                    $result = $communication;
+                }
+            }
+            return $result;
+        }
+
+        $result = $query->orderBy(['created_at' => SORT_DESC])->one();
+        return $result ?: null;
     }
 
 
@@ -807,5 +888,61 @@ class Projects extends ActiveRecord
     public function setAnnouncementEvent(string $announcement_event): void
     {
         $this->announcement_event = $announcement_event;
+    }
+
+    /**
+     * Параметр разрешения экспертизы
+     *
+     * @return string
+     */
+    public function getEnableExpertise(): string
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise(): void
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+        $this->setEnableExpertiseAt(time());
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEnableExpertiseAt(): ?int
+    {
+        return $this->enable_expertise_at;
+    }
+
+    /**
+     * @param int $enable_expertise_at
+     */
+    public function setEnableExpertiseAt(int $enable_expertise_at): void
+    {
+        $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTargetDateAppointExpert(): int
+    {
+        return $this->getEnableExpertiseAt() ?
+            $this->getEnableExpertiseAt() + self::PERIOD_TARGET_DATE_FOR_APPOINT_EXPERT :
+            time() + self::PERIOD_TARGET_DATE_FOR_APPOINT_EXPERT;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTargetDateAskExpert(): int
+    {
+        return $this->getEnableExpertiseAt() ?
+            $this->getEnableExpertiseAt() + self::PERIOD_TARGET_DATE_FOR_ASK_EXPERT :
+            time() + self::PERIOD_TARGET_DATE_FOR_ASK_EXPERT;
     }
 }

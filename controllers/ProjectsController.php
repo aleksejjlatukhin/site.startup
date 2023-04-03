@@ -613,11 +613,7 @@ class ProjectsController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $project = Projects::findOne($id);
-            $project->setEnableExpertise();
-            if ($project->update()) {
-
-                // ToDo: Если на проект назначены эксперты отправить им уведомление о том,
-                // ToDo: что проектант разрешил экспертизу по этапу проекта, а так же уведомление трекеру
+            if ($project->allowExpertise()) {
 
                 $response = [
                     'renderAjax' => $this->renderAjax('_index_ajax', [

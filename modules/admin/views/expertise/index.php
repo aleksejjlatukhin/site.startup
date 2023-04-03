@@ -1,40 +1,38 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 
-$this->title = 'Экспертизы';
+$this->title = 'Разделы экпертизы';
 
 ?>
 
-<div class="row">
-
-    <div class="col-sm-6 col-md-8" style="margin-top: 35px; padding-left: 40px;">
-
-        <?= Html::a('Экспертизы (сортировка по экспертам)' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
-            'class' => 'link_to_instruction_page open_modal_instruction_page',
-            'title' => 'Инструкция', 'onclick' => 'return false'
-        ]) ?>
-
-    </div>
-
-    <div class="col-sm-6 col-md-4">
-        <?= Html::a( 'Назначение экспертов на проекты',
-            Url::to(['/admin/expertise/tasks']),[
-            'class' => 'btn btn-success pull-right',
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#52BE7F',
-                'width' => '100%',
-                'max-width' => '450px',
-                'min-width' => '350px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px',
-                'margin-top' => '35px',
-            ],
-        ]) ?>
-    </div>
+<div class="col-xs-12" style="margin-top: 35px;">
+    <?= Html::a($this->title . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+        'class' => 'link_to_instruction_page open_modal_instruction_page',
+        'title' => 'Инструкция', 'onclick' => 'return false'
+    ]) ?>
 </div>
+
+<div class="col-xs-12">
+    <ul class="menu-expertise">
+        <li><?= Html::a( 'Назначения экспертов на проекты', ['/admin/expertise/tasks']) ?></li>
+        <li><?= Html::a( 'Сводная таблица назначений экспертов на проекты', ['/admin/expertise/result-tasks']) ?></li>
+    </ul>
+</div>
+
+<style>
+    .menu-expertise {
+        padding: 15px;
+    }
+    .menu-expertise a {
+        font-size: 18px;
+        color: #4F4F4F;
+        transition: all .3s ease;
+    }
+    .menu-expertise a:hover {
+        color: #333333;
+    }
+    .menu-expertise a:focus {
+        color: #333333;
+    }
+</style>

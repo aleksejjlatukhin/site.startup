@@ -26,6 +26,12 @@ class SearchFormExperts extends Model
     public $keywords;
 
     /**
+     * Сфера профессиональной компетенции
+     * @var string
+     */
+    public $scope_professional_competence;
+
+    /**
      * Тип эксперта
      * @var array
      */
@@ -38,8 +44,8 @@ class SearchFormExperts extends Model
     public function rules(): array
     {
         return [
-            [['keywords', 'name'], 'string', 'max' => 255],
-            [['keywords', 'name'], 'trim'],
+            [['keywords', 'name', 'scope_professional_competence'], 'string', 'max' => 255],
+            [['keywords', 'name', 'scope_professional_competence'], 'trim'],
             ['type', 'safe'],
         ];
     }
@@ -56,6 +62,7 @@ class SearchFormExperts extends Model
         $client = $clientUser->client;
         $filter = $_POST['SearchFormExperts'];
         $name = trim($filter['name']);
+        $scopeProfessionalCompetence = trim($filter['scope_professional_competence']);
         $keywords = explode(' ', trim($filter['keywords']));
         if (!$filter['type']) {
             $listTypes = array_keys(ExpertType::getListTypes());
@@ -68,7 +75,8 @@ class SearchFormExperts extends Model
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
             ->where(['role' => User::ROLE_EXPERT, 'status' => User::STATUS_ACTIVE, 'client_user.client_id' => $client->getId()])
             ->andWhere(['REGEXP', 'expert_info.type', $type])
-            ->andWhere(['like', 'username', $name]);
+            ->andWhere(['like', 'username', $name])
+            ->andWhere(['like', 'scope_professional_competence', $scopeProfessionalCompetence]);
 
         foreach ($keywords as $keyword) {
             $experts->orOnCondition(['like', 'keywords_expert.description', $keyword]);

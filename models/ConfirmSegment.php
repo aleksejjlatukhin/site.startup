@@ -3,8 +3,10 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 /**
  * Класс, который хранит объекты подтверждения сегментов в бд
@@ -19,7 +21,8 @@ use yii\db\ActiveRecord;
  * @property string $greeting_interview             Приветствие в начале встречи
  * @property string $view_interview                 Информация о вас для респондентов
  * @property string $reason_interview               Причина и тема (что побудило) для проведения исследования
- * @property string $enable_expertise                  Параметр разрешения на экспертизу по даному этапу
+ * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
+ * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
  *
  * @property Segments $segment                      Сегмент
  * @property QuestionsConfirmSegment[] $questions   Вопросы, привязанные к подтверждению
@@ -311,6 +314,58 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm';
     }
 
+
+    /**
+     * Разрешение эксертизы и отправка уведомлений
+     * эксперту и трекеру (если на проект назначен экперт)
+     *
+     * @param Segments $segment
+     * @return bool
+     * @throws StaleObjectException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
+    public function allowExpertise(Segments $segment): bool
+    {
+        $project = $this->hypothesis->project;
+        $user = $project->user;
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($expertIds = ProjectCommunications::getExpertIdsByProjectId($project->getId())) {
+
+            $communicationIds = [];
+            foreach ($expertIds as $i => $expertId) {
+                $communication = new ProjectCommunications();
+                $communication->setParams($expertId, $project->getId(), CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE, $this->getId());
+                if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
+                    $communicationIds[] = $communication->getId();
+                } elseif ($communication->save()) {
+                    $communicationIds[] = $communication->getId();
+                }
+            }
+
+            if (count($communicationIds) === count($expertIds)) {
+                $this->setEnableExpertise();
+                if ($this->update() && $segment->update()) {
+                    $transaction->commit();
+                    return true;
+                }
+            }
+
+            $transaction->rollBack();
+            return false;
+        }
+
+        $this->setEnableExpertise();
+        if ($this->update() && $segment->update()) {
+            $transaction->commit();
+            return true;
+        }
+
+        $transaction->rollBack();
+        return false;
+    }
+
+
     /**
      * @return int
      */
@@ -327,32 +382,12 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         $this->segment_id = $id;
     }
 
-
     /**
      * @return int
      */
     public function getSegmentId(): int
     {
         return $this->segment_id;
-    }
-
-
-    /**
-     * Параметр разрешения экспертизы
-     * @return string
-     */
-    public function getEnableExpertise(): string
-    {
-        return $this->enable_expertise;
-    }
-
-
-    /**
-     *  Установить разрешение на экспертизу
-     */
-    public function setEnableExpertise(): void
-    {
-        $this->enable_expertise = EnableExpertise::ON;
     }
 
     /**
@@ -433,6 +468,41 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function setReasonInterview(string $reason_interview): void
     {
         $this->reason_interview = $reason_interview;
+    }
+
+    /**
+     * Параметр разрешения экспертизы
+     * @return string
+     */
+    public function getEnableExpertise(): string
+    {
+        return $this->enable_expertise;
+    }
+
+
+    /**
+     *  Установить разрешение на экспертизу
+     */
+    public function setEnableExpertise(): void
+    {
+        $this->enable_expertise = EnableExpertise::ON;
+        $this->setEnableExpertiseAt(time());
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEnableExpertiseAt(): ?int
+    {
+        return $this->enable_expertise_at;
+    }
+
+    /**
+     * @param int $enable_expertise_at
+     */
+    public function setEnableExpertiseAt(int $enable_expertise_at): void
+    {
+        $this->enable_expertise_at = $enable_expertise_at;
     }
 
 }

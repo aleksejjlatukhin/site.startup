@@ -49,6 +49,13 @@ use app\models\ExpertType;
                     'autocomplete' => 'off'])
                 ->label(false) ?>
 
+            <label for="SearchFormExperts[scope_professional_competence]">Сфера профессиональной компетенции</label>
+            <?= $form->field($searchFormExperts, 'scope_professional_competence', ['template' => '{input}'])
+                ->textInput([
+                    'class' => 'style_form_field_respond',
+                    'autocomplete' => 'off'])
+                ->label(false) ?>
+
             <label for="SearchFormExperts[keywords]">Ключевые слова</label>
             <?= $form->field($searchFormExperts, 'keywords', ['template' => '{input}'])
                 ->textInput([

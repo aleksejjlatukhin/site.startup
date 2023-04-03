@@ -4,8 +4,10 @@
 namespace app\modules\client\controllers;
 
 use app\models\ClientUser;
+use app\models\CommunicationTypes;
 use app\models\EnableExpertise;
 use app\models\PatternHttpException;
+use app\models\ProjectCommunications;
 use app\models\Projects;
 use app\models\User;
 use app\modules\admin\models\form\SearchForm;
@@ -121,6 +123,79 @@ class ExpertiseController extends AppClientController
             'pages' => $pages,
             'searchForm' => $searchForm,
         ]);
+    }
+
+
+    public function actionResultTasks(int $page = 1)
+    {
+        $clientUser = ClientUser::findOne(['user_id' => Yii::$app->user->getId()]);
+        $client = $clientUser->client;
+        $pageSize = self::TASKS_PAGE_SIZE;
+
+        $query_projects = Projects::find()
+            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $client->getId()])
+            ->orderBy(['id' => SORT_DESC]);
+
+        $countProjects = $query_projects->count();
+
+        $countEnableProjects = Projects::find()
+            ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
+            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+            ->where(['client_user.client_id' => $client->getId()])
+            ->andWhere(['enable_expertise' => EnableExpertise::ON])
+            ->count();
+
+        $pages = new Pagination(['totalCount' => $query_projects->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
+        $pages->pageSizeParam = false; //убираем параметр $per-page
+        $projects = $query_projects->offset($pages->offset)->limit($pageSize)->all();
+
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('ajax_search_tasks', [
+                    'projects' => $projects, 'pages' => $pages, 'search' => true
+                ]), 'projects' => $projects];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+
+        }
+
+        return $this->render('result-tasks', [
+            'countProjects' => $countProjects,
+            'countEnableProjects' => $countEnableProjects,
+            'projects' => $projects,
+            'pages' => $pages,
+        ]);
+    }
+
+
+    public function actionGetResultTask(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $project = Projects::findOne($id);
+            $communicationsMainAdminAskExpert = ProjectCommunications::findAll([
+                'project_id' => $id, 'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
+            ]);
+
+            $communicationsMainAdminAppointExpert = ProjectCommunications::findAll([
+                'project_id' => $id, 'type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT
+            ]);
+
+            $response = [
+                'renderAjax' => $this->renderAjax('ajax_result_task', [
+                    'project' => $project, 'communicationsMainAdminAskExpert' => $communicationsMainAdminAskExpert,
+                    'communicationsMainAdminAppointExpert' => $communicationsMainAdminAppointExpert
+                ])
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 

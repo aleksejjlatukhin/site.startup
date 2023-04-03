@@ -113,10 +113,10 @@ use app\models\CommunicationResponse;
 
         </div>
         <div class="col-md-1 text-center">
-            <?= $communication->getNotificationStatus() ?>
+            <?= $communication->getNotificationStatus() ?: '-' ?>
         </div>
         <div class="col-md-1 text-center">
-            <?= $communication->getAccessStatus() ?>
+            <?= $communication->getAccessStatus() ?: '-' ?>
         </div>
     </div>
 

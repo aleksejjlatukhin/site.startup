@@ -3883,6 +3883,12 @@ a.link_cancel_search_field_mobile img {
 /* Общие стили для разных страниц
 --Начало--
 */
+.color-green {
+    color: #52BE7F;
+}
+.color-red {
+    color: #FF5C5C;
+}
 .text-block-not-expertise-mobile {
     text-transform: uppercase;
     margin-bottom: 15px;

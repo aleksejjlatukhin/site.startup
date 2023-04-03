@@ -30,17 +30,20 @@ use yii\helpers\Html;
  * @property int $cancel                                        Параметр аннулирования коммуникации
  * @property int $created_at                                    Дата создания коммуникации
  * @property int $updated_at                                    Дата обновления коммуникации
+ * @property int|null $hypothesis_id                            Идентификатор гипотезы (на которую проектант разрешил экспертизу)
  *
  * @property UserAccessToProjects $userAccessToProject          объект доступа пользователя к проекту по коммуникации
  * @property CommunicationResponse $communicationResponse       объект ответа по коммуникации
  * @property ProjectCommunications $responsiveCommunication     объект ответной коммуникации, т.е. обращение от коммуникации на которую ответили, а запрос на поиск коммуникации, которой ответили
  * @property ProjectCommunications $communicationAnswered       коммуникация на которую, была создана ответная коммуникация, запрос выполняется от ответной коммуникации
  * @property User $expert                                       эксперт
+ * @property User $user                                         проектант
  * @property Projects $project                                  объект проекта, по которому создана коммуникация
  * @property CommunicationPatterns $pattern                     шаблон коммуникации
  * @property TypesAccessToExpertise $typesAccessToExpertise     типы экспертиз назначенных эксперту по данной коммуникации
  * @property string $accessStatus                               Статус доступа к проекту
  * @property string $notificationStatus                         Тип (статус) уведомления для эксперта
+ * @property Projects|Segments|ConfirmSegment|Problems|ConfirmProblem|Gcps|ConfirmGcp|Mvps|ConfirmMvp|BusinessModel $hypothesis   Объект этапа проекта по которому была разрешена экспертиза
  */
 class ProjectCommunications extends ActiveRecord implements CommunicationsInterface
 {
@@ -119,11 +122,47 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public function getExpert(): ?User
     {
         if ($this->getType() === CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE) {
-            $expert = User::findOne($this->getSenderId());
-        } else {
-            $expert = User::findOne($this->getAdresseeId());
+            return User::findOne($this->getSenderId());
         }
-        return $expert;
+
+        if (in_array($this->getType(), [
+            CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE,
+            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
+            CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
+            CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
+            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT
+        ], true)) {
+            return User::findOne($this->getAdresseeId());
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Получить объект
+     * проектанта
+     *
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        if (in_array($this->getType(), [
+            CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE
+        ], true)) {
+            return User::findOne($this->getSenderId());
+        }
+
+        return null;
     }
 
 
@@ -161,6 +200,45 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public function getTypesAccessToExpertise(): ActiveQuery
     {
         return $this->hasOne(TypesAccessToExpertise::class, ['communication_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveRecord|null
+     */
+    public function getHypothesis(): ?ActiveRecord
+    {
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE) {
+            return Projects::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE) {
+            return Segments::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE) {
+            return ConfirmSegment::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE) {
+            return Problems::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE) {
+            return ConfirmProblem::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE) {
+            return Gcps::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE) {
+            return ConfirmGcp::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE) {
+            return Mvps::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE) {
+            return ConfirmMvp::findOne($this->getHypothesisId());
+        }
+        if ($this->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
+            return BusinessModel::findOne($this->getHypothesisId());
+        }
+
+        return null;
     }
 
 
@@ -254,7 +332,98 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             return str_replace($projectName_search, $projectName_replace, $defaultPattern);
         }
 
+        if (in_array($this->getType(), [
+            CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+        ], true)) {
+            $userName_search = '{{проектант}}';
+            $linkStageProject_search = '{{наименование этапа проекта, ссылка на этап проекта}}';
+            $userName_replace = $this->user->getUsername();
+            $linkStageProject_replace = '';
+            $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_USER_ALLOWED_STAGE_EXPERTISE;
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::SEGMENT) . ': ' . $this->hypothesis->getName(), ['/segments/index', 'id' => $this->getProjectId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_SEGMENT) . ': ' . $this->hypothesis->hypothesis->getName(), ['/confirm-segment/view', 'id' => $this->getHypothesisId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::PROBLEM) . ': ' . $this->hypothesis->getTitle(), ['/problems/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_PROBLEM) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-problem/view', 'id' => $this->getHypothesisId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::GCP) . ': ' . $this->hypothesis->getTitle(), ['/gcps/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_GCP) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-gcp/view', 'id' => $this->getHypothesisId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::MVP) . ': ' . $this->hypothesis->getTitle(), ['/mvps/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_MVP) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-mvp/view', 'id' => $this->getHypothesisId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::BUSINESS_MODEL) . ': ' . $this->hypothesis->mvp->getTitle(), ['/business-model/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            return str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern)));
+        }
+
         return '';
+    }
+
+
+    /**
+     * Получить название этапа экспертизы проекта
+     *
+     * @param int $stage
+     * @return string
+     */
+    private function getStage(int $stage): string
+    {
+        switch ($stage) {
+            case StageExpertise::PROJECT:
+                return 'описание проекта';
+            case StageExpertise::SEGMENT:
+                return 'генерация гипотезы целевого сегмента';
+            case StageExpertise::CONFIRM_SEGMENT:
+                return 'подтверждение гипотезы целевого сегмента';
+            case StageExpertise::PROBLEM:
+                return 'генерация гипотезы проблемы сегмента';
+            case StageExpertise::CONFIRM_PROBLEM:
+                return 'подтверждение гипотезы проблемы сегмента';
+            case StageExpertise::GCP:
+                return 'разработка гипотезы ценностного предложения';
+            case StageExpertise::CONFIRM_GCP:
+                return 'подтверждение гипотезы ценностного предложения';
+            case StageExpertise::MVP:
+                return 'разработка MVP';
+            case StageExpertise::CONFIRM_MVP:
+                return 'подтверждение MVP';
+            case StageExpertise::BUSINESS_MODEL:
+                return 'генерация бизнес-модели';
+            default:
+                return '';
+        }
     }
 
 
@@ -430,7 +599,19 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
 
         /** @var self $lastCommunication */
         $lastCommunication = $communications->orderBy('id DESC')->one();
-        if ($lastCommunication->getType() === CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT) {
+        if (in_array($lastCommunication->getType(), [
+            CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
+            CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+        ], true)) {
             return true;
         }
         return false;
@@ -486,13 +667,15 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param int $adressee_id
      * @param int $project_id
      * @param int $type
+     * @param int|null $hypothesisId
      */
-    public function setParams(int $adressee_id, int $project_id, int $type): void
+    public function setParams(int $adressee_id, int $project_id, int $type, int $hypothesisId = null): void
     {
         $this->setSenderId(Yii::$app->user->getId());
         $this->setAdresseeId($adressee_id);
         $this->setProjectId($project_id);
         $this->setType($type);
+        $this->setHypothesisId($hypothesisId);
 
         $pattern = CommunicationPatterns::findOne([
             'communication_type' => $type,
@@ -503,6 +686,49 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
         if ($pattern) {
             $this->setPatternId($pattern->getId());
         }
+    }
+
+
+    /**
+     * Получить ids экспертов назначенных на проект
+     *
+     * @param int $projectId
+     * @return array
+     */
+    public static function getExpertIdsByProjectId(int $projectId): array
+    {
+        $lastCommunicationExperts = self::find()
+            ->where(['project_id' => $projectId])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        $expertIds = [];
+        $adresseeIds = [];
+        if (count($lastCommunicationExperts) > 0) {
+            foreach ($lastCommunicationExperts as $communicationExpert) {
+                /** @var self $communicationExpert */
+                if (!in_array($communicationExpert->getAdresseeId(), $adresseeIds, true)) {
+                    $adresseeIds[] = $communicationExpert->getAdresseeId();
+                    if (in_array($communicationExpert->getType(), [
+                        CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
+                        CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+                        CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+                    ], true)) {
+                        $expertIds[] = $communicationExpert->getAdresseeId();
+                    }
+                }
+            }
+        }
+
+        return $expertIds;
     }
 
 
@@ -692,6 +918,22 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public function getUpdatedAt(): int
     {
         return $this->updated_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getHypothesisId(): ?int
+    {
+        return $this->hypothesis_id;
+    }
+
+    /**
+     * @param int|null $hypothesis_id
+     */
+    public function setHypothesisId(?int $hypothesis_id): void
+    {
+        $this->hypothesis_id = $hypothesis_id;
     }
 
 

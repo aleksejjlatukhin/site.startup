@@ -599,14 +599,12 @@ class ConfirmProblemController extends AppUserPartController
 
         if ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) {
             return $this->redirect(['/problems/index', 'id' => $confirmSegment->getId()]);
-
         }
 
         $problem->setExistConfirm(StatusConfirmHypothesis::NOT_COMPLETED);
         $problem->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($problem->update() && $model->update()){
+        if ($model->allowExpertise($problem)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);
@@ -633,9 +631,8 @@ class ConfirmProblemController extends AppUserPartController
 
         $problem->setExistConfirm(StatusConfirmHypothesis::COMPLETED);
         $problem->setTimeConfirm();
-        $model->setEnableExpertise();
 
-        if ($problem->update() && $model->update()){
+        if ($model->allowExpertise($problem)){
 
             $cacheManager->deleteCache($cachePath); // Удаление дирректории для кэша подтверждения
             $problem->trigger(Problems::EVENT_CLICK_BUTTON_CONFIRM);

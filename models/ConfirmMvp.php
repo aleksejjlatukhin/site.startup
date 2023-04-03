@@ -3,8 +3,10 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 /**
  * Класс, который хранит объекты подтверждений mvp-продуктов в бд
@@ -17,6 +19,7 @@ use yii\db\ActiveRecord;
  * @property int $count_respond                         Количество респондентов
  * @property int $count_positive                        Количество респондентов, подтверждающих mvp-продукт
  * @property string $enable_expertise                   Параметр разрешения на экспертизу по даному этапу
+ * @property int|null $enable_expertise_at              Дата разрешения на экспертизу по даному этапу
  *
  * @property Mvps $mvp                                  Mvp-продукт
  * @property RespondsMvp[] $responds                    Респонденты, привязанные к подтверждению
@@ -290,6 +293,58 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/confirm';
     }
 
+
+    /**
+     * Разрешение эксертизы и отправка уведомлений
+     * эксперту и трекеру (если на проект назначен экперт)
+     *
+     * @param Mvps $mvp
+     * @return bool
+     * @throws StaleObjectException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
+    public function allowExpertise(Mvps $mvp): bool
+    {
+        $project = $this->hypothesis->project;
+        $user = $project->user;
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($expertIds = ProjectCommunications::getExpertIdsByProjectId($project->getId())) {
+
+            $communicationIds = [];
+            foreach ($expertIds as $i => $expertId) {
+                $communication = new ProjectCommunications();
+                $communication->setParams($expertId, $project->getId(), CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE, $this->getId());
+                if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
+                    $communicationIds[] = $communication->getId();
+                } elseif ($communication->save()) {
+                    $communicationIds[] = $communication->getId();
+                }
+            }
+
+            if (count($communicationIds) === count($expertIds)) {
+                $this->setEnableExpertise();
+                if ($this->update() && $mvp->update()) {
+                    $transaction->commit();
+                    return true;
+                }
+            }
+
+            $transaction->rollBack();
+            return false;
+        }
+
+        $this->setEnableExpertise();
+        if ($this->update() && $mvp->update()) {
+            $transaction->commit();
+            return true;
+        }
+
+        $transaction->rollBack();
+        return false;
+    }
+
+
     /**
      * @return int
      */
@@ -360,5 +415,22 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function setEnableExpertise(): void
     {
         $this->enable_expertise = EnableExpertise::ON;
+        $this->setEnableExpertiseAt(time());
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEnableExpertiseAt(): ?int
+    {
+        return $this->enable_expertise_at;
+    }
+
+    /**
+     * @param int $enable_expertise_at
+     */
+    public function setEnableExpertiseAt(int $enable_expertise_at): void
+    {
+        $this->enable_expertise_at = $enable_expertise_at;
     }
 }
