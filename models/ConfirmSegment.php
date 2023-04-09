@@ -327,6 +327,10 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
      */
     public function allowExpertise(Segments $segment): bool
     {
+        if ($this->getEnableExpertise() === EnableExpertise::ON) {
+            return true;
+        }
+
         $project = $this->hypothesis->project;
         $user = $project->user;
         $transaction = Yii::$app->db->beginTransaction();
@@ -338,8 +342,10 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
                 $communication->setParams($expertId, $project->getId(), CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE, $this->getId());
                 if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
                     $communicationIds[] = $communication->getId();
+                    SendingCommunicationsToEmail::allowExpertiseToStageProject($communication, true);
                 } elseif ($communication->save()) {
                     $communicationIds[] = $communication->getId();
+                    SendingCommunicationsToEmail::allowExpertiseToStageProject($communication);
                 }
             }
 

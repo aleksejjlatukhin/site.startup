@@ -193,6 +193,10 @@ class BusinessModel extends ActiveRecord
      */
     public function allowExpertise(): bool
     {
+        if ($this->getEnableExpertise() === EnableExpertise::ON) {
+            return true;
+        }
+
         $user = $this->project->user;
         if ($expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getProjectId())) {
             $transaction = Yii::$app->db->beginTransaction();
@@ -203,8 +207,10 @@ class BusinessModel extends ActiveRecord
                 $communication->setParams($expertId, $this->getProjectId(), CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE, $this->getId());
                 if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE)) {
                     $communicationIds[] = $communication->getId();
+                    SendingCommunicationsToEmail::allowExpertiseToStageProject($communication, true);
                 } elseif ($communication->save()) {
                     $communicationIds[] = $communication->getId();
+                    SendingCommunicationsToEmail::allowExpertiseToStageProject($communication);
                 }
             }
 

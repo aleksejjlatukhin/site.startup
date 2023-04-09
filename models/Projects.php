@@ -464,6 +464,10 @@ class Projects extends ActiveRecord
      */
     public function allowExpertise(): bool
     {
+        if ($this->getEnableExpertise() === EnableExpertise::ON) {
+            return true;
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         $user = $this->user;
         $communication = new ProjectCommunications();
@@ -472,36 +476,12 @@ class Projects extends ActiveRecord
             $transaction->commit();
             $this->setEnableExpertise();
             if($this->update()) {
-                //$this->sendCommunicationToEmail($communication);
+                SendingCommunicationsToEmail::allowExpertiseToProject($communication);
                 return true;
             }
         }
 
         $transaction->rollBack();
-        return false;
-    }
-
-
-    /**
-     * Отправка письма с уведомлением о разрешении экпертизы
-     * по проекту на почту админу организации
-     *
-     * @param ProjectCommunications $communication
-     * @return bool
-     */
-    private function sendCommunicationToEmail(ProjectCommunications $communication): bool
-    {
-        /* @var $user User */
-        $user = User::findOne($communication->getAdresseeId());
-
-        if ($user) {
-            return Yii::$app->mailer->compose('communications__FromUserToMainAdmin', ['communication' => $communication])
-                ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
-                ->setTo($user->getEmail())
-                ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
-                ->send();
-        }
-
         return false;
     }
 

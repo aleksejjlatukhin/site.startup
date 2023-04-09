@@ -130,7 +130,16 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
             CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
             CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
-            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT
+            CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT,
+            CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE
         ], true)) {
             return User::findOne($this->getAdresseeId());
         }
@@ -398,7 +407,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      * @param int $stage
      * @return string
      */
-    private function getStage(int $stage): string
+    public function getStage(int $stage): string
     {
         switch ($stage) {
             case StageExpertise::PROJECT:
