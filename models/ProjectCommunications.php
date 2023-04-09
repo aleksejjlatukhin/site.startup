@@ -720,7 +720,6 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
                     $adresseeIds[] = $communicationExpert->getAdresseeId();
                     if (in_array($communicationExpert->getType(), [
                         CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
-                        CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,
                         CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE,
                         CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE,
                         CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE,
