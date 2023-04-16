@@ -7,6 +7,7 @@ use app\models\PatternHttpException;
 use app\models\Projects;
 use app\models\SortForm;
 use app\models\User;
+use app\modules\admin\models\form\SearchForm;
 use Yii;
 use yii\data\Pagination;
 use yii\web\BadRequestHttpException;
@@ -58,6 +59,7 @@ class ProjectsController extends AppClientController
     public function actionIndex(): string
     {
         $sortModel = new SortForm();
+        $searchModel = new SearchForm();
         $show_count_projects = [
             10 => 'по 10 проектов',
             20 => 'по 20 проектов',
@@ -66,6 +68,7 @@ class ProjectsController extends AppClientController
 
         return $this->render('index', [
             'sortModel' => $sortModel,
+            'searchModel' => $searchModel,
             'show_count_projects' => $show_count_projects,
         ]);
     }
@@ -83,6 +86,7 @@ class ProjectsController extends AppClientController
         $tracker = User::findOne($id);
         Yii::$app->view->title = 'Портфель проектов трекера «' . $tracker->getUsername(). '»';
         $sortModel = new SortForm();
+        $searchModel = new SearchForm();
         $show_count_projects = [
             10 => 'по 10 проектов',
             20 => 'по 20 проектов',
@@ -91,6 +95,7 @@ class ProjectsController extends AppClientController
 
         return $this->render('index', [
             'sortModel' => $sortModel,
+            'searchModel' => $searchModel,
             'show_count_projects' => $show_count_projects,
         ]);
     }
@@ -102,9 +107,10 @@ class ProjectsController extends AppClientController
      * @param int|string $id
      * @param int $page
      * @param int $per_page
+     * @param string $search
      * @return array|bool
      */
-    public function actionGetResultProjects($id, int $page, int $per_page)
+    public function actionGetResultProjects($id, int $page, int $per_page, string $search = '')
     {
         if(Yii::$app->request->isAjax) {
 
@@ -116,8 +122,7 @@ class ProjectsController extends AppClientController
                 $query = Projects::find()->with('user')
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                    ->where(['client_user.client_id' => $client->getId()])
-                    ->orderBy(['id' => SORT_DESC]);
+                    ->where(['client_user.client_id' => $client->getId()]);
 
             } else {
                 // вывести проекты, которые курирует трекер
@@ -126,6 +131,14 @@ class ProjectsController extends AppClientController
                     ->where(['user.id_admin' => $id])->orderBy(['id' => SORT_DESC]);
             }
 
+            if ($search !== '') {
+                $query ->andWhere(['or',
+                    ['like', 'project_name', trim($search)],
+                    ['like', 'project_fullname', trim($search)]
+                ]);
+            }
+
+            $query->orderBy(['id' => SORT_DESC]);
             $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $per_page]);
             $pages->pageSizeParam = false; //убираем параметр $per-page
             $projects = $query->offset($pages->offset)->limit($per_page)->all();

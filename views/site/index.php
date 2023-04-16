@@ -36,6 +36,7 @@ $this->title = 'Главная';
 
                 <div>
                     <div class="bottom_title_main_page">Customer Development<br><span>ШАГ</span> ЗА <span>ШАГОМ</span></div>
+                    <div class="mt-15 text-center">Для преакселерации и акселерации<br>стартап проектов</div>
                 </div>
 
             </div>
@@ -249,6 +250,8 @@ $this->title = 'Главная';
                 <div>
                     <div class="bottom_title_main_page">Customer Development <span>ШАГ</span> ЗА <span>ШАГОМ</span></div>
                 </div>
+
+                <div class="bottom_text_main_page">Для преакселерации и акселерации стартап проектов</div>
 
             </div>
 

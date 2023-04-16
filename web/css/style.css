@@ -1191,6 +1191,7 @@ div.style_form_field_questions {
     }
     .content_main_page_block_text_mobile > div {
         display:flex;
+        flex-direction: column;
         width: 100%;
         margin: 0 auto;
         justify-content: center;
@@ -1359,6 +1360,9 @@ div.style_form_field_questions {
         width: 100%;
         margin: 0 auto;
         justify-content: center;
+    }
+    .content_main_page_block_text_desktop .bottom_text_main_page {
+        margin-top: 15px;
     }
     .content_main_page_block_text_desktop > div > .top_title_main_page {
         font-size: 52px;

@@ -25,9 +25,6 @@ $(document).ready(function() {
         success: function(response){
 
             $('.allContainersDataOfTableResultProject').html(response.renderAjax);
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -47,12 +44,29 @@ $(body).change('#field_count_projects', function(){
         success: function(response){
 
             $('.allContainersDataOfTableResultProject').html(response.renderAjax);
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 });
+
+
+//Поиск проектов по назаванию и полному названию проекта
+$(body).on('input', '#search_project_name', function(){
+
+    var search = $('body').find('#search_project_name').val();
+    var count_projects = $('body').find('#field_count_projects').val();
+
+    $.ajax({
+
+        url: '/' + module + '/projects/get-result-projects?id=' + id + '&page=1&per_page=' + count_projects + '&search=' + search,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.allContainersDataOfTableResultProject').html(response.renderAjax);
+        }
+    });
+});
+
 
 //Постраничная навигация
 $(body).on('click', '.pagination-admin-projects-result .admin-projects-result-pagin-list li a', function(e){
@@ -68,9 +82,6 @@ $(body).on('click', '.pagination-admin-projects-result .admin-projects-result-pa
 
             $('.allContainersDataOfTableResultProject').html(response.renderAjax);
             simpleBar.getScrollElement().scrollBy({top: $('.select_count_projects').offset().top, behavior: 'smooth'});
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 

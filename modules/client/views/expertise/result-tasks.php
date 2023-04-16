@@ -54,14 +54,14 @@ $this->registerCssFile('@web/css/expertise-result-tasks-style.css');
                     if ($lastCommunication_mainAdminAsks) {
                         $date = $project->getTargetDateAskExpert();
                         if ($lastCommunication_mainAdminAsks->getCreatedAt() > $date) {
-                            echo '<span class="color-red bolder">' . date('d.m.Y', $lastCommunication_mainAdminAsks->getCreatedAt()) . '</span>';
+                            echo '<span class="bolder">' . date('d.m.Y', $lastCommunication_mainAdminAsks->getCreatedAt()) . '</span><span class="color-red bolder"> ! </span>';
                         } else {
                             echo '<span class="color-green bolder">' . date('d.m.Y', $lastCommunication_mainAdminAsks->getCreatedAt()) . '</span>';
                         }
                     } elseif ($project->getEnableExpertiseAt()) {
                         $date = $project->getTargetDateAskExpert();
                         if (time() > $date) {
-                            echo '<span class="bolder">' . date('d.m.Y', $date) . '</span><span class="color-red bolder"> ! </span>';
+                            echo '<span class="color-red bolder">' . date('d.m.Y', $date) . '</span>';
                         } else {
                             echo '<span class="bolder">' . date('d.m.Y', $date) . '</span>';
                         }
@@ -77,13 +77,13 @@ $this->registerCssFile('@web/css/expertise-result-tasks-style.css');
                             if (!$isExpiredAccess) {
                                 echo '<span class="color-green bolder">' . date('d.m.Y', $userAccessToProject->getDateStop()) . '</span>';
                             } else {
-                                echo '<span class="color-red bolder">' . date('d.m.Y', $userAccessToProject->getDateStop()) . '</span>';
+                                echo '<span class="bolder">' . date('d.m.Y', $userAccessToProject->getDateStop()) . '</span><span class="color-red bolder"> ! </span>';
                             }
                         }
                         else {
                             $date = $userAccessToProject->getDateStop();
                             if (time() > $date) {
-                                echo '<span class="bolder">' . date('d.m.Y', $date) . '</span><span class="color-red bolder"> ! </span>';
+                                echo '<span class="color-red bolder">' . date('d.m.Y', $date) . '</span>';
                             } else {
                                 echo '<span class="bolder">' . date('d.m.Y', $date) . '</span>';
                             }
@@ -96,13 +96,13 @@ $this->registerCssFile('@web/css/expertise-result-tasks-style.css');
                         $date = $project->getTargetDateAppointExpert();
                         if ($lastCommunication_mainAdminAppoints) {
                             if ($lastCommunication_mainAdminAppoints->getCreatedAt() > $date) {
-                                echo '<span class="color-red bolder">' . date('d.m.Y', $lastCommunication_mainAdminAppoints->getCreatedAt()) . '</span>';
+                                echo '<span class="bolder">' . date('d.m.Y', $lastCommunication_mainAdminAppoints->getCreatedAt()) . '</span><span class="color-red bolder"> ! </span>';
                             } else {
                                 echo '<span class="color-green bolder">' . date('d.m.Y', $lastCommunication_mainAdminAppoints->getCreatedAt()) . '</span>';
                             }
                         } elseif ($project->getEnableExpertiseAt()) {
                             if (time() > $date) {
-                                echo '<span class="bolder">' . date('d.m.Y', $date) . '</span><span class="color-red bolder"> ! </span>';
+                                echo '<span class="color-red bolder">' . date('d.m.Y', $date) . '</span>';
                             } else {
                                 echo '<span class="bolder">' . date('d.m.Y', $date) . '</span>';
                             }
@@ -110,7 +110,7 @@ $this->registerCssFile('@web/css/expertise-result-tasks-style.css');
                     } elseif ($project->getEnableExpertiseAt()) {
                         $date = $project->getTargetDateAppointExpert();
                         if (time() > $date) {
-                            echo '<span class="bolder">' . date('d.m.Y', $date) . '</span><span class="color-red bolder"> ! </span>';
+                            echo '<span class="color-red bolder">' . date('d.m.Y', $date) . '</span>';
                         } else {
                             echo '<span class="bolder">' . date('d.m.Y', $date) . '</span>';
                         }
