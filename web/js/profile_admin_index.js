@@ -92,10 +92,10 @@ $(body).on('beforeSubmit', '#form_change_password_user', function(e){
             }
 
             if (response.success) {
-                // Скрыть форму изменения пароля и показать просмотр профиля
-                $('#show_form_view_data').trigger('click');
                 // Очистить форму после сохранения
                 $('#form_change_password_user')[0].reset();
+                // Скрыть форму изменения пароля и показать просмотр профиля
+                $('.show_form_update_profile').trigger('click');
             }
 
         }, error: function(){

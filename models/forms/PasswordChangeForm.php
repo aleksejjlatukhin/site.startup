@@ -73,9 +73,8 @@ class PasswordChangeForm extends Model
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function validatePassword(string $attribute, array $params): void
+    public function validatePassword(string $attribute): void
     {
         if (!$this->hasErrors() && !$this->getUser()->validatePassword($this->$attribute)) {
             $this->addError($attribute, 'Ошибка! Неверный текущий пароль.');
