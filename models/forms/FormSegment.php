@@ -513,7 +513,7 @@ abstract class FormSegment extends Model
      */
     public function getUseWishList(): int
     {
-        return $this->use_wish_list;
+        return $this->use_wish_list ?: Segments::NOT_USE_WISH_LIST;
     }
 
     /**

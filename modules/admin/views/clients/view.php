@@ -100,33 +100,33 @@ use yii\widgets\ActiveForm;
                     <div><?= $accessAdmin ?></div>
                 </div>
 
-                <div class="col-lg-12 mt-15 block_wishListChangeAccess">
-                    <div class="bolder pl-10 mb-5" style="display:flex; align-items: center;">Доступ к спискам запросов B2B компаний:
-                        <?= Html::button('Изменить', [
-                            'class' => 'btn btn-default changeAccessWishList',
-                            'style' => [
-                                'display' => 'flex',
-                                'align-items' => 'center',
-                                'justify-content' => 'center',
-                                'color' => '#FFFFFF',
-                                'background' => '#52BE7F',
-                                'width' => '120px',
-                                'height' => '40px',
-                                'font-size' => '18px',
-                                'border-radius' => '8px',
-                                'margin-left' => '10px'
-                            ]
-                        ])?>
-                    </div>
-                    <div>
-                        <span class="pl-10">Организация получила доступ к общим спискам запросов B2B компаний:</span>
-                        <span class="pl-5"><?php $accessGeneralWishList = $client->isAccessGeneralWishList() ? 'Да' : 'Нет' ?><?= $accessGeneralWishList ?></span>
-                    </div>
-                    <div>
-                        <span class="pl-10">Организация разрешает доступ к своим спискам запросов B2B компаний:</span>
-                        <span class="pl-5"><?php $accessMyWishList = $client->isAccessMyWishList() ? 'Да' : 'Нет' ?><?= $accessMyWishList ?></span>
-                    </div>
-                </div>
+<!--                <div class="col-lg-12 mt-15 block_wishListChangeAccess">-->
+<!--                    <div class="bolder pl-10 mb-5" style="display:flex; align-items: center;">Доступ к спискам запросов B2B компаний:-->
+<!--                        --><?//= Html::button('Изменить', [
+//                            'class' => 'btn btn-default changeAccessWishList',
+//                            'style' => [
+//                                'display' => 'flex',
+//                                'align-items' => 'center',
+//                                'justify-content' => 'center',
+//                                'color' => '#FFFFFF',
+//                                'background' => '#52BE7F',
+//                                'width' => '120px',
+//                                'height' => '40px',
+//                                'font-size' => '18px',
+//                                'border-radius' => '8px',
+//                                'margin-left' => '10px'
+//                            ]
+//                        ])?>
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <span class="pl-10">Организация получила доступ к общим спискам запросов B2B компаний:</span>-->
+<!--                        <span class="pl-5">--><?php //$accessGeneralWishList = $client->isAccessGeneralWishList() ? 'Да' : 'Нет' ?><!----><?//= $accessGeneralWishList ?><!--</span>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <span class="pl-10">Организация разрешает доступ к своим спискам запросов B2B компаний:</span>-->
+<!--                        <span class="pl-5">--><?php //$accessMyWishList = $client->isAccessMyWishList() ? 'Да' : 'Нет' ?><!----><?//= $accessMyWishList ?><!--</span>-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div class="col-lg-12 mt-15 pl-20 block_wishListChangeAccessForm" style="display: none;">
                     <?php $form = ActiveForm::begin([

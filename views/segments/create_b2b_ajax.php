@@ -12,12 +12,12 @@ use app\models\Segments;
 
 ?>
 
-<div class="row desktop-mb-15 desktop-mt-25">
-    <?= $form->field($model, 'use_wish_list', [
-        'template' => '<div class="col-md-12 pl-20">{label}{input}</div>'
-    ])->checkbox(['value' => true, 'id' => 'use_wish_list'])
-    ?>
-</div>
+<!--<div class="row desktop-mb-15 desktop-mt-25">-->
+<!--    --><?//= $form->field($model, 'use_wish_list', [
+//        'template' => '<div class="col-md-12 pl-20">{label}{input}</div>'
+//    ])->checkbox(['value' => true, 'id' => 'use_wish_list'])
+//    ?>
+<!--</div>-->
 
 <?php if ($model->getUseWishList() === Segments::NOT_USE_WISH_LIST): ?>
 
