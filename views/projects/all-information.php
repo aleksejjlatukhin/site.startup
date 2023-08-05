@@ -1,5 +1,6 @@
 <?php
 
+use app\models\PreFiles;
 use app\models\Projects;
 use yii\helpers\Html;
 
@@ -27,12 +28,24 @@ $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $proje
 ?>
 
 <div class="block_export_link_hypothesis">
-    <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
-        '/projects/mpdf-project', 'id' => $project->getId()], [
-        'class' => 'export_link_hypothesis',
-        'target' => '_blank',
-        'title' => 'Скачать в pdf',
-    ]) ?>
+
+    <?php if (!$project->getDeletedAt()): ?>
+
+        <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+            '/projects/mpdf-project', 'id' => $project->getId()], [
+            'class' => 'export_link_hypothesis',
+            'target' => '_blank',
+            'title' => 'Скачать в pdf',
+        ]) ?>
+
+    <?php else: ?>
+
+        <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . '</div>', ['#'], [
+            'class' => 'export_link_hypothesis', 'style' => ['cursor' => 'default'], 'onclick' => 'return false;'
+        ]) ?>
+
+    <?php endif; ?>
+
 </div>
 
 <?php
@@ -81,8 +94,13 @@ $string .= '<div class="panel panel-default"><div class="panel-heading" style="f
 
 $string .= '<div style="margin-bottom: 20px;">';
 
-if (!empty($project->preFiles)) {
-    foreach ($project->preFiles as $file) {
+/** @var $preFiles PreFiles[] */
+$preFiles = PreFiles::find(false)
+    ->andWhere(['project_id' => $project->getId()])
+    ->all();
+
+if (count($preFiles) > 0) {
+    foreach ($preFiles as $file) {
         $filename = $file->getFileName();
         if (mb_strlen($filename) > 35) {
             $filename = mb_substr($file->getFileName(), 0, 35) . '...';

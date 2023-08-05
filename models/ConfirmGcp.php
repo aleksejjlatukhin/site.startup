@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
+use app\models\traits\SoftDeleteModelTrait;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -20,6 +21,7 @@ use yii\db\StaleObjectException;
  * @property int $count_positive                        Количество респондентов, подтверждающих ценностное предложение
  * @property string $enable_expertise                   Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at              Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                       Дата удаления
  *
  * @property Gcps $gcp                                  Ценностное предложение
  * @property RespondsGcp[] $responds                    Респонденты, привязанные к подтверждению
@@ -29,6 +31,7 @@ use yii\db\StaleObjectException;
  */
 class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
 {
+    use SoftDeleteModelTrait;
 
     public const STAGE = 6;
     public const LIMIT_COUNT_RESPOND = 100;
@@ -190,7 +193,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         $defaultQuestions = AllQuestionsConfirmGcp::defaultListQuestions();
         // Вопросы, которые когда-либо добавлял пользователь на данном этапе
         $attachQuestions = AllQuestionsConfirmGcp::find()
-            ->where(['user_id' => $user->getId()])
+            ->andWhere(['user_id' => $user->getId()])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
@@ -227,11 +230,11 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     {
         $count_interview = (int)RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         $count_positive = (int)RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 
         if ($this->mvps || (count($this->responds) === $count_interview && $this->getCountPositive() <= $count_positive)) {
             return true;
@@ -247,7 +250,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        return RespondsGcp::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
+        return RespondsGcp::find()->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
     }
 
@@ -260,7 +263,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         // Кол-во респондентов, у кот-х существует анкета
         return RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
     }
 
 
@@ -272,7 +275,7 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
         // Кол-во подтвердивших ЦП
         return RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_gcp.status' => '1'])->count();
     }
 
 
@@ -437,5 +440,21 @@ class ConfirmGcp extends ActiveRecord implements ConfirmationInterface
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

@@ -54,13 +54,24 @@ class BusinessModelController extends AppUserPartController
 
         if ($action->id === 'index'){
 
-            $confirmMvp = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
+            /** @var $confirmMvp ConfirmMvp */
+            $confirmMvp = ConfirmMvp::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
             if (!$confirmMvp) {
                 PatternHttpException::noData();
             }
 
-            $mvp = Mvps::findOne($confirmMvp->getMvpId());
-            $project = $mvp->project;
+            /** @var $mvp Mvps */
+            $mvp = Mvps::find(false)
+                ->andWhere(['id' => $confirmMvp->getMvpId()])
+                ->one();
+
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $mvp->getProjectId()])
+                ->one();
 
             if (($project->getUserId() === $currentUser->getId())){
                 return parent::beforeAction($action);
@@ -238,20 +249,59 @@ class BusinessModelController extends AppUserPartController
      */
     public function actionIndex (int $id)
     {
-        $model = BusinessModel::findOne(['basic_confirm_id' => $id]);
+        /** @var $model BusinessModel */
+        $model = BusinessModel::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->one();
+
         if (!$model) {
             return $this->redirect(['/business-model/instruction', 'id' => $id]);
         }
 
-        $confirmMvp = ConfirmMvp::findOne($id);
-        $mvp = Mvps::findOne($confirmMvp->getMvpId());
-        $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
-        $gcp = Gcps::findOne($confirmGcp->getGcpId());
-        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
-        $problem = Problems::findOne($confirmProblem->getProblemId());
-        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
-        $segment = Segments::findOne($confirmSegment->getSegmentId());
-        $project = Projects::findOne($segment->getProjectId());
+        /** @var $confirmMvp ConfirmMvp */
+        $confirmMvp = ConfirmMvp::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $mvp Mvps */
+        $mvp = Mvps::find(false)
+            ->andWhere(['id' => $confirmMvp->getMvpId()])
+            ->one();
+
+        /** @var $confirmGcp ConfirmGcp */
+        $confirmGcp = ConfirmGcp::find(false)
+            ->andWhere(['id' => $mvp->getConfirmGcpId()])
+            ->one();
+
+        /** @var $gcp Gcps */
+        $gcp = Gcps::find(false)
+            ->andWhere(['id' => $confirmGcp->getGcpId()])
+            ->one();
+
+        /** @var $confirmProblem ConfirmProblem */
+        $confirmProblem = ConfirmProblem::find(false)
+            ->andWhere(['id' => $gcp->getConfirmProblemId()])
+            ->one();
+
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $confirmProblem->getProblemId()])
+            ->one();
+
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $problem->getConfirmSegmentId()])
+            ->one();
+
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
 
         return $this->render('index', [
             'model' => $model,

@@ -109,47 +109,47 @@ class RespondsController extends AppUserPartController
 
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
 
-            $count_models = RespondsSegment::find()->where(['confirm_id' => $id])->count();
+            $count_models = RespondsSegment::find()->andWhere(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsSegment::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsSegment::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
             $count_exist_data_descInterview = RespondsSegment::find()->with('interview')
                 ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
+                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
         } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
 
-            $count_models = RespondsProblem::find()->where(['confirm_id' => $id])->count();
+            $count_models = RespondsProblem::find()->andWhere(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsProblem::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsProblem::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
             $count_exist_data_descInterview = RespondsProblem::find()->with('interview')
                 ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
 
-            $count_models = RespondsGcp::find()->where(['confirm_id' => $id])->count();
+            $count_models = RespondsGcp::find()->andWhere(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsGcp::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsGcp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
             $count_exist_data_descInterview = RespondsGcp::find()->with('interview')
                 ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
 
         } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
 
-            $count_models = RespondsMvp::find()->where(['confirm_id' => $id])->count();
+            $count_models = RespondsMvp::find()->andWhere(['confirm_id' => $id])->count();
 
-            $count_exist_data_respond = RespondsMvp::find()->where(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+            $count_exist_data_respond = RespondsMvp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
                 ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
 
             $count_exist_data_descInterview = RespondsMvp::find()->with('interview')
                 ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-                ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
         }
 
 
@@ -318,16 +318,17 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return array|bool
      */
-    public function actionGetDataUpdateForm(int $stage, int $id)
+    public function actionGetDataUpdateForm(int $stage, int $id, bool $isOnlyNotDelete = true)
     {
-        $model = self::getUpdateModel($stage, $id);
-        $confirm = $model->findConfirm();
+        $model = self::getUpdateModel($stage, $id, $isOnlyNotDelete);
+        $confirm = $model->findConfirm($isOnlyNotDelete);
 
         if(Yii::$app->request->isAjax) {
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'confirm' => $confirm])];
+            $response = ['renderAjax' => $this->renderAjax('update', ['model' => $model, 'confirm' => $confirm, 'isOnlyNotDelete' => $isOnlyNotDelete])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -396,12 +397,13 @@ class RespondsController extends AppUserPartController
      * @param int $id
      * @param string $search
      * @param bool $isMobile
+     * @param bool $isOnlyNotDelete
      * @return array|bool
      */
-    public function actionGetQueryResponds(int $stage, int $id, string $search = '', bool $isMobile = false)
+    public function actionGetQueryResponds(int $stage, int $id, string $search = '', bool $isMobile = false, bool $isOnlyNotDelete = true)
     {
-        $confirm = self::getConfirm($stage, $id);
-        $queryResponds = self::getQueryModels($stage, $id, $search);
+        $confirm = self::getConfirm($stage, $id, $isOnlyNotDelete);
+        $queryResponds = self::getQueryModels($stage, $id, $search, $isOnlyNotDelete);
         $responds = $queryResponds->all();
 
         if(Yii::$app->request->isAjax) {
@@ -410,19 +412,19 @@ class RespondsController extends AppUserPartController
 
             if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmSegment', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmProblem', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmGcp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmMvp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
             }
 
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -522,32 +524,49 @@ class RespondsController extends AppUserPartController
      * @param int $stage
      * @param int $id
      * @param string $search
+     * @param bool $isOnlyNotDelete
      * @return bool|ActiveQuery
      */
-    private static function getQueryModels(int $stage, int $id, string $search)
+    private static function getQueryModels(int $stage, int $id, string $search, bool $isOnlyNotDelete = true)
     {
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return RespondsSegment::find()
-                ->where(['confirm_id' => $id])
-                ->andWhere(['like', 'name', $search]);
+            return $isOnlyNotDelete ?
+                RespondsSegment::find()
+                ->andWhere(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]) :
+                RespondsSegment::find(false)
+                    ->andWhere(['confirm_id' => $id])
+                    ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return RespondsProblem::find()
-                ->where(['confirm_id' => $id])
-                ->andWhere(['like', 'name', $search]);
+            return $isOnlyNotDelete ?
+                RespondsProblem::find()
+                ->andWhere(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]) :
+                RespondsProblem::find(false)
+                    ->andWhere(['confirm_id' => $id])
+                    ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-            return RespondsGcp::find()
-                ->where(['confirm_id' => $id])
-                ->andWhere(['like', 'name', $search]);
+            return $isOnlyNotDelete ?
+                RespondsGcp::find()
+                ->andWhere(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]) :
+                RespondsGcp::find(false)
+                    ->andWhere(['confirm_id' => $id])
+                    ->andWhere(['like', 'name', $search]);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-            return RespondsMvp::find()
-                ->where(['confirm_id' => $id])
-                ->andWhere(['like', 'name', $search]);
+            return $isOnlyNotDelete ?
+                RespondsMvp::find()
+                ->andWhere(['confirm_id' => $id])
+                ->andWhere(['like', 'name', $search]) :
+                RespondsMvp::find(false)
+                    ->andWhere(['confirm_id' => $id])
+                    ->andWhere(['like', 'name', $search]);
         }
         return false;
     }
@@ -608,24 +627,53 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return ConfirmGcp|ConfirmMvp|ConfirmProblem|ConfirmSegment|bool|null
      */
-    private static function getConfirm(int $stage, int $id)
+    private static function getConfirm(int $stage, int $id, bool $isOnlyNotDelete = true)
     {
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return ConfirmSegment::findOne($id);
+            /** @var ConfirmSegment $confirm */
+            $confirm = $isOnlyNotDelete ?
+                ConfirmSegment::findOne($id) :
+                ConfirmSegment::find(false)
+                    ->andWhere(['id' => $id])
+                    ->one();
+
+            return $confirm;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return ConfirmProblem::findOne($id);
+            /** @var ConfirmProblem $confirm */
+            $confirm = $isOnlyNotDelete ?
+                ConfirmProblem::findOne($id) :
+                ConfirmProblem::find(false)
+                    ->andWhere(['id' => $id])
+                    ->one();
+
+            return $confirm;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-            return ConfirmGcp::findOne($id);
+            /** @var ConfirmGcp $confirm */
+            $confirm = $isOnlyNotDelete ?
+                ConfirmGcp::findOne($id) :
+                ConfirmGcp::find(false)
+                    ->andWhere(['id' => $id])
+                    ->one();
+
+            return $confirm;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-            return ConfirmMvp::findOne($id);
+            /** @var ConfirmMvp $confirm */
+            $confirm = $isOnlyNotDelete ?
+                ConfirmMvp::findOne($id) :
+                ConfirmMvp::find(false)
+                    ->andWhere(['id' => $id])
+                    ->one();
+
+            return $confirm;
         }
         return false;
     }
@@ -685,24 +733,25 @@ class RespondsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return UpdateRespondProblemForm|UpdateRespondGcpForm|UpdateRespondMvpForm|UpdateRespondSegmentForm|bool
      */
-    private static function getUpdateModel(int $stage, int $id)
+    private static function getUpdateModel(int $stage, int $id, bool $isOnlyNotDelete = true)
     {
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return new UpdateRespondSegmentForm($id);
+            return new UpdateRespondSegmentForm($id, $isOnlyNotDelete);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return new UpdateRespondProblemForm($id);
+            return new UpdateRespondProblemForm($id, $isOnlyNotDelete);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-            return new UpdateRespondGcpForm($id);
+            return new UpdateRespondGcpForm($id, $isOnlyNotDelete);
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-            return new UpdateRespondMvpForm($id);
+            return new UpdateRespondMvpForm($id, $isOnlyNotDelete);
         }
         return false;
     }

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
+use app\models\traits\SoftDeleteModelTrait;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -23,6 +24,7 @@ use yii\db\StaleObjectException;
  * @property string $reason_interview               Причина и тема (что побудило) для проведения исследования
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                   Дата удаления
  *
  * @property Segments $segment                      Сегмент
  * @property QuestionsConfirmSegment[] $questions   Вопросы, привязанные к подтверждению
@@ -32,6 +34,7 @@ use yii\db\StaleObjectException;
  */
 class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 {
+    use SoftDeleteModelTrait;
 
     public const STAGE = 2;
     public const LIMIT_COUNT_RESPOND = 100;
@@ -207,7 +210,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         $defaultQuestions = AllQuestionsConfirmSegment::defaultListQuestions();
         // Вопросы, которые когда-либо добавлял пользователь на данном этапе
         $attachQuestions = AllQuestionsConfirmSegment::find()
-            ->where(['user_id' => $user->getId()])
+            ->andWhere(['user_id' => $user->getId()])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
@@ -246,11 +249,11 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
 
         $count_interview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
         $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])->count();
 
         if ($this->problems || (count($this->responds) === $count_interview && $this->getCountPositive() <= $count_positive)) {
             return true;
@@ -267,7 +270,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     {
         //Кол-во респондентов, у кот-х заполнены данные
         return RespondsSegment::find()
-            ->where(['confirm_id' => $this->getId()])
+            ->andWhere(['confirm_id' => $this->getId()])
             ->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])
             ->andWhere(['not', ['place_interview' => '']])
@@ -283,7 +286,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         // Кол-во респондентов, у кот-х существует интервью
         return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_segment.id' => null]])
             ->count();
     }
 
@@ -296,7 +299,7 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
         // Кол-во представителей сегмента
         return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_segment.status' => '1'])
             ->count();
     }
 
@@ -509,6 +512,22 @@ class ConfirmSegment extends ActiveRecord implements ConfirmationInterface
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 
 }

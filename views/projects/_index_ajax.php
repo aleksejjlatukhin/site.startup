@@ -135,29 +135,41 @@ use app\models\StageExpertise;
 
                     <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                        <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+                        <?php if (!$model->getDeletedAt()): ?>
 
-                            <?= Html::a(Html::img('/images/icons/icon-enable-expertise-danger.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['#'], [
-                                'onclick' => 'return false;',
-                                'class' => 'link-enable-expertise',
-                                'style' => ['margin-left' => '30px'],
-                                'title' => 'Экспертиза не разрешена',
-                            ]) ?>
+                            <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
 
-                        <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
+                                <?= Html::a(Html::img('/images/icons/icon-enable-expertise-danger.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['#'], [
+                                    'onclick' => 'return false;',
+                                    'class' => 'link-enable-expertise',
+                                    'style' => ['margin-left' => '30px'],
+                                    'title' => 'Экспертиза не разрешена',
+                                ]) ?>
+
+                            <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
+
+                                <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
+                                    'class' => 'link-get-list-expertise',
+                                    'style' => ['margin-left' => '30px'],
+                                    'title' => 'Экспертиза',
+                                ]) ?>
+
+                            <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
+
+                                <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['#'], [
+                                    'onclick' => 'return false;',
+                                    'style' => ['margin-left' => '30px'],
+                                    'title' => 'Экспертиза не доступна',
+                                ]) ?>
+
+                            <?php endif; ?>
+
+                        <?php else: ?>
 
                             <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
                                 'class' => 'link-get-list-expertise',
                                 'style' => ['margin-left' => '30px'],
-                                'title' => 'Экспертиза',
-                            ]) ?>
-
-                        <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
-
-                            <?= Html::a(Html::img('/images/icons/icon-enable-expertise-success.png', ['style' => ['width' => '35px', 'margin-right' => '10px']]),['#'], [
-                                'onclick' => 'return false;',
-                                'style' => ['margin-left' => '30px'],
-                                'title' => 'Экспертиза не доступна',
+                                'title' => 'Смотреть экспертизу',
                             ]) ?>
 
                         <?php endif; ?>
@@ -416,11 +428,91 @@ use app\models\StageExpertise;
 
                 </div>
 
-            <?php else: ?>
+            <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+                <div class="project_buttons_mobile">
 
-                    <div class="project_buttons_mobile">
+                    <?= Html::a('Смотреть описание', ['/projects/show-all-information', 'id' => $model->getId()], [
+                        'class' => 'btn btn-default openAllInformationProject',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 1% 0 2%',
+                        ],
+                    ]) ?>
+
+                    <?php if (!$model->getDeletedAt()): ?>
+
+                        <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                            <?= Html::a('Экспертиза не разрешена', ['#'], [
+                                'onclick' => 'return false;',
+                                'class' => 'btn btn-default link-enable-expertise',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'width' => '47%',
+                                    'height' => '36px',
+                                    'background' => '#4F4F4F',
+                                    'color' => '#FFFFFF',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'border-radius' => '0',
+                                    'border' => '1px solid #ffffff',
+                                    'font-size' => '18px',
+                                    'margin' => '10px 2% 0 1%',
+                                ],
+                            ]) ?>
+
+                        <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
+
+                            <?= Html::a('Экспертиза', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
+                                'class' => 'btn btn-default link-get-list-expertise',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'width' => '47%',
+                                    'height' => '36px',
+                                    'background' => '#4F4F4F',
+                                    'color' => '#FFFFFF',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'border-radius' => '0',
+                                    'border' => '1px solid #ffffff',
+                                    'font-size' => '18px',
+                                    'margin' => '10px 2% 0 1%',
+                                ],
+                            ]) ?>
+
+                        <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getId())) : ?>
+
+                            <?= Html::a('Экспертиза не доступна', ['#'], [
+                                'onclick' => 'return false;',
+                                'class' => 'btn btn-default link-enable-expertise',
+                                'style' => [
+                                    'display' => 'flex',
+                                    'width' => '47%',
+                                    'height' => '36px',
+                                    'background' => '#4F4F4F',
+                                    'color' => '#FFFFFF',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'border-radius' => '0',
+                                    'border' => '1px solid #ffffff',
+                                    'font-size' => '18px',
+                                    'margin' => '10px 2% 0 1%',
+                                ],
+                            ]) ?>
+
+                        <?php endif; ?>
+
+                    <?php else: ?>
 
                         <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
                             'class' => 'btn btn-default link-get-list-expertise',
@@ -435,15 +527,23 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '0 1% 2% 2%',
+                                'margin' => '10px 2% 0 1%',
                             ],
                         ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
+
+                <div class="project_buttons_mobile">
+
+                    <?php if ($model->segments): ?>
 
                         <?= Html::a('Работать далее', Url::to(['/segments/index', 'id' => $model->id]), [
                             'class' => 'btn btn-default',
                             'style' => [
                                 'display' => 'flex',
-                                'width' => '47%',
+                                'width' => '96%',
                                 'height' => '36px',
                                 'background' => '#52BE7F',
                                 'color' => '#FFFFFF',
@@ -452,17 +552,144 @@ use app\models\StageExpertise;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '0 2% 2% 1%',
+                                'margin' => '10px 2% 2% 2%',
                             ]
                         ]) ?>
 
-                    </div>
+                    <?php else: ?>
 
-                <?php else: ?>
+                        <?= Html::a('Работать далее', ['#'], [
+                            'disabled' => true,
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '96%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 2%',
+                            ]
+                        ]) ?>
 
-                    <div class="text-block-not-expertise-mobile">Экспертиза не разрешена</div>
+                    <?php endif; ?>
 
-                <?php endif; ?>
+                </div>
+
+            <?php else: ?>
+
+                <div class="project_buttons_mobile">
+
+                    <?= Html::a('Смотреть описание', ['/projects/show-all-information', 'id' => $model->getId()], [
+                        'class' => 'btn btn-default openAllInformationProject',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '47%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 1% 0 2%',
+                        ],
+                    ]) ?>
+
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                        <?= Html::a('Экспертиза запрещена', ['#'], [
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                        <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROJECT], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
+
+                <div class="project_buttons_mobile">
+
+                    <?php if ($model->segments): ?>
+
+                        <?= Html::a('Работать далее', Url::to(['/segments/index', 'id' => $model->id]), [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '96%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 2%',
+                            ]
+                        ]) ?>
+
+                    <?php else: ?>
+
+                        <?= Html::a('Работать далее', ['#'], [
+                            'disabled' => true,
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '96%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 2%',
+                            ]
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
 
             <?php endif; ?>
 

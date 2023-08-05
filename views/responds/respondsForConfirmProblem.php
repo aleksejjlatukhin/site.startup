@@ -2,18 +2,20 @@
 
 use app\models\ConfirmProblem;
 use app\models\EnableExpertise;
+use app\models\Gcps;
+use app\models\InterviewConfirmProblem;
 use app\models\ProjectCommunications;
 use app\models\RespondsProblem;
 use app\models\StageExpertise;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use app\models\User;
-use yii\widgets\LinkPager;
 
 /**
  * @var RespondsProblem[] $responds
  * @var ConfirmProblem $confirm
  * @var bool $isMobile
+ * @var bool $isOnlyNotDelete
  */
 
 ?>
@@ -32,11 +34,18 @@ use yii\widgets\LinkPager;
                     <div style="padding-right: 10px; padding-bottom: 3px;">
 
                         <?php
-                        if ($respond->interview) {
-                            if ($respond->interview->getStatus() === 1) {
+                        /** @var $interview InterviewConfirmProblem */
+                        $interview = $isOnlyNotDelete ?
+                            $respond->interview :
+                            InterviewConfirmProblem::find(false)
+                                ->andWhere(['respond_id' => $respond->getId()])
+                                ->one();
+
+                        if ($interview) {
+                            if ($interview->getStatus() === 1) {
                                 echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
                             }
-                            elseif ($respond->interview->getStatus() === 0) {
+                            elseif ($interview->getStatus() === 0) {
                                 echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
                             }
                         }
@@ -49,7 +58,7 @@ use yii\widgets\LinkPager;
 
                     <div class="" style="overflow: hidden; max-height: 60px; padding: 5px 0;">
 
-                        <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                        <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                             <?=  Html::a($respond->getName(), ['#'], [
                                 'id' => "respond_name-" . $respond->getId(),
@@ -93,12 +102,12 @@ use yii\widgets\LinkPager;
                 <div class="col-md-1">
 
                     <?php
-                    if ($respond->interview){
+                    if ($interview){
 
-                        $date_fact = date("d.m.y", $respond->interview->getUpdatedAt());
+                        $date_fact = date("d.m.y", $interview->getUpdatedAt());
                         echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
-                    }elseif (!empty($respond->getInfoRespond()) && !empty($respond->getPlaceInterview()) && $respond->getDatePlan()
+                    }elseif ($isOnlyNotDelete && !empty($respond->getInfoRespond()) && !empty($respond->getPlaceInterview()) && $respond->getDatePlan()
                         && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                         echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
@@ -113,7 +122,7 @@ use yii\widgets\LinkPager;
 
                 </div>
 
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                     <div class="col-md-1" style="text-align: right;">
 
@@ -142,10 +151,10 @@ use yii\widgets\LinkPager;
                     <div class="col-md-1" style="text-align: center;">
 
                         <?php
-                        if ($respond->interview) {
+                        if ($interview) {
 
                             echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
-                                'id' => 'descInterview_form-' . $respond->interview->getId(),
+                                'id' => 'descInterview_form-' . $interview->getId(),
                                 'class' => 'showDescInterviewUpdateForm',
                                 'title' => 'Результаты интервью',
                             ]);
@@ -173,11 +182,18 @@ use yii\widgets\LinkPager;
                         <span class="header_table_hypothesis_mobile">Статус</span>
                         <span class="text_14_table_hypothesis">
                             <?php
-                            if ($respond->interview) {
-                                if ($respond->interview->getStatus() === 1) {
+                            /** @var $interview InterviewConfirmProblem */
+                            $interview = $isOnlyNotDelete ?
+                                $respond->interview :
+                                InterviewConfirmProblem::find(false)
+                                    ->andWhere(['respond_id' => $respond->getId()])
+                                    ->one();
+
+                            if ($interview) {
+                                if ($interview->getStatus() === 1) {
                                     echo 'подтверждает проблему';
                                 }
-                                elseif ($respond->interview->getStatus() === 0) {
+                                elseif ($interview->getStatus() === 0) {
                                     echo 'не подтверждает проблему';
                                 }
                             }
@@ -224,18 +240,18 @@ use yii\widgets\LinkPager;
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($respond->interview): ?>
+                    <?php if ($interview): ?>
                         <div class="col-xs-6">
                             <div class="header_table_hypothesis_mobile">Фактическая дата</div>
                             <div class="text_14_table_hypothesis">
-                                <?= date('d.m.Y', $respond->interview->getUpdatedAt()) ?>
+                                <?= date('d.m.Y', $interview->getUpdatedAt()) ?>
                             </div>
                         </div>
                     <?php else: ?>
                         <div class="col-xs-6"></div>
                     <?php endif; ?>
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                    <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                         <div class="hypothesis_buttons_mobile">
 
@@ -325,27 +341,31 @@ use yii\widgets\LinkPager;
 
                     <?php else: ?>
 
-                        <div class="hypothesis_buttons_mobile">
+                        <?php if ($interview): ?>
 
-                            <?= Html::a('Смотреть данные интервью', ['#'], [
-                                'id' => 'descInterview_form-' . $respond->interview->getId(),
-                                'class' => 'btn btn-default showDescInterviewUpdateForm',
-                                'style' => [
-                                    'display' => 'flex',
-                                    'width' => '96%',
-                                    'height' => '36px',
-                                    'background' => '#52BE7F',
-                                    'color' => '#FFFFFF',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'border-radius' => '0',
-                                    'border' => '1px solid #ffffff',
-                                    'font-size' => '18px',
-                                    'margin' => '10px 2% 0% 2%',
-                                ]
-                            ]) ?>
+                            <div class="hypothesis_buttons_mobile">
 
-                        </div>
+                                <?= Html::a('Смотреть данные интервью', ['#'], [
+                                    'id' => 'descInterview_form-' . $interview->getId(),
+                                    'class' => 'btn btn-default showDescInterviewUpdateForm',
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'width' => '96%',
+                                        'height' => '36px',
+                                        'background' => '#52BE7F',
+                                        'color' => '#FFFFFF',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'border-radius' => '0',
+                                        'border' => '1px solid #ffffff',
+                                        'font-size' => '18px',
+                                        'margin' => '10px 2% 0% 2%',
+                                    ]
+                                ]) ?>
+
+                            </div>
+
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
@@ -390,7 +410,7 @@ use yii\widgets\LinkPager;
 
             <?php if ($confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
 
-                <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
                     <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->getProjectId())) : ?>
 
@@ -436,48 +456,90 @@ use yii\widgets\LinkPager;
 
             <?php endif; ?>
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+            <?php if ($isOnlyNotDelete): ?>
 
-                <?php if ($confirm->getButtonMovingNextStage()) : ?>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $confirm->getId()],[
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#52BE7F',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                        ],
-                        'class' => 'btn btn-lg btn-success',
-                        'id' => 'button_MovingNextStage',
-                    ]) ?>
-
-                <?php else : ?>
-
-                    <?php if (($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) === 0) : ?>
+                    <?php if ($confirm->getButtonMovingNextStage()) : ?>
 
                         <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $confirm->getId()],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
                                 'justify-content' => 'center',
-                                'background' => '#eb5757',
-                                'color' => '#FFFFFF',
+                                'background' => '#52BE7F',
                                 'width' => '140px',
                                 'height' => '40px',
                                 'font-size' => '24px',
                                 'border-radius' => '8px',
                             ],
-                            'class' => 'btn btn-lg btn-default',
+                            'class' => 'btn btn-lg btn-success',
                             'id' => 'button_MovingNextStage',
                         ]) ?>
 
                     <?php else : ?>
 
-                        <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $confirm->getId()],[
+                        <?php if (($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) === 0) : ?>
+
+                            <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $confirm->getId()],[
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#eb5757',
+                                    'color' => '#FFFFFF',
+                                    'width' => '140px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                                'class' => 'btn btn-lg btn-default',
+                                'id' => 'button_MovingNextStage',
+                            ]) ?>
+
+                        <?php else : ?>
+
+                            <?= Html::a( 'Далее', ['/confirm-problem/moving-next-stage', 'id' => $confirm->getId()],[
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#E0E0E0',
+                                    'color' => '#FFFFFF',
+                                    'width' => '140px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                                'class' => 'btn btn-lg btn-default',
+                                'id' => 'button_MovingNextStage',
+                            ]) ?>
+
+                        <?php endif; ?>
+
+                    <?php endif; ?>
+
+                <?php else : ?>
+
+                    <?php if ($confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+
+                        <?= Html::a( 'Далее', ['/gcps/index', 'id' => $confirm->getId()],[
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#52BE7F',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-success',
+                        ]) ?>
+
+                    <?php else : ?>
+
+                        <?= Html::a( 'Далее', ['#'],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -490,16 +552,21 @@ use yii\widgets\LinkPager;
                                 'border-radius' => '8px',
                             ],
                             'class' => 'btn btn-lg btn-default',
-                            'id' => 'button_MovingNextStage',
+                            'onclick' => 'return false',
                         ]) ?>
 
                     <?php endif; ?>
 
                 <?php endif; ?>
 
-            <?php else : ?>
+            <?php else: ?>
 
-                <?php if ($confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+                <?php
+                $gcpExist = Gcps::find(false)
+                    ->andWhere(['id' => $confirm->getProblemId()])
+                    ->exists();
+
+                if ($gcpExist): ?>
 
                     <?= Html::a( 'Далее', ['/gcps/index', 'id' => $confirm->getId()],[
                         'style' => [
@@ -571,7 +638,7 @@ use yii\widgets\LinkPager;
 
             <?php if ($confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
 
-                <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
                     <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->getProjectId())) : ?>
 

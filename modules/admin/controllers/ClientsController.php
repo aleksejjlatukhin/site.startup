@@ -63,11 +63,11 @@ class ClientsController extends AppAdminController
         $clientSpaccel = Client::find()
             ->leftJoin('client_user', '`client_user`.`client_id` = `client`.`id`')
             ->leftJoin('user', '`user`.`id` = `client_user`.`user_id`')
-            ->where(['user.role' => User::ROLE_MAIN_ADMIN])
+            ->andWhere(['user.role' => User::ROLE_MAIN_ADMIN])
             ->one();
 
         $countUsersOnPage = 20;
-        $query = Client::find()->where(['!=', 'id', $clientSpaccel->getId()]);
+        $query = Client::find()->andWhere(['!=', 'id', $clientSpaccel->getId()]);
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $clients = $query->offset($pages->offset)->limit($countUsersOnPage)->all();
@@ -91,7 +91,7 @@ class ClientsController extends AppAdminController
     {
         $managers = User::findAll(['role' => User::ROLE_MANAGER, 'status' => User::STATUS_ACTIVE, 'confirm' => User::CONFIRM]);
 
-        $customerManager = CustomerManager::find()->where(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
+        $customerManager = CustomerManager::find()->andWhere(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
         if (!$customerManager) {
             $customerManager = new CustomerManager();
             $customerManager->setClientId($clientId);
@@ -119,7 +119,7 @@ class ClientsController extends AppAdminController
             $clientId = $_POST['CustomerManager']['client_id'];
 
             /** @var CustomerManager $customerManager */
-            $customerManager = CustomerManager::find()->where(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
+            $customerManager = CustomerManager::find()->andWhere(['client_id' => $clientId])->orderBy(['created_at' => SORT_DESC])->one();
             if ($customerManager) {
                 if ($customerManager->getUserId() !== $userId) {
                     CustomerManager::addManager($clientId, $userId);
@@ -281,7 +281,7 @@ class ClientsController extends AppAdminController
 
                     /** @var CustomerWishList|null $record */
                     $record = CustomerWishList::find()
-                        ->where([
+                        ->andWhere([
                             'client_id' => $clientSpaccel->getId(),
                             'customer_id' => $client->getId(),
                         ])
@@ -308,7 +308,7 @@ class ClientsController extends AppAdminController
 
                     /** @var CustomerWishList|null $record */
                     $record = CustomerWishList::find()
-                        ->where([
+                        ->andWhere([
                             'client_id' => $client->getId(),
                             'customer_id' => $clientSpaccel->getId(),
                         ])

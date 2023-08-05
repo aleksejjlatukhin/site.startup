@@ -79,13 +79,24 @@ class MvpsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index', 'mpdf-table-mvps'])){
 
-            $confirmGcp = ConfirmGcp::findOne((int)Yii::$app->request->get('id'));
+            /** @var $confirmGcp ConfirmGcp */
+            $confirmGcp = ConfirmGcp::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
             if (!$confirmGcp) {
                 PatternHttpException::noData();
             }
 
-            $gcp = Gcps::findOne($confirmGcp->getGcpId());
-            $project = Projects::findOne($gcp->getProjectId());
+            /** @var $gcp Gcps */
+            $gcp = Gcps::find(false)
+                ->andWhere(['id' => $confirmGcp->getGcpId()])
+                ->one();
+
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $gcp->getProjectId()])
+                ->one();
 
             if (($project->getUserId() === $currentUser->getId())){
                 return parent::beforeAction($action);
@@ -161,17 +172,58 @@ class MvpsController extends AppUserPartController
     public function actionIndex(int $id)
     {
         $models = Mvps::findAll(['basic_confirm_id' => $id]);
-        if (!$models) {
+        $countModels = Mvps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
+
+        if ((int)$countModels === 0) {
             return $this->redirect(['instruction', 'id' => $id]);
         }
 
-        $confirmGcp = ConfirmGcp::findOne($id);
-        $gcp = Gcps::findOne($confirmGcp->getGcpId());
-        $confirmProblem = ConfirmProblem::findOne($gcp->getConfirmProblemId());
-        $problem = Problems::findOne($confirmProblem->getProblemId());
-        $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
-        $segment = Segments::findOne($confirmSegment->getSegmentId());
-        $project = Projects::findOne($segment->getProjectId());
+        /** @var $confirmGcp ConfirmGcp */
+        $confirmGcp = ConfirmGcp::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $gcp Gcps */
+        $gcp = Gcps::find(false)
+            ->andWhere(['id' => $confirmGcp->getGcpId()])
+            ->one();
+
+        /** @var $confirmProblem ConfirmProblem */
+        $confirmProblem = ConfirmProblem::find(false)
+            ->andWhere(['id' => $gcp->getConfirmProblemId()])
+            ->one();
+
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $confirmProblem->getProblemId()])
+            ->one();
+
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $problem->getConfirmSegmentId()])
+            ->one();
+
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $existTrashList = Mvps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->exists();
+
+        $trashList = Mvps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->all();
 
         return $this->render('index', [
             'models' => $models,
@@ -182,7 +234,55 @@ class MvpsController extends AppUserPartController
             'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
+            'existTrashList' => $existTrashList,
+            'trashList' => $trashList
         ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_index_ajax', [
+                    'models' => Mvps::findAll(['basic_confirm_id' => $id])
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionTrashList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $queryModels = Mvps::find(false)
+                ->andWhere(['basic_confirm_id' => $id])
+                ->andWhere(['not', ['deleted_at' => null]]);
+
+            $response = [
+                'countItems' => $queryModels->count(),
+                'renderAjax' => $this->renderAjax('_trash_ajax', [
+                    'basicConfirmId' => $id,
+                    'models' => $queryModels->all()
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
@@ -192,8 +292,11 @@ class MvpsController extends AppUserPartController
      */
     public function actionInstruction (int $id)
     {
-        $models = Mvps::findAll(['basic_confirm_id' => $id]);
-        if ($models) {
+        $countModels = Mvps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
+
+        if ((int)$countModels > 0) {
             return $this->redirect(['index', 'id' => $id]);
         }
 
@@ -255,7 +358,7 @@ class MvpsController extends AppUserPartController
                 if ($model->create()) {
 
                     $response = [
-                        'count' => Mvps::find()->where(['basic_confirm_id' => $id])->count(),
+                        'count' => Mvps::find(false)->andWhere(['basic_confirm_id' => $id])->count(),
                         'renderAjax' => $this->renderAjax('_index_ajax', [
                         'models' => Mvps::findAll(['basic_confirm_id' => $id])
                     ])];
@@ -362,12 +465,29 @@ class MvpsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfTableMvps (int $id) {
+    public function actionMpdfTableMvps(int $id)
+    {
+        /** @var $confirm_gcp ConfirmGcp */
+        $confirm_gcp = ConfirmGcp::find()
+            ->andWhere(['id' => $id])
+            ->one();
 
-        $confirm_gcp = ConfirmGcp::findOne($id);
-        $gcp_description = mb_substr($confirm_gcp->gcp->getDescription(), 0, 100).'...';
-        $models = $confirm_gcp->mvps;
+        if (!$confirm_gcp->getDeletedAt()) {
+            $gcp = $confirm_gcp->gcp;
+            $models = $confirm_gcp->mvps;
+        } else {
+            /** @var $gcp Gcps */
+            $gcp = Gcps::find(false)
+                ->andWhere(['id' => $confirm_gcp->getGcpId()])
+                ->one();
 
+            /** @var $models Mvps[]*/
+            $models = Mvps::find(false)
+                ->andWhere(['basic_confirm_id' => $confirm_gcp->getId()])
+                ->all();
+        }
+
+        $gcp_description = mb_substr($gcp->getDescription(), 0, 100).'...';
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('mpdf_table_mvps', ['models' => $models]);
 
@@ -412,28 +532,54 @@ class MvpsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
-     * @throws Throwable
-     * @throws ErrorException
-     * @throws StaleObjectException
      */
     public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
 
-        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+        if(Yii::$app->request->isAjax && $model->softDeleteStage()) {
             return true;
         }
         return false;
     }
 
+
     /**
      * @param int $id
+     * @return void|Response
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionRecovery(int $id)
+    {
+        $model = $this->findModel($id, false);
+
+        if($model->recoveryStage()) {
+            return $this->redirect(['index', 'id' => $model->getBasicConfirmId()]);
+        }
+
+        PatternHttpException::noData();
+    }
+
+
+    /**
+     * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return Mvps|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?Mvps
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?Mvps
     {
-        if (($model = Mvps::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = Mvps::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = Mvps::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -16,11 +17,13 @@ use yii\db\ActiveRecord;
  * @property string $fio                        ФИО автора проекта
  * @property string $role                       Роль автора в проекте
  * @property string $experience                 Опыт работы автора проекта
+ * @property int|null $deleted_at               Дата удаления
  *
  * @property Projects $project                  Проект
  */
 class Authors extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     /**
      * {@inheritdoc}
@@ -153,5 +156,13 @@ class Authors extends ActiveRecord
     public function setExperience(string $experience): void
     {
         $this->experience = $experience;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
     }
 }

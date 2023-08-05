@@ -128,7 +128,7 @@ class WishListController extends AppAdminController
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $models = $query->offset($pages->offset)->limit($limit)->all();
         $listClient = Client::find()
-            ->where(['in', 'id', array_column($models, 'client_id')])
+            ->andWhere(['in', 'id', array_column($models, 'client_id')])
             ->all();
 
         return $this->render('index', [

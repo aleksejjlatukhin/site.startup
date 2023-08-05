@@ -1,6 +1,7 @@
 <?php
 
 use app\models\CommunicationTypes;
+use app\models\Projects;
 use app\models\UserAccessToProjects;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
@@ -146,22 +147,32 @@ use app\models\ExpertType;
                                                 <div class="text-success">Назначен(-а) на проект</div>
                                                 <div><b>Типы деятельности: </b><?= ExpertType::getContent($responsiveCommunication->typesAccessToExpertise->getTypes()) ?></div>
                                                 <div>
-                                                    <?= Html::a('Отозвать эксперта', Url::to([
-                                                        '/client/communications/send',
-                                                        'adressee_id' => $communicationExpert->getSenderId(),
-                                                        'project_id' => $communicationExpert->getProjectId(),
-                                                        'type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT,
-                                                        'triggered_communication_id' => $responsiveCommunication->getId()
-                                                    ]), [
-                                                        'class' => 'btn btn-danger send-communication',
-                                                        'id' => 'withdraws_expert_from_project-'.$communicationExpert->getProjectId(),
-                                                        'style' => [
-                                                            'width' => '160px',
-                                                            'font-size' => '18px',
-                                                            'border-radius' => '8px',
-                                                            'margin-top' => '10px'
-                                                        ]
-                                                    ]) ?>
+                                                    <?php /** @var $project Projects */
+                                                    $project = Projects::find(false)
+                                                        ->andWhere(['id' => $project_id])
+                                                        ->one();
+
+                                                    if (!$project->getDeletedAt()): ?>
+
+                                                        <?= Html::a('Отозвать эксперта', Url::to([
+                                                            '/client/communications/send',
+                                                            'adressee_id' => $communicationExpert->getSenderId(),
+                                                            'project_id' => $communicationExpert->getProjectId(),
+                                                            'type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT,
+                                                            'triggered_communication_id' => $responsiveCommunication->getId()
+                                                        ]), [
+                                                            'class' => 'btn btn-danger send-communication',
+                                                            'id' => 'withdraws_expert_from_project-'.$communicationExpert->getProjectId(),
+                                                            'style' => [
+                                                                'width' => '160px',
+                                                                'font-size' => '18px',
+                                                                'border-radius' => '8px',
+                                                                'margin-top' => '10px'
+                                                            ]
+                                                        ]) ?>
+
+                                                    <?php endif; ?>
+
                                                 </div>
                                             </div>
                                             <div class="col-md-1"><?= date('d.m.Y H:i', $responsiveCommunication->getCreatedAt()) ?></div>

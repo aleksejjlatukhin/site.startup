@@ -3,10 +3,12 @@
 use app\models\AnswersQuestionsConfirmProblem;
 use app\models\QuestionsConfirmProblem;
 use app\models\QuestionStatus;
+use app\models\RespondsProblem;
 
 /**
  * @var QuestionsConfirmProblem[] $questions
  * @var AnswersQuestionsConfirmProblem $answer
+ * @var bool $isOnlyNotDelete
  */
 
 ?>
@@ -34,10 +36,27 @@ use app\models\QuestionStatus;
         </div>
     </div>
 
-    <?php foreach ($question->answers as $answer) : ?>
+    <?php
+    /** @var $answers AnswersQuestionsConfirmProblem[] */
+    $answers = $isOnlyNotDelete ?
+        $question->answers :
+        AnswersQuestionsConfirmProblem::find(false)
+            ->andWhere(['question_id' => $question->getId()])
+            ->all();
+
+    foreach ($answers as $answer) : ?>
+
+        <?php
+        /** @var $respond RespondsProblem */
+        $respond = $isOnlyNotDelete ?
+            $answer->respond :
+            RespondsProblem::find(false)
+                ->andWhere(['id' => $answer->getRespondId()])
+                ->one();
+        ?>
 
         <div class="row container-fluid answer-container">
-            <div class="col-md-4 col-lg-3 respond-block"><?= $answer->respond->getName() ?></div>
+            <div class="col-md-4 col-lg-3 respond-block"><?= $respond->getName() ?></div>
             <div class="col-md-8 col-lg-9"><?= $answer->getAnswer() ?></div>
         </div>
 

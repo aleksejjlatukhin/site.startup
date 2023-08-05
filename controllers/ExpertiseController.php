@@ -4,6 +4,10 @@
 namespace app\controllers;
 
 
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
 use app\models\DataForUserListExpertise;
 use app\models\Expertise;
 use app\models\ExpertType;
@@ -48,47 +52,122 @@ class ExpertiseController extends AppUserPartController
     {
         if (Yii::$app->request->isAjax) {
 
+            // Инициализируем дирректорию с json-файлами содержащие вариантов ответов для разных форм экспертизы
+            Yii::setAlias('@dirDataFormExpertise', '../models/forms/expertise/answerOptions');
+
             if (User::isUserExpert(Yii::$app->user->identity['username'])) {
 
                 $expert = User::findOne(Yii::$app->user->getId());
 
                 if ($stage === StageExpertise::getList()[StageExpertise::PROJECT]) {
-                    $userAccessToProject = $expert->findUserAccessToProject($stageId);
+                    /** @var $hypothesis Projects */
+                    $hypothesis = Projects::find(false)
+                        ->andWhere(['id' => $stageId])
+                        ->one();
+
+                    $userAccessToProject = $expert->findUserAccessToProject($hypothesis->getId());
                 } else {
                     $stageClass = StageExpertise::getClassByStage($stage);
                     $interfaces = class_implements($stageClass);
                     /**
                      * @var Segments|Problems|Gcps|Mvps $hypothesis
                      */
-                    $hypothesis = !isset($interfaces[ConfirmationInterface::class]) ? $stageClass::findOne($stageId) : $stageClass::findOne($stageId)->hypothesis;
-                    $userAccessToProject = $expert->findUserAccessToProject($hypothesis->project->getId());
+                    if (!isset($interfaces[ConfirmationInterface::class])) {
+                        $hypothesis = $stageClass::find(false)
+                            ->andWhere(['id' => $stageId])
+                            ->one();
+                    } else {
+                        /** @var $confirmHypothesis ConfirmSegment|ConfirmProblem|ConfirmGcp|ConfirmMvp */
+                        $confirmHypothesis = $stageClass::find(false)
+                            ->andWhere(['id' => $stageId])
+                            ->one();
+
+                        if ($stageClass === ConfirmSegment::class) {
+                            $hypothesis = Segments::find(false)
+                                ->andWhere(['id' => $confirmHypothesis->getSegmentId()])
+                                ->one();
+                        }
+
+                        if ($stageClass === ConfirmProblem::class) {
+                            $hypothesis = Problems::find(false)
+                                ->andWhere(['id' => $confirmHypothesis->getProblemId()])
+                                ->one();
+                        }
+
+                        if ($stageClass === ConfirmGcp::class) {
+                            $hypothesis = Gcps::find(false)
+                                ->andWhere(['id' => $confirmHypothesis->getGcpId()])
+                                ->one();
+                        }
+
+                        if ($stageClass === ConfirmMvp::class) {
+                            $hypothesis = Mvps::find(false)
+                                ->andWhere(['id' => $confirmHypothesis->getMvpId()])
+                                ->one();
+                        }
+                    }
+                    $userAccessToProject = $expert->findUserAccessToProject($hypothesis->getProjectId());
                 }
 
-                /**
-                 * @var UserAccessToProjects $userAccessToProject
-                 * @var ProjectCommunications $communication
-                 */
-                $communication = $userAccessToProject->communication;
-                $typesAccessToExpertise = $communication->typesAccessToExpertise;
-                $types = ExpertType::getListTypes(null, $typesAccessToExpertise->getTypes());
+                if (empty($hypothesis->getDeletedAt())) {
+                    /**
+                     * @var UserAccessToProjects $userAccessToProject
+                     * @var ProjectCommunications $communication
+                     */
+                    $communication = $userAccessToProject->communication;
+                    $typesAccessToExpertise = $communication->typesAccessToExpertise;
+                    $types = ExpertType::getListTypes(null, $typesAccessToExpertise->getTypes());
+
+                    $response = [
+                        'headerContent' => 'Экспертиза по этапу: ' . StageExpertise::getTitle($stage, $stageId),
+                        'renderList' => $this->renderAjax('list_expertise', [
+                            'types' => $types, 'stage' => $stage, 'stageId' => $stageId,
+                        ]),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+
+                }
+
+                /** @var Expertise[] $models */
+                $models = Expertise::find()->andWhere([
+                    'stage' => array_search($stage, StageExpertise::getList(), false),
+                    'stage_id' => $stageId,
+                    'completed' => Expertise::COMPLETED,
+                    'expert_id' => $expert->getId()
+                ])->orderBy('updated_at DESC')->all();
+
+                $stageClass = StageExpertise::getClassByStage($stage);
+                $interfaces = class_implements($stageClass);
+
+                $data = array(); // Массив с данными по экспертизе данного этапа проекта
+
+                foreach ($models as $i => $model) {
+                    $data[$i] = new DataForUserListExpertise(
+                        $model->getId(),
+                        $model->getUpdatedAt(),
+                        $model->getTypeExpert(),
+                        $model->expert->getUsername(),
+                        $model->getGeneralEstimationByOne(),
+                        $model->getComment(),
+                        !isset($interfaces[ConfirmationInterface::class]) ? new FormExpertiseSingleAnswer($model) : new FormExpertiseManyAnswer($model)
+                    );
+                }
 
                 $response = [
                     'headerContent' => 'Экспертиза по этапу: ' . StageExpertise::getTitle($stage, $stageId),
-                    'renderList' => $this->renderAjax('list_expertise', [
-                        'types' => $types, 'stage' => $stage, 'stageId' => $stageId,
+                    'renderList' => $this->renderAjax('user_list_expertise', [
+                        'stage' => $stage, 'stageId' => $stageId, 'data' => $data
                     ]),
                 ];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-
             }
 
-            // Инициализируем дирректорию с json-файлами содержащие вариантов ответов для разных форм экспертизы
-            Yii::setAlias('@dirDataFormExpertise', '../models/forms/expertise/answerOptions');
-
             /** @var Expertise[] $models */
-            $models = Expertise::find()->where([
+            $models = Expertise::find()->andWhere([
                 'stage' => array_search($stage, StageExpertise::getList(), false),
                 'stage_id' => $stageId,
                 'completed' => Expertise::COMPLETED

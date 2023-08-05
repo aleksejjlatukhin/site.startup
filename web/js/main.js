@@ -63,8 +63,9 @@ $(document).ready(function() {
     */
     var url_pathname = location.pathname;
     var array_search_results = [
-        '/confirm-segment/add-questions', '/confirm-segment/view', '/confirm-problem/add-questions', '/confirm-problem/view',
-        '/confirm-gcp/add-questions', '/confirm-gcp/view', '/confirm-mvp/add-questions', '/confirm-mvp/view',
+        '/confirm-segment/add-questions', '/confirm-segment/view', '/confirm-segment/view-trash', '/confirm-problem/add-questions',
+        '/confirm-problem/view', '/confirm-problem/view-trash', '/confirm-gcp/add-questions', '/confirm-gcp/view', '/confirm-gcp/view-trash',
+        '/confirm-mvp/add-questions', '/confirm-mvp/view', '/confirm-mvp/view-trash',
     ];
     if (url_pathname !== '/') {
         array_search_results.forEach(function (elem) {
@@ -259,8 +260,12 @@ $(document).on('click', 'body #confirm_delete_hypothesis', function(e) {
         cache: false,
         success: function(){
 
-            $('.row_hypothesis-' + model_id).hide();
-            $('#delete_hypothesis_modal').modal('hide');
+            if ($('#show_trash_list').length === 0) {
+                location.reload();
+            } else {
+                $('.row_hypothesis-' + model_id).hide();
+                $('#delete_hypothesis_modal').modal('hide');
+            }
         },
         error: function () {
            alert('Ошибка');

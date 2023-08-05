@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\interfaces\ConfirmationInterface;
+use app\models\traits\SoftDeleteModelTrait;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -20,6 +21,7 @@ use yii\db\StaleObjectException;
  * @property int $count_positive                        Количество респондентов, подтверждающих mvp-продукт
  * @property string $enable_expertise                   Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at              Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                       Дата удаления
  *
  * @property Mvps $mvp                                  Mvp-продукт
  * @property RespondsMvp[] $responds                    Респонденты, привязанные к подтверждению
@@ -29,6 +31,7 @@ use yii\db\StaleObjectException;
  */
 class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
 {
+    use SoftDeleteModelTrait;
 
     public const STAGE = 8;
     public const LIMIT_COUNT_RESPOND = 100;
@@ -189,7 +192,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
         $defaultQuestions = AllQuestionsConfirmMvp::defaultListQuestions();
         // Вопросы, которые когда-либо добавлял пользователь на данном этапе
         $attachQuestions = AllQuestionsConfirmMvp::find()
-            ->where(['user_id' => $user->getId()])
+            ->andWhere(['user_id' => $user->getId()])
             ->orderBy(['id' => SORT_DESC])
             ->select('title')
             ->asArray()
@@ -226,11 +229,11 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     {
         $count_interview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
 
         if ($this->business || (count($this->responds) === $count_interview && $this->getCountPositive() <= $count_positive)) {
             return true;
@@ -246,7 +249,7 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountRespondsOfModel()
     {
         //Кол-во респондентов, у кот-х заполнены данные
-        return RespondsMvp::find()->where(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
+        return RespondsMvp::find(false)->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['info_respond' => '']])
             ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
     }
 
@@ -257,9 +260,9 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountDescInterviewsOfModel()
     {
         // Кол-во респондентов, у кот-х существует анкета
-        return RespondsMvp::find()->with('interview')
+        return RespondsMvp::find(false)->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $this->getId()])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
     }
 
 
@@ -269,9 +272,9 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function getCountConfirmMembers()
     {
         // Кол-во подтвердивших MVP
-        return RespondsMvp::find()->with('interview')
+        return RespondsMvp::find(false)->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $this->getId(), 'interview_confirm_mvp.status' => '1'])->count();
     }
 
 
@@ -438,5 +441,21 @@ class ConfirmMvp extends ActiveRecord implements ConfirmationInterface
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

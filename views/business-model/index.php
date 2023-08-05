@@ -280,17 +280,20 @@ $this->registerCssFile('@web/css/business-model-index-style.css');
         <div><?= $mvp->getDescription() ?></div>
     </div>
 
+    <?php if (!$model->getDeletedAt()): ?>
 
-    <div class="row row_header_data_generation_mobile">
-        <div class="col-xs-9"></div>
-        <div class="col-xs-3">
-            <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
-                Url::to('/business-model/get-instruction'), [
-                    'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                    'title' => 'Инструкция'
-                ]) ?>
+        <div class="row row_header_data_generation_mobile">
+            <div class="col-xs-9"></div>
+            <div class="col-xs-3">
+                <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                    Url::to('/business-model/get-instruction'), [
+                        'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                        'title' => 'Инструкция'
+                    ]) ?>
+            </div>
         </div>
-    </div>
+
+    <?php endif; ?>
 
 
     <div class="container-fluid container-data row">

@@ -67,8 +67,15 @@ class SegmentsController extends AppUserPartController
 
         }elseif ($action->id === 'mpdf-segment'){
 
-            $model = Segments::findOne((int)Yii::$app->request->get('id'));
-            $project = Projects::findOne($model->getProjectId());
+            /** @var $model Segments */
+            $model = Segments::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $model->getProjectId()])
+                ->one();
 
             if (($project->getUserId() === $currentUser->getId())) {
                 return parent::beforeAction($action);
@@ -138,7 +145,11 @@ class SegmentsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index', 'mpdf-table-segments'])){
 
-            $project = Projects::findOne((int)Yii::$app->request->get('id'));
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
             if (!$project) {
                 PatternHttpException::noData();
             }
@@ -235,26 +246,92 @@ class SegmentsController extends AppUserPartController
      */
     public function actionIndex(int $id)
     {
-        $project = Projects::findOne($id);
-        $models = Segments::findAll(['project_id' => $project->getId()]);
-        $searchForm = new SearchForm();
+        $countModels = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->count();
 
-        if (!$models) {
+        if ((int)$countModels === 0) {
             return $this->redirect(['/segments/instruction', 'id' => $id]);
         }
 
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        $models = Segments::findAll(['project_id' => $project->getId()]);
+        $searchForm = new SearchForm();
+
         if ($searchForm->load(Yii::$app->request->post())) {
             $models = Segments::find()
-                ->where(['project_id' => $project->getId()])
+                ->andWhere(['project_id' => $project->getId()])
                 ->andWhere(['like', 'name', $searchForm->search])
                 ->all();
         }
 
+        $existTrashList = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->exists();
+
+        $trashList = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->all();
+
         return $this->render('index', [
             'project' => $project,
             'models' => $models,
-            'searchForm' => new SearchForm(),
+            'searchForm' => $searchForm,
+            'existTrashList' => $existTrashList,
+            'trashList' => $trashList
         ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_index_ajax', [
+                    'models' => Segments::findAll(['project_id' => $id])
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionTrashList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $queryModels = Segments::find(false)
+                ->andWhere(['project_id' => $id])
+                ->andWhere(['not', ['deleted_at' => null]]);
+
+            $response = [
+                'countItems' => $queryModels->count(),
+                'renderAjax' => $this->renderAjax('_trash_ajax', [
+                    'projectId' => $id,
+                    'models' => $queryModels->all()
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
@@ -264,8 +341,11 @@ class SegmentsController extends AppUserPartController
      */
     public function actionInstruction (int $id)
     {
-        $models = Segments::findAll(['project_id' => $id]);
-        if ($models) {
+        $countModels = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->count();
+
+        if ((int)$countModels > 0) {
             return $this->redirect(['/segments/index', 'id' => $id]);
         }
 
@@ -383,7 +463,7 @@ class SegmentsController extends AppUserPartController
             $wishListIds = array_column($wishLists, 'id');
             $query = RequirementWishList::find()
                 ->leftJoin('wish_list', '`wish_list`.`id` = `requirement_wish_list`.`wish_list_id`')
-                ->where(['in', 'wish_list_id', $wishListIds])
+                ->andWhere(['in', 'wish_list_id', $wishListIds])
                 ->andWhere(['is_actual' => RequirementWishList::REQUIREMENT_ACTUAL]);
 
             $filters = new FormFilterRequirement();
@@ -460,10 +540,9 @@ class SegmentsController extends AppUserPartController
 
                     if ($model->create()) {
 
-                        $count = Segments::find()->where(['project_id' => $id])->count();
-
                         $response =  [
-                            'success' => true, 'count' => $count,
+                            'success' => true,
+                            'count' => Segments::find(false)->andWhere(['project_id' => $id])->count(),
                             'renderAjax' => $this->renderAjax('_index_ajax', [
                                 'models' => Segments::findAll(['project_id' => $id]),
                             ]),
@@ -624,7 +703,10 @@ class SegmentsController extends AppUserPartController
      */
     public function actionShowAllInformation (int $id)
     {
-        $segment = Segments::findOne($id);
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
         if(Yii::$app->request->isAjax) {
 
@@ -649,9 +731,12 @@ class SegmentsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfSegment (int $id) {
-
-        $model = Segments::findOne($id);
+    public function actionMpdfSegment (int $id)
+    {
+        /** @var $model Segments */
+        $model = Segments::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('mpdf_segment', ['segment' => $model]);
@@ -702,10 +787,19 @@ class SegmentsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfTableSegments (int $id) {
+    public function actionMpdfTableSegments(int $id)
+    {
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
-        $project = Projects::findOne($id);
-        $models = $project->segments;
+        /** @var $models Segments[] */
+        $models = !$project->getDeletedAt() ?
+            $project->segments :
+            Segments::find(false)
+                ->andWhere(['project_id' => $id])
+                ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('mpdf_table_segments', ['models' => $models]);
@@ -754,7 +848,9 @@ class SegmentsController extends AppUserPartController
     public function actionShowRoadmap (int $id)
     {
         $roadmap = new Roadmap($id);
-        $segment = Segments::findOne($id);
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
         if(Yii::$app->request->isAjax) {
 
@@ -774,30 +870,56 @@ class SegmentsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
-     * @throws Throwable
-     * @throws ErrorException
-     * @throws StaleObjectException
      */
     public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
 
-        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+        if(Yii::$app->request->isAjax && $model->softDeleteStage()) {
             return true;
         }
         return false;
     }
 
+
+    /**
+     * @param int $id
+     * @return void|Response
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionRecovery(int $id)
+    {
+        $model = $this->findModel($id, false);
+
+        if($model->recoveryStage()) {
+            return $this->redirect(['index', 'id' => $model->getProjectId()]);
+        }
+
+        PatternHttpException::noData();
+    }
+
+
     /**
      * Finds the Segments model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return Segments the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel(int $id): Segments
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): Segments
     {
-        if (($model = Segments::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = Segments::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = Segments::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

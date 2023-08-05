@@ -71,10 +71,10 @@ class CommunicationsController extends AppExpertController
     {
         $user = User::findOne($id);
         // Проекты, по которым у эксперта есть коммуникации
-        $projects = Projects::find()
+        $projects = Projects::find(false)
             ->distinct()
             ->leftJoin('project_communications', '`project_communications`.`project_id` = `projects`.`id`')
-            ->where(['or', ['project_communications.sender_id' => $id], ['project_communications.adressee_id' => $id]])
+            ->andWhere(['or', ['project_communications.sender_id' => $id], ['project_communications.adressee_id' => $id]])
             ->orderBy('project_communications.id DESC')
             ->all();
 
@@ -112,7 +112,7 @@ class CommunicationsController extends AppExpertController
     private function responseForGetCommunications(int $project_id): array
     {
         $communications = ProjectCommunications::find()
-            ->where(['project_id' => $project_id])
+            ->andWhere(['project_id' => $project_id])
             ->andWhere(['not', ['type' => CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE]])
             ->andWhere(['or', ['adressee_id' => Yii::$app->user->getId()], ['sender_id' => Yii::$app->user->getId()]])
             ->orderBy('id DESC')

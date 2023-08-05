@@ -97,12 +97,12 @@ class SegmentSort extends Model
 
         if ($type_sort_id === 12){
             // Для того чтобы вывести значения в порядке [0, 1, null]
-            $models_not_null = Segments::find()->where(['project_id' => $project_id])->andWhere(['is not', 'exist_confirm', null])->orderBy($search_type_sort)->all();
-            $models_is_null = Segments::find()->where(['project_id' => $project_id])->andWhere(['is', 'exist_confirm', null])->orderBy($search_type_sort)->all();
+            $models_not_null = Segments::find()->andWhere(['project_id' => $project_id])->andWhere(['is not', 'exist_confirm', null])->orderBy($search_type_sort)->all();
+            $models_is_null = Segments::find()->andWhere(['project_id' => $project_id])->andWhere(['is', 'exist_confirm', null])->orderBy($search_type_sort)->all();
             return array_merge($models_not_null, $models_is_null);
         }
 
-        return Segments::find()->where(['project_id' => $project_id])->orderBy($search_type_sort)->all();
+        return Segments::find()->andWhere(['project_id' => $project_id])->orderBy($search_type_sort)->all();
     }
 
 }

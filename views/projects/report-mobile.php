@@ -1,5 +1,13 @@
 <?php
 
+use app\models\BusinessModel;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
+use app\models\Gcps;
+use app\models\Mvps;
+use app\models\Problems;
 use app\models\Segments;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
@@ -24,14 +32,20 @@ $this->title = 'Протокол проекта';
 
             <div class="col-xs-12 one-report-mobile">
 
-                <?php if($segment->confirm) : ?>
+                <?php
+                /** @var $confirmSegment ConfirmSegment */
+                $confirmSegment = ConfirmSegment::find(false)
+                    ->andWhere(['segment_id' => $segment->getId()])
+                    ->one();
+                
+                if($confirmSegment) : ?>
 
                     <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                         <div class="row report-mobile-header-segment report-mobile-bg-green">
                             <div class="col-xs-8">
                                 <?= Html::a($segment->propertyContainer->getProperty('title')
-                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $segment->confirm->getId()],
+                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $confirmSegment->getId()],
                                     ['class' => 'link-stage-report-mobile white']) ?>
                             </div>
                             <div class="col-xs-4">
@@ -44,7 +58,7 @@ $this->title = 'Протокол проекта';
                         <div class="row report-mobile-header-segment report-mobile-bg-grey">
                             <div class="col-xs-8">
                                 <?= Html::a($segment->propertyContainer->getProperty('title')
-                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $segment->confirm->getId()],
+                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $confirmSegment->getId()],
                                     ['class' => 'link-stage-report-mobile white']) ?>
                             </div>
                             <div class="col-xs-4">
@@ -57,7 +71,7 @@ $this->title = 'Протокол проекта';
                         <div class="row report-mobile-header-segment report-mobile-bg-red">
                             <div class="col-xs-8">
                                 <?= Html::a($segment->propertyContainer->getProperty('title')
-                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $segment->confirm->getId()],
+                                    . ' - ' . $segment->getName(), ['/confirm-segment/view', 'id' => $confirmSegment->getId()],
                                     ['class' => 'link-stage-report-mobile white']) ?>
                             </div>
                             <div class="col-xs-4">
@@ -79,11 +93,11 @@ $this->title = 'Протокол проекта';
 
                     <div class="row">
                         <div class="col-xs-12 report-mobile-value-columns">
-                            <div><?= $segment->confirm->getCountRespond() ?></div>
-                            <div><?= $segment->confirm->getCountPositive() ?></div>
-                            <div><?= $segment->confirm->getCountConfirmMembers() ?></div>
-                            <div><?= ($segment->confirm->getCountDescInterviewsOfModel() - $segment->confirm->getCountConfirmMembers()) ?></div>
-                            <div><?= ($segment->confirm->getCountRespond() - $segment->confirm->getCountDescInterviewsOfModel()) ?></div>
+                            <div><?= $confirmSegment->getCountRespond() ?></div>
+                            <div><?= $confirmSegment->getCountPositive() ?></div>
+                            <div><?= $confirmSegment->getCountConfirmMembers() ?></div>
+                            <div><?= ($confirmSegment->getCountDescInterviewsOfModel() - $confirmSegment->getCountConfirmMembers()) ?></div>
+                            <div><?= ($confirmSegment->getCountRespond() - $confirmSegment->getCountDescInterviewsOfModel()) ?></div>
                         </div>
                     </div>
 
@@ -124,17 +138,29 @@ $this->title = 'Протокол проекта';
                 <?php endif; ?>
 
                 <!--Строки проблем сегментов-->
-                <?php foreach ($segment->problems as $problem) : ?>
+                <?php
+                /** @var $problems Problems[] */
+                $problems = Problems::find(false)
+                    ->andWhere(['segment_id' => $segment->getId()])
+                    ->all();
+                
+                foreach ($problems as $problem) : ?>
 
                     <!--Если у проблемы существует подтверждение-->
-                    <?php if($problem->confirm) : ?>
+                    <?php
+                    /** @var $confirmProblem ConfirmProblem */
+                    $confirmProblem = ConfirmProblem::find(false)
+                        ->andWhere(['problem_id' => $problem->getId()])
+                        ->one();
+                    
+                    if($confirmProblem) : ?>
 
                         <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                             <div class="row report-mobile-header-hypothesis report-mobile-bg-green">
                                 <div class="col-xs-12">
                                     <?= Html::a($problem->propertyContainer->getProperty('title')
-                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $problem->confirm->getId()],
+                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $confirmProblem->getId()],
                                         ['class' => 'link-stage-report-mobile white']) ?>
                                 </div>
                             </div>
@@ -144,7 +170,7 @@ $this->title = 'Протокол проекта';
                             <div class="row report-mobile-header-hypothesis report-mobile-bg-grey">
                                 <div class="col-xs-12">
                                     <?= Html::a($problem->propertyContainer->getProperty('title')
-                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $problem->confirm->getId()],
+                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $confirmProblem->getId()],
                                         ['class' => 'link-stage-report-mobile white']) ?>
                                 </div>
                             </div>
@@ -154,7 +180,7 @@ $this->title = 'Протокол проекта';
                             <div class="row report-mobile-header-hypothesis report-mobile-bg-red">
                                 <div class="col-xs-12">
                                     <?= Html::a($problem->propertyContainer->getProperty('title')
-                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $problem->confirm->getId()],
+                                        . ' - ' . $problem->getDescription(), ['/confirm-problem/view', 'id' => $confirmProblem->getId()],
                                         ['class' => 'link-stage-report-mobile white']) ?>
                                 </div>
                             </div>
@@ -173,11 +199,11 @@ $this->title = 'Протокол проекта';
 
                         <div class="row">
                             <div class="col-xs-12 report-mobile-value-columns">
-                                <div><?= $problem->confirm->getCountRespond() ?></div>
-                                <div><?= $problem->confirm->getCountPositive() ?></div>
-                                <div><?= $problem->confirm->getCountConfirmMembers() ?></div>
-                                <div><?= ($problem->confirm->getCountDescInterviewsOfModel() - $problem->confirm->getCountConfirmMembers()) ?></div>
-                                <div><?= ($problem->confirm->getCountRespond() - $problem->confirm->getCountDescInterviewsOfModel()) ?></div>
+                                <div><?= $confirmProblem->getCountRespond() ?></div>
+                                <div><?= $confirmProblem->getCountPositive() ?></div>
+                                <div><?= $confirmProblem->getCountConfirmMembers() ?></div>
+                                <div><?= ($confirmProblem->getCountDescInterviewsOfModel() - $confirmProblem->getCountConfirmMembers()) ?></div>
+                                <div><?= ($confirmProblem->getCountRespond() - $confirmProblem->getCountDescInterviewsOfModel()) ?></div>
                             </div>
                         </div>
 
@@ -215,17 +241,29 @@ $this->title = 'Протокол проекта';
                     <?php endif; ?>
 
                     <!--Строки ценностных предложений-->
-                    <?php foreach ($problem->gcps as $gcp) : ?>
+                    <?php
+                    /** @var $gcps Gcps[] */
+                    $gcps = Gcps::find(false)
+                        ->andWhere(['problem_id' => $problem->getId()])
+                        ->all();
+                    
+                    foreach ($gcps as $gcp) : ?>
 
                         <!--Если у ЦП существует подтверждение-->
-                        <?php if($gcp->confirm) : ?>
+                        <?php
+                        /** @var $confirmGcp ConfirmGcp */
+                        $confirmGcp = ConfirmGcp::find(false)
+                            ->andWhere(['gcp_id' => $gcp->getId()])
+                            ->one();
+                        
+                        if($confirmGcp) : ?>
 
                             <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                 <div class="row report-mobile-header-hypothesis report-mobile-bg-green">
                                     <div class="col-xs-12">
                                         <?= Html::a($gcp->propertyContainer->getProperty('title')
-                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()],
+                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $confirmGcp->getId()],
                                             ['class' => 'link-stage-report-mobile white']) ?>
                                     </div>
                                 </div>
@@ -235,7 +273,7 @@ $this->title = 'Протокол проекта';
                                 <div class="row report-mobile-header-hypothesis report-mobile-bg-grey">
                                     <div class="col-xs-12">
                                         <?= Html::a($gcp->propertyContainer->getProperty('title')
-                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()],
+                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $confirmGcp->getId()],
                                             ['class' => 'link-stage-report-mobile white']) ?>
                                     </div>
                                 </div>
@@ -245,7 +283,7 @@ $this->title = 'Протокол проекта';
                                 <div class="row report-mobile-header-hypothesis report-mobile-bg-red">
                                     <div class="col-xs-12">
                                         <?= Html::a($gcp->propertyContainer->getProperty('title')
-                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()],
+                                            . ' - ' . $gcp->getDescription(), ['/confirm-gcp/view', 'id' => $confirmGcp->getId()],
                                             ['class' => 'link-stage-report-mobile white']) ?>
                                     </div>
                                 </div>
@@ -264,11 +302,11 @@ $this->title = 'Протокол проекта';
 
                             <div class="row">
                                 <div class="col-xs-12 report-mobile-value-columns">
-                                    <div><?= $gcp->confirm->getCountRespond() ?></div>
-                                    <div><?= $gcp->confirm->getCountPositive() ?></div>
-                                    <div><?= $gcp->confirm->getCountConfirmMembers() ?></div>
-                                    <div><?= ($gcp->confirm->getCountDescInterviewsOfModel() - $gcp->confirm->getCountConfirmMembers()) ?></div>
-                                    <div><?= ($gcp->confirm->getCountRespond() - $gcp->confirm->getCountDescInterviewsOfModel()) ?></div>
+                                    <div><?= $confirmGcp->getCountRespond() ?></div>
+                                    <div><?= $confirmGcp->getCountPositive() ?></div>
+                                    <div><?= $confirmGcp->getCountConfirmMembers() ?></div>
+                                    <div><?= ($confirmGcp->getCountDescInterviewsOfModel() - $confirmGcp->getCountConfirmMembers()) ?></div>
+                                    <div><?= ($confirmGcp->getCountRespond() - $confirmGcp->getCountDescInterviewsOfModel()) ?></div>
                                 </div>
                             </div>
 
@@ -306,22 +344,39 @@ $this->title = 'Протокол проекта';
                         <?php endif; ?>
 
                         <!--Строки mvps-->
-                        <?php foreach ($gcp->mvps as $mvp) : ?>
+                        <?php
+                        /** @var $mvps Mvps[] */
+                        $mvps = Mvps::find(false)
+                            ->andWhere(['gcp_id' => $gcp->getId()])
+                            ->all();
+                        
+                        foreach ($mvps as $mvp) : ?>
 
                             <!--Если у MVP существует подтверждение-->
-                            <?php if($mvp->confirm) : ?>
+                            <?php
+                            /** @var $confirmMvp ConfirmMvp */
+                            $confirmMvp = ConfirmMvp::find(false)
+                                ->andWhere(['mvp_id' => $mvp->getId()])
+                                ->one();
+                            
+                            if($confirmMvp) : ?>
 
                                 <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
-                                    <?php if ($mvp->businessModel): ?>
+                                    <?php
+                                    $businessModel = BusinessModel::find(false)
+                                        ->andWhere(['mvp_id' => $mvp->getId()])
+                                        ->one();
+
+                                    if ($businessModel): ?>
                                         <div class="row report-mobile-header-mvp">
                                             <div class="col-xs-9 report-mobile-bg-green">
                                                 <?= Html::a($mvp->propertyContainer->getProperty('title')
-                                                    . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()],
+                                                    . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $confirmMvp->getId()],
                                                     ['class' => 'link-stage-report-mobile white']) ?>
                                             </div>
                                             <div class="col-xs-3 report-mobile-bg-green">
-                                                <?= Html::a('Бизнес-модель', ['/business-model/index', 'id' => $mvp->confirm->getId()],
+                                                <?= Html::a('Бизнес-модель', ['/business-model/index', 'id' => $confirmMvp->getId()],
                                                     ['class' => 'link-stage-report-mobile white']) ?>
                                             </div>
                                         </div>
@@ -329,11 +384,11 @@ $this->title = 'Протокол проекта';
                                         <div class="row report-mobile-header-mvp">
                                             <div class="col-xs-9 report-mobile-bg-green">
                                                 <?= Html::a($mvp->propertyContainer->getProperty('title')
-                                                    . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()],
+                                                    . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $confirmMvp->getId()],
                                                     ['class' => 'link-stage-report-mobile white']) ?>
                                             </div>
                                             <div class="col-xs-3 report-mobile-bg-grey">
-                                                <?= Html::a('Бизнес-модель', ['/business-model/index', 'id' => $mvp->confirm->getId()],
+                                                <?= Html::a('Бизнес-модель', ['/business-model/index', 'id' => $confirmMvp->getId()],
                                                     ['class' => 'link-stage-report-mobile white']) ?>
                                             </div>
                                         </div>
@@ -344,7 +399,7 @@ $this->title = 'Протокол проекта';
                                     <div class="row report-mobile-header-hypothesis report-mobile-bg-grey">
                                         <div class="col-xs-12">
                                             <?= Html::a($mvp->propertyContainer->getProperty('title')
-                                                . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()],
+                                                . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $confirmMvp->getId()],
                                                 ['class' => 'link-stage-report-mobile white']) ?>
                                         </div>
                                     </div>
@@ -354,7 +409,7 @@ $this->title = 'Протокол проекта';
                                     <div class="row report-mobile-header-hypothesis report-mobile-bg-red">
                                         <div class="col-xs-12">
                                             <?= Html::a($mvp->propertyContainer->getProperty('title')
-                                                . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()],
+                                                . ' - ' . $mvp->getDescription(), ['/confirm-mvp/view', 'id' => $confirmMvp->getId()],
                                                 ['class' => 'link-stage-report-mobile white']) ?>
                                         </div>
                                     </div>
@@ -373,11 +428,11 @@ $this->title = 'Протокол проекта';
 
                                 <div class="row">
                                     <div class="col-xs-12 report-mobile-value-columns">
-                                        <div><?= $mvp->confirm->getCountRespond() ?></div>
-                                        <div><?= $mvp->confirm->getCountPositive() ?></div>
-                                        <div><?= $mvp->confirm->getCountConfirmMembers() ?></div>
-                                        <div><?= ($mvp->confirm->getCountDescInterviewsOfModel() - $mvp->confirm->getCountConfirmMembers()) ?></div>
-                                        <div><?= ($mvp->confirm->getCountRespond() - $mvp->confirm->getCountDescInterviewsOfModel()) ?></div>
+                                        <div><?= $confirmMvp->getCountRespond() ?></div>
+                                        <div><?= $confirmMvp->getCountPositive() ?></div>
+                                        <div><?= $confirmMvp->getCountConfirmMembers() ?></div>
+                                        <div><?= ($confirmMvp->getCountDescInterviewsOfModel() - $confirmMvp->getCountConfirmMembers()) ?></div>
+                                        <div><?= ($confirmMvp->getCountRespond() - $confirmMvp->getCountDescInterviewsOfModel()) ?></div>
                                     </div>
                                 </div>
 

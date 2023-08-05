@@ -30,11 +30,18 @@ class UpdateRespondMvpForm extends UpdateFormRespond
     /**
      * UpdateRespondMvpForm constructor.
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @param array $config
      */
-    public function __construct(int $id, array $config = [])
+    public function __construct(int $id, bool $isOnlyNotDelete = true, array $config = [])
     {
-        $respond = RespondsMvp::findOne($id);
+        /** @var $respond RespondsMvp */
+        $respond = $isOnlyNotDelete ?
+            RespondsMvp::findOne($id) :
+            RespondsMvp::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
         foreach ($respond as $key => $value) {
             $this[$key] = $value;
         }
@@ -45,11 +52,17 @@ class UpdateRespondMvpForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
+     * @param bool $isOnlyNotDelete
      * @return ConfirmMvp|null
      */
-    public function findConfirm(): ?ConfirmMvp
+    public function findConfirm(bool $isOnlyNotDelete = true): ?ConfirmMvp
     {
-        return ConfirmMvp::findOne($this->getConfirmId());
+        /** @var $confirm ConfirmMvp */
+        $confirm = ConfirmMvp::find($isOnlyNotDelete)
+            ->andWhere(['id' => $this->getConfirmId()])
+            ->one();
+
+        return $confirm ?: null;
     }
 
 

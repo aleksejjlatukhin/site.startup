@@ -37,6 +37,7 @@ class CommunicationPatterns extends ActiveRecord
     public const COMMUNICATION_DEFAULT_DOES_NOT_APPOINTS_EXPERT_PROJECT = 'Вы не назначены на экспертизу по проекту {{наименование проекта}}. Приносим Вам свои извинения, запрос на экспертизу отозван.';
     public const COMMUNICATION_DEFAULT_WITHDRAWS_EXPERT_FROM_PROJECT = 'Вы отозваны с экспертизы по проекту {{наименование проекта}}. Подробную информацию получите у администратора сайта Spaccel.ru';
     public const COMMUNICATION_DEFAULT_USER_ALLOWED_STAGE_EXPERTISE = 'Проектант, {{проектант}}, разрешил экспертизу по этапу «{{наименование этапа проекта, ссылка на этап проекта}}».<br>Проект: {{наименование проекта}}.';
+    public const COMMUNICATION_DEFAULT_USER_DELETED_STAGE_PROJECT = 'Проектант, {{проектант}}, удалил «{{наименование этапа проекта, ссылка на этап проекта}}».<br>Проект: {{наименование проекта}}.';
 
 
     /**

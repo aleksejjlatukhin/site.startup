@@ -122,13 +122,13 @@ class ProjectsController extends AppClientController
                 $query = Projects::find()->with('user')
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                    ->where(['client_user.client_id' => $client->getId()]);
+                    ->andWhere(['client_user.client_id' => $client->getId()]);
 
             } else {
                 // вывести проекты, которые курирует трекер
                 $query = Projects::find()
                     ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                    ->where(['user.id_admin' => $id])->orderBy(['id' => SORT_DESC]);
+                    ->andWhere(['user.id_admin' => $id])->orderBy(['id' => SORT_DESC]);
             }
 
             if ($search !== '') {

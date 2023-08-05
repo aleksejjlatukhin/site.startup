@@ -84,10 +84,10 @@ class ExpertiseController extends AppClientController
         $query = $searchForm->search;
         if (5 <= mb_strlen($query)) {
 
-            $query_projects = Projects::find()
+            $query_projects = Projects::find(false)
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                 ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                ->where(['client_user.client_id' => $client->getId()])
+                ->andWhere(['client_user.client_id' => $client->getId()])
                 ->andWhere(['enable_expertise' => EnableExpertise::ON])
                 ->andWhere(['or',
                     ['like', 'project_name', $query],
@@ -95,10 +95,10 @@ class ExpertiseController extends AppClientController
                 ])->orderBy(['id' => SORT_DESC]);
         } else {
 
-            $query_projects = Projects::find()
+            $query_projects = Projects::find(false)
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
                 ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                ->where(['client_user.client_id' => $client->getId()])
+                ->andWhere(['client_user.client_id' => $client->getId()])
                 ->andWhere(['enable_expertise' => EnableExpertise::ON])
                 ->orderBy(['id' => SORT_DESC]);
         }
@@ -132,18 +132,18 @@ class ExpertiseController extends AppClientController
         $client = $clientUser->client;
         $pageSize = self::TASKS_PAGE_SIZE;
 
-        $query_projects = Projects::find()
+        $query_projects = Projects::find(false)
             ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $client->getId()])
+            ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['id' => SORT_DESC]);
 
         $countProjects = $query_projects->count();
 
-        $countEnableProjects = Projects::find()
+        $countEnableProjects = Projects::find(false)
             ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $client->getId()])
+            ->andWhere(['client_user.client_id' => $client->getId()])
             ->andWhere(['enable_expertise' => EnableExpertise::ON])
             ->count();
 
@@ -176,7 +176,11 @@ class ExpertiseController extends AppClientController
     {
         if (Yii::$app->request->isAjax) {
 
-            $project = Projects::findOne($id);
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
             $communicationsMainAdminAskExpert = ProjectCommunications::findAll([
                 'project_id' => $id, 'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
             ]);
@@ -228,7 +232,11 @@ class ExpertiseController extends AppClientController
     {
         if(Yii::$app->request->isAjax) {
 
-            $project = Projects::findOne($id);
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
             $response = ['renderAjax' => $this->renderAjax('ajax_project_summary_table', [
                 'project' => $project]), 'project_id' => $project->getId()];
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -248,7 +256,11 @@ class ExpertiseController extends AppClientController
      */
     public function actionGetSearchFormExperts(int $id)
     {
-        $project = Projects::findOne($id);
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         $searchFormExperts = new SearchFormExperts();
 
         if(Yii::$app->request->isAjax) {

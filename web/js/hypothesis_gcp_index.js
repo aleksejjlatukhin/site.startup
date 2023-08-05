@@ -63,15 +63,47 @@ $(body).on('change', 'form#hypothesisCreateForm', function(){
 
     var url = '/gcps/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
+    $.ajax({url: url, data: data, method: 'POST', cache: false});
+});
+
+
+// Показать данные корзины
+$(body).on('click', '#show_trash_list', function(e){
+
+    var url = $(this).attr('href');
+
     $.ajax({
         url: url,
-        data: data,
         method: 'POST',
         cache: false,
-        error: function(){
-            alert('Ошибка');
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
         }
     });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Показать список гипотез этапа проекта
+$(body).on('click', '#show_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
 });
 
 

@@ -1,6 +1,7 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 const confirmId = (window.location.search).split('?id=')[1];
+const action = window.location.pathname.split('/')[2];
 var body = $('body');
 
 //Выполнить при загрузке страницы
@@ -27,10 +28,19 @@ $(window).resize(function () {
 
 // Получение списка респондентов
 function getQueryResponds() {
+    var url
     if ($(window).width() <= '480') {
-        var url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true';
+        if (action === 'view-trash') {
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true&isOnlyNotDelete=false';
+        } else {
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true';
+        }
     } else {
-        var url = '/responds/get-query-responds?stage=2&id=' + confirmId;
+        if (action === 'view-trash') {
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isOnlyNotDelete=false';
+        } else {
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId;
+        }
     }
     $.ajax({
         url: url,
@@ -363,18 +373,20 @@ $(window).on('scroll', function() {
 // Отслеживаем клик вне поля Select
 $(document).mouseup(function (e){ // событие клика по веб-документу
 
-    var search = $('.select2-container--krajee .select2-search--dropdown .select2-search__field'); // поле поиска в select
-    var button = $('#button_add_text_question_confirm'); // кнопка открытия и закрытия списка select
+    if (action !== 'view-trash') {
+        var search = $('.select2-container--krajee .select2-search--dropdown .select2-search__field'); // поле поиска в select
+        var button = $('#button_add_text_question_confirm'); // кнопка открытия и закрытия списка select
 
-    if (!search.is(e.target) && !button.is(e.target) // если клик был не полю поиска и не по кнопке
-        && search.has(e.target).length === 0 && button.has(e.target).length === 0) { // и не их по его дочерним элементам
+        if (!search.is(e.target) && !button.is(e.target) // если клик был не полю поиска и не по кнопке
+            && search.has(e.target).length === 0 && button.has(e.target).length === 0) { // и не их по его дочерним элементам
 
-        $('#add_new_question_confirm').select2('close'); // скрываем список select
-        $(button).removeClass('openDropDownList'); // убираем класс открытового списка у кнопки открытия и закрытия списка select
+            $('#add_new_question_confirm').select2('close'); // скрываем список select
+            $(button).removeClass('openDropDownList'); // убираем класс открытового списка у кнопки открытия и закрытия списка select
 
-        $(button).css('border-width', '0 0 0 1px'); // возвращаем стили кнопке
-        $(this).find('.triangle-bottom').css('transform', 'rotate(0deg)'); // возвращаем стили кнопке
-        $('#add_text_question_confirm').css({'border-width': '1px', 'border-radius': '12px'}); // возвращаем стили для поля ввода
+            $(button).css('border-width', '0 0 0 1px'); // возвращаем стили кнопке
+            $(this).find('.triangle-bottom').css('transform', 'rotate(0deg)'); // возвращаем стили кнопке
+            $('#add_text_question_confirm').css({'border-width': '1px', 'border-radius': '12px'}); // возвращаем стили для поля ввода
+        }
     }
 });
 
@@ -570,7 +582,11 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 $(body).on('click', '.showRespondUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/responds/get-data-update-form?stage=2&id=' + id;
+    if (action !== 'view-trash') {
+        var url = '/responds/get-data-update-form?stage=2&id=' + id;
+    } else {
+        var url = '/responds/get-data-update-form?stage=2&id=' + id + '&isOnlyNotDelete=false';
+    }
     var respond_update_modal = $('#respond_update_modal');
     $(body).append($(respond_update_modal).first());
 
@@ -760,7 +776,11 @@ $(body).on('beforeSubmit', '#formCreateDescInterview', function(e){
 $(body).on('click', '.showDescInterviewUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    var url = '/interviews/get-data-update-form?stage=2&id=' + id;
+    if (action !== 'view-trash') {
+        var url = '/interviews/get-data-update-form?stage=2&id=' + id;
+    } else {
+        var url = '/interviews/get-data-update-form?stage=2&id=' + id + '&isOnlyNotDelete=false';
+    }
     var update_descInterview_modal = $('#update_descInterview_modal');
     $(body).append($(update_descInterview_modal).first());
 
@@ -1031,7 +1051,12 @@ $(body).on('click', '#cancel-not_exist-confirm', function(e) {
 //Показать таблицу ответов на вопросы интервью
 $(body).on('click', '.openTableQuestionsAndAnswers', function (e) {
 
-    var url = $(this).attr('href');
+    var url
+    if (action !== 'view-trash') {
+        url = $(this).attr('href');
+    } else {
+        var url = $(this).attr('href') + '&isOnlyNotDelete=false';
+    }
     var showQuestionsAndAnswers_modal = $('#showQuestionsAndAnswers');
     $(body).append($(showQuestionsAndAnswers_modal).first());
     var container = $(showQuestionsAndAnswers_modal).find('.modal-body');

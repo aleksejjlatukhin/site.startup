@@ -47,7 +47,12 @@ $this->registerCssFile('@web/css/expertise-result-tasks-style.css');
         <?php foreach ($projects as $project): ?>
 
             <div class="row table_row_expertise_result_tasks showDataResultTaskExpertise" id="dataShortResultTaskExpertise-<?= $project->getId() ?>">
-                <div class="col-md-4"><?= $project->getProjectName() ?></div>
+                <div class="col-md-4">
+                    <?= $project->getProjectName() ?>
+                    <?php if ($project->getDeletedAt()): ?>
+                        <span class="color-red"> - проект удален</span>
+                    <?php endif; ?>
+                </div>
                 <div class="col-md-2 text-center"><?= $project->getEnableExpertiseAt() ? '<span class="color-green bolder">' . date('d.m.Y', $project->getEnableExpertiseAt()) . '</span>' : Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) ?></div>
                 <div class="col-md-2 text-center">
                     <?php $lastCommunication_mainAdminAsks = $project->getLastProjectCommunicationByType(CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE);

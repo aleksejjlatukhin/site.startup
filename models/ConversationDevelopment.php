@@ -119,7 +119,7 @@ class ConversationDevelopment extends ActiveRecord
     public function getCountNewMessages(): int
     {
         return MessageDevelopment::find()
-            ->where(['conversation_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            ->andWhere(['conversation_id' => $this->id, 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
     }
 
 

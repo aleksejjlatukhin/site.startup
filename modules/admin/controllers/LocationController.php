@@ -51,7 +51,7 @@ class LocationController extends AppAdminController
             $model = new LocationWishList();
             if ($model->load(Yii::$app->request->post())) {
                 $exist = LocationWishList::find()
-                    ->where(['like', 'name', $model->getName()])
+                    ->andWhere(['like', 'name', $model->getName()])
                     ->exists();
                 if (!$exist) {
                     if ($model->save()) {
@@ -111,7 +111,7 @@ class LocationController extends AppAdminController
             $model = LocationWishList::findOne($id);
             if ($model->load(Yii::$app->request->post())) {
                 $exist = LocationWishList::find()
-                    ->where(['!=', 'id', $id])
+                    ->andWhere(['!=', 'id', $id])
                     ->andWhere(['like', 'name', $model->getName()])
                     ->exists();
                 if (!$exist) {

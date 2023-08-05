@@ -81,7 +81,7 @@ class UsersController extends AppClientController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
 
@@ -114,7 +114,7 @@ class UsersController extends AppClientController
 
             $countUsersCompany = User::find()
                 ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                ->where(['client_user.client_id' => $client->getId()])
+                ->andWhere(['client_user.client_id' => $client->getId()])
                 ->andWhere(['role' => User::ROLE_USER])
                 ->andWhere(['not', ['status' => [User::STATUS_NOT_ACTIVE, User::STATUS_DELETED]]])
                 ->count();
@@ -123,7 +123,7 @@ class UsersController extends AppClientController
 
                 $admins = User::find()->with('clientUser')
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                    ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
+                    ->andWhere(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
                     ->andWhere(['client_user.client_id' => $user->clientUser->getClientId()])
                     ->all();
 
@@ -160,7 +160,7 @@ class UsersController extends AppClientController
 
                 $countUsersCompany = User::find()
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                    ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['client_user.client_id' => $client->getId()])
                     ->andWhere(['role' => User::ROLE_USER])
                     ->andWhere(['not', ['status' => [User::STATUS_NOT_ACTIVE, User::STATUS_DELETED]]])
                     ->count();
@@ -174,7 +174,7 @@ class UsersController extends AppClientController
 
                 $countTrackersCompany = User::find()
                     ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                    ->where(['client_user.client_id' => $client->getId()])
+                    ->andWhere(['client_user.client_id' => $client->getId()])
                     ->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
                     ->andWhere(['not', ['status' => [User::STATUS_NOT_ACTIVE, User::STATUS_DELETED]]])
                     ->count();
@@ -209,7 +209,7 @@ class UsersController extends AppClientController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
 
@@ -243,7 +243,7 @@ class UsersController extends AppClientController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
 
@@ -354,7 +354,7 @@ class UsersController extends AppClientController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])
+            ->andWhere(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])
             ->andWhere(['client_user.client_id' => $clientUser->getClientId()])
             ->orderBy(['updated_at' => SORT_DESC]);
 

@@ -152,6 +152,24 @@ a.view_block_description > div {
     text-decoration: none;
 }
 
+.hypothesis_trash_link_block {
+    display:flex;
+    align-items: center;
+    padding: 5px 10px 5px 0;
+}
+.hypothesis_link_trash {
+    color: #F5A4A4;
+    font-size: 24px;
+}
+.hypothesis_link_trash:hover {
+    color: #F5A4A4;
+    text-decoration: none;
+}
+.hypothesis_link_trash:focus {
+    color: #F5A4A4;
+    text-decoration: none;
+}
+
 @media screen and (min-width: 1140px) {
 
     .project_info_data {
@@ -281,7 +299,8 @@ a.view_block_description > div {
 }
 
 @media screen and (max-width: 480px) {
-    .new_hypothesis_link_plus {
+    .new_hypothesis_link_plus,
+    .hypothesis_link_trash {
         font-size: 18px;
     }
     .container-fluid.block-button-new-gcp {

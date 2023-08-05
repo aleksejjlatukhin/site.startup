@@ -1,5 +1,10 @@
 <?php
 
+use app\models\BusinessModel;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
 use app\models\Gcps;
 use app\models\Mvps;
 use app\models\Problems;
@@ -25,12 +30,22 @@ use yii\helpers\Html;
         <div class="headerTableResultProject">
             <div class="text-center">
 
-                <?= Html::a('<div style="margin-top: -50px;">Проект: ' . $project->getProjectName() . ' ' . Html::img('/images/icons/icon_export_light.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '5px']]) . '</div>', [
-                    '/projects/result-export', 'id' => $project->getId()], [
-                    'class' => 'export_link_hypothesis',
-                    'target' => '_blank',
-                    'title' => 'Скачать в pdf',
-                ]) ?>
+                <?php if (!$project->getDeletedAt()): ?>
+
+                    <?= Html::a('<div style="margin-top: -50px;">Проект: ' . $project->getProjectName() . ' ' . Html::img('/images/icons/icon_export_light.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '5px']]) . '</div>', [
+                        '/projects/result-export', 'id' => $project->getId()], [
+                        'class' => 'export_link_hypothesis',
+                        'target' => '_blank',
+                        'title' => 'Скачать в pdf',
+                    ]) ?>
+
+                <?php else: ?>
+
+                    <?= Html::a('<div style="margin-top: -50px;">Проект: ' . $project->getProjectName() . '</div>', ['#'], [
+                        'class' => 'export_link_hypothesis', 'style' => ['cursor' => 'default'], 'onclick' => 'return false;'
+                    ]) ?>
+
+                <?php endif; ?>
 
             </div>
         </div>
@@ -124,19 +139,27 @@ use yii\helpers\Html;
                                 ['/segments/index', 'id' => $segment->getProjectId()], ['class' => 'link_in_column_result_table']) ?>
                         </div>
 
+                        <?php /** @var $confirmSegment ConfirmSegment */
+                        $confirmSegment = !$project->getDeletedAt() ?
+                            $segment->confirm :
+                            ConfirmSegment::find(false)
+                                ->andWhere(['segment_id' => $segment->getId()])
+                                ->one();
+                        ?>
+
                         <!--Статусы сегментов-->
                         <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                             <div class="text-center regular_column">
                                 <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title'=> 'Посмотреть подтверждение сегмента']) ?>
+                                    ['/confirm-segment/view', 'id' => $confirmSegment->getId()], ['title'=> 'Посмотреть подтверждение сегмента']) ?>
                             </div>
 
                         <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                             <div class="text-center regular_column">
                                 <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title'=> 'Посмотреть подтверждение сегмента']) ?>
+                                    ['/confirm-segment/view', 'id' => $confirmSegment->getId()], ['title'=> 'Посмотреть подтверждение сегмента']) ?>
                             </div>
 
                         <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
@@ -164,7 +187,14 @@ use yii\helpers\Html;
                         <div class="" style="display:flex; flex-direction: column;">
 
                             <!--Если у сегмента отсутствуют гипотезы проблем-->
-                            <?php if (empty($segment->problems)) : ?>
+                            <?php /** @var $problems Problems[] */
+                            $problems = !$project->getDeletedAt() ?
+                                $segment->problems :
+                                Problems::find(false)
+                                    ->andWhere(['segment_id' => $segment->getId()])
+                                    ->all();
+
+                            if (empty($problems)) : ?>
 
                                 <div class="" style="display:flex; height: 100%;">
 
@@ -172,7 +202,7 @@ use yii\helpers\Html;
 
                                         <div class="text-center first_regular_column_of_stage">
                                             <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                ['/problems/index', 'id' => $segment->confirm->id], ['title'=> 'Создать ГПС']) ?>
+                                                ['/problems/index', 'id' => $confirmSegment->getId()], ['title'=> 'Создать ГПС']) ?>
                                         </div>
 
                                     <?php else : ?>
@@ -201,7 +231,7 @@ use yii\helpers\Html;
                             <?php endif;?>
 
                             <!--Если у сегмента есть гипотезы проблем-->
-                            <?php foreach ($segment->problems as $number_problem => $problem) : ?>
+                            <?php foreach ($problems as $number_problem => $problem) : ?>
 
                                 <div class="" style="display:flex; height: 100%;">
 
@@ -212,19 +242,26 @@ use yii\helpers\Html;
                                             ['class' => 'link_in_column_result_table', 'title' => $problem->getDescription()]) ?>
                                     </div>
 
+                                    <?php /** @var $confirmProblem ConfirmProblem */
+                                    $confirmProblem = !$project->getDeletedAt() ? $problem->confirm :
+                                        ConfirmProblem::find(false)
+                                            ->andWhere(['problem_id' => $problem->getId()])
+                                            ->one();
+                                    ?>
+
                                     <!--Статусы проблем-->
                                     <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                         <div class="text-center regular_column">
                                             <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГПС']) ?>
+                                                ['/confirm-problem/view', 'id' => $confirmProblem->getId()], ['title'=> 'Посмотреть подтверждение ГПС']) ?>
                                         </div>
 
                                     <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                         <div class="text-center regular_column">
                                             <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГПС']) ?>
+                                                ['/confirm-problem/view', 'id' => $confirmProblem->getId()], ['title'=> 'Посмотреть подтверждение ГПС']) ?>
                                         </div>
 
                                     <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
@@ -250,7 +287,14 @@ use yii\helpers\Html;
                                     <div class="" style="display:flex; flex-direction: column;">
 
                                         <!--Если у проблемы отсутствуют гипотезы ценностных предложений-->
-                                        <?php if (empty($problem->gcps)) : ?>
+                                        <?php
+                                        $gcps = !$project->getDeletedAt() ?
+                                            $problem->gcps :
+                                            Gcps::find(false)
+                                                ->andWhere(['problem_id' => $problem->getId()])
+                                                ->all();
+
+                                        if (empty($gcps)) : ?>
 
                                             <div class="" style="display:flex; height: 100%;">
 
@@ -258,7 +302,7 @@ use yii\helpers\Html;
 
                                                     <div class="text-center first_regular_column_of_stage">
                                                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                            ['/gcps/index', 'id' => $problem->confirm->getId()], ['title'=> 'Создать ГЦП']) ?>
+                                                            ['/gcps/index', 'id' => $confirmProblem->getId()], ['title'=> 'Создать ГЦП']) ?>
                                                     </div>
 
                                                 <?php else : ?>
@@ -281,7 +325,7 @@ use yii\helpers\Html;
 
                                         <?php endif;?>
 
-                                        <?php foreach ($problem->gcps as $gcp) : ?>
+                                        <?php foreach ($gcps as $gcp) : ?>
 
                                             <div class="" style="display:flex; height: 100%;">
 
@@ -292,19 +336,27 @@ use yii\helpers\Html;
                                                         ['class' => 'link_in_column_result_table', 'title' => $gcp->getDescription()]) ?>
                                                 </div>
 
+                                                <?php /** @var $confirmGcp ConfirmGcp */
+                                                $confirmGcp = !$project->getDeletedAt() ?
+                                                    $gcp->confirm :
+                                                    ConfirmGcp::find(false)
+                                                        ->andWhere(['gcp_id' => $gcp->getId()])
+                                                        ->one();
+                                                ?>
+
                                                 <!--Статусы ценностных предложений-->
                                                 <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                     <div class="text-center regular_column">
                                                         <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                            ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГЦП']) ?>
+                                                            ['/confirm-gcp/view', 'id' => $confirmGcp->getId()], ['title'=> 'Посмотреть подтверждение ГЦП']) ?>
                                                     </div>
 
                                                 <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                                     <div class="text-center regular_column">
                                                         <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                            ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title'=> 'Посмотреть подтверждение ГЦП']) ?>
+                                                            ['/confirm-gcp/view', 'id' => $confirmGcp->getId()], ['title'=> 'Посмотреть подтверждение ГЦП']) ?>
                                                     </div>
 
                                                 <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
@@ -330,7 +382,14 @@ use yii\helpers\Html;
                                                 <div class="" style="display:flex; flex-direction: column;">
 
                                                     <!--Если у ценностного предложения отсутствуют mvp-->
-                                                    <?php if (empty($gcp->mvps)) : ?>
+                                                    <?php /** @var $mvps Mvps[] */
+                                                    $mvps = !$project->getDeletedAt() ?
+                                                        $gcp->mvps :
+                                                        Mvps::find(false)
+                                                            ->andWhere(['gcp_id' => $gcp->getId()])
+                                                            ->all();
+
+                                                    if (empty($mvps)) : ?>
 
                                                         <div class="" style="display:flex; height: 100%;">
 
@@ -338,7 +397,7 @@ use yii\helpers\Html;
 
                                                                 <div class="text-center first_regular_column_of_stage">
                                                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                        ['/mvps/index', 'id' => $gcp->confirm->getId()], ['title'=> 'Создать MVP']) ?>
+                                                                        ['/mvps/index', 'id' => $confirmGcp->getId()], ['title'=> 'Создать MVP']) ?>
                                                                 </div>
 
                                                             <?php else : ?>
@@ -356,7 +415,7 @@ use yii\helpers\Html;
 
                                                     <?php endif;?>
 
-                                                    <?php foreach ($gcp->mvps as $mvp) : ?>
+                                                    <?php foreach ($mvps as $mvp) : ?>
 
                                                         <div class="" style="display:flex; height: 100%;">
 
@@ -370,19 +429,27 @@ use yii\helpers\Html;
                                                                     ['class' => 'link_in_column_result_table', 'title' => $mvp->getDescription()]) ?>
                                                             </div>
 
+                                                            <?php /** @var $confirmMvp ConfirmMvp */
+                                                            $confirmMvp = !$project->getDeletedAt() ?
+                                                                $mvp->confirm :
+                                                                ConfirmMvp::find(false)
+                                                                    ->andWhere(['mvp_id' => $mvp->getId()])
+                                                                    ->one();
+                                                            ?>
+
                                                             <!--Статусы mvps-->
                                                             <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                                 <div class="text-center regular_column">
                                                                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть подтверждение MVP']) ?>
+                                                                        ['/confirm-mvp/view', 'id' => $confirmMvp->getId()], ['title'=> 'Посмотреть подтверждение MVP']) ?>
                                                                 </div>
 
                                                             <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                                                 <div class="text-center regular_column">
                                                                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть подтверждение MVP']) ?>
+                                                                        ['/confirm-mvp/view', 'id' => $confirmMvp->getId()], ['title'=> 'Посмотреть подтверждение MVP']) ?>
                                                                 </div>
 
                                                             <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
@@ -405,18 +472,25 @@ use yii\helpers\Html;
                                                             </div>
 
                                                             <!--Бизнес модели-->
-                                                            <?php if (!$mvp->businessModel && $mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+                                                            <?php /** @var $businessModel BusinessModel */
+                                                            $businessModel = !$project->getDeletedAt() ?
+                                                                $mvp->businessModel :
+                                                                BusinessModel::find(false)
+                                                                    ->andWhere(['mvp_id' => $mvp->getId()])
+                                                                    ->one();
+
+                                                            if (!$businessModel && $mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                                                 <div class="text-center column_business_model">
                                                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Создать бизнес-модель']) ?>
+                                                                        ['/business-model/index', 'id' => $confirmMvp->getId()], ['title'=> 'Создать бизнес-модель']) ?>
                                                                 </div>
 
-                                                            <?php elseif ($mvp->businessModel) : ?>
+                                                            <?php elseif ($businessModel) : ?>
 
                                                                 <div class="text-center column_business_model">
                                                                     <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
-                                                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
+                                                                        ['/business-model/index', 'id' => $confirmMvp->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
                                                                 </div>
 
                                                             <?php else : ?>

@@ -1,5 +1,10 @@
 <?php
 
+use app\models\BusinessModel;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
 use app\models\EnableExpertise;
 use app\models\Gcps;
 use app\models\Mvps;
@@ -42,7 +47,13 @@ $this->title = 'Сводная таблица проекта'
 
             <div class="block-segment-margin">
 
-                <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                <?php
+                /** @var $confirmSegment ConfirmSegment */
+                $confirmSegment = ConfirmSegment::find(false)
+                    ->andWhere(['segment_id' => $segment->getId()])
+                    ->one();
+
+                if ($segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                     <div class="block-segment">
 
@@ -91,11 +102,17 @@ $this->title = 'Сводная таблица проекта'
                     <div class="block-segment block-segment-<?= $number_segment ?>">
 
                         <?= Html::a('ГЦС ' . ($number_segment + 1), [
-                            '/confirm-segment/view', 'id' => $segment->confirm->getId()],[
+                            '/confirm-segment/view', 'id' => $confirmSegment->getId()],[
                             'class' => 'link-confirm-result-mobile bg-green'
                         ]) ?>
 
-                        <?php if ($segment->problems) : ?>
+                        <?php
+                        /** @var $problems Problems[] */
+                        $problems = Problems::find(false)
+                            ->andWhere(['segment_id' => $segment->getId()])
+                            ->all();
+
+                        if ($problems) : ?>
                             <div class="line-segment line-segment-<?= $number_segment ?>"></div>
                         <?php endif; ?>
 
@@ -122,7 +139,7 @@ $this->title = 'Сводная таблица проекта'
                     <div class="block-segment">
 
                         <?= Html::a('ГЦС ' . ($number_segment + 1), [
-                            '/confirm-segment/view', 'id' => $segment->confirm->getId()],[
+                            '/confirm-segment/view', 'id' => $confirmSegment->getId()],[
                             'class' => 'link-confirm-result-mobile bg-red'
                         ]) ?>
 
@@ -147,13 +164,25 @@ $this->title = 'Сводная таблица проекта'
                 <?php endif; ?>
 
                 <!--PROBLEMS-->
-                <?php if ($problems = $segment->problems) : ?>
+                <?php
+                /** @var $problems Problems[] */
+                $problems = Problems::find(false)
+                    ->andWhere(['segment_id' => $segment->getId()])
+                    ->all();
+
+                if ($problems) : ?>
 
                     <?php foreach ($problems as $number_problem => $problem) : ?>
 
                         <div class="block-problem-margin">
 
-                            <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                            <?php
+                            /** @var $confirmProblem ConfirmProblem */
+                            $confirmProblem = ConfirmProblem::find(false)
+                                ->andWhere(['problem_id' => $problem->getId()])
+                                ->one();
+
+                            if ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                 <div class="block-problem segment-number-<?= $number_segment ?>">
 
@@ -202,11 +231,17 @@ $this->title = 'Сводная таблица проекта'
                                 <div class="block-problem segment-number-<?= $number_segment ?> block-problem-<?= $number_segment . '-' . $number_problem ?>">
 
                                     <?= Html::a('ГПС ' . ($number_segment + 1) . '.' . ($number_problem + 1), [
-                                        '/confirm-problem/view', 'id' => $problem->confirm->getId()],[
+                                        '/confirm-problem/view', 'id' => $confirmProblem->getId()],[
                                         'class' => 'link-confirm-result-mobile bg-green'
                                     ]) ?>
 
-                                    <?php if ($problem->gcps) : ?>
+                                    <?php
+                                    /** @var $gcps Gcps[] */
+                                    $gcps = Gcps::find(false)
+                                        ->andWhere(['problem_id' => $problem->getId()])
+                                        ->all();
+
+                                    if ($gcps) : ?>
                                         <div class="line-problem line-problem-<?= $number_segment . '-' . $number_problem ?>"></div>
                                     <?php endif; ?>
 
@@ -233,7 +268,7 @@ $this->title = 'Сводная таблица проекта'
                                 <div class="block-problem segment-number-<?= $number_segment ?>">
 
                                     <?= Html::a('ГПС ' . ($number_segment + 1) . '.' . ($number_problem + 1), [
-                                        '/confirm-problem/view', 'id' => $problem->confirm->getId()],[
+                                        '/confirm-problem/view', 'id' => $confirmProblem->getId()],[
                                         'class' => 'link-confirm-result-mobile bg-red'
                                     ]) ?>
 
@@ -258,13 +293,24 @@ $this->title = 'Сводная таблица проекта'
                             <?php endif; ?>
 
                             <!--GCPS-->
-                            <?php if ($gcps = $problem->gcps) : ?>
+                            <?php
+                            /** @var $gcps Gcps[] */
+                            $gcps = Gcps::find(false)
+                                ->andWhere(['problem_id' => $problem->getId()])
+                                ->all();
+                            if ($gcps) : ?>
 
                                 <?php foreach ($gcps as $number_gcp => $gcp) : ?>
 
                                     <div class="block-gcp-margin">
 
-                                        <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                                        <?php
+                                        /** @var $confirmGcp ConfirmGcp */
+                                        $confirmGcp = ConfirmGcp::find(false)
+                                            ->andWhere(['gcp_id' => $gcp->getId()])
+                                            ->one();
+
+                                        if ($gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                             <div class="block-gcp problem-number-<?= $number_segment . '-' . $number_problem ?>">
 
@@ -313,11 +359,17 @@ $this->title = 'Сводная таблица проекта'
                                             <div class="block-gcp problem-number-<?= $number_segment . '-' . $number_problem ?> block-gcp-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?>">
 
                                                 <?= Html::a('ГЦП ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1), [
-                                                    '/confirm-gcp/view', 'id' => $gcp->confirm->getId()],[
+                                                    '/confirm-gcp/view', 'id' => $confirmGcp->getId()],[
                                                     'class' => 'link-confirm-result-mobile bg-green'
                                                 ]) ?>
 
-                                                <?php if ($gcp->mvps) : ?>
+                                                <?php
+                                                /** @var $mvps Mvps[] */
+                                                $mvps = Mvps::find(false)
+                                                    ->andWhere(['gcp_id' => $gcp->getId()])
+                                                    ->all();
+
+                                                if ($mvps) : ?>
                                                     <div class="line-gcp line-gcp-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?>"></div>
                                                 <?php endif; ?>
 
@@ -344,7 +396,7 @@ $this->title = 'Сводная таблица проекта'
                                             <div class="block-gcp problem-number-<?= $number_segment . '-' . $number_problem ?>">
 
                                                 <?= Html::a('ГЦП ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1), [
-                                                    '/confirm-gcp/view', 'id' => $gcp->confirm->getId()],[
+                                                    '/confirm-gcp/view', 'id' => $confirmGcp->getId()],[
                                                     'class' => 'link-confirm-result-mobile bg-red'
                                                 ]) ?>
 
@@ -369,13 +421,25 @@ $this->title = 'Сводная таблица проекта'
                                         <?php endif; ?>
 
                                         <!--MVPS-->
-                                        <?php if ($mvps = $gcp->mvps) : ?>
+                                        <?php
+                                        /** @var $mvps Mvps[] */
+                                        $mvps = Mvps::find(false)
+                                            ->andWhere(['gcp_id' => $gcp->getId()])
+                                            ->all();
+
+                                        if ($mvps) : ?>
 
                                             <?php foreach ($mvps as $number_mvp => $mvp) : ?>
 
                                                 <div class="block-mvp-margin">
 
-                                                    <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                                                    <?php
+                                                    /** @var $confirmMvp ConfirmMvp */
+                                                    $confirmMvp = ConfirmMvp::find(false)
+                                                        ->andWhere(['mvp_id' => $mvp->getId()])
+                                                        ->one();
+
+                                                    if ($mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                                         <div class="block-mvp gcp-number-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?>">
 
@@ -424,11 +488,17 @@ $this->title = 'Сводная таблица проекта'
                                                         <div class="block-mvp gcp-number-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?> block-mvp-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp . '-' . $number_mvp ?>">
 
                                                             <?= Html::a('MVP ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1) . '.' . ($number_mvp + 1), [
-                                                                '/confirm-mvp/view', 'id' => $mvp->confirm->getId()],[
+                                                                '/confirm-mvp/view', 'id' => $confirmMvp->getId()],[
                                                                 'class' => 'link-confirm-result-mobile bg-green'
                                                             ]) ?>
 
-                                                            <?php if ($mvp->businessModel) : ?>
+                                                            <?php
+                                                            /** @var $businessModel BusinessModel */
+                                                            $businessModel = BusinessModel::find(false)
+                                                                ->andWhere(['mvp_id' => $mvp->getId()])
+                                                                ->one();
+
+                                                            if ($businessModel) : ?>
                                                                 <div class="line-mvp line-mvp-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp . '-' . $number_mvp ?>"></div>
                                                             <?php endif; ?>
 
@@ -455,7 +525,7 @@ $this->title = 'Сводная таблица проекта'
                                                         <div class="block-mvp gcp-number-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp ?>">
 
                                                             <?= Html::a('MVP ' . ($number_segment + 1) . '.' . ($number_problem + 1) . '.' . ($number_gcp + 1) . '.' . ($number_mvp + 1), [
-                                                                '/confirm-mvp/view', 'id' => $mvp->confirm->getId()],[
+                                                                '/confirm-mvp/view', 'id' => $confirmMvp->getId()],[
                                                                 'class' => 'link-confirm-result-mobile bg-red'
                                                             ]) ?>
 
@@ -479,7 +549,13 @@ $this->title = 'Сводная таблица проекта'
 
                                                     <?php endif; ?>
 
-                                                    <?php if ($businessModel = $mvp->businessModel) : ?>
+                                                    <?php
+                                                    /** @var $businessModel BusinessModel */
+                                                    $businessModel = BusinessModel::find(false)
+                                                        ->andWhere(['mvp_id' => $mvp->getId()])
+                                                        ->one();
+
+                                                    if ($businessModel) : ?>
 
                                                         <div class="block-business-model-margin">
                                                             <div class="block-business-model mvp-number-<?= $number_segment . '-' . $number_problem . '-' . $number_gcp . '-' . $number_mvp ?>">

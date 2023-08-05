@@ -187,7 +187,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
     <div class="roadmap_row_dates" style="width: 1120px;">
 
         <div class="roadmap_block_name_segment">
-            <?= $segment_name; ?>
+            <?= $segment_name ?>
         </div>
 
         <div class="roadmap_block_date_segment">
@@ -201,7 +201,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_segment_confirm; ?>
+                <?= $fact_segment_confirm ?>
             </div>
 
         </div>
@@ -213,7 +213,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_gps; ?>
+                <?= $fact_gps ?>
             </div>
 
         </div>
@@ -225,7 +225,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_gps_confirm; ?>
+                <?= $fact_gps_confirm ?>
             </div>
 
         </div>
@@ -237,7 +237,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_gcp; ?>
+                <?= $fact_gcp ?>
             </div>
 
         </div>
@@ -249,7 +249,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_gcp_confirm; ?>
+                <?= $fact_gcp_confirm ?>
             </div>
 
         </div>
@@ -261,7 +261,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_mvp; ?>
+                <?= $fact_mvp ?>
             </div>
 
         </div>
@@ -273,7 +273,7 @@ if ($roadmap->getProperty('fact_mvp_confirm') != null) {
             </div>
 
             <div>
-                <?= $fact_mvp_confirm; ?>
+                <?= $fact_mvp_confirm ?>
             </div>
 
         </div>

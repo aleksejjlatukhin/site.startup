@@ -30,11 +30,18 @@ class UpdateRespondProblemForm extends UpdateFormRespond
     /**
      * UpdateRespondProblemForm constructor.
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @param array $config
      */
-    public function __construct(int $id, array $config = [])
+    public function __construct(int $id, bool $isOnlyNotDelete = true, array $config = [])
     {
-        $respond = RespondsProblem::findOne($id);
+        /** @var $respond RespondsProblem */
+        $respond = $isOnlyNotDelete ?
+            RespondsProblem::findOne($id) :
+            RespondsProblem::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         foreach ($respond as $key => $value) {
             $this[$key] = $value;
         }
@@ -45,11 +52,17 @@ class UpdateRespondProblemForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
+     * @param bool $isOnlyNotDelete
      * @return ConfirmProblem|null
      */
-    public function findConfirm(): ?ConfirmProblem
+    public function findConfirm(bool $isOnlyNotDelete = true): ?ConfirmProblem
     {
-        return ConfirmProblem::findOne($this->getConfirmId());
+        /** @var $confirm ConfirmProblem */
+        $confirm = ConfirmProblem::find($isOnlyNotDelete)
+            ->andWhere(['id' => $this->getConfirmId()])
+            ->one();
+
+        return $confirm ?: null;
     }
 
 

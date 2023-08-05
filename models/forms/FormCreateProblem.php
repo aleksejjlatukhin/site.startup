@@ -45,14 +45,16 @@ class FormCreateProblem extends Model
      */
     public function __construct(Segments $preliminaryHypothesis, array $config = [])
     {
-        $this->setExpectedResultsInterview();
-        $this->setCacheManager();
-        $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
-        $cacheName = 'formCreateHypothesisCache';
-        if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
-            $className = explode('\\', self::class)[3];
-            foreach ($cache[$className] as $key => $value) {
-                $this[$key] = $value;
+        if (!$preliminaryHypothesis->getDeletedAt()) {
+            $this->setExpectedResultsInterview();
+            $this->setCacheManager();
+            $this->setCachePathForm(self::getCachePath($preliminaryHypothesis));
+            $cacheName = 'formCreateHypothesisCache';
+            if ($cache = $this->getCacheManager()->getCache($this->getCachePathForm(), $cacheName)) {
+                $className = explode('\\', self::class)[3];
+                foreach ($cache[$className] as $key => $value) {
+                    $this[$key] = $value;
+                }
             }
         }
 
@@ -112,7 +114,7 @@ class FormCreateProblem extends Model
         /**
          * @var Problems $last_model
          */
-        $last_model = Problems::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
+        $last_model = Problems::find(false)->andWhere(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmSegment = ConfirmSegment::findOne($this->getBasicConfirmId());
 
         $problem = new Problems();

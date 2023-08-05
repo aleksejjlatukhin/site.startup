@@ -133,7 +133,7 @@ class ProfileExpertForm extends  Model
     public function __construct($id, array $config = [])
     {
         /** @var User $user */
-        $user = User::find()->with(['expertInfo', 'keywords'])->where(['id' => $id])->one();
+        $user = User::find()->with(['expertInfo', 'keywords'])->andWhere(['id' => $id])->one();
         $this->keywords = $user->keywords->getDescription();
         foreach ($user as $key => $value) {
             if (property_exists($this, $key)) {

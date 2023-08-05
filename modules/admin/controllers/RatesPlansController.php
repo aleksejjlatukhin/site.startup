@@ -98,7 +98,7 @@ class RatesPlansController extends AppAdminController
 
             $ratesPlans = RatesPlan::find()->all();
             $clientRatesPlan = ClientRatesPlan::find()
-                ->where(['client_id' => $clientId])
+                ->andWhere(['client_id' => $clientId])
                 ->orderBy(['created_at' => SORT_DESC])
                 ->one();
             if (!$clientRatesPlan) {

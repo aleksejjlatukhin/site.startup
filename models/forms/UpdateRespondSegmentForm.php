@@ -30,11 +30,18 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
     /**
      * UpdateRespondForm constructor.
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @param array $config
      */
-    public function __construct(int $id, array $config = [])
+    public function __construct(int $id, bool $isOnlyNotDelete = true, array $config = [])
     {
-        $respond = RespondsSegment::findOne($id);
+        /** @var $respond RespondsSegment */
+        $respond = $isOnlyNotDelete ?
+            RespondsSegment::findOne($id) :
+            RespondsSegment::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         foreach ($respond as $key => $value) {
             $this[$key] = $value;
         }
@@ -45,12 +52,18 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
-     * 
+     *
+     * @param bool $isOnlyNotDelete
      * @return ConfirmSegment|null
      */
-    public function findConfirm(): ?ConfirmSegment
+    public function findConfirm(bool $isOnlyNotDelete = true): ?ConfirmSegment
     {
-        return ConfirmSegment::findOne($this->getConfirmId());
+        /** @var $confirm ConfirmSegment */
+        $confirm = ConfirmSegment::find($isOnlyNotDelete)
+            ->andWhere(['id' => $this->getConfirmId()])
+            ->one();
+
+        return $confirm ?: null;
     }
 
 

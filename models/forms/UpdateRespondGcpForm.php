@@ -29,12 +29,19 @@ class UpdateRespondGcpForm extends UpdateFormRespond
 
     /**
      * UpdateRespondGcpForm constructor.
-     * @param int  $id
+     * @param int $id
+     * @param bool $isOnlyNotDelete
      * @param array $config
      */
-    public function __construct(int $id, array $config = [])
+    public function __construct(int $id, bool $isOnlyNotDelete = true, array $config = [])
     {
-        $respond = RespondsGcp::findOne($id);
+        /** @var $respond RespondsGcp */
+        $respond = $isOnlyNotDelete ?
+            RespondsGcp::findOne($id) :
+            RespondsGcp::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         foreach ($respond as $key => $value) {
             $this[$key] = $value;
         }
@@ -45,11 +52,17 @@ class UpdateRespondGcpForm extends UpdateFormRespond
 
     /**
      * Получить модель подтверждения
+     * @param bool $isOnlyNotDelete
      * @return ConfirmGcp|null
      */
-    public function findConfirm(): ?ConfirmGcp
+    public function findConfirm(bool $isOnlyNotDelete = true): ?ConfirmGcp
     {
-        return ConfirmGcp::findOne($this->getConfirmId());
+        /** @var $confirm ConfirmGcp */
+        $confirm = ConfirmGcp::find($isOnlyNotDelete)
+            ->andWhere(['id' => $this->getConfirmId()])
+            ->one();
+
+        return $confirm ?: null;
     }
 
 

@@ -53,7 +53,7 @@ class ClientProfileController extends AppClientController
         /** @var Client $client */
         $client = Client::find()
             ->leftJoin('client_settings','`client_settings`.`client_id` = `client`.`id`')
-            ->where(['client_settings.admin_id' => Yii::$app->user->getId()])
+            ->andWhere(['client_settings.admin_id' => Yii::$app->user->getId()])
             ->one();
         $model = new FormUpdateClient($client);
         $avatarForm = new AvatarCompanyForm($client->getId());

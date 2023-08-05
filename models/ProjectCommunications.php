@@ -139,7 +139,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
             CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
             CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
-            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+            CommunicationTypes::USER_DELETED_PROJECT,
+            CommunicationTypes::USER_DELETED_SEGMENT,
+            CommunicationTypes::USER_DELETED_PROBLEM,
+            CommunicationTypes::USER_DELETED_GCP,
+            CommunicationTypes::USER_DELETED_MVP
         ], true)) {
             return User::findOne($this->getAdresseeId());
         }
@@ -166,7 +171,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE,
             CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
             CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
-            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE
+            CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+            CommunicationTypes::USER_DELETED_PROJECT,
+            CommunicationTypes::USER_DELETED_SEGMENT,
+            CommunicationTypes::USER_DELETED_PROBLEM,
+            CommunicationTypes::USER_DELETED_GCP,
+            CommunicationTypes::USER_DELETED_MVP
         ], true)) {
             return User::findOne($this->getSenderId());
         }
@@ -216,35 +226,55 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public function getHypothesis(): ?ActiveRecord
     {
-        if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE) {
-            return Projects::findOne($this->getHypothesisId());
+        if (in_array($this->getType(), [CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE, CommunicationTypes::USER_DELETED_PROJECT], true)) {
+            return Projects::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
-        if ($this->getType() === CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE) {
-            return Segments::findOne($this->getHypothesisId());
+        if (in_array($this->getType(), [CommunicationTypes::USER_ALLOWED_SEGMENT_EXPERTISE, CommunicationTypes::USER_DELETED_SEGMENT], true)) {
+            return Segments::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
         if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE) {
-            return ConfirmSegment::findOne($this->getHypothesisId());
+            return ConfirmSegment::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
-        if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE) {
-            return Problems::findOne($this->getHypothesisId());
+        if (in_array($this->getType(), [CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE, CommunicationTypes::USER_DELETED_PROBLEM], true)) {
+            return Problems::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
         if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE) {
-            return ConfirmProblem::findOne($this->getHypothesisId());
+            return ConfirmProblem::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
-        if ($this->getType() === CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE) {
-            return Gcps::findOne($this->getHypothesisId());
+        if (in_array($this->getType(), [CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE, CommunicationTypes::USER_DELETED_GCP], true)) {
+            return Gcps::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
         if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE) {
-            return ConfirmGcp::findOne($this->getHypothesisId());
+            return ConfirmGcp::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
-        if ($this->getType() === CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE) {
-            return Mvps::findOne($this->getHypothesisId());
+        if (in_array($this->getType(), [CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE, CommunicationTypes::USER_DELETED_MVP], true)) {
+            return Mvps::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
         if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE) {
-            return ConfirmMvp::findOne($this->getHypothesisId());
+            return ConfirmMvp::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
         if ($this->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
-            return BusinessModel::findOne($this->getHypothesisId());
+            return BusinessModel::find(false)
+                ->andWhere(['id' => $this->getHypothesisId()])
+                ->one();
         }
 
         return null;
@@ -260,11 +290,16 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public function getDescriptionPattern(bool $isSendEmail = false): string
     {
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $this->getProjectId()])
+            ->one();
+
         $projectName_search = '{{наименование проекта}}';
-        $projectName_replace = '«' . $this->project->getProjectName() . '»';
+        $projectName_replace = '«' . $project->getProjectName() . '»';
         $linkProjectName_search = '{{наименование проекта, ссылка на проект}}';
-        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()]);
-        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()])) : $linkProjectName_replace;
+        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $project->getUserId(), 'project_id' => $project->getId()]);
+        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $project->getUserId(), 'project_id' => $project->getId()])) : $linkProjectName_replace;
         $pattern = $this->pattern;
 
         if ($pattern) {
@@ -308,11 +343,16 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public function getDefaultPattern(bool $isSendEmail = false): string
     {
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $this->getProjectId()])
+            ->one();
+
         $projectName_search = '{{наименование проекта}}';
-        $projectName_replace = '«' . $this->project->getProjectName() . '»';
+        $projectName_replace = '«' . $project->getProjectName() . '»';
         $linkProjectName_search = '{{наименование проекта, ссылка на проект}}';
-        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()]);
-        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $this->project->getUserId(), 'project_id' => $this->project->getId()])) : $linkProjectName_replace;
+        $linkProjectName_replace = Html::a($projectName_replace, ['/projects/index', 'id' => $project->getUserId(), 'project_id' => $project->getId()]);
+        $linkProjectName_replace = $isSendEmail ? Html::a($projectName_replace, Yii::$app->urlManager->createAbsoluteUrl(['/projects/index', 'id' => $project->getUserId(), 'project_id' => $project->getId()])) : $linkProjectName_replace;
 
         if ($this->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
             $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_ABOUT_READINESS_CONDUCT_EXPERTISE;
@@ -363,7 +403,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_SEGMENT_EXPERTISE) {
-                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_SEGMENT) . ': ' . $this->hypothesis->hypothesis->getName(), ['/confirm-segment/view', 'id' => $this->getHypothesisId()]);
+                /** @var $segment Segments */
+                $segment = Segments::find(false)
+                    ->andWhere(['id' => $this->hypothesis->getSegmentId()])
+                    ->one();
+
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_SEGMENT) . ': ' . $segment->getName(), ['/confirm-segment/view', 'id' => $this->getHypothesisId()]);
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_PROBLEM_EXPERTISE) {
@@ -371,7 +416,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_PROBLEM_EXPERTISE) {
-                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_PROBLEM) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-problem/view', 'id' => $this->getHypothesisId()]);
+                /** @var $problem Problems */
+                $problem = Problems::find(false)
+                    ->andWhere(['id' => $this->hypothesis->getProblemId()])
+                    ->one();
+
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_PROBLEM) . ': ' . $problem->getTitle(), ['/confirm-problem/view', 'id' => $this->getHypothesisId()]);
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_GCP_EXPERTISE) {
@@ -379,7 +429,12 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_GCP_EXPERTISE) {
-                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_GCP) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-gcp/view', 'id' => $this->getHypothesisId()]);
+                /** @var $gcp Gcps */
+                $gcp = Gcps::find(false)
+                    ->andWhere(['id' => $this->hypothesis->getGcpId()])
+                    ->one();
+
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_GCP) . ': ' . $gcp->getTitle(), ['/confirm-gcp/view', 'id' => $this->getHypothesisId()]);
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE) {
@@ -387,11 +442,57 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE) {
-                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_MVP) . ': ' . $this->hypothesis->hypothesis->getTitle(), ['/confirm-mvp/view', 'id' => $this->getHypothesisId()]);
+                /** @var $mvp Mvps */
+                $mvp = Mvps::find(false)
+                    ->andWhere(['id' => $this->hypothesis->getMvpId()])
+                    ->one();
+
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::CONFIRM_MVP) . ': ' . $mvp->getTitle(), ['/confirm-mvp/view', 'id' => $this->getHypothesisId()]);
             }
 
             if ($this->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
-                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::BUSINESS_MODEL) . ': ' . $this->hypothesis->mvp->getTitle(), ['/business-model/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+                /** @var $mvp Mvps */
+                $mvp = Mvps::find(false)
+                    ->andWhere(['id' => $this->hypothesis->getMvpId()])
+                    ->one();
+
+                $linkStageProject_replace = Html::a($this->getStage(StageExpertise::BUSINESS_MODEL) . ': ' . $mvp->getTitle(), ['/business-model/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            return str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern)));
+        }
+
+        if (in_array($this->getType(), [
+            CommunicationTypes::USER_DELETED_PROJECT,
+            CommunicationTypes::USER_DELETED_SEGMENT,
+            CommunicationTypes::USER_DELETED_PROBLEM,
+            CommunicationTypes::USER_DELETED_GCP,
+            CommunicationTypes::USER_DELETED_MVP
+        ], true)) {
+            $userName_search = '{{проектант}}';
+            $linkStageProject_search = '{{наименование этапа проекта, ссылка на этап проекта}}';
+            $userName_replace = $this->user->getUsername();
+            $linkStageProject_replace = '';
+            $defaultPattern = CommunicationPatterns::COMMUNICATION_DEFAULT_USER_DELETED_STAGE_PROJECT;
+
+            if ($this->getType() === CommunicationTypes::USER_DELETED_PROJECT) {
+                $linkStageProject_replace = Html::a('проект: ' . $this->hypothesis->getProjectName(), ['/projects/index', 'id' => $this->hypothesis->getUserId(), 'project_id' => $this->getProjectId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_DELETED_SEGMENT) {
+                $linkStageProject_replace = Html::a('сегмент: ' . $this->hypothesis->getName(), ['/segments/index', 'id' => $this->getProjectId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_DELETED_PROBLEM) {
+                $linkStageProject_replace = Html::a('проблему сегмента: ' . $this->hypothesis->getTitle(), ['/problems/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_DELETED_GCP) {
+                $linkStageProject_replace = Html::a('ценностное предложение: ' . $this->hypothesis->getTitle(), ['/gcps/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
+            }
+
+            if ($this->getType() === CommunicationTypes::USER_DELETED_MVP) {
+                $linkStageProject_replace = Html::a('продукт-MVP: ' . $this->hypothesis->getTitle(), ['/mvps/index', 'id' => $this->hypothesis->getBasicConfirmId()]);
             }
 
             return str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern)));
@@ -449,7 +550,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
                 return '<div class="text-danger">Закрыт</div>';
             }
 
-            return '<div class="text-success">Открыт до ' . date('d.m.Y H:i', $this->userAccessToProject->date_stop) . '</div>';
+            return '<div class="text-success">Открыт до ' . date('d.m.Y H:i', $this->userAccessToProject->getDateStop()) . '</div>';
         }
 
         if (in_array($this->getType(), [CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
@@ -547,7 +648,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public static function isNeedAskExpert(int $expert_id, int $project_id): bool
     {
-        $communications = self::find()->where(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
+        $communications = self::find()->andWhere(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
         $existCommunications = $communications->all();
 
         if (!$existCommunications) {
@@ -596,7 +697,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
      */
     public static function checkOfAccessToCarryingExpertise(int $expert_id, int $project_id): bool
     {
-        $communications = self::find()->where(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
+        $communications = self::find()->andWhere(['project_id' => $project_id])->andWhere(['or', ['adressee_id' => $expert_id], ['sender_id' => $expert_id]]);
         $existCommunications = $communications->all();
 
         if (!$existCommunications) {
@@ -707,7 +808,7 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
     public static function getExpertIdsByProjectId(int $projectId): array
     {
         $lastCommunicationExperts = self::find()
-            ->where(['project_id' => $projectId])
+            ->andWhere(['project_id' => $projectId])
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
 
@@ -729,6 +830,11 @@ class ProjectCommunications extends ActiveRecord implements CommunicationsInterf
                         CommunicationTypes::USER_ALLOWED_MVP_EXPERTISE,
                         CommunicationTypes::USER_ALLOWED_CONFIRM_MVP_EXPERTISE,
                         CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE,
+                        CommunicationTypes::USER_DELETED_PROJECT,
+                        CommunicationTypes::USER_DELETED_SEGMENT,
+                        CommunicationTypes::USER_DELETED_PROBLEM,
+                        CommunicationTypes::USER_DELETED_GCP,
+                        CommunicationTypes::USER_DELETED_MVP,
                     ], true)) {
                         $expertIds[] = $communicationExpert->getAdresseeId();
                     }

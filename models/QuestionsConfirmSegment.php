@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -19,6 +20,7 @@ use yii\db\StaleObjectException;
  * @property int $status                                                            Параметр указывает на важность вопроса
  * @property int $created_at                                                        Дата создания вопроса
  * @property int $updated_at                                                        Дата обновления вопроса
+ * @property int|null $deleted_at                                                   Дата удаления
  * @property ManagerForAnswersAtQuestion $_manager_answers                          Менеджер по ответам на вопросы
  * @property CreatorQuestionToGeneralList $_creator_question_to_general_list        Менеджер, который добавляет вопросы в таблицы, которые содержат все вопросы добавляемые на этапах подтверждения гипотез
  *
@@ -27,6 +29,7 @@ use yii\db\StaleObjectException;
  */
 class QuestionsConfirmSegment extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     private $_manager_answers;
     private $_creator_question_to_general_list;
@@ -73,7 +76,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     public function getAnswers(): array
     {
         return AnswersQuestionsConfirmSegment::find()
-            ->where(['question_id' => $this->getId()])
+            ->andWhere(['question_id' => $this->getId()])
             ->andWhere(['not', ['answers_questions_confirm_segment.answer' => '']])
             ->all();
     }
@@ -162,7 +165,7 @@ class QuestionsConfirmSegment extends ActiveRecord
     public function deleteAndGetData()
     {
         // Получить список вопросов без удаленного вопроса
-        $questions = self::find()->where(['confirm_id' => $this->confirm->getId()])->andWhere(['!=', 'id', $this->getId()])->all();
+        $questions = self::find()->andWhere(['confirm_id' => $this->confirm->getId()])->andWhere(['!=', 'id', $this->getId()])->all();
         //Передаем обновленный список вопросов для добавления в программу
         $queryQuestions = $this->confirm->queryQuestionsGeneralList();
         $queryQuestions[] = $this;
@@ -288,5 +291,21 @@ class QuestionsConfirmSegment extends ActiveRecord
     public function setCreatorQuestionToGeneralList(): void
     {
         $this->_creator_question_to_general_list = new CreatorQuestionToGeneralList();
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

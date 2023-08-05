@@ -122,7 +122,7 @@ class MessageController extends AppUserPartController
         $development = $user->development;
         $conversation_admin = ConversationAdmin::findOne(['user_id' => $id]);
         $conversation_development = ConversationDevelopment::findOne(['user_id' => $id]);
-        $conversationsExpert = ConversationExpert::find()->where(['user_id' => $id])
+        $conversationsExpert = ConversationExpert::find()->andWhere(['user_id' => $id])
             ->orderBy(['updated_at' => SORT_DESC])->all();
 
         return $this->render('index', [
@@ -194,7 +194,7 @@ class MessageController extends AppUserPartController
                     'blockConversationAdmin' => '#adminConversation-' . $conversation_admin->getId(),
                     'blockConversationDevelopment' => '#conversationTechnicalSupport-' . $conversation_development->getId(),
                     'conversationsExpertForUser' => $this->renderAjax('update_conversations_expert_for_user',[
-                        'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $user->getId()])
+                        'conversationsExpert' => ConversationExpert::find()->andWhere(['user_id' => $user->getId()])
                             ->orderBy(['updated_at' => SORT_DESC])->all(), 'user' => $user,
                     ]),
                 ];
@@ -227,7 +227,7 @@ class MessageController extends AppUserPartController
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                         'conversationsExpertForAdminAjax' => $this->renderAjax('update_conversations_expert_for_admin',[
-                            'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $admin->getId()])
+                            'conversationsExpert' => ConversationExpert::find()->andWhere(['user_id' => $admin->getId()])
                                 ->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
@@ -246,7 +246,7 @@ class MessageController extends AppUserPartController
 
                     $response = [
                         'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                            'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
+                            'allConversations' => ConversationDevelopment::find()->joinWith('user')->andWhere(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
@@ -267,12 +267,12 @@ class MessageController extends AppUserPartController
                     $conversationAdminMain = ConversationExpert::findOne(['expert_id' => $expert->getId(), 'user_id' => $expert->mainAdmin->getId()]);
                     // Беседы эксперта и трекеров
                     $adminConversations = ConversationExpert::find()
-                        ->where(['expert_id' => $expert->getId(), 'role' => User::ROLE_ADMIN])
+                        ->andWhere(['expert_id' => $expert->getId(), 'role' => User::ROLE_ADMIN])
                         ->orderBy(['updated_at' => SORT_DESC])
                         ->all();
                     // Беседы эксперта и проектантов
                     $userConversations = ConversationExpert::find()
-                        ->where(['expert_id' => $expert->getId(), 'role' => User::ROLE_USER])
+                        ->andWhere(['expert_id' => $expert->getId(), 'role' => User::ROLE_USER])
                         ->orderBy(['updated_at' => SORT_DESC])
                         ->all();
 
@@ -404,11 +404,11 @@ class MessageController extends AppUserPartController
         $searchForm = new SearchForm(); // Форма поиска
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
         // Вывод сообщений через пагинацию
-        $query = MessageAdmin::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
+        $query = MessageAdmin::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
-        $countMessages = MessageAdmin::find()->where(['conversation_id' => $id])->count();
+        $countMessages = MessageAdmin::find()->andWhere(['conversation_id' => $id])->count();
 
         if (User::isUserAdmin(Yii::$app->user->identity['username'])) {
 
@@ -419,7 +419,7 @@ class MessageController extends AppUserPartController
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $admin->getId()]);
             // Все беседы трекера с экспертами
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $admin->getId()])
+                ->andWhere(['user_id' => $admin->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
             // Все беседы трекера с проектантами
@@ -460,7 +460,7 @@ class MessageController extends AppUserPartController
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $user->getId()]);
             // Все беседы проектанта с экспертами
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $user->getId()])
+                ->andWhere(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
@@ -500,7 +500,7 @@ class MessageController extends AppUserPartController
         $conversation = ConversationAdmin::findOne($id);
         $user = $conversation->user;
         $admin = $conversation->admin;
-        $query = MessageAdmin::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+        $query = MessageAdmin::find()->andWhere(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
@@ -508,7 +508,7 @@ class MessageController extends AppUserPartController
         // Проверяем является ли страница последней
         $lastPage = false;
         /** @var MessageAdmin $lastMessage */
-        $lastMessage = MessageAdmin::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+        $lastMessage = MessageAdmin::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
         /** @var MessageAdmin[] $messages */
         foreach ($messages as $message) {
             if ($message->getId() === $lastMessage->getId()) {
@@ -662,7 +662,7 @@ class MessageController extends AppUserPartController
             if ($model->save()) {
 
                 $user = User::findOne($model->getAdresseeId());
-                $countUnreadMessagesForConversation = MessageAdmin::find()->where(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+                $countUnreadMessagesForConversation = MessageAdmin::find()->andWhere(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
                 // Передаем id блока беседы
                 $blockConversation = '';
                 if (User::isUserSimple($user->getUsername())) {
@@ -698,7 +698,7 @@ class MessageController extends AppUserPartController
     {
         /** @var MessageFiles $model */
         $model = MessageFiles::find()
-            ->where([
+            ->andWhere([
                 'category' => $category,
                 'id' => $id
             ])->one();
@@ -738,18 +738,18 @@ class MessageController extends AppUserPartController
         $searchForm = new SearchForm(); // Форма поиска
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
         // Вывод сообщений через пагинацию
-        $query = MessageDevelopment::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
+        $query = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
-        $countMessages = MessageDevelopment::find()->where(['conversation_id' => $id])->count();
+        $countMessages = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->count();
 
         if (User::isUserSimple(Yii::$app->user->identity['username'])) {
 
             $admin = User::findOne($user->getIdAdmin());
             $conversation_admin = ConversationAdmin::findOne(['user_id' => $user->getId()]);
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $user->getId()])
+                ->andWhere(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
@@ -886,7 +886,7 @@ class MessageController extends AppUserPartController
         $conversation = ConversationDevelopment::findOne($id);
         $user = $conversation->user;
         $development = $conversation->development;
-        $query = MessageDevelopment::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+        $query = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
@@ -894,7 +894,7 @@ class MessageController extends AppUserPartController
         // Проверяем является ли страница последней
         $lastPage = false;
         /** @var MessageDevelopment $lastMessage */
-        $lastMessage = MessageDevelopment::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+        $lastMessage = MessageDevelopment::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
         /** @var MessageDevelopment[] $messages */
         foreach ($messages as $message) {
             if ($message->getId() === $lastMessage->getId()) {
@@ -981,7 +981,7 @@ class MessageController extends AppUserPartController
                             'sender' => 'development',
                             'countUnreadMessages' => $development->countUnreadMessages,
                             'conversationsForDevelopmentAjax' => $this->renderAjax('update_conversations_for_development', [
-                                'allConversations' => ConversationDevelopment::find()->joinWith('user')->where(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
+                                'allConversations' => ConversationDevelopment::find()->joinWith('user')->andWhere(['dev_id' => $development->getId()])->orderBy(['updated_at' => SORT_DESC])->all(),
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_development', [
                                 'messages' => $messages, 'development' => $development, 'user' => $user, 'lastMessageOnPage' => $lastMessageOnPage,
@@ -1045,7 +1045,7 @@ class MessageController extends AppUserPartController
             if ($model->save()) {
 
                 $user = User::findOne($model->getAdresseeId());
-                $countUnreadMessagesForConversation = MessageDevelopment::find()->where(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+                $countUnreadMessagesForConversation = MessageDevelopment::find()->andWhere(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
                 // Передаем id блока беседы
                 $blockConversation = '';
                 if (User::isUserSimple($user->getUsername())) {
@@ -1084,11 +1084,11 @@ class MessageController extends AppUserPartController
         $searchForm = new SearchForm(); // Форма поиска
         $cache = Yii::$app->cache; //Обращаемся к кэшу приложения
         // Вывод сообщений через пагинацию
-        $query = MessageExpert::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
+        $query = MessageExpert::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
-        $countMessages = MessageExpert::find()->where(['conversation_id' => $id])->count();
+        $countMessages = MessageExpert::find()->andWhere(['conversation_id' => $id])->count();
 
         if (User::isUserExpert(Yii::$app->user->identity['username'])) {
 
@@ -1140,7 +1140,7 @@ class MessageController extends AppUserPartController
             $conversation_development = ConversationDevelopment::findOne(['user_id' => $user->getId()]);
             // Все беседы проектанта с экспертами
             $expertConversations = ConversationExpert::find()
-                ->where(['user_id' => $user->getId()])
+                ->andWhere(['user_id' => $user->getId()])
                 ->orderBy(['updated_at' => SORT_DESC])
                 ->all();
 
@@ -1183,7 +1183,7 @@ class MessageController extends AppUserPartController
             if ($model->save()) {
 
                 $user = User::findOne($model->getAdresseeId());
-                $countUnreadMessagesForConversation = MessageExpert::find()->where(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+                $countUnreadMessagesForConversation = MessageExpert::find()->andWhere(['adressee_id' => $model->getAdresseeId(), 'sender_id' => $model->getSenderId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
                 // Передаем id блока беседы
                 $blockConversation = '';
                 if (User::isUserSimple($user->getUsername())) {
@@ -1278,7 +1278,7 @@ class MessageController extends AppUserPartController
                             'sender' => 'user',
                             'countUnreadMessages' => $user->countUnreadMessages,
                             'conversationsExpertForUser' => $this->renderAjax('update_conversations_expert_for_user',[
-                                'conversationsExpert' => ConversationExpert::find()->where(['user_id' => $user->getId()])
+                                'conversationsExpert' => ConversationExpert::find()->andWhere(['user_id' => $user->getId()])
                                     ->orderBy(['updated_at' => SORT_DESC])->all(), 'user' => $user,
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_expert', [
@@ -1309,7 +1309,7 @@ class MessageController extends AppUserPartController
                             'sender' => 'expert',
                             'countUnreadMessages' => $expert->countUnreadMessages,
                             'conversationsUserForExpertAjax' => $this->renderAjax('update_conversations_user_for_expert', [
-                                'userConversations' => ConversationExpert::find()->where(['expert_id' => $expert->getId(), 'role' => User::ROLE_USER])
+                                'userConversations' => ConversationExpert::find()->andWhere(['expert_id' => $expert->getId(), 'role' => User::ROLE_USER])
                                     ->orderBy(['updated_at' => SORT_DESC])->all(), 'expert' => $expert,
                             ]),
                             'addNewMessagesAjax' => $this->renderAjax('check_new_messages_expert', [
@@ -1364,7 +1364,7 @@ class MessageController extends AppUserPartController
         $conversation = ConversationExpert::findOne($id);
         $user = $conversation->user;
         $expert = $conversation->expert;
-        $query = MessageExpert::find()->where(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
+        $query = MessageExpert::find()->andWhere(['conversation_id' => $id])->andWhere(['<', 'id', $final])->orderBy(['id' => SORT_DESC]);
         $pagesMessages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => 20]);
         $messages = $query->offset($pagesMessages->offset)->limit($pagesMessages->pageSize)->all();
         $messages = array_reverse($messages);
@@ -1372,7 +1372,7 @@ class MessageController extends AppUserPartController
         // Проверяем является ли страница последней
         $lastPage = false;
         /** @var MessageExpert $lastMessage */
-        $lastMessage = MessageExpert::find()->where(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
+        $lastMessage = MessageExpert::find()->andWhere(['conversation_id' => $id])->orderBy(['id' => SORT_ASC])->one();
         /** @var MessageExpert[] $messages */
         foreach ($messages as $message) {
             if ($message->getId() === $lastMessage->getId()) {

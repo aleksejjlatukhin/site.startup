@@ -1,5 +1,6 @@
 <?php
 
+use app\models\PreFiles;
 use app\models\Projects;
 use yii\helpers\Html;
 
@@ -101,8 +102,14 @@ $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $proje
         <div class="presentation-mobile-title-row">Дата анонсирования проекта</div>
         <div class="presentation-mobile-simple-row"><?= $date_of_announcement ?></div>
         <div class="presentation-mobile-title-row">Презентационные файлы</div>
-        <?php if (!empty($project->preFiles)): ?>
-            <?php foreach ($project->preFiles as $file): ?>
+        <?php
+        /** @var $preFiles PreFiles[] */
+        $preFiles = PreFiles::find(false)
+            ->andWhere(['project_id' => $project->getId()])
+            ->all();
+
+        if (!empty($preFiles)): ?>
+            <?php foreach ($preFiles as $file): ?>
                 <div class="presentation-mobile-simple-row">
                     <?= Html::a(Html::img('/images/icons/icon_export_pdf.png', ['style' => ['width' => '17px', 'margin-right' => '10px']]) . $file->getFileName(), ['/projects/download', 'id' => $file->getId()]) ?>
                 </div>

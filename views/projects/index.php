@@ -13,6 +13,8 @@ use yii\widgets\ActiveForm;
  * @var Projects[] $models
  * @var Authors $new_author
  * @var SearchForm $searchForm
+ * @var bool $existTrashList
+ * @var Projects[] $trashList
 */
 
 $this->title = 'Проекты';
@@ -61,43 +63,90 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
             <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-            <div class="col-md-6 search_block_desktop">
+                <?php if ($existTrashList): ?>
 
-                <?php
-                $form = ActiveForm::begin([
-                    'id' => 'search_projects',
-                    'options' => ['class' => 'g-py-15'],
-                    'errorCssClass' => 'u-has-error-v1',
-                    'successCssClass' => 'u-has-success-v1-1',
-                ]); ?>
+                    <div class="col-md-4 search_block_desktop">
 
-                    <?= $form->field($searchForm, 'search', ['template' => '{input}'])
-                        ->textInput([
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => 'поиск проекта',
-                            'minlength' => 5,
-                            'autocomplete' => 'off'])
-                        ->label(false) ?>
+                        <?php
+                        $form = ActiveForm::begin([
+                            'id' => 'search_projects',
+                            'options' => ['class' => 'g-py-15'],
+                            'errorCssClass' => 'u-has-error-v1',
+                            'successCssClass' => 'u-has-success-v1-1',
+                        ]); ?>
 
-                <?php ActiveForm::end(); ?>
+                        <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                            ->textInput([
+                                'class' => 'style_form_field_respond form-control',
+                                'placeholder' => 'поиск проекта',
+                                'minlength' => 5,
+                                'autocomplete' => 'off'])
+                            ->label(false) ?>
 
-            </div>
+                        <?php ActiveForm::end(); ?>
+
+                    </div>
+
+                    <div class="col-md-3" style="padding: 0;">
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
+                                ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
+                            ) ?>
+
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="col-md-2 p-0">
+                        <?=  Html::a( '<div class="hypothesis_trash_link_block"><div>' . Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div><div style="padding-left: 20px;">Корзина</div></div>',
+                            ['/projects/trash-list', 'id' => $user->getId()],
+                            ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right']
+                        ) ?>
+                    </div>
+
+                <?php else : ?>
+
+                    <div class="col-md-6 search_block_desktop">
+
+                        <?php
+                        $form = ActiveForm::begin([
+                            'id' => 'search_projects',
+                            'options' => ['class' => 'g-py-15'],
+                            'errorCssClass' => 'u-has-error-v1',
+                            'successCssClass' => 'u-has-success-v1-1',
+                        ]); ?>
+
+                        <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                            ->textInput([
+                                'class' => 'style_form_field_respond form-control',
+                                'placeholder' => 'поиск проекта',
+                                'minlength' => 5,
+                                'autocomplete' => 'off'])
+                            ->label(false) ?>
+
+                        <?php ActiveForm::end(); ?>
+
+                    </div>
+
+                    <div class="col-md-3" style="padding: 0;">
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
+                                ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
+                            ) ?>
+
+                        <?php endif; ?>
+                    </div>
+
+                <?php endif; ?>
 
             <?php else : ?>
 
                 <div class="col-md-6"></div>
+                <div class="col-md-3 p-0"></div>
 
             <?php endif; ?>
 
-            <div class="col-md-3" style="padding: 0;">
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
-                        ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
-                    ) ?>
-
-                <?php endif; ?>
-            </div>
         </div>
 
         <!--Заголовки для списка проектов-->
@@ -123,7 +172,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
         <div class="row row_header_data_generation_mobile">
 
-            <div class="col-xs-8">
+            <div class="col-xs-7">
                 <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
                     <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый проект</div></div>', ['/projects/get-hypothesis-to-create', 'id' => $user->getId()],
@@ -133,7 +182,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 <?php endif; ?>
             </div>
 
-            <div class="col-xs-4">
+            <div class="col-xs-5">
 
                 <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
@@ -148,13 +197,23 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                             'title' => 'Поиск проектов', 'style' => ['margin-top' => '5px']
                     ]) ?>
 
+                    <?php if ($existTrashList): ?>
+                        <?=  Html::a('<div class="hypothesis_trash_link_block"><div>' .  Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div></div>',
+                            ['/projects/trash-list', 'id' => $user->getId()], ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right', 'title' => 'Корзина']
+                        ) ?>
+                    <?php endif; ?>
+
                 <?php else : ?>
 
-                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
-                        Url::to('/projects/get-instruction'), [
-                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                            'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
-                        ]) ?>
+                    <?php if (!$models[0]->getDeletedAt()): ?>
+
+                        <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                            Url::to('/projects/get-instruction'), [
+                                'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                                'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
+                            ]) ?>
+
+                    <?php endif; ?>
 
                 <?php endif; ?>
 

@@ -68,4 +68,36 @@ class SendingCommunicationsToEmail
                 ->send();
         }
     }
+
+
+    /**
+     * Отправка письма с уведомлением об удалении
+     * этапа проекта на почту эксперту и трекеру
+     *
+     * @param ProjectCommunications $communication
+     * @param bool $isSendTracker
+     * @return void
+     */
+    public static function softDeleteStageProject(ProjectCommunications $communication, bool $isSendTracker = false): void
+    {
+        $user = $communication->user;
+        $expert = $communication->expert;
+        $admin = $user->admin;
+
+        if ($expert) {
+            Yii::$app->mailer->compose('communications__UserSoftDeleteStageProject', ['communication' => $communication, 'role' => $expert->getRole()])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
+                ->setTo($expert->getEmail())
+                ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
+                ->send();
+        }
+
+        if ($admin && $isSendTracker) {
+            Yii::$app->mailer->compose('communications__UserSoftDeleteStageProject', ['communication' => $communication, 'role' => $admin->getRole()])
+                ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
+                ->setTo($admin->getEmail())
+                ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
+                ->send();
+        }
+    }
 }

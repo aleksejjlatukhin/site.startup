@@ -79,7 +79,7 @@ class ProfileController extends AppExpertController
         /** @var User $user */
         $user = User::find()
             ->with(['expertInfo', 'keywords'])
-            ->where(['id' => $id])
+            ->andWhere(['id' => $id])
             ->one();
         $profile = new ProfileExpertForm($id);
         $passwordChangeForm = new PasswordChangeForm($user);

@@ -64,10 +64,10 @@ class ProfileController extends AppAdminController
     public function actionIndex(int $id): string
     {
         $user = User::findOne($id);
-        $count_users = User::find()->where(['id_admin' => $id])->count();
+        $count_users = User::find()->andWhere(['id_admin' => $id])->count();
         $countProjects = Projects::find()->with('user')
             ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-            ->where(['user.id_admin' => $id])->count();
+            ->andWhere(['user.id_admin' => $id])->count();
         $profile = new ProfileForm($id);
         $passwordChangeForm = new PasswordChangeForm($user);
         $avatarForm = new AvatarForm($id);
@@ -122,10 +122,10 @@ class ProfileController extends AppAdminController
         if (Yii::$app->request->isAjax) {
 
             $model = new ProfileForm($id);
-            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $count_users = User::find()->andWhere(['id_admin' => $id])->count();
             $countProjects = Projects::find()->with('user')
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                ->where(['user.id_admin' => $id])->count();
+                ->andWhere(['user.id_admin' => $id])->count();
 
             if ($model->load(Yii::$app->request->post())) {
 
@@ -234,10 +234,10 @@ class ProfileController extends AppAdminController
         if (Yii::$app->request->isAjax) {
 
             $avatarForm = new AvatarForm($id);
-            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $count_users = User::find()->andWhere(['id_admin' => $id])->count();
             $countProjects = Projects::find()->with('user')
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                ->where(['user.id_admin' => $id])->count();
+                ->andWhere(['user.id_admin' => $id])->count();
 
             if (isset($_POST['imageMin'])) {
 
@@ -318,10 +318,10 @@ class ProfileController extends AppAdminController
         if (Yii::$app->request->isAjax) {
 
             $avatarForm = new AvatarForm($id);
-            $count_users = User::find()->where(['id_admin' => $id])->count();
+            $count_users = User::find()->andWhere(['id_admin' => $id])->count();
             $countProjects = Projects::find()->with('user')
                 ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                ->where(['user.id_admin' => $id])->count();
+                ->andWhere(['user.id_admin' => $id])->count();
 
             if ($avatarForm->deleteOldAvatarImages()) {
 

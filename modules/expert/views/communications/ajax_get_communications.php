@@ -1,6 +1,7 @@
 <?php
 
 use app\models\ProjectCommunications;
+use app\models\Projects;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
 use app\models\CommunicationTypes;
@@ -79,7 +80,14 @@ use app\models\CommunicationResponse;
 
                 <div class="conversation-exist">
 
-                    <?php $admin = $communication->project->user->admin; ?>
+                    <?php
+                    /** @var $project Projects*/
+                    $project = Projects::find(false)
+                        ->andWhere(['id' => $communication->getProjectId()])
+                        ->one();
+
+                    $admin = $project->user->admin;
+                    ?>
 
                     Трекер проекта:
                     <span class="bolder">

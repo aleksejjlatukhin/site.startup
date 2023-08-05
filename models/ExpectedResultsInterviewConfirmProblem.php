@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -17,11 +18,14 @@ use yii\db\ActiveRecord;
  * @property int $problem_id                Идентификатор записи в таб. problems
  * @property string $question               Вопрос
  * @property string $answer                 Ответ
+ * @property int|null $deleted_at           Дата удаления
  *
  * @property Problems $problem              Проблема
  */
 class ExpectedResultsInterviewConfirmProblem extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
+
 
     /**
      * {@inheritdoc}

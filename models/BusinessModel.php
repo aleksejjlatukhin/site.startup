@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -31,6 +32,7 @@ use yii\db\StaleObjectException;
  * @property int $updated_at                        Дата обновления mvp-продукта
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                   Дата удаления
  *
  * @property Projects $project                      Проект
  * @property Segments $segment                      Сегмент
@@ -41,6 +43,7 @@ use yii\db\StaleObjectException;
  */
 class BusinessModel extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     /**
      * {@inheritdoc}
@@ -486,5 +489,21 @@ class BusinessModel extends ActiveRecord
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

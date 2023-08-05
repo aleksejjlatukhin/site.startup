@@ -396,7 +396,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
         </div>
         <div class="text-stage">2/9. Подтверждение гипотез целевых сегментов</div>
         <div class="arrow_link_router_mobile_right">
-            <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED && $segment->confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
+            <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED && $model->getEnableExpertise() === EnableExpertise::ON) : ?>
                 <?= Html::a(Html::img('@web/images/icons/arrow_left_active.png'),
                     Url::to(['/problems/index', 'id' => $model->getId()])) ?>
             <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED): ?>

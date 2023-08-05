@@ -70,7 +70,7 @@ class UserAccessToProjects extends ActiveRecord
     public function getUserCommunications(): array
     {
         $communications = ProjectCommunications::find()
-            ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
+            ->andWhere(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
             ->andWhere(['project_id' => $this->getProjectId()]);
          return $communications->all();
     }
@@ -85,12 +85,12 @@ class UserAccessToProjects extends ActiveRecord
     public function getUserCommunicationsForAdminTable(): array
     {
         $communications = ProjectCommunications::find()
-            ->where(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
+            ->andWhere(['or', ['sender_id' => $this->getUserId()], ['adressee_id' => $this->getUserId()]])
             ->andWhere(['project_id' => $this->getProjectId()])
-            ->andWhere(['not in', 'type', [
-                CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT,
-                CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT,
-                CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT
+            ->andWhere(['in', 'type', [
+                CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE,
+                CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE,
+                CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE
             ]]);
         return $communications->all();
     }

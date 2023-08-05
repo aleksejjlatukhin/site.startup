@@ -93,7 +93,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
                     <div class="col-md-3 column-tracker">
 
-                        <?php $count_users = User::find()->where(['id_admin' => $user->getId()])->count();?>
+                        <?php $count_users = User::find()->andWhere(['id_admin' => $user->getId()])->count();?>
 
                         <?= Html::a( '<span class="glyphicon glyphicon-user" style="font-size: 16px;"></span><span style="margin-left: 5px;"> - '.$count_users.'</span>', Url::to(['/admin/users/group', 'id' => $user->getId()]), [
                             'style' => [
@@ -112,7 +112,7 @@ $this->registerCssFile('@web/css/users-index-style.css');
                         <?php
                         $countProjects = Projects::find()->with('user')
                             ->leftJoin('user', '`user`.`id` = `projects`.`user_id`')
-                            ->where(['user.id_admin' => $user->getId()])->count();
+                            ->andWhere(['user.id_admin' => $user->getId()])->count();
                         ?>
 
                         <?= Html::a( 'Проекты - '.$countProjects, Url::to(['/admin/projects/group', 'id' => $user->getId()]), [

@@ -81,7 +81,7 @@ class ProjectSort extends Model
 
         $search_type_sort = $array_sort[$key_arr]['type_sort'];
 
-        return Projects::find()->where(['user_id' => $user_id])->orderBy($search_type_sort)->all();
+        return Projects::find()->andWhere(['user_id' => $user_id])->orderBy($search_type_sort)->all();
     }
 
 }

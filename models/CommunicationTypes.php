@@ -30,6 +30,12 @@ class CommunicationTypes
     public const USER_ALLOWED_CONFIRM_MVP_EXPERTISE = 1008;
     public const USER_ALLOWED_BUSINESS_MODEL_EXPERTISE = 1009;
 
+    public const USER_DELETED_PROJECT = 2000;
+    public const USER_DELETED_SEGMENT = 2001;
+    public const USER_DELETED_PROBLEM = 2003;
+    public const USER_DELETED_GCP = 2005;
+    public const USER_DELETED_MVP = 2007;
+
 
     /**
      * @return array

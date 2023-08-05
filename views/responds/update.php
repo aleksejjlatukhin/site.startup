@@ -11,12 +11,13 @@ use yii\helpers\Html;
 /**
  * @var ConfirmationInterface $confirm
  * @var UpdateFormRespond $model
+ * @var bool $isOnlyNotDelete
 */
 
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) :?>
+<?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) :?>
 
 
     <?php $form = ActiveForm::begin([

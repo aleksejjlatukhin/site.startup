@@ -38,7 +38,7 @@ class FormUpdateCommunicationPattern extends Model
     public function __construct(int $id, int $communicationType, array $config = [])
     {
         $pattern = CommunicationPatterns::find()
-            ->where(['id' => $id, 'communication_type' => $communicationType])
+            ->andWhere(['id' => $id, 'communication_type' => $communicationType])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->one();
 

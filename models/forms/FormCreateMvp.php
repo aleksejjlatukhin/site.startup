@@ -97,7 +97,7 @@ class FormCreateMvp extends Model
     public function create(): Mvps
     {
         /** @var Mvps $last_model */
-        $last_model = Mvps::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
+        $last_model = Mvps::find(false)->andWhere(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmGcp = ConfirmGcp::findOne($this->getBasicConfirmId());
         $gcp = Gcps::findOne($confirmGcp->getGcpId());
         $problem = Problems::findOne($gcp->getProblemId());

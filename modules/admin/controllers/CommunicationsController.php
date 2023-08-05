@@ -104,35 +104,35 @@ class CommunicationsController extends AppAdminController
 
         // Шаблоны коммуникации о готовности эксперта провести экспертизу
         $patternsCommunicationsAboutReadinessConductExpertise = CommunicationPatterns::find()
-            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
+            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отмена запроса о готовности эксперта провести экспертизу
         $patternsCommunicationsWithdrawsRequestAboutReadinessConductExpertise = CommunicationPatterns::find()
-            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE])
+            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации назначение экперта на проект
         $patternsCommunicationsAppointsExpertProject = CommunicationPatterns::find()
-            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT])
+            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_APPOINTS_EXPERT_PROJECT])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отказ эксперту в назначении на проект
         $patternsCommunicationsDoesNotAppointsExpertProject = CommunicationPatterns::find()
-            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT])
+            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
 
         // Шаблоны коммуникации отзыв эксперта с проекта
         $patternsCommunicationsWithdrawsExpertFromProject = CommunicationPatterns::find()
-            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT])
+            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_WITHDRAWS_EXPERT_FROM_PROJECT])
             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
             ->orderBy('id DESC')
             ->all();
@@ -169,7 +169,7 @@ class CommunicationsController extends AppAdminController
                     if ($communicationType === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
 
                         $patternsCommunicationsAboutReadinessConductExpertise = CommunicationPatterns::find()
-                            ->where(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
+                            ->andWhere(['communication_type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE])
                             ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                             ->orderBy('id DESC')
                             ->all();
@@ -183,7 +183,7 @@ class CommunicationsController extends AppAdminController
                     }
 
                     $patterns = CommunicationPatterns::find()
-                        ->where(['communication_type' => $communicationType])
+                        ->andWhere(['communication_type' => $communicationType])
                         ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                         ->orderBy('id DESC')
                         ->all();
@@ -323,7 +323,7 @@ class CommunicationsController extends AppAdminController
 
             /** @var CommunicationPatterns[] $patternsActive */
             $patternsActive = CommunicationPatterns::find()
-                ->where(['communication_type' => $communicationType, 'is_active' => CommunicationPatterns::ACTIVE])
+                ->andWhere(['communication_type' => $communicationType, 'is_active' => CommunicationPatterns::ACTIVE])
                 ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                 ->all();
 
@@ -337,7 +337,7 @@ class CommunicationsController extends AppAdminController
             $patternActivate->update(true, ['is_active']);
 
             $patterns = CommunicationPatterns::find()
-                ->where(['communication_type' => $communicationType])
+                ->andWhere(['communication_type' => $communicationType])
                 ->andWhere(['initiator' => Yii::$app->user->getId(), 'is_remote' => CommunicationPatterns::NOT_REMOTE])
                 ->orderBy('id DESC')
                 ->all();
@@ -445,7 +445,7 @@ class CommunicationsController extends AppAdminController
                         // Устанавливаем параметр аннулирования предыдущей коммуникации
                         /** @var ProjectCommunications $communicationCanceled */
                         $communicationCanceled = ProjectCommunications::find()
-                            ->where([
+                            ->andWhere([
                                 'adressee_id' => $adressee_id,
                                 'project_id' => $project_id,
                                 'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
@@ -547,7 +547,7 @@ class CommunicationsController extends AppAdminController
             $admittedExperts = UserAccessToProjects::find()
                 ->select(['user_id', 'project_id'])
                 ->distinct('user_id')
-                ->where(['project_id' => $id])
+                ->andWhere(['project_id' => $id])
                 ->all();
 
             $response = ['renderAjax' => $this->renderAjax('ajax_get_communications', [
@@ -601,7 +601,7 @@ class CommunicationsController extends AppAdminController
             // Дублирующие коммуникации отправленные трекеру
             $query_communications = DuplicateCommunications::find()
                 ->leftJoin('project_communications', '`project_communications`.`id` = `duplicate_communications`.`source_id`')
-                ->where(['duplicate_communications.adressee_id' => $id])
+                ->andWhere(['duplicate_communications.adressee_id' => $id])
                 ->orderBy('id DESC');
 
             $pages = new Pagination(['totalCount' => $query_communications->count(), 'page' => ($page - 1), 'pageSize' => $pageSize]);
@@ -618,7 +618,7 @@ class CommunicationsController extends AppAdminController
         if (User::isUserMainAdmin(Yii::$app->user->identity['username'])) {
 
             $query_communications = ProjectCommunications::find()
-                ->where(['adressee_id' => $id])
+                ->andWhere(['adressee_id' => $id])
                 ->andWhere(['in','type', [
                     CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE,
                     CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE,

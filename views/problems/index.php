@@ -19,6 +19,8 @@ $this->registerCssFile('@web/css/problem-index-style.css');
  * @var Segments $segment
  * @var Projects $project
  * @var FormCreateProblem $formModel
+ * @var bool $existTrashList
+ * @var Problems[] $trashList
  */
 
 ?>
@@ -232,43 +234,95 @@ $this->registerCssFile('@web/css/problem-index-style.css');
 
         <div class="row row_header_data_generation" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
 
-            <div class="col-md-9" style="padding-top: 17px; padding-bottom: 17px;">
+            <div class="col-md-6" style="padding-top: 17px; padding-bottom: 17px;">
                 <?= Html::a('Проблемы' . Html::img('/images/icons/icon_report_next.png'), ['/problems/get-instruction'],[
                     'class' => 'link_to_instruction_page open_modal_instruction_page', 'title' => 'Инструкция'
                 ]) ?>
             </div>
 
-            <div class="col-md-3" style="padding-top: 15px; padding-bottom: 15px;">
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
-                        ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
-                        ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
-                    ) ?>
+            <?php if (!$confirmSegment->getDeletedAt()): ?>
+
+                <?php if ($existTrashList): ?>
+
+                    <div class="col-md-4" style="padding-top: 15px; padding-bottom: 15px;">
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                                ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
+                                ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
+                            ) ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="col-md-2" style="padding-top: 15px; padding-bottom: 15px;">
+                        <?=  Html::a( '<div class="hypothesis_trash_link_block"><div>' . Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div><div style="padding-left: 20px;">Корзина</div></div>',
+                            ['/problems/trash-list', 'id' => $confirmSegment->getId()],
+                            ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right']
+                        ) ?>
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="col-md-6" style="padding-top: 15px; padding-bottom: 15px;">
+                        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                                ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
+                                ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-right']
+                            ) ?>
+                        <?php endif; ?>
+                    </div>
+
                 <?php endif; ?>
-            </div>
+
+            <?php else: ?>
+
+                <div class="col-md-6"></div>
+
+            <?php endif; ?>
 
         </div>
 
-        <div class="row row_header_data_generation_mobile">
-            <div class="col-xs-9">
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+        <?php if (!$confirmSegment->getDeletedAt()): ?>
 
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
-                        ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
-                        ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus']
-                    ) ?>
+            <div class="row row_header_data_generation_mobile">
+                <div class="col-xs-7">
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                <?php endif; ?>
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новая проблема</div></div>',
+                            ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
+                            ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus']
+                        ) ?>
+
+                    <?php endif; ?>
+                </div>
+                <div class="col-xs-5">
+
+                    <?php if ($existTrashList): ?>
+
+                        <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                            Url::to('/problems/get-instruction'), [
+                                'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                                'style' => ['margin-top' => '5px'],
+                                'title' => 'Инструкция'
+                            ]) ?>
+
+                        <?=  Html::a('<div class="hypothesis_trash_link_block"><div>' .  Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div></div>',
+                            ['/problems/trash-list', 'id' => $confirmSegment->getId()], ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right', 'title' => 'Корзина']
+                        ) ?>
+
+                    <?php else: ?>
+
+                        <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                            Url::to('/problems/get-instruction'), [
+                                'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                                'title' => 'Инструкция'
+                            ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
             </div>
-            <div class="col-xs-3">
-                <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
-                    Url::to('/problems/get-instruction'), [
-                        'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                        'style' => ['margin-top' => '5px'],
-                        'title' => 'Инструкция'
-                    ]) ?>
-            </div>
-        </div>
+
+        <?php endif; ?>
 
         <!--Заголовки для списка проблем-->
         <div class="row headers_data_hypothesis" style="margin: 0; padding: 10px;">
@@ -304,13 +358,30 @@ $this->registerCssFile('@web/css/problem-index-style.css');
         <div class="block_all_hypothesis row" style="padding-left: 10px; padding-right: 10px;">
 
             <!--Данные для списка проблем-->
-            <?= $this->render('_index_ajax', ['models' => $models]) ?>
+            <?php if (!$confirmSegment->getDeletedAt()): ?>
+
+                <?= $this->render('_index_ajax', [
+                        'models' => $models
+                ]) ?>
+
+            <?php else: ?>
+
+                <?= $this->render('_trash_index_ajax', [
+                    'trashList' => $trashList
+                ]) ?>
+
+            <?php endif; ?>
 
         </div>
     </div>
 
 
-    <?php if (count($models) > 0) : ?>
+    <?php
+    $countModels = Problems::find(false)
+        ->andWhere(['basic_confirm_id' => $confirmSegment->getId()])
+        ->count();
+
+    if ((int)$countModels > 0) : ?>
 
         <div class="row information_status_confirm">
 

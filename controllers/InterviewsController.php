@@ -7,16 +7,28 @@ use app\models\AnswersQuestionsConfirmGcp;
 use app\models\AnswersQuestionsConfirmMvp;
 use app\models\AnswersQuestionsConfirmProblem;
 use app\models\AnswersQuestionsConfirmSegment;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
 use app\models\forms\CacheForm;
+use app\models\Gcps;
 use app\models\InterviewConfirmGcp;
 use app\models\InterviewConfirmMvp;
 use app\models\InterviewConfirmProblem;
 use app\models\InterviewConfirmSegment;
+use app\models\Mvps;
 use app\models\PatternHttpException;
+use app\models\Problems;
+use app\models\QuestionsConfirmGcp;
+use app\models\QuestionsConfirmMvp;
+use app\models\QuestionsConfirmProblem;
+use app\models\QuestionsConfirmSegment;
 use app\models\RespondsGcp;
 use app\models\RespondsMvp;
 use app\models\RespondsProblem;
 use app\models\RespondsSegment;
+use app\models\Segments;
 use app\models\StageConfirm;
 use Throwable;
 use yii\base\ErrorException;
@@ -94,7 +106,7 @@ class InterviewsController extends AppUserPartController
      */
     public function actionDownload(int $stage, int $id)
     {
-        $model = self::findModel($stage, $id);
+        $model = self::findModel($stage, $id, false);
         $file = $model->getPathFile() . $model->getServerFile();
 
         if (file_exists($file)) {
@@ -245,18 +257,143 @@ class InterviewsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return array|bool
      */
-    public function actionGetDataUpdateForm(int $stage, int $id)
+    public function actionGetDataUpdateForm(int $stage, int $id, bool $isOnlyNotDelete = true)
     {
         if(Yii::$app->request->isAjax) {
-            
-            $model = self::findModel($stage, $id);
-            $respond = $model->respond;
-            $confirm = $respond->confirm;
-            $hypothesis = $confirm->hypothesis;
 
-            $response = ['renderAjax' => $this->renderAjax('update', ['respond' => $respond, 'model' => $model, 'confirm' => $confirm, 'hypothesis' => $hypothesis])];
+            $model = self::findModel($stage, $id, $isOnlyNotDelete);
+            $questionsConfirm = [];
+
+            if ($isOnlyNotDelete) {
+                $respond = $model->respond;
+                $confirm = $respond->confirm;
+                $hypothesis = $confirm->hypothesis;
+                $answers = $respond->answers;
+
+            } elseif ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
+                /** @var $respond RespondsSegment */
+                $respond = RespondsSegment::find(false)
+                    ->andWhere(['id' => $model->getRespondId()])
+                    ->one();
+
+                /** @var $confirm ConfirmSegment */
+                $confirm = ConfirmSegment::find(false)
+                    ->andWhere(['id' => $respond->getConfirmId()])
+                    ->one();
+
+                /** @var $hypothesis Segments */
+                $hypothesis = Segments::find(false)
+                    ->andWhere(['id' => $confirm->getSegmentId()])
+                    ->one();
+
+                /** @var $answers AnswersQuestionsConfirmSegment[] */
+                $answers = AnswersQuestionsConfirmSegment::find(false)
+                    ->andWhere(['respond_id' => $respond->getId()])
+                    ->all();
+
+                foreach ($answers as $answer) {
+                    $questionsConfirm[$answer->getId()] = QuestionsConfirmSegment::find(false)
+                        ->andWhere(['id' => $answer->getQuestionId()])
+                        ->one();
+                }
+
+            } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
+                /** @var $respond RespondsProblem */
+                $respond = RespondsProblem::find(false)
+                    ->andWhere(['id' => $model->getRespondId()])
+                    ->one();
+
+                /** @var $confirm ConfirmProblem */
+                $confirm = ConfirmProblem::find(false)
+                    ->andWhere(['id' => $respond->getConfirmId()])
+                    ->one();
+
+                /** @var $hypothesis Problems */
+                $hypothesis = Problems::find(false)
+                    ->andWhere(['id' => $confirm->getProblemId()])
+                    ->one();
+
+                /** @var $answers AnswersQuestionsConfirmProblem[] */
+                $answers = AnswersQuestionsConfirmProblem::find(false)
+                    ->andWhere(['respond_id' => $respond->getId()])
+                    ->all();
+
+                foreach ($answers as $answer) {
+                    $questionsConfirm[$answer->getId()] = QuestionsConfirmProblem::find(false)
+                        ->andWhere(['id' => $answer->getQuestionId()])
+                        ->one();
+                }
+
+            } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
+                /** @var $respond RespondsGcp */
+                $respond = RespondsGcp::find(false)
+                    ->andWhere(['id' => $model->getRespondId()])
+                    ->one();
+
+                /** @var $confirm ConfirmGcp */
+                $confirm = ConfirmGcp::find(false)
+                    ->andWhere(['id' => $respond->getConfirmId()])
+                    ->one();
+
+                /** @var $hypothesis Gcps */
+                $hypothesis = Gcps::find(false)
+                    ->andWhere(['id' => $confirm->getGcpId()])
+                    ->one();
+
+                /** @var $answers AnswersQuestionsConfirmGcp[] */
+                $answers = AnswersQuestionsConfirmGcp::find(false)
+                    ->andWhere(['respond_id' => $respond->getId()])
+                    ->all();
+
+                foreach ($answers as $answer) {
+                    $questionsConfirm[$answer->getId()] = QuestionsConfirmGcp::find(false)
+                        ->andWhere(['id' => $answer->getQuestionId()])
+                        ->one();
+                }
+
+            } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
+                /** @var $respond RespondsMvp */
+                $respond = RespondsMvp::find(false)
+                    ->andWhere(['id' => $model->getRespondId()])
+                    ->one();
+
+                /** @var $confirm ConfirmMvp */
+                $confirm = ConfirmMvp::find(false)
+                    ->andWhere(['id' => $respond->getConfirmId()])
+                    ->one();
+
+                /** @var $hypothesis Mvps */
+                $hypothesis = Mvps::find(false)
+                    ->andWhere(['id' => $confirm->getMvpId()])
+                    ->one();
+
+                /** @var $answers AnswersQuestionsConfirmMvp[] */
+                $answers = AnswersQuestionsConfirmMvp::find(false)
+                    ->andWhere(['respond_id' => $respond->getId()])
+                    ->all();
+
+                foreach ($answers as $answer) {
+                    $questionsConfirm[$answer->getId()] = QuestionsConfirmMvp::find(false)
+                        ->andWhere(['id' => $answer->getQuestionId()])
+                        ->one();
+                }
+
+            } else {
+                return false;
+            }
+
+            $response = ['renderAjax' => $this->renderAjax('update', [
+                'respond' => $respond,
+                'model' => $model,
+                'confirm' => $confirm,
+                'hypothesis' => $hypothesis,
+                'answers' => $answers,
+                'isOnlyNotDelete' => $isOnlyNotDelete,
+                'questionsConfirm' => $questionsConfirm
+            ])];
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->data = $response;
             return $response;
@@ -304,24 +441,45 @@ class InterviewsController extends AppUserPartController
     /**
      * @param int $stage
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return InterviewConfirmGcp|InterviewConfirmMvp|InterviewConfirmProblem|InterviewConfirmSegment|bool|null
      */
-    private static function findModel(int $stage, int $id)
+    private static function findModel(int $stage, int $id, bool $isOnlyNotDelete = true)
     {
         if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-            return InterviewConfirmSegment::findOne($id);
+            /** @var $interview InterviewConfirmSegment */
+            $interview = InterviewConfirmSegment::find($isOnlyNotDelete)
+                ->andWhere(['id' => $id])
+                ->one();
+
+            return $interview ?: null;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-            return InterviewConfirmProblem::findOne($id);
+            /** @var $interview InterviewConfirmProblem */
+            $interview = InterviewConfirmProblem::find($isOnlyNotDelete)
+                ->andWhere(['id' => $id])
+                ->one();
+
+            return $interview ?: null;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-            return InterviewConfirmGcp::findOne($id);
+            /** @var $interview InterviewConfirmGcp */
+            $interview = InterviewConfirmGcp::find($isOnlyNotDelete)
+                ->andWhere(['id' => $id])
+                ->one();
+
+            return $interview ?: null;
         }
 
         if ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-            return InterviewConfirmMvp::findOne($id);
+            /** @var $interview InterviewConfirmMvp */
+            $interview = InterviewConfirmMvp::find($isOnlyNotDelete)
+                ->andWhere(['id' => $id])
+                ->one();
+
+            return $interview ?: null;
         }
         return false;
     }

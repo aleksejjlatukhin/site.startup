@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -15,11 +16,13 @@ use yii\db\ActiveRecord;
  * @property int $project_id                        Идентификатор проекта
  * @property string $file_name                      Имя загруженного файла
  * @property string $server_file                    Сгенерированное имя файла на сервере
+ * @property int|null $deleted_at                   Дата удаления
  *
  * @property Projects $project                      Проект
  */
 class PreFiles extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     /**
      * {@inheritdoc}
@@ -131,5 +134,13 @@ class PreFiles extends ActiveRecord
     public function setServerFile(string $server_file): void
     {
         $this->server_file = $server_file;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
     }
 }

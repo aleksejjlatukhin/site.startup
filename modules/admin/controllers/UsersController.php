@@ -129,7 +129,7 @@ class UsersController extends AppAdminController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
@@ -164,7 +164,7 @@ class UsersController extends AppAdminController
             $user = User::findOne($id);
             $admins = User::find()->with('clientUser')
                 ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
+                ->andWhere(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM, 'status' => User::STATUS_ACTIVE])
                 ->andWhere(['client_user.client_id' => $user->clientUser->getClientId()])
                 ->all();
 
@@ -221,7 +221,7 @@ class UsersController extends AppAdminController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_ADMIN, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
@@ -268,7 +268,7 @@ class UsersController extends AppAdminController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_EXPERT, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage]);
@@ -307,7 +307,7 @@ class UsersController extends AppAdminController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_MANAGER, 'confirm' => User::CONFIRM])
+            ->andWhere(['role' => User::ROLE_MANAGER, 'confirm' => User::CONFIRM])
             ->andWhere(['client_user.client_id' => $client->getId()])
             ->orderBy(['updated_at' => SORT_DESC]);
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => $countUsersOnPage, ]);
@@ -424,7 +424,7 @@ class UsersController extends AppAdminController
         $countUsersOnPage = 20;
         $query = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])
+            ->andWhere(['role' => User::ROLE_USER, 'confirm' => User::CONFIRM, 'id_admin' => $id])
             ->andWhere(['client_user.client_id' => $clientUser->getClientId()])
             ->orderBy(['updated_at' => SORT_DESC]);
         $pages = new Pagination(['totalCount' => $query->count(), 'page' => ($page - 1), 'pageSize' => $countUsersOnPage]);

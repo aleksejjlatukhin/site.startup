@@ -24,6 +24,9 @@ use yii\widgets\LinkPager;
                 <div class="col-md-9 col-lg-10">
                     <div class="project_name_table">
                         <?= $project->getProjectName() ?> -<span class="project_fullname_text"><?= $project->getProjectFullname() ?></span>
+                        <?php if ($project->getDeletedAt()): ?>
+                            <p class="color-red">проект удален</p>
+                        <?php endif; ?>
                     </div>
                 </div>
 

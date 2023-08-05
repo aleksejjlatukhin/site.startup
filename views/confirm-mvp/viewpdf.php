@@ -1,6 +1,7 @@
 <?php
 
 use app\models\ConfirmMvp;
+use app\models\InterviewConfirmMvp;
 use app\models\RespondsMvp;
 use yii\helpers\Html;
 
@@ -62,11 +63,16 @@ use yii\helpers\Html;
 
                 <td colspan="1" style="width: 50px; text-align: center;">
                     <?php
-                    if ($respond->interview) {
-                        if ($respond->interview->getStatus() === 1) {
+                    /** @var $interview InterviewConfirmMvp */
+                    $interview = InterviewConfirmMvp::find(false)
+                        ->andWhere(['respond_id' => $respond->getId()])
+                        ->one();
+
+                    if ($interview) {
+                        if ($interview->getStatus() === 1) {
                             echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                         }
-                        elseif ($respond->interview->getStatus() === 0) {
+                        elseif ($interview->getStatus() === 0) {
                             echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px', 'margin-bottom' => '-4px']]);
                         }
                     }
@@ -99,8 +105,8 @@ use yii\helpers\Html;
                 </td>
 
                 <td colspan="1" style="width: 100px; padding: 15px 5px; text-align: center; color: #FFFFFF; font-size: 15px;">
-                    <?php if ($respond->interview) : ?>
-                        <?= date("d.m.y", $respond->interview->getUpdatedAt()) ?>
+                    <?php if ($interview) : ?>
+                        <?= date("d.m.y", $interview->getUpdatedAt()) ?>
                     <?php endif; ?>
                 </td>
 

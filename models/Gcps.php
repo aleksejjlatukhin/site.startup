@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -30,6 +31,7 @@ use yii\db\ActiveRecord;
  * @property int $exist_confirm                     Параметр факта подтверждения ЦП
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                   Дата удаления
  * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property ConfirmGcp $confirm                    Подтверждение ценностного предложения
@@ -42,6 +44,7 @@ use yii\db\ActiveRecord;
  */
 class Gcps extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
@@ -154,7 +157,7 @@ class Gcps extends ActiveRecord
     {
         return RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $this->getConfirmProblemId(), 'interview_confirm_problem.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $this->getConfirmProblemId(), 'interview_confirm_problem.status' => '1'])->all();
     }
 
 
@@ -278,49 +281,190 @@ class Gcps extends ActiveRecord
 
 
     /**
+     * Отправка писем трекеру и экспертам.
+     * Чтобы не ломать код в случае ошибки при отправке письма,
+     * выводим этот код в отдельный блок
+     *
+     * @param ProjectCommunications[] $communications
+     * @return void
+     */
+    private function sendingCommunicationsToEmail(array $communications): void
+    {
+        try {
+            if ($communications) {
+                foreach ($communications as $k => $communication) {
+                    SendingCommunicationsToEmail::softDeleteStageProject($communication, $k === 0);
+                }
+            }
+        } catch (\Exception $exception) {}
+    }
+
+
+    /**
+     * @param bool $sendCommunications
      * @return false|int
-     * @throws ErrorException
-     * @throws StaleObjectException
+     */
+    public function softDeleteStage(bool $sendCommunications = true)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $communications = [];
+            if ($sendCommunications && ($this->getEnableExpertise() === EnableExpertise::ON) && $expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getProjectId())) {
+                $user = $this->project->user;
+                foreach ($expertIds as $i => $expertId) {
+                    $communication = new ProjectCommunications();
+                    $communication->setParams($expertId, $this->getProjectId(), CommunicationTypes::USER_DELETED_GCP, $this->getId());
+                    if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT)) {
+                        $communications[] = $communication;
+                    } elseif ($communication->save()) {
+                        $communications[] = $communication;
+                    }
+                }
+            }
+
+            $this->sendingCommunicationsToEmail($communications);
+
+            if ($mvps = $this->mvps) {
+                foreach ($mvps as $mvp) {
+                    $mvp->softDeleteStage(false);
+                }
+            }
+
+            if ($confirm = $this->confirm) {
+
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmGcp::softDeleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmGcp::softDeleteAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmGcp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsGcp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->softDelete(['id' => $confirm->getId()]);
+            }
+
+            // Удаление кэша для форм ГЦП
+            $cachePathDelete = '../runtime/cache/forms/user-' . $this->project->user->getId() . '/projects/project-' . $this->project->getId() . '/segments/segment-' . $this->segment->getId() .
+                '/problems/problem-' . $this->problem->getId() . '/gcps/gcp-' . $this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            $result = $this->softDelete(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
+     */
+    public function recoveryStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            /** @var $mvps Mvps[] */
+            $mvps = Mvps::find(false)
+                ->andWhere(['gcp_id' => $this->getId()])
+                ->all();
+
+            if (count($mvps) > 0) {
+                foreach ($mvps as $mvp) {
+                    $mvp->recoveryStage();
+                }
+            }
+
+            /** @var $confirm ConfirmGcp */
+            $confirm = ConfirmGcp::find(false)
+                ->andWhere(['gcp_id' => $this->getId()])
+                ->one();
+
+            if ($confirm) {
+                /** @var $responds RespondsGcp[] */
+                $responds = RespondsGcp::find(false)
+                    ->andWhere(['confirm_id' => $confirm->getId()])
+                    ->all();
+
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmGcp::recoveryAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmGcp::recoveryAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmGcp::recoveryAll(['confirm_id' => $confirm->getId()]);
+                RespondsGcp::recoveryAll(['confirm_id' => $confirm->getId()]);
+                $confirm->recovery(['id' => $confirm->getId()]);
+            }
+
+            $result = $this->recovery(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
      * @throws Throwable
      */
-    public function deleteStage ()
+    public function deleteStage()
     {
-        if ($mvps = $this->mvps) {
-            foreach ($mvps as $mvp) {
-                $mvp->deleteStage();
-            }
-        }
-
-        if ($confirm = $this->confirm) {
-
-            $responds = $confirm->responds;
-            foreach ($responds as $respond) {
-
-                InterviewConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
-                AnswersQuestionsConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($mvps = $this->mvps) {
+                foreach ($mvps as $mvp) {
+                    $mvp->deleteStage();
+                }
             }
 
-            QuestionsConfirmGcp::deleteAll(['confirm_id' => $confirm->getId()]);
-            RespondsGcp::deleteAll(['confirm_id' => $confirm->getId()]);
-            $confirm->delete();
+            if ($confirm = $this->confirm) {
+
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmGcp::deleteAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmGcp::deleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsGcp::deleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->delete();
+            }
+
+            // Удаление директории ГЦП
+            $gcpPathDelete = UPLOAD . '/user-' . $this->project->user->getId() . '/project-' . $this->project->getId() . '/segments/segment-' . $this->segment->getId() .
+                '/problems/problem-' . $this->problem->getId() . '/gcps/gcp-' . $this->getId();
+            if (file_exists($gcpPathDelete)) {
+                FileHelper::removeDirectory($gcpPathDelete);
+            }
+
+            // Удаление кэша для форм ГЦП
+            $cachePathDelete = '../runtime/cache/forms/user-' . $this->project->user->getId() . '/projects/project-' . $this->project->getId() . '/segments/segment-' . $this->segment->getId() .
+                '/problems/problem-' . $this->problem->getId() . '/gcps/gcp-' . $this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            // Удаление ГЦП
+            $result = $this->delete();
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
         }
 
-        // Удаление директории ГЦП
-        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
-            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->getId();
-        if (file_exists($gcpPathDelete)) {
-            FileHelper::removeDirectory($gcpPathDelete);
-        }
-
-        // Удаление кэша для форм ГЦП
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
-            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->getId();
-        if (file_exists($cachePathDelete)) {
-            FileHelper::removeDirectory($cachePathDelete);
-        }
-
-        // Удаление ГЦП
-        return $this->delete();
     }
 
     /**
@@ -522,5 +666,21 @@ class Gcps extends ActiveRecord
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

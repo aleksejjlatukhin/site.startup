@@ -104,14 +104,14 @@ class SiteController extends AppUserPartController
 
                     $countUsersCompany = User::find()
                         ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                        ->where(['client_user.client_id' => $client->getId()])
+                        ->andWhere(['client_user.client_id' => $client->getId()])
                         ->andWhere(['role' => User::ROLE_USER])
                         ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
                         ->count();
 
                     $countTrackersCompany = User::find()
                         ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                        ->where(['client_user.client_id' => $client->getId()])
+                        ->andWhere(['client_user.client_id' => $client->getId()])
                         ->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
                         ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
                         ->count();

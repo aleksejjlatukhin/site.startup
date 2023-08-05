@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -31,6 +32,7 @@ use yii\db\ActiveRecord;
  * @property int $exist_confirm                     Параметр факта подтверждения mvp-продукта
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                   Дата удаления
  * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property ConfirmMvp $confirm                    Подтверждение mvp-продукта
@@ -43,6 +45,7 @@ use yii\db\ActiveRecord;
  */
 class Mvps extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     public const EVENT_CLICK_BUTTON_CONFIRM = 'event click button confirm';
 
@@ -155,7 +158,7 @@ class Mvps extends ActiveRecord
     {
         return RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $this->getConfirmGcpId(), 'interview_confirm_gcp.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $this->getConfirmGcpId(), 'interview_confirm_gcp.status' => '1'])->all();
     }
 
 
@@ -278,47 +281,183 @@ class Mvps extends ActiveRecord
 
 
     /**
-     * @return false|int
-     * @throws ErrorException
-     * @throws StaleObjectException
-     * @throws Throwable
+     * Отправка писем трекеру и экспертам.
+     * Чтобы не ломать код в случае ошибки при отправке письма,
+     * выводим этот код в отдельный блок
+     *
+     * @param ProjectCommunications[] $communications
+     * @return void
      */
-    public function deleteStage ()
+    private function sendingCommunicationsToEmail(array $communications): void
     {
-        if ($businessModel = $this->businessModel) {
-            $businessModel->delete();
-        }
+        try {
+            if ($communications) {
+                foreach ($communications as $k => $communication) {
+                    SendingCommunicationsToEmail::softDeleteStageProject($communication, $k === 0);
+                }
+            }
+        } catch (\Exception $exception) {}
+    }
 
-        if ($confirm = $this->confirm) {
 
-            $responds = $confirm->responds;
-            foreach ($responds as $respond) {
-
-                InterviewConfirmMvp::deleteAll(['responds_mvp_id' => $respond->getId()]);
-                AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $respond->getId()]);
+    /**
+     * @param bool $sendCommunications
+     * @return false|int
+     */
+    public function softDeleteStage(bool $sendCommunications = true)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $communications = [];
+            if ($sendCommunications && ($this->getEnableExpertise() === EnableExpertise::ON) && $expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getProjectId())) {
+                $user = $this->project->user;
+                foreach ($expertIds as $i => $expertId) {
+                    $communication = new ProjectCommunications();
+                    $communication->setParams($expertId, $this->getProjectId(), CommunicationTypes::USER_DELETED_MVP, $this->getId());
+                    if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT)) {
+                        $communications[] = $communication;
+                    } elseif ($communication->save()) {
+                        $communications[] = $communication;
+                    }
+                }
             }
 
-            QuestionsConfirmMvp::deleteAll(['confirm_mvp_id' => $confirm->getId()]);
-            RespondsMvp::deleteAll(['confirm_mvp_id' => $confirm->getId()]);
-            $confirm->delete();
-        }
+            $this->sendingCommunicationsToEmail($communications);
 
-        // Удаление директории MVP
-        $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
-            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
-        if (file_exists($gcpPathDelete)) {
-            FileHelper::removeDirectory($gcpPathDelete);
-        }
+            if ($businessModel = $this->businessModel) {
+                $businessModel->softDelete(['id' => $businessModel->getId()]);
+            }
 
-        // Удаление кэша для форм MVP
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
-            '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
-        if (file_exists($cachePathDelete)) {
-            FileHelper::removeDirectory($cachePathDelete);
-        }
+            if ($confirm = $this->confirm) {
 
-        // Удаление MVP
-        return $this->delete();
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmMvp::softDeleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmMvp::softDeleteAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmMvp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsMvp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->softDelete(['id' => $confirm->getId()]);
+            }
+
+            // Удаление кэша для форм MVP
+            $cachePathDelete = '../runtime/cache/forms/user-' . $this->project->user->getId() . '/projects/project-' . $this->project->getId() . '/segments/segment-' . $this->segment->getId() .
+                '/problems/problem-' . $this->problem->getId() . '/gcps/gcp-' . $this->gcp->getId() . '/mvps/mvp-' . $this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            $result = $this->softDelete(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
+     */
+    public function recoveryStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            /** @var $businessModel BusinessModel */
+            $businessModel = BusinessModel::find(false)
+                ->andWhere(['mvp_id' => $this->getId()])
+                ->one();
+
+            if ($businessModel) {
+                $businessModel->recovery(['id' => $businessModel->getId()]);
+            }
+
+            /** @var $confirm ConfirmMvp */
+            $confirm = ConfirmMvp::find(false)
+                ->andWhere(['mvp_id' => $this->getId()])
+                ->one();
+
+            if ($confirm) {
+                /** @var $responds RespondsMvp[] */
+                $responds = RespondsMvp::find(false)
+                    ->andWhere(['confirm_id' => $confirm->getId()])
+                    ->all();
+
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmMvp::recoveryAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmMvp::recoveryAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmMvp::recoveryAll(['confirm_id' => $confirm->getId()]);
+                RespondsMvp::recoveryAll(['confirm_id' => $confirm->getId()]);
+                $confirm->recovery(['id' => $confirm->getId()]);
+            }
+
+            $result = $this->recovery(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
+     * @throws Throwable
+     */
+    public function deleteStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($businessModel = $this->businessModel) {
+                $businessModel->delete();
+            }
+
+            if ($confirm = $this->confirm) {
+
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmMvp::deleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmMvp::deleteAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmMvp::deleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsMvp::deleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->delete();
+            }
+
+            // Удаление директории MVP
+            $gcpPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+                '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
+            if (file_exists($gcpPathDelete)) {
+                FileHelper::removeDirectory($gcpPathDelete);
+            }
+
+            // Удаление кэша для форм MVP
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->segment->getId().
+                '/problems/problem-'.$this->problem->getId().'/gcps/gcp-'.$this->gcp->getId().'/mvps/mvp-'.$this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            // Удаление MVP
+            $result = $this->delete();
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
     }
 
     /**
@@ -536,5 +675,21 @@ class Mvps extends ActiveRecord
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

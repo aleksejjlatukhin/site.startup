@@ -10,8 +10,11 @@ use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\forms\CacheForm;
 use app\models\forms\SearchForm;
+use app\models\Gcps;
+use app\models\Mvps;
 use app\models\PatternHttpException;
 use app\models\PreFiles;
+use app\models\Problems;
 use app\models\ProjectSort;
 use app\models\Roadmap;
 use app\models\Segments;
@@ -57,7 +60,10 @@ class ProjectsController extends AppUserPartController
 
         if (in_array($action->id, ['result', 'result-export', 'report', 'upshot', 'mpdf-project'])){
 
-            $model = Projects::findOne((int)Yii::$app->request->get('id'));
+            /** @var $model Projects */
+            $model = Projects::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
 
             if (($model->getUserId() === $currentUser->getId())) {
                 return parent::beforeAction($action);
@@ -257,29 +263,96 @@ class ProjectsController extends AppUserPartController
     {
         $user = User::findOne($id);
         $condition = $project_id ? ['user_id' => $id, 'id' => $project_id] : ['user_id' => $id];
-        $models = Projects::findAll($condition);
-        $searchForm = new SearchForm();
+        $countModels = Projects::find(false)
+            ->andWhere($condition)
+            ->count();
 
-        if (!$models) {
+        if ((int)$countModels === 0) {
             return $this->redirect(['/projects/instruction', 'id' => $id]);
         }
+
+        $models = Projects::findAll($condition);
+        if ($project_id && User::isUserExpert(Yii::$app->user->identity['username'])) {
+            /** @var $models Projects[] */
+            $models = Projects::find(false)
+                ->andWhere($condition)
+                ->all();
+        }
+
+        $searchForm = new SearchForm();
 
         if ($searchForm->load(Yii::$app->request->post())) {
 
             $models = Projects::find()
-                ->where($condition)
+                ->andWhere($condition)
                 ->andWhere(['or',
                     ['like', 'project_name', $searchForm->search],
                     ['like', 'project_fullname', $searchForm->search],
                 ])->all();
         }
 
+        $existTrashList = Projects::find(false)
+            ->andWhere(['user_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->exists();
+
+        $trashList = Projects::find(false)
+            ->andWhere(['user_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->all();
+
         return $this->render('index', [
             'user' => $user,
             'models' => $models,
             'new_author' => new Authors(),
             'searchForm' => new SearchForm(),
+            'existTrashList' => $existTrashList,
+            'trashList' => $trashList
         ]);
+    }
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_index_ajax', [
+                    'models' => Projects::findAll(['user_id' => $id])
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionTrashList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $queryModels = Projects::find(false)
+                ->andWhere(['user_id' => $id])
+                ->andWhere(['not', ['deleted_at' => null]]);
+
+            $response = [
+                'countItems' => $queryModels->count(),
+                'renderAjax' => $this->renderAjax('_trash_ajax', [
+                    'userId' => $id,
+                    'models' => $queryModels->all()
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
     /**
@@ -406,7 +479,7 @@ class ProjectsController extends AppUserPartController
                         $model->_cacheManager->deleteCache(mb_substr($cachePath, 0, -1));
 
                         $response =  [
-                            'success' => true, 'count' => (int)Projects::find()->where(['user_id' => $id])->count(),
+                            'success' => true, 'count' => (int)Projects::find()->andWhere(['user_id' => $id])->count(),
                             'renderAjax' => $this->renderAjax('_index_ajax', [
                                 'models' => Projects::findAll(['user_id' => $user->getId()]),
                             ]),
@@ -484,8 +557,16 @@ class ProjectsController extends AppUserPartController
      */
     public function actionDownload(int $id)
     {
-        $model = PreFiles::findOne($id);
-        $project = Projects::findOne(['id' => $model->getProjectId()]);
+        /** @var $model PreFiles */
+        $model = PreFiles::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $model->getProjectId()])
+            ->one();
+
         $user = User::findOne(['id' => $project->getUserId()]);
 
         $path = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/present_files/';
@@ -635,7 +716,9 @@ class ProjectsController extends AppUserPartController
      */
     public function actionShowAllInformation(int $id)
     {
-        $project = Projects::findOne($id);
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
         if(Yii::$app->request->isAjax) {
 
@@ -657,10 +740,21 @@ class ProjectsController extends AppUserPartController
      */
     public function actionShowRoadmap(int $id)
     {
-        $project = Projects::findOne($id);
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         $roadmaps = [];
 
-        foreach ($project->segments as $i => $segment){
+        /** @var $segments Segments[] */
+        $segments = !$project->getDeletedAt() ?
+            $project->segments :
+            Segments::find(false)
+                ->andWhere(['project_id' => $project->getId()])
+                ->all();
+
+        foreach ($segments as $i => $segment){
             $roadmaps[$i] = new Roadmap($segment->getId());
         }
 
@@ -684,10 +778,21 @@ class ProjectsController extends AppUserPartController
      */
     public function actionRoadmapMobile(int $id): string
     {
-        $project = Projects::findOne($id);
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
         $roadmaps = [];
 
-        foreach ($project->segments as $i => $segment){
+        /** @var $segments Segments[] */
+        $segments = !$project->getDeletedAt() ?
+            $project->segments :
+            Segments::find(false)
+                ->andWhere(['project_id' => $project->getId()])
+                ->all();
+
+        foreach ($segments as $i => $segment){
             $roadmaps[$i] = new Roadmap($segment->getId());
         }
 
@@ -786,7 +891,7 @@ class ProjectsController extends AppUserPartController
     public function actionPresentationMobile(int $id): string
     {
         return $this->render('presentation-mobile', [
-            'project' => $this->findModel($id)]);
+            'project' => $this->findModel($id, false)]);
     }
 
 
@@ -796,8 +901,17 @@ class ProjectsController extends AppUserPartController
      */
     public function actionResult(int $id)
     {
-        $project = Projects::findOne($id);
-        $segments = Segments::findAll(['project_id' => $id]);
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $segments Segments[] */
+        $segments = !$project->getDeletedAt() ?
+            $project->segments :
+            Segments::find(false)
+                ->andWhere(['project_id' => $id])
+                ->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -819,8 +933,15 @@ class ProjectsController extends AppUserPartController
      */
     public function actionResultMobile(int $id): string
     {
-        $project = Projects::findOne($id);
-        $segments = $project->segments;
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $segments Segments[] */
+        $segments = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->all();
 
         return $this->render('result-mobile', [
             'project' => $project,
@@ -835,22 +956,52 @@ class ProjectsController extends AppUserPartController
      */
     public function actionReport(int $id)
     {
-        $project = Projects::findOne($id);
-        $segments = Segments::findAll(['project_id' => $id]);
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $segments Segments[] */
+        $segments = !$project->getDeletedAt() ?
+            $project->segments :
+            Segments::find(false)
+                ->andWhere(['project_id' => $project->getId()])
+                ->all();
 
         foreach ($segments as $s => $segment) {
 
             $segment->propertyContainer->addProperty('title', 'Сегмент ' . ($s+1));
 
-            foreach ($segment->problems as $p => $problem) {
+            /** @var $problems Problems[] */
+            $problems = !$project->getDeletedAt() ?
+                $segment->problems :
+                Problems::find(false)
+                    ->andWhere(['segment_id' => $segment->getId()])
+                    ->all();
+
+            foreach ($problems as $p => $problem) {
 
                 $problem->propertyContainer->addProperty('title', 'ГПС ' . ($s+1) . '.' . ($p+1));
 
-                foreach ($problem->gcps as $g => $gcp) {
+                /** @var $gcps Gcps[] */
+                $gcps = !$project->getDeletedAt() ?
+                    $problem->gcps :
+                    Gcps::find(false)
+                        ->andWhere(['problem_id' => $problem->getId()])
+                        ->all();
+
+                foreach ($gcps as $g => $gcp) {
 
                     $gcp->propertyContainer->addProperty('title', 'ГЦП ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1));
 
-                    foreach ($gcp->mvps as $m => $mvp) {
+                    /** @var $mvps Mvps[] */
+                    $mvps = !$project->getDeletedAt() ?
+                        $gcp->mvps :
+                        Mvps::find(false)
+                            ->andWhere(['gcp_id' => $gcp->getId()])
+                            ->all();
+
+                    foreach ($mvps as $m => $mvp) {
 
                         $mvp->propertyContainer->addProperty('title', 'MVP ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . '.' . ($m+1));
                     }
@@ -878,21 +1029,39 @@ class ProjectsController extends AppUserPartController
      */
     public function actionReportMobile(int $id): string
     {
-        $segments = Segments::findAll(['project_id' => $id]);
+        /** @var $segments Segments[] */
+        $segments = Segments::find(false)
+            ->andWhere(['project_id' => $id])
+            ->all();
 
         foreach ($segments as $s => $segment) {
 
             $segment->propertyContainer->addProperty('title', 'ГЦС ' . ($s+1));
 
-            foreach ($segment->problems as $p => $problem) {
+            /** @var $problems Problems[] */
+            $problems = Problems::find(false)
+                ->andWhere(['segment_id' => $segment->getId()])
+                ->all();
+
+            foreach ($problems as $p => $problem) {
 
                 $problem->propertyContainer->addProperty('title', 'ГПС ' . ($s+1) . '.' . ($p+1));
 
-                foreach ($problem->gcps as $g => $gcp) {
+                /** @var $gcps Gcps[] */
+                $gcps = Gcps::find(false)
+                    ->andWhere(['problem_id' => $problem->getId()])
+                    ->all();
+
+                foreach ($gcps as $g => $gcp) {
 
                     $gcp->propertyContainer->addProperty('title', 'ГЦП ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1));
 
-                    foreach ($gcp->mvps as $m => $mvp) {
+                    /** @var $mvps Mvps[] */
+                    $mvps = Mvps::find(false)
+                        ->andWhere(['gcp_id' => $gcp->getId()])
+                        ->all();
+
+                    foreach ($mvps as $m => $mvp) {
 
                         $mvp->propertyContainer->addProperty('title', 'MVP ' . ($s+1) . '.' . ($p+1) . '.' . ($g+1) . '.' . ($m+1));
                     }
@@ -1055,7 +1224,7 @@ class ProjectsController extends AppUserPartController
      */
     /*public function actionReportTest ($id) {
 
-        $segments = Segments::find()->where(['project_id' => $id])->with(['confirm', 'problems'])->all();
+        $segments = Segments::find()->andWhere(['project_id' => $id])->with(['confirm', 'problems'])->all();
 
         $statModels = [];
 
@@ -1072,7 +1241,7 @@ class ProjectsController extends AppUserPartController
 
             if ($segment->confirm && $segment->problems) {
 
-                $problems = Problems::find()->where(['segment_id' => $segment->id])->with(['gcps'])->all();
+                $problems = Problems::find()->andWhere(['segment_id' => $segment->id])->with(['gcps'])->all();
 
                 foreach ($problems as $p => $problem) {
 
@@ -1082,7 +1251,7 @@ class ProjectsController extends AppUserPartController
 
                     if ($segment->confirm && $segment->problems && $problem->gcps) {
 
-                        $gcps = Gcps::find()->where(['problem_id' => $problem->id])->with(['mvps'])->all();
+                        $gcps = Gcps::find()->andWhere(['problem_id' => $problem->id])->with(['mvps'])->all();
 
                         foreach ($gcps as $g => $gcp) {
 
@@ -1092,7 +1261,7 @@ class ProjectsController extends AppUserPartController
 
                             if ($segment->confirm && $segment->problems && $problem->gcps && $gcp->mvps){
 
-                                $mvps = Mvps::find()->where(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
+                                $mvps = Mvps::find()->andWhere(['gcp_id' => $gcp->id])->with(['businessModel'])->all();
 
                                 foreach ($mvps as $m => $mvp) {
 
@@ -1260,15 +1429,12 @@ class ProjectsController extends AppUserPartController
     /**
      * @param int $id
      * @return bool
-     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
-        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+        if(Yii::$app->request->isAjax && $model->softDeleteStage()) {
             return true;
         }
         return false;
@@ -1276,15 +1442,42 @@ class ProjectsController extends AppUserPartController
 
 
     /**
+     * @param int $id
+     * @return void|Response
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionRecovery(int $id)
+    {
+        $model = $this->findModel($id, false);
+
+        if($model->recoveryStage()) {
+            return $this->redirect(['index', 'id' => $model->getUserId()]);
+        }
+
+        PatternHttpException::noData();
+    }
+
+
+    /**
      * Finds the Projects model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return Projects the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel(int $id): Projects
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): Projects
     {
-        if (($model = Projects::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = Projects::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+        } else {
+            $model = Projects::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

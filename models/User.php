@@ -212,7 +212,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function findUserAccessToProject(int $id)
     {
         return UserAccessToProjects::find()
-            ->where(['user_id' => $this->getId()])
+            ->andWhere(['user_id' => $this->getId()])
             ->andWhere(['project_id' => $id])
             ->orderBy('id DESC')
             ->one();
@@ -403,7 +403,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findIdentityByUsernameOrEmail(string $identity)
     {
         /** @var User $user */
-        $user = self::find()->where(['or', ['email' => $identity], ['username' => $identity]])->one();
+        $user = self::find()->andWhere(['or', ['email' => $identity], ['username' => $identity]])->one();
         return $user ?: false;
     }
 
@@ -482,7 +482,7 @@ class User extends ActiveRecord implements IdentityInterface
         if ($this->role !== self::ROLE_ADMIN_COMPANY) {
             $mainAdminId = ClientSettings::find()
                 ->select('admin_id')
-                ->where(['client_id' => $this->clientUser->getClientId()])
+                ->andWhere(['client_id' => $this->clientUser->getClientId()])
                 ->one();
 
             return self::findOne($mainAdminId);
@@ -661,41 +661,41 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserSimple($this->getUsername())) {
 
-            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesAdmin = MessageAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
         }
         elseif (self::isUserAdmin($this->getUsername())) {
 
-            $countUnreadMessagesAdmin = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesAdmin = MessageAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesAdmin + $countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert);
         }
         elseif (self::isUserMainAdmin($this->getUsername()) || self::isUserAdminCompany($this->getUsername())) {
 
-            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesMainAdmin = MessageMainAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesManager = MessageManager::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesMainAdmin + $countUnreadMessagesDev + $countUnreadMessagesExpert + $countUnreadMessagesManager);
         }
         elseif (self::isUserDev($this->getUsername())) {
 
-            $count = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $count = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
         }
         elseif (self::isUserExpert($this->getUsername())) {
 
-            $countUnreadMessagesExpert = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesExpert = MessageExpert::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesExpert + $countUnreadMessagesDev);
         }
         elseif (self::isUserManager($this->getUsername())) {
 
-            $countUnreadMessagesManager = MessageManager::find()->where(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
-            $countUnreadMessagesDev = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesManager = MessageManager::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $countUnreadMessagesDev = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
             $count = ($countUnreadMessagesManager + $countUnreadMessagesDev);
         }
 
@@ -715,22 +715,22 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserExpert($this->getUsername())) {
 
-            $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
+            $countUnreadProjectCommunications = ProjectCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
         }
         elseif (self::isUserMainAdmin($this->getUsername()) || self::isUserAdminCompany($this->getUsername())) {
 
-            $countUnreadProjectCommunications = ProjectCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
+            $countUnreadProjectCommunications = ProjectCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => ProjectCommunications::NO_READ])->count();
             $count += $countUnreadProjectCommunications;
         }
         elseif (self::isUserAdmin($this->getUsername())) {
 
-            $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
+            $countDuplicateCommunications = DuplicateCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
             $count += $countDuplicateCommunications;
         }
         elseif (self::isUserSimple($this->getUsername())) {
 
-            $countDuplicateCommunications = DuplicateCommunications::find()->where(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
+            $countDuplicateCommunications = DuplicateCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
             $count += $countDuplicateCommunications;
         }
 
@@ -753,7 +753,7 @@ class User extends ActiveRecord implements IdentityInterface
         if (self::isUserExpert($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()
-                ->where([
+                ->andWhere([
                     'adressee_id' => $this->getId(),
                     'status' => ProjectCommunications::NO_READ,
                     'project_id' => $id
@@ -764,7 +764,7 @@ class User extends ActiveRecord implements IdentityInterface
         elseif (self::isUserMainAdmin($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()
-                ->where([
+                ->andWhere([
                     'adressee_id' => $this->getId(),
                     'status' => ProjectCommunications::NO_READ,
                     'project_id' => $id
@@ -788,7 +788,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserSimple($this->getUsername())) {
 
-            $count = MessageAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $count = MessageAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -802,7 +802,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getCountUnreadMessagesFromDev()
     {
-        $count = MessageDevelopment::find()->where(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        $count = MessageDevelopment::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
         return ($count > 0) ? $count : false;
     }
 
@@ -819,12 +819,12 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserAdmin($this->getUsername())) {
 
-            $count = MessageMainAdmin::find()->where(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $count = MessageMainAdmin::find()->andWhere(['adressee_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
         }
 
         elseif (self::isUserManager($this->getUsername())) {
 
-            $count = MessageManager::find()->where(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $count = MessageManager::find()->andWhere(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -842,7 +842,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserExpert($this->getUsername())) {
 
-            $count = MessageExpert::find()->where(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $count = MessageExpert::find()->andWhere(['sender_id' => $this->mainAdmin->getId(), 'adressee_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -861,7 +861,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserSimple($this->getUsername())) {
 
-            $count = MessageAdmin::find()->where(['sender_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
+            $count = MessageAdmin::find()->andWhere(['sender_id' => $this->getId(), 'status' => MessageAdmin::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -876,7 +876,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getCountUnreadMessagesDevelopmentFromUser()
     {
-        $count = MessageDevelopment::find()->where(['sender_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
+        $count = MessageDevelopment::find()->andWhere(['sender_id' => $this->getId(), 'status' => MessageDevelopment::NO_READ_MESSAGE])->count();
         return ($count > 0) ? $count : false;
     }
 
@@ -893,7 +893,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserAdmin($this->getUsername())) {
 
-            $count = MessageMainAdmin::find()->where(['sender_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
+            $count = MessageMainAdmin::find()->andWhere(['sender_id' => $this->getId(), 'status' => MessageMainAdmin::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -912,7 +912,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserExpert($this->getUsername())) {
 
-            $count = MessageExpert::find()->where(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            $count = MessageExpert::find()->andWhere(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -931,7 +931,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserManager($this->username)) {
 
-            $count = MessageManager::find()->where(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $count = MessageManager::find()->andWhere(['adressee_id' => $this->mainAdmin->getId(), 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -950,7 +950,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if (self::isUserManager($this->getUsername())) {
 
-            $count = MessageManager::find()->where(['adressee_id' => $userId, 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
+            $count = MessageManager::find()->andWhere(['adressee_id' => $userId, 'sender_id' => $this->getId(), 'status' => MessageManager::NO_READ_MESSAGE])->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -966,7 +966,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function getCountUnreadMessagesUserFromExpert(int $id)
     {
 
-        $count = MessageExpert::find()->where(['adressee_id' => $id, 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        $count = MessageExpert::find()->andWhere(['adressee_id' => $id, 'sender_id' => $this->getId(), 'status' => MessageExpert::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -982,7 +982,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function getCountUnreadMessagesExpertFromUser(int $id)
     {
 
-        $count = MessageExpert::find()->where(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+        $count = MessageExpert::find()->andWhere(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }
@@ -998,7 +998,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function getCountUnreadMessagesManager(int $id)
     {
 
-        $count = MessageManager::find()->where(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
+        $count = MessageManager::find()->andWhere(['adressee_id' => $this->getId(), 'sender_id' => $id, 'status' => MessageManager::NO_READ_MESSAGE])->count();
 
         return ($count > 0) ? $count : false;
     }

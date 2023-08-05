@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\forms\CacheForm;
+use app\models\traits\SoftDeleteModelTrait;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -46,6 +47,7 @@ use yii\web\UploadedFile;
  * @property string $announcement_event                         Мероприятие, на котором анонсирован проект
  * @property string $enable_expertise                           Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at                      Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                               Дата удаления
  * @property $present_files                                     Поле для загрузки презентационных файлов
  * @property CacheForm $_cacheManager                           Менеджер для кэширования
  *
@@ -61,6 +63,8 @@ use yii\web\UploadedFile;
  */
 class Projects extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
+
     public const PERIOD_TARGET_DATE_FOR_APPOINT_EXPERT = 14*24*60*60;
     public const PERIOD_TARGET_DATE_FOR_ASK_EXPERT = 7*24*60*60;
 
@@ -378,7 +382,10 @@ class Projects extends ActiveRecord
      */
     public function uniqueName ($attr): void
     {
-        $models = self::findAll(['user_id' => $this->getUserId()]);
+        /** @var $models Projects[] */
+        $models = self::find(false)
+            ->andWhere(['user_id' => $this->getUserId()])
+            ->all();
 
         if (empty($this->id)) {
             //При создании проекта
@@ -574,36 +581,256 @@ class Projects extends ActiveRecord
 
 
     /**
+     * Отправка писем трекеру и экспертам.
+     * Чтобы не ломать код в случае ошибки при отправке письма,
+     * выводим этот код в отдельный блок
+     *
+     * @param ProjectCommunications[] $communications
+     * @return void
+     */
+    private function sendingCommunicationsToEmail(array $communications): void
+    {
+        try {
+            if ($communications) {
+                foreach ($communications as $k => $communication) {
+                    SendingCommunicationsToEmail::softDeleteStageProject($communication, $k === 0);
+                }
+            }
+        } catch (\Exception $exception) {}
+    }
+
+
+    /**
      * @return false|int
-     * @throws ErrorException
+     * @throws Throwable
+     */
+    public function softDeleteStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $communications = [];
+            if (($this->getEnableExpertise() === EnableExpertise::ON) && $expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getId())) {
+                $user = $this->user;
+                foreach ($expertIds as $i => $expertId) {
+                    $communication = new ProjectCommunications();
+                    $communication->setParams($expertId, $this->getId(), CommunicationTypes::USER_DELETED_PROJECT, $this->getId());
+                    if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT)) {
+                        $communications[] = $communication;
+                    } elseif ($communication->save()) {
+                        $communications[] = $communication;
+                    }
+                }
+            }
+
+            $this->sendingCommunicationsToEmail($communications);
+
+            // Допуски экспертов к проекту
+            /** @var UserAccessToProjects[] */
+            $admittedExperts = UserAccessToProjects::find()
+                ->select(['user_id', 'project_id'])
+                ->distinct('user_id')
+                ->andWhere(['project_id' => $this->getId()])
+                ->all();
+
+            $recalledExpertIds = []; // IDs экспертов, которым был сделан только запрос на проведение экспертизы, которые необходимо отозвать.
+            $rejectedExperts = []; // IDs экспертов, которым был сделан только запрос на проведение экспертизы и которые уже приняли решение её провети, но не были пока назначены на проект. В этом случае необходимо им отказать.
+            if (count($admittedExperts) > 0) {
+                foreach ($admittedExperts as $admittedExpert) {
+                    $userCommunications = $admittedExpert->userCommunicationsForAdminTable;
+                    foreach ($userCommunications as $key => $communication) {
+                        if (($key === array_key_last($userCommunications)) && $communication->getType() === CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+                            $recalledExpertIds[] = $admittedExpert->getUserId();
+                        }
+                        if ($communication->getSenderId() !== $admittedExpert->getUserId()) {
+                            $communicationExpert = $communication->responsiveCommunication;
+                            if (!$communicationExpert->responsiveCommunication && ($communicationResponse = $communicationExpert->communicationResponse) && $communicationResponse->getAnswer() === CommunicationResponse::POSITIVE_RESPONSE) {
+                                $result['user_id'] = $admittedExpert->getUserId();
+                                $result['triggered_communication_id'] = $communicationExpert->getId();
+                                $rejectedExperts[] = $result;
+                            }
+                        }
+                    }
+                }
+
+                if ($recalledExpertIds) {
+                    foreach ($recalledExpertIds as $recalledExpertId) {
+                        $this->actionSendRollbackCommunication($recalledExpertId, $this->getId(), CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE);
+                    }
+                }
+
+                if ($rejectedExperts) {
+                    foreach ($rejectedExperts as $rejectedExpert) {
+                        $this->actionSendRollbackCommunication($rejectedExpert['user_id'], $this->getId(), CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT, $rejectedExpert['triggered_communication_id']);
+                    }
+                }
+            }
+
+
+            if ($segments = $this->segments) {
+                foreach ($segments as $segment) {
+                    $segment->softDeleteStage(false);
+                }
+            }
+
+            Authors::softDeleteAll(['project_id' => $this->getId()]);
+            PreFiles::softDeleteAll(['project_id' => $this->getId()]);
+
+            // Удаление кэша для форм проекта
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->getId().'/projects/project-'.$this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            $result = $this->softDelete(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
+     */
+    public function recoveryStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            /** @var $segments Segments[] */
+            $segments = Segments::find(false)
+                ->andWhere(['project_id' => $this->getId()])
+                ->all();
+
+            if (count($segments) > 0) {
+                foreach ($segments as $segment) {
+                    $segment->recoveryStage();
+                }
+            }
+
+            Authors::recoveryAll(['project_id' => $this->getId()]);
+            PreFiles::recoveryAll(['project_id' => $this->getId()]);
+
+            $result = $this->recovery(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * Метод для отправки
+     * коммуникации по удаленным проектам экспертам,
+     * которые ещё не были назначены на проект
+     *
+     * @param int $adressee_id
+     * @param int $project_id
+     * @param int $type
+     * @param int|null $triggered_communication_id
+     * @return void
      * @throws StaleObjectException
      * @throws Throwable
      */
-    public function deleteStage ()
+    public function actionSendRollbackCommunication(int $adressee_id, int $project_id, int $type, int $triggered_communication_id = null): void
     {
-        if ($segments = $this->segments) {
-            foreach ($segments as $segment) {
-                $segment->deleteStage();
+        $communication = new ProjectCommunications();
+        $communication->setParams($adressee_id, $project_id, $type);
+        $communication->setTriggeredCommunicationId($triggered_communication_id);
+        if ($communication->save()) {
+            $accessToProject = new UserAccessToProjects();
+            $accessToProject->setParams($adressee_id, $project_id, $communication);
+            if ($accessToProject->save()) {
+
+                if ($type === CommunicationTypes::MAIN_ADMIN_WITHDRAWS_REQUEST_ABOUT_READINESS_CONDUCT_EXPERTISE) {
+
+                    // Тип коммуникации "отмена запроса о готовности провести экспертизу"
+                    // Устанавливаем параметр аннулирования предыдущей коммуникации
+                    /** @var ProjectCommunications $communicationCanceled */
+                    $communicationCanceled = ProjectCommunications::find()
+                        ->andWhere([
+                            'adressee_id' => $adressee_id,
+                            'project_id' => $project_id,
+                            'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
+                        ])
+                        ->orderBy('id DESC')
+                        ->one();
+
+                    $communicationCanceled->setCancel();
+                    $communicationCanceled->update();
+
+                    $communicationCanceledUserAccessToProject = $communicationCanceled->userAccessToProject;
+                    $communicationCanceledUserAccessToProject->setCancel();
+                    $communicationCanceledUserAccessToProject->update();
+
+                } elseif ($type === CommunicationTypes::MAIN_ADMIN_DOES_NOT_APPOINTS_EXPERT_PROJECT) {
+
+                    // Тип коммуникации "отказ в проведении экспертизы"
+                    // Прочтение коммуникации на которое поступил ответ
+                    $communication = ProjectCommunications::findOne($triggered_communication_id);
+                    $communication->setStatusRead();
+                    $communication->update();
+                }
+
+                // Отправка письма эксперту на почту
+                /* @var $user User */
+                $user = User::findOne($communication->getAdresseeId());
+
+                if ($user) {
+                    Yii::$app->mailer->compose('communications__FromMainAdminToExpert', ['user' => $user, 'communication' => $communication])
+                        ->setFrom([Yii::$app->params['supportEmail'] => 'Spaccel.ru - Акселератор стартап-проектов'])
+                        ->setTo($user->getEmail())
+                        ->setSubject('Вам пришло новое уведомление на сайте Spaccel.ru')
+                        ->send();
+                }
             }
         }
+    }
 
-        Authors::deleteAll(['project_id' => $this->getId()]);
-        PreFiles::deleteAll(['project_id' => $this->getId()]);
 
-        // Удаление директории проекта
-        $projectPathDelete = UPLOAD.'/user-'.$this->user->getId().'/project-'.$this->getId();
-        if (file_exists($projectPathDelete)) {
-            FileHelper::removeDirectory($projectPathDelete);
+    /**
+     * @return false|int
+     * @throws Throwable
+     */
+    public function deleteStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($segments = $this->segments) {
+                foreach ($segments as $segment) {
+                    $segment->deleteStage();
+                }
+            }
+
+            Authors::deleteAll(['project_id' => $this->getId()]);
+            PreFiles::deleteAll(['project_id' => $this->getId()]);
+
+            // Удаление директории проекта
+            $projectPathDelete = UPLOAD.'/user-'.$this->user->getId().'/project-'.$this->getId();
+            if (file_exists($projectPathDelete)) {
+                FileHelper::removeDirectory($projectPathDelete);
+            }
+
+            // Удаление кэша для форм проекта
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->getId().'/projects/project-'.$this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            // Удаление проекта
+            $result = $this->delete();
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
         }
-
-        // Удаление кэша для форм проекта
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->user->getId().'/projects/project-'.$this->getId();
-        if (file_exists($cachePathDelete)) {
-            FileHelper::removeDirectory($cachePathDelete);
-        }
-
-        // Удаление проекта
-        return $this->delete();
     }
 
     /**
@@ -924,5 +1151,21 @@ class Projects extends ActiveRecord
         return $this->getEnableExpertiseAt() ?
             $this->getEnableExpertiseAt() + self::PERIOD_TARGET_DATE_FOR_ASK_EXPERT :
             time() + self::PERIOD_TARGET_DATE_FOR_ASK_EXPERT;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

@@ -1,5 +1,14 @@
 <?php
 
+use app\models\BusinessModel;
+use app\models\ConfirmGcp;
+use app\models\ConfirmMvp;
+use app\models\ConfirmProblem;
+use app\models\ConfirmSegment;
+use app\models\Gcps;
+use app\models\Mvps;
+use app\models\Problems;
+use app\models\Projects;
 use app\models\Segments;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
@@ -39,7 +48,20 @@ use yii\helpers\Html;
     <?php foreach ($segments as $segment) : ?>
 
         <!--Если у сегмента существует подтверждение-->
-        <?php if($segment->confirm) : ?>
+        <?php
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = !$project->getDeletedAt() ?
+            $segment->confirm :
+            ConfirmSegment::find(false)
+                ->andWhere(['segment_id' => $segment->getId()])
+                ->one();
+
+        if($confirmSegment) : ?>
 
         <div class="stage_data_string">
 
@@ -68,32 +90,32 @@ use yii\helpers\Html;
             </div>
 
 
-            <div class="column_stage_confirm"><?= $segment->confirm->getCountRespond() ?></div>
+            <div class="column_stage_confirm"><?= $confirmSegment->getCountRespond() ?></div>
 
-            <div class="column_stage_confirm"><?= $segment->confirm->getCountPositive() ?></div>
+            <div class="column_stage_confirm"><?= $confirmSegment->getCountPositive() ?></div>
 
-            <div class="column_stage_confirm"><?= $segment->confirm->getCountConfirmMembers() ?></div>
+            <div class="column_stage_confirm"><?= $confirmSegment->getCountConfirmMembers() ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->confirm->getCountDescInterviewsOfModel() - $segment->confirm->getCountConfirmMembers()) ?></div>
+            <div class="column_stage_confirm"><?= ($confirmSegment->getCountDescInterviewsOfModel() - $confirmSegment->getCountConfirmMembers()) ?></div>
 
-            <div class="column_stage_confirm"><?= ($segment->confirm->getCountRespond() - $segment->confirm->getCountDescInterviewsOfModel()) ?></div>
+            <div class="column_stage_confirm"><?= ($confirmSegment->getCountRespond() - $confirmSegment->getCountDescInterviewsOfModel()) ?></div>
 
             <div class="column_stage_confirm">
 
                 <?php if ($segment->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                        ['/confirm-segment/view', 'id' => $confirmSegment->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                 <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
+                        ['/confirm-segment/view', 'id' => $confirmSegment->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
                 <?php elseif ($segment->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                        ['/confirm-segment/view', 'id' => $segment->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                        ['/confirm-segment/view', 'id' => $confirmSegment->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                 <?php endif; ?>
 
@@ -152,10 +174,24 @@ use yii\helpers\Html;
         <?php endif; ?>
 
         <!--Строки проблем сегментов-->
-        <?php foreach ($segment->problems as $problem) : ?>
+        <?php /** @var $problems Problems[] */
+        $problems = !$project->getDeletedAt() ?
+            $segment->problems :
+            Problems::find(false)
+                ->andWhere(['segment_id' => $segment->getId()])
+                ->all();
+
+        foreach ($problems as $problem) : ?>
 
             <!--Если у проблемы существует подтверждение-->
-            <?php if($problem->confirm) : ?>
+            <?php /** @var $confirmProblem ConfirmProblem */
+            $confirmProblem = !$project->getDeletedAt() ?
+                $problem->confirm :
+                ConfirmProblem::find(false)
+                    ->andWhere(['problem_id' => $problem->getId()])
+                    ->one();
+
+            if($confirmProblem) : ?>
 
             <div class="stage_data_string">
 
@@ -196,32 +232,32 @@ use yii\helpers\Html;
                 <?php endif; ?>
 
 
-                <div class="column_stage_confirm"><?= $problem->confirm->getCountRespond() ?></div>
+                <div class="column_stage_confirm"><?= $confirmProblem->getCountRespond() ?></div>
 
-                <div class="column_stage_confirm"><?= $problem->confirm->getCountPositive() ?></div>
+                <div class="column_stage_confirm"><?= $confirmProblem->getCountPositive() ?></div>
 
-                <div class="column_stage_confirm"><?= $problem->confirm->getCountConfirmMembers() ?></div>
+                <div class="column_stage_confirm"><?= $confirmProblem->getCountConfirmMembers() ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->getCountDescInterviewsOfModel() - $problem->confirm->getCountConfirmMembers()) ?></div>
+                <div class="column_stage_confirm"><?= ($confirmProblem->getCountDescInterviewsOfModel() - $confirmProblem->getCountConfirmMembers()) ?></div>
 
-                <div class="column_stage_confirm"><?= ($problem->confirm->getCountRespond() - $problem->confirm->getCountDescInterviewsOfModel()) ?></div>
+                <div class="column_stage_confirm"><?= ($confirmProblem->getCountRespond() - $confirmProblem->getCountDescInterviewsOfModel()) ?></div>
 
                 <div class="column_stage_confirm">
 
                     <?php if ($problem->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                            ['/confirm-problem/view', 'id' => $confirmProblem->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                     <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
+                            ['/confirm-problem/view', 'id' => $confirmProblem->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
                     <?php elseif ($problem->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                         <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                            ['/confirm-problem/view', 'id' => $problem->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                            ['/confirm-problem/view', 'id' => $confirmProblem->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                     <?php endif; ?>
 
@@ -291,10 +327,24 @@ use yii\helpers\Html;
             <?php endif; ?>
 
             <!--Строки ценностных предложений-->
-            <?php foreach ($problem->gcps as $gcp) : ?>
+            <?php /** @var $gcps Gcps[] */
+            $gcps = !$project->getDeletedAt() ?
+                $problem->gcps :
+                Gcps::find(false)
+                    ->andWhere(['problem_id' => $problem->getId()])
+                    ->all();
+
+            foreach ($gcps as $gcp) : ?>
 
                 <!--Если у ценностного предложения существует подтверждение-->
-                <?php if($gcp->confirm) : ?>
+                <?php /** @var $confirmGcp ConfirmGcp */
+                $confirmGcp = !$project->getDeletedAt() ?
+                    $gcp->confirm :
+                    ConfirmGcp::find(false)
+                        ->andWhere(['gcp_id' => $gcp->getId()])
+                        ->one();
+
+                if($confirmGcp) : ?>
 
                     <div class="stage_data_string">
 
@@ -335,32 +385,32 @@ use yii\helpers\Html;
                         <?php endif; ?>
 
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountRespond() ?></div>
+                        <div class="column_stage_confirm"><?= $confirmGcp->getCountRespond() ?></div>
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountPositive() ?></div>
+                        <div class="column_stage_confirm"><?= $confirmGcp->getCountPositive() ?></div>
 
-                        <div class="column_stage_confirm"><?= $gcp->confirm->getCountConfirmMembers() ?></div>
+                        <div class="column_stage_confirm"><?= $confirmGcp->getCountConfirmMembers() ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->getCountDescInterviewsOfModel() - $gcp->confirm->getCountConfirmMembers()) ?></div>
+                        <div class="column_stage_confirm"><?= ($confirmGcp->getCountDescInterviewsOfModel() - $confirmGcp->getCountConfirmMembers()) ?></div>
 
-                        <div class="column_stage_confirm"><?= ($gcp->confirm->getCountRespond() - $gcp->confirm->getCountDescInterviewsOfModel()) ?></div>
+                        <div class="column_stage_confirm"><?= ($confirmGcp->getCountRespond() - $confirmGcp->getCountDescInterviewsOfModel()) ?></div>
 
                         <div class="column_stage_confirm">
 
                             <?php if ($gcp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                                    ['/confirm-gcp/view', 'id' => $confirmGcp->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                             <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
+                                    ['/confirm-gcp/view', 'id' => $confirmGcp->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
                             <?php elseif ($gcp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                 <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                    ['/confirm-gcp/view', 'id' => $gcp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                                    ['/confirm-gcp/view', 'id' => $confirmGcp->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                             <?php endif; ?>
 
@@ -429,10 +479,24 @@ use yii\helpers\Html;
                 <?php endif; ?>
 
                 <!--Строки MVP(продуктов)-->
-                <?php foreach ($gcp->mvps as $mvp) : ?>
+                <?php /** @var $mvps Mvps[] */
+                $mvps = !$project->getDeletedAt() ?
+                    $gcp->mvps :
+                    Mvps::find(false)
+                        ->andWhere(['gcp_id' => $gcp->getId()])
+                        ->all();
+
+                foreach ($mvps as $mvp) : ?>
 
                     <!--Если у MVP существует подтверждение-->
-                    <?php if($mvp->confirm) : ?>
+                    <?php /** @var $confirmMvp ConfirmMvp */
+                    $confirmMvp = !$project->getDeletedAt() ?
+                        $mvp->confirm :
+                        ConfirmMvp::find(false)
+                            ->andWhere(['mvp_id' => $mvp->getId()])
+                            ->one();
+
+                    if($confirmMvp) : ?>
 
                         <div class="stage_data_string">
 
@@ -473,50 +537,57 @@ use yii\helpers\Html;
                             <?php endif; ?>
 
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountRespond() ?></div>
+                            <div class="column_stage_confirm"><?= $confirmMvp->getCountRespond() ?></div>
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountPositive() ?></div>
+                            <div class="column_stage_confirm"><?= $confirmMvp->getCountPositive() ?></div>
 
-                            <div class="column_stage_confirm"><?= $mvp->confirm->getCountConfirmMembers() ?></div>
+                            <div class="column_stage_confirm"><?= $confirmMvp->getCountConfirmMembers() ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->getCountDescInterviewsOfModel() - $mvp->confirm->getCountConfirmMembers()) ?></div>
+                            <div class="column_stage_confirm"><?= ($confirmMvp->getCountDescInterviewsOfModel() - $confirmMvp->getCountConfirmMembers()) ?></div>
 
-                            <div class="column_stage_confirm"><?= ($mvp->confirm->getCountRespond() - $mvp->confirm->getCountDescInterviewsOfModel()) ?></div>
+                            <div class="column_stage_confirm"><?= ($confirmMvp->getCountRespond() - $confirmMvp->getCountDescInterviewsOfModel()) ?></div>
 
                             <div class="column_stage_confirm">
 
                                 <?php if ($mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                                        ['/confirm-mvp/view', 'id' => $confirmMvp->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                                 <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Продолжить подтверждение']) ?>
+                                        ['/confirm-mvp/view', 'id' => $confirmMvp->getId()], ['title' => 'Продолжить подтверждение']) ?>
 
                                 <?php elseif ($mvp->getExistConfirm() === StatusConfirmHypothesis::NOT_COMPLETED) : ?>
 
                                     <?= Html::a(Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px']]),
-                                        ['/confirm-mvp/view', 'id' => $mvp->confirm->getId()], ['title' => 'Посмотреть подтверждение']) ?>
+                                        ['/confirm-mvp/view', 'id' => $confirmMvp->getId()], ['title' => 'Посмотреть подтверждение']) ?>
 
                                 <?php endif; ?>
 
                             </div>
 
                             <!--Бизнес модели-->
-                            <?php if (!$mvp->businessModel && $mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+                            <?php /** @var $businessModel BusinessModel */
+                            $businessModel = !$project->getDeletedAt() ?
+                                $mvp->businessModel :
+                                BusinessModel::find(false)
+                                    ->andWhere(['mvp_id' => $mvp->getId()])
+                                    ->one();
+
+                            if (!$businessModel && $mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
 
                                 <div class="column_stage_confirm">
                                     <?= Html::a(Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]),
-                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Создать бизнес-модель']) ?>
+                                        ['/business-model/index', 'id' => $confirmMvp->getId()], ['title'=> 'Создать бизнес-модель']) ?>
                                 </div>
 
-                            <?php elseif ($mvp->businessModel) : ?>
+                            <?php elseif ($businessModel) : ?>
 
                                 <div class="column_stage_confirm">
                                     <?= Html::a(Html::img('@web/images/icons/icon-pdf.png', ['style' => ['width' => '20px']]),
-                                        ['/business-model/index', 'id' => $mvp->confirm->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
+                                        ['/business-model/index', 'id' => $confirmMvp->getId()], ['title'=> 'Посмотреть бизнес-модель']) ?>
                                 </div>
 
                             <?php else : ?>

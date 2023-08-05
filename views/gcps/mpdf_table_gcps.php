@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ConfirmGcp;
 use app\models\Gcps;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
@@ -28,6 +29,13 @@ use yii\helpers\Html;
 
         <?php foreach ($models as $model) : ?>
 
+            <?php
+            /** @var $confirm ConfirmGcp */
+            $confirm = ConfirmGcp::find(false)
+                ->andWhere(['gcp_id' => $model->getId()])
+                ->one();
+            ?>
+
         <tr>
 
             <td class="block_gcp_status">
@@ -36,11 +44,11 @@ use yii\helpers\Html;
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                }elseif (!$model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
+                }elseif (!$confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
+                }elseif ($confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 

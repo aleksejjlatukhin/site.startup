@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\interfaces\RespondsInterface;
+use app\models\traits\SoftDeleteModelTrait;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\helpers\FileHelper;
@@ -21,6 +22,7 @@ use yii\db\ActiveRecord;
  * @property string $email                              Эл.почта респондента
  * @property int $date_plan                             Плановая дата интервью
  * @property string $place_interview                    Место проведения интервью
+ * @property int|null $deleted_at                       Дата удаления
  *
  * @property ConfirmProblem $confirm                    Подтверждение проблемы
  * @property InterviewConfirmProblem $interview         Информация о проведении интервью
@@ -28,6 +30,7 @@ use yii\db\ActiveRecord;
  */
 class RespondsProblem extends ActiveRecord implements RespondsInterface
 {
+    use SoftDeleteModelTrait;
 
 
     /**
@@ -274,6 +277,22 @@ class RespondsProblem extends ActiveRecord implements RespondsInterface
     public function setPlaceInterview(string $place_interview): void
     {
         $this->place_interview = $place_interview;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 
 }

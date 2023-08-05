@@ -40,6 +40,24 @@ body > .wrap {
     text-decoration: none;
 }
 
+.hypothesis_trash_link_block {
+    display:flex;
+    align-items: center;
+    padding: 5px 10px 5px 0;
+}
+.hypothesis_link_trash {
+    color: #F5A4A4;
+    font-size: 24px;
+}
+.hypothesis_link_trash:hover {
+    color: #F5A4A4;
+    text-decoration: none;
+}
+.hypothesis_link_trash:focus {
+    color: #F5A4A4;
+    text-decoration: none;
+}
+
 .header_data_hypothesis {
     font-weight: 700;
     color: #4F4F4F;
@@ -179,7 +197,8 @@ body > .wrap {
         display: none;
     }
 
-    .new_hypothesis_link_plus {
+    .new_hypothesis_link_plus,
+    .hypothesis_link_trash {
         font-size: 18px;
     }
     .search_block_desktop {

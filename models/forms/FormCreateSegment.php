@@ -173,7 +173,10 @@ class FormCreateSegment extends FormSegment
      */
     public function uniqueName($attr): void
     {
-        $models = Segments::findAll(['project_id' => $this->getProjectId()]);
+        /** @var $models Segments[] */
+        $models = Segments::find(false)
+            ->andWhere(['project_id' => $this->getProjectId()])
+            ->all();
 
         foreach ($models as $item){
 

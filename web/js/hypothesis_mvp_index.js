@@ -47,9 +47,6 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
             }
             $(modal).find('.modal-body').html(response);
             $(modal).modal('show');
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -63,15 +60,47 @@ $(body).on('change', 'form#hypothesisCreateForm', function(){
 
     var url = '/mvps/save-cache-creation-form?id=' + id_page;
     var data = $(this).serialize();
+    $.ajax({url: url, data: data, method: 'POST', cache: false});
+});
+
+
+// Показать данные корзины
+$(body).on('click', '#show_trash_list', function(e){
+
+    var url = $(this).attr('href');
+
     $.ajax({
         url: url,
-        data: data,
         method: 'POST',
         cache: false,
-        error: function(){
-            alert('Ошибка');
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
         }
     });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Показать список гипотез этапа проекта
+$(body).on('click', '#show_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
 });
 
 
@@ -98,9 +127,6 @@ $(body).on('click', '#checking_the_possibility', function(){
             }else{
                 $(hypothesis_create_modal_error).modal('show');
             }
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -131,9 +157,6 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
             }
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -159,9 +182,6 @@ $(body).on('click', '.update-hypothesis', function(e){
             $(hypothesis_update_modal).modal('show');
             $(hypothesis_update_modal).find('.modal-header').find('span').html(response.model.title);
             $(hypothesis_update_modal).find('.modal-body').html(response.renderAjax);
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 
@@ -214,9 +234,6 @@ $(body).on('beforeSubmit', '#hypothesisUpdateForm', function(e){
             if (catchChange === true) catchChange = false;
             $('.hypothesis_update_modal').modal('hide');
             $('.block_all_hypothesis').html(response.renderAjax);
-        },
-        error: function(){
-            alert('Ошибка');
         }
     });
 

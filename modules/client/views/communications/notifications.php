@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Projects;
 use yii\data\Pagination;
 use yii\helpers\Html;
 use app\modules\expert\models\form\FormCreateCommunicationResponse;
@@ -33,6 +34,13 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
             <?php foreach ($communications as $key => $communication) : ?>
 
+                <?php
+                /** @var $project Projects */
+                $project = Projects::find(false)
+                    ->andWhere(['id' => $communication->getProjectId()])
+                    ->one();
+                ?>
+
                 <div class="row line_data_notifications">
 
                     <?php if ($communication->getType() !== CommunicationTypes::EXPERT_ANSWERS_QUESTION_ABOUT_READINESS_CONDUCT_EXPERTISE): ?>
@@ -45,7 +53,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
                         <div class="col-md-6">
                             <?php if ($communication->getType() === CommunicationTypes::USER_ALLOWED_PROJECT_EXPERTISE): ?>
                                 Проектант разрешил эспертизу по этапу «описание проекта:
-                                <?= Html::a($communication->project->getProjectName(), ['/projects/index', 'id' => $communication->project->getUserId()])?>»
+                                <?= Html::a($project->getProjectName(), ['/projects/index', 'id' => $communication->project->getUserId()])?>»
                             <?php endif; ?>
                         </div>
 
@@ -82,7 +90,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
                         <div class="col-md-3">
                             <?= FormCreateCommunicationResponse::getAnswers()[$communicationResponse->getAnswer()] . ' ' .
-                            Html::a($communication->project->getProjectName(), ['/projects/index', 'id' => $communication->project->getUserId()]) ?>
+                            Html::a($project->getProjectName(), ['/projects/index', 'id' => $project->getUserId()]) ?>
                         </div>
 
                         <div class="col-md-3">

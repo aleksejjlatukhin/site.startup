@@ -59,11 +59,13 @@ class ConfirmProblemController extends AppUserPartController
         $currentUser = User::findOne(Yii::$app->user->getId());
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
+        // Закомментировал потому, что блокируются методы для гипотез которые находятся в корзине, исправить это.
+        if ($action->id === 'view'/*, 'mpdf-questions-and-answers', 'mpdf-data-responds'*/){
 
-            $confirm = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
-            if (!$confirm) {
-                PatternHttpException::noData();
+            $confirm = $this->findModel((int)Yii::$app->request->get('id'), false);
+
+            if ($confirm->getDeletedAt()) {
+                return parent::beforeAction($action);
             }
 
             $hypothesis = $confirm->hypothesis;
@@ -288,7 +290,7 @@ class ConfirmProblemController extends AppUserPartController
         //кол-во представителей сегмента
         $count_represent_segment = RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $confirmSegment->getId(), 'interview_confirm_segment.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $confirmSegment->getId(), 'interview_confirm_segment.status' => '1'])->count();
 
         $model->setCountRespond($count_represent_segment);
 
@@ -406,12 +408,15 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param int $id
-     * @return string
+     * @return string|Response
      * @throws NotFoundHttpException
      */
-    public function actionView(int $id): string
+    public function actionView(int $id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, false);
+        if ($model->getDeletedAt()) {
+            return $this->redirect(['/confirm-problem/view-trash', 'id' => $id]);
+        }
         $formUpdateConfirmProblem = new FormUpdateConfirmProblem($id);
         $problem = Problems::findOne($model->getProblemId());
         $confirmSegment = ConfirmSegment::findOne($problem->getConfirmSegmentId());
@@ -434,6 +439,55 @@ class ConfirmProblemController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionViewTrash(int $id): string
+    {
+        /**
+         * @var $model ConfirmProblem
+         * @var $problem Problems
+         * @var $confirmSegment ConfirmSegment
+         * @var $segment Segments
+         * @var $project Projects
+         * @var $questions QuestionsConfirmProblem[]
+         */
+        $model = $this->findModel($id, false);
+
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $model->getProblemId()])
+            ->one();
+
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $problem->getConfirmSegmentId()])
+            ->one();
+
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $questions = QuestionsConfirmProblem::find(false)
+            ->andWhere(['confirm_id' => $id])
+            ->all();
+
+        return $this->render('view_trash', [
+            'model' => $model,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+            'questions' => $questions,
             'searchForm' => new SearchForm()
         ]);
     }
@@ -497,11 +551,11 @@ class ConfirmProblemController extends AppUserPartController
 
         $count_descInterview = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         $count_positive = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 
 
         if (Yii::$app->request->isAjax) {
@@ -544,11 +598,11 @@ class ConfirmProblemController extends AppUserPartController
 
         $count_descInterview = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
 
         $count_positive = (int)RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_problem.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -644,15 +698,24 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers(int $id): array
+    public function actionGetDataQuestionsAndAnswers(int $id, bool $isOnlyNotDelete = true): array
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, $isOnlyNotDelete);
 
-        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        /** @var $questions QuestionsConfirmProblem[] */
+        $questions = $isOnlyNotDelete ?
+            $model->questions :
+            QuestionsConfirmProblem::find(false)
+                ->andWhere(['confirm_id' => $model->getId()])
+                ->all();
+
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', [
+            'questions' => $questions, 'isOnlyNotDelete' => $isOnlyNotDelete
+        ])];
         Yii::$app->response->format = Response::FORMAT_JSON;
         Yii::$app->response->data = $response;
         return $response;
@@ -672,8 +735,11 @@ class ConfirmProblemController extends AppUserPartController
      */
     public function actionMpdfQuestionsAndAnswers(int $id)
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, false);
+        /** @var $questions QuestionsConfirmProblem[] */
+        $questions = QuestionsConfirmProblem::find(false)
+            ->andWhere(['confirm_id' => $model->getId()])
+            ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
@@ -681,7 +747,12 @@ class ConfirmProblemController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $problem_desc = $model->problem->getDescription();
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $model->getProblemId()])
+            ->one();
+
+        $problem_desc = $problem->getDescription();
         if (mb_strlen($problem_desc) > 25) {
             $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
@@ -740,8 +811,12 @@ class ConfirmProblemController extends AppUserPartController
      */
     public function actionMpdfDataResponds($id)
     {
-        $model = $this->findModel($id);
-        $responds = $model->responds;
+        $model = $this->findModel($id, false);
+
+        /** @var $responds RespondsProblem[] */
+        $responds = RespondsProblem::find(false)
+            ->andWhere(['confirm_id' => $model->getId()])
+            ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
@@ -749,7 +824,12 @@ class ConfirmProblemController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $problem_desc = $model->problem->getDescription();
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $model->getProblemId()])
+            ->one();
+
+        $problem_desc = $problem->getDescription();
         if (mb_strlen($problem_desc) > 25) {
             $problem_desc = mb_substr($problem_desc, 0, 25) . '...';
         }
@@ -795,12 +875,22 @@ class ConfirmProblemController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return ConfirmProblem|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?ConfirmProblem
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?ConfirmProblem
     {
-        if (($model = ConfirmProblem::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = ConfirmProblem::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = ConfirmProblem::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

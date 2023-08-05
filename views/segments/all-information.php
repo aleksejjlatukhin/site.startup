@@ -1,5 +1,7 @@
 <?php
 
+use app\models\Projects;
+use app\models\SegmentRequirement;
 use app\models\Segments;
 use yii\helpers\Html;
 
@@ -10,12 +12,28 @@ use yii\helpers\Html;
 ?>
 
 <div class="block_export_link_hypothesis">
-    <?= Html::a('<div style="margin-top: -15px;">Исходные данные сегмента' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
-        '/segments/mpdf-segment', 'id' => $segment->getId()], [
-        'class' => 'export_link_hypothesis',
-        'target' => '_blank',
-        'title' => 'Скачать в pdf',
-    ]); ?>
+
+    <?php /** @var $project Projects */
+    $project = Projects::find(false)
+        ->andWhere(['id' => $segment->getProjectId()])
+        ->one();
+
+    if (!$project->getDeletedAt() && !$segment->getDeletedAt()): ?>
+
+        <?= Html::a('<div style="margin-top: -15px;">Исходные данные сегмента' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
+            '/segments/mpdf-segment', 'id' => $segment->getId()], [
+            'class' => 'export_link_hypothesis',
+            'target' => '_blank',
+            'title' => 'Скачать в pdf',
+        ]) ?>
+
+    <?php else: ?>
+
+        <?= Html::a('<div style="margin-top: -15px;">Исходные данные сегмента' . '</div>', ['#'], [
+            'class' => 'export_link_hypothesis', 'style' => ['cursor' => 'default'], 'onclick' => 'return false;'
+        ]) ?>
+
+    <?php endif; ?>
 </div>
 
 <div class="row container-fluid" style="color: #4F4F4F;">
@@ -90,7 +108,13 @@ use yii\helpers\Html;
         <div style="font-weight: 700;">Тип взаимодействия с потребителями</div>
         <div style="margin-bottom: 10px;">Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
-        <?php if ($requirement = $segment->segmentRequirement->requirement): ?>
+        <?php
+        /** @var $segmentRequirement SegmentRequirement */
+        $segmentRequirement = SegmentRequirement::find(false)
+            ->andWhere(['segment_id' => $segment->getId()])
+            ->one();
+
+        if ($segmentRequirement && $requirement = $segmentRequirement->requirement): ?>
 
             <?php $wishList = $requirement->wishList ?>
 

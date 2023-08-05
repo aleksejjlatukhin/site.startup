@@ -154,7 +154,7 @@ class ConversationExpert extends ActiveRecord
     public function getCountNewMessages(): int
     {
         return MessageExpert::find()
-            ->where(['conversation_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
+            ->andWhere(['conversation_id' => $this->id, 'status' => MessageExpert::NO_READ_MESSAGE])->count();
     }
 
 

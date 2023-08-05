@@ -87,6 +87,46 @@ $(body).on('change', 'form#hypothesisCreateForm', function(){
 });
 
 
+// Показать данные корзины
+$(body).on('click', '#show_trash_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Показать список гипотез этапа проекта
+$(body).on('click', '#show_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_hypothesis').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //Отслеживаем изменения значения чекбокса use_wish_list в форме создания сегмента
 $(body).on('input', '#use_wish_list', function(){
 

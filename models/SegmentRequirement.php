@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -13,12 +14,16 @@ use yii\db\ActiveRecord;
  *
  * @property int $segment_id                Идентификатор сегмента
  * @property int $requirement_id            Идентификатор запроса
+ * @property int|null $deleted_at           Дата удаления
  *
  * @property Segments $segment
  * @property RequirementWishList $requirement
  */
 class SegmentRequirement extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
+
+
     /**
      * {@inheritdoc}
      */
@@ -97,5 +102,13 @@ class SegmentRequirement extends ActiveRecord
     public function setRequirementId(int $requirement_id): void
     {
         $this->requirement_id = $requirement_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
     }
 }

@@ -63,11 +63,13 @@ class ConfirmMvpController extends AppUserPartController
         $currentUser = User::findOne(Yii::$app->user->getId());
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
+        // Закомментировал потому, что блокируются методы для гипотез которые находятся в корзине, исправить это.
+        if ($action->id === 'view'/*, 'mpdf-questions-and-answers', 'mpdf-data-responds'*/){
 
-            $confirm = ConfirmMvp::findOne((int)Yii::$app->request->get('id'));
-            if (!$confirm) {
-                PatternHttpException::noData();
+            $confirm = $this->findModel((int)Yii::$app->request->get('id'), false);
+
+            if ($confirm->getDeletedAt()) {
+                return parent::beforeAction($action);
             }
 
             $hypothesis = $confirm->hypothesis;
@@ -290,7 +292,7 @@ class ConfirmMvpController extends AppUserPartController
         //кол-во респондентов, подтвердивших текущую проблему
         $count_represent_gcp = RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->where(['confirm_id' => $confirmGcp->getId(), 'interview_confirm_gcp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $confirmGcp->getId(), 'interview_confirm_gcp.status' => '1'])->count();
 
         $model->setCountRespond($count_represent_gcp);
 
@@ -424,12 +426,15 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * @param int $id
-     * @return string
+     * @return string|Response
      * @throws NotFoundHttpException
      */
-    public function actionView(int $id): string
+    public function actionView(int $id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, false);
+        if ($model->getDeletedAt()) {
+            return $this->redirect(['/confirm-mvp/view-trash', 'id' => $id]);
+        }
         $formUpdateConfirmMvp = new FormUpdateConfirmMvp($id);
         $mvp = Mvps::findOne($model->getMvpId());
         $confirmGcp = ConfirmGcp::findOne($mvp->getConfirmGcpId());
@@ -460,6 +465,78 @@ class ConfirmMvpController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionViewTrash(int $id): string
+    {
+        /**
+         * @var $model ConfirmMvp
+         * @var $mvp Mvps
+         * @var $confirmGcp ConfirmGcp
+         * @var $gcp Gcps
+         * @var $confirmProblem ConfirmProblem
+         * @var $problem Problems
+         * @var $confirmSegment ConfirmSegment
+         * @var $segment Segments
+         * @var $project Projects
+         * @var $questions QuestionsConfirmMvp[]
+         */
+        $model = $this->findModel($id, false);
+        $mvp = Mvps::find(false)
+            ->andWhere(['id' => $model->getMvpId()])
+            ->one();
+
+        $confirmGcp = ConfirmGcp::find(false)
+            ->andWhere(['id' => $mvp->getConfirmGcpId()])
+            ->one();
+
+        $gcp = Gcps::find(false)
+            ->andWhere(['id' => $confirmGcp->getGcpId()])
+            ->one();
+
+        $confirmProblem = ConfirmProblem::find(false)
+            ->andWhere(['id' => $gcp->getConfirmProblemId()])
+            ->one();
+
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $confirmProblem->getProblemId()])
+            ->one();
+
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $problem->getConfirmSegmentId()])
+            ->one();
+
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $questions = QuestionsConfirmMvp::find(false)
+            ->andWhere(['confirm_id' => $id])
+            ->all();
+
+        return $this->render('view_trash', [
+            'model' => $model,
+            'mvp' => $mvp,
+            'confirmGcp' => $confirmGcp,
+            'gcp' => $gcp,
+            'confirmProblem' => $confirmProblem,
+            'problem' => $problem,
+            'confirmSegment' => $confirmSegment,
+            'segment' => $segment,
+            'project' => $project,
+            'questions' => $questions,
             'searchForm' => new SearchForm()
         ]);
     }
@@ -523,11 +600,11 @@ class ConfirmMvpController extends AppUserPartController
 
         $count_descInterview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
             if ($model->getCountPositive() <= $count_positive && $model->mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED && ($model->business || (count($model->responds) === $count_descInterview && $model->mvp->getExistConfirm() === StatusConfirmHypothesis::COMPLETED))) {
@@ -567,11 +644,11 @@ class ConfirmMvpController extends AppUserPartController
 
         $count_descInterview = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
 
         $count_positive = (int)RespondsMvp::find()->with('interview')
             ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_mvp.status' => '1'])->count();
 
         if(Yii::$app->request->isAjax) {
 
@@ -666,15 +743,24 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers(int $id): array
+    public function actionGetDataQuestionsAndAnswers(int $id, bool $isOnlyNotDelete = true): array
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, $isOnlyNotDelete);
 
-        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        /** @var $questions QuestionsConfirmMvp[] */
+        $questions = $isOnlyNotDelete ?
+            $model->questions :
+            QuestionsConfirmMvp::find(false)
+                ->andWhere(['confirm_id' => $model->getId()])
+                ->all();
+
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', [
+            'questions' => $questions, 'isOnlyNotDelete' => $isOnlyNotDelete
+        ])];
         Yii::$app->response->format = Response::FORMAT_JSON;
         Yii::$app->response->data = $response;
         return $response;
@@ -694,8 +780,11 @@ class ConfirmMvpController extends AppUserPartController
      */
     public function actionMpdfQuestionsAndAnswers(int $id)
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, false);
+        /** @var $questions QuestionsConfirmMvp[] */
+        $questions = QuestionsConfirmMvp::find(false)
+                ->andWhere(['confirm_id' => $model->getId()])
+                ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
@@ -703,7 +792,12 @@ class ConfirmMvpController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $mvp_desc = $model->mvp->getDescription();
+        /** @var $mvp Mvps */
+        $mvp = Mvps::find(false)
+            ->andWhere(['id' => $model->getMvpId()])
+            ->one();
+
+        $mvp_desc = $mvp->getDescription();
         if (mb_strlen($mvp_desc) > 25) {
             $mvp_desc = mb_substr($mvp_desc, 0, 25) . '...';
         }
@@ -762,8 +856,12 @@ class ConfirmMvpController extends AppUserPartController
      */
     public function actionMpdfDataResponds(int $id)
     {
-        $model = $this->findModel($id);
-        $responds = $model->responds;
+        $model = $this->findModel($id, false);
+
+        /** @var $responds RespondsMvp[] */
+        $responds = RespondsMvp::find(false)
+            ->andWhere(['confirm_id' => $model->getId()])
+            ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
@@ -771,7 +869,12 @@ class ConfirmMvpController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $mvp_desc = $model->mvp->getDescription();
+        /** @var $mvp Mvps */
+        $mvp = Mvps::find(false)
+            ->andWhere(['id' => $model->getMvpId()])
+            ->one();
+
+        $mvp_desc = $mvp->getDescription();
         if (mb_strlen($mvp_desc) > 25) {
             $mvp_desc = mb_substr($mvp_desc, 0, 25) . '...';
         }
@@ -817,12 +920,22 @@ class ConfirmMvpController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return ConfirmMvp|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?ConfirmMvp
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?ConfirmMvp
     {
-        if (($model = ConfirmMvp::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = ConfirmMvp::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = ConfirmMvp::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

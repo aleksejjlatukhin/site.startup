@@ -57,7 +57,7 @@ class CommunicationsController extends AppUserPartController
      */
     public function actionNotifications(int $id): string
     {
-        $query = DuplicateCommunications::find()->where(['adressee_id' => $id])->orderBy('id DESC');
+        $query = DuplicateCommunications::find()->andWhere(['adressee_id' => $id])->orderBy('id DESC');
         $pages = new Pagination(['totalCount' => $query->count(), 'pageSize' => 20]);
         $pages->pageSizeParam = false; //убираем параметр $per-page
         $communications = $query->offset($pages->offset)->limit(20)->all();

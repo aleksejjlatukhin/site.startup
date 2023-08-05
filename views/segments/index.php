@@ -15,6 +15,8 @@ $this->registerCssFile('@web/css/segments-index-style.css');
  * @var Projects $project
  * @var Segments[] $models
  * @var SearchForm $searchForm
+ * @var bool $existTrashList
+ * @var Segments[] $trashList
  */
 
 ?>
@@ -218,41 +220,101 @@ $this->registerCssFile('@web/css/segments-index-style.css');
 
             <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                <div class="col-md-6 search_block_desktop">
+                <?php if (!$project->getDeletedAt()): ?>
 
-                    <?php
-                    $form = ActiveForm::begin([
-                        'id' => 'search_segments',
-                        'options' => ['class' => 'g-py-15'],
-                        'errorCssClass' => 'u-has-error-v1',
-                        'successCssClass' => 'u-has-success-v1-1',
-                    ]); ?>
+                    <?php if ($existTrashList): ?>
 
-                    <?= $form->field($searchForm, 'search', ['template' => '{input}'])
-                        ->textInput([
-                            'class' => 'style_form_field_respond form-control',
-                            'placeholder' => 'поиск сегмента',
-                            'minlength' => 5,
-                            'autocomplete' => 'off'])
-                        ->label(false) ?>
+                        <div class="col-md-4 search_block_desktop">
 
-                    <?php ActiveForm::end(); ?>
+                            <?php
+                            $form = ActiveForm::begin([
+                                'id' => 'search_segments',
+                                'options' => ['class' => 'g-py-15'],
+                                'errorCssClass' => 'u-has-error-v1',
+                                'successCssClass' => 'u-has-success-v1-1',
+                            ]); ?>
 
-                </div>
+                            <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                                ->textInput([
+                                    'class' => 'style_form_field_respond form-control',
+                                    'placeholder' => 'поиск сегмента',
+                                    'minlength' => 5,
+                                    'autocomplete' => 'off'])
+                                ->label(false) ?>
+
+                            <?php ActiveForm::end(); ?>
+
+                        </div>
+
+                        <div class="col-md-3 p-0">
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                                <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Новый сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
+                                    ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
+                                ) ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-md-2 p-0">
+                            <?=  Html::a( '<div class="hypothesis_trash_link_block"><div>' . Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div><div style="padding-left: 20px;">Корзина</div></div>',
+                                ['/segments/trash-list', 'id' => $project->getId()],
+                                ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right']
+                            ) ?>
+                        </div>
+
+                    <?php else : ?>
+
+                        <div class="col-md-6 search_block_desktop">
+
+                            <?php
+                            $form = ActiveForm::begin([
+                                'id' => 'search_segments',
+                                'options' => ['class' => 'g-py-15'],
+                                'errorCssClass' => 'u-has-error-v1',
+                                'successCssClass' => 'u-has-success-v1-1',
+                            ]); ?>
+
+                            <?= $form->field($searchForm, 'search', ['template' => '{input}'])
+                                ->textInput([
+                                    'class' => 'style_form_field_respond form-control',
+                                    'placeholder' => 'поиск сегмента',
+                                    'minlength' => 5,
+                                    'autocomplete' => 'off'])
+                                ->label(false) ?>
+
+                            <?php ActiveForm::end(); ?>
+
+                        </div>
+
+                        <div class="col-md-3 p-0">
+                            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                                <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Новый сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
+                                    ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
+                                ) ?>
+                            <?php endif; ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                <?php else : ?>
+
+                    <div class="col-md-9"></div>
+
+                <?php endif; ?>
 
             <?php else : ?>
 
                 <div class="col-md-6"></div>
+                <div class="col-md-3 p-0">
+                    <?php if ($existTrashList && !$project->getDeletedAt()): ?>
+                        <?=  Html::a( '<div class="hypothesis_trash_link_block"><div>' . Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div><div style="padding-left: 20px;">Корзина</div></div>',
+                            ['/segments/trash-list', 'id' => $project->getId()],
+                            ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right']
+                        ) ?>
+                    <?php endif; ?>
+                </div>
 
             <?php endif; ?>
 
-            <div class="col-md-3 p-0">
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Новый сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
-                        ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-right']
-                    ) ?>
-                <?php endif; ?>
-            </div>
         </div>
 
 
@@ -287,45 +349,55 @@ $this->registerCssFile('@web/css/segments-index-style.css');
             </div>
         </div>
 
-        <div class="row row_header_data_generation_mobile">
+        <?php if (!$project->getDeletedAt()): ?>
 
-            <div class="col-xs-8">
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <div class="row row_header_data_generation_mobile">
 
-                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
-                        ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus']
-                    ) ?>
+                <div class="col-xs-7">
+                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                <?php endif; ?>
-            </div>
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Новый сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
+                            ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus']
+                        ) ?>
 
-            <div class="col-xs-4">
+                    <?php endif; ?>
+                </div>
 
-                <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <div class="col-xs-5">
 
-                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
-                        Url::to('/segments/get-instruction'), [
-                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                            'title' => 'Инструкция', 'style' => ['margin-left' => '10px', 'margin-top' => '5px']
+                    <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                        <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                            Url::to('/segments/get-instruction'), [
+                                'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                                'title' => 'Инструкция', 'style' => ['margin-left' => '10px', 'margin-top' => '5px']
+                            ]) ?>
+
+                        <?= Html::a(Html::img('@web/images/icons/icon_green_search.png'), ['#'], [
+                            'class' => 'link_show_search_field_mobile show_search_segments pull-right',
+                            'title' => 'Поиск сегментов', 'style' => ['margin-top' => '5px']
                         ]) ?>
 
-                    <?= Html::a(Html::img('@web/images/icons/icon_green_search.png'), ['#'], [
-                        'class' => 'link_show_search_field_mobile show_search_segments pull-right',
-                        'title' => 'Поиск сегментов', 'style' => ['margin-top' => '5px']
-                    ]) ?>
+                    <?php else : ?>
 
-                <?php else : ?>
+                        <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
+                            Url::to('/segments/get-instruction'), [
+                                'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
+                                'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
+                            ]) ?>
 
-                    <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
-                        Url::to('/segments/get-instruction'), [
-                            'class' => 'link_to_instruction_page_mobile open_modal_instruction_page pull-right',
-                            'title' => 'Инструкция', 'style' => ['margin-top' => '5px']
-                        ]) ?>
+                    <?php endif; ?>
 
-                <?php endif; ?>
+                    <?php if ($existTrashList): ?>
+                        <?=  Html::a('<div class="hypothesis_trash_link_block"><div>' .  Html::img('/images/icons/icon_delete.png', ['style' => ['width' => '30px', 'height' => '35px']]) . '</div></div>',
+                            ['/segments/trash-list', 'id' => $project->getId()], ['id' => 'show_trash_list', 'class' => 'hypothesis_link_trash pull-right', 'title' => 'Корзина']
+                        ) ?>
+                    <?php endif; ?>
 
+                </div>
             </div>
-        </div>
+
+        <?php endif; ?>
 
         <div class="row search_block_mobile">
             <div class="col-xs-10">
@@ -354,13 +426,30 @@ $this->registerCssFile('@web/css/segments-index-style.css');
         <div class="block_all_hypothesis row pl-10 pr-10">
 
             <!--Данные для списка сегментов-->
-            <?= $this->render('_index_ajax', ['models' => $models]) ?>
+            <?php if (!$project->getDeletedAt()): ?>
+
+                <?= $this->render('_index_ajax', [
+                    'models' => $models
+                ]) ?>
+
+            <?php else: ?>
+
+                <?= $this->render('_trash_index_ajax', [
+                    'trashList' => $trashList
+                ]) ?>
+
+            <?php endif; ?>
 
         </div>
     </div>
 
 
-    <?php if (count($models) > 0) : ?>
+    <?php
+    $countModels = Segments::find(false)
+        ->andWhere(['project_id' => $project->getId()])
+        ->count();
+
+    if ((int)$countModels > 0) : ?>
 
         <div class="row information_status_confirm">
 

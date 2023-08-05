@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -41,6 +42,7 @@ use yii\helpers\FileHelper;
  * @property int|null $exist_confirm                                Параметр факта подтверждения сегмента
  * @property string $enable_expertise                               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at                          Дата разрешения на экспертизу по даному этапу
+ * @property int|null $deleted_at                                   Дата удаления
  * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
  * @property PropertyContainer $propertyContainer                   Свойство для реализации шаблона 'контейнер свойств'
  *
@@ -54,6 +56,7 @@ use yii\helpers\FileHelper;
  */
 class Segments extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     public const TYPE_B2C = 100;
     public const TYPE_B2B = 200;
@@ -317,51 +320,202 @@ class Segments extends ActiveRecord
 
 
     /**
+     * Отправка писем трекеру и экспертам.
+     * Чтобы не ломать код в случае ошибки при отправке письма,
+     * выводим этот код в отдельный блок
+     *
+     * @param ProjectCommunications[] $communications
+     * @return void
+     */
+    private function sendingCommunicationsToEmail(array $communications): void
+    {
+        try {
+            if ($communications) {
+                foreach ($communications as $k => $communication) {
+                    SendingCommunicationsToEmail::softDeleteStageProject($communication, $k === 0);
+                }
+            }
+        } catch (\Exception $exception) {}
+    }
+
+
+    /**
+     * @param bool $sendCommunications
      * @return false|int
-     * @throws ErrorException
-     * @throws StaleObjectException
+     */
+    public function softDeleteStage(bool $sendCommunications = true)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $communications = [];
+            if ($sendCommunications && ($this->getEnableExpertise() === EnableExpertise::ON) && $expertIds = ProjectCommunications::getExpertIdsByProjectId($this->getProjectId())) {
+                $user = $this->project->user;
+                foreach ($expertIds as $i => $expertId) {
+                    $communication = new ProjectCommunications();
+                    $communication->setParams($expertId, $this->getProjectId(), CommunicationTypes::USER_DELETED_SEGMENT, $this->getId());
+                    if ($i === 0 && $communication->save() && DuplicateCommunications::create($communication, $user->admin, TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT)) {
+                        $communications[] = $communication;
+                    } elseif ($communication->save()) {
+                        $communications[] = $communication;
+                    }
+                }
+            }
+
+            $this->sendingCommunicationsToEmail($communications);
+
+            if ($problems = $this->problems) {
+                foreach ($problems as $problem) {
+                    $problem->softDeleteStage(false);
+                }
+            }
+
+            if ($confirm = $this->confirm) {
+
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmSegment::softDeleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmSegment::softDeleteAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmSegment::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsSegment::softDeleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->softDelete(['id' => $confirm->getId()]);
+            }
+
+            // Удаление кэша для форм сегмента
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            if ($this->segmentRequirement) {
+                SegmentRequirement::softDeleteAll(['segment_id' => $this->getId()]);
+            }
+
+            $result = $this->softDelete(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
+     */
+    public function recoveryStage()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            /** @var $problems Problems[] */
+            $problems = Problems::find(false)
+                ->andWhere(['segment_id' => $this->getId()])
+                ->all();
+
+            if (count($problems) > 0) {
+                foreach ($problems as $problem) {
+                    $problem->recoveryStage();
+                }
+            }
+
+            /** @var $confirm ConfirmSegment */
+            $confirm = ConfirmSegment::find(false)
+                ->andWhere(['segment_id' => $this->getId()])
+                ->one();
+
+            if ($confirm) {
+                /** @var $responds RespondsSegment[] */
+                $responds = RespondsSegment::find(false)
+                    ->andWhere(['confirm_id' => $confirm->getId()])
+                    ->all();
+
+                foreach ($responds as $respond) {
+
+                    InterviewConfirmSegment::recoveryAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmSegment::recoveryAll(['respond_id' => $respond->getId()]);
+                }
+
+                QuestionsConfirmSegment::recoveryAll(['confirm_id' => $confirm->getId()]);
+                RespondsSegment::recoveryAll(['confirm_id' => $confirm->getId()]);
+                $confirm->recovery(['id' => $confirm->getId()]);
+            }
+
+            $segmentRequirementExist = SegmentRequirement::find(false)
+                ->andWhere(['segment_id' => $this->getId()])
+                ->exists();
+
+            if ($segmentRequirementExist) {
+                SegmentRequirement::recoveryAll(['segment_id' => $this->getId()]);
+            }
+
+            $result = $this->recovery(['id' => $this->getId()]);
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+
+    /**
+     * @return false|int
      * @throws Throwable
      */
-    public function deleteStage ()
+    public function deleteStage()
     {
-        if ($problems = $this->problems) {
-            foreach ($problems as $problem) {
-                $problem->deleteStage();
-            }
-        }
-
-        if ($confirm = $this->confirm) {
-
-            $responds = $confirm->responds;
-            foreach ($responds as $respond) {
-
-                InterviewConfirmSegment::deleteAll(['respond_id' => $respond->getId()]);
-                AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $respond->getId()]);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($problems = $this->problems) {
+                foreach ($problems as $problem) {
+                    $problem->deleteStage();
+                }
             }
 
-            QuestionsConfirmSegment::deleteAll(['confirm_id' => $confirm->getId()]);
-            RespondsSegment::deleteAll(['confirm_id' => $confirm->getId()]);
-            $confirm->delete();
-        }
+            if ($confirm = $this->confirm) {
 
-        // Удаление директории сегмента
-        $segmentPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
-        if (file_exists($segmentPathDelete)) {
-            FileHelper::removeDirectory($segmentPathDelete);
-        }
+                $responds = $confirm->responds;
+                foreach ($responds as $respond) {
 
-        // Удаление кэша для форм сегмента
-        $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
-        if (file_exists($cachePathDelete)) {
-            FileHelper::removeDirectory($cachePathDelete);
-        }
+                    InterviewConfirmSegment::deleteAll(['respond_id' => $respond->getId()]);
+                    AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $respond->getId()]);
+                }
 
-        if ($this->segmentRequirement) {
-            SegmentRequirement::deleteAll(['segment_id' => $this->getId()]);
-        }
+                QuestionsConfirmSegment::deleteAll(['confirm_id' => $confirm->getId()]);
+                RespondsSegment::deleteAll(['confirm_id' => $confirm->getId()]);
+                $confirm->delete();
+            }
 
-        // Удаление сегмента
-        return $this->delete();
+            // Удаление директории сегмента
+            $segmentPathDelete = UPLOAD.'/user-'.$this->project->user->getId().'/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
+            if (file_exists($segmentPathDelete)) {
+                FileHelper::removeDirectory($segmentPathDelete);
+            }
+
+            // Удаление кэша для форм сегмента
+            $cachePathDelete = '../runtime/cache/forms/user-'.$this->project->user->getId().'/projects/project-'.$this->project->getId().'/segments/segment-'.$this->getId();
+            if (file_exists($cachePathDelete)) {
+                FileHelper::removeDirectory($cachePathDelete);
+            }
+
+            if ($this->segmentRequirement) {
+                SegmentRequirement::deleteAll(['segment_id' => $this->getId()]);
+            }
+
+            // Удаление сегмента
+            $result = $this->delete();
+            $transaction->commit();
+            return $result;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
+        }
     }
 
     /**
@@ -764,5 +918,21 @@ class Segments extends ActiveRecord
     public function setEnableExpertiseAt(int $enable_expertise_at): void
     {
         $this->enable_expertise_at = $enable_expertise_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

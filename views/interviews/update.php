@@ -1,5 +1,9 @@
 <?php
 
+use app\models\AnswersQuestionsConfirmGcp;
+use app\models\AnswersQuestionsConfirmMvp;
+use app\models\AnswersQuestionsConfirmProblem;
+use app\models\AnswersQuestionsConfirmSegment;
 use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
@@ -30,12 +34,15 @@ use app\models\QuestionStatus;
  * @var InterviewConfirmSegment|InterviewConfirmProblem|InterviewConfirmGcp|InterviewConfirmMvp $model
  * @var ConfirmSegment|ConfirmProblem|ConfirmGcp|ConfirmMvp $confirm
  * @var Segments|Problems|Gcps|Mvps $hypothesis
+ * @var AnswersQuestionsConfirmSegment|AnswersQuestionsConfirmProblem|AnswersQuestionsConfirmGcp|AnswersQuestionsConfirmMvp $answers
+ * @var bool $isOnlyNotDelete
+ * @var array $questionsConfirm
  */
 
 ?>
 
 
-<?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+<?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'formUpdateDescInterview',
@@ -330,14 +337,16 @@ use app\models\QuestionStatus;
             <div style="border-bottom: 1px solid #ccc;">Ответы на вопросы интервью</div>
         </div>
 
-        <?php foreach ($respond->answers as $index => $answer) : ?>
+        <?php foreach ($answers as $index => $answer) : ?>
 
             <div class="col-md-12" style="padding: 0 20px; margin-top: 10px;">
 
-                <?php if ($answer->question->getStatus() === QuestionStatus::STATUS_ONE_STAR) : ?>
-                    <div style="font-weight: 700; color: #52be7f;"><?= $answer->question->getTitle() ?></div>
-                <?php elseif($answer->question->getStatus() === QuestionStatus::STATUS_NOT_STAR) : ?>
-                    <div style="font-weight: 700;"><?= $answer->question->getTitle() ?></div>
+                <?php
+                $question = $isOnlyNotDelete ? $answer->question : $questionsConfirm[$answer->getId()];
+                if ($question->getStatus() === QuestionStatus::STATUS_ONE_STAR) : ?>
+                    <div style="font-weight: 700; color: #52be7f;"><?= $question->getTitle() ?></div>
+                <?php elseif($question->getStatus() === QuestionStatus::STATUS_NOT_STAR) : ?>
+                    <div style="font-weight: 700;"><?= $question->getTitle() ?></div>
                 <?php endif; ?>
 
                 <div><?= $answer->getAnswer() ?></div>

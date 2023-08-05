@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\forms\CacheForm;
+use app\models\traits\SoftDeleteModelTrait;
 use Exception;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -29,11 +30,13 @@ use yii\web\UploadedFile;
  * @property $loadFile                                  Поле для загрузки файла
  * @property CacheForm $_cacheManager                   Менеджер кэширования
  * @property string $result                             Варианты проблем
+ * @property int|null $deleted_at                       Дата удаления
  *
  * @property RespondsSegment $respond                   Респондент
  */
 class InterviewConfirmSegment extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     public $loadFile;
     public $_cacheManager;
@@ -354,5 +357,21 @@ class InterviewConfirmSegment extends ActiveRecord
     public function setResult(string $result): void
     {
         $this->result = $result;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

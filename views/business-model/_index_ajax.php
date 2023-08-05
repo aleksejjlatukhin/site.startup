@@ -8,7 +8,6 @@ use app\models\Segments;
 use app\models\User;
 use app\models\EnableExpertise;
 use app\models\StageExpertise;
-use yii\helpers\Url;
 
 /**
  * @var BusinessModel $model
@@ -29,31 +28,12 @@ use yii\helpers\Url;
 
     <div class="col-lg-9" style="padding-top: 17px; padding-bottom: 17px;">
 
-        <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
-            'class' => 'btn btn-success pull-right',
-            'title' => 'Скачать бизнес-модель',
-            'target' => '_blank',
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'padding' => '2px 7px 0 7px',
-                'width' => '220px',
-                'height' => '40px',
-                'border-radius' => '8px',
-                'background' => '#52BE7F',
-                'text-transform' => 'uppercase',
-                'font-size' => '16px',
-                'color' => '#FFFFFF',
-                'font-weight' => '700',
-            ],
-        ]) ?>
+        <?php if (!$model->getDeletedAt()): ?>
 
-        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-
-            <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->getId()], [
-                'class' => 'btn btn-default update-hypothesis pull-right',
-                'title' => 'Редактировать бизнес-модель',
+            <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
+                'class' => 'btn btn-success pull-right',
+                'title' => 'Скачать бизнес-модель',
+                'target' => '_blank',
                 'style' => [
                     'display' => 'flex',
                     'align-items' => 'center',
@@ -62,7 +42,7 @@ use yii\helpers\Url;
                     'width' => '220px',
                     'height' => '40px',
                     'border-radius' => '8px',
-                    'background' => '#7F9FC5',
+                    'background' => '#52BE7F',
                     'text-transform' => 'uppercase',
                     'font-size' => '16px',
                     'color' => '#FFFFFF',
@@ -70,11 +50,78 @@ use yii\helpers\Url;
                 ],
             ]) ?>
 
-            <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 
-                <?=  Html::a( 'Разрешить экспертизу',
-                    ['/business-model/enable-expertise', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default link-enable-expertise pull-right',
+                <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->getId()], [
+                    'class' => 'btn btn-default update-hypothesis pull-right',
+                    'title' => 'Редактировать бизнес-модель',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'padding' => '2px 7px 0 7px',
+                        'width' => '220px',
+                        'height' => '40px',
+                        'border-radius' => '8px',
+                        'background' => '#7F9FC5',
+                        'text-transform' => 'uppercase',
+                        'font-size' => '16px',
+                        'color' => '#FFFFFF',
+                        'font-weight' => '700',
+                    ],
+                ]) ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                    <?=  Html::a( 'Разрешить экспертизу',
+                        ['/business-model/enable-expertise', 'id' => $model->getId()], [
+                            'class' => 'btn btn-default link-enable-expertise pull-right',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'padding' => '2px 7px 0 7px',
+                                'width' => '220px',
+                                'height' => '40px',
+                                'border-radius' => '8px',
+                                'background' => '#4F4F4F',
+                                'text-transform' => 'uppercase',
+                                'font-size' => '16px',
+                                'color' => '#FFFFFF',
+                                'font-weight' => '700',
+                            ]
+                        ]) ?>
+
+                <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                    <?=  Html::a( 'Смотреть экспертизу',
+                        ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise pull-right',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'padding' => '2px 7px 0 7px',
+                                'width' => '220px',
+                                'height' => '40px',
+                                'border-radius' => '8px',
+                                'background' => '#4F4F4F',
+                                'text-transform' => 'uppercase',
+                                'font-size' => '16px',
+                                'color' => '#FFFFFF',
+                                'font-weight' => '700',
+                            ],
+                        ]) ?>
+
+                <?php endif; ?>
+
+            <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                    <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
+                        'onclick' => 'return false;',
+                        'class' => 'btn btn-default pull-right',
                         'style' => [
                             'display' => 'flex',
                             'align-items' => 'center',
@@ -91,7 +138,80 @@ use yii\helpers\Url;
                         ]
                     ]) ?>
 
-            <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+                <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getProjectId())) : ?>
+
+                    <?=  Html::a( 'Экспертиза',
+                        ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise pull-right',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'padding' => '2px 7px 0 7px',
+                                'width' => '220px',
+                                'height' => '40px',
+                                'border-radius' => '8px',
+                                'background' => '#4F4F4F',
+                                'text-transform' => 'uppercase',
+                                'font-size' => '16px',
+                                'color' => '#FFFFFF',
+                                'font-weight' => '700',
+                            ]
+                        ]) ?>
+
+                <?php endif; ?>
+
+            <?php else : ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                    <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
+                        'onclick' => 'return false;',
+                        'class' => 'btn btn-default pull-right',
+                        'style' => [
+                            'display' => 'flex',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'padding' => '2px 7px 0 7px',
+                            'width' => '220px',
+                            'height' => '40px',
+                            'border-radius' => '8px',
+                            'background' => '#4F4F4F',
+                            'text-transform' => 'uppercase',
+                            'font-size' => '16px',
+                            'color' => '#FFFFFF',
+                            'font-weight' => '700',
+                        ]
+                    ]) ?>
+
+                <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                    <?=  Html::a( 'Экспертиза',
+                        ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise pull-right',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'padding' => '2px 7px 0 7px',
+                                'width' => '220px',
+                                'height' => '40px',
+                                'border-radius' => '8px',
+                                'background' => '#4F4F4F',
+                                'text-transform' => 'uppercase',
+                                'font-size' => '16px',
+                                'color' => '#FFFFFF',
+                                'font-weight' => '700',
+                            ]
+                        ]) ?>
+
+                <?php endif; ?>
+
+            <?php endif; ?>
+
+        <?php else: ?>
+
+            <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
                 <?=  Html::a( 'Смотреть экспертизу',
                     ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
@@ -110,98 +230,6 @@ use yii\helpers\Url;
                             'color' => '#FFFFFF',
                             'font-weight' => '700',
                         ],
-                    ]) ?>
-
-            <?php endif; ?>
-
-        <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
-
-            <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
-
-                <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
-                    'onclick' => 'return false;',
-                    'class' => 'btn btn-default pull-right',
-                    'style' => [
-                        'display' => 'flex',
-                        'align-items' => 'center',
-                        'justify-content' => 'center',
-                        'padding' => '2px 7px 0 7px',
-                        'width' => '220px',
-                        'height' => '40px',
-                        'border-radius' => '8px',
-                        'background' => '#4F4F4F',
-                        'text-transform' => 'uppercase',
-                        'font-size' => '16px',
-                        'color' => '#FFFFFF',
-                        'font-weight' => '700',
-                    ]
-                ]) ?>
-
-            <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getProjectId())) : ?>
-
-                <?=  Html::a( 'Экспертиза',
-                    ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
-                        'class' => 'btn btn-default link-get-list-expertise pull-right',
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'padding' => '2px 7px 0 7px',
-                            'width' => '220px',
-                            'height' => '40px',
-                            'border-radius' => '8px',
-                            'background' => '#4F4F4F',
-                            'text-transform' => 'uppercase',
-                            'font-size' => '16px',
-                            'color' => '#FFFFFF',
-                            'font-weight' => '700',
-                        ]
-                    ]) ?>
-
-            <?php endif; ?>
-
-        <?php else : ?>
-
-            <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
-
-                <?=  Html::a( 'Экспертиза не разрешена', ['#'], [
-                    'onclick' => 'return false;',
-                    'class' => 'btn btn-default pull-right',
-                    'style' => [
-                        'display' => 'flex',
-                        'align-items' => 'center',
-                        'justify-content' => 'center',
-                        'padding' => '2px 7px 0 7px',
-                        'width' => '220px',
-                        'height' => '40px',
-                        'border-radius' => '8px',
-                        'background' => '#4F4F4F',
-                        'text-transform' => 'uppercase',
-                        'font-size' => '16px',
-                        'color' => '#FFFFFF',
-                        'font-weight' => '700',
-                    ]
-                ]) ?>
-
-            <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
-
-                <?=  Html::a( 'Экспертиза',
-                    ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
-                        'class' => 'btn btn-default link-get-list-expertise pull-right',
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'padding' => '2px 7px 0 7px',
-                            'width' => '220px',
-                            'height' => '40px',
-                            'border-radius' => '8px',
-                            'background' => '#4F4F4F',
-                            'text-transform' => 'uppercase',
-                            'font-size' => '16px',
-                            'color' => '#FFFFFF',
-                            'font-weight' => '700',
-                        ]
                     ]) ?>
 
             <?php endif; ?>
@@ -412,17 +440,136 @@ use yii\helpers\Url;
     </div>
 
     <div class="col-xs-12 business-model-block-buttons-mobile">
-        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+        <?php if (!$model->getDeletedAt()): ?>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
+                <div class="hypothesis_buttons_mobile">
+
+                    <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->getId()], [
+                        'class' => 'btn btn-default update-hypothesis',
+                        'style' => [
+                            'display' => 'flex',
+                            'width' => '50%',
+                            'height' => '36px',
+                            'background' => '#7F9FC5',
+                            'color' => '#FFFFFF',
+                            'align-items' => 'center',
+                            'justify-content' => 'center',
+                            'border-radius' => '0',
+                            'border' => '1px solid #ffffff',
+                            'font-size' => '18px',
+                            'margin' => '10px 0 0 0',
+                        ],
+                    ]) ?>
+
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                        <?= Html::a('Запросить экспертизу', ['/business-model/enable-expertise', 'id' => $model->getId()], [
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '50%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 0 0 0',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                        <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '50%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 0 0 0',
+                            ],
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
+
+            <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+
+                <?php if ($model->getEnableExpertise() === EnableExpertise::ON && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getProjectId())) : ?>
+
+                    <?=  Html::a( 'Экспертиза',
+                        ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise pull-right',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'padding' => '2px 7px 0 7px',
+                                'width' => '220px',
+                                'height' => '40px',
+                                'border-radius' => '8px',
+                                'background' => '#4F4F4F',
+                                'text-transform' => 'uppercase',
+                                'font-size' => '16px',
+                                'color' => '#FFFFFF',
+                                'font-weight' => '700',
+                            ]
+                        ]) ?>
+
+                <?php endif; ?>
+
+            <?php else : ?>
+
+                <div class="hypothesis_buttons_mobile">
+
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+
+                        <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '100%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 0 0 0',
+                            ],
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
+
+            <?php endif; ?>
 
             <div class="hypothesis_buttons_mobile">
 
-                <?= Html::a('Редактировать', ['/business-model/get-hypothesis-to-update', 'id' => $model->getId()], [
-                    'class' => 'btn btn-default update-hypothesis',
+                <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
+                    'class' => 'btn btn-success',
+                    'target' => '_blank',
                     'style' => [
                         'display' => 'flex',
-                        'width' => '50%',
+                        'width' => '100%',
                         'height' => '36px',
-                        'background' => '#7F9FC5',
+                        'background' => '#52BE7F',
                         'color' => '#FFFFFF',
                         'align-items' => 'center',
                         'justify-content' => 'center',
@@ -430,48 +577,8 @@ use yii\helpers\Url;
                         'border' => '1px solid #ffffff',
                         'font-size' => '18px',
                         'margin' => '10px 0 0 0',
-                    ],
+                    ]
                 ]) ?>
-
-                <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
-
-                    <?= Html::a('Запросить экспертизу', ['/business-model/enable-expertise', 'id' => $model->getId()], [
-                        'class' => 'btn btn-default link-enable-expertise',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#4F4F4F',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 0 0 0',
-                        ],
-                    ]) ?>
-
-                <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
-
-                    <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::BUSINESS_MODEL], 'stageId' => $model->getId()], [
-                        'class' => 'btn btn-default link-get-list-expertise',
-                        'style' => [
-                            'display' => 'flex',
-                            'width' => '50%',
-                            'height' => '36px',
-                            'background' => '#4F4F4F',
-                            'color' => '#FFFFFF',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'border-radius' => '0',
-                            'border' => '1px solid #ffffff',
-                            'font-size' => '18px',
-                            'margin' => '10px 0 0 0',
-                        ],
-                    ]) ?>
-
-                <?php endif; ?>
 
             </div>
 
@@ -503,28 +610,6 @@ use yii\helpers\Url;
             </div>
 
         <?php endif; ?>
-
-        <div class="hypothesis_buttons_mobile">
-
-            <?= Html::a('Скачать PDF', ['/business-model/mpdf-business-model', 'id' => $model->id],[
-                'class' => 'btn btn-success',
-                'target' => '_blank',
-                'style' => [
-                    'display' => 'flex',
-                    'width' => '100%',
-                    'height' => '36px',
-                    'background' => '#52BE7F',
-                    'color' => '#FFFFFF',
-                    'align-items' => 'center',
-                    'justify-content' => 'center',
-                    'border-radius' => '0',
-                    'border' => '1px solid #ffffff',
-                    'font-size' => '18px',
-                    'margin' => '10px 0 0 0',
-                ]
-            ]) ?>
-
-        </div>
     </div>
 
 </div>

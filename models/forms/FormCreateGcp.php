@@ -106,7 +106,7 @@ class FormCreateGcp extends Model
     public function create(): Gcps
     {
         /** @var Gcps $last_model */
-        $last_model = Gcps::find()->where(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
+        $last_model = Gcps::find(false)->andWhere(['basic_confirm_id' => $this->getBasicConfirmId()])->orderBy(['id' => SORT_DESC])->one();
         $confirmProblem = ConfirmProblem::findOne($this->getBasicConfirmId());
         $problem = Problems::findOne($confirmProblem->getProblemId());
         $segment = Segments::findOne($problem->getSegmentId());

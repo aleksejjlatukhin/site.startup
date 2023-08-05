@@ -1,5 +1,6 @@
 <?php
 
+use app\models\SegmentRequirement;
 use app\models\Segments;
 
 /**
@@ -78,7 +79,13 @@ use app\models\Segments;
         <h4>Тип взаимодействия с потребителями</h4>
         <div>Коммерческие взаимоотношения между представителями бизнес-аудитории (B2B)</div>
 
-        <?php if ($requirement = $segment->segmentRequirement->requirement): ?>
+        <?php
+        /** @var $segmentRequirement SegmentRequirement */
+        $segmentRequirement = SegmentRequirement::find(false)
+            ->andWhere(['segment_id' => $segment->getId()])
+            ->one();
+
+        if ($segmentRequirement && $requirement = $segmentRequirement->requirement): ?>
 
             <?php $wishList = $requirement->wishList ?>
 

@@ -88,6 +88,46 @@ $(body).on('change', 'form#project_create_form', function(){
 });
 
 
+// Показать данные корзины
+$(body).on('click', '#show_trash_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_projects_user').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Показать список гипотез этапа проекта
+$(body).on('click', '#show_list', function(e){
+
+    var url = $(this).attr('href');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('.block_all_projects_user').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
 //При нажатии на кнопку Новый проект
 $(body).on('click', '#showHypothesisToCreate', function(e){
 

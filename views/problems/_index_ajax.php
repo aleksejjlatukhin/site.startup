@@ -429,11 +429,140 @@ use yii\helpers\Url;
 
                 </div>
 
-            <?php else: ?>
+            <?php elseif (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
-                <?php if ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
+                <div class="hypothesis_buttons_mobile">
 
-                    <div class="hypothesis_buttons_mobile">
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                        <?= Html::a('Экспертиза не разрешена', ['#'], [
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON  && ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getProjectId())) : ?>
+
+                        <?= Html::a('Экспертиза', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROBLEM], 'stageId' => $model->getId()], [
+                            'class' => 'btn btn-default link-get-list-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON  && !ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $model->getProjectId())) : ?>
+
+                        <?= Html::a('Экспертиза не доступна', ['#'], [
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                    <?php if ($model->confirm): ?>
+
+                        <?= Html::a('Работать далее', Url::to(['/confirm-problem/view', 'id' => $model->confirm->getId()]), [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 1%',
+                            ]
+                        ]) ?>
+
+                    <?php else: ?>
+
+                        <?= Html::a('Работать далее', ['#'], [
+                            'disabled' => true,
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 1%',
+                            ]
+                        ]) ?>
+
+                    <?php endif; ?>
+
+                </div>
+
+            <?php else : ?>
+
+                <div class="hypothesis_buttons_mobile">
+
+                    <?php if ($model->getEnableExpertise() === EnableExpertise::OFF) : ?>
+
+                        <?= Html::a('Экспертиза запрещена', ['#'], [
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default link-enable-expertise',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#4F4F4F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 0 1%',
+                            ],
+                        ]) ?>
+
+                    <?php elseif ($model->getEnableExpertise() === EnableExpertise::ON) : ?>
 
                         <?= Html::a('Смотреть экспертизу', ['/expertise/get-list', 'stage' => StageExpertise::getList()[StageExpertise::PROBLEM], 'stageId' => $model->getId()], [
                             'class' => 'btn btn-default link-get-list-expertise',
@@ -448,59 +577,55 @@ use yii\helpers\Url;
                                 'border-radius' => '0',
                                 'border' => '1px solid #ffffff',
                                 'font-size' => '18px',
-                                'margin' => '10px 1% 2% 2%',
+                                'margin' => '10px 2% 0 1%',
                             ],
                         ]) ?>
 
-                        <?php if ($model->confirm): ?>
+                    <?php endif; ?>
 
-                            <?= Html::a('Работать далее', Url::to(['/confirm-problem/view', 'id' => $model->confirm->getId()]), [
-                                'class' => 'btn btn-default',
-                                'style' => [
-                                    'display' => 'flex',
-                                    'width' => '47%',
-                                    'height' => '36px',
-                                    'background' => '#52BE7F',
-                                    'color' => '#FFFFFF',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'border-radius' => '0',
-                                    'border' => '1px solid #ffffff',
-                                    'font-size' => '18px',
-                                    'margin' => '10px 2% 2% 1%',
-                                ]
-                            ]) ?>
+                    <?php if ($model->confirm): ?>
 
-                        <?php else: ?>
+                        <?= Html::a('Работать далее', Url::to(['/confirm-problem/view', 'id' => $model->confirm->getId()]), [
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 1%',
+                            ]
+                        ]) ?>
 
-                            <?= Html::a('Работать далее', ['#'], [
-                                'disabled' => true,
-                                'onclick' => 'return false;',
-                                'class' => 'btn btn-default',
-                                'style' => [
-                                    'display' => 'flex',
-                                    'width' => '47%',
-                                    'height' => '36px',
-                                    'background' => '#52BE7F',
-                                    'color' => '#FFFFFF',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'border-radius' => '0',
-                                    'border' => '1px solid #ffffff',
-                                    'font-size' => '18px',
-                                    'margin' => '10px 2% 2% 1%',
-                                ]
-                            ]) ?>
+                    <?php else: ?>
 
-                        <?php endif; ?>
+                        <?= Html::a('Работать далее', ['#'], [
+                            'disabled' => true,
+                            'onclick' => 'return false;',
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'width' => '47%',
+                                'height' => '36px',
+                                'background' => '#52BE7F',
+                                'color' => '#FFFFFF',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'border-radius' => '0',
+                                'border' => '1px solid #ffffff',
+                                'font-size' => '18px',
+                                'margin' => '10px 2% 2% 1%',
+                            ]
+                        ]) ?>
 
-                    </div>
+                    <?php endif; ?>
 
-                <?php else: ?>
-
-                    <div class="text-block-not-expertise-mobile">Экспертиза не разрешена</div>
-
-                <?php endif; ?>
+                </div>
 
             <?php endif; ?>
 

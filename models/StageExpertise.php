@@ -126,28 +126,40 @@ class StageExpertise
     {
         $title = '';
         $class = self::getClassByStage($stage);
-        $obj = $class::findOne($stageId);
+        $obj = $class::find(false)
+            ->andWhere(['id' => $stageId])
+            ->one();
 
         if ($obj instanceof Projects) {
             $title = self::$listTitle[$stage] . '</br> «' . $obj->getProjectName() . '»';
         } elseif ($obj instanceof Segments) {
             $title = self::$listTitle[$stage] . '</br> «' . $obj->getName() . '»';
         } elseif ($obj instanceof ConfirmSegment) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->segment->getName() . '»';
+            /** @var $segment Segments */
+            $segment = Segments::find(false)->andWhere(['id' => $obj->getSegmentId()])->one();
+            $title = self::$listTitle[$stage] . '</br> «' . $segment->getName() . '»';
         } elseif ($obj instanceof Problems) {
             $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmProblem) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->problem->getTitle() . '»';
+            /** @var $problem Problems */
+            $problem = Problems::find(false)->andWhere(['id' => $obj->getProblemId()])->one();
+            $title = self::$listTitle[$stage] . '</br> «' . $problem->getTitle() . '»';
         } elseif ($obj instanceof Gcps) {
             $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmGcp) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->gcp->getTitle() . '»';
+            /** @var $gcp Gcps */
+            $gcp = Gcps::find(false)->andWhere(['id' => $obj->getGcpId()])->one();
+            $title = self::$listTitle[$stage] . '</br> «' . $gcp->getTitle() . '»';
         } elseif ($obj instanceof Mvps) {
             $title = self::$listTitle[$stage] . '</br> «' . $obj->getTitle() . '»';
         } elseif ($obj instanceof ConfirmMvp) {
-            $title = self::$listTitle[$stage] . '</br> «' . $obj->mvp->getTitle() . '»';
+            /** @var $mvp Mvps */
+            $mvp = Mvps::find(false)->andWhere(['id' => $obj->getMvpId()])->one();
+            $title = self::$listTitle[$stage] . '</br> «' . $mvp->getTitle() . '»';
         } elseif ($obj instanceof BusinessModel) {
-            $title = self::$listTitle[$stage] . '</br> для «' . $obj->mvp->getTitle() . '»';
+            /** @var $mvp Mvps */
+            $mvp = Mvps::find(false)->andWhere(['id' => $obj->getMvpId()])->one();
+            $title = self::$listTitle[$stage] . '</br> для «' . $mvp->getTitle() . '»';
         }
 
         return $title;

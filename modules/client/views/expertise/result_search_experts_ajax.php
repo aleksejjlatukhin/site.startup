@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Projects;
 use app\models\User;
 use yii\helpers\Html;
 use app\models\ExpertType;
@@ -81,26 +82,35 @@ use yii\helpers\Url;
 
                     <?php if (ProjectCommunications::isNeedAskExpert($expert->getId(), $project_id)) : ?>
 
-                        <?= Html::a('Сделать запрос', Url::to([
-                            '/client/communications/send',
-                            'adressee_id' => $expert->getId(),
-                            'project_id' => $project_id,
-                            'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
-                        ]), [
-                            'class' => 'btn btn-default send-communication',
-                            'id' => 'send_communication-'.$expert->getId(),
-                            'style' => [
-                                'display' => 'flex',
-                                'align-items' => 'center',
-                                'justify-content' => 'center',
-                                'color' => '#FFFFFF',
-                                'background' => '#52BE7F',
-                                'width' => '140px',
-                                'height' => '40px',
-                                'font-size' => '18px',
-                                'border-radius' => '8px',
-                            ]
-                        ]) ?>
+                        <?php /** @var $project Projects */
+                        $project = Projects::find(false)
+                            ->andWhere(['id' => $project_id])
+                            ->one();
+
+                        if (!$project->getDeletedAt()): ?>
+
+                            <?= Html::a('Сделать запрос', Url::to([
+                                '/client/communications/send',
+                                'adressee_id' => $expert->getId(),
+                                'project_id' => $project_id,
+                                'type' => CommunicationTypes::MAIN_ADMIN_ASKS_ABOUT_READINESS_CONDUCT_EXPERTISE
+                            ]), [
+                                'class' => 'btn btn-default send-communication',
+                                'id' => 'send_communication-'.$expert->getId(),
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'color' => '#FFFFFF',
+                                    'background' => '#52BE7F',
+                                    'width' => '140px',
+                                    'height' => '40px',
+                                    'font-size' => '18px',
+                                    'border-radius' => '8px',
+                                ]
+                            ]) ?>
+
+                        <?php endif; ?>
 
                     <?php else : ?>
 

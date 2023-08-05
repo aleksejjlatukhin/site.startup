@@ -2,6 +2,8 @@
 
 use app\models\ConfirmSegment;
 use app\models\EnableExpertise;
+use app\models\InterviewConfirmSegment;
+use app\models\Problems;
 use app\models\ProjectCommunications;
 use app\models\RespondsSegment;
 use app\models\StageExpertise;
@@ -13,6 +15,7 @@ use app\models\User;
  * @var RespondsSegment[] $responds
  * @var ConfirmSegment $confirm
  * @var bool $isMobile
+ * @var bool $isOnlyNotDelete
  */
 
 ?>
@@ -31,11 +34,18 @@ use app\models\User;
                     <div style="padding-right: 10px; padding-bottom: 3px;">
 
                         <?php
-                        if ($respond->interview) {
-                            if ($respond->interview->getStatus() === 1) {
+                        /** @var $interview InterviewConfirmSegment */
+                        $interview = $isOnlyNotDelete ?
+                            $respond->interview :
+                            InterviewConfirmSegment::find(false)
+                                ->andWhere(['respond_id' => $respond->getId()])
+                                ->one();
+
+                        if ($interview) {
+                            if ($interview->getStatus() === 1) {
                                 echo  Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]);
                             }
-                            elseif ($respond->interview->getStatus() === 0) {
+                            elseif ($interview->getStatus() === 0) {
                                 echo  Html::img('@web/images/icons/danger-offer.png', ['style' => ['width' => '20px',]]);
                             }
                         }
@@ -48,7 +58,7 @@ use app\models\User;
 
                     <div class="" style="overflow: hidden; max-height: 60px; padding: 5px 0;">
 
-                        <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                        <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                             <?=  Html::a($respond->getName(), ['#'], [
                                 'id' => "respond_name-" . $respond->getId(),
@@ -92,12 +102,12 @@ use app\models\User;
                 <div class="col-md-1">
 
                     <?php
-                    if ($respond->interview){
+                    if ($interview){
 
-                        $date_fact = date("d.m.y", $respond->interview->getUpdatedAt());
+                        $date_fact = date("d.m.y", $interview->getUpdatedAt());
                         echo '<div class="text-center" style="margin-left: -10px;">' . Html::encode($date_fact) . '</div>';
 
-                    }elseif (!empty($respond->getInfoRespond()) && !empty($respond->getPlaceInterview()) && $respond->getDatePlan()
+                    }elseif ($isOnlyNotDelete && !empty($respond->getInfoRespond()) && !empty($respond->getPlaceInterview()) && $respond->getDatePlan()
                         && User::isUserSimple(Yii::$app->user->identity['username'])){
 
                         echo '<div class="text-center" style="margin-left: -10px;">' . Html::a(
@@ -112,15 +122,15 @@ use app\models\User;
 
                 </div>
 
-                <?php if ($respond->interview) : ?>
-                    <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $respond->interview->getResult() ?>">
-                        <?= $respond->interview->getResult() ?>
+                <?php if ($interview) : ?>
+                    <div class="col-md-2" style="font-size: 14px; padding: 0; overflow: hidden; max-height: inherit;" title="<?= $interview->getResult() ?>">
+                        <?= $interview->getResult() ?>
                     </div>
                 <?php else : ?>
                     <div class="col-md-2"></div>
                 <?php endif; ?>
 
-                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                     <div class="col-md-1" style="text-align: right;">
 
@@ -149,10 +159,10 @@ use app\models\User;
                     <div class="col-md-1" style="text-align: center;">
 
                         <?php
-                        if ($respond->interview) {
+                        if ($interview) {
 
                             echo Html::a(Html::img('/images/icons/icon_view.png', ['style' => ['width' => '28px']]), ['#'], [
-                                'id' => 'descInterview_form-' . $respond->interview->getId(),
+                                'id' => 'descInterview_form-' . $interview->getId(),
                                 'class' => 'showDescInterviewUpdateForm',
                                 'title' => 'Результаты опроса',
                             ]);
@@ -180,11 +190,18 @@ use app\models\User;
                         <span class="header_table_hypothesis_mobile">Статус</span>
                         <span class="text_14_table_hypothesis">
                             <?php
-                            if ($respond->interview) {
-                                if ($respond->interview->getStatus() === 1) {
+                            /** @var $interview InterviewConfirmSegment */
+                            $interview = $isOnlyNotDelete ?
+                                $respond->interview :
+                                InterviewConfirmSegment::find(false)
+                                    ->andWhere(['respond_id' => $respond->getId()])
+                                    ->one();
+
+                            if ($interview) {
+                                if ($interview->getStatus() === 1) {
                                     echo 'соответствует сегменту';
                                 }
-                                elseif ($respond->interview->getStatus() === 0) {
+                                elseif ($interview->getStatus() === 0) {
                                     echo 'не соответствует сегменту';
                                 }
                             }
@@ -222,11 +239,11 @@ use app\models\User;
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($respond->interview): ?>
+                    <?php if ($interview): ?>
                         <div class="col-xs-12">
                             <div class="header_table_hypothesis_mobile">Варианты проблем</div>
                             <div class="text_14_table_hypothesis">
-                                <?= $respond->interview->getResult() ?>
+                                <?= $interview->getResult() ?>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -240,18 +257,18 @@ use app\models\User;
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($respond->interview): ?>
+                    <?php if ($interview): ?>
                         <div class="col-xs-6">
                             <div class="header_table_hypothesis_mobile">Фактическая дата</div>
                             <div class="text_14_table_hypothesis">
-                                <?= date('d.m.Y', $respond->interview->getUpdatedAt()) ?>
+                                <?= date('d.m.Y', $interview->getUpdatedAt()) ?>
                             </div>
                         </div>
                     <?php else: ?>
                         <div class="col-xs-6"></div>
                     <?php endif; ?>
 
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+                    <?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
                         <div class="hypothesis_buttons_mobile">
 
@@ -341,27 +358,31 @@ use app\models\User;
 
                     <?php else: ?>
 
-                        <div class="hypothesis_buttons_mobile">
+                        <?php if ($interview): ?>
 
-                            <?= Html::a('Смотреть данные интервью', ['#'], [
-                                'id' => 'descInterview_form-' . $respond->interview->getId(),
-                                'class' => 'btn btn-default showDescInterviewUpdateForm',
-                                'style' => [
-                                    'display' => 'flex',
-                                    'width' => '96%',
-                                    'height' => '36px',
-                                    'background' => '#52BE7F',
-                                    'color' => '#FFFFFF',
-                                    'align-items' => 'center',
-                                    'justify-content' => 'center',
-                                    'border-radius' => '0',
-                                    'border' => '1px solid #ffffff',
-                                    'font-size' => '18px',
-                                    'margin' => '10px 2% 0% 2%',
-                                ]
-                            ]) ?>
+                            <div class="hypothesis_buttons_mobile">
 
-                        </div>
+                                <?= Html::a('Смотреть данные интервью', ['#'], [
+                                    'id' => 'descInterview_form-' . $interview->getId(),
+                                    'class' => 'btn btn-default showDescInterviewUpdateForm',
+                                    'style' => [
+                                        'display' => 'flex',
+                                        'width' => '96%',
+                                        'height' => '36px',
+                                        'background' => '#52BE7F',
+                                        'color' => '#FFFFFF',
+                                        'align-items' => 'center',
+                                        'justify-content' => 'center',
+                                        'border-radius' => '0',
+                                        'border' => '1px solid #ffffff',
+                                        'font-size' => '18px',
+                                        'margin' => '10px 2% 0% 2%',
+                                    ]
+                                ]) ?>
+
+                            </div>
+
+                        <?php endif; ?>
 
                     <?php endif; ?>
 
@@ -406,7 +427,7 @@ use app\models\User;
 
             <?php if ($confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
 
-                <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
                     <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->getProjectId())) : ?>
 
@@ -452,48 +473,90 @@ use app\models\User;
 
             <?php endif; ?>
 
-            <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+            <?php if ($isOnlyNotDelete): ?>
 
-                <?php if ($confirm->getButtonMovingNextStage()) : ?>
+                <?php if (User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
 
-                    <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
-                    'style' => [
-                        'display' => 'flex',
-                        'align-items' => 'center',
-                        'justify-content' => 'center',
-                        'background' => '#52BE7F',
-                        'width' => '140px',
-                        'height' => '40px',
-                        'font-size' => '24px',
-                        'border-radius' => '8px',
-                    ],
-                    'class' => 'btn btn-lg btn-success',
-                    'id' => 'button_MovingNextStage',
-                    ]) ?>
-
-                <?php else : ?>
-
-                    <?php if (($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) === 0) : ?>
+                    <?php if ($confirm->getButtonMovingNextStage()) : ?>
 
                         <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
-                        'style' => [
-                            'display' => 'flex',
-                            'align-items' => 'center',
-                            'justify-content' => 'center',
-                            'background' => '#eb5757',
-                            'color' => '#FFFFFF',
-                            'width' => '140px',
-                            'height' => '40px',
-                            'font-size' => '24px',
-                            'border-radius' => '8px',
-                        ],
-                        'class' => 'btn btn-lg btn-default',
-                        'id' => 'button_MovingNextStage',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#52BE7F',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-success',
+                            'id' => 'button_MovingNextStage',
                         ]) ?>
 
                     <?php else : ?>
 
-                        <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
+                        <?php if (($confirm->getCountRespond() - $confirm->getCountDescInterviewsOfModel()) === 0) : ?>
+
+                            <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#eb5757',
+                                    'color' => '#FFFFFF',
+                                    'width' => '140px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                                'class' => 'btn btn-lg btn-default',
+                                'id' => 'button_MovingNextStage',
+                            ]) ?>
+
+                        <?php else : ?>
+
+                            <?= Html::a( 'Далее', ['/confirm-segment/moving-next-stage', 'id' => $confirm->getId()],[
+                                'style' => [
+                                    'display' => 'flex',
+                                    'align-items' => 'center',
+                                    'justify-content' => 'center',
+                                    'background' => '#E0E0E0',
+                                    'color' => '#FFFFFF',
+                                    'width' => '140px',
+                                    'height' => '40px',
+                                    'font-size' => '24px',
+                                    'border-radius' => '8px',
+                                ],
+                                'class' => 'btn btn-lg btn-default',
+                                'id' => 'button_MovingNextStage',
+                            ]) ?>
+
+                        <?php endif; ?>
+
+                    <?php endif; ?>
+
+                <?php else : ?>
+
+                    <?php if ($confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+
+                        <?= Html::a( 'Далее', ['/problems/index', 'id' => $confirm->getId()],[
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#52BE7F',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '24px',
+                                'border-radius' => '8px',
+                            ],
+                            'class' => 'btn btn-lg btn-success',
+                        ]) ?>
+
+                    <?php else : ?>
+
+                        <?= Html::a( 'Далее', ['#'],[
                             'style' => [
                                 'display' => 'flex',
                                 'align-items' => 'center',
@@ -506,16 +569,21 @@ use app\models\User;
                                 'border-radius' => '8px',
                             ],
                             'class' => 'btn btn-lg btn-default',
-                            'id' => 'button_MovingNextStage',
+                            'onclick' => 'return false',
                         ]) ?>
 
                     <?php endif; ?>
 
                 <?php endif; ?>
 
-            <?php else : ?>
+            <?php else: ?>
 
-                <?php if ($confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::COMPLETED) : ?>
+                <?php
+                $problemExist = Problems::find(false)
+                    ->andWhere(['segment_id' => $confirm->getSegmentId()])
+                    ->exists();
+
+                if ($problemExist): ?>
 
                     <?= Html::a( 'Далее', ['/problems/index', 'id' => $confirm->getId()],[
                         'style' => [
@@ -586,7 +654,7 @@ use app\models\User;
 
             <?php if ($confirm->getEnableExpertise() === EnableExpertise::ON) : ?>
 
-                <?php if (User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <?php if ($isOnlyNotDelete && User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
 
                     <?php if (ProjectCommunications::checkOfAccessToCarryingExpertise(Yii::$app->user->getId(), $confirm->hypothesis->getProjectId())) : ?>
 

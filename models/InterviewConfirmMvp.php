@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\forms\CacheForm;
+use app\models\traits\SoftDeleteModelTrait;
 use Exception;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -28,11 +29,13 @@ use yii\web\UploadedFile;
  * @property int $updated_at                            Дата редактирования
  * @property $loadFile                                  Поле для загрузки файла
  * @property CacheForm $_cacheManager                   Менеджер кэширования
+ * @property int|null $deleted_at                       Дата удаления
  *
  * @property RespondsMvp $respond                       Респондент
  */
 class InterviewConfirmMvp extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     public $loadFile;
     public $_cacheManager;
@@ -71,13 +74,41 @@ class InterviewConfirmMvp extends ActiveRecord
      */
     public function getPathFile(): string
     {
-        $respond = $this->respond;
-        $confirm = $respond->confirm;
-        $mvp = $confirm->mvp;
-        $gcp = $mvp->gcp;
-        $problem = $mvp->problem;
-        $segment = $mvp->segment;
-        $project = $mvp->project;
+        /** @var $respond RespondsMvp */
+        $respond = RespondsMvp::find(false)
+            ->andWhere(['id' => $this->getRespondId()])
+            ->one();
+
+        /** @var $confirm ConfirmMvp */
+        $confirm = ConfirmMvp::find(false)
+            ->andWhere(['id' => $respond->getConfirmId()])
+            ->one();
+
+        /** @var $mvp Mvps */
+        $mvp = Mvps::find(false)
+            ->andWhere(['id' => $confirm->getMvpId()])
+            ->one();
+
+        /** @var $gcp Gcps */
+        $gcp = Gcps::find(false)
+            ->andWhere(['id' => $mvp->getGcpId()])
+            ->one();
+
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $gcp->getProblemId()])
+            ->one();
+
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $problem->getSegmentId()])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
         $user = $project->user;
         return UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().
             '/problems/problem-'.$problem->getId().'/gcps/gcp-'.$gcp->getId().'/mvps/mvp-'.$mvp->getId().'/interviews/respond-'.$respond->getId().'/';
@@ -342,5 +373,21 @@ class InterviewConfirmMvp extends ActiveRecord
     public function setCacheManager(): void
     {
         $this->_cacheManager = new CacheForm();
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

@@ -77,13 +77,24 @@ class GcpsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index', 'mpdf-table-gcps'])){
 
-            $confirmProblem = ConfirmProblem::findOne((int)Yii::$app->request->get('id'));
+            /** @var $confirmProblem ConfirmProblem */
+            $confirmProblem = ConfirmProblem::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
             if (!$confirmProblem) {
                 PatternHttpException::noData();
             }
 
-            $problem = Problems::findOne($confirmProblem->getProblemId());
-            $project = Projects::findOne($problem->getProjectId());
+            /** @var $problem Problems */
+            $problem = Problems::find(false)
+                ->andWhere(['id' => $confirmProblem->getProblemId()])
+                ->one();
+
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $problem->getProjectId()])
+                ->one();
             
             if (($project->getUserId() === $currentUser->getId())){
                 return parent::beforeAction($action);
@@ -163,15 +174,48 @@ class GcpsController extends AppUserPartController
     public function actionIndex(int $id)
     {
         $models = Gcps::findAll(['basic_confirm_id' => $id]);
-        if (!$models) {
+        $countModels = Gcps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
+
+        if ((int)$countModels === 0) {
             return $this->redirect(['/gcps/instruction', 'id' => $id]);
         }
 
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $problem = Problems::findOne($confirmProblem->getProblemId());
-        $confirmSegment = ConfirmSegment::findOne($problem->getBasicConfirmId());
-        $segment = Segments::findOne($confirmSegment->getSegmentId());
-        $project = Projects::findOne($segment->getProjectId());
+        /** @var $confirmProblem ConfirmProblem */
+        $confirmProblem = ConfirmProblem::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $problem Problems */
+        $problem = Problems::find(false)
+            ->andWhere(['id' => $confirmProblem->getProblemId()])
+            ->one();
+
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $problem->getBasicConfirmId()])
+            ->one();
+
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $existTrashList = Gcps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->exists();
+
+        $trashList = Gcps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->all();
 
         return $this->render('index', [
             'models' => $models,
@@ -180,7 +224,55 @@ class GcpsController extends AppUserPartController
             'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
+            'existTrashList' => $existTrashList,
+            'trashList' => $trashList
         ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_index_ajax', [
+                    'models' => Gcps::findAll(['basic_confirm_id' => $id])
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionTrashList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $queryModels = Gcps::find(false)
+                ->andWhere(['basic_confirm_id' => $id])
+                ->andWhere(['not', ['deleted_at' => null]]);
+
+            $response = [
+                'countItems' => $queryModels->count(),
+                'renderAjax' => $this->renderAjax('_trash_ajax', [
+                    'basicConfirmId' => $id,
+                    'models' => $queryModels->all()
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
@@ -190,8 +282,11 @@ class GcpsController extends AppUserPartController
      */
     public function actionInstruction (int $id)
     {
-        $models = Gcps::find()->where(['basic_confirm_id' => $id])->all();
-        if ($models) {
+        $countModels = Gcps::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
+
+        if ((int)$countModels > 0) {
             return $this->redirect(['/gcps/index', 'id' => $id]);
         }
 
@@ -252,9 +347,9 @@ class GcpsController extends AppUserPartController
                 if ($model->create()) {
 
                     $response = [
-                        'count' => Gcps::find()->where(['basic_confirm_id' => $id])->count(),
+                        'count' => Gcps::find()->andWhere(['basic_confirm_id' => $id])->count(),
                         'renderAjax' => $this->renderAjax('_index_ajax', [
-                            'models' => Gcps::find()->where(['basic_confirm_id' => $id])->all(),
+                            'models' => Gcps::find()->andWhere(['basic_confirm_id' => $id])->all(),
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
@@ -359,12 +454,29 @@ class GcpsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfTableGcps(int $id) {
+    public function actionMpdfTableGcps(int $id)
+    {
+        /** @var $confirm_problem ConfirmProblem */
+        $confirm_problem = ConfirmProblem::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
-        $confirm_problem = ConfirmProblem::findOne($id);
-        $problem_description = mb_substr($confirm_problem->problem->getDescription(), 0, 50).'...';
-        $models = $confirm_problem->gcps;
+        if (!$confirm_problem->getDeletedAt()) {
+            $problem = $confirm_problem->problem;
+            $models = $confirm_problem->gcps;
+        } else {
+            /** @var $problem Problems */
+            $problem = Problems::find(false)
+                ->andWhere(['id' => $confirm_problem->getProblemId()])
+                ->one();
 
+            /** @var $models Gcps[] */
+            $models = Gcps::find(false)
+                ->andWhere(['basic_confirm_id' => $confirm_problem->getId()])
+                ->all();
+        }
+
+        $problem_description = mb_substr($problem->getDescription(), 0, 50).'...';
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('mpdf_table_gcps', ['models' => $models]);
 
@@ -408,29 +520,55 @@ class GcpsController extends AppUserPartController
     /**
      * @param int $id
      * @return bool
-     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
 
-        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+        if(Yii::$app->request->isAjax && $model->softDeleteStage()) {
             return true;
         }
         return false;
     }
 
+
     /**
      * @param int $id
+     * @return void|Response
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionRecovery(int $id)
+    {
+        $model = $this->findModel($id, false);
+
+        if($model->recoveryStage()) {
+            return $this->redirect(['index', 'id' => $model->getBasicConfirmId()]);
+        }
+
+        PatternHttpException::noData();
+    }
+
+
+    /**
+     * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return Gcps|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?Gcps
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?Gcps
     {
-        if (($model = Gcps::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = Gcps::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = Gcps::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

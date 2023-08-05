@@ -1,6 +1,7 @@
 <?php
 
 use app\models\DuplicateCommunications;
+use app\models\Projects;
 use yii\data\Pagination;
 use yii\helpers\Html;
 use app\models\CommunicationTypes;
@@ -58,7 +59,14 @@ $this->registerCssFile('@web/css/notifications-style.css');
 
                             <div class="conversation-exist">
 
-                                <?php $admin = $source->project->user->admin; ?>
+                                <?php
+                                /** @var $project Projects */
+                                $project = Projects::find(false)
+                                    ->andWhere(['id' => $source->getProjectId()])
+                                    ->one();
+
+                                $admin = $project->user->admin;
+                                ?>
 
                                 <?php if (ConversationExpert::isExist($source->expert->getId(), $admin->getId())) : ?>
 

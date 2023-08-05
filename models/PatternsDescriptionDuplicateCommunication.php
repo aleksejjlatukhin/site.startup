@@ -46,6 +46,9 @@ class PatternsDescriptionDuplicateCommunication
             if ($type === TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE) {
                 return $model->getDescriptionDuplicateUserAllowedExpertiseCommunication($source);
             }
+            if ($type === TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT) {
+                return $model->getDescriptionDuplicateUserSoftDeleteStageProjectCommunication($source);
+            }
 
             if (is_a($expertise, Expertise::class)) {
 
@@ -162,6 +165,39 @@ class PatternsDescriptionDuplicateCommunication
         if ($source->getType() === CommunicationTypes::USER_ALLOWED_BUSINESS_MODEL_EXPERTISE) {
             $this->description = 'Проектант, ' . $source->user->getUsername() . ', разрешил эспертизу по этапу «' . $this->getStage(StageExpertise::BUSINESS_MODEL)
                 . ': ' . Html::a($source->hypothesis->mvp->getTitle(), ['/business-model/index', 'id' => $source->getHypothesisId()]) . '»';
+        }
+
+        return $this->description;
+    }
+
+
+    /**
+     * Получить описание шаблона коммуникации для трекера о том,
+     * что проектант удалил этап проекта
+     *
+     * @param ProjectCommunications $source
+     * @return string
+     */
+    private function getDescriptionDuplicateUserSoftDeleteStageProjectCommunication(ProjectCommunications $source): string
+    {
+        if ($source->getType() === CommunicationTypes::USER_DELETED_PROJECT) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', удалил проект «' . Html::a($source->project->getProjectName(), ['/projects/index', 'id' => $source->project->getUserId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_DELETED_SEGMENT) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', удалил сегмент «' . Html::a($source->hypothesis->getName(), ['/segments/index', 'id' => $source->getProjectId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_DELETED_PROBLEM) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', удалил проблему сегмента «' . Html::a($source->hypothesis->getTitle(), ['/problems/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_DELETED_GCP) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', удалил ценностное предложение «' . Html::a($source->hypothesis->getTitle(), ['/gcps/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
+        }
+
+        if ($source->getType() === CommunicationTypes::USER_DELETED_MVP) {
+            $this->description = 'Проектант, ' . $source->user->getUsername() . ', удалил MVP-продукт «' . Html::a($source->hypothesis->getTitle(), ['/mvps/index', 'id' => $source->hypothesis->getBasicConfirmId()]) . '»';
         }
 
         return $this->description;

@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ConfirmSegment;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use app\models\Segments;
@@ -32,6 +33,13 @@ use app\models\Segments;
 
         <?php foreach ($models as $model) : ?>
 
+            <?php
+            /** @var $confirm ConfirmSegment */
+            $confirm = ConfirmSegment::find(false)
+                ->andWhere(['segment_id' => $model->getId()])
+                ->one();
+            ?>
+
         <tr>
 
             <td class="block_segment_status">
@@ -40,11 +48,11 @@ use app\models\Segments;
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/positive-offer.png', ['style' => ['width' => '20px',]]) . '</div>';
 
-                }elseif (!$model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
+                }elseif (!$confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 
-                }elseif ($model->confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
+                }elseif ($confirm && $model->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) {
 
                     echo '<div class="" style="padding: 0 5px;">' . Html::img('@web/images/icons/next-step.png', ['style' => ['width' => '20px']]) . '</div>';
 

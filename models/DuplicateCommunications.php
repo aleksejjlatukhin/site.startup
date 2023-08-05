@@ -55,7 +55,8 @@ class DuplicateCommunications extends ActiveRecord implements CommunicationsInte
             TypesDuplicateCommunication::MAIN_ADMIN_TO_EXPERT,
             TypesDuplicateCommunication::EXPERT_COMPLETED_EXPERTISE,
             TypesDuplicateCommunication::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE,
-            TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE
+            TypesDuplicateCommunication::USER_ALLOWED_EXPERTISE,
+            TypesDuplicateCommunication::USER_DELETE_STAGE_PROJECT
         ], false))
         {
             return ProjectCommunications::findOne($this->getSourceId());

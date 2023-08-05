@@ -56,12 +56,15 @@ class ConfirmSegmentController extends AppUserPartController
         $currentUser = User::findOne(Yii::$app->user->getId());
         $currentClientUser = $currentUser->clientUser;
 
-        if (in_array($action->id, ['view', 'mpdf-questions-and-answers', 'mpdf-data-responds'])){
+        // Закомментировал потому, что блокируются методы для гипотез которые находятся в корзине, исправить это.
+        if ($action->id === 'view'/*, 'mpdf-questions-and-answers', 'mpdf-data-responds'*/){
 
-            $confirm = ConfirmSegment::findOne((int)Yii::$app->request->get('id'));
-            if (!$confirm) {
-                PatternHttpException::noData();
+            $confirm = $this->findModel((int)Yii::$app->request->get('id'), false);
+
+            if ($confirm->getDeletedAt()) {
+                return parent::beforeAction($action);
             }
+
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
 
@@ -375,11 +378,15 @@ class ConfirmSegmentController extends AppUserPartController
 
     /**
      * @param int $id
-     * @return string
+     * @return string|Response
+     * @throws NotFoundHttpException
      */
-    public function actionView(int $id): string
+    public function actionView(int $id)
     {
-        $model = ConfirmSegment::findOne($id);
+        $model = $this->findModel($id, false);
+        if ($model->getDeletedAt()) {
+            return $this->redirect(['/confirm-segment/view-trash', 'id' => $id]);
+        }
         $formUpdateConfirmSegment = new FormUpdateConfirmSegment($id);
         $segment = Segments::findOne($model->getSegmentId());
         $project = Projects::findOne($segment->getProjectId());
@@ -399,6 +406,43 @@ class ConfirmSegmentController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
+            'searchForm' => new SearchForm()
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionViewTrash(int $id): string
+    {
+        /**
+         * @var $model ConfirmSegment
+         * @var $segment Segments
+         * @var $project Projects
+         * @var $questions QuestionsConfirmSegment[]
+         */
+        $model = $this->findModel($id, false);
+
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $model->getSegmentId()])
+            ->one();
+
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $questions = QuestionsConfirmSegment::find(false)
+            ->andWhere(['confirm_id' => $id])
+            ->all();
+
+        return $this->render('view_trash', [
+            'model' => $model,
+            'segment' => $segment,
+            'project' => $project,
+            'questions' => $questions,
             'searchForm' => new SearchForm()
         ]);
     }
@@ -462,11 +506,11 @@ class ConfirmSegmentController extends AppUserPartController
 
         $count_descInterview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
         $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
 
         if (Yii::$app->request->isAjax) {
 
@@ -480,7 +524,7 @@ class ConfirmSegmentController extends AppUserPartController
                         'model' => $formCreateProblem,
                         'responds' => RespondsSegment::find()->with('interview')
                             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-                            ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->all(),
+                            ->andWhere(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->all(),
                     ]),
                 ];
 
@@ -507,11 +551,11 @@ class ConfirmSegmentController extends AppUserPartController
 
         $count_descInterview = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
+            ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
 
         $count_positive = (int)RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $id, 'interview_confirm_segment.status' => '1'])->count();
 
 
         if(Yii::$app->request->isAjax) {
@@ -598,15 +642,24 @@ class ConfirmSegmentController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionGetDataQuestionsAndAnswers(int $id): array
+    public function actionGetDataQuestionsAndAnswers(int $id, bool $isOnlyNotDelete = true): array
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, $isOnlyNotDelete);
 
-        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', ['questions' => $questions])];
+        /** @var $questions QuestionsConfirmSegment[] */
+        $questions = $isOnlyNotDelete ?
+            $model->questions :
+            QuestionsConfirmSegment::find(false)
+                ->andWhere(['confirm_id' => $model->getId()])
+                ->all();
+
+        $response = ['ajax_questions_and_answers' => $this->renderAjax('ajax_questions_and_answers', [
+            'questions' => $questions, 'isOnlyNotDelete' => $isOnlyNotDelete
+        ])];
         Yii::$app->response->format = Response::FORMAT_JSON;
         Yii::$app->response->data = $response;
         return $response;
@@ -626,8 +679,11 @@ class ConfirmSegmentController extends AppUserPartController
      */
     public function actionMpdfQuestionsAndAnswers(int $id)
     {
-        $model = $this->findModel($id);
-        $questions = $model->questions;
+        $model = $this->findModel($id, false);
+        /** @var $questions QuestionsConfirmSegment[] */
+        $questions = QuestionsConfirmSegment::find(false)
+            ->andWhere(['confirm_id' => $model->getId()])
+            ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('questions_and_answers_pdf', ['questions' => $questions]);
@@ -635,7 +691,12 @@ class ConfirmSegmentController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $segment_name = $model->segment->getName();
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $model->getSegmentId()])
+            ->one();
+
+        $segment_name = $segment->getName();
         if (mb_strlen($segment_name) > 25) {
             $segment_name = mb_substr($segment_name, 0, 25) . '...';
         }
@@ -694,8 +755,12 @@ class ConfirmSegmentController extends AppUserPartController
      */
     public function actionMpdfDataResponds(int $id)
     {
-        $model = $this->findModel($id);
-        $responds = $model->responds;
+        $model = $this->findModel($id, false);
+
+        /** @var $responds RespondsSegment[] */
+        $responds = RespondsSegment::find(false)
+            ->andWhere(['confirm_id' => $model->getId()])
+            ->all();
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('viewpdf', ['model' => $model, 'responds' => $responds]);
@@ -703,7 +768,12 @@ class ConfirmSegmentController extends AppUserPartController
         $destination = Pdf::DEST_BROWSER;
         //$destination = Pdf::DEST_DOWNLOAD;
 
-        $segment_name = $model->segment->getName();
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $model->getSegmentId()])
+            ->one();
+
+        $segment_name = $segment->getName();
         if (mb_strlen($segment_name) > 25) {
             $segment_name = mb_substr($segment_name, 0, 25) . '...';
         }
@@ -750,12 +820,21 @@ class ConfirmSegmentController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return ConfirmSegment|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?ConfirmSegment
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?ConfirmSegment
     {
-        if (($model = ConfirmSegment::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = ConfirmSegment::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+        } else {
+            $model = ConfirmSegment::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

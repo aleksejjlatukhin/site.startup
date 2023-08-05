@@ -69,7 +69,7 @@ class Client extends ActiveRecord
     public function findClientActivation(): ?ActiveRecord
     {
         return ClientActivation::find()
-            ->where(['client_id' => $this->getId()])
+            ->andWhere(['client_id' => $this->getId()])
             ->orderBy(['created_at' => SORT_DESC])
             ->one();
     }
@@ -139,7 +139,7 @@ class Client extends ActiveRecord
     public function findLastClientRatesPlan(): ?ActiveRecord
     {
         return ClientRatesPlan::find()
-            ->where(['client_id' => $this->getId()])
+            ->andWhere(['client_id' => $this->getId()])
             ->orderBy(['created_at' => SORT_DESC])
             ->one();
     }
@@ -171,7 +171,7 @@ class Client extends ActiveRecord
      */
     public function findCustomerManager(): ?ActiveRecord
     {
-        return CustomerManager::find()->where(['client_id' => $this->getId()])->orderBy(['created_at' => SORT_DESC])->one();
+        return CustomerManager::find()->andWhere(['client_id' => $this->getId()])->orderBy(['created_at' => SORT_DESC])->one();
     }
 
 
@@ -194,7 +194,7 @@ class Client extends ActiveRecord
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_ADMIN])->count();
+            ->andWhere(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_ADMIN])->count();
     }
 
 
@@ -208,7 +208,7 @@ class Client extends ActiveRecord
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_EXPERT])->count();
+            ->andWhere(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_EXPERT])->count();
     }
 
 
@@ -222,7 +222,7 @@ class Client extends ActiveRecord
     {
         return User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->count();
+            ->andWhere(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->count();
     }
 
 
@@ -236,11 +236,11 @@ class Client extends ActiveRecord
     {
         $users = User::find()->with('clientUser')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->all();
+            ->andWhere(['client_user.client_id' => $this->getId(), 'role' => User::ROLE_USER])->all();
 
         $arrayCountProjects = array();
         foreach ($users as $user) {
-            $arrayCountProjects[] = Projects::find()->where(['user_id' => $user->id])->count();
+            $arrayCountProjects[] = Projects::find()->andWhere(['user_id' => $user->id])->count();
         }
         return array_sum($arrayCountProjects);
     }
@@ -265,7 +265,7 @@ class Client extends ActiveRecord
     {
         return User::find()->with('clientUsers')
             ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-            ->where(['client_user.client_id' => $this->getId()])->all();
+            ->andWhere(['client_user.client_id' => $this->getId()])->all();
     }
 
 
@@ -295,7 +295,7 @@ class Client extends ActiveRecord
 
         if (User::isUserMainAdmin($mainAdmin->getUsername())) {
             $customers = CustomerWishList::find()
-                ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
+                ->andWhere(['customer_id' => $this->getId(), 'deleted_at' => null])
                 ->orderBy(['created_at' => SORT_DESC])
                 ->all();
 
@@ -310,13 +310,13 @@ class Client extends ActiveRecord
             if ($clientIds) {
                 array_unshift($clientIds, $this->getId());
                 return WishList::find()
-                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['in', 'client_id', $clientIds])
                     ->andWhere(['not', ['completed_at' => null]])
                     ->all();
             }
 
             return WishList::find()
-                ->where(['client_id' => $this->getId()])
+                ->andWhere(['client_id' => $this->getId()])
                 ->andWhere(['not', ['completed_at' => null]])
                 ->all();
         }
@@ -325,7 +325,7 @@ class Client extends ActiveRecord
             $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
             $clientSpaccel = $mainAdminSpaccel->clientUser->client;
             $customer = CustomerWishList::find()
-                ->where([
+                ->andWhere([
                     'client_id' => $clientSpaccel->getId(),
                     'customer_id' => $this->getId(),
                     'deleted_at' => null
@@ -339,7 +339,7 @@ class Client extends ActiveRecord
             if ($existAccess) {
 
                 $customers = CustomerWishList::find()
-                    ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
+                    ->andWhere(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
                     ->orderBy(['created_at' => SORT_DESC])
                     ->all();
 
@@ -353,13 +353,13 @@ class Client extends ActiveRecord
 
                 array_unshift($clientIds, $this->getId(), $clientSpaccel->getId());
                 return WishList::find()
-                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['in', 'client_id', $clientIds])
                     ->andWhere(['not', ['completed_at' => null]])
                     ->all();
             }
 
             return WishList::find()
-                ->where(['client_id' => $this->getId()])
+                ->andWhere(['client_id' => $this->getId()])
                 ->andWhere(['not', ['completed_at' => null]])
                 ->all();
         }
@@ -376,7 +376,7 @@ class Client extends ActiveRecord
 
         if (User::isUserMainAdmin($user->getUsername())) {
             $customers = CustomerWishList::find()
-                ->where(['customer_id' => $this->getId(), 'deleted_at' => null])
+                ->andWhere(['customer_id' => $this->getId(), 'deleted_at' => null])
                 ->orderBy(['created_at' => SORT_DESC])
                 ->all();
 
@@ -391,12 +391,12 @@ class Client extends ActiveRecord
             if ($clientIds) {
                 array_unshift($clientIds, $this->getId());
                 return WishList::find()
-                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['in', 'client_id', $clientIds])
                     ->andWhere(['not', ['completed_at' => null]]);
             }
 
             return WishList::find()
-                ->where(['client_id' => $this->getId()])
+                ->andWhere(['client_id' => $this->getId()])
                 ->andWhere(['not', ['completed_at' => null]]);
         }
 
@@ -404,7 +404,7 @@ class Client extends ActiveRecord
             $mainAdminSpaccel = User::findOne(['role' => User::ROLE_MAIN_ADMIN]);
             $clientSpaccel = $mainAdminSpaccel->clientUser->client;
             $customer = CustomerWishList::find()
-                ->where([
+                ->andWhere([
                     'client_id' => $clientSpaccel->getId(),
                     'customer_id' => $this->getId(),
                     'deleted_at' => null
@@ -418,7 +418,7 @@ class Client extends ActiveRecord
             if ($existAccess) {
 
                 $customers = CustomerWishList::find()
-                    ->where(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
+                    ->andWhere(['customer_id' => $clientSpaccel->getId(), 'deleted_at' => null])
                     ->orderBy(['created_at' => SORT_DESC])
                     ->all();
 
@@ -432,12 +432,12 @@ class Client extends ActiveRecord
 
                 array_unshift($clientIds, $this->getId(), $clientSpaccel->getId());
                 return WishList::find()
-                    ->where(['in', 'client_id', $clientIds])
+                    ->andWhere(['in', 'client_id', $clientIds])
                     ->andWhere(['not', ['completed_at' => null]]);
             }
 
             return WishList::find()
-                ->where(['client_id' => $this->getId()])
+                ->andWhere(['client_id' => $this->getId()])
                 ->andWhere(['not', ['completed_at' => null]]);
         }
 
@@ -453,7 +453,7 @@ class Client extends ActiveRecord
         $clientSpaccel = $mainAdminSpaccel->clientUser->client;
         /** @var CustomerWishList|null $record */
         $record = CustomerWishList::find()
-            ->where([
+            ->andWhere([
                 'client_id' => $clientSpaccel->getId(),
                 'customer_id' => $this->getId(),
             ])
@@ -472,7 +472,7 @@ class Client extends ActiveRecord
         $clientSpaccel = $mainAdminSpaccel->clientUser->client;
         /** @var CustomerWishList|null $record */
         $record = CustomerWishList::find()
-            ->where([
+            ->andWhere([
                 'client_id' => $this->getId(),
                 'customer_id' => $clientSpaccel->getId(),
             ])

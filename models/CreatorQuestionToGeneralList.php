@@ -22,7 +22,7 @@ class CreatorQuestionToGeneralList
     {
         $user = $confirm->hypothesis->project->user;
         $class = self::getClassQuestion($confirm);
-        $baseQuestions = $class::find()->where(['user_id' => $user->getId()])->select('title')->all();
+        $baseQuestions = $class::find()->andWhere(['user_id' => $user->getId()])->select('title')->all();
         $existQuestions = 0;
 
         foreach ($baseQuestions as $baseQuestion){

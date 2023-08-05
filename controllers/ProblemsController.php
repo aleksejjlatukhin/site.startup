@@ -79,13 +79,24 @@ class ProblemsController extends AppUserPartController
 
         }elseif (in_array($action->id, ['index', 'mpdf-table-problems'])){
 
-            $confirmSegment = ConfirmSegment::findOne((int)Yii::$app->request->get('id'));
+            /** @var $confirmSegment ConfirmSegment */
+            $confirmSegment = ConfirmSegment::find(false)
+                ->andWhere(['id' => (int)Yii::$app->request->get('id')])
+                ->one();
+
             if (!$confirmSegment) {
                 PatternHttpException::noData();
             }
 
-            $segment = Segments::findOne($confirmSegment->getSegmentId());
-            $project = Projects::findOne($segment->getProjectId());
+            /** @var $segment Segments */
+            $segment = Segments::find(false)
+                ->andWhere(['id' => $confirmSegment->getSegmentId()])
+                ->one();
+
+            /** @var $project Projects */
+            $project = Projects::find(false)
+                ->andWhere(['id' => $segment->getProjectId()])
+                ->one();
 
             if (($project->getUserId() === $currentUser->getId())) {
                 return parent::beforeAction($action);
@@ -162,24 +173,97 @@ class ProblemsController extends AppUserPartController
      */
     public function actionIndex(int $id)
     {
-
-        $confirmSegment = ConfirmSegment::findOne($id);
-        $segment = Segments::findOne($confirmSegment->getSegmentId());
-        $project = Projects::findOne($segment->getProjectId());
         $models = Problems::findAll(['basic_confirm_id' => $id]);
-        $formModel = new FormCreateProblem($segment);
+        $countModels = Problems::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
 
-        if (!$models) {
+        if ((int)$countModels === 0) {
             return $this->redirect(['/problems/instruction', 'id' => $id]);
         }
+
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
+
+        /** @var $segment Segments */
+        $segment = Segments::find(false)
+            ->andWhere(['id' => $confirmSegment->getSegmentId()])
+            ->one();
+
+        /** @var $project Projects */
+        $project = Projects::find(false)
+            ->andWhere(['id' => $segment->getProjectId()])
+            ->one();
+
+        $formModel = new FormCreateProblem($segment);
+
+        $existTrashList = Problems::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->exists();
+
+        $trashList = Problems::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->andWhere(['not', ['deleted_at' => null]])
+            ->all();
 
         return $this->render('index', [
             'models' => $models,
             'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
-            'formModel' => $formModel
+            'formModel' => $formModel,
+            'existTrashList' => $existTrashList,
+            'trashList' => $trashList
         ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $response = [
+                'renderAjax' => $this->renderAjax('_index_ajax', [
+                    'models' => Problems::findAll(['basic_confirm_id' => $id])
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param int $id
+     * @return array|false
+     */
+    public function actionTrashList(int $id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $queryModels = Problems::find(false)
+                ->andWhere(['basic_confirm_id' => $id])
+                ->andWhere(['not', ['deleted_at' => null]]);
+
+            $response = [
+                'countItems' => $queryModels->count(),
+                'renderAjax' => $this->renderAjax('_trash_ajax', [
+                    'basicConfirmId' => $id,
+                    'models' => $queryModels->all()
+                ])];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+        return false;
     }
 
 
@@ -189,8 +273,13 @@ class ProblemsController extends AppUserPartController
      */
     public function actionInstruction (int $id)
     {
-        $models = Problems::findAll(['basic_confirm_id' => $id]);
-        if ($models) return $this->redirect(['/problems/index', 'id' => $id]);
+        $countModels = Problems::find(false)
+            ->andWhere(['basic_confirm_id' => $id])
+            ->count();
+
+        if ((int)$countModels > 0) {
+            return $this->redirect(['/problems/index', 'id' => $id]);
+        }
 
         $confirmSegment = ConfirmSegment::findOne($id);
         $formModel = new FormCreateProblem($confirmSegment->hypothesis);
@@ -251,7 +340,7 @@ class ProblemsController extends AppUserPartController
                 if ($model->create()){
 
                     $response = [
-                        'count' => Problems::find()->where(['basic_confirm_id' => $id])->count(),
+                        'count' => Problems::find()->andWhere(['basic_confirm_id' => $id])->count(),
                         'renderAjax' => $this->renderAjax('_index_ajax', [
                             'models' => Problems::findAll(['basic_confirm_id' => $id]),
                         ]),
@@ -279,7 +368,7 @@ class ProblemsController extends AppUserPartController
         //Выбор респондентов, которые являются представителями сегмента
         $responds = RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->where(['confirm_id' => $model->getConfirmSegmentId(), 'interview_confirm_segment.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $model->getConfirmSegmentId(), 'interview_confirm_segment.status' => '1'])->all();
 
         if(Yii::$app->request->isAjax) {
 
@@ -407,11 +496,27 @@ class ProblemsController extends AppUserPartController
      * @throws PdfTypeException
      * @throws InvalidConfigException
      */
-    public function actionMpdfTableProblems (int $id) {
+    public function actionMpdfTableProblems(int $id)
+    {
+        /** @var $confirmSegment ConfirmSegment */
+        $confirmSegment = ConfirmSegment::find(false)
+            ->andWhere(['id' => $id])
+            ->one();
 
-        $confirmSegment = ConfirmSegment::findOne($id);
-        $segment = $confirmSegment->segment;
-        $models = $confirmSegment->problems;
+        if (!$confirmSegment->getDeletedAt()) {
+            $segment = $confirmSegment->segment;
+            $models = $confirmSegment->problems;
+        } else {
+            /** @var $segment Segments */
+            $segment = Segments::find(false)
+                ->andWhere(['id' => $confirmSegment->getSegmentId()])
+                ->one();
+
+            /** @var $models Problems[] */
+            $models = Problems::find(false)
+                ->andWhere(['basic_confirm_id' => $confirmSegment->getId()])
+                ->all();
+        }
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('mpdf_table_problems', ['models' => $models]);
@@ -456,29 +561,55 @@ class ProblemsController extends AppUserPartController
     /**
      * @param int $id
      * @return bool
-     * @throws ErrorException
      * @throws NotFoundHttpException
-     * @throws StaleObjectException
-     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
         $model = $this->findModel($id);
 
-        if(Yii::$app->request->isAjax && $model->deleteStage()) {
+        if(Yii::$app->request->isAjax && $model->softDeleteStage()) {
             return true;
         }
         return false;
     }
 
+
     /**
      * @param int $id
+     * @return void|Response
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionRecovery(int $id)
+    {
+        $model = $this->findModel($id, false);
+
+        if($model->recoveryStage()) {
+            return $this->redirect(['index', 'id' => $model->getBasicConfirmId()]);
+        }
+
+        PatternHttpException::noData();
+    }
+
+
+    /**
+     * @param int $id
+     * @param bool $isOnlyNotDelete
      * @return Problems|null
      * @throws NotFoundHttpException
      */
-    protected function findModel(int $id): ?Problems
+    protected function findModel(int $id, bool $isOnlyNotDelete = true): ?Problems
     {
-        if (($model = Problems::findOne($id)) !== null) {
+        if (!$isOnlyNotDelete) {
+            $model = Problems::find(false)
+                ->andWhere(['id' => $id])
+                ->one();
+
+        } else {
+            $model = Problems::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         }
 

@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use app\models\traits\SoftDeleteModelTrait;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -17,12 +18,14 @@ use yii\db\ActiveRecord;
  * @property int $question_id                               Идентификатор записи в таб. questions_confirm_gcp
  * @property int $respond_id                                Идентификатор записи в таб. responds_gcp
  * @property string $answer                                 Ответ на вопрос
+ * @property int|null $deleted_at                           Дата удаления
  *
  * @property QuestionsConfirmGcp $question                  Вопрос
  * @property RespondsGcp $respond                           Респондент
  */
 class AnswersQuestionsConfirmGcp extends ActiveRecord
 {
+    use SoftDeleteModelTrait;
 
     /**
      * {@inheritdoc}
@@ -130,5 +133,21 @@ class AnswersQuestionsConfirmGcp extends ActiveRecord
     public function setAnswer(string $answer): void
     {
         $this->answer = $answer;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param int $deleted_at
+     */
+    public function setDeletedAt(int $deleted_at): void
+    {
+        $this->deleted_at = $deleted_at;
     }
 }

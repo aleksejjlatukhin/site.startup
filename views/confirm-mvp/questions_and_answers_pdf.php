@@ -3,11 +3,11 @@
 use app\models\AnswersQuestionsConfirmMvp;
 use app\models\QuestionsConfirmMvp;
 use app\models\QuestionStatus;
+use app\models\RespondsMvp;
 use yii\helpers\Html;
 
 /**
  * @var QuestionsConfirmMvp[] $questions
- * @var AnswersQuestionsConfirmMvp $answer
  */
 
 ?>
@@ -31,10 +31,22 @@ use yii\helpers\Html;
             </td>
         </tr>
 
-        <?php foreach ($question->answers as $answer) : ?>
+        <?php  /** @var $answers AnswersQuestionsConfirmMvp[] */
+        $answers = AnswersQuestionsConfirmMvp::find(false)
+                ->andWhere(['question_id' => $question->getId()])
+                ->all();
+
+        foreach ($answers as $answer) : ?>
+
+            <?php
+            /** @var $respond RespondsMvp */
+            $respond = RespondsMvp::find(false)
+                    ->andWhere(['id' => $answer->getRespondId()])
+                    ->one();
+            ?>
 
             <tr style="color: #4F4F4F; background: #F2F2F2;">
-                <td style="width: 200px; font-size: 16px; padding: 10px;"><?= $answer->respond->getName() ?></td>
+                <td style="width: 200px; font-size: 16px; padding: 10px;"><?= $respond->getName() ?></td>
                 <td style="width: 480px; font-size: 13px; padding: 10px;"><?= $answer->getAnswer() ?></td>
             </tr>
 

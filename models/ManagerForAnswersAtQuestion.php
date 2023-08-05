@@ -64,7 +64,7 @@ class ManagerForAnswersAtQuestion
     {
         $class = self::getClassAnswer($confirm);
         foreach ($confirm->responds as $respond) {
-            $answer = $class::find()->where(['question_id' => $question_id, 'respond_id' => $respond->getId()])->one();
+            $answer = $class::find()->andWhere(['question_id' => $question_id, 'respond_id' => $respond->getId()])->one();
             $answer->delete();
         }
     }

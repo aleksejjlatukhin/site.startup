@@ -18,6 +18,7 @@ use yii\base\Model;
  * @property string $email                          Эл.почта респондента
  * @property $date_plan                             Плановая дата проведения интервью
  * @property int $confirm_id                        Идентификатор подтверждения гипотезы, к которому отновится респондент
+ * @property int|null deleted_at                    Дата удаления
  */
 abstract class UpdateFormRespond extends Model
 {
@@ -29,6 +30,7 @@ abstract class UpdateFormRespond extends Model
     public $email;
     public $date_plan;
     public $confirm_id;
+    public $deleted_at;
 
 
     /**
@@ -179,5 +181,13 @@ abstract class UpdateFormRespond extends Model
     public function setConfirmId(int $confirm_id): void
     {
         $this->confirm_id = $confirm_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeletedAt(): ?int
+    {
+        return $this->deleted_at;
     }
 }

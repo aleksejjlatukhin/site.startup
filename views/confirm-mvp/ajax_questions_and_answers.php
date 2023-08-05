@@ -3,10 +3,12 @@
 use app\models\AnswersQuestionsConfirmMvp;
 use app\models\QuestionsConfirmMvp;
 use app\models\QuestionStatus;
+use app\models\RespondsMvp;
 
 /**
  * @var QuestionsConfirmMvp[] $questions
  * @var AnswersQuestionsConfirmMvp $answer
+ * @var bool $isOnlyNotDelete
  */
 
 ?>
@@ -34,10 +36,27 @@ use app\models\QuestionStatus;
         </div>
     </div>
 
-    <?php foreach ($question->answers as $answer) : ?>
+    <?php
+    /** @var $answers AnswersQuestionsConfirmMvp[] */
+    $answers = $isOnlyNotDelete ?
+        $question->answers :
+        AnswersQuestionsConfirmMvp::find(false)
+            ->andWhere(['question_id' => $question->getId()])
+            ->all();
+
+    foreach ($answers as $answer) : ?>
+
+        <?php
+        /** @var $respond RespondsMvp */
+        $respond = $isOnlyNotDelete ?
+            $answer->respond :
+            RespondsMvp::find(false)
+                ->andWhere(['id' => $answer->getRespondId()])
+                ->one();
+        ?>
 
         <div class="row container-fluid answer-container">
-            <div class="col-md-4 col-lg-3 respond-block"><?= $answer->respond->getName() ?></div>
+            <div class="col-md-4 col-lg-3 respond-block"><?= $respond->getName() ?></div>
             <div class="col-md-8 col-lg-9"><?= $answer->getAnswer() ?></div>
         </div>
 

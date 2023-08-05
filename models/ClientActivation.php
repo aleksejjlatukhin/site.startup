@@ -57,7 +57,7 @@ class ClientActivation extends ActiveRecord
      */
     public static function getCurrentStatus($clientId): int
     {
-        $obj = self::find()->where(['client_id' => $clientId])->orderBy(['id' => SORT_DESC])->one();
+        $obj = self::find()->andWhere(['client_id' => $clientId])->orderBy(['id' => SORT_DESC])->one();
         return $obj->getStatus();
     }
 

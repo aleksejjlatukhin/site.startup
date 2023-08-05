@@ -37,6 +37,12 @@ class TypesDuplicateCommunication
      */
     public const USER_ALLOWED_EXPERTISE = 574;
 
+    /**
+     * Отправка уведомления трекеру о том,
+     * что проектант удалил этап проекта
+     */
+    public const USER_DELETE_STAGE_PROJECT = 294;
+
 
     /**
      * Все типы дублирующих коммуникаций
@@ -49,7 +55,8 @@ class TypesDuplicateCommunication
             self::MAIN_ADMIN_TO_EXPERT,
             self::EXPERT_COMPLETED_EXPERTISE,
             self::EXPERT_UPDATE_DATA_COMPLETED_EXPERTISE,
-            self::USER_ALLOWED_EXPERTISE
+            self::USER_ALLOWED_EXPERTISE,
+            self::USER_DELETE_STAGE_PROJECT
         ];
     }
 }
