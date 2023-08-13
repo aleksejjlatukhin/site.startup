@@ -18,49 +18,71 @@ $this->registerCssFile('@web/css/users-index-style.css');
 
 <div class="users-admins">
 
-    <div class="switches-between-users" style="display: flex; margin: 30px 0 0 0;">
+    <div class="switches-between-users">
 
-        <?= Html::a( 'Проектанты', Url::to(['/client/users/index']), [
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#E0E0E0',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '8px 0 0 8px',
-            ],
-            'class' => 'btn btn-lg btn-default',
-        ]) ?>
+        <div class="switches-between-users-item">
 
-        <?= Html::a( 'Трекеры', Url::to(['/client/users/admins']),[
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#E0E0E0',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '0',
-            ],
-            'class' => 'btn btn-lg btn-default',
-        ]) ?>
+            <?= Html::a( 'Проектанты', Url::to(['/client/users/index']), [
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#E0E0E0',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '8px 0 0 8px',
+                ],
+                'class' => 'btn btn-lg btn-default',
+            ]) ?>
 
-        <?= Html::button( 'Эксперты',[
-            'style' => [
-                'display' => 'flex',
-                'align-items' => 'center',
-                'justify-content' => 'center',
-                'background' => '#52BE7F',
-                'width' => '180px',
-                'height' => '40px',
-                'font-size' => '24px',
-                'border-radius' => '0 8px 8px 0',
-            ],
-            'class' => 'btn btn-lg btn-success',
-        ]) ?>
+            <?= Html::a( 'Трекеры', Url::to(['/client/users/admins']),[
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#E0E0E0',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '0',
+                ],
+                'class' => 'btn btn-lg btn-default',
+            ]) ?>
+
+            <?= Html::button( 'Эксперты',[
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#52BE7F',
+                    'width' => '180px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '0 8px 8px 0',
+                ],
+                'class' => 'btn btn-lg btn-success',
+            ]) ?>
+
+        </div>
+
+        <div class="switches-between-users-item">
+
+            <?= Html::a( 'Настройки доступа', Url::to(['/client/setting-codes/index']),[
+                'style' => [
+                    'display' => 'flex',
+                    'align-items' => 'center',
+                    'justify-content' => 'center',
+                    'background' => '#E0E0E0',
+                    'width' => '240px',
+                    'height' => '40px',
+                    'font-size' => '24px',
+                    'border-radius' => '8px',
+                ],
+                'class' => 'btn btn-lg btn-default',
+            ]) ?>
+
+        </div>
 
     </div>
 

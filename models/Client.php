@@ -35,6 +35,7 @@ use yii\db\ActiveRecord;
  * @property int $countProjects                                     Кол-во проектов привязанных к данной организации
  * @property CustomerExpert[] $customerExperts                      Эксперты Spaccel, которые когда-либо были привязаны к организации
  * @property CustomerWishList[] $customerWishLists                  Доступы организаций к спискам запросов компаний B2B сегмента
+ * @property ClientCodes[] $codes                                   Клиентские коды
  */
 class Client extends ActiveRecord
 {
@@ -57,6 +58,18 @@ class Client extends ActiveRecord
     public function getClientActivationRecords(): ActiveQuery
     {
         return $this->hasMany(ClientActivation::class, ['client_id' => 'id']);
+    }
+
+
+    /**
+     * Получить все записи по клиенту
+     * в таблице client_codes
+     *
+     * @return ActiveQuery
+     */
+    public function getCodes(): ActiveQuery
+    {
+        return $this->hasMany(ClientCodes::class, ['client_id' => 'id']);
     }
 
 

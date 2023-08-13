@@ -20,6 +20,7 @@ use Yii;
  * @property int $status
  * @property int $confirm
  * @property int $role
+ * @property int $clientId
  */
 class SingupForm extends Model
 {
@@ -33,6 +34,7 @@ class SingupForm extends Model
     public $status;
     public $confirm;
     public $role;
+    public $clientId;
     public $exist_agree = true;
 
 
@@ -45,6 +47,7 @@ class SingupForm extends Model
             [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
             [['email', 'username', 'password'], 'required'],
+            ['clientId', 'safe'],
             [['username', 'email', 'password'], 'trim'],
             [['email'], 'string', 'max' => 255],
             ['username', 'uniqUsername'],
@@ -85,6 +88,7 @@ class SingupForm extends Model
             'password' => 'Пароль *',
             'rememberMe' => 'Запомнить',
             'role' => 'Проектная роль пользователя *',
+            'clientId' => 'Организация, к которой будет привязан Ваш аккаунт *',
             'exist_agree' => ''
         ];
     }
@@ -263,6 +267,22 @@ class SingupForm extends Model
     public function setRole(int $role): void
     {
         $this->role = $role;
+    }
+
+    /**
+     * @return int
+     */
+    public function getClientId(): int
+    {
+        return $this->clientId;
+    }
+
+    /**
+     * @param int $clientId
+     */
+    public function setClientId(int $clientId): void
+    {
+        $this->clientId = $clientId;
     }
 
 }

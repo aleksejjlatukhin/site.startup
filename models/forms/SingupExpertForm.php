@@ -21,6 +21,7 @@ use yii\base\Exception;
  * @property int $status
  * @property int $confirm
  * @property int $role
+ * @property int $clientId
  * @property string $education
  * @property string $academic_degree
  * @property string $position
@@ -100,6 +101,7 @@ class SingupExpertForm extends SingupForm
             [['email', 'username', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
+            ['clientId', 'safe'],
             [['username', 'email', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
@@ -139,6 +141,7 @@ class SingupExpertForm extends SingupForm
             'password' => 'Пароль *',
             'rememberMe' => 'Запомнить *',
             'role' => 'Проектная роль пользователя *',
+            'clientId' => 'Организация, к которой будет привязан Ваш аккаунт *',
             'exist_agree' => '',
             'education' => 'Образование *',
             'academic_degree' => 'Ученая степень *',

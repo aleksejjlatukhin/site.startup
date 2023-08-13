@@ -58,10 +58,56 @@ $(body).on('change', '#formClientAndRole_role', function(){
 });
 
 
+// Отслеживаем изменения в поле отправки кода для регистрации
+$(body).on('input', '#clientCodeInput', function(){
+    if ($('#clientCodeInput').val() !== '') {
+        $(body).find('#button-formClientCode').attr('disabled', false);
+    } else {
+        $(body).find('#button-formClientCode').attr('disabled', true);
+    }
+});
+
+
+// Отслеживаем отправку в форме отправки кода для регистрации
+$(body).on('beforeSubmit', '#formClientCode', function(e){
+
+    var url = $(this).attr('action');
+    var data = $(this).serialize();
+
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $('#formClientCode').toggle('display');
+
+            if (!response.errorMessage) {
+                if ($(window).width() > 1000 && $(window).width() < 1700) {
+                    $('.wrap').css('margin-bottom', '0');
+                } else {
+                    $('.wrap').css('margin-bottom', '20px');
+                }
+                $('.block-form-registration').html(response.renderAjax);
+            } else {
+                $('.block-form-registration').html('<div class="text-center">' + response.errorMessage + '</div>');
+            }
+
+        }, error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault(e);
+    return false;
+});
+
+
 //Отправка формы регистрации пользователя
 $(body).on('beforeSubmit', '#form_user_singup', function(e){
 
-    var data = $(this).serialize() + '&&' + $('#formClientAndRole_clientId').serialize();
+    var data = $(this).serialize();
     var url = $(this).attr('action');
 
     var error_user_singup_modal = $('#error_user_singup').find('.modal-body');

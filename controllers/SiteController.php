@@ -3,9 +3,12 @@
 namespace app\controllers;
 
 use app\models\Client;
+use app\models\ClientCodes;
+use app\models\ClientCodeTypes;
 use app\models\ClientRatesPlan;
 use app\models\ClientUser;
 use app\models\forms\FormClientAndRole;
+use app\models\forms\FormClientCodeRegistration;
 use app\models\forms\SingupExpertForm;
 use Throwable;
 use Yii;
@@ -76,82 +79,33 @@ class SiteController extends AppUserPartController
     {
         if (Yii::$app->user->isGuest) {
 
-            $formClientAndRole = new FormClientAndRole();
-            $clients = Client::findAllActiveClients();
-            $dataClients = ArrayHelper::map($clients, 'id', 'fullname');
+            $formClientCode = new FormClientCodeRegistration();
 
             if (Yii::$app->request->isAjax) {
 
-                if ($_POST['FormClientAndRole']['clientId']) {
+                if (($code = $_POST['FormClientCodeRegistration']['code']) && $code !== '' && $clientCode = ClientCodes::findOne(['code' => $code])) {
 
-                    $formClientAndRole->setClientId((int)$_POST['FormClientAndRole']['clientId']);
-                    $client = Client::findById($formClientAndRole->clientId);
+                    $role = ClientCodeTypes::getUserRoleByType($clientCode->getType());
+                    $client = $clientCode->client;
                     $admin = $client->settings->admin;
-                    if (User::isUserMainAdmin($admin->getUsername())) {
 
-                        $response = ['renderAjax' => $this->renderAjax('form_registration_spaccel', [
-                            'formClientAndRole' => $formClientAndRole,
-                            'dataClients' => $dataClients,
-                        ])];
-                        Yii::$app->response->format = Response::FORMAT_JSON;
-                        Yii::$app->response->data = $response;
-                        return $response;
-                    }
+                    $clients = Client::findAllActiveClients();
+                    $dataClients = ArrayHelper::map($clients, 'id', 'name');
 
-                    /** @var ClientRatesPlan $clientRatesPlan */
-                    $clientRatesPlan = $client->findLastClientRatesPlan();
-                    $ratesPlan = $clientRatesPlan->ratesPlan;
-
-                    $countUsersCompany = User::find()
-                        ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                        ->andWhere(['client_user.client_id' => $client->getId()])
-                        ->andWhere(['role' => User::ROLE_USER])
-                        ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
-                        ->count();
-
-                    $countTrackersCompany = User::find()
-                        ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
-                        ->andWhere(['client_user.client_id' => $client->getId()])
-                        ->andWhere(['role' => User::ROLE_ADMIN_COMPANY])
-                        ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
-                        ->count();
-
-                    $selectRoleCompany = [];
-
-                    if ($ratesPlan->getMaxCountProjectUser() > $countUsersCompany) {
-                        $selectRoleCompany[User::ROLE_USER] = 'Проектант';
-                    }
-                    if ($ratesPlan->getMaxCountTracker() > $countTrackersCompany) {
-                        $selectRoleCompany[User::ROLE_ADMIN] = 'Трекер';
-                    }
-
-                    $selectRoleCompany[User::ROLE_EXPERT] = 'Эксперт';
-
-                    $response = ['renderAjax' => $this->renderAjax('form_registration', [
-                        'formClientAndRole' => $formClientAndRole,
-                        'dataClients' => $dataClients,
-                        'selectRoleCompany' => $selectRoleCompany
-                    ])];
-                    Yii::$app->response->format = Response::FORMAT_JSON;
-                    Yii::$app->response->data = $response;
-                    return $response;
-
-                }
-
-                if ($_POST['FormClientAndRole']['role']) {
-
-                    $role = (int)$_POST['FormClientAndRole']['role'];
                     $formRegistration = new SingupForm();
-                    $formRegistration->role = $role;
+                    $formRegistration->setRole($role);
+                    $formRegistration->setClientId($client->getId());
 
                     if ($role === User::ROLE_EXPERT) {
 
                         $formRegistration = new SingupExpertForm();
-                        $formRegistration->role = $role;
+                        $formRegistration->setRole($role);
+                        $formRegistration->setClientId($client->getId());
 
                         $response = [
                             'renderAjax' => $this->renderAjax('singup-expert', [
-                                'formRegistration' => $formRegistration
+                                'formRegistration' => $formRegistration,
+                                'dataClients' => $dataClients,
                             ]),
                         ];
                         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -159,18 +113,72 @@ class SiteController extends AppUserPartController
                         return $response;
                     }
 
+                    if (User::isUserMainAdmin($admin->getUsername())) {
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('singup', [
+                                'formRegistration' => $formRegistration,
+                                'dataClients' => $dataClients,
+                            ]),
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+
+                    }
+
+                    if (in_array($role, [User::ROLE_USER, User::ROLE_ADMIN], true)) {
+
+                        /** @var ClientRatesPlan $clientRatesPlan */
+                        $clientRatesPlan = $client->findLastClientRatesPlan();
+                        $ratesPlan = $clientRatesPlan->ratesPlan;
+
+                        $countUsersCompany = User::find()
+                            ->leftJoin('client_user', '`client_user`.`user_id` = `user`.`id`')
+                            ->andWhere(['client_user.client_id' => $client->getId()])
+                            ->andWhere(['role' => $role])
+                            ->andWhere(['!=', 'status', User::STATUS_NOT_ACTIVE])
+                            ->count();
+
+                        $maxCountUser = $role ===  User::ROLE_USER ? $ratesPlan->getMaxCountProjectUser() : $ratesPlan->getMaxCountTracker();
+                        if ($maxCountUser > $countUsersCompany) {
+
+                            $response = [
+                                'renderAjax' => $this->renderAjax('singup', [
+                                    'formRegistration' => $formRegistration,
+                                    'dataClients' => $dataClients,
+                                ]),
+                            ];
+                            Yii::$app->response->format = Response::FORMAT_JSON;
+                            Yii::$app->response->data = $response;
+                            return $response;
+
+                        }
+
+                        $response = ['errorMessage' => 'Превышено количество зарегистрированных пользователей по тарифу организации'];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
                     $response = [
                         'renderAjax' => $this->renderAjax('singup', [
-                            'formRegistration' => $formRegistration
+                            'formRegistration' => $formRegistration,
+                            'dataClients' => $dataClients,
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
                 }
+
+                $response = ['errorMessage' => 'Указан некорректный код для регистрации'];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
 
-            return $this->render('registration', compact('formClientAndRole', 'dataClients'));
+            return $this->render('registration', compact('formClientCode'));
         }
 
         return $this->redirect('/');
@@ -198,15 +206,17 @@ class SiteController extends AppUserPartController
 
                 if ($model->validate()) {
 
+                    $clientId = $model->getClientId();
+
                     if ($user = $model->singup()) {
 
-                        if (ClientUser::createRecord($_POST['FormClientAndRole']['clientId'], $user->getId())) {
+                        if (ClientUser::createRecord($clientId, $user->getId())) {
 
                             if ($user->getConfirm() === User::NOT_CONFIRM) {
 
-                                if ($model->sendActivationEmail($user)) {
+                                //if ($model->sendActivationEmail($user)) {
 
-                                    //Письмо с подтверждение отправлено
+                                    //Письмо с подтверждением отправлено
                                     $response = [
                                         'success_singup' => true,
                                         'message' => 'Спасибо за регистрацию. Письмо с подтверждением регистрации отправлено на указанный email.',
@@ -215,18 +225,18 @@ class SiteController extends AppUserPartController
                                     Yii::$app->response->data = $response;
                                     return $response;
 
-                                }
+                                //}
 
-                                $user->delete();
+                                //$user->delete();
 
-                                //Письмо с подтверждение не отправлено
-                                $response = [
-                                    'error_singup_send_email' => true,
-                                    'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
-                                ];
-                                Yii::$app->response->format = Response::FORMAT_JSON;
-                                Yii::$app->response->data = $response;
-                                return $response;
+                                //Письмо с подтверждением не отправлено
+//                                $response = [
+//                                    'error_singup_send_email' => true,
+//                                    'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
+//                                ];
+//                                Yii::$app->response->format = Response::FORMAT_JSON;
+//                                Yii::$app->response->data = $response;
+//                                return $response;
                             }
                         }
                     }
