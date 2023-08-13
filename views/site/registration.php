@@ -1,15 +1,14 @@
 <?php
 
-use app\models\forms\FormClientAndRole;
+use app\models\forms\FormClientCodeRegistration;
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use kartik\select2\Select2;
 
 $this->title = 'Регистрация';
 $this->registerCssFile('@web/css/registration.css');
 
 /**
- * @var FormClientAndRole $formClientAndRole
- * @var array $dataClients
+ * @var FormClientCodeRegistration $formClientCode
  */
 
 ?>
@@ -25,24 +24,40 @@ $this->registerCssFile('@web/css/registration.css');
         <div class="block-form-user-role">
 
             <?php $form = ActiveForm::begin([
-                'id' => 'form_client_and_role',
+                'id' => 'formClientCode',
                 'options' => ['class' => 'g-py-15'],
                 'errorCssClass' => 'u-has-error-v1',
                 'successCssClass' => 'u-has-success-v1-1',
             ]); ?>
 
-                <?= $form->field($formClientAndRole, 'clientId', [
-                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Организация, к которой будет привязан Ваш аккаунт *</div><div>{input}</div>'
-                ])->widget(Select2::class, [
-                    'data' => $dataClients,
-                    'options' => [
-                        'autocomplete' => 'off',
-                        'id' => 'formClientAndRole_clientId',
-                        'placeholder' => 'Выберите организацию, к которой будет привязан Ваш аккаунт',
-                    ],
-                    'disabled' => false,  //Сделать поле неактивным
-                    'hideSearch' => true, //Скрытие поиска
-                ]) ?>
+                <?= $form->field($formClientCode, 'code', [
+                    'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Введите код для регистрации *</div><div>{input}</div>'
+                ])->textInput([
+                    'id' => 'clientCodeInput',
+                    'maxlength' => true,
+                    'class' => 'style_form_field_respond form-control',
+                    'autocomplete' => 'off'])
+                    ->label(false) ?>
+
+                <div class="block-submit-registration">
+
+                    <?= Html::submitButton('Отправить', [
+                        'class' => 'btn btn-default',
+                        'id' => 'button-formClientCode',
+                        'disabled' => true,
+                        'style' => [
+                            'margin-top' => '10px',
+                            'background' => '#E0E0E0',
+                            'color' => '4F4F4F',
+                            'border-radius' => '8px',
+                            'width' => '220px',
+                            'height' => '40px',
+                            'font-size' => '16px',
+                            'font-weight' => '700'
+                        ]
+                    ]) ?>
+
+                </div>
 
             <?php ActiveForm::end(); ?>
 
