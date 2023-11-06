@@ -606,6 +606,22 @@ use app\models\User;
 
         </div>
     </div>
+
+    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+        <div class="col-md-12" style="color: #4F4F4F; font-size: 16px; display: flex; justify-content: space-around; padding: 10px 20px; border-radius: 12px; border: 2px solid #707F99; align-items: center; margin-top: 10px;">
+            <?php if ($confirm->hypothesis->getExistConfirm() !== 1): ?>
+                <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '22px']]) . '</div><div class="pl-10">Добавить задание исполнителю</div></div>', [
+                    '/tasks/get-task-create', 'projectId' => $confirm->hypothesis->getProjectId(), 'stage' => StageExpertise::CONFIRM_MVP, 'stageId' => $confirm->getId()],
+                    ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_small_plus pull-left']
+                ) ?>
+            <?php endif; ?>
+            <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img('/images/icons/icon_view.png', ['style' => ['width' => '24px']]) . '</div><div class="pl-10">Задания исполнителям</div></div>', [
+                '/tasks/get-tasks', 'projectId' => $confirm->hypothesis->getProjectId(), 'stage' => StageExpertise::CONFIRM_MVP, 'stageId' => $confirm->getId()],
+                ['id' => 'showContractorTasksGet', 'class' => 'new_hypothesis_link_small_plus pull-left']
+            ) ?>
+        </div>
+    <?php endif; ?>
+
 </div>
 
 

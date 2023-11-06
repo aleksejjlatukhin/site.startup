@@ -404,3 +404,91 @@ $(document).on('click', '.open-confirm-hypothesis-step-three-mobile', function (
     $(this).parents('.confirm-stage-mobile').toggle('display');
     $('.confirm-hypothesis-step-three-mobile').toggle('display');
 })
+
+//При нажатии на кнопку добавить задание исполнителю
+$(document).on('click', '#showFormContractorTaskCreate', function(e){
+
+    var url = $(this).attr('href');
+    var task_create_modal = $('.showFormCreateTask');
+    $(body).append($(task_create_modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(task_create_modal).modal('show');
+            $(task_create_modal).find('.modal-header > a > span.text-link').html(response.headerContent);
+            $(task_create_modal).find('.modal-body').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Отслеживаем выбор исполнителя в форме создания задания
+$(document).on('change', '#taskCreateForm_contractorId', function(){
+    $(this).serialize();
+    var url = $(body).find('#showFormContractorTaskCreate').attr('href') + '&contractorId=' + $(this).val();
+    var task_create_modal = $('.showFormCreateTask');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(task_create_modal).find('.modal-body').html(response.renderAjax);
+        }
+    });
+});
+
+
+//Сохранение нового задания исполнителю проекта
+$(document).on('beforeSubmit', '#taskCreateForm', function(e){
+
+    var data = $(this).serialize();
+    var url = $(this).attr('action');
+    var task_create_modal = $('.showFormCreateTask');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+
+            $(task_create_modal).find('.modal-body').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//При нажатии на кнопку смотреть задания исполнителям
+$(document).on('click', '#showContractorTasksGet', function(e){
+
+    var url = $(this).attr('href');
+    var task_create_modal = $('.showContractorTasks');
+    $(body).append($(task_create_modal).first());
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(task_create_modal).modal('show');
+            $(task_create_modal).find('.modal-header > a > span.text-link').html(response.headerContent);
+            $(task_create_modal).find('.modal-body').html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});

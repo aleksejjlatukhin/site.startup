@@ -7,8 +7,11 @@ use app\models\ClientCodes;
 use app\models\ClientCodeTypes;
 use app\models\ClientRatesPlan;
 use app\models\ClientUser;
+use app\models\ContractorActivities;
+use app\models\ContractorEducations;
 use app\models\forms\FormClientAndRole;
 use app\models\forms\FormClientCodeRegistration;
+use app\models\forms\SingupContractorForm;
 use app\models\forms\SingupExpertForm;
 use Throwable;
 use Yii;
@@ -113,6 +116,26 @@ class SiteController extends AppUserPartController
                         return $response;
                     }
 
+                    if ($role === User::ROLE_CONTRACTOR) {
+
+                        $formRegistration = new SingupContractorForm();
+                        $formRegistration->setRole($role);
+                        $formRegistration->setClientId($client->getId());
+                        $contractorActivities = ContractorActivities::find()->all();
+
+                        $response = [
+                            'renderAjax' => $this->renderAjax('singup-contractor', [
+                                'formRegistration' => $formRegistration,
+                                'dataClients' => $dataClients,
+                                'contractorActivities' => ArrayHelper::map($contractorActivities, 'id', 'title'),
+                                'education' => new ContractorEducations()
+                            ]),
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
                     if (User::isUserMainAdmin($admin->getUsername())) {
 
                         $response = [
@@ -199,6 +222,9 @@ class SiteController extends AppUserPartController
             if ($_POST['SingupExpertForm']) {
                 $model = $emailActivation ? new SingupExpertForm(['scenario' => 'emailActivation']) : new SingupExpertForm();
             }
+            if ($_POST['SingupContractorForm']) {
+                $model = $emailActivation ? new SingupContractorForm(['scenario' => 'emailActivation']) : new SingupContractorForm();
+            }
 
             if ($model->load(Yii::$app->request->post())) {
 
@@ -214,7 +240,7 @@ class SiteController extends AppUserPartController
 
                             if ($user->getConfirm() === User::NOT_CONFIRM) {
 
-                                //if ($model->sendActivationEmail($user)) {
+                                if ($model->sendActivationEmail($user)) {
 
                                     //Письмо с подтверждением отправлено
                                     $response = [
@@ -225,7 +251,7 @@ class SiteController extends AppUserPartController
                                     Yii::$app->response->data = $response;
                                     return $response;
 
-                                //}
+                                }
 
                                 //$user->delete();
 
@@ -384,6 +410,14 @@ class SiteController extends AppUserPartController
                     if (User::isUserExpert($user->getUsername())) {
 
                         $response = ['url' => Url::to('/expert')];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+
+                    if (User::isUserContractor($user->getUsername())) {
+
+                        $response = ['url' => Url::to('/contractor')];
                         Yii::$app->response->format = Response::FORMAT_JSON;
                         Yii::$app->response->data = $response;
                         return $response;

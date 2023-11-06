@@ -127,6 +127,7 @@ class ClientCodes extends ActiveRecord
                 ClientCodeTypes::REGISTRATION_CODE_FOR_TRACKER,
                 ClientCodeTypes::REGISTRATION_CODE_FOR_MANAGER,
                 ClientCodeTypes::REGISTRATION_CODE_FOR_EXPERT,
+                ClientCodeTypes::REGISTRATION_CODE_FOR_CONTRACTOR,
             ]],
         ];
     }

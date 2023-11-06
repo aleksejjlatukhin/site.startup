@@ -54,7 +54,7 @@ use yii\helpers\Html;
     echo $form->field($formRegistration, 'role', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя *</div><div>{input}</div>'
     ])->widget(Select2::class, [
-        'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт', User::ROLE_MANAGER => 'Менеджер'],
+        'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_MANAGER => 'Менеджер'],
         'disabled' => true,  //Сделать поле неактивным
     ]);
 

@@ -1,6 +1,7 @@
 <?php
 
 use app\models\ConfirmGcp;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
 use yii\helpers\Url;
@@ -134,16 +135,22 @@ $project = $confirmGcp->hypothesis->project;
                 </div>
             </div>
 
-            <div class="row container-fluid block-button-new-mvp">
-                <div class="col-md-12">
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="row container-fluid block-button-new-mvp">
+                    <div class="col-md-12">
                         <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить продукт MVP</div></div>',
                             ['/confirm-gcp/data-availability-for-next-step', 'id' => $confirmGcp->getId()],
                             ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-left']
                         ) ?>
-                    <?php endif; ?>
+                    </div>
+                    <div class="col-md-12">
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить задание исполнителю</div></div>', [
+                            '/tasks/get-task-create', 'projectId' => $project->getId(), 'stage' => StageExpertise::MVP, 'stageId' => $confirmGcp->getId()],
+                            ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_plus pull-left']
+                        ) ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
             <div class="container-list">
 

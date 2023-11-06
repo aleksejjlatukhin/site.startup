@@ -22,6 +22,7 @@ $invest_amount = $project->getInvestAmount() ? number_format($project->getInvest
 $invest_date = $project->getInvestDate() ? date('d.m.Y', $project->getInvestDate()) : $default_value;
 $announcement_event = $project->getAnnouncementEvent() ?: $default_value;
 $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $project->getDateOfAnnouncement()) : $default_value;
+$listContractors = $project->showListContractors() ?: 'Отсутствуют';
 
 ?>
 
@@ -63,11 +64,18 @@ $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $proje
         <div><?= $patent_date ?></div>
     </div>
 
-    <!--Команда проекта-->
-    <div class="header_section">Команда проекта</div>
+    <!--Авторы проекта-->
+    <div class="header_section">Авторы проекта</div>
     
     <div class="section_content">
         <?= $project->showListAuthors() ?>
+    </div>
+
+    <!--Исполнители проекта-->
+    <div class="header_section">Исполнители проекта</div>
+
+    <div class="section_content">
+        <?= $listContractors ?>
     </div>
 
     <!--Сведения о технологии-->

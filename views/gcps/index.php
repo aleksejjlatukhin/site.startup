@@ -6,6 +6,7 @@ use app\models\Gcps;
 use app\models\Problems;
 use app\models\Projects;
 use app\models\Segments;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
 use yii\helpers\Url;
@@ -263,7 +264,15 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
 
 
 
+    <?php if (!User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
     <div class="container-fluid container-data row">
+
+    <?php else: ?>
+
+    <div class="container-fluid container-data_for_user row">
+
+    <?php endif; ?>
 
         <div class="row row_header_data_generation" style="margin-left: 10px; margin-right: 10px; border-bottom: 1px solid #ccc;">
 
@@ -432,6 +441,19 @@ $this->registerCssFile('@web/css/gcp-index-style.css');
                 </div>
 
             </div>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="new_buttons_block_down">
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '22px']]) . '</div><div class="pl-10">Добавить задание исполнителю</div></div>', [
+                        '/tasks/get-task-create', 'projectId' => $project->getId(), 'stage' => StageExpertise::GCP, 'stageId' => $confirmProblem->getId()],
+                        ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_small_plus pull-left']
+                    ) ?>
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img('/images/icons/icon_view.png', ['style' => ['width' => '24px']]) . '</div><div class="pl-10">Задания исполнителям</div></div>', [
+                        '/tasks/get-tasks', 'projectId' => $project->getId(), 'stage' => StageExpertise::GCP, 'stageId' => $confirmProblem->getId()],
+                        ['id' => 'showContractorTasksGet', 'class' => 'new_hypothesis_link_small_plus pull-left']
+                    ) ?>
+                </div>
+            <?php endif; ?>
 
         </div>
 

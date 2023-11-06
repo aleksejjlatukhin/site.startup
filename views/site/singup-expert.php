@@ -1,6 +1,5 @@
 <?php
 
-use app\models\forms\FormClientAndRole;
 use app\models\forms\SingupExpertForm;
 use app\models\User;
 use yii\widgets\ActiveForm;
@@ -11,7 +10,6 @@ use app\models\ExpertType;
 
 /**
  * @var SingupExpertForm $formRegistration
- * @var FormClientAndRole $formClientAndRole
  * @var array $dataClients
  */
 
@@ -32,6 +30,30 @@ use app\models\ExpertType;
         padding-bottom: 15px;
         border: 1px solid #4F4F4F;
         border-radius: 8px;
+    }
+    #type-expert-field {
+        margin-bottom: 15px;
+    }
+    #type-expert-field .select2-container--krajee .select2-selection {
+        font-size: 20px;
+        height: 125px;
+        padding-left: 5px;
+        padding-top: 7px;
+        padding-bottom: 15px;
+        border: 1px solid #4F4F4F;
+        border-radius: 8px;
+    }
+    @media screen and (max-width: 1140px) {
+        #type-expert-field .select2-container--krajee .select2-selection {
+            font-size: 14px;
+            height: 160px;
+        }
+        .select2-container--krajee .select2-results__option[aria-selected] {
+            font-size: 14px;
+        }
+    }
+    .select2-container .select2-search--inline .select2-search__field {
+        font-size: 20px;
     }
     .select2-container--krajee .select2-selection--single .select2-selection__arrow {
         height: 44px;
@@ -64,7 +86,7 @@ $form = ActiveForm::begin([
     echo $form->field($formRegistration, 'role', [
         'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Проектная роль пользователя *</div><div>{input}</div>'
     ])->widget(Select2::class, [
-        'data' => [User::ROLE_USER => 'Проектант', User::ROLE_ADMIN => 'Трекер', User::ROLE_EXPERT => 'Эксперт', User::ROLE_MANAGER => 'Менеджер'],
+        'data' => [User::ROLE_EXPERT => 'Эксперт'],
         'disabled' => true,  //Сделать поле неактивным
     ]);
 
@@ -131,7 +153,8 @@ $form = ActiveForm::begin([
 
 
     echo $form->field($formRegistration, 'type', [
-        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Тип экпертной деятельности *</div><div>{input}</div>'
+        'template' => '<div style="padding-left: 15px; padding-bottom: 5px;">Тип экпертной деятельности *</div><div>{input}</div>',
+        'options' => ['id' => 'type-expert-field']
     ])->widget(Select2::class, [
         'data' => ExpertType::getListTypes(),
         'options' => [

@@ -61,8 +61,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                                 : '<div class="countUnreadCommunications"></div>' . Html::img('/images/icons/icon_notification_bell.png', ['class' => 'icon_messager', 'title' => 'Уведомления']), 'url' => ['/communications/notifications', 'id' => $user->getId()]
                         ]) : (''),
 
-                        !Yii::$app->user->isGuest ? (
-                        ['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messager', 'title' => 'Проекты']), 'url' => ['/projects/index', 'id' => $user->getId()]]) : (''),
+                        !Yii::$app->user->isGuest ? (['label' => Html::img('/images/icons/projects_icon.png', ['class' => 'icon_messager', 'title' => 'Проекты']), 'url' => ['/projects/index', 'id' => $user->getId()]]) : (''),
+
+                        !Yii::$app->user->isGuest ? ([
+                            'label' => $user->countUnreadCommunicationsFromContractors ? '<div class="countUnreadCommunicationsFromContractors active">' . $user->countUnreadCommunicationsFromContractors . '</div>' . Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messager', 'title' => 'Исполнители проектов'])
+                                : '<div class="countUnreadCommunicationsFromContractors"></div>' . Html::img('/images/icons/users_group_icon.png', ['class' => 'icon_messager', 'title' => 'Исполнители проектов']), 'url' => ['/contractors/index', 'id' => $user->getId()]
+                        ]) : (''),
 
                         !Yii::$app->user->isGuest ? ([
                             'label' => $user->getAvatarImage() ? Html::img('/web/upload/user-'.$user->getId().'/avatar/'.$user->getAvatarImage(), ['class' => 'icon_user_avatar user_profile_picture'])
@@ -93,7 +97,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                 <?php
                 $existUnreadBlock = '<div class="existUnreadMessagesOrCommunications"></div>';
-                if (($user->countUnreadCommunications + $user->countUnreadMessages) > 0) {
+                if (($user->countUnreadCommunications + $user->countUnreadMessages + $user->countUnreadCommunicationsFromContractors) > 0) {
                     $existUnreadBlock = '<div class="existUnreadMessagesOrCommunications active"></div>';
                 } ?>
 
@@ -115,6 +119,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
                         ]) : (''),
 
                         !Yii::$app->user->isGuest ? (['label' => '<div class="link_nav_bar_menu_mobile">Проекты</div>', 'url' => ['/projects/index', 'id' => $user->getId()]]) : (''),
+
+                        !Yii::$app->user->isGuest ? ([
+                            'label' => $user->countUnreadCommunicationsFromContractors ? '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors active">' . $user->countUnreadCommunicationsFromContractors . '</div>'
+                                : '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors"></div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
+                        ]) : (''),
 
                         !Yii::$app->user->isGuest ? (
                         ['label' => $user->countUnreadMessages ? '<div class="link_nav_bar_menu_mobile">Сообщения</div><div class="countUnreadMessages active">' . $user->countUnreadMessages . '</div>'
@@ -298,6 +307,36 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
     <?php Modal::end(); ?>
 
     <!--View Expertise end-->
+
+    <!--Create Task begin-->
+
+    <?php // Модальное окно - создание задания для исполнителя проекта
+    Modal::begin([
+        'options' => ['id' => 'showFormCreateTask', 'class' => 'showFormCreateTask'],
+        'size' => 'modal-lg',
+        'header' => Html::a('<span class="text-link"></span>' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+            'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page_expertise', 'title' => 'Инструкция', 'onclick' => 'return false']),
+        'headerOptions' => ['style' => ['text-align' => 'center']]
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Create Task end-->
+
+    <!--Get Tasks begin-->
+
+    <?php // Модальное окно - получение заданий для исполнителей по этапу проекту
+    Modal::begin([
+        'options' => ['id' => 'showContractorTasks', 'class' => 'showContractorTasks'],
+        'size' => 'modal-lg',
+        'header' => Html::a('<span class="text-link"></span>' . Html::img('/images/icons/icon_report_next.png'), ['#'],[
+            'class' => 'link_to_instruction_page_in_modal open_modal_instruction_page_expertise', 'title' => 'Инструкция', 'onclick' => 'return false']),
+        'headerOptions' => ['style' => ['text-align' => 'center']]
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--Get Tasks end-->
 
 
 <?php $this->endBody() ?>

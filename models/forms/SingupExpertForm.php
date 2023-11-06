@@ -98,11 +98,11 @@ class SingupExpertForm extends SingupForm
         return [
             [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
-            [['email', 'username', 'password',
+            [['email', 'password',
                 'education', 'academic_degree', 'position', 'type', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'required'],
             ['clientId', 'safe'],
-            [['username', 'email', 'password',
+            [['email', 'password',
                 'education', 'academic_degree', 'position', 'scope_professional_competence',
                 'publications', 'implemented_projects', 'role_in_implemented_projects', 'keywords'], 'trim'],
             [['email', 'education', 'academic_degree', 'position'], 'string', 'max' => 255],
@@ -116,7 +116,7 @@ class SingupExpertForm extends SingupForm
                 User::NOT_CONFIRM,
             ]],
 
-            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE,],
+            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE],
             ['status', 'in', 'range' => [
                 User::STATUS_NOT_ACTIVE,
                 User::STATUS_ACTIVE,
@@ -139,7 +139,6 @@ class SingupExpertForm extends SingupForm
             'email' => 'Email *',
             'username' => 'Логин *',
             'password' => 'Пароль *',
-            'rememberMe' => 'Запомнить *',
             'role' => 'Проектная роль пользователя *',
             'clientId' => 'Организация, к которой будет привязан Ваш аккаунт *',
             'exist_agree' => '',
@@ -165,7 +164,7 @@ class SingupExpertForm extends SingupForm
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->setUsername($this->getUsername());
+            $user->setUsername($this->getEmail());
             $user->setEmail($this->getEmail());
             $user->setStatus($this->getStatus());
             $user->setConfirm($this->getConfirm());

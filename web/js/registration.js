@@ -156,3 +156,10 @@ $(body).on('beforeSubmit', '#form_user_singup', function(e){
     e.preventDefault();
     return false;
 });
+
+
+// Отслеживаем изменения в чекбоксе "Имею опыт работы"
+// в форме регистрации исполнителя
+$(body).on('change', '#exist_experience_checkbox', function(){
+    $('.block-for-experience').toggle('display');
+});

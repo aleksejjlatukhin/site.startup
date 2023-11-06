@@ -303,7 +303,8 @@ PRELOADER
     margin: -10px 0;
 }
 .countUnreadMessages,
-.countUnreadCommunications {
+.countUnreadCommunications,
+.countUnreadCommunicationsFromContractors {
     display: flex;
     min-width: 24px;
     min-height: 24px;
@@ -320,7 +321,8 @@ PRELOADER
     border: 1px solid #FFFFFF;
 }
 .countUnreadMessages.active,
-.countUnreadCommunications.active {
+.countUnreadCommunications.active,
+.countUnreadCommunicationsFromContractors.active {
     opacity: 1;
 }
 /*
@@ -361,7 +363,8 @@ PRELOADER
 коммуникаций по проекту
 ---Начало---
 */
-.countUnreadCommunicationsByProject {
+.countUnreadCommunicationsByProject,
+.countUnreadCommunicationsByContractor {
     display: flex;
     min-width: 20px;
     min-height: 20px;
@@ -375,7 +378,8 @@ PRELOADER
     margin-right: 15px;
     border: 1px solid #FFFFFF;
 }
-.countUnreadCommunicationsByProject.active {
+.countUnreadCommunicationsByProject.active,
+.countUnreadCommunicationsByContractor.active {
     opacity: 1;
 }
 /*
@@ -3861,6 +3865,12 @@ a.link_cancel_search_field_mobile img {
         left: unset;
         right: 15%;
     }
+    /* Значек кол-ва непрочитанных уведомлений от исполнителей */
+    .countUnreadCommunicationsFromContractors {
+        bottom: 7px;
+        left: unset;
+        right: 15%;
+    }
 }
 
 @media screen and (min-width: 481px) {
@@ -4020,7 +4030,7 @@ a.link_cancel_search_field_mobile img {
     align-items: center;
 }
 .block_all_responds {
-    margin-bottom: 90px;
+    margin-bottom: 160px;
 }
 
 @media screen and (max-width: 480px) {
@@ -4162,6 +4172,10 @@ a.link_cancel_search_field_mobile img {
 
 .select2-container--krajee .select2-results__option[aria-selected] {
     font-size: 20px;
+}
+
+.hereAddProjectTasks {
+    display: none;
 }
 
 /* Общие стили для разных страниц

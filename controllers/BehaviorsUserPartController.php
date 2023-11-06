@@ -51,6 +51,11 @@ class BehaviorsUserPartController extends AppController
             if (User::isUserExpert($user->getUsername())) {
                 $this->layout = '@app/modules/expert/views/layouts/main-user';
             }
+
+            // Подключение шаблона исполнителя в пользовательской части
+            if (User::isUserContractor($user->getUsername())) {
+                $this->layout = '@app/modules/contractor/views/layouts/main-user';
+            }
         }
 
         return parent::beforeAction($action);
@@ -171,6 +176,16 @@ class BehaviorsUserPartController extends AppController
                             $user = User::findOne(Yii::$app->user->getId());
                             $isActiveClient = $user->clientUser->client->isActive();
                             return User::isUserAdminCompany($user->getUsername()) && $isActiveClient;
+                        }
+                    ],
+
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            $user = User::findOne(Yii::$app->user->getId());
+                            $isActiveClient = $user->clientUser->client->isActive();
+                            return User::isUserContractor($user->getUsername()) && $isActiveClient;
                         }
                     ],
                 ]

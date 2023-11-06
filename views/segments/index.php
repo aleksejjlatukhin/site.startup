@@ -2,6 +2,7 @@
 
 use app\models\forms\SearchForm;
 use app\models\Projects;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -208,7 +209,15 @@ $this->registerCssFile('@web/css/segments-index-style.css');
     </div>
 
 
+    <?php if (!User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+
     <div class="container-fluid container-data row">
+
+    <?php else: ?>
+
+    <div class="container-fluid container-data_for_user row">
+
+    <?php endif; ?>
 
         <div class="row row_header_data_generation">
 
@@ -471,6 +480,19 @@ $this->registerCssFile('@web/css/segments-index-style.css');
                 </div>
 
             </div>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="new_buttons_block_down">
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '22px']]) . '</div><div class="pl-10">Добавить задание исполнителю</div></div>', [
+                        '/tasks/get-task-create', 'projectId' => $project->getId(), 'stage' => StageExpertise::SEGMENT, 'stageId' => $project->getId()],
+                        ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_small_plus pull-left']
+                    ) ?>
+                    <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img('/images/icons/icon_view.png', ['style' => ['width' => '24px']]) . '</div><div class="pl-10">Задания исполнителям</div></div>', [
+                        '/tasks/get-tasks', 'projectId' => $project->getId(), 'stage' => StageExpertise::SEGMENT, 'stageId' => $project->getId()],
+                        ['id' => 'showContractorTasksGet', 'class' => 'new_hypothesis_link_small_plus pull-left']
+                    ) ?>
+                </div>
+            <?php endif; ?>
 
         </div>
 

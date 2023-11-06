@@ -8,6 +8,7 @@ use app\models\BusinessModel;
 use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
+use app\models\ContractorProjectAccess;
 use app\models\forms\CacheForm;
 use app\models\forms\SearchForm;
 use app\models\Gcps;
@@ -232,6 +233,15 @@ class ProjectsController extends AppUserPartController
                 } else{
                     PatternHttpException::noAccess();
                 }
+            } elseif (User::isUserContractor($currentUser->getUsername())) {
+
+                $project = Projects::findOne((int)Yii::$app->request->get('project_id'));
+                $contractor = User::findOne(Yii::$app->user->getId());
+                if ($contractor && $project && ContractorProjectAccess::existAccessByParams($contractor->getId(), $project->getId())) {
+                    return parent::beforeAction($action);
+                }
+
+                PatternHttpException::noAccess();
             } else{
                 PatternHttpException::noAccess();
             }

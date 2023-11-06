@@ -22,3 +22,6 @@
     justify-content: center;
     margin: 15px 0;
 }
+.block-for-experience {
+    display: none;
+}

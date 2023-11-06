@@ -6,7 +6,6 @@ use app\models\forms\CacheForm;
 use app\models\traits\SoftDeleteModelTrait;
 use Throwable;
 use Yii;
-use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -60,6 +59,7 @@ use yii\web\UploadedFile;
  * @property BusinessModel[] $businessModels                    Бизнес-модели
  * @property PreFiles[] $preFiles                               Презентационные файлы
  * @property ProjectCommunications[] $projectCommunications     Коммуникации админа организации и экспертов по проекту
+ * @property User[] $contractors                                Исполнители проекта
  */
 class Projects extends ActiveRecord
 {
@@ -213,6 +213,33 @@ class Projects extends ActiveRecord
 
 
     /**
+     * @return User[]|null
+     */
+    public function getContractors(): ?array
+    {
+        /** @var $contractors User[] */
+        $contractors = User::find()
+            ->innerJoin('contractor_project','`contractor_project`.`contractor_id` = `user`.`id`')
+            ->andWhere(['contractor_project.project_id' => $this->getId()])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        $result = [];
+        if (count($contractors) > 0) {
+            $contractorIds = [];
+            foreach ($contractors as $contractor) {
+                if (!in_array($contractor->getId(), $contractorIds, true)) {
+                    $contractorIds[] = $contractor->getId();
+                    $result[] = $contractor;
+                }
+            }
+        }
+
+        return $result ?: null;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function rules(): array
@@ -334,6 +361,46 @@ class Projects extends ActiveRecord
 
         }
         return $string;
+    }
+
+
+    /**
+     * Показать исполнителей проекта
+     * @return string|null
+     */
+    public function showListContractors(): ?string
+    {
+        $contractorProjects = ContractorProject::findAll([
+            'project_id' => $this->getId(),
+            'deleted_at' => null
+        ]);
+
+        if (count($contractorProjects) === 0) {
+            return null;
+        }
+
+        $contractors = [];
+        $contractorIds = [];
+        foreach ($contractorProjects as $contractorProject) {
+            if (!in_array($contractorProject->getContractorId(), $contractorIds, true)) {
+                $contractorIds[] = $contractorProject->getContractorId();
+                $contractors[$contractorProject->getContractorId()]['username'] = $contractorProject->contractor->getUsername();
+                $contractors[$contractorProject->getContractorId()]['activity'] = $contractorProject->activity->getTitle();
+            } else {
+                $contractors[$contractorProject->getContractorId()]['activity'] .= ', ' . $contractorProject->activity->getTitle();
+            }
+        }
+
+        $result = '';
+        $k = 0;
+        foreach ($contractors as $contractor) {
+            $k++;
+            $result .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$k.'</div>';
+            $result .= '<div>Логин: ' . $contractor['username'] . '</div>';
+            $result .= '<div>Вид деятельности: ' . $contractor['activity'] . '</div>';
+        }
+
+        return $result;
     }
 
 

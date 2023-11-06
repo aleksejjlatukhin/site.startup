@@ -23,6 +23,10 @@ $config = [
             'class' => 'app\modules\client\Module',
             'layout' => 'main',
         ],
+        'contractor' => [
+            'class' => 'app\modules\contractor\Module',
+            'layout' => 'main',
+        ],
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
             'downloadAction' => 'gridview/export/download',
@@ -114,6 +118,7 @@ $config = [
                 'admin' => 'admin/default/index',
                 'expert' => 'expert/default/index',
                 'client' => 'client/default/index',
+                'contractor' => 'contractor/default/index',
                 '<action:\w+>' => 'site/<action>',
             ],
         ],

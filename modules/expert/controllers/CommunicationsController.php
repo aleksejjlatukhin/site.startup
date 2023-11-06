@@ -230,7 +230,7 @@ class CommunicationsController extends AppExpertController
                         // Если ответ эксперта отрицательный, то у коммуникации на которую была создана данная коммуникация
                         // меняем у объекта доступа к проекту параметр cancel,
                         // т.е. аннулируем доступ к проекту
-                        if ($communicationResponse->answer === CommunicationResponse::NEGATIVE_RESPONSE) {
+                        if ($communication->communicationResponse->getAnswer() === CommunicationResponse::NEGATIVE_RESPONSE) {
                             $communicationAnsweredAccessToProject = $communicationAnswered->userAccessToProject;
                             $communicationAnsweredAccessToProject->setCancel();
                             $communicationAnsweredAccessToProject->update();

@@ -20,6 +20,7 @@ $invest_amount = $project->getInvestAmount() ? number_format($project->getInvest
 $invest_date = $project->getInvestDate() ? date('d.m.Y', $project->getInvestDate()) : $default_value;
 $announcement_event = $project->getAnnouncementEvent() ?: $default_value;
 $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $project->getDateOfAnnouncement()) : $default_value;
+$listContractors = $project->showListContractors() ?: 'Отсутствуют';
 
 $string .= '<div class="row container-fluid" style="color: #4F4F4F;">';
 
@@ -38,8 +39,11 @@ $string .= '<div class="panel panel-default"><div class="panel-heading" style="f
                     <div style="font-weight: 700;">Номер патента</div><div style="margin-bottom: 10px;">'.$patent_number.'</div>
                     <div style="font-weight: 700;">Дата получения патента</div><div style="margin-bottom: 20px;">'.$patent_date.'</div>
                     
-                    <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Команда проекта</div></div>
+                    <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Авторы проекта</div></div>
                     <div style="margin-bottom: 10px;">'.$project->showListAuthors().'</div>
+
+                    <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Исполнители проекта</div></div>
+                    <div style="margin-bottom: 10px;">'.$listContractors.'</div>
                     
                     <div class="panel panel-default"><div class="panel-heading" style="font-size: 24px;">Сведения о технологии</div></div>
                     <div style="font-weight: 700;">На какой технологии основан проект</div><div style="margin-bottom: 10px;">'.$project->getTechnology().'</div>

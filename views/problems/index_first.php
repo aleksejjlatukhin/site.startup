@@ -2,6 +2,7 @@
 
 use app\models\ConfirmSegment;
 use app\models\forms\FormCreateProblem;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
 use yii\helpers\Url;
@@ -136,16 +137,22 @@ $project = $confirmSegment->hypothesis->project;
                 </div>
             </div>
 
-            <div class="row container-fluid block-button-new-problem">
-                <div class="col-md-12">
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить проблему</div></div>',
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="row container-fluid block-button-new-problem">
+                    <div class="col-md-12">
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить проблему</div></div>',
                             ['/confirm-segment/data-availability-for-next-step', 'id' => $confirmSegment->getId()],
                             ['id' => 'checking_the_possibility', 'class' => 'new_hypothesis_link_plus pull-left']
                         ) ?>
-                    <?php endif; ?>
+                    </div>
+                    <div class="col-md-12">
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить задание исполнителю</div></div>', [
+                            '/tasks/get-task-create', 'projectId' => $project->getId(), 'stage' => StageExpertise::PROBLEM, 'stageId' => $confirmSegment->getId()],
+                            ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_plus pull-left']
+                        ) ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
             <div class="container-list">
 

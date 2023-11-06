@@ -27,29 +27,33 @@ $this->registerCssFile('@web/css/projects-index-style.css');
         <div class="col-xs-12 header-title-mobile"><?= $this->title ?></div>
     </div>
 
-    <div class="row project_menu">
+    <?php if (!User::isUserExpert(Yii::$app->user->identity['username']) && !User::isUserContractor(Yii::$app->user->identity['username'])) : ?>
 
-        <?= Html::a('Проекты', ['/projects/index', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+        <div class="row project_menu">
 
-        <?= Html::a('Сводные таблицы', ['/projects/results', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Проекты', ['/projects/index', 'id' => $user->getId()], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Трэкшн карты', ['/projects/roadmaps', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Сводные таблицы', ['/projects/results', 'id' => $user->getId()], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Протоколы', ['/projects/reports', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Трэкшн карты', ['/projects/roadmaps', 'id' => $user->getId()], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-        <?= Html::a('Презентации', ['/projects/presentations', 'id' => $user->getId()], [
-            'class' => 'link_in_the_header',
-        ]) ?>
+            <?= Html::a('Протоколы', ['/projects/reports', 'id' => $user->getId()], [
+                'class' => 'link_in_the_header',
+            ]) ?>
 
-    </div>
+            <?= Html::a('Презентации', ['/projects/presentations', 'id' => $user->getId()], [
+                'class' => 'link_in_the_header',
+            ]) ?>
+
+        </div>
+
+    <?php endif; ?>
 
     <div class="container-fluid container-data row">
 
@@ -61,7 +65,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
                 ]) ?>
             </div>
 
-            <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+            <?php if (!User::isUserExpert(Yii::$app->user->identity['username']) && !User::isUserContractor(Yii::$app->user->identity['username'])) : ?>
 
                 <?php if ($existTrashList): ?>
 
@@ -184,7 +188,7 @@ $this->registerCssFile('@web/css/projects-index-style.css');
 
             <div class="col-xs-5">
 
-                <?php if (!User::isUserExpert(Yii::$app->user->identity['username'])) : ?>
+                <?php if (!User::isUserExpert(Yii::$app->user->identity['username']) && !User::isUserContractor(Yii::$app->user->identity['username'])) : ?>
 
                     <?= Html::a(Html::img('@web/images/icons/icon_red_info.png'),
                         Url::to('/projects/get-instruction'), [

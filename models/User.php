@@ -37,6 +37,10 @@ use Yii;
  * @property int $updated_at                                    Дата обновления пользователя (его данных)
  *
  * @property Projects[] $projects                               Проекты пользователя
+ * @property ContractorInfo $contractorInfo                     Получение информации о исполнителе от лица исполнителя
+ * @property ContractorEducations[] $contractorEducations       Получение информации об образовании исполнителя от лица исполнителя
+ * @property ContractorUsers[] $contractorUsers                 Связи исполнителей с проектантами
+ * @property ContractorProject[] $contractorProjects            Связи исполнителей с проектами
  * @property ExpertInfo $expertInfo                             Информация о пользователе с ролью "Эксперт"
  * @property KeywordsExpert $keywords                           Ключевые слова о деятельности эксперта
  * @property UserAccessToProjects[] $userAccessToProjects       Все записи о доступе пользователя (эксперта) к проектам
@@ -51,6 +55,7 @@ use Yii;
  * @property User $development                                  Получить объект техподдержки
  * @property bool|int $countUnreadMessages                      Получить кол-во непрочитанных сообщений пользователя
  * @property bool|int $countUnreadCommunications                Получить кол-во непрочитанных уведомлений пользователя
+ * @property bool|int $countUnreadCommunicationsFromContractors Получить кол-во непрочитанных уведомлений от исполнителей
  * @property bool|int $countUnreadMessagesFromAdmin             Получить кол-во непрочитанных сообщений проектанта от трекера
  * @property bool|int $countUnreadMessagesFromDev               Получить кол-во непрочитанных сообщений пользователя от техподдержки
  * @property bool|int $countUnreadMessagesFromMainAdmin         Получить кол-во непрочитанных сообщений трекера или менеджера от админа
@@ -69,6 +74,7 @@ class User extends ActiveRecord implements IdentityInterface
     public const STATUS_ACTIVE = 10; // Активирован
 
     public const ROLE_USER = 10;           // Роль проектанта
+    public const ROLE_CONTRACTOR = 15;     // Роль исполнителя проекта
     public const ROLE_ADMIN = 20;          // Роль трекера
     public const ROLE_ADMIN_COMPANY = 25;  // Роль администратора организации
     public const ROLE_MAIN_ADMIN = 30;     // Роль гл.администратора платформы
@@ -733,6 +739,54 @@ class User extends ActiveRecord implements IdentityInterface
             $countDuplicateCommunications = DuplicateCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => DuplicateCommunications::NO_READ])->count();
             $count += $countDuplicateCommunications;
         }
+        elseif (self::isUserContractor($this->getUsername())) {
+
+            $countContractorCommunications = ContractorCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => ContractorCommunications::STATUS_NO_READ])->count();
+            $count += $countContractorCommunications;
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных
+     * уведомлений от исполнителей
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadCommunicationsFromContractors()
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->getUsername())) {
+            $countContractorCommunications = ContractorCommunications::find()->andWhere(['adressee_id' => $this->getId(), 'status' => ContractorCommunications::STATUS_NO_READ])->count();
+            $count += $countContractorCommunications;
+        }
+
+        return ($count > 0) ? $count : false;
+    }
+
+
+    /**
+     * Кол-во непрочитанных
+     * уведомлений от исполнителей
+     *
+     * @return bool|int
+     */
+    public function getCountUnreadCommunicationsByContractor(int $contractorId)
+    {
+        $count = 0;
+
+        if (self::isUserSimple($this->getUsername())) {
+            $countContractorCommunications = ContractorCommunications::find()
+                ->andWhere([
+                    'adressee_id' => $this->getId(),
+                    'status' => ContractorCommunications::STATUS_NO_READ,
+                    'sender_id' => $contractorId
+                ])->count();
+            $count += $countContractorCommunications;
+        }
 
         return ($count > 0) ? $count : false;
     }
@@ -746,7 +800,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @param int $id
      * @return bool|int|string
      */
-    public function getCountUnreadCommunicationsByProject(int $id)
+    public function getCountUnreadCommunicationsByProject(int $id, int $senderId = null)
     {
         $count = 0;
 
@@ -761,7 +815,8 @@ class User extends ActiveRecord implements IdentityInterface
 
             $count += $countUnreadProjectCommunications;
         }
-        elseif (self::isUserMainAdmin($this->getUsername())) {
+
+        if (self::isUserMainAdmin($this->getUsername())) {
 
             $countUnreadProjectCommunications = ProjectCommunications::find()
                 ->andWhere([
@@ -771,6 +826,34 @@ class User extends ActiveRecord implements IdentityInterface
                 ])->count();
 
             $count += $countUnreadProjectCommunications;
+        }
+
+        if (self::isUserContractor($this->getUsername())) {
+
+            $countUnreadContractorCommunications = ContractorCommunications::find()
+                ->andWhere([
+                    'adressee_id' => $this->getId(),
+                    'status' => ContractorCommunications::STATUS_NO_READ,
+                    'project_id' => $id
+                ])->count();
+
+            $count += $countUnreadContractorCommunications;
+        }
+
+        if (self::isUserSimple($this->getUsername())) {
+
+            $contractorCommunications = ContractorCommunications::find()
+                ->andWhere([
+                    'adressee_id' => $this->getId(),
+                    'status' => ContractorCommunications::STATUS_NO_READ,
+                    'project_id' => $id
+                ]);
+
+            if ($senderId) {
+                $contractorCommunications = $contractorCommunications->andWhere(['sender_id' => $senderId]);
+            }
+
+            $count += $contractorCommunications->count();
         }
 
         return ($count > 0) ? $count : false;
@@ -1005,7 +1088,121 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Проверка на пользователя
+     * Получение связей исполнителей с проектами
+     *
+     * @return ActiveQuery
+     */
+    public function getContractorProjects(): ActiveQuery
+    {
+        return $this->hasMany(ContractorProject::class, ['contractor_id' => 'id']);
+    }
+
+
+    /**
+     * Получение количества проектов у исполнителя
+     *
+     * @return int
+     */
+    public function getCountContractorProjects(): int
+    {
+        return (int)ContractorProject::find()
+            ->select(['contractor_id', 'project_id'])
+            ->distinct('project_id')
+            ->andWhere(['contractor_id' => $this->getId()])
+            ->andWhere(['deleted_at' => null])
+            ->count();
+    }
+
+
+    /**
+     * Получение количества
+     * моих проектов у исполнителя.
+     * Запрос делается от лица проектанта
+     *
+     * @return int
+     */
+    public function getCountContractorMyProjects(): int
+    {
+        $projects = Projects::find()
+            ->andWhere(['user_id' => Yii::$app->user->getId()])
+            ->all();
+
+        return (int)ContractorProject::find()
+            ->select(['contractor_id', 'project_id'])
+            ->distinct('project_id')
+            ->andWhere(['contractor_id' => $this->getId()])
+            ->andWhere(['deleted_at' => null])
+            ->andWhere(['in', 'project_id', array_column($projects, 'id')])
+            ->count();
+    }
+
+
+    /**
+     * Получение информации от лица исполнителя
+     *
+     * @return ActiveQuery
+     */
+    public function getContractorInfo(): ActiveQuery
+    {
+        return $this->hasOne(ContractorInfo::class, ['contractor_id' => 'id']);
+    }
+
+
+    /**
+     * Получение информации об образовании от лица исполнителя
+     *
+     * @return ActiveQuery
+     */
+    public function getContractorEducations(): ActiveQuery
+    {
+        return $this->hasMany(ContractorEducations::class, ['contractor_id' => 'id']);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getContractorUsers(): ActiveQuery
+    {
+        if (self::isUserContractor(Yii::$app->user->identity['username'])) {
+            return $this->hasMany(ContractorUsers::class, ['contractor_id' => 'id']);
+        }
+
+        return $this->hasMany(ContractorUsers::class, ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getAdditionalDateContractor(): ?int
+    {
+        if (self::isUserSimple(Yii::$app->user->identity['username']) && self::isUserContractor($this->getUsername())) {
+
+            $projects = Projects::findAll(['user_id' => Yii::$app->user->getId()]);
+
+            $projectIds = [];
+            foreach ($projects as $project) {
+                $projectIds[] = $project->getId();
+            }
+
+            /** @var $firstContractorProject ContractorProject */
+            $firstContractorProject = ContractorProject::find()
+                ->andWhere([
+                    'contractor_id' => $this->getId(),
+                    'project_id' => $projectIds
+                ])->orderBy(['created_at' => SORT_ASC])
+                ->one();
+
+            return $firstContractorProject ? $firstContractorProject->getCreatedAt() : null;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Проверка на проектанта (руководителя проекта)
      *
      * @param string $username
      * @return bool
@@ -1013,6 +1210,21 @@ class User extends ActiveRecord implements IdentityInterface
     public static function isUserSimple(string $username): bool
     {
         if (static::findOne(['username' => $username, 'role' => self::ROLE_USER, 'status' => self::STATUS_ACTIVE])) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Проверка на исполнителя проекта
+     *
+     * @param string $username
+     * @return bool
+     */
+    public static function isUserContractor(string $username): bool
+    {
+        if (static::findOne(['username' => $username, 'role' => self::ROLE_CONTRACTOR, 'status' => self::STATUS_ACTIVE])) {
             return true;
         }
         return false;
@@ -1212,6 +1424,8 @@ class User extends ActiveRecord implements IdentityInterface
                 return 'менеджер';
             case self::ROLE_DEV:
                 return 'тех.поддержка';
+            case self::ROLE_CONTRACTOR:
+                return 'исполнитель';
             default:
                 return '';
         }

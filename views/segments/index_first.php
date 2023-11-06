@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Projects;
+use app\models\StageExpertise;
 use yii\helpers\Html;
 use app\models\User;
 use yii\helpers\Url;
@@ -132,15 +133,21 @@ $this->registerCssFile('@web/css/methodological-guide-style.css');
                 </div>
             </div>
 
-            <div class="row desktop-pl-15 desktop-pr-15">
-                <div class="col-md-12">
-                    <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
-                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div style="padding-left: 20px;">Добавить сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
+                <div class="row desktop-pl-15 desktop-pr-15">
+                    <div class="col-md-12">
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить сегмент</div></div>', ['/segments/get-hypothesis-to-create', 'id' => $project->getId()],
                             ['id' => 'showHypothesisToCreate', 'class' => 'new_hypothesis_link_plus pull-left']
                         ) ?>
-                    <?php endif; ?>
+                    </div>
+                    <div class="col-md-12">
+                        <?=  Html::a( '<div class="new_hypothesis_link_block"><div>' . Html::img(['@web/images/icons/add_vector.png'], ['style' => ['width' => '35px']]) . '</div><div class="pl-20">Добавить задание исполнителю</div></div>', [
+                            '/tasks/get-task-create', 'projectId' => $project->getId(), 'stage' => StageExpertise::SEGMENT, 'stageId' => $project->getId()],
+                            ['id' => 'showFormContractorTaskCreate', 'class' => 'new_hypothesis_link_plus pull-left']
+                        ) ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
             <div class="container-list">
 

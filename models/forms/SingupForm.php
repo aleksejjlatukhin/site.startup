@@ -46,9 +46,9 @@ class SingupForm extends Model
         return [
             [['exist_agree', 'uniq_username', 'uniq_email'],'boolean'],
             ['exist_agree', 'existAgree'],
-            [['email', 'username', 'password'], 'required'],
+            [['email', 'password'], 'required'],
             ['clientId', 'safe'],
-            [['username', 'email', 'password'], 'trim'],
+            [['email', 'password'], 'trim'],
             [['email'], 'string', 'max' => 255],
             ['username', 'uniqUsername'],
             ['email', 'uniqEmail'],
@@ -59,7 +59,7 @@ class SingupForm extends Model
                 User::NOT_CONFIRM,
             ]],
 
-            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE,],
+            ['status', 'default', 'value' => User::STATUS_NOT_ACTIVE],
             ['status', 'in', 'range' => [
                 User::STATUS_NOT_ACTIVE,
                 User::STATUS_ACTIVE,
@@ -86,7 +86,6 @@ class SingupForm extends Model
             'email' => 'Email *',
             'username' => 'Логин *',
             'password' => 'Пароль *',
-            'rememberMe' => 'Запомнить',
             'role' => 'Проектная роль пользователя *',
             'clientId' => 'Организация, к которой будет привязан Ваш аккаунт *',
             'exist_agree' => ''
@@ -139,7 +138,7 @@ class SingupForm extends Model
         if ($this->exist_agree == 1){
 
             $user = new User();
-            $user->setUsername($this->getUsername());
+            $user->setUsername($this->getEmail());
             $user->setEmail($this->getEmail());
             $user->setStatus($this->getStatus());
             $user->setConfirm($this->getConfirm());

@@ -52,6 +52,7 @@ class SettingCodesController extends AppAdminController
         $codeRegistrationForTracker = null;
         $codeRegistrationForManager = null;
         $codeRegistrationForExpert = null;
+        $codeRegistrationForContractor = null;
 
         if (count($clientCodes) > 0) {
             foreach ($clientCodes as $clientCode) {
@@ -63,6 +64,8 @@ class SettingCodesController extends AppAdminController
                     $codeRegistrationForManager = $clientCode;
                 } elseif ($clientCode->getType() === ClientCodeTypes::REGISTRATION_CODE_FOR_EXPERT) {
                     $codeRegistrationForExpert = $clientCode;
+                } elseif ($clientCode->getType() === ClientCodeTypes::REGISTRATION_CODE_FOR_CONTRACTOR) {
+                    $codeRegistrationForContractor = $clientCode;
                 }
             }
         }
@@ -74,6 +77,7 @@ class SettingCodesController extends AppAdminController
             'codeRegistrationForTracker' => $codeRegistrationForTracker,
             'codeRegistrationForManager' => $codeRegistrationForManager,
             'codeRegistrationForExpert' => $codeRegistrationForExpert,
+            'codeRegistrationForContractor' => $codeRegistrationForContractor,
         ]);
     }
 

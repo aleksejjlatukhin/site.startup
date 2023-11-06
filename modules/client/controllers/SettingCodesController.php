@@ -51,6 +51,7 @@ class SettingCodesController extends AppClientController
         $codeRegistrationForSimpleUser = null;
         $codeRegistrationForTracker = null;
         $codeRegistrationForExpert = null;
+        $codeRegistrationForContractor = null;
 
         if (count($clientCodes) > 0) {
             foreach ($clientCodes as $clientCode) {
@@ -60,6 +61,8 @@ class SettingCodesController extends AppClientController
                     $codeRegistrationForTracker = $clientCode;
                 } elseif ($clientCode->getType() === ClientCodeTypes::REGISTRATION_CODE_FOR_EXPERT) {
                     $codeRegistrationForExpert = $clientCode;
+                } elseif ($clientCode->getType() === ClientCodeTypes::REGISTRATION_CODE_FOR_CONTRACTOR) {
+                    $codeRegistrationForContractor = $clientCode;
                 }
             }
         }
@@ -70,6 +73,7 @@ class SettingCodesController extends AppClientController
             'codeRegistrationForSimpleUser' => $codeRegistrationForSimpleUser,
             'codeRegistrationForTracker' => $codeRegistrationForTracker,
             'codeRegistrationForExpert' => $codeRegistrationForExpert,
+            'codeRegistrationForContractor' => $codeRegistrationForContractor,
         ]);
     }
 

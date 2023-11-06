@@ -18,6 +18,7 @@ $this->registerCssFile('@web/css/setting-codes-style.css');
  * @var ClientCodes|null $codeRegistrationForTracker
  * @var ClientCodes|null $codeRegistrationForManager
  * @var ClientCodes|null $codeRegistrationForExpert
+ * @var ClientCodes|null $codeRegistrationForContractor
 */
 ?>
 
@@ -145,6 +146,34 @@ $this->registerCssFile('@web/css/setting-codes-style.css');
                 <div class="col-md-4">
                     <?= Html::a( 'Сгенерировать новый код доступа',
                         Url::to(['/admin/setting-codes/generation', 'type' => ClientCodeTypes::REGISTRATION_CODE_FOR_EXPERT]),[
+                            'class' => 'btn btn-default',
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'background' => '#E0E0E0',
+                                'border-radius' => '8px',
+                            ],
+                        ]) ?>
+                </div>
+            </div>
+
+            <div class="row rowClientCode">
+                <div class="col-md-4">
+                    Код для регистрации с ролью "Исполнитель"
+                </div>
+                <div class="col-md-4">
+
+                    <?php if (!$codeRegistrationForContractor): ?>
+                        <?= $form->field(new EmptyForm(), 'value', ['template' => '{input}'])->textInput(['disabled' => true, 'class' => 'form-control field-setting-code']) ?>
+                    <?php else: ?>
+                        <?= $form->field($codeRegistrationForContractor, 'code', ['template' => '{input}'])->textInput(['disabled' => true, 'class' => 'form-control field-setting-code']) ?>
+                    <?php endif; ?>
+
+                </div>
+                <div class="col-md-4">
+                    <?= Html::a( 'Сгенерировать новый код доступа',
+                        Url::to(['/admin/setting-codes/generation', 'type' => ClientCodeTypes::REGISTRATION_CODE_FOR_CONTRACTOR]),[
                             'class' => 'btn btn-default',
                             'style' => [
                                 'display' => 'flex',
