@@ -36,6 +36,11 @@ $this->registerCssFile('@web/css/contractor-projects-style.css');
                     <div class="container-one_project">
 
                         <div class="col-md-9 col-lg-10">
+                            <?php if ($project->getDeletedAt()): ?>
+                                <div class="text-danger bolder pl-5">
+                                    Проект удалён
+                                </div>
+                            <?php endif; ?>
                             <div class="project_name_table">
                                 <?= $project->getProjectName() ?> -<span class="project_fullname_text"><?= $project->getProjectFullname() ?></span>
                             </div>

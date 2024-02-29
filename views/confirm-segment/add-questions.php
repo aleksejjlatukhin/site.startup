@@ -24,6 +24,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
  * @var FormUpdateConfirmSegment $formUpdateConfirmSegment
  * @var Segments $segment
  * @var Projects $project
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -154,6 +155,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
             'formUpdateConfirmSegment' => $formUpdateConfirmSegment,
             'model' => $model,
             'project' => $project,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -360,6 +362,7 @@ $this->registerCssFile('@web/css/interview-add_questions-style.css');
                 'formUpdateConfirmSegment' => $formUpdateConfirmSegment,
                 'model' => $model,
                 'project' => $project,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

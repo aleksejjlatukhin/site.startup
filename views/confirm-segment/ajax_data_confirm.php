@@ -13,6 +13,7 @@ use yii\helpers\Url;
  * @var FormUpdateConfirmSegment $formUpdateConfirmSegment
  * @var ConfirmSegment $model
  * @var Projects $project
+ * @var int $countContractorResponds
 */
 
 ?>
@@ -53,6 +54,14 @@ use yii\helpers\Url;
                 <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
                 <div class="col-md-12"><?= $model->getReasonInterview() ?></div>
             </div>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])): ?>
+                <div class="row">
+                    <div class="col-md-12">Количество респондентов, занятых исполнителями:
+                        <span><?= $countContractorResponds ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="row">
                 <div class="col-md-12">Планируемое количество респондентов:
@@ -160,6 +169,17 @@ use yii\helpers\Url;
 
             </div>
 
+            <div class="row pt-10">
+                <div class="col-xs-12 pl-20">
+                    <span class="bolder">
+                        Количество респондентов, занятых исполнителями:
+                    </span>
+                    <span>
+                        <?= $countContractorResponds ?>
+                    </span>
+                </div>
+            </div>
+
             <div class="row pt-5 pb-5">
 
                 <?= $form->field($formUpdateConfirmSegment, 'count_respond', [
@@ -170,7 +190,8 @@ use yii\helpers\Url;
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                         'id' => 'confirm_count_respond',
-                        'autocomplete' => 'off'
+                        'autocomplete' => 'off',
+                        'min' => $countContractorResponds
                     ])
                 ?>
 

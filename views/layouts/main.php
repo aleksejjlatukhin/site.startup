@@ -122,7 +122,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                         !Yii::$app->user->isGuest ? ([
                             'label' => $user->countUnreadCommunicationsFromContractors ? '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors active">' . $user->countUnreadCommunicationsFromContractors . '</div>'
-                                : '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors"></div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
+                                : '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors"></div>', 'url' => ['/contractors/index', 'id' => $user->getId()]
                         ]) : (''),
 
                         !Yii::$app->user->isGuest ? (
@@ -337,6 +337,18 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
     <?php Modal::end(); ?>
 
     <!--Get Tasks end-->
+
+    <!--All-information Confirm begin-->
+
+    <?php // Модальное окно - Данные подтверждения гипотезы
+    Modal::begin([
+        'options' => ['id' => 'data_confirm_hypothesis_modal', 'class' => 'data_confirm_hypothesis_modal'],
+        'size' => 'modal-lg',
+    ]); ?>
+    <!--Контент добавляется через Ajax-->
+    <?php Modal::end(); ?>
+
+    <!--All-information Confirm end-->
 
 
 <?php $this->endBody() ?>

@@ -97,6 +97,97 @@ use yii\helpers\Url;
 
         </div>
 
+        <div class="container-one_user_mobile user_container_number-<?= $model->getId() ?>">
+
+            <div class="column-user-fio">
+
+                <!--Проверка существования аватарки-->
+                <?php if ($model->getAvatarImage()) : ?>
+                    <?= Html::img('/web/upload/user-'.$model->getId().'/avatar/'.$model->getAvatarImage(), ['class' => 'user_picture']) ?>
+                <?php else : ?>
+                    <?= Html::img('/images/icons/button_user_menu.png', ['class' => 'user_picture_default']) ?>
+                <?php endif; ?>
+
+                <!--Проверка онлайн статуса-->
+                <?php if ($model->checkOnline === true) : ?>
+                    <div class="checkStatusOnlineUser active"></div>
+                <?php else : ?>
+                    <div class="checkStatusOnlineUser"></div>
+                <?php endif; ?>
+
+                <div class="block-fio-and-date-last-visit">
+                    <div class="block-fio">
+                        <?= $model->getUsername() ?>
+                    </div>
+                    <div class="block-date-last-visit">
+                        <?php if(is_string($model->checkOnline)) : ?>
+                            Пользователь был в сети <?= $model->checkOnline ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+                <span class="bolder">Виды деятельности:</span>
+                <?php foreach ($model->contractorInfo->contractorActivities as $activity): ?>
+                    <span><?= $activity->getTitle() ?></span>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="display-flex justify-content-center align-items-center mt-20 action-buttons" id="linkContractorInfo-<?= $model->getId() ?>">
+
+                <?= Html::a('Смотреть описание', ['#'], [
+                    'class' => 'btn btn-default openContractorInfo',
+                    'style' => [
+                        'display' => 'flex',
+                        'align-items' => 'center',
+                        'justify-content' => 'center',
+                        'color' => '#FFFFFF',
+                        'background' => '#707F99',
+                        'width' => '180px',
+                        'height' => '40px',
+                        'font-size' => '18px',
+                        'border-radius' => '8px',
+                        'margin-right' => '10px',
+                    ]]) ?>
+
+                <?php if (ContractorCommunications::isNeedAskContractor($model->getId(), $_POST['SearchContractorsForm']['projectId'], $_POST['SearchContractorsForm']['activityId'])) : ?>
+
+                    <div class="button-send-communication">
+                        <?= Html::a('Сделать запрос', Url::to([
+                            '/contractors/send-communication',
+                            'adressee_id' => $model->getId(),
+                            'type' => ContractorCommunicationTypes::SIMPLE_USER_ASKS_ABOUT_READINESS_TO_JOIN_PROJECT,
+                            'project_id' => (int)$_POST['SearchContractorsForm']['projectId'],
+                            'activity_id' => (int)$_POST['SearchContractorsForm']['activityId']
+                        ]), [
+                            'class' => 'btn btn-default send-communication',
+                            'id' => 'send_communication-'.$model->getId(),
+                            'style' => [
+                                'display' => 'flex',
+                                'align-items' => 'center',
+                                'justify-content' => 'center',
+                                'color' => '#FFFFFF',
+                                'background' => '#52BE7F',
+                                'width' => '140px',
+                                'height' => '40px',
+                                'font-size' => '18px',
+                                'border-radius' => '8px',
+                            ]
+                        ]) ?>
+                    </div>
+
+                <?php else : ?>
+
+                    <div class="text-success">Запрос сделан</div>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
         <div class="row blockContractorInfo containerContractorInfo-<?= $model->getId() ?>">
 
             <div class="col-md-12">

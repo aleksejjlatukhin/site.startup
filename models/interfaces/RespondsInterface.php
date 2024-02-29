@@ -101,4 +101,24 @@ interface RespondsInterface
      * @param string $place_interview
      */
     public function setPlaceInterview(string $place_interview);
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int;
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id);
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int;
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id);
 }

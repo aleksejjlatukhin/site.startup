@@ -5,7 +5,6 @@ use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
-use app\models\EnableExpertise;
 use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\Mvps;
@@ -13,12 +12,9 @@ use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmMvp;
 use app\models\Segments;
-use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use app\models\User;
 use yii\widgets\ActiveForm;
-use app\models\QuestionStatus;
 
 $this->title = 'Подтверждение MVP';
 $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
@@ -35,6 +31,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
  * @var Projects $project
  * @var QuestionsConfirmMvp[] $questions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -209,7 +206,8 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
     <div id="step_one" class="tabcontent row">
         <?= $this->render('ajax_data_confirm_trash', [
             'model' => $model,
-            'mvp' => $mvp
+            'mvp' => $mvp,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -466,6 +464,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
             <?= $this->render('ajax_data_confirm_trash', [
                 'model' => $model,
                 'mvp' => $mvp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

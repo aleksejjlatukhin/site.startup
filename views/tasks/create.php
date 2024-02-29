@@ -1,6 +1,7 @@
 <?php
 
 use app\models\forms\FormCreateTaskHypothesis;
+use app\models\StageExpertise;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -74,6 +75,27 @@ use yii\widgets\ActiveForm;
             ?>
 
         </div>
+
+        <?php if (in_array($formTask->getType(), [StageExpertise::CONFIRM_PROBLEM, StageExpertise::CONFIRM_GCP, StageExpertise::CONFIRM_MVP], true)): ?>
+
+            <div class="row desktop-mb-15">
+
+                <?= $form->field($formTask, 'useRespond', [
+                    'template' => '<div class="col-md-3 pl-20">{label}</div><div class="col-md-9">{input}</div>'
+                ])->label('Добавить респондентов')
+                    ->widget(Select2::class, [
+                        'data' => [
+                            true => 'Да - добавить респондентов исполнителя, подтвердивших предыдущий этап',
+                            false => 'Нет - исполнитель будет добавлять новых респондентов'
+                        ],
+                        'disabled' => false,  //Сделать поле неактивным
+                        'hideSearch' => true, //Скрытие поиска
+                    ])
+                ?>
+
+            </div>
+
+        <?php endif; ?>
 
         <div class="row desktop-mb-15">
 

@@ -32,6 +32,8 @@ use yii\helpers\FileHelper;
  * @property string $enable_expertise                                       Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at                                  Дата разрешения на экспертизу по даному этапу
  * @property int|null $deleted_at                                           Дата удаления
+ * @property int|null $contractor_id                                        Идентификатор исполнителя, создавшего проблему (если null - проблема создана проектантом)
+ * @property int|null $task_id                                              Идентификатор задания исполнителя, по которому создана проблема (если null - проблема создана проектантом)
  * @property PropertyContainer $propertyContainer                           Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property Gcps[] $gcps                                                   Ценностные предложения
@@ -42,6 +44,7 @@ use yii\helpers\FileHelper;
  * @property Projects $project                                              Проект
  * @property RespondsSegment[] $respondsAgents                              Представители сегмента
  * @property ExpectedResultsInterviewConfirmProblem[] $expectedResults      Вопросы для проверки и ответы на них создаются на этапе генерации проблем сегмента
+ * @property User|null $contractor                                          Исполнитель создавший проблему
  */
 class Problems extends ActiveRecord
 {
@@ -140,7 +143,17 @@ class Problems extends ActiveRecord
 
 
     /**
-     * Получить представителей сегмента
+     * Исполнитель создавший проблему
+     * @return User|null
+     */
+    public function getContractor(): ?User
+    {
+        return $this->getContractorId() ? User::findOne($this->getContractorId()) : null;
+    }
+
+
+    /**
+     * Получить представителей сегмента, которых опросил руководитель проекта
      *
      * @return array|ActiveRecord[]
      */
@@ -148,7 +161,9 @@ class Problems extends ActiveRecord
     {
         return RespondsSegment::find()->with('interview')
             ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-            ->andWhere(['confirm_id' => $this->getBasicConfirmId(), 'interview_confirm_segment.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $this->getBasicConfirmId(), 'interview_confirm_segment.status' => '1'])
+            ->andWhere(['contractor_id' => null])
+            ->all();
     }
 
 
@@ -226,6 +241,7 @@ class Problems extends ActiveRecord
                 EnableExpertise::OFF,
                 EnableExpertise::ON,
             ]],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -353,6 +369,7 @@ class Problems extends ActiveRecord
     /**
      * @param bool $sendCommunications
      * @return false|int
+     * @throws Throwable
      */
     public function softDeleteStage(bool $sendCommunications = true)
     {
@@ -392,6 +409,15 @@ class Problems extends ActiveRecord
                 QuestionsConfirmProblem::softDeleteAll(['confirm_id' => $confirm->getId()]);
                 RespondsProblem::softDeleteAll(['confirm_id' => $confirm->getId()]);
 
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Изменение статусов заданий исполнителей на "Удалено"
+                    if (!ContractorTasks::deleteByParams(StageExpertise::CONFIRM_PROBLEM, $confirm->getId()) ||
+                        !ContractorTasks::deleteByParams(StageExpertise::GCP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
+
                 $confirm->softDelete(['id' => $confirm->getId()]);
             }
 
@@ -416,6 +442,7 @@ class Problems extends ActiveRecord
 
     /**
      * @return false|int
+     * @throws Throwable
      */
     public function recoveryStage()
     {
@@ -452,8 +479,16 @@ class Problems extends ActiveRecord
 
                 QuestionsConfirmProblem::recoveryAll(['confirm_id' => $confirm->getId()]);
                 RespondsProblem::recoveryAll(['confirm_id' => $confirm->getId()]);
-
                 $confirm->recovery(['id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Воостановление статусов заданий исполнителей
+                    if (!ContractorTasks::recoveryByParams(StageExpertise::CONFIRM_PROBLEM, $confirm->getId()) ||
+                        !ContractorTasks::recoveryByParams(StageExpertise::GCP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
             }
 
             ExpectedResultsInterviewConfirmProblem::recoveryAll(['problem_id' => $this->getId()]);
@@ -748,5 +783,37 @@ class Problems extends ActiveRecord
     public function setDeletedAt(int $deleted_at): void
     {
         $this->deleted_at = $deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

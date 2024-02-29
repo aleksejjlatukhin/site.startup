@@ -253,16 +253,16 @@ class SiteController extends AppUserPartController
 
                                 }
 
-                                //$user->delete();
+                                $user->delete();
 
                                 //Письмо с подтверждением не отправлено
-//                                $response = [
-//                                    'error_singup_send_email' => true,
-//                                    'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
-//                                ];
-//                                Yii::$app->response->format = Response::FORMAT_JSON;
-//                                Yii::$app->response->data = $response;
-//                                return $response;
+                                $response = [
+                                    'error_singup_send_email' => true,
+                                    'message' => ' - на указанный почтовый адрес не отправляются письма, возможно вы указали некорректный адрес;',
+                                ];
+                                Yii::$app->response->format = Response::FORMAT_JSON;
+                                Yii::$app->response->data = $response;
+                                return $response;
                             }
                         }
                     }

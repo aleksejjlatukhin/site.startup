@@ -3,8 +3,10 @@
 // comment out the following two lines when deployed to production
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
-define('UPLOAD', 'upload/');
-define('DOCUMENTS_WEB', 'documents/');
+//defined('UPLOAD', 'upload/');
+//defined('DOCUMENTS_WEB', 'documents/');
+const UPLOAD = 'upload/';
+const DOCUMENTS_WEB = 'documents/';
 
 
 require __DIR__ . '/../vendor/autoload.php';

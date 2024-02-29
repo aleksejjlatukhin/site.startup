@@ -8,6 +8,7 @@ use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\ContractorTasks;
 use app\models\Gcps;
 use app\models\InterviewConfirmGcp;
 use app\models\InterviewConfirmMvp;
@@ -42,7 +43,10 @@ use app\models\QuestionStatus;
 ?>
 
 
-<?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) : ?>
+<?php if ($isOnlyNotDelete && $hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE &&
+    ((User::isUserSimple(Yii::$app->user->identity['username']) && !$respond->getContractorId()) ||
+        (User::isUserContractor(Yii::$app->user->identity['username']) && $respond->getContractorId() === Yii::$app->user->getId() && ($task = ContractorTasks::findOne($respond->getTaskId())) &&
+            in_array($task->getStatus(), [ContractorTasks::TASK_STATUS_NEW, ContractorTasks::TASK_STATUS_PROCESS, ContractorTasks::TASK_STATUS_RETURNED], true)))) : ?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'formUpdateDescInterview',

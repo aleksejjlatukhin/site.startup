@@ -16,7 +16,6 @@ $(document).ready(function() {
                 method: 'POST',
                 cache: false,
                 success: function(response){
-                    console.log(response)
                     $('#hypothesis-' + projectId).find('.hereAddProjectTasks').html(response.renderAjax);
                 }
             })
@@ -46,3 +45,47 @@ $(body).on('click', '.container-one_hypothesis', function () {
 
     $(block_data_project).toggle('display');
 })
+
+// При клике по кнопке "Подробнее"
+// Показываем и скрываем историю статусов задачи
+$(body).on('click', '.openTaskHistory', function () {
+    var taskId = $(this).attr('id').split('-')[1];
+    var blockHistory = $('.hereAddProjectTasks').find('.blockTaskHistory-' + taskId);
+    if ($(blockHistory).is(':hidden')) {
+        $(body).find('.blockTaskHistory').hide();
+    }
+    $(blockHistory).toggle('display');
+})
+
+// Изменение статуса задания в зависимости от выбранного статуса кнопки
+$(body).on('click', '.changeStatusSubmit', function (e) {
+
+    var status = $(this).attr('id').split('-')[2];
+    var blockForm = $(this).parents('.blockChangeTaskStatusCustomForm');
+    var form = $(blockForm).find('form#changeTaskStatusCustomForm');
+    var data = $(form).serialize();
+    var url = $(form).attr('action') + status;
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+            if (response.success) {
+                var projectId = response.projectId
+                $.ajax({
+                    url: '/tasks/get-tasks-by-params?contractorId='+contractor_id+'&projectId='+projectId,
+                    method: 'POST',
+                    cache: false,
+                    success: function(response){
+                        $('#hypothesis-' + projectId).find('.hereAddProjectTasks').html(response.renderAjax);
+                    }
+                })
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});

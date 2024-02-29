@@ -125,7 +125,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'href' => '/imag
 
                         !Yii::$app->user->isGuest ? ([
                             'label' => $user->countUnreadCommunicationsFromContractors ? '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors active">' . $user->countUnreadCommunicationsFromContractors . '</div>'
-                                : '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors"></div>', 'url' => ['/communications/notifications', 'id' => $user->getId()]
+                                : '<div class="link_nav_bar_menu_mobile">Исполнители</div><div class="countUnreadCommunicationsFromContractors"></div>', 'url' => ['/contractors/index', 'id' => $user->getId()]
                         ]) : (''),
 
                         !Yii::$app->user->isGuest ? (

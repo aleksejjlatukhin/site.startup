@@ -53,6 +53,12 @@ use yii\helpers\Url;
                     <div class="col-lg-11">
 
                         <div class="hypothesis_title pl-15">
+                            <?php if ($contractor = $model->contractor): ?>
+                                <div class="font-size-12">
+                                    <span class="border">Исполнитель: </span>
+                                    <span><?= $contractor->getUsername() ?></span>
+                                </div>
+                            <?php endif; ?>
                             <?= $model->getName() ?>
                         </div>
 
@@ -322,6 +328,15 @@ use yii\helpers\Url;
                     <?= $model->getSortOfActivity() ?>
                 </div>
             </div>
+
+            <?php if ($contractor): ?>
+                <div class="col-xs-12 mb-5">
+                    <div class="header_table_hypothesis_mobile">Исполнитель:</div>
+                    <div class="text_14_table_hypothesis">
+                        <?= $contractor->getUsername() ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if (User::isUserSimple(Yii::$app->user->identity['username'])) : ?>
 

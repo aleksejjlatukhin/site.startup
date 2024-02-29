@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmMvp;
+use app\models\ContractorTasks;
 use app\models\interfaces\ConfirmationInterface;
 use app\models\RespondsMvp;
 use yii\web\NotFoundHttpException;
@@ -67,13 +68,18 @@ class UpdateRespondMvpForm extends UpdateFormRespond
 
 
     /**
+     * @param ContractorTasks|null $task
      * @return RespondsMvp|null
      * @throws NotFoundHttpException
      */
-    public function update(): ?RespondsMvp
+    public function update(ContractorTasks $task = null): ?RespondsMvp
     {
         $respond = RespondsMvp::findOne($this->getId());
         $respond->setName($this->getName());
+        if ($task) {
+            $respond->setTaskId($task->getId());
+            $respond->setContractorId($task->getContractorId());
+        }
         $respond->setParams([
             'info_respond' => $this->getInfoRespond(),
             'place_interview' => $this->getPlaceInterview(),
@@ -93,7 +99,11 @@ class UpdateRespondMvpForm extends UpdateFormRespond
      */
     public function uniqueName($attr)
     {
-        $models = RespondsMvp::findAll(['confirm_id' => $this->getConfirmId()]);
+        $models = RespondsMvp::findAll([
+            'confirm_id' => $this->getConfirmId(),
+            'task_id' => $this->getTaskId(),
+            'contractor_id' => $this->getContractorId()
+        ]);
 
         foreach ($models as $item){
 

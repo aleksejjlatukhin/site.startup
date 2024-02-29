@@ -53,6 +53,12 @@ use yii\helpers\Url;
             </div>
 
             <div class="col-lg-5 text_field_problem" title="<?= $model->getDescription() ?>">
+                <?php if ($contractor = $model->contractor): ?>
+                    <div class="font-size-12">
+                        <span class="border">Исполнитель: </span>
+                        <span><?= $contractor->getUsername() ?></span>
+                    </div>
+                <?php endif; ?>
                 <?= $model->getDescription() ?>
             </div>
 
@@ -300,6 +306,15 @@ use yii\helpers\Url;
                     <span class="text_14_table_hypothesis">
                         <?= date('d.m.Y', $model->getTimeConfirm()) ?>
                     </span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($contractor): ?>
+                <div class="col-xs-12 mb-5">
+                    <div class="header_table_hypothesis_mobile">Исполнитель:</div>
+                    <div class="text_14_table_hypothesis">
+                        <?= $contractor->getUsername() ?>
+                    </div>
                 </div>
             <?php endif; ?>
 

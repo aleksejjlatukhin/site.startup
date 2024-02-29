@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\models\interfaces\RespondsInterface;
 use app\models\traits\SoftDeleteModelTrait;
+use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\helpers\FileHelper;
@@ -23,6 +24,8 @@ use yii\db\ActiveRecord;
  * @property int $date_plan                             Плановая дата интервью
  * @property string $place_interview                    Место проведения интервью
  * @property int|null $deleted_at                       Дата удаления
+ * @property int|null $contractor_id                    Идентификатор исполнителя, который опросил респондента (если null - опрос проводил проектант)
+ * @property int|null $task_id                          Идентификатор задания исполнителя, по которому исполнитель опросил респондента (если null - опрос проводил проектант)
  *
  * @property ConfirmSegment $confirm                    Подтверждение сегмента
  * @property InterviewConfirmSegment $interview         Информация о проведении интервью
@@ -100,6 +103,7 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
             [['name'], 'string', 'max' => 100],
             [['info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -143,10 +147,11 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
 
 
     /**
+     * @param bool $isRemoveAnswers
      * @return void
      * @throws ErrorException
      */
-    private function deleteDataRespond(): void
+    private function deleteDataRespond(bool $isRemoveAnswers = true): void
     {
         $confirm = ConfirmSegment::findOne($this->getConfirmId());
         $segment = Segments::findOne($confirm->getSegmentId());
@@ -159,7 +164,11 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
         }
         //Удаление ответов респондента на вопросы интервью
         if (AnswersQuestionsConfirmSegment::findAll(['respond_id' => $this->getId()])) {
-            AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $this->getId()]);
+            if ($isRemoveAnswers) {
+                AnswersQuestionsConfirmSegment::deleteAll(['respond_id' => $this->getId()]);
+            } else {
+                AnswersQuestionsConfirmSegment::updateAll(['answer' => ''], ['respond_id' => $this->getId()]);
+            }
         }
         //Удаление дирректории респондента
         $del_dir = UPLOAD.'/user-'.$user->getId().'/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/interviews/respond-'.$this->getId();
@@ -170,6 +179,41 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
         $cachePathDelete = '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId().'/segments/segment-'.$segment->getId().'/confirm/interviews/respond-'.$this->getId();
         if (file_exists($cachePathDelete)) {
             FileHelper::removeDirectory($cachePathDelete);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function clearData(): bool
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            $responds = self::findAll(['confirm_id' => $this->getConfirmId()]);
+            $numberResponds = [];
+            foreach ($responds as $respond) {
+                if (preg_match('/^Респондент \d+$/', $respond->getName())) {
+                    $numberResponds[] = str_replace('Респондент ', '', $respond->getName());
+                }
+            }
+
+            $this->name = 'Респондент ' . (max($numberResponds) + 1);
+            $this->info_respond = '';
+            $this->email = '';
+            $this->date_plan = null;
+            $this->place_interview = '';
+            $this->contractor_id = null;
+            $this->task_id = null;
+            $this->save();
+            $this->deleteDataRespond(false);
+
+            $transaction->commit();
+            return true;
+
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            return false;
         }
     }
 
@@ -294,5 +338,37 @@ class RespondsSegment extends ActiveRecord implements RespondsInterface
     public function setDeletedAt(int $deleted_at): void
     {
         $this->deleted_at = $deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

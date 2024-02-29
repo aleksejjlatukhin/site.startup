@@ -2,7 +2,6 @@
 
 namespace app\modules\contractor\controllers;
 
-use app\models\ContractorProject;
 use app\models\ContractorTasks;
 use app\models\PatternHttpException;
 use app\models\Projects;
@@ -53,7 +52,6 @@ class ProjectsController extends AppContractorController
         $user = User::findOne($id);
         // Проекты, на которые назначен исполнитель
         $projects = Projects::find(false)
-            ->distinct()
             ->innerJoin('contractor_project', '`contractor_project`.`project_id` = `projects`.`id`')
             ->innerJoin('user', '`user`.`id` = `contractor_project`.`contractor_id`')
             ->andWhere(['user.id' => $user->getId()])

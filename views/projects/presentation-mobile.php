@@ -68,6 +68,11 @@ $date_of_announcement = $project->getDateOfAnnouncement() ? date('d.m.Y', $proje
     </div>
 
     <div class="presentation-mobile-one-stage">
+        <div class="presentation-mobile-header-stage">Исполнители проекта</div>
+        <?= $project->showListContractors(true) ?>
+    </div>
+
+    <div class="presentation-mobile-one-stage">
         <div class="presentation-mobile-header-stage">Сведения о технологии</div>
         <div class="presentation-mobile-title-row">На какой технологии основан проект</div>
         <div class="presentation-mobile-simple-row"><?= $project->getTechnology() ?></div>

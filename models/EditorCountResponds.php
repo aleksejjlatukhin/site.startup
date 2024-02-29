@@ -44,10 +44,16 @@ class EditorCountResponds extends Model
             }
         }else{
             $minus = $countResponds - $confirm->getCountRespond();
-            $responds = array_reverse($responds);
-            foreach ($responds as $i => $respond) {
+            $respondsWithoutContractors = [];
+            foreach ($responds as $respond) {
+                if (!$respond->getContractorId()) {
+                    $respondsWithoutContractors[] = $respond;
+                }
+            }
+            $respondsWithoutContractors = array_reverse($respondsWithoutContractors);
+            foreach ($respondsWithoutContractors as $i => $respondWithoutContractor) {
                 if ($i < $minus) {
-                    $respond->delete();
+                    $respondWithoutContractor->delete();
                 }
             }
         }

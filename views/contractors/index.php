@@ -34,26 +34,22 @@ $this->registerCssFile('@web/css/contractors-index-style.css');
 
     </div>
 
-    <div class="container-fluid">
+    <div class="row container-fluid contractor-headers">
 
-        <div class="row" style="display:flex; align-items: center; padding: 30px 0 15px 0; font-weight: 700;">
-
-            <div class="col-md-4" style="padding-left: 30px;">
-                Логин
-            </div>
-
-            <div class="col-md-1">
-                Проекты *
-            </div>
-
-            <div class="col-md-5" style="display:flex; align-items: center; justify-content: space-between;">
-                <div>Последняя коммуникация *</div>
-                <div style="padding-right: 60px;">Дата</div>
-            </div>
-
-            <div class="col-md-2"></div>
-
+        <div class="col-md-4 pl-30">
+            Логин
         </div>
+
+        <div class="col-md-1">
+            Проекты *
+        </div>
+
+        <div class="col-md-5" style="display:flex; align-items: center; justify-content: space-between;">
+            <div>Последняя коммуникация *</div>
+            <div style="padding-right: 60px;">Дата</div>
+        </div>
+
+        <div class="col-md-2"></div>
 
     </div>
 

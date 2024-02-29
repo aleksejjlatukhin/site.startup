@@ -74,6 +74,12 @@ class InterviewsController extends AppUserPartController
                 return parent::beforeAction($action);
             }
 
+            if ($respond->getContractorId() === Yii::$app->user->getId()) {
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
             PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
@@ -82,8 +88,14 @@ class InterviewsController extends AppUserPartController
             $confirm = $respond->confirm;
             $hypothesis = $confirm->hypothesis;
             $project = $hypothesis->project;
-            
-            if ($project->getUserId() === Yii::$app->user->getId()){
+
+            if ($project->getUserId() === Yii::$app->user->getId()) {
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
+            if ($respond->getContractorId() === Yii::$app->user->getId()) {
                 // ОТКЛЮЧАЕМ CSRF
                 $this->enableCsrfValidation = false;
                 return parent::beforeAction($action);
@@ -194,7 +206,7 @@ class InterviewsController extends AppUserPartController
                     foreach ($cache[$classQuestions] as $answerCache) {
                         foreach ($respond->answers as $answer) { // Добавляем ответы на вопросы интервью для полей модели AnswersQuestionsConfirmSegment
                             if ($answer->getQuestionId() === (int)$answerCache['question_id']) {
-                                $answer->setAnswer((int)$answerCache['answer']);
+                                $answer->setAnswer($answerCache['answer']);
                             }
                         }
                     }

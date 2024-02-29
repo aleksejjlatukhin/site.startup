@@ -1440,6 +1440,7 @@ class ProjectsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
@@ -1456,6 +1457,7 @@ class ProjectsController extends AppUserPartController
      * @return void|Response
      * @throws HttpException
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionRecovery(int $id)
     {

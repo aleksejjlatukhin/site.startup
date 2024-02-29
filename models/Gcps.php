@@ -32,6 +32,8 @@ use yii\db\ActiveRecord;
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
  * @property int|null $deleted_at                   Дата удаления
+ * @property int|null $contractor_id                Идентификатор исполнителя, создавшего ЦП (если null - ЦП создано проектантом)
+ * @property int|null $task_id                      Идентификатор задания исполнителя, по которому создано ЦП (если null - ЦП создано проектантом)
  * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property ConfirmGcp $confirm                    Подтверждение ценностного предложения
@@ -41,6 +43,7 @@ use yii\db\ActiveRecord;
  * @property Segments $segment                      Сегмент
  * @property Projects $project                      Проект
  * @property RespondsProblem[] $respondsAgents      Респонденты, которые подтвердили текущую проблему
+ * @property User|null $contractor                  Исполнитель создавший ГЦП
  */
 class Gcps extends ActiveRecord
 {
@@ -157,7 +160,19 @@ class Gcps extends ActiveRecord
     {
         return RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->andWhere(['confirm_id' => $this->getConfirmProblemId(), 'interview_confirm_problem.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $this->getConfirmProblemId(), 'interview_confirm_problem.status' => '1'])
+            ->andWhere(['contractor_id' => null])
+            ->all();
+    }
+
+
+    /**
+     * Исполнитель создавший ГЦП
+     * @return User|null
+     */
+    public function getContractor(): ?User
+    {
+        return $this->getContractorId() ? User::findOne($this->getContractorId()) : null;
     }
 
 
@@ -176,6 +191,7 @@ class Gcps extends ActiveRecord
                 EnableExpertise::OFF,
                 EnableExpertise::ON,
             ]],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -303,6 +319,7 @@ class Gcps extends ActiveRecord
     /**
      * @param bool $sendCommunications
      * @return false|int
+     * @throws Throwable
      */
     public function softDeleteStage(bool $sendCommunications = true)
     {
@@ -341,6 +358,16 @@ class Gcps extends ActiveRecord
 
                 QuestionsConfirmGcp::softDeleteAll(['confirm_id' => $confirm->getId()]);
                 RespondsGcp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Изменение статусов заданий исполнителей на "Удалено"
+                    if (!ContractorTasks::deleteByParams(StageExpertise::CONFIRM_GCP, $confirm->getId()) ||
+                        !ContractorTasks::deleteByParams(StageExpertise::MVP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
+
                 $confirm->softDelete(['id' => $confirm->getId()]);
             }
 
@@ -364,6 +391,7 @@ class Gcps extends ActiveRecord
 
     /**
      * @return false|int
+     * @throws Throwable
      */
     public function recoveryStage()
     {
@@ -400,6 +428,15 @@ class Gcps extends ActiveRecord
                 QuestionsConfirmGcp::recoveryAll(['confirm_id' => $confirm->getId()]);
                 RespondsGcp::recoveryAll(['confirm_id' => $confirm->getId()]);
                 $confirm->recovery(['id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Воостановление статусов заданий исполнителей
+                    if (!ContractorTasks::recoveryByParams(StageExpertise::CONFIRM_GCP, $confirm->getId()) ||
+                        !ContractorTasks::recoveryByParams(StageExpertise::MVP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
             }
 
             $result = $this->recovery(['id' => $this->getId()]);
@@ -682,5 +719,37 @@ class Gcps extends ActiveRecord
     public function setDeletedAt(int $deleted_at): void
     {
         $this->deleted_at = $deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

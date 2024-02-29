@@ -366,9 +366,10 @@ class Projects extends ActiveRecord
 
     /**
      * Показать исполнителей проекта
+     * @param bool $mobile
      * @return string|null
      */
-    public function showListContractors(): ?string
+    public function showListContractors(bool $mobile = false): ?string
     {
         $contractorProjects = ContractorProject::findAll([
             'project_id' => $this->getId(),
@@ -395,9 +396,19 @@ class Projects extends ActiveRecord
         $k = 0;
         foreach ($contractors as $contractor) {
             $k++;
-            $result .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №'.$k.'</div>';
-            $result .= '<div>Логин: ' . $contractor['username'] . '</div>';
-            $result .= '<div>Вид деятельности: ' . $contractor['activity'] . '</div>';
+            if (!$mobile) {
+                $result .= '<div style="padding-bottom: 10px;"><div style="font-weight: bold;">Сотрудник №' . $k . '</div>';
+                $result .= '<div>Логин: ' . $contractor['username'] . '</div>';
+                $result .= '<div>Вид деятельности: ' . $contractor['activity'] . '</div>';
+            } else {
+                $result .= '<div class="presentation-mobile-title-row">Сотрудник '.$k.'</div>';
+                $result .= '<div class="presentation-mobile-simple-row">' . $contractor['username'] . '</div>';
+                $result .= '<div class="presentation-mobile-title-row">Вид деятельности: </div>';
+                $result .= '<div class="presentation-mobile-simple-row">' . $contractor['activity'] . '</div>';
+                if ($k !== count($this->contractors)) {
+                    $result .= '<div class="presentation-mobile-simple-row"></div>';
+                }
+            }
         }
 
         return $result;
@@ -737,6 +748,14 @@ class Projects extends ActiveRecord
                 foreach ($segments as $segment) {
                     $segment->softDeleteStage(false);
                 }
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Изменение статусов заданий исполнителей на "Удалено"
+                    if (!ContractorTasks::deleteByParams(StageExpertise::SEGMENT, $this->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
             }
 
             Authors::softDeleteAll(['project_id' => $this->getId()]);
@@ -761,6 +780,7 @@ class Projects extends ActiveRecord
 
     /**
      * @return false|int
+     * @throws Throwable
      */
     public function recoveryStage()
     {
@@ -774,6 +794,14 @@ class Projects extends ActiveRecord
             if (count($segments) > 0) {
                 foreach ($segments as $segment) {
                     $segment->recoveryStage();
+                }
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Воостановление статусов заданий исполнителей
+                    if (!ContractorTasks::recoveryByParams(StageExpertise::SEGMENT, $this->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
                 }
             }
 

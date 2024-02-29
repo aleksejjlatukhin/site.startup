@@ -5,6 +5,7 @@ use app\models\ConfirmSegment;
 use app\models\Problems;
 use app\models\Projects;
 use app\models\Segments;
+use app\models\User;
 use yii\helpers\Html;
 
 /**
@@ -13,6 +14,7 @@ use yii\helpers\Html;
  * @var Projects $project
  * @var Segments $segment
  * @var ConfirmSegment $segmentConfirm
+ * @var int $countContractorResponds
  */
 
 $project = Projects::find(false)->andWhere(['id' => $problem->getProjectId()])->one();
@@ -76,6 +78,14 @@ $segmentConfirm = ConfirmSegment::find(false)->andWhere(['segment_id' => $segmen
             <div class="col-md-12">Потребность потребителя сегмента, которую проверяем</div>
             <div class="col-md-12"><?= $model->getNeedConsumer() ?></div>
         </div>
+
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])): ?>
+            <div class="row">
+                <div class="col-md-12">Количество респондентов, занятых исполнителями:
+                    <span><?= $countContractorResponds ?></span>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <div class="row">
             <div class="col-md-12">Количество респондентов (представителей сегмента):

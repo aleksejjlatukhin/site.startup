@@ -5,8 +5,10 @@ namespace app\controllers;
 use app\models\ContractorActivities;
 use app\models\ContractorProject;
 use app\models\ContractorTasks;
+use app\models\forms\FormComment;
 use app\models\forms\FormCreateTaskHypothesis;
 use app\models\PatternHttpException;
+use app\models\StageExpertise;
 use app\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -49,11 +51,57 @@ class TasksController extends AppUserPartController
             $contractorIds = array_unique(array_column($contractorProjects, 'contractor_id'));
 
             if (count($contractorIds) > 0) {
+                $contractorsQuery = User::find()
+                    ->leftJoin('contractor_info', '`contractor_info`.`contractor_id` = `user`.`id`')
+                    ->andWhere(['in', 'user.id', $contractorIds]);
+
+                /** @var $activitiesForStage ContractorActivities[] */
+                $activitiesForStage = [];
+                if (in_array($stage, [StageExpertise::SEGMENT, StageExpertise::PROBLEM, StageExpertise::GCP, StageExpertise::MVP], true)) {
+                    if ($stage === StageExpertise::GCP) {
+                        $activitiesForStage = ContractorActivities::find()->andWhere(['in', 'title', ['Маркетинг', 'Техническая разработка']])->all();
+                        $contractorsQuery->andWhere(['or',
+                            ['like', 'contractor_info.activities', $activitiesForStage[0]->getId()],
+                            ['like', 'contractor_info.activities', $activitiesForStage[1]->getId()],
+                        ]);
+                    } else {
+                        $activitiesForStage = ContractorActivities::findAll(['title' => 'Маркетинг']);
+                        $contractorsQuery->andWhere(['like', 'contractor_info.activities', $activitiesForStage[0]->getId()]);
+                    }
+
+                } elseif (in_array($stage, [StageExpertise::CONFIRM_SEGMENT, StageExpertise::CONFIRM_PROBLEM, StageExpertise::CONFIRM_GCP, StageExpertise::CONFIRM_MVP], true)) {
+                    if ($stage === StageExpertise::CONFIRM_MVP) {
+                        $activitiesForStage = ContractorActivities::findAll(['title' => 'Полевая работа']);
+                        $contractorsQuery->andWhere(['like', 'contractor_info.activities', $activitiesForStage[0]->getId()]);
+                    } else {
+                        $activitiesForStage = ContractorActivities::find()->andWhere(['in', 'title', ['Маркетинг', 'Полевая работа']])->all();
+                        $contractorsQuery->andWhere(['or',
+                            ['like', 'contractor_info.activities', $activitiesForStage[0]->getId()],
+                            ['like', 'contractor_info.activities', $activitiesForStage[1]->getId()],
+                        ]);
+                    }
+                }
+
+                if (!$activitiesForStage) {
+                    $response = [
+                        'headerContent' => 'Новое задание',
+                        'renderAjax' => $this->renderAjax('not-found-contractors'),
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+
+                $activitiesIdsForStage = array_map(static function (ContractorActivities $activity) {
+                    return $activity->getId();
+                }, $activitiesForStage);
+
                 /** @var $contractors User[] */
-                $contractors = User::find()
-                    ->andWhere(['in', 'id', $contractorIds])
+                $contractors = $contractorsQuery
+                    ->select('user.*')
                     ->all();
 
+                $contractorIds = array_unique(array_column($contractors, 'id'));
                 $contractorOptions = ArrayHelper::map($contractors, 'id', 'username');
                 $activitiesContractor = ContractorProject::findAll([
                     'contractor_id' => $contractorId ?: $contractorIds[0],
@@ -62,6 +110,7 @@ class TasksController extends AppUserPartController
                 ]);
 
                 $activityIds = array_unique(array_column($activitiesContractor, 'activity_id'));
+                $activityIds = array_intersect($activityIds, $activitiesIdsForStage);
                 $activities = ContractorActivities::find()->andWhere(['in', 'id', $activityIds])->all();
                 $activityOptions = ArrayHelper::map($activities, 'id', 'title');
 
@@ -105,18 +154,21 @@ class TasksController extends AppUserPartController
         if(Yii::$app->request->isAjax) {
 
             $success = false;
+            $reloadPage = false;
             if ($_POST['FormCreateTaskHypothesis']) {
                 $projectId = $_POST['FormCreateTaskHypothesis']['projectId'];
                 $stage = $_POST['FormCreateTaskHypothesis']['type'];
                 $stageId = $_POST['FormCreateTaskHypothesis']['hypothesisId'];
                 $formTask = new FormCreateTaskHypothesis($projectId, $stage, $stageId);
                 if ($formTask->load(Yii::$app->request->post())) {
-                    $success = (bool)$formTask->create();
+                    [$success, $reloadPage] = $formTask->create();
                 }
             }
 
             $response = [
-                'renderAjax' => $this->renderAjax('result-create', ['success' => $success]),
+                'reloadPage' => $reloadPage,
+                'renderAjax' => $this->renderAjax('result-create', [
+                    'success' => (bool)$success]),
             ];
 
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -193,7 +245,7 @@ class TasksController extends AppUserPartController
 
                 $response = [
                     'renderAjax' => $this->renderAjax('get-tasks-by-params', [
-                        'tasks' => $contractorTasks
+                        'tasks' => $contractorTasks, 'formComment' => new FormComment()
                     ]),
                 ];
 
@@ -201,6 +253,31 @@ class TasksController extends AppUserPartController
                 $response = [
                     'renderAjax' => $this->renderAjax('not-found-tasks-by-contractor'),
                 ];
+            }
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->data = $response;
+            return $response;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param int $taskId
+     * @param int $newStatus
+     * @return array|false
+     * @throws \Throwable
+     */
+    public function actionChangeStatus(int $taskId, int $newStatus)
+    {
+        if (Yii::$app->request->isAjax) {
+            $response = ['success' => false];
+            $formComment = new FormComment();
+            $task = ContractorTasks::findOne($taskId);
+            if ($formComment->load(Yii::$app->request->post()) && $task->changeStatus($newStatus, $formComment->getComment())) {
+                $response = ['success' => true, 'projectId' => $task->getProjectId()];
             }
 
             Yii::$app->response->format = Response::FORMAT_JSON;

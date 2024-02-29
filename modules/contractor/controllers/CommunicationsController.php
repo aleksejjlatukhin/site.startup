@@ -65,7 +65,6 @@ class CommunicationsController extends AppContractorController
         $user = User::findOne($id);
         // Проекты, по которым у исполнителя есть коммуникации
         $projects = Projects::find(false)
-            ->distinct()
             ->leftJoin('contractor_communications', '`contractor_communications`.`project_id` = `projects`.`id`')
             ->andWhere(['or', ['contractor_communications.sender_id' => $id], ['contractor_communications.adressee_id' => $id]])
             ->orderBy('contractor_communications.id DESC')
@@ -107,6 +106,7 @@ class CommunicationsController extends AppContractorController
         $communications = ContractorCommunications::find()
             ->andWhere(['project_id' => $project_id])
             ->andWhere(['not', ['type' => ContractorCommunicationTypes::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT]])
+            ->andWhere(['not', ['type' => ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK]])
             ->andWhere(['or', ['adressee_id' => Yii::$app->user->getId()], ['sender_id' => Yii::$app->user->getId()]])
             ->orderBy('id DESC')
             ->all();
@@ -239,7 +239,7 @@ class CommunicationsController extends AppContractorController
                         $result_ReadCommunication = $this->responseForReadCommunication($communicationAnswered->getId());
 
                         // Отправка письма проектанту на почту
-                        //TODO: Раскомментировать, когда будет нормально работать отправка писем!!!
+                        //TODO: Раскомментировать, когда будет нормально работать отправка писем
 
                         // $this->sendCommunicationToEmail($communication);
 

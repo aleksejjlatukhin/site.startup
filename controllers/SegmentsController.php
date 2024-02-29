@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
+use app\models\ContractorTasks;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateSegment;
 use app\models\forms\FormFilterRequirement;
@@ -395,15 +396,32 @@ class SegmentsController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param int|null $taskId
      * @return bool
+     * @throws Throwable
      */
-    public function actionSaveCacheCreationForm(int $id): bool
+    public function actionSaveCacheCreationForm(int $id, int $taskId = null): bool
     {
-        $project = Projects::findOne($id);
-        $cachePath = FormCreateSegment::getCachePath($project);
-        $cacheName = 'formCreateHypothesisCache';
-
         if(Yii::$app->request->isAjax) {
+
+            try {
+                if (!$taskId) {
+                    $project = Projects::findOne($id);
+                    $projectId = $project->getId();
+                } else {
+                    $task = ContractorTasks::findOne($taskId);
+                    $projectId = $task->getProjectId();
+                    if ($task->getStatus() === ContractorTasks::TASK_STATUS_NEW) {
+                        $task->changeStatus(ContractorTasks::TASK_STATUS_PROCESS);
+                    }
+                }
+
+            } catch (\Exception $exception) {
+                return false;
+            }
+
+            $cachePath = FormCreateSegment::getCachePath($projectId);
+            $cacheName = 'formCreateHypothesisCache';
 
             $cache = new CacheForm();
             $cache->setCache($cachePath, $cacheName);
@@ -870,6 +888,7 @@ class SegmentsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
@@ -887,6 +906,7 @@ class SegmentsController extends AppUserPartController
      * @return void|Response
      * @throws HttpException
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionRecovery(int $id)
     {

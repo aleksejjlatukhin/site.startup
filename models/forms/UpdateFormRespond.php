@@ -19,6 +19,8 @@ use yii\base\Model;
  * @property $date_plan                             Плановая дата проведения интервью
  * @property int $confirm_id                        Идентификатор подтверждения гипотезы, к которому отновится респондент
  * @property int|null deleted_at                    Дата удаления
+ * @property int|null $contractor_id                Идентификатор исполнителя, который опросил респондента (если null - опрос проводил проектант)
+ * @property int|null $task_id                      Идентификатор задания исполнителя, по которому исполнитель опросил респондента (если null - опрос проводил проектант)
  */
 abstract class UpdateFormRespond extends Model
 {
@@ -31,6 +33,8 @@ abstract class UpdateFormRespond extends Model
     public $date_plan;
     public $confirm_id;
     public $deleted_at;
+    public $contractor_id;
+    public $task_id;
 
 
     /**
@@ -46,6 +50,7 @@ abstract class UpdateFormRespond extends Model
             [['name'], 'string', 'max' => 100],
             [['info_respond', 'place_interview', 'email'], 'string', 'max' => 255],
             ['email', 'email', 'message' => 'Неверный формат адреса электронной почты'],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -189,5 +194,37 @@ abstract class UpdateFormRespond extends Model
     public function getDeletedAt(): ?int
     {
         return $this->deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

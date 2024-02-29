@@ -3,7 +3,6 @@
 use app\models\ConfirmGcp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
-use app\models\EnableExpertise;
 use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\Mvps;
@@ -11,11 +10,9 @@ use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmGcp;
 use app\models\Segments;
-use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use app\models\User;
 
 $this->title = 'Подтверждение гипотез ценностных предложений';
 $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
@@ -30,6 +27,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
  * @var Projects $project
  * @var QuestionsConfirmGcp[] $questions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -199,7 +197,8 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
         <div id="step_one" class="tabcontent row">
             <?= $this->render('ajax_data_confirm_trash', [
                 'model' => $model,
-                'gcp' => $gcp
+                'gcp' => $gcp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 
@@ -457,6 +456,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
                 <?= $this->render('ajax_data_confirm_trash', [
                     'model' => $model,
                     'gcp' => $gcp,
+                    'countContractorResponds' => $countContractorResponds
                 ]) ?>
             </div>
 

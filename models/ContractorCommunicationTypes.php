@@ -26,13 +26,14 @@ class ContractorCommunicationTypes
     public const USER_APPOINTS_MVP_TASK_CONTRACTOR = 10071;
     public const USER_APPOINTS_CONFIRM_MVP_TASK_CONTRACTOR = 10081;
 
-    //TODO: Проработать сценарий отправки коммуникаций
-    // исполнителям при удалении этапов проекта проектантом
     public const USER_DELETED_PROJECT = 2000;
     public const USER_DELETED_SEGMENT = 2001;
     public const USER_DELETED_PROBLEM = 2003;
     public const USER_DELETED_GCP = 2005;
     public const USER_DELETED_MVP = 2007;
+
+    public const USER_CHANGE_STATUS_TASK = 3003;
+    public const CONTRACTOR_CHANGE_STATUS_TASK = 3004;
 
     /**
      * @return array
@@ -45,7 +46,8 @@ class ContractorCommunicationTypes
             self::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT,
             self::SIMPLE_USER_APPOINTS_CONTRACTOR_PROJECT,
             self::SIMPLE_USER_DOES_NOT_APPOINTS_CONTRACTOR_PROJECT,
-            self::SIMPLE_USER_WITHDRAWS_CONTRACTOR_FROM_PROJECT
+            self::SIMPLE_USER_WITHDRAWS_CONTRACTOR_FROM_PROJECT,
+            self::CONTRACTOR_CHANGE_STATUS_TASK
         ];
     }
 }

@@ -33,6 +33,8 @@ use yii\db\ActiveRecord;
  * @property string $enable_expertise               Параметр разрешения на экспертизу по даному этапу
  * @property int|null $enable_expertise_at          Дата разрешения на экспертизу по даному этапу
  * @property int|null $deleted_at                   Дата удаления
+ * @property int|null $contractor_id                Идентификатор исполнителя, создавшего MVP (если null - MVP создан проектантом)
+ * @property int|null $task_id                      Идентификатор задания исполнителя, по которому создан MVP (если null - MVP создан проектантом)
  * @property PropertyContainer $propertyContainer   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property ConfirmMvp $confirm                    Подтверждение mvp-продукта
@@ -42,6 +44,7 @@ use yii\db\ActiveRecord;
  * @property Gcps $gcp                              Ценностное предложение
  * @property BusinessModel $businessModel           Бизнес-модель
  * @property RespondsGcp[] $respondsAgents          Респонденты которые подтвердили текущее ценностное предложение
+ * @property User|null $contractor                  Исполнитель создавший MVP
  */
 class Mvps extends ActiveRecord
 {
@@ -158,7 +161,19 @@ class Mvps extends ActiveRecord
     {
         return RespondsGcp::find()->with('interview')
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-            ->andWhere(['confirm_id' => $this->getConfirmGcpId(), 'interview_confirm_gcp.status' => '1'])->all();
+            ->andWhere(['confirm_id' => $this->getConfirmGcpId(), 'interview_confirm_gcp.status' => '1'])
+            ->andWhere(['contractor_id' => null])
+            ->all();
+    }
+
+
+    /**
+     * Исполнитель создавший MVP
+     * @return User|null
+     */
+    public function getContractor(): ?User
+    {
+        return $this->getContractorId() ? User::findOne($this->getContractorId()) : null;
     }
 
 
@@ -178,6 +193,7 @@ class Mvps extends ActiveRecord
                 EnableExpertise::OFF,
                 EnableExpertise::ON,
             ]],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -303,6 +319,7 @@ class Mvps extends ActiveRecord
     /**
      * @param bool $sendCommunications
      * @return false|int
+     * @throws Throwable
      */
     public function softDeleteStage(bool $sendCommunications = true)
     {
@@ -339,6 +356,15 @@ class Mvps extends ActiveRecord
 
                 QuestionsConfirmMvp::softDeleteAll(['confirm_id' => $confirm->getId()]);
                 RespondsMvp::softDeleteAll(['confirm_id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Изменение статусов заданий исполнителей на "Удалено"
+                    if (!ContractorTasks::deleteByParams(StageExpertise::CONFIRM_MVP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
+
                 $confirm->softDelete(['id' => $confirm->getId()]);
             }
 
@@ -362,6 +388,7 @@ class Mvps extends ActiveRecord
 
     /**
      * @return false|int
+     * @throws Throwable
      */
     public function recoveryStage()
     {
@@ -396,6 +423,14 @@ class Mvps extends ActiveRecord
                 QuestionsConfirmMvp::recoveryAll(['confirm_id' => $confirm->getId()]);
                 RespondsMvp::recoveryAll(['confirm_id' => $confirm->getId()]);
                 $confirm->recovery(['id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Воостановление статусов заданий исполнителей
+                    if (!ContractorTasks::recoveryByParams(StageExpertise::CONFIRM_MVP, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
             }
 
             $result = $this->recovery(['id' => $this->getId()]);
@@ -691,5 +726,37 @@ class Mvps extends ActiveRecord
     public function setDeletedAt(int $deleted_at): void
     {
         $this->deleted_at = $deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

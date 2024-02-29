@@ -272,7 +272,7 @@ class ContractorsController extends AppUserPartController
                             $result_ReadCommunication = $this->responseForReadCommunication($triggered_communication_id);
                         }
 
-                        // Отправка письма эксперту на почту
+                        // Отправка письма на почту
                         //$this->sendCommunicationToEmail($communication);
 
                         $result_SendCommunication = ['success' => true, 'type' => $type, 'project_id' => $project_id];
@@ -426,12 +426,4 @@ class ContractorsController extends AppUserPartController
             'contractor' => $contractor
         ]);
     }
-
-
-    //TODO: Продолжить отсюда!!!
-    // 1. Добавить параметр contractor_id в модели segments, problems, gcps, mvps, responds(все таб. с респондентами) и возможно таб. с вопросами
-    // Создание и редактирование числа респондентов подтверждения гипотезы детально описано в заметках!!!
-    // 2. Сделать страницы для работы исполнителей над проектами в модуле contractor
-    // 3. При удалении этапов проекта проектантом отправлять исполнителям уведомления и закрывать им возможность продолжать работу по этапу.
-    // При удалении проекта дополнительно выставить параметр deleted_at в связях contractor_projects.
 }

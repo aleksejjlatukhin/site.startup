@@ -122,7 +122,10 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
      */
     public function getContractor(): ?User
     {
-        if ($this->getType() === ContractorCommunicationTypes::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT) {
+        if (in_array($this->getType(), [
+            ContractorCommunicationTypes::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT,
+            ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK
+        ], true)) {
             return User::findOne($this->getSenderId());
         }
 
@@ -131,7 +134,8 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             ContractorCommunicationTypes::SIMPLE_USER_WITHDRAWS_REQUEST_ABOUT_READINESS_TO_JOIN_PROJECT,
             ContractorCommunicationTypes::SIMPLE_USER_APPOINTS_CONTRACTOR_PROJECT,
             ContractorCommunicationTypes::SIMPLE_USER_DOES_NOT_APPOINTS_CONTRACTOR_PROJECT,
-            ContractorCommunicationTypes::SIMPLE_USER_WITHDRAWS_CONTRACTOR_FROM_PROJECT
+            ContractorCommunicationTypes::SIMPLE_USER_WITHDRAWS_CONTRACTOR_FROM_PROJECT,
+            ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK,
         ], true)) {
             return User::findOne($this->getAdresseeId());
         }
@@ -148,7 +152,10 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
      */
     public function getUser(): ?User
     {
-        if ($this->getType() === ContractorCommunicationTypes::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT) {
+        if (in_array($this->getType(), [
+            ContractorCommunicationTypes::CONTRACTOR_ANSWERS_QUESTION_ABOUT_READINESS_TO_JOIN_PROJECT,
+            ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK
+        ], true)) {
             return User::findOne($this->getAdresseeId());
         }
 
@@ -172,6 +179,7 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             ContractorCommunicationTypes::USER_DELETED_PROBLEM,
             ContractorCommunicationTypes::USER_DELETED_GCP,
             ContractorCommunicationTypes::USER_DELETED_MVP,
+            ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK,
         ], true)) {
             return User::findOne($this->getSenderId());
         }
@@ -344,6 +352,21 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             return '<div class="text-danger">Отказано в назначении на проект</div>';
         } elseif ($this->getType() === ContractorCommunicationTypes::SIMPLE_USER_WITHDRAWS_CONTRACTOR_FROM_PROJECT) {
             return '<div class="text-danger">Отозван(-а) с проекта</div>';
+        } elseif (in_array($this->getType(), [
+            ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK,
+            ContractorCommunicationTypes::USER_APPOINTS_SEGMENT_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_SEGMENT_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_PROBLEM_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_PROBLEM_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_GCP_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_GCP_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_MVP_TASK_CONTRACTOR,
+            ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_MVP_TASK_CONTRACTOR,
+        ], true)) {
+            if ($this->getStatus() === self::STATUS_READ) {
+                return '<div class="text-success">Прочитано</div>';
+            }
+            return '<div class="text-warning">Не прочитано</div>';
         }
 
         return '';
@@ -384,7 +407,7 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
 
     /**
      * Проверка на необходимость спросить исполнителя
-     * (о готовности провести экспертизу)
+     * (о готовности сделать задание)
      *
      * @param int $contractor_id
      * @param int $project_id
@@ -491,6 +514,8 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             } elseif ($this->getType() === ContractorCommunicationTypes::SIMPLE_USER_ASKS_ABOUT_READINESS_TO_JOIN_PROJECT &&
                 ($this->getStatus() === self::STATUS_NO_READ || time() > $this->contractorProjectAccess->getDateStop())) {
                 return true;
+            } elseif ($this->getType() === ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK && $this->getStatus() === self::STATUS_NO_READ) {
+                return true;
             }
         }
         if (User::isUserSimple(Yii::$app->user->identity['username'])) {
@@ -498,6 +523,8 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
                 if ($this->getStatus() === self::STATUS_NO_READ && !self::findOne(['triggered_communication_id' => $this->getId()])) {
                     return true;
                 }
+            } elseif ($this->getType() === ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK && $this->getStatus() === self::STATUS_NO_READ) {
+                return true;
             }
         }
         return false;
@@ -574,35 +601,68 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             $defaultPattern = ContractorCommunicationPatterns::COMMUNICATION_DEFAULT_USER_CREATED_TASK_STAGE_PROJECT;
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_SEGMENT_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::SEGMENT), ['/contractor/segments/index', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::SEGMENT), ['/contractor/segments/index', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::SEGMENT);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_SEGMENT_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_SEGMENT), ['/contractor/confirm-segment/view', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_SEGMENT), ['/contractor/confirm-segment/view', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::CONFIRM_SEGMENT);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_PROBLEM_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::PROBLEM), ['/contractor/problems/index', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::PROBLEM), ['/contractor/problems/index', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::PROBLEM);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_PROBLEM_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_PROBLEM), ['/contractor/confirm-problem/view', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_PROBLEM), ['/contractor/confirm-problem/view', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::CONFIRM_PROBLEM);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_GCP_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::GCP), ['/contractor/gcps/index', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::GCP), ['/contractor/gcps/index', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::GCP);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_GCP_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_GCP), ['/contractor/confirm-gcp/view', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_GCP), ['/contractor/confirm-gcp/view', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::CONFIRM_GCP);
+                }
+
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_MVP_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::MVP), ['/contractor/mvps/index', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::MVP), ['/contractor/mvps/index', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::MVP);
+                }
             }
 
             if ($this->getType() === ContractorCommunicationTypes::USER_APPOINTS_CONFIRM_MVP_TASK_CONTRACTOR) {
-                $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_MVP), ['/contractor/confirm-mvp/view', 'id' => $this->getStageId()]);
+                if (!User::isUserContractor(Yii::$app->user->identity['username'])) {
+                    $linkStageProject_replace = Html::a($this->getNameStage(StageExpertise::CONFIRM_MVP), ['/contractor/confirm-mvp/view', 'id' => $this->getStageId()]);
+                } else {
+                    $linkStageProject_replace = $this->getNameStage(StageExpertise::CONFIRM_MVP);
+                }
             }
 
             return str_replace($activity_search, $activity_replace, str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern))));
@@ -642,6 +702,32 @@ class ContractorCommunications extends ActiveRecord implements CommunicationsInt
             }
 
             return str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern)));
+        }
+
+        if (in_array($this->getType(), [
+            ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK,
+            ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK
+        ], true)) {
+            $userName_search = '{{пользователь}}';
+            $activity_search = '{{вид деятельности исполнителя}}';
+            $linkStageProject_search = '{{наименование этапа проекта}}';
+            $userName_replace = $this->user->getUsername();
+            $activity_replace = $this->activity->getTitle();
+            $linkStageProject_replace = '';
+            $defaultPattern = '';
+
+            if ($this->getType() === ContractorCommunicationTypes::USER_CHANGE_STATUS_TASK) {
+                $defaultPattern = ContractorCommunicationPatterns::COMMUNICATION_DEFAULT_USER_CHANGE_STATUS_TASK;
+                $linkStageProject_replace = $this->getNameStage($this->getStage());
+            }
+
+            if ($this->getType() === ContractorCommunicationTypes::CONTRACTOR_CHANGE_STATUS_TASK) {
+                $userName_replace = $this->contractor->getUsername();
+                $defaultPattern = ContractorCommunicationPatterns::COMMUNICATION_DEFAULT_CONTRACTOR_CHANGE_STATUS_TASK;
+                $linkStageProject_replace = $this->getNameStage($this->getStage());
+            }
+
+            return str_replace($activity_search, $activity_replace, str_replace($projectName_search, $projectName_replace, str_replace($userName_search, $userName_replace, str_replace($linkStageProject_search, $linkStageProject_replace, $defaultPattern))));
         }
         
         return '';

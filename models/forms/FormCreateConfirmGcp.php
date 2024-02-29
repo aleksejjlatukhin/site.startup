@@ -60,9 +60,14 @@ class FormCreateConfirmGcp extends FormCreateConfirm
     public function rules(): array
     {
         return [
-            [['hypothesis_id', 'count_respond', 'count_positive'], 'required'],
+            [['hypothesis_id', 'count_positive'], 'required'],
+            ['count_respond', 'required', 'when' => function($model) {
+                return $model->add_count_respond === 0;
+            }],
+            ['add_count_respond', 'required', 'when' => function($model) {
+                return $model->count_respond === 0;
+            }],
             [['hypothesis_id'], 'integer'],
-            [['count_respond', 'count_positive', 'add_count_respond'], 'integer', 'integerOnly' => TRUE, 'min' => '1'],
             [['count_respond', 'count_positive', 'add_count_respond'], 'integer', 'integerOnly' => TRUE, 'max' => '100'],
         ];
     }

@@ -16,7 +16,7 @@ $(body).on('beforeSubmit', '#searchContractorsForm', function(e){
         cache: false,
         success: function(response){
             if (response.success) {
-                if ($('.headers-contractor-ajax-list').css('display') === 'none') {
+                if ($('.headers-contractor-ajax-list').css('display') === 'none' && $(window).width() > '990') {
                     $('.headers-contractor-ajax-list').toggle('display');
                 }
                 $('.block_all_contractors').html(response.renderAjax);
@@ -32,10 +32,18 @@ $(body).on('beforeSubmit', '#searchContractorsForm', function(e){
 // Показать информацию о исполнителе
 $(body).on('click', '.openContractorInfo', function (e) {
 
-    var parent = $(this).parents('.column-user-fio');
-    var id_contractor = $(parent).attr('id').split('linkContractorInfo-')[1];
-    $('.blockContractorInfo.containerContractorInfo-' + id_contractor).toggle('display');
-    var preParent = parent.parents('.container-one_user')
+    if ($(window).width() > '990') {
+        var parent = $(this).parents('.column-user-fio');
+        var id_contractor = $(parent).attr('id').split('linkContractorInfo-')[1];
+        $('.blockContractorInfo.containerContractorInfo-' + id_contractor).toggle('display');
+        var preParent = parent.parents('.container-one_user')
+    } else {
+        var parent = $(this).parents('.action-buttons');
+        var id_contractor = $(parent).attr('id').split('linkContractorInfo-')[1];
+        $('.blockContractorInfo.containerContractorInfo-' + id_contractor).toggle('display');
+        var preParent = parent.parents('.container-one_user_mobile')
+    }
+
     if (preParent.hasClass('active')) {
         preParent.removeClass('active')
     } else {
@@ -51,7 +59,11 @@ $(body).on('click', '.openContractorInfo', function (e) {
 $(body).on('click', '.send-communication', function (e) {
 
     var url = $(this).attr('href');
-    var container = $(this).parent();
+    if ($(window).width() > '990') {
+        var container = $(this).parent();
+    } else {
+        var container = $('.button-send-communication');
+    }
 
     $.ajax({
         url: url,

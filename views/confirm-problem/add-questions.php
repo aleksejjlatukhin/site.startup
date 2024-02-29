@@ -28,6 +28,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
  * @var ConfirmSegment $confirmSegment
  * @var Segments $segment
  * @var Projects $project
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -187,6 +188,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
             'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
             'model' => $model,
             'problem' => $problem,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -395,6 +397,7 @@ $this->registerCssFile('@web/css/confirm-problem-add_questions-style.css');
                 'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
                 'model' => $model,
                 'problem' => $problem,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

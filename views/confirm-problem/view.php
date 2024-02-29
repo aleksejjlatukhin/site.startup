@@ -30,6 +30,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -194,6 +195,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
             'model' => $model,
             'problem' => $problem,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -476,6 +478,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                 'formUpdateConfirmProblem' => $formUpdateConfirmProblem,
                 'model' => $model,
                 'problem' => $problem,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

@@ -4,6 +4,7 @@
 namespace app\models\forms;
 
 use app\models\ConfirmProblem;
+use Yii;
 use yii\base\ErrorException;
 use yii\base\Model;
 use app\models\Projects;
@@ -24,6 +25,8 @@ use yii\web\NotFoundHttpException;
  * @property int $basic_confirm_id                  Идентификатор записи в таб. confirm_problem
  * @property CacheForm $_cacheManager               Менеджер кэширования
  * @property string $cachePath                      Путь к файлу кэша
+ * @property int|null $contractor_id                Идентификатор исполнителя, создавшего ГЦП (если null - ГЦП создано проектантом)
+ * @property int|null $task_id                      Идентификатор задания исполнителя, по которому создано ГЦП (если null - ГЦП создано проектантом)
  */
 class FormCreateGcp extends Model
 {
@@ -32,6 +35,8 @@ class FormCreateGcp extends Model
     public $benefit;
     public $contrast;
     public $basic_confirm_id;
+    public $contractor_id;
+    public $task_id;
     public $_cacheManager;
     public $cachePath;
 
@@ -65,8 +70,7 @@ class FormCreateGcp extends Model
     {
         $segment = $preliminaryHypothesis->segment;
         $project = $preliminaryHypothesis->project;
-        $user = $project->user;
-        return '../runtime/cache/forms/user-'.$user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId()
+        return '../runtime/cache/forms/user-'.Yii::$app->user->getId().'/projects/project-'.$project->getId(). '/segments/segment-'.$segment->getId()
             .'/problems/problem-'.$preliminaryHypothesis->getId().'/gcps/formCreate/';
     }
 
@@ -81,6 +85,7 @@ class FormCreateGcp extends Model
             [['good', 'contrast'], 'string', 'max' => 255],
             [['benefit'], 'string', 'max' => 500],
             [['basic_confirm_id'], 'integer'],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -125,6 +130,13 @@ class FormCreateGcp extends Model
         $gcp->description .= 'который хочет удовлетворить проблему ' . mb_strtolower($problem->getDescription()) . ', ';
         $gcp->description .= 'избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, ' . mb_strtolower($this->getBenefit()) . ', ';
         $gcp->description .= 'в отличии от ' . mb_strtolower($this->getContrast()) . '.';
+
+        if ($this->getContractorId()) {
+            $gcp->setContractorId($this->getContractorId());
+        }
+        if ($this->getTaskId()) {
+            $gcp->setTaskId($this->getTaskId());
+        }
 
         if ($gcp->save()){
             $this->getCacheManager()->deleteCache($this->getCachePathForm()); // Удаление кэша формы создания
@@ -227,6 +239,38 @@ class FormCreateGcp extends Model
     public function setCachePathForm(string $cachePath): void
     {
         $this->cachePath = $cachePath;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 
 }

@@ -13,6 +13,7 @@ use yii\helpers\Url;
  * @var ConfirmProblem $model
  * @var Problems $problem
  * @var FormUpdateConfirmProblem $formUpdateConfirmProblem
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -74,6 +75,14 @@ use yii\helpers\Url;
                 <div class="col-md-12">Потребность потребителя сегмента, которую проверяем</div>
                 <div class="col-md-12"><?= $model->getNeedConsumer() ?></div>
             </div>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])): ?>
+                <div class="row">
+                    <div class="col-md-12">Количество респондентов, занятых исполнителями:
+                        <span><?= $countContractorResponds ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="row">
                 <div class="col-md-12">Количество респондентов (представителей сегмента):
@@ -172,6 +181,17 @@ use yii\helpers\Url;
 
             </div>
 
+            <div class="row pt-10">
+                <div class="col-xs-12 pl-20">
+                    <span class="bolder">
+                        Количество респондентов, занятых исполнителями:
+                    </span>
+                    <span>
+                        <?= $countContractorResponds ?>
+                    </span>
+                </div>
+            </div>
+
             <div class="row desktop-pt-5 desktop-pb-5">
 
                 <?= $form->field($formUpdateConfirmProblem, 'count_respond', [
@@ -182,7 +202,8 @@ use yii\helpers\Url;
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                         'id' => 'confirm_count_respond',
-                        'autocomplete' => 'off'
+                        'autocomplete' => 'off',
+                        'min' => $countContractorResponds
                     ])
                 ?>
 

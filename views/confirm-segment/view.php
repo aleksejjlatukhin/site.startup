@@ -26,6 +26,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -159,6 +160,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                 'formUpdateConfirmSegment' => $formUpdateConfirmSegment,
                 'model' => $model,
                 'project' => $project,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
     </div>
 
@@ -442,6 +444,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
                 'formUpdateConfirmSegment' => $formUpdateConfirmSegment,
                 'model' => $model,
                 'project' => $project,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

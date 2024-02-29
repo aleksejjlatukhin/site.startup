@@ -2,18 +2,15 @@
 
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
-use app\models\EnableExpertise;
 use app\models\forms\SearchForm;
 use app\models\Gcps;
 use app\models\Problems;
 use app\models\Projects;
 use app\models\QuestionsConfirmProblem;
 use app\models\Segments;
-use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
-use app\models\User;
 
 $this->title = 'Подтверждение гипотез проблем сегмента';
 $this->registerCssFile('@web/css/confirm-problem-view-style.css');
@@ -26,6 +23,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
  * @var Projects $project
  * @var QuestionsConfirmProblem[] $questions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -189,6 +187,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
             <?= $this->render('ajax_data_confirm_trash', [
                 'model' => $model,
                 'problem' => $problem,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 
@@ -444,6 +443,7 @@ $this->registerCssFile('@web/css/confirm-problem-view-style.css');
                 <?= $this->render('ajax_data_confirm_trash', [
                     'model' => $model,
                     'problem' => $problem,
+                    'countContractorResponds' => $countContractorResponds
                 ]) ?>
             </div>
 

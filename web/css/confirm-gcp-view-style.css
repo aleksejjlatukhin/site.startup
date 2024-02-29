@@ -2,6 +2,20 @@
 
 }
 
+.task-block {
+    padding: 0 2% 10px 2%;
+}
+.task-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: #4F4F4F;
+}
+.task-description {
+    font-size: 16px;
+    font-weight: 400;
+    color: #4F4F4F;
+}
+
 .project_info_data {
     background: #707F99;
 }
@@ -498,5 +512,12 @@ input#update_text_question_confirm {
     .form-newQuestion-panel {
         margin-left: -15px;
         margin-right: -15px;
+    }
+
+    .task-header {
+        color: #FFFFFF;
+    }
+    .task-description {
+        color: #FFFFFF;
     }
 }

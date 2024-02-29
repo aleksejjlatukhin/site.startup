@@ -88,7 +88,11 @@ class CreateRespondProblemForm extends FormCreateRespondent
      */
     public function uniqueName($attr)
     {
-        $models = RespondsProblem::findAll(['confirm_id' => $this->getConfirmId()]);
+        $models = RespondsProblem::findAll([
+            'confirm_id' => $this->getConfirmId(),
+            'task_id' => null,
+            'contractor_id' => null
+        ]);
 
         foreach ($models as $item){
 

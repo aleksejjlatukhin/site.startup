@@ -23,7 +23,7 @@ $this->registerCssFile('@web/css/notifications-style.css');
     </div>
 </div>
 
-<div class="row page-notifications">
+<div class="row page-contractor-notifications">
 
     <div class="col-md-12 notifications-content">
 

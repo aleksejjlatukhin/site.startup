@@ -86,7 +86,11 @@ class CreateRespondSegmentForm extends FormCreateRespondent
      */
     public function uniqueName($attr)
     {
-        $models = RespondsSegment::findAll(['confirm_id' => $this->getConfirmId()]);
+        $models = RespondsSegment::findAll([
+            'confirm_id' => $this->getConfirmId(),
+            'task_id' => null,
+            'contractor_id' => null
+        ]);
 
         foreach ($models as $item){
 

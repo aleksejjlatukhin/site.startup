@@ -2,6 +2,7 @@
 
 use app\models\PreFiles;
 use app\models\Projects;
+use app\models\User;
 use yii\helpers\Html;
 
 /**
@@ -30,7 +31,7 @@ $listContractors = $project->showListContractors() ?: 'Отсутствуют';
 
 <div class="block_export_link_hypothesis">
 
-    <?php if (!$project->getDeletedAt()): ?>
+    <?php if (!$project->getDeletedAt() && !User::isUserContractor(Yii::$app->user->identity['username'])): ?>
 
         <?= Html::a('<div style="margin-top: -15px;">Исходные данные по проекту' . Html::img('/images/icons/icon_export.png', ['style' => ['width' => '22px', 'margin-left' => '10px', 'margin-bottom' => '10px']]) . '</div>', [
             '/projects/mpdf-project', 'id' => $project->getId()], [

@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Ноя 06 2023 г., 20:19
--- Версия сервера: 5.6.47
+-- Время создания: Фев 29 2024 г., 22:29
+-- Версия сервера: 8.0.19
 -- Версия PHP: 7.4.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `all_questions_confirm_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
+  `user_id` int NOT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -61,10 +61,10 @@ INSERT INTO `all_questions_confirm_gcp` (`id`, `title`, `user_id`, `created_at`)
 --
 
 CREATE TABLE `all_questions_confirm_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
+  `user_id` int NOT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -83,7 +83,9 @@ INSERT INTO `all_questions_confirm_mvp` (`id`, `title`, `user_id`, `created_at`)
 (9, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 47, 1650458503),
 (10, 'интересный вопрос', 1, 1670161005),
 (11, 'интересный вопрос!', 1, 1670161019),
-(12, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1670167194);
+(12, 'Вписывается ли предложение в формат вашей деятельности?', 1, 1670167194),
+(13, 'Сколько сейчас платят?', 1, 1706807276),
+(14, 'Какая цена решения должна быть по мнению респондентов?', 1, 1706963565);
 
 -- --------------------------------------------------------
 
@@ -92,10 +94,10 @@ INSERT INTO `all_questions_confirm_mvp` (`id`, `title`, `user_id`, `created_at`)
 --
 
 CREATE TABLE `all_questions_confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
+  `user_id` int NOT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -124,10 +126,10 @@ INSERT INTO `all_questions_confirm_problem` (`id`, `title`, `user_id`, `created_
 --
 
 CREATE TABLE `all_questions_confirm_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
+  `user_id` int NOT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -151,7 +153,8 @@ INSERT INTO `all_questions_confirm_segment` (`id`, `title`, `user_id`, `created_
 (29, 'Расскажите, что произойдет, если вы не сможете решать потребность? Что при решении доставляет вам неудобство?', 1, 1669641863),
 (30, 'Новый вопрос', 1, 1669707323),
 (31, 'новый вопрос', 1, 1669719113),
-(32, 'новый вопрос!!!', 1, 1669719122);
+(32, 'новый вопрос!!!', 1, 1669719122),
+(33, 'Как вы решали проблему в последний раз, какие шаги предпринимали?', 1, 1705150580);
 
 -- --------------------------------------------------------
 
@@ -160,11 +163,11 @@ INSERT INTO `all_questions_confirm_segment` (`id`, `title`, `user_id`, `created_
 --
 
 CREATE TABLE `answers_questions_confirm_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `question_id` int(11) NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `question_id` int NOT NULL,
+  `respond_id` int NOT NULL,
   `answer` text,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -217,7 +220,30 @@ INSERT INTO `answers_questions_confirm_gcp` (`id`, `question_id`, `respond_id`, 
 (71, 29, 59, '', 1691244711),
 (72, 30, 59, '', 1691244711),
 (73, 31, 60, 'атва', NULL),
-(74, 32, 61, 'аиап', NULL);
+(74, 32, 61, 'аиап', NULL),
+(75, 33, 62, '', NULL),
+(76, 34, 63, 'Ответ 11', NULL),
+(77, 34, 64, 'Ответ 5', NULL),
+(78, 34, 65, 'ОТвет 33', NULL),
+(79, 35, 63, 'Ответ 22', NULL),
+(80, 35, 64, 'Ответ 6', NULL),
+(81, 35, 65, 'Ответ 44', NULL),
+(82, 34, 66, 'Ответ 1', NULL),
+(83, 35, 66, 'Ответ 2', NULL),
+(84, 34, 67, 'Ответ 3', NULL),
+(85, 35, 67, 'Ответ 4', NULL),
+(86, 34, 68, 'Ответ 66', NULL),
+(87, 35, 68, 'Ответ 55', NULL),
+(88, 36, 69, '', NULL),
+(89, 36, 70, '', NULL),
+(90, 37, 69, '', NULL),
+(91, 37, 70, '', NULL),
+(92, 36, 71, 'Ответ 1', NULL),
+(93, 37, 71, 'Ответ 2', NULL),
+(94, 36, 72, '', NULL),
+(95, 37, 72, '', NULL),
+(96, 36, 73, '', NULL),
+(97, 37, 73, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -226,11 +252,11 @@ INSERT INTO `answers_questions_confirm_gcp` (`id`, `question_id`, `respond_id`, 
 --
 
 CREATE TABLE `answers_questions_confirm_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `question_id` int(11) NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `question_id` int NOT NULL,
+  `respond_id` int NOT NULL,
   `answer` text,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -288,7 +314,39 @@ INSERT INTO `answers_questions_confirm_mvp` (`id`, `question_id`, `respond_id`, 
 (79, 33, 55, '', NULL),
 (80, 33, 56, '', NULL),
 (81, 34, 57, 'пртвпт', NULL),
-(82, 35, 58, 'вапива', NULL);
+(82, 35, 58, 'вапива', NULL),
+(83, 36, 59, 'Ответ Петрова 1', NULL),
+(89, 38, 59, 'Ответ Петрова 2', NULL),
+(92, 36, 62, 'Ответ 1', NULL),
+(93, 38, 62, 'Ответ 2', NULL),
+(94, 36, 63, 'Ответ 1', NULL),
+(95, 38, 63, 'ОТвет 2', NULL),
+(96, 36, 64, 'Ответ 1', NULL),
+(97, 38, 64, 'Ответ 2', NULL),
+(98, 39, 65, 'Ответ Петрова 1', NULL),
+(99, 39, 66, '', NULL),
+(100, 40, 65, 'Ответ Петрова 2', NULL),
+(101, 40, 66, '', NULL),
+(102, 39, 67, 'Ответ 1', NULL),
+(103, 40, 67, 'Ответ 2', NULL),
+(104, 39, 68, '', NULL),
+(105, 40, 68, '', NULL),
+(106, 39, 69, '', NULL),
+(107, 40, 69, '', NULL),
+(108, 41, 70, '', NULL),
+(109, 41, 71, '', NULL),
+(110, 42, 70, '', NULL),
+(111, 42, 71, '', NULL),
+(112, 43, 72, '', NULL),
+(113, 43, 73, '', NULL),
+(114, 44, 72, '', NULL),
+(115, 44, 73, '', NULL),
+(116, 43, 74, 'Ответ 1', NULL),
+(117, 44, 74, 'Ответ 2', NULL),
+(118, 43, 75, '', NULL),
+(119, 44, 75, '', NULL),
+(120, 43, 76, '', NULL),
+(121, 44, 76, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -297,11 +355,11 @@ INSERT INTO `answers_questions_confirm_mvp` (`id`, `question_id`, `respond_id`, 
 --
 
 CREATE TABLE `answers_questions_confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `question_id` int(11) NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `question_id` int NOT NULL,
+  `respond_id` int NOT NULL,
   `answer` text,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -361,7 +419,19 @@ INSERT INTO `answers_questions_confirm_problem` (`id`, `question_id`, `respond_i
 (111, 53, 86, '', 1691244711),
 (112, 54, 88, 'ответ', NULL),
 (113, 54, 89, 'ответ', NULL),
-(114, 55, 90, 'чапиыв', NULL);
+(114, 55, 90, 'чапиыв', NULL),
+(115, 56, 91, 'Ответ 1', NULL),
+(120, 57, 91, 'Ответ 2', NULL),
+(125, 58, 96, '', NULL),
+(192, 56, 134, 'Ответ', NULL),
+(193, 57, 134, 'Ответ', NULL),
+(194, 56, 135, 'Ответ', NULL),
+(195, 57, 135, 'Ответ', NULL),
+(196, 56, 136, 'Ответ', NULL),
+(197, 57, 136, 'Ответ', NULL),
+(198, 58, 137, 'Ответ', NULL),
+(199, 58, 138, '', NULL),
+(200, 58, 139, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -370,11 +440,11 @@ INSERT INTO `answers_questions_confirm_problem` (`id`, `question_id`, `respond_i
 --
 
 CREATE TABLE `answers_questions_confirm_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `question_id` int(11) NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `question_id` int NOT NULL,
+  `respond_id` int NOT NULL,
   `answer` text,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -438,7 +508,30 @@ INSERT INTO `answers_questions_confirm_segment` (`id`, `question_id`, `respond_i
 (295, 80, 92, 'ответ 4', NULL),
 (296, 81, 93, 'dfgsfg', NULL),
 (297, 81, 94, 'dfgnbfg', NULL),
-(298, 82, 95, 'апыап', NULL);
+(298, 82, 95, 'апыап', NULL),
+(304, 83, 101, 'Ответ 1', NULL),
+(305, 83, 102, 'ОТвет 1', NULL),
+(314, 84, 101, 'Ответ 2', NULL),
+(315, 84, 102, 'Ответ 2', NULL),
+(334, 86, 101, 'Ответ 3', NULL),
+(335, 86, 102, 'ОТвет 3', NULL),
+(345, 83, 98, 'апр', NULL),
+(346, 84, 98, 'вапра', NULL),
+(347, 86, 98, 'апрар', NULL),
+(348, 87, 103, 'Ответ 1', NULL),
+(349, 87, 104, 'Ответ 1', NULL),
+(350, 88, 103, 'Ответ 2', NULL),
+(351, 88, 104, 'Ответ 2', NULL),
+(352, 89, 105, 'Ответ 1', NULL),
+(353, 89, 106, 'Ответ 3', NULL),
+(354, 89, 107, '', NULL),
+(355, 90, 105, 'Ответ 2', NULL),
+(356, 90, 106, 'Ответ 4', NULL),
+(357, 90, 107, '', NULL),
+(358, 89, 108, 'Ответ 1', NULL),
+(359, 90, 108, 'Ответ 2', NULL),
+(360, 89, 109, 'Ответ\r\nОписание', NULL),
+(361, 90, 109, 'Ответ\r\nОписание 2', NULL);
 
 -- --------------------------------------------------------
 
@@ -447,12 +540,12 @@ INSERT INTO `answers_questions_confirm_segment` (`id`, `question_id`, `respond_i
 --
 
 CREATE TABLE `authors` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `project_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `project_id` int NOT NULL,
   `fio` varchar(255) NOT NULL,
   `role` varchar(255) NOT NULL,
   `experience` text,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -488,24 +581,24 @@ INSERT INTO `authors` (`id`, `project_id`, `fio`, `role`, `experience`, `deleted
 --
 
 CREATE TABLE `business_model` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `basic_confirm_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `segment_id` int(11) NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  `gcp_id` int(11) NOT NULL,
-  `mvp_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `basic_confirm_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `segment_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `gcp_id` int NOT NULL,
+  `mvp_id` int NOT NULL,
   `relations` varchar(255) NOT NULL,
   `partners` text NOT NULL,
   `distribution_of_sales` varchar(255) NOT NULL,
   `resources` varchar(255) NOT NULL,
   `cost` text NOT NULL,
   `revenue` text NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -535,9 +628,9 @@ INSERT INTO `business_model` (`id`, `basic_confirm_id`, `project_id`, `segment_i
 --
 
 CREATE TABLE `checking_online_user` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `last_active_time` int(11) NOT NULL
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `last_active_time` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -545,8 +638,8 @@ CREATE TABLE `checking_online_user` (
 --
 
 INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
-(1, 1, 1699291151),
-(2, 28, 1699289969),
+(1, 1, 1709234278),
+(2, 28, 1700664140),
 (4, 9, 1690743394),
 (6, 21, 1675607691),
 (7, 22, 1657649492),
@@ -570,8 +663,9 @@ INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
 (28, 54, 1661268890),
 (29, 55, 1677329619),
 (30, 56, 1677332012),
-(31, 58, 1699272575),
-(32, 57, 1699284612);
+(31, 58, 1709140694),
+(32, 57, 1699284612),
+(33, 59, 1700729832);
 
 -- --------------------------------------------------------
 
@@ -580,14 +674,14 @@ INSERT INTO `checking_online_user` (`id`, `user_id`, `last_active_time`) VALUES
 --
 
 CREATE TABLE `client` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `fullname` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `city` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `description` text CHARACTER SET utf8 NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `client`
@@ -608,11 +702,11 @@ INSERT INTO `client` (`id`, `name`, `fullname`, `city`, `description`, `created_
 --
 
 CREATE TABLE `client_activation` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
+  `status` int NOT NULL,
+  `created_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `client_activation`
@@ -657,12 +751,12 @@ INSERT INTO `client_activation` (`id`, `client_id`, `status`, `created_at`) VALU
 --
 
 CREATE TABLE `client_codes` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
+  `type` int NOT NULL,
   `code` varchar(255) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -687,13 +781,13 @@ INSERT INTO `client_codes` (`id`, `client_id`, `type`, `code`, `created_at`, `up
 --
 
 CREATE TABLE `client_rates_plan` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `rates_plan_id` int(11) NOT NULL,
-  `date_start` int(11) NOT NULL,
-  `date_end` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
+  `rates_plan_id` int NOT NULL,
+  `date_start` int NOT NULL,
+  `date_end` int NOT NULL,
+  `created_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `client_rates_plan`
@@ -727,13 +821,13 @@ INSERT INTO `client_rates_plan` (`id`, `client_id`, `rates_plan_id`, `date_start
 --
 
 CREATE TABLE `client_settings` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `admin_id` int(11) NOT NULL,
-  `avatar_max_image` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `avatar_image` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `access_admin` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
+  `admin_id` int NOT NULL,
+  `avatar_max_image` varchar(255) DEFAULT NULL,
+  `avatar_image` varchar(255) DEFAULT NULL,
+  `access_admin` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `client_settings`
@@ -754,10 +848,10 @@ INSERT INTO `client_settings` (`id`, `client_id`, `admin_id`, `avatar_max_image`
 --
 
 CREATE TABLE `client_user` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `client_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `client_user`
@@ -801,16 +895,16 @@ INSERT INTO `client_user` (`id`, `user_id`, `client_id`) VALUES
 --
 
 CREATE TABLE `communication_patterns` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `communication_type` int(11) NOT NULL,
-  `initiator` int(11) NOT NULL,
-  `is_active` int(11) NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `project_access_period` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `is_remote` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `communication_type` int NOT NULL,
+  `initiator` int NOT NULL,
+  `is_active` int NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `project_access_period` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `is_remote` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `communication_patterns`
@@ -842,12 +936,12 @@ INSERT INTO `communication_patterns` (`id`, `communication_type`, `initiator`, `
 --
 
 CREATE TABLE `communication_response` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `answer` int(11) NOT NULL,
-  `expert_types` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `comment` varchar(255) CHARACTER SET utf8 DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `communication_id` int NOT NULL,
+  `answer` int NOT NULL,
+  `expert_types` varchar(255) DEFAULT NULL,
+  `comment` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `communication_response`
@@ -876,13 +970,13 @@ INSERT INTO `communication_response` (`id`, `communication_id`, `answer`, `exper
 --
 
 CREATE TABLE `confirm_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `gcp_id` int(11) NOT NULL,
-  `count_respond` int(11) NOT NULL,
-  `count_positive` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `gcp_id` int NOT NULL,
+  `count_respond` int NOT NULL,
+  `count_positive` int NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -909,7 +1003,10 @@ INSERT INTO `confirm_gcp` (`id`, `gcp_id`, `count_respond`, `count_positive`, `e
 (22, 32, 2, 1, '1', 1682771823, NULL),
 (23, 34, 1, 1, '0', NULL, 1691244711),
 (24, 35, 1, 1, '1', 1699196095, NULL),
-(25, 36, 1, 1, '1', 1699262407, NULL);
+(25, 36, 1, 1, '1', 1699262407, NULL),
+(26, 37, 1, 1, '0', NULL, NULL),
+(27, 42, 6, 2, '1', 1706724403, NULL),
+(28, 43, 5, 1, '0', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -918,13 +1015,13 @@ INSERT INTO `confirm_gcp` (`id`, `gcp_id`, `count_respond`, `count_positive`, `e
 --
 
 CREATE TABLE `confirm_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `mvp_id` int(11) NOT NULL,
-  `count_respond` int(11) NOT NULL,
-  `count_positive` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `mvp_id` int NOT NULL,
+  `count_respond` int NOT NULL,
+  `count_positive` int NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -954,7 +1051,11 @@ INSERT INTO `confirm_mvp` (`id`, `mvp_id`, `count_respond`, `count_positive`, `e
 (25, 37, 1, 1, '0', NULL, 1691244711),
 (26, 20, 2, 1, '0', NULL, NULL),
 (27, 39, 1, 1, '1', 1699196782, NULL),
-(28, 40, 1, 1, '1', 1699262498, NULL);
+(28, 40, 1, 1, '1', 1699262498, NULL),
+(29, 52, 4, 2, '1', 1706963084, NULL),
+(30, 54, 5, 1, '0', NULL, NULL),
+(31, 46, 2, 2, '0', NULL, NULL),
+(32, 55, 5, 2, '0', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -963,14 +1064,14 @@ INSERT INTO `confirm_mvp` (`id`, `mvp_id`, `count_respond`, `count_positive`, `e
 --
 
 CREATE TABLE `confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  `count_respond` int(11) NOT NULL,
-  `count_positive` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `problem_id` int NOT NULL,
+  `count_respond` int NOT NULL,
+  `count_positive` int NOT NULL,
   `need_consumer` varchar(255) NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1003,7 +1104,9 @@ INSERT INTO `confirm_problem` (`id`, `problem_id`, `count_respond`, `count_posit
 (30, 50, 2, 1, 'Потребность', '0', NULL, 1691244711),
 (31, 53, 1, 1, 'Какую потребность потребителя сегмента проверяем', '0', NULL, 1691244711),
 (32, 55, 2, 1, 'Какую потребность потребителя сегмента проверяем', '1', 1699195325, NULL),
-(33, 56, 1, 1, 'Какую потребность потребителя сегмента проверяем', '1', 1699262303, NULL);
+(33, 56, 1, 1, 'Какую потребность потребителя сегмента проверяем', '1', 1699262303, NULL),
+(34, 60, 4, 3, 'Какую потребность потребителя сегмента проверяем', '1', 1706635735, NULL),
+(35, 61, 4, 1, 'Какую потребность потребителя сегмента проверяем', '0', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1012,16 +1115,16 @@ INSERT INTO `confirm_problem` (`id`, `problem_id`, `count_respond`, `count_posit
 --
 
 CREATE TABLE `confirm_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `segment_id` int(11) NOT NULL,
-  `count_respond` int(11) UNSIGNED NOT NULL,
-  `count_positive` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `segment_id` int NOT NULL,
+  `count_respond` int NOT NULL,
+  `count_positive` int NOT NULL,
   `greeting_interview` text NOT NULL,
   `view_interview` text NOT NULL,
   `reason_interview` text NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1050,7 +1153,10 @@ INSERT INTO `confirm_segment` (`id`, `segment_id`, `count_respond`, `count_posit
 (32, 55, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1679734255, 1691244711),
 (33, 62, 2, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1681048252, NULL),
 (34, 66, 2, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1699193107, NULL),
-(35, 67, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1699262183, NULL);
+(35, 67, 1, 1, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1699262183, NULL),
+(36, 68, 3, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '1', 1706378701, NULL),
+(37, 73, 2, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0', NULL, NULL),
+(38, 74, 5, 2, 'Приветствие в начале встречи', 'Информация о вас для респондентов', 'Причина и тема (что побудило) для проведения исследования', '0', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1059,7 +1165,7 @@ INSERT INTO `confirm_segment` (`id`, `segment_id`, `count_respond`, `count_posit
 --
 
 CREATE TABLE `contractor_activities` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1079,17 +1185,17 @@ INSERT INTO `contractor_activities` (`id`, `title`) VALUES
 --
 
 CREATE TABLE `contractor_communications` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `activity_id` int(11) NOT NULL,
-  `stage` int(11) DEFAULT NULL,
-  `stage_id` int(11) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `triggered_communication_id` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL
+  `id` int UNSIGNED NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
+  `type` int NOT NULL,
+  `project_id` int NOT NULL,
+  `activity_id` int NOT NULL,
+  `stage` int DEFAULT NULL,
+  `stage_id` int DEFAULT NULL,
+  `status` int NOT NULL,
+  `triggered_communication_id` int DEFAULT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1098,7 +1204,7 @@ CREATE TABLE `contractor_communications` (
 
 INSERT INTO `contractor_communications` (`id`, `sender_id`, `adressee_id`, `type`, `project_id`, `activity_id`, `stage`, `stage_id`, `status`, `triggered_communication_id`, `created_at`) VALUES
 (7, 1, 58, 1100, 5, 3, NULL, NULL, 70008, NULL, 1697377355),
-(8, 1, 59, 1100, 5, 2, NULL, NULL, 80007, NULL, 1697377385),
+(8, 1, 59, 1100, 5, 2, NULL, NULL, 70008, NULL, 1697377385),
 (9, 1, 57, 1100, 5, 3, NULL, NULL, 70008, NULL, 1697377391),
 (10, 1, 58, 1100, 5, 1, NULL, NULL, 70008, NULL, 1697377392),
 (11, 1, 58, 1100, 7, 1, NULL, NULL, 70008, NULL, 1697979044),
@@ -1132,7 +1238,270 @@ INSERT INTO `contractor_communications` (`id`, `sender_id`, `adressee_id`, `type
 (96, 1, 57, 10051, 7, 3, 5, 33, 70008, NULL, 1699262318),
 (97, 1, 57, 10061, 7, 3, 6, 25, 70008, NULL, 1699262378),
 (98, 1, 57, 10071, 7, 3, 7, 25, 70008, NULL, 1699262420),
-(99, 1, 57, 10081, 7, 3, 8, 28, 70008, NULL, 1699262478);
+(99, 1, 57, 10081, 7, 3, 8, 28, 70008, NULL, 1699262478),
+(100, 1, 59, 1150, 5, 2, NULL, NULL, 70008, 8, 1700729741),
+(101, 1, 59, 1100, 7, 2, NULL, NULL, 70008, NULL, 1700729788),
+(102, 59, 1, 1200, 7, 2, NULL, NULL, 70008, 101, 1700729826),
+(103, 1, 59, 1300, 7, 2, NULL, NULL, 80007, 102, 1700729850),
+(104, 1, 58, 10011, 7, 1, 1, 7, 70008, NULL, 1702212490),
+(106, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1702215102),
+(107, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1702215206),
+(108, 1, 58, 10011, 7, 1, 1, 7, 70008, NULL, 1703321028),
+(109, 1, 58, 10031, 7, 1, 3, 34, 70008, NULL, 1703321082),
+(110, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1703331402),
+(111, 58, 1, 3004, 7, 1, 3, 34, 70008, NULL, 1703333239),
+(112, 58, 1, 3004, 7, 1, 3, 34, 70008, NULL, 1704465942),
+(113, 1, 58, 3003, 7, 1, 3, 34, 70008, NULL, 1704466109),
+(114, 1, 58, 10051, 7, 1, 5, 32, 70008, NULL, 1704546789),
+(115, 58, 1, 3004, 7, 1, 5, 32, 70008, NULL, 1704553079),
+(116, 58, 1, 3004, 7, 1, 5, 32, 70008, NULL, 1704627652),
+(117, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1704627740),
+(118, 58, 1, 3004, 7, 1, 5, 32, 70008, NULL, 1704632890),
+(119, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1704632987),
+(120, 1, 58, 10071, 7, 1, 7, 24, 70008, NULL, 1704710129),
+(121, 58, 1, 3004, 7, 1, 7, 24, 70008, NULL, 1704722253),
+(122, 58, 1, 3004, 7, 1, 7, 24, 70008, NULL, 1704723383),
+(123, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1704723502),
+(124, 58, 1, 3004, 7, 1, 7, 24, 70008, NULL, 1704723590),
+(125, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1704723808),
+(126, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1704723851),
+(127, 1, 57, 10021, 7, 3, 2, 36, 80007, NULL, 1705135336),
+(128, 1, 58, 10021, 7, 3, 2, 36, 70008, NULL, 1705135349),
+(129, 1, 58, 10021, 7, 1, 2, 36, 70008, NULL, 1705135412),
+(130, 58, 1, 3004, 7, 3, 2, 36, 70008, NULL, 1706363750),
+(131, 58, 1, 3004, 7, 3, 2, 36, 70008, NULL, 1706363938),
+(132, 58, 1, 3004, 7, 3, 2, 36, 70008, NULL, 1706364690),
+(133, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1706366189),
+(134, 58, 1, 3004, 7, 3, 2, 36, 70008, NULL, 1706366798),
+(135, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1706378522),
+(136, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1706378542),
+(137, 1, 57, 3003, 7, 3, 2, 36, 80007, NULL, 1706378643),
+(156, 1, 58, 10041, 7, 3, 4, 34, 70008, NULL, 1706451735),
+(157, 58, 1, 3004, 7, 3, 4, 34, 70008, NULL, 1706552451),
+(158, 58, 1, 3004, 7, 3, 4, 34, 70008, NULL, 1706553870),
+(159, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1706554121),
+(160, 58, 1, 3004, 7, 3, 4, 34, 70008, NULL, 1706635549),
+(161, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1706635617),
+(162, 1, 58, 10061, 7, 3, 6, 27, 70008, NULL, 1706637519),
+(163, 58, 1, 3004, 7, 3, 6, 27, 70008, NULL, 1706722055),
+(164, 58, 1, 3004, 7, 3, 6, 27, 70008, NULL, 1706723654),
+(165, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1706723808),
+(166, 58, 1, 3004, 7, 3, 6, 27, 70008, NULL, 1706723903),
+(167, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1706724378),
+(168, 1, 58, 10081, 7, 3, 8, 29, 70008, NULL, 1706808538),
+(169, 58, 1, 3004, 7, 3, 8, 29, 70008, NULL, 1706961997),
+(170, 58, 1, 3004, 7, 3, 8, 29, 70008, NULL, 1706962073),
+(171, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1706962167),
+(172, 1, 58, 10081, 7, 3, 8, 30, 70008, NULL, 1706963659),
+(173, 58, 1, 3004, 7, 3, 8, 30, 70008, NULL, 1706963720),
+(178, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707051160),
+(179, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707051184),
+(180, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707051216),
+(181, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707051740),
+(182, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707051967),
+(183, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707054299),
+(184, 1, 58, 10071, 7, 1, 7, 27, 70008, NULL, 1707054344),
+(185, 1, 58, 10071, 7, 1, 7, 27, 70008, NULL, 1707054365),
+(187, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707054762),
+(188, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707054762),
+(189, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707054762),
+(190, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707054762),
+(191, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707054762),
+(193, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055259),
+(194, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055259),
+(195, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055259),
+(196, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055259),
+(197, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055259),
+(198, 1, 58, 10051, 7, 1, 5, 34, 70008, NULL, 1707055558),
+(199, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055633),
+(200, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055633),
+(201, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055633),
+(202, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055633),
+(203, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055633),
+(204, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055634),
+(205, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055634),
+(206, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055699),
+(207, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055700),
+(208, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055700),
+(209, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055700),
+(210, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055700),
+(211, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055700),
+(212, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055700),
+(213, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055726),
+(214, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055726),
+(215, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055726),
+(216, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055727),
+(217, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055727),
+(218, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055727),
+(219, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055727),
+(220, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055748),
+(221, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055748),
+(222, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055748),
+(223, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055748),
+(224, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055748),
+(225, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055748),
+(226, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055748),
+(227, 1, 58, 10031, 7, 1, 3, 36, 70008, NULL, 1707055829),
+(228, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055846),
+(229, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055846),
+(230, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055846),
+(231, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055846),
+(232, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055846),
+(233, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055846),
+(234, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055846),
+(235, 1, 57, 3003, 7, 3, 2, 36, 70008, NULL, 1707055847),
+(236, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707055847),
+(237, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707055847),
+(238, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707055847),
+(239, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707055899),
+(240, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707055899),
+(241, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707055899),
+(242, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055899),
+(243, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707055899),
+(244, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707055899),
+(245, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707055899),
+(246, 1, 57, 3003, 7, 3, 2, 36, 70008, NULL, 1707055899),
+(247, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707055899),
+(248, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707055899),
+(249, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707055899),
+(250, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1707056021),
+(251, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1707056021),
+(252, 1, 58, 3003, 7, 1, 3, 34, 70008, NULL, 1707056022),
+(253, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707056022),
+(254, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707056022),
+(255, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707056022),
+(256, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056022),
+(257, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056022),
+(258, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707056022),
+(259, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707056022),
+(260, 1, 57, 3003, 7, 3, 2, 36, 70008, NULL, 1707056022),
+(261, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707056022),
+(262, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707056022),
+(263, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707056022),
+(264, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707056022),
+(265, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707056022),
+(266, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1707056056),
+(267, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1707056056),
+(268, 1, 58, 3003, 7, 1, 3, 34, 70008, NULL, 1707056057),
+(269, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707056057),
+(270, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707056057),
+(271, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707056057),
+(272, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056057),
+(273, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056057),
+(274, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707056057),
+(275, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707056057),
+(276, 1, 57, 3003, 7, 3, 2, 36, 70008, NULL, 1707056057),
+(277, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707056057),
+(278, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707056057),
+(279, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707056057),
+(280, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707056057),
+(281, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707056057),
+(282, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707056174),
+(283, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707056174),
+(284, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707056174),
+(285, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056174),
+(286, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707056174),
+(287, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707059589),
+(288, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707059589),
+(289, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707059589),
+(290, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707059589),
+(291, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707059589),
+(292, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707059607),
+(293, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707059607),
+(294, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707059607),
+(295, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707059607),
+(296, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707059607),
+(297, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707059607),
+(298, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707059607),
+(299, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1707059863),
+(300, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1707059863),
+(301, 1, 58, 3003, 7, 1, 3, 34, 70008, NULL, 1707059863),
+(302, 1, 57, 3003, 7, 3, 2, 36, 80007, NULL, 1707059863),
+(303, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707059863),
+(304, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707059863),
+(305, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707059864),
+(306, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707059864),
+(307, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707059864),
+(308, 1, 58, 3003, 7, 1, 7, 24, 70008, NULL, 1707060093),
+(309, 1, 58, 3003, 7, 1, 5, 32, 70008, NULL, 1707060093),
+(310, 1, 58, 3003, 7, 1, 3, 34, 70008, NULL, 1707060093),
+(311, 1, 58, 3003, 7, 3, 8, 29, 70008, NULL, 1707060093),
+(312, 1, 58, 3003, 7, 3, 8, 30, 70008, NULL, 1707060093),
+(313, 1, 58, 3003, 7, 3, 6, 27, 70008, NULL, 1707060093),
+(314, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707060093),
+(315, 1, 58, 3003, 7, 1, 7, 27, 70008, NULL, 1707060093),
+(316, 1, 58, 3003, 7, 3, 4, 34, 70008, NULL, 1707060093),
+(317, 1, 58, 3003, 7, 1, 5, 34, 70008, NULL, 1707060094),
+(318, 1, 57, 3003, 7, 3, 2, 36, 80007, NULL, 1707060094),
+(319, 1, 58, 3003, 7, 3, 2, 36, 70008, NULL, 1707060094),
+(320, 1, 58, 3003, 7, 1, 2, 36, 70008, NULL, 1707060094),
+(321, 1, 58, 3003, 7, 1, 3, 36, 70008, NULL, 1707060094),
+(322, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707060094),
+(323, 1, 58, 3003, 7, 1, 1, 7, 70008, NULL, 1707060094),
+(324, 1, 58, 10081, 7, 3, 8, 31, 70008, NULL, 1707155697),
+(325, 1, 58, 10021, 7, 3, 2, 37, 70008, NULL, 1707244162),
+(326, 58, 1, 3004, 7, 3, 2, 37, 70008, NULL, 1707245214),
+(327, 58, 1, 3004, 7, 1, 3, 36, 70008, NULL, 1707409896),
+(328, 1, 58, 10041, 7, 3, 4, 35, 70008, NULL, 1707410513),
+(329, 58, 1, 3004, 7, 3, 4, 35, 70008, NULL, 1707415128),
+(330, 58, 1, 3004, 7, 1, 5, 34, 70008, NULL, 1707415439),
+(331, 1, 58, 10061, 7, 3, 6, 28, 70008, NULL, 1707417591),
+(332, 58, 1, 3004, 7, 3, 6, 28, 70008, NULL, 1707417655),
+(333, 58, 1, 3004, 7, 1, 7, 27, 70008, NULL, 1707554876),
+(334, 1, 58, 10081, 7, 3, 8, 32, 70008, NULL, 1707555726),
+(335, 58, 1, 3004, 7, 3, 8, 32, 70008, NULL, 1707556321),
+(336, 1, 58, 10021, 7, 1, 2, 38, 70008, NULL, 1707558511),
+(337, 1, 58, 10021, 7, 3, 2, 38, 70008, NULL, 1707563421),
+(338, 58, 1, 3004, 7, 3, 2, 38, 70008, NULL, 1707563905),
+(340, 58, 1, 3004, 7, 1, 2, 38, 70008, NULL, 1708164292),
+(341, 58, 1, 3004, 7, 1, 2, 38, 70008, NULL, 1708164327),
+(342, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708164475),
+(343, 58, 1, 3004, 7, 1, 2, 38, 70008, NULL, 1708164623),
+(344, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708164697),
+(345, 1, 58, 10021, 7, 1, 2, 38, 70008, NULL, 1708252685),
+(346, 58, 1, 3004, 7, 1, 2, 38, 70008, NULL, 1708252901),
+(347, 58, 1, 3004, 7, 1, 2, 38, 70008, NULL, 1708255540),
+(348, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708261401),
+(349, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708261519),
+(350, 1, 58, 3003, 7, 3, 2, 38, 70008, NULL, 1708261519),
+(351, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708261520),
+(352, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708262289),
+(353, 1, 58, 3003, 7, 3, 2, 38, 70008, NULL, 1708262289),
+(354, 1, 58, 3003, 7, 1, 2, 38, 70008, NULL, 1708262290),
+(355, 58, 1, 3004, 7, 3, 2, 38, 70008, NULL, 1708262469),
+(356, 1, 58, 10041, 7, 1, 4, 35, 70008, NULL, 1708263508),
+(357, 58, 1, 3004, 7, 1, 4, 35, 70008, NULL, 1708268695),
+(358, 1, 58, 3003, 7, 3, 4, 35, 70008, NULL, 1708269193),
+(359, 1, 58, 3003, 7, 1, 4, 35, 70008, NULL, 1708269194),
+(360, 1, 58, 3003, 7, 3, 4, 35, 70008, NULL, 1708269272),
+(361, 1, 58, 3003, 7, 1, 4, 35, 70008, NULL, 1708269272),
+(362, 1, 58, 10061, 7, 1, 6, 28, 70008, NULL, 1708269418),
+(363, 58, 1, 3004, 7, 1, 6, 28, 70008, NULL, 1708277925),
+(364, 58, 1, 3004, 7, 1, 4, 35, 70008, NULL, 1708866644),
+(365, 1, 58, 3003, 7, 1, 4, 35, 70008, NULL, 1708873667),
+(366, 58, 1, 3004, 7, 1, 4, 35, 70008, NULL, 1708873784),
+(367, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1708973637),
+(368, 1, 58, 3003, 7, 1, 1, 7, 80007, NULL, 1708973812),
+(369, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1709056195),
+(370, 1, 58, 3003, 7, 1, 1, 7, 80007, NULL, 1709056253),
+(371, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1709056307),
+(372, 1, 58, 3003, 7, 1, 1, 7, 80007, NULL, 1709056729),
+(373, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1709056916),
+(374, 1, 58, 3003, 7, 1, 1, 7, 80007, NULL, 1709056960),
+(375, 58, 1, 3004, 7, 1, 1, 7, 70008, NULL, 1709057015),
+(376, 58, 1, 3004, 7, 1, 3, 34, 80007, NULL, 1709058675),
+(377, 1, 58, 3003, 7, 1, 3, 34, 80007, NULL, 1709058763),
+(378, 58, 1, 3004, 7, 1, 5, 34, 80007, NULL, 1709059203),
+(379, 58, 1, 3004, 7, 1, 7, 24, 80007, NULL, 1709059503),
+(380, 1, 58, 10021, 7, 3, 2, 37, 80007, NULL, 1709059929),
+(381, 58, 1, 3004, 7, 3, 2, 37, 80007, NULL, 1709059987),
+(382, 58, 1, 3004, 7, 3, 2, 37, 80007, NULL, 1709060026),
+(383, 1, 58, 10021, 7, 1, 2, 37, 80007, NULL, 1709060979),
+(384, 58, 1, 3004, 7, 1, 2, 37, 80007, NULL, 1709062160),
+(385, 58, 1, 3004, 7, 1, 2, 37, 70008, NULL, 1709062310),
+(386, 1, 58, 10061, 7, 1, 6, 26, 80007, NULL, 1709062894),
+(387, 58, 1, 3004, 7, 1, 6, 26, 70008, NULL, 1709063273),
+(388, 58, 1, 3004, 7, 1, 6, 26, 70008, NULL, 1709064202);
 
 -- --------------------------------------------------------
 
@@ -1141,9 +1510,9 @@ INSERT INTO `contractor_communications` (`id`, `sender_id`, `adressee_id`, `type
 --
 
 CREATE TABLE `contractor_communication_response` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `answer` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `communication_id` int NOT NULL,
+  `answer` int NOT NULL,
   `comment` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1158,7 +1527,8 @@ INSERT INTO `contractor_communication_response` (`id`, `communication_id`, `answ
 (9, 34, 5445, 'YES'),
 (10, 74, 5445, 'yes'),
 (11, 86, 5445, 'Да'),
-(12, 87, 5445, 'Yes');
+(12, 87, 5445, 'Yes'),
+(13, 102, 5445, 'Да');
 
 -- --------------------------------------------------------
 
@@ -1167,12 +1537,12 @@ INSERT INTO `contractor_communication_response` (`id`, `communication_id`, `answ
 --
 
 CREATE TABLE `contractor_educations` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `contractor_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
   `educational_institution` varchar(255) NOT NULL,
   `faculty` varchar(255) NOT NULL,
   `course` varchar(255) DEFAULT NULL,
-  `finish_date` int(11) DEFAULT NULL
+  `finish_date` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1192,8 +1562,8 @@ INSERT INTO `contractor_educations` (`id`, `contractor_id`, `educational_institu
 --
 
 CREATE TABLE `contractor_info` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `contractor_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
   `activities` varchar(255) NOT NULL,
   `academic_degree` varchar(255) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
@@ -1218,11 +1588,11 @@ INSERT INTO `contractor_info` (`id`, `contractor_id`, `activities`, `academic_de
 --
 
 CREATE TABLE `contractor_project` (
-  `contractor_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `activity_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `contractor_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `activity_id` int NOT NULL,
+  `created_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1233,7 +1603,8 @@ INSERT INTO `contractor_project` (`contractor_id`, `project_id`, `activity_id`, 
 (57, 7, 3, 1699173707, NULL),
 (58, 5, 1, 1698587270, 1698685748),
 (58, 7, 1, 1698589883, NULL),
-(58, 7, 3, 1699173692, NULL);
+(58, 7, 3, 1699173692, NULL),
+(59, 7, 2, 1700729850, NULL);
 
 -- --------------------------------------------------------
 
@@ -1242,15 +1613,15 @@ INSERT INTO `contractor_project` (`contractor_id`, `project_id`, `activity_id`, 
 --
 
 CREATE TABLE `contractor_project_access` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `contractor_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `communication_type` int(11) NOT NULL,
-  `stage` int(11) DEFAULT NULL,
-  `stage_id` int(11) DEFAULT NULL,
-  `date_stop` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `communication_id` int NOT NULL,
+  `communication_type` int NOT NULL,
+  `stage` int DEFAULT NULL,
+  `stage_id` int DEFAULT NULL,
+  `date_stop` int DEFAULT NULL,
+  `created_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1282,7 +1653,10 @@ INSERT INTO `contractor_project_access` (`id`, `contractor_id`, `project_id`, `c
 (75, 57, 7, 84, 1100, NULL, NULL, 1700383139, 1699173539),
 (76, 58, 7, 85, 1100, NULL, NULL, 1700383140, 1699173540),
 (77, 58, 7, 88, 1300, NULL, NULL, NULL, 1699173692),
-(78, 57, 7, 89, 1300, NULL, NULL, NULL, 1699173707);
+(78, 57, 7, 89, 1300, NULL, NULL, NULL, 1699173707),
+(79, 59, 5, 100, 1150, NULL, NULL, NULL, 1700729741),
+(80, 59, 7, 101, 1100, NULL, NULL, 1701939388, 1700729788),
+(81, 59, 7, 103, 1300, NULL, NULL, NULL, 1700729850);
 
 -- --------------------------------------------------------
 
@@ -1291,16 +1665,16 @@ INSERT INTO `contractor_project_access` (`id`, `contractor_id`, `project_id`, `c
 --
 
 CREATE TABLE `contractor_tasks` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `contractor_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `hypothesis_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `type` int NOT NULL,
+  `status` int NOT NULL,
+  `hypothesis_id` int NOT NULL,
   `description` text NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `activity_id` int(11) NOT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `activity_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1308,32 +1682,415 @@ CREATE TABLE `contractor_tasks` (
 --
 
 INSERT INTO `contractor_tasks` (`id`, `contractor_id`, `project_id`, `type`, `status`, `hypothesis_id`, `description`, `created_at`, `updated_at`, `activity_id`) VALUES
-(1, 58, 7, 1, 12974543, 7, 'Добавить два сегмента', 1699173335, 1699173335, 1),
-(2, 57, 7, 1, 12974543, 7, 'Определить вероятные сегменты для данного проекта', 1699187295, 1699187295, 3),
-(3, 58, 7, 1, 12974543, 7, 'Сделайте хорошо, плохо не делайте)', 1699188951, 1699188951, 3),
-(4, 58, 7, 1, 12974543, 7, 'Исследовать рынок и предоставить анализ в виде файла', 1699189166, 1699189166, 1),
-(5, 58, 7, 1, 12974543, 7, 'Сделай 500 сегментов', 1699192808, 1699192808, 1),
-(6, 57, 7, 2, 12974543, 34, 'Проведи интервью с 20 респондентами', 1699192859, 1699192859, 3),
-(7, 58, 7, 3, 12974543, 34, 'Исследовать сегмент на наличие проблем', 1699194215, 1699194215, 1),
-(8, 57, 7, 3, 12974543, 34, 'Сделай красиво', 1699195042, 1699195042, 3),
-(9, 57, 7, 4, 12974543, 32, 'Провести 100 интервью', 1699195103, 1699195103, 3),
-(10, 58, 7, 4, 12974543, 32, 'провести 5 интервью', 1699195289, 1699195289, 3),
-(11, 57, 7, 5, 12974543, 32, 'Сгенерировать ценностные предложения', 1699195678, 1699195678, 3),
-(12, 58, 7, 5, 12974543, 32, 'Сделай 10 ценностный предложений', 1699195989, 1699195989, 1),
-(13, 57, 7, 6, 12974543, 24, 'проведи как можно больше интервью', 1699196069, 1699196069, 3),
-(14, 58, 7, 7, 12974543, 24, 'Придумайте реализацию MVP', 1699196361, 1699196361, 1),
-(15, 57, 7, 7, 12974543, 24, 'Сделай что можешь', 1699196688, 1699196688, 3),
-(16, 57, 7, 8, 12974543, 27, 'проведи 1 интервью', 1699196751, 1699196751, 3),
-(17, 57, 7, 1, 12974543, 7, 'Сделай несколько сегментов', 1699259570, 1699259570, 3),
-(18, 58, 7, 1, 12974543, 7, 'Сделай пару сегментов', 1699259617, 1699259617, 1),
-(19, 58, 7, 1, 12974543, 7, 'Какое-то новое задание', 1699262084, 1699262084, 1),
-(20, 58, 7, 2, 12974543, 35, 'Какое-то задание', 1699262176, 1699262176, 3),
-(21, 58, 7, 3, 12974543, 35, 'Придумать проблемы', 1699262207, 1699262207, 1),
-(22, 57, 7, 4, 12974543, 33, 'Проведите интервью', 1699262284, 1699262284, 3),
-(23, 57, 7, 5, 12974543, 33, 'Придумайте ЦП', 1699262318, 1699262318, 3),
-(24, 57, 7, 6, 12974543, 25, 'проведите срочно интервью', 1699262378, 1699262378, 3),
-(25, 57, 7, 7, 12974543, 25, 'Придумайте MVP', 1699262419, 1699262419, 3),
-(26, 57, 7, 8, 12974543, 28, 'Проедите финальное интервью', 1699262478, 1699262478, 3);
+(27, 58, 7, 1, 9603574, 7, 'Создайте два сегмента Создайте два сегмента Создайте два сегментаСоздайтедвасегмента', 1702212490, 1707060094, 1),
+(28, 58, 7, 1, 5603465, 7, 'Добавьте один сегмент', 1703321028, 1709057015, 1),
+(29, 58, 7, 3, 3366557, 34, 'Сгенерируйте две проблемы сегмента', 1703321082, 1709058763, 1),
+(30, 58, 7, 5, 3366557, 32, 'Сгенерируйте 3 ценностных предложения и напишите комментарий при завершении этого задания', 1704546789, 1707060093, 1),
+(31, 58, 7, 7, 5603465, 24, 'Придумайте 3 MVP-продукта', 1704710129, 1709059503, 1),
+(32, 57, 7, 2, 9603574, 36, 'Проведите интервью минимум с 5 респондентами', 1705135336, 1707060094, 3),
+(33, 58, 7, 2, 3863285, 36, 'Проведите интервью минимум с 3 респондентами', 1705135349, 1707060094, 3),
+(34, 58, 7, 2, 9603574, 36, 'Проведите анализ данных по результатам проведенных интервью', 1705135412, 1707060094, 1),
+(53, 58, 7, 4, 3863285, 34, 'Провести минимум два интервью', 1706451735, 1707060093, 3),
+(54, 58, 7, 6, 3863285, 27, 'Проведите два интервью', 1706637519, 1707060093, 3),
+(55, 58, 7, 8, 3863285, 29, 'Проведите минимум два интервью', 1706808538, 1707060093, 3),
+(56, 58, 7, 8, 4581456, 30, 'Проведите 2 или 3 интервью', 1706963659, 1707060093, 3),
+(57, 58, 7, 7, 4581456, 27, 'Создайте 2 продукта', 1707054344, 1707554875, 1),
+(58, 58, 7, 7, 12974543, 27, 'Проведите исследование', 1707054365, 1707060093, 1),
+(59, 58, 7, 5, 5603465, 34, 'Проведите исследование рынка', 1707055558, 1709059203, 1),
+(60, 58, 7, 3, 4581456, 36, 'Проведите исследование проблем сегмента', 1707055829, 1707409896, 1),
+(61, 58, 7, 8, 12974543, 31, 'проведите 2 интервью', 1707155697, 1707155697, 3),
+(62, 58, 7, 2, 4581456, 37, 'Проведите интервью с респондентами', 1707244162, 1707245214, 3),
+(63, 58, 7, 4, 4581456, 35, 'Проведите несколько интервью', 1707410513, 1708269272, 3),
+(64, 58, 7, 6, 4581456, 28, 'Проведите несколько бесед с друзьями', 1707417591, 1707417654, 3),
+(65, 58, 7, 8, 4581456, 32, 'Проведите интервью ', 1707555726, 1707556321, 3),
+(66, 58, 7, 2, 3863285, 38, 'Проведите анализ ответов респондентов', 1707558511, 1708262289, 1),
+(67, 58, 7, 2, 5603465, 38, 'Проведите интервью', 1707563421, 1708262469, 3),
+(68, 58, 7, 2, 3366557, 38, 'Проведите ещё анализ рынка', 1708252684, 1708262289, 1),
+(69, 58, 7, 4, 5603465, 35, 'Сделайте хорошо', 1708263508, 1708873784, 1),
+(70, 58, 7, 6, 4581456, 28, 'Сделай как получится', 1708269418, 1708277925, 1),
+(71, 58, 7, 2, 5603465, 37, 'Проведите интервью', 1709059928, 1709060026, 3),
+(72, 58, 7, 2, 5603465, 37, 'Оцените работу полевого работника', 1709060978, 1709062310, 1),
+(73, 58, 7, 6, 5603465, 26, 'Проведите анализ', 1709062893, 1709064202, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `contractor_task_files`
+--
+
+CREATE TABLE `contractor_task_files` (
+  `id` int UNSIGNED NOT NULL,
+  `task_id` int NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `server_file` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `contractor_task_files`
+--
+
+INSERT INTO `contractor_task_files` (`id`, `task_id`, `file_name`, `server_file`) VALUES
+(4, 28, '010323Методичка_Проектант для вставки в платформу(1).docx', 'E030Gfzde27yGGN.docx'),
+(6, 28, 'Бизнес требования для сервиса Акселератор(1).docx', '6T5b6-jd9Z9ui2w.docx'),
+(9, 28, 'presentation_spaccel.pdf', 'XeYquwM2Avs9HRq.pdf'),
+(10, 29, '010323Методичка_Проектант для вставки в платформу(1).docx', 'osiAPov1924JFZC.docx'),
+(12, 59, 'Бизнес требования для сервиса Акселератор.docx', 'Akdkl8iONpnUlXO.docx'),
+(13, 59, 'Листинг для Spaccel.doc', 'Y6sb117IvSeb0xG.doc'),
+(14, 59, 'Сводная_таблица_проекта_«Проект_1_(длинное_назва_ние_про)».pdf', 'ah-Wg0ao1z9enQQ.pdf'),
+(15, 31, 'Листинг для Spaccel.doc', 'TiC46hJi1hhZjeO.doc'),
+(16, 31, 'Сводная_таблица_проекта_«Проект_1_(длинное_назва_ние_про)».pdf', 'Zq6221Cjp6ZOMt-.pdf'),
+(17, 72, 'Бизнес требования для сервиса Акселератор.docx', 'Q7M1P8bDYcwSIyJ.docx'),
+(18, 72, 'Листинг для Spaccel.doc', 'J2d7yIG9-L8k8Kc.doc'),
+(19, 73, 'Бизнес требования для сервиса Акселератор.docx', 'zOt6fechuXNpbz8.docx'),
+(20, 73, 'Листинг для Spaccel.doc', 'o3WtJBlD9-MOkLF.doc');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `contractor_task_histories`
+--
+
+CREATE TABLE `contractor_task_histories` (
+  `id` int UNSIGNED NOT NULL,
+  `task_id` int NOT NULL,
+  `old_status` int NOT NULL,
+  `new_status` int NOT NULL,
+  `comment` text,
+  `created_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `contractor_task_histories`
+--
+
+INSERT INTO `contractor_task_histories` (`id`, `task_id`, `old_status`, `new_status`, `comment`, `created_at`) VALUES
+(19, 27, 12974543, 4581456, NULL, 1702215102),
+(20, 27, 4581456, 9603574, 'Так надо', 1702215206),
+(21, 28, 12974543, 4581456, NULL, 1703331401),
+(22, 29, 12974543, 4581456, NULL, 1703333239),
+(23, 29, 4581456, 5603465, 'Готово', 1704465942),
+(24, 29, 5603465, 3366557, 'Создайте ещё две проблемы', 1704466109),
+(25, 30, 12974543, 4581456, NULL, 1704553079),
+(26, 30, 4581456, 5603465, 'Что-то сделал', 1704627651),
+(27, 30, 5603465, 3366557, 'Доделайте задание до конца', 1704627739),
+(28, 30, 3366557, 5603465, 'Сделал как вы просили', 1704632890),
+(29, 30, 5603465, 3366557, 'Придумайте ещё одно ЦП', 1704632987),
+(30, 31, 12974543, 4581456, NULL, 1704722252),
+(31, 31, 4581456, 5603465, 'Сделал как указано в задании', 1704723382),
+(32, 31, 5603465, 3366557, 'Вы перестарались))', 1704723501),
+(33, 31, 3366557, 5603465, 'Так норм ???', 1704723590),
+(34, 31, 5603465, 3366557, 'Не очень', 1704723808),
+(36, 33, 12974543, 4581456, NULL, 1706363938),
+(37, 33, 4581456, 5603465, 'Завершил задание, проверьте пожалуйста)', 1706364690),
+(38, 33, 5603465, 3366557, 'Нужно ещё 2 респондента', 1706366188),
+(39, 33, 3366557, 5603465, 'Извините нет времени', 1706366798),
+(40, 33, 5603465, 3863285, 'Хорошо', 1706378520),
+(41, 34, 12974543, 9603574, 'Нет времени ждать', 1706378542),
+(42, 32, 12974543, 9603574, 'Нет времени ждать', 1706378643),
+(43, 53, 12974543, 4581456, NULL, 1706552451),
+(44, 53, 4581456, 5603465, 'Вроде работает', 1706553870),
+(45, 53, 5603465, 3366557, 'Проверьте ещё раз', 1706554121),
+(46, 53, 3366557, 5603465, 'Теперь вроде готово', 1706635549),
+(47, 53, 5603465, 3863285, 'Согласен', 1706635617),
+(48, 54, 12974543, 4581456, NULL, 1706722055),
+(49, 54, 4581456, 5603465, 'Готово', 1706723654),
+(50, 54, 5603465, 3366557, 'Нужно что-то доработать', 1706723808),
+(51, 54, 3366557, 5603465, 'Сделано', 1706723903),
+(52, 54, 5603465, 3863285, 'Ок', 1706724378),
+(53, 55, 12974543, 4581456, NULL, 1706961997),
+(54, 55, 4581456, 5603465, 'Провел все интервью', 1706962073),
+(55, 55, 5603465, 3863285, 'Окей', 1706962167),
+(56, 56, 12974543, 4581456, NULL, 1706963720),
+(57, 56, 4581456, 4477665, NULL, 1707051160),
+(58, 56, 4477665, 4581456, NULL, 1707051184),
+(59, 56, 4581456, 4477665, NULL, 1707051216),
+(60, 56, 4477665, 4581456, NULL, 1707051740),
+(61, 56, 4581456, 4477665, NULL, 1707051967),
+(62, 56, 4477665, 4581456, NULL, 1707054299),
+(64, 55, 3863285, 4477665, NULL, 1707054762),
+(65, 56, 4581456, 4477665, NULL, 1707054762),
+(66, 54, 3863285, 4477665, NULL, 1707054762),
+(67, 57, 12974543, 4477665, NULL, 1707054762),
+(68, 58, 12974543, 4477665, NULL, 1707054762),
+(70, 55, 4477665, 3863285, NULL, 1707055259),
+(71, 56, 4477665, 4581456, NULL, 1707055259),
+(72, 54, 4477665, 3863285, NULL, 1707055259),
+(73, 57, 4477665, 12974543, NULL, 1707055259),
+(74, 58, 4477665, 12974543, NULL, 1707055259),
+(75, 55, 3863285, 4477665, NULL, 1707055633),
+(76, 56, 4581456, 4477665, NULL, 1707055633),
+(77, 54, 3863285, 4477665, NULL, 1707055633),
+(78, 57, 12974543, 4477665, NULL, 1707055633),
+(79, 58, 12974543, 4477665, NULL, 1707055633),
+(80, 53, 3863285, 4477665, NULL, 1707055634),
+(81, 59, 12974543, 4477665, NULL, 1707055634),
+(82, 55, 4477665, 3863285, NULL, 1707055699),
+(83, 56, 4477665, 4581456, NULL, 1707055699),
+(84, 54, 4477665, 3863285, NULL, 1707055700),
+(85, 57, 4477665, 12974543, NULL, 1707055700),
+(86, 58, 4477665, 12974543, NULL, 1707055700),
+(87, 53, 4477665, 3863285, NULL, 1707055700),
+(88, 59, 4477665, 12974543, NULL, 1707055700),
+(89, 55, 3863285, 4477665, NULL, 1707055726),
+(90, 56, 4581456, 4477665, NULL, 1707055726),
+(91, 54, 3863285, 4477665, NULL, 1707055726),
+(92, 57, 12974543, 4477665, NULL, 1707055726),
+(93, 58, 12974543, 4477665, NULL, 1707055727),
+(94, 53, 3863285, 4477665, NULL, 1707055727),
+(95, 59, 12974543, 4477665, NULL, 1707055727),
+(96, 55, 4477665, 3863285, NULL, 1707055748),
+(97, 56, 4477665, 4581456, NULL, 1707055748),
+(98, 54, 4477665, 3863285, NULL, 1707055748),
+(99, 57, 4477665, 12974543, NULL, 1707055748),
+(100, 58, 4477665, 12974543, NULL, 1707055748),
+(101, 53, 4477665, 3863285, NULL, 1707055748),
+(102, 59, 4477665, 12974543, NULL, 1707055748),
+(103, 55, 3863285, 4477665, NULL, 1707055846),
+(104, 56, 4581456, 4477665, NULL, 1707055846),
+(105, 54, 3863285, 4477665, NULL, 1707055846),
+(106, 57, 12974543, 4477665, NULL, 1707055846),
+(107, 58, 12974543, 4477665, NULL, 1707055846),
+(108, 53, 3863285, 4477665, NULL, 1707055846),
+(109, 59, 12974543, 4477665, NULL, 1707055846),
+(110, 32, 9603574, 4477665, NULL, 1707055847),
+(111, 33, 3863285, 4477665, NULL, 1707055847),
+(112, 34, 9603574, 4477665, NULL, 1707055847),
+(113, 60, 12974543, 4477665, NULL, 1707055847),
+(114, 55, 4477665, 3863285, NULL, 1707055899),
+(115, 56, 4477665, 4581456, NULL, 1707055899),
+(116, 54, 4477665, 3863285, NULL, 1707055899),
+(117, 57, 4477665, 12974543, NULL, 1707055899),
+(118, 58, 4477665, 12974543, NULL, 1707055899),
+(119, 53, 4477665, 3863285, NULL, 1707055899),
+(120, 59, 4477665, 12974543, NULL, 1707055899),
+(121, 32, 4477665, 9603574, NULL, 1707055899),
+(122, 33, 4477665, 3863285, NULL, 1707055899),
+(123, 34, 4477665, 9603574, NULL, 1707055899),
+(124, 60, 4477665, 12974543, NULL, 1707055899),
+(125, 31, 3366557, 4477665, NULL, 1707056021),
+(126, 30, 3366557, 4477665, NULL, 1707056021),
+(127, 29, 3366557, 4477665, NULL, 1707056022),
+(128, 55, 3863285, 4477665, NULL, 1707056022),
+(129, 56, 4581456, 4477665, NULL, 1707056022),
+(130, 54, 3863285, 4477665, NULL, 1707056022),
+(131, 57, 12974543, 4477665, NULL, 1707056022),
+(132, 58, 12974543, 4477665, NULL, 1707056022),
+(133, 53, 3863285, 4477665, NULL, 1707056022),
+(134, 59, 12974543, 4477665, NULL, 1707056022),
+(135, 32, 9603574, 4477665, NULL, 1707056022),
+(136, 33, 3863285, 4477665, NULL, 1707056022),
+(137, 34, 9603574, 4477665, NULL, 1707056022),
+(138, 60, 12974543, 4477665, NULL, 1707056022),
+(139, 27, 9603574, 4477665, NULL, 1707056022),
+(140, 28, 4581456, 4477665, NULL, 1707056022),
+(141, 31, 4477665, 3366557, NULL, 1707056056),
+(142, 30, 4477665, 3366557, NULL, 1707056056),
+(143, 29, 4477665, 3366557, NULL, 1707056057),
+(144, 55, 4477665, 3863285, NULL, 1707056057),
+(145, 56, 4477665, 4581456, NULL, 1707056057),
+(146, 54, 4477665, 3863285, NULL, 1707056057),
+(147, 57, 4477665, 12974543, NULL, 1707056057),
+(148, 58, 4477665, 12974543, NULL, 1707056057),
+(149, 53, 4477665, 3863285, NULL, 1707056057),
+(150, 59, 4477665, 12974543, NULL, 1707056057),
+(151, 32, 4477665, 9603574, NULL, 1707056057),
+(152, 33, 4477665, 3863285, NULL, 1707056057),
+(153, 34, 4477665, 9603574, NULL, 1707056057),
+(154, 60, 4477665, 12974543, NULL, 1707056057),
+(155, 27, 4477665, 9603574, NULL, 1707056057),
+(156, 28, 4477665, 4581456, NULL, 1707056057),
+(157, 55, 3863285, 4477665, NULL, 1707056174),
+(158, 56, 4581456, 4477665, NULL, 1707056174),
+(159, 54, 3863285, 4477665, NULL, 1707056174),
+(160, 57, 12974543, 4477665, NULL, 1707056174),
+(161, 58, 12974543, 4477665, NULL, 1707056174),
+(162, 55, 4477665, 3863285, NULL, 1707059589),
+(163, 56, 4477665, 4581456, NULL, 1707059589),
+(164, 54, 4477665, 3863285, NULL, 1707059589),
+(165, 57, 4477665, 12974543, NULL, 1707059589),
+(166, 58, 4477665, 12974543, NULL, 1707059589),
+(167, 55, 3863285, 4477665, NULL, 1707059607),
+(168, 56, 4581456, 4477665, NULL, 1707059607),
+(169, 54, 3863285, 4477665, NULL, 1707059607),
+(170, 57, 12974543, 4477665, NULL, 1707059607),
+(171, 58, 12974543, 4477665, NULL, 1707059607),
+(172, 53, 3863285, 4477665, NULL, 1707059607),
+(173, 59, 12974543, 4477665, NULL, 1707059607),
+(174, 31, 3366557, 4477665, NULL, 1707059863),
+(175, 30, 3366557, 4477665, NULL, 1707059863),
+(176, 29, 3366557, 4477665, NULL, 1707059863),
+(177, 32, 9603574, 4477665, NULL, 1707059863),
+(178, 33, 3863285, 4477665, NULL, 1707059863),
+(179, 34, 9603574, 4477665, NULL, 1707059863),
+(180, 60, 12974543, 4477665, NULL, 1707059863),
+(181, 27, 9603574, 4477665, NULL, 1707059864),
+(182, 28, 4581456, 4477665, NULL, 1707059864),
+(183, 31, 4477665, 3366557, NULL, 1707060093),
+(184, 30, 4477665, 3366557, NULL, 1707060093),
+(185, 29, 4477665, 3366557, NULL, 1707060093),
+(186, 55, 4477665, 3863285, NULL, 1707060093),
+(187, 56, 4477665, 4581456, NULL, 1707060093),
+(188, 54, 4477665, 3863285, NULL, 1707060093),
+(189, 57, 4477665, 12974543, NULL, 1707060093),
+(190, 58, 4477665, 12974543, NULL, 1707060093),
+(191, 53, 4477665, 3863285, NULL, 1707060093),
+(192, 59, 4477665, 12974543, NULL, 1707060093),
+(193, 32, 4477665, 9603574, NULL, 1707060094),
+(194, 33, 4477665, 3863285, NULL, 1707060094),
+(195, 34, 4477665, 9603574, NULL, 1707060094),
+(196, 60, 4477665, 12974543, NULL, 1707060094),
+(197, 27, 4477665, 9603574, NULL, 1707060094),
+(198, 28, 4477665, 4581456, NULL, 1707060094),
+(199, 62, 12974543, 4581456, NULL, 1707245214),
+(200, 60, 12974543, 4581456, NULL, 1707409896),
+(201, 63, 12974543, 4581456, NULL, 1707415128),
+(202, 59, 12974543, 4581456, NULL, 1707415439),
+(203, 64, 12974543, 4581456, NULL, 1707417654),
+(204, 57, 12974543, 4581456, NULL, 1707554875),
+(205, 65, 12974543, 4581456, NULL, 1707556321),
+(206, 67, 12974543, 4581456, NULL, 1707563905),
+(208, 66, 12974543, 4581456, NULL, 1708164292),
+(209, 66, 4581456, 5603465, 'Сделал два продукта, хватит ?', 1708164327),
+(210, 66, 5603465, 3366557, 'Давай ещё 1 продукт', 1708164475),
+(211, 66, 3366557, 5603465, 'Сделал', 1708164623),
+(212, 66, 5603465, 3863285, 'Спасибо', 1708164697),
+(213, 68, 12974543, 4581456, NULL, 1708252900),
+(214, 68, 4581456, 5603465, 'Сделал пару продуктов', 1708255540),
+(215, 68, 5603465, 3366557, 'Сделайте ещё', 1708261400),
+(216, 66, 3863285, 4477665, NULL, 1708261519),
+(217, 67, 4581456, 4477665, NULL, 1708261519),
+(218, 68, 3366557, 4477665, NULL, 1708261519),
+(219, 66, 4477665, 3863285, NULL, 1708262289),
+(220, 67, 4477665, 4581456, NULL, 1708262289),
+(221, 68, 4477665, 3366557, NULL, 1708262289),
+(222, 67, 4581456, 5603465, 'Готово', 1708262469),
+(223, 69, 12974543, 4581456, NULL, 1708268694),
+(224, 63, 4581456, 4477665, NULL, 1708269193),
+(225, 69, 4581456, 4477665, NULL, 1708269194),
+(226, 63, 4477665, 4581456, NULL, 1708269272),
+(227, 69, 4477665, 4581456, NULL, 1708269272),
+(228, 70, 12974543, 4581456, NULL, 1708277925),
+(229, 69, 4581456, 5603465, 'Завершаю', 1708866644),
+(230, 69, 5603465, 3366557, 'Доработайте', 1708873666),
+(231, 69, 3366557, 5603465, 'Не хочу', 1708873784),
+(232, 28, 4581456, 5603465, 'Завершаю может быть', 1708973636),
+(233, 28, 5603465, 3366557, 'Доработайте', 1708973812),
+(234, 28, 3366557, 5603465, 'Завершаю', 1709056194),
+(235, 28, 5603465, 3366557, NULL, 1709056252),
+(236, 28, 3366557, 5603465, 'Как то так', 1709056306),
+(237, 28, 5603465, 3366557, NULL, 1709056729),
+(238, 28, 3366557, 5603465, 'Конец', 1709056916),
+(239, 28, 5603465, 3366557, NULL, 1709056960),
+(240, 28, 3366557, 5603465, 'Finish', 1709057015),
+(241, 29, 3366557, 5603465, 'Finish', 1709058674),
+(242, 29, 5603465, 3366557, NULL, 1709058763),
+(243, 59, 4581456, 5603465, 'finish', 1709059203),
+(244, 31, 3366557, 5603465, 'Finish', 1709059503),
+(245, 71, 12974543, 4581456, NULL, 1709059987),
+(246, 71, 4581456, 5603465, 'Завершаю', 1709060026),
+(247, 72, 12974543, 4581456, NULL, 1709062160),
+(248, 72, 4581456, 5603465, 'Finish', 1709062310),
+(249, 73, 12974543, 4581456, NULL, 1709063272),
+(250, 73, 4581456, 5603465, 'Конец', 1709064202);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `contractor_task_products`
+--
+
+CREATE TABLE `contractor_task_products` (
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
+  `task_id` int NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `price` int NOT NULL,
+  `satisfaction` int NOT NULL,
+  `flaws` varchar(500) NOT NULL,
+  `advantages` varchar(500) NOT NULL,
+  `suppliers` varchar(500) NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `contractor_task_products`
+--
+
+INSERT INTO `contractor_task_products` (`id`, `contractor_id`, `task_id`, `name`, `price`, `satisfaction`, `flaws`, `advantages`, `suppliers`, `created_at`, `updated_at`) VALUES
+(2, 58, 66, 'Какой-то интересный продукт с перспективной страгией продвижения на рынке', 3000000, 3476, '1. Дорогая стоимость\r\n2. Инновационный продукт с которым рынок не знаком и поэтому необходима большая реклама, чтобы убедить людей в необходимости приобретения данного продукта\r\n3. Нужна команда профессионалов\r\n4. Нужны крупные инвестиции', '1. Инновационность продукта\r\n2. Реальная польза\r\n3. Рынок свободен\r\n4. Хорошие перспективы в случае удачного захода на рынок', '1. ООО \"New Products\"\r\n2. ИП \"Колобок\"', 1707756006, 1708252074),
+(5, 58, 66, 'Продукт 2', 20674, 4534, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708164292, 1708164292),
+(6, 58, 66, 'Продукт 3', 3000, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708164614, 1708164614),
+(16, 58, 68, 'Продукт 1', 4534, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708254741, 1708254785),
+(17, 58, 68, 'Продукт 2', 34523, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708254774, 1708254774),
+(22, 58, 69, 'Продукт 1', 123234, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708269066, 1708269066),
+(23, 58, 69, 'Продукт 2', 3434, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708269101, 1708269101),
+(29, 58, 70, 'Продукт 1', 1123, 9871, 'прва', 'вапиа', 'апиап', 1708877048, 1708877048),
+(30, 58, 70, 'Продукт 2', 1000, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1708878578, 1708878578),
+(31, 58, 72, 'Продукт 1', 234234, 9871, 'Недостатки продукта', 'Преимущества продукта', 'Ключевые поставщики', 1709062160, 1709062160),
+(33, 58, 73, 'ghfgh', 567, 9871, 'ghjmf', 'fghj', 'ghj', 1709063468, 1709063468);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `contractor_task_similar_products`
+--
+
+CREATE TABLE `contractor_task_similar_products` (
+  `id` int UNSIGNED NOT NULL,
+  `contractor_id` int NOT NULL,
+  `task_id` int NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `ownership_cost` int NOT NULL,
+  `price` int NOT NULL,
+  `params` json DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `contractor_task_similar_products`
+--
+
+INSERT INTO `contractor_task_similar_products` (`id`, `contractor_id`, `task_id`, `name`, `ownership_cost`, `price`, `params`, `created_at`, `updated_at`) VALUES
+(1, 58, 69, 'Аналогичный продукт 1', 22000, 100, '\"{\\\"2\\\":\\\"средне\\\",\\\"3\\\":\\\"хорошо\\\",\\\"4\\\":\\\"плохо\\\",\\\"5\\\":\\\"Так себе\\\"}\"', 1708794869, 1708866251),
+(2, 58, 69, 'Аналогичный продукт 2', 2000, 198, '\"{\\\"2\\\":\\\"как-то так\\\",\\\"3\\\":\\\"никак\\\",\\\"4\\\":\\\"Отлично\\\",\\\"5\\\":\\\"Норм\\\"}\"', 1708795219, 1708798905),
+(6, 58, 70, 'Аналогичный продукт 1', 10000, 100, '\"{\\\"8\\\":\\\"Есть\\\",\\\"9\\\":\\\"Не сложно\\\",\\\"10\\\":\\\"Есть\\\"}\"', 1708878535, 1708878718),
+(7, 58, 70, 'Аналогичный продукт 2', 100000000, 100000, '\"{\\\"8\\\":\\\"Нет\\\",\\\"9\\\":\\\"Да\\\",\\\"10\\\":\\\"Нет\\\"}\"', 1708878618, 1708878618),
+(8, 58, 73, 'Аналог 1', 123, 3434, '\"{\\\"11\\\":\\\"вапва\\\"}\"', 1709064075, 1709064142),
+(9, 58, 73, 'Аналог 2', 34, 345, '\"{\\\"11\\\":\\\"апрва\\\"}\"', 1709064158, 1709064158),
+(10, 58, 70, 'Аналогичный продукт 3', 1234, 32235, '\"{\\\"8\\\":\\\"Есть\\\",\\\"9\\\":\\\"Есть\\\",\\\"10\\\":\\\"Есть\\\"}\"', 1709065743, 1709065840);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `contractor_task_similar_product_params`
+--
+
+CREATE TABLE `contractor_task_similar_product_params` (
+  `id` int UNSIGNED NOT NULL,
+  `task_id` int NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `contractor_task_similar_product_params`
+--
+
+INSERT INTO `contractor_task_similar_product_params` (`id`, `task_id`, `name`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(2, 69, 'Параметр 1', 1708770048, 1708770048, NULL),
+(3, 69, 'Параметр 2', 1708774346, 1708774346, NULL),
+(4, 69, 'Параметр 3', 1708774356, 1708797040, NULL),
+(5, 69, 'Параметр 4', 1708774673, 1708799006, NULL),
+(6, 69, 'Параметр 5', 1708778684, 1708799007, 1708799007),
+(7, 69, 'Параметр 6', 1708865213, 1708865240, 1708865240),
+(8, 70, 'Польза от использования', 1708878450, 1709065805, NULL),
+(9, 70, 'Сложность внедрения на рынок', 1708878473, 1709065807, NULL),
+(10, 70, 'Наличие комплектующих', 1708878492, 1709065808, NULL),
+(11, 73, 'Параметр 1', 1709064119, 1709064119, NULL);
 
 -- --------------------------------------------------------
 
@@ -1342,8 +2099,8 @@ INSERT INTO `contractor_tasks` (`id`, `contractor_id`, `project_id`, `type`, `st
 --
 
 CREATE TABLE `contractor_users` (
-  `contractor_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `contractor_id` int NOT NULL,
+  `user_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1362,10 +2119,10 @@ INSERT INTO `contractor_users` (`contractor_id`, `user_id`) VALUES
 --
 
 CREATE TABLE `conversation_admin` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `admin_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `updated_at` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `admin_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1388,10 +2145,10 @@ INSERT INTO `conversation_admin` (`id`, `admin_id`, `user_id`, `updated_at`) VAL
 --
 
 CREATE TABLE `conversation_development` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `dev_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `updated_at` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `dev_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1430,12 +2187,12 @@ INSERT INTO `conversation_development` (`id`, `dev_id`, `user_id`, `updated_at`)
 --
 
 CREATE TABLE `conversation_expert` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `expert_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `role` int(11) NOT NULL,
-  `updated_at` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `expert_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `role` int NOT NULL,
+  `updated_at` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `conversation_expert`
@@ -1466,10 +2223,10 @@ INSERT INTO `conversation_expert` (`id`, `expert_id`, `user_id`, `role`, `update
 --
 
 CREATE TABLE `conversation_main_admin` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `main_admin_id` int(11) NOT NULL,
-  `admin_id` int(11) NOT NULL,
-  `updated_at` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `main_admin_id` int NOT NULL,
+  `admin_id` int NOT NULL,
+  `updated_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1489,12 +2246,12 @@ INSERT INTO `conversation_main_admin` (`id`, `main_admin_id`, `admin_id`, `updat
 --
 
 CREATE TABLE `conversation_manager` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `manager_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `role` int(11) NOT NULL,
-  `updated_at` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `manager_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `role` int NOT NULL,
+  `updated_at` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `conversation_manager`
@@ -1514,13 +2271,13 @@ INSERT INTO `conversation_manager` (`id`, `manager_id`, `user_id`, `role`, `upda
 --
 
 CREATE TABLE `customer_expert` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `client_id` int NOT NULL,
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1529,11 +2286,11 @@ CREATE TABLE `customer_expert` (
 --
 
 CREATE TABLE `customer_manager` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `client_id` int NOT NULL,
+  `created_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `customer_manager`
@@ -1579,13 +2336,13 @@ INSERT INTO `customer_manager` (`id`, `user_id`, `client_id`, `created_at`) VALU
 --
 
 CREATE TABLE `customer_tracker` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `client_id` int NOT NULL,
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1594,11 +2351,11 @@ CREATE TABLE `customer_tracker` (
 --
 
 CREATE TABLE `customer_wish_list` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
+  `customer_id` int NOT NULL,
+  `created_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1625,16 +2382,16 @@ INSERT INTO `customer_wish_list` (`id`, `client_id`, `customer_id`, `created_at`
 --
 
 CREATE TABLE `duplicate_communications` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `type` int(11) NOT NULL,
-  `source_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
-  `description` text CHARACTER SET utf8 NOT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `type` int NOT NULL,
+  `source_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
+  `description` text NOT NULL,
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `duplicate_communications`
@@ -1835,7 +2592,43 @@ INSERT INTO `duplicate_communications` (`id`, `type`, `source_id`, `sender_id`, 
 (218, 574, 215, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка гипотезы ценностного предложения: <a href=\"/gcps/index?id=33\">ГЦП 1</a>»', 3579, 1699262341, 1699262341),
 (219, 574, 216, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение гипотезы ценностного предложения: <a href=\"/confirm-gcp/view?id=25\">ГЦП 1</a>»', 3579, 1699262405, 1699262405),
 (220, 574, 217, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка MVP: <a href=\"/mvps/index?id=25\">MVP 1</a>»', 3579, 1699262435, 1699262435),
-(221, 574, 218, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение MVP: <a href=\"/confirm-mvp/view?id=28\">MVP 1</a>»', 3579, 1699262496, 1699262496);
+(221, 574, 218, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение MVP: <a href=\"/confirm-mvp/view?id=28\">MVP 1</a>»', 3579, 1699262496, 1699262496),
+(222, 574, 219, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка гипотезы ценностного предложения: <a href=\"/gcps/index?id=32\">ГЦП 2</a>»', 3579, 1700753126, 1700753126),
+(223, 294, 220, 1, 46, 'Проектант, IvanoV, удалил проблему сегмента «<a href=\"/problems/index?id=34\">ГПС 1</a>»', 3579, 1704636431, 1704636431),
+(224, 294, 221, 1, 46, 'Проектант, IvanoV, удалил проект «<a href=\"/projects/index?id=1\">Проект 3</a>»', 3579, 1704637061, 1704637061),
+(225, 574, 222, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка MVP: <a href=\"/mvps/index?id=24\">MVP 2</a>»', 3579, 1704723699, 1704723699),
+(226, 574, 223, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы целевого сегмента: <a href=\"/segments/index?id=7\">Сегмент 3</a>»', 3579, 1705134920, 1705134920),
+(227, 294, 224, 1, 46, 'Проектант, IvanoV, удалил сегмент «<a href=\"/segments/index?id=7\">Сегмент 1</a>»', 3579, 1705150390, 1705150390),
+(228, 574, 225, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение гипотезы целевого сегмента: <a href=\"/confirm-segment/view?id=36\">Сегмент 3</a>»', 3579, 1706378695, 1706378695),
+(229, 574, 226, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы проблемы сегмента: <a href=\"/problems/index?id=36\">ГПС 1</a>»', 3579, 1706378744, 1706378744),
+(230, 574, 227, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы проблемы сегмента: <a href=\"/problems/index?id=36\">ГПС 2</a>»', 3579, 1706433043, 1706433043),
+(231, 574, 228, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы проблемы сегмента: <a href=\"/problems/index?id=36\">ГПС 3</a>»', 3579, 1706547748, 1706547748),
+(232, 574, 229, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение гипотезы проблемы сегмента: <a href=\"/confirm-problem/view?id=34\">ГПС 1</a>»', 3579, 1706635731, 1706635731),
+(233, 574, 230, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка гипотезы ценностного предложения: <a href=\"/gcps/index?id=34\">ГЦП 1</a>»', 3579, 1706635775, 1706635775),
+(234, 574, 231, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы целевого сегмента: <a href=\"/segments/index?id=7\">Сегмент 4</a>»', 3579, 1706635823, 1706635823),
+(235, 574, 232, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение гипотезы ценностного предложения: <a href=\"/confirm-gcp/view?id=27\">ГЦП 1</a>»', 3579, 1706724399, 1706724399),
+(236, 574, 233, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка MVP: <a href=\"/mvps/index?id=27\">MVP 1</a>»', 3579, 1706806259, 1706806259),
+(239, 574, 236, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «подтверждение MVP: <a href=\"/confirm-mvp/view?id=29\">MVP 1</a>»', 3579, 1706963082, 1706963082),
+(240, 574, 237, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка MVP: <a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1706963529, 1706963529),
+(241, 294, 238, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1706963800, 1706963800),
+(242, 294, 239, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1707049952, 1707049952),
+(243, 294, 240, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1707050745, 1707050745),
+(244, 294, 241, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1707051158, 1707051158),
+(245, 294, 242, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1707051215, 1707051215),
+(246, 294, 243, 1, 46, 'Проектант, IvanoV, удалил MVP-продукт «<a href=\"/mvps/index?id=27\">MVP 3</a>»', 3579, 1707051965, 1707051965),
+(248, 294, 245, 1, 46, 'Проектант, IvanoV, удалил ценностное предложение «<a href=\"/gcps/index?id=34\">ГЦП 1</a>»', 3579, 1707054760, 1707054760),
+(249, 294, 246, 1, 46, 'Проектант, IvanoV, удалил проблему сегмента «<a href=\"/problems/index?id=36\">ГПС 1</a>»', 3579, 1707055603, 1707055603),
+(250, 294, 247, 1, 46, 'Проектант, IvanoV, удалил проблему сегмента «<a href=\"/problems/index?id=36\">ГПС 1</a>»', 3579, 1707055721, 1707055721),
+(251, 294, 248, 1, 46, 'Проектант, IvanoV, удалил сегмент «<a href=\"/segments/index?id=7\">Сегмент 3</a>»', 3579, 1707055839, 1707055839),
+(252, 294, 249, 1, 46, 'Проектант, IvanoV, удалил проект «<a href=\"/projects/index?id=1\">Проект 3</a>»', 3579, 1707055989, 1707055989),
+(253, 294, 250, 1, 46, 'Проектант, IvanoV, удалил ценностное предложение «<a href=\"/gcps/index?id=34\">ГЦП 1</a>»', 3579, 1707056151, 1707056151),
+(254, 294, 251, 1, 46, 'Проектант, IvanoV, удалил проблему сегмента «<a href=\"/problems/index?id=36\">ГПС 1</a>»', 3579, 1707059602, 1707059602),
+(255, 294, 252, 1, 46, 'Проектант, IvanoV, удалил проект «<a href=\"/projects/index?id=1\">Проект 3</a>»', 3579, 1707059860, 1707059860),
+(258, 574, 255, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка гипотезы ценностного предложения: <a href=\"/gcps/index?id=34\">ГЦП 2</a>»', 3579, 1707417431, 1707417431),
+(259, 574, 256, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «разработка MVP: <a href=\"/mvps/index?id=27\">MVP 4</a>»', 3579, 1707555619, 1707555619),
+(260, 574, 257, 1, 46, 'Проектант, IvanoV, разрешил эспертизу по этапу «генерация гипотезы целевого сегмента: <a href=\"/segments/index?id=7\">Сегмент 5</a>»', 3579, 1707558409, 1707558409),
+(261, 294, 258, 1, 46, 'Проектант, IvanoV, удалил сегмент «<a href=\"/segments/index?id=7\">Сегмент 5</a>»', 3579, 1708261514, 1708261514),
+(262, 294, 259, 1, 46, 'Проектант, IvanoV, удалил проблему сегмента «<a href=\"/problems/index?id=36\">ГПС 2</a>»', 3579, 1708269188, 1708269188);
 
 -- --------------------------------------------------------
 
@@ -1844,12 +2637,12 @@ INSERT INTO `duplicate_communications` (`id`, `type`, `source_id`, `sender_id`, 
 --
 
 CREATE TABLE `expected_results_interview_confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  `question` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `answer` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `problem_id` int NOT NULL,
+  `question` varchar(255) NOT NULL,
+  `answer` varchar(255) NOT NULL,
+  `deleted_at` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `expected_results_interview_confirm_problem`
@@ -1896,7 +2689,21 @@ INSERT INTO `expected_results_interview_confirm_problem` (`id`, `problem_id`, `q
 (56, 53, 'вопрос 2', 'ответ 2', 1691244711),
 (57, 54, 'вопрос 1', 'ответ 1', 1691244711),
 (58, 55, 'вопрос', 'ответ', NULL),
-(59, 56, 'апиыв', 'ываиыв', NULL);
+(59, 56, 'апиыв', 'ываиыв', NULL),
+(60, 57, 'Вопрос 1', 'Ответ 1', NULL),
+(61, 57, 'Вопрос 2', 'Ответ 2', NULL),
+(62, 58, 'Вопрос 11', 'Ответ 11', NULL),
+(63, 58, 'Вопрос 22', 'Ответ 22', NULL),
+(64, 59, 'Вопрос 44', 'Ответ 44', NULL),
+(65, 60, 'Вопрос 1', 'Ответ 1', NULL),
+(66, 60, 'Вопрос 2', 'Ответ 2', NULL),
+(67, 61, 'Вопрос 1', 'Ответ 1', NULL),
+(68, 61, 'Вопрос 2', 'Ответ 2', NULL),
+(69, 62, 'Вопрос 1', 'Ответ 1', NULL),
+(70, 63, 'вопрос 1', 'ответ 1', NULL),
+(71, 63, 'вопрос 2', 'ответ 2', NULL),
+(72, 64, 'вопрос 11', 'ответ 11', NULL),
+(73, 64, 'вопрос 22', 'ответ 22', NULL);
 
 -- --------------------------------------------------------
 
@@ -1905,19 +2712,19 @@ INSERT INTO `expected_results_interview_confirm_problem` (`id`, `problem_id`, `q
 --
 
 CREATE TABLE `expertise` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `stage` int(11) NOT NULL,
-  `stage_id` int(11) NOT NULL,
-  `expert_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `type_expert` int(11) NOT NULL,
-  `estimation` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `comment` text CHARACTER SET utf8 NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `completed` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `stage` int NOT NULL,
+  `stage_id` int NOT NULL,
+  `expert_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `type_expert` int NOT NULL,
+  `estimation` varchar(255) NOT NULL,
+  `comment` text NOT NULL,
+  `communication_id` int NOT NULL,
+  `completed` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `expertise`
@@ -1975,17 +2782,17 @@ INSERT INTO `expertise` (`id`, `stage`, `stage_id`, `expert_id`, `user_id`, `typ
 --
 
 CREATE TABLE `expert_info` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `education` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `academic_degree` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `position` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `type` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `scope_professional_competence` text CHARACTER SET utf8 NOT NULL,
-  `publications` text CHARACTER SET utf8 NOT NULL,
-  `implemented_projects` text CHARACTER SET utf8 NOT NULL,
-  `role_in_implemented_projects` text CHARACTER SET utf8 NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `education` varchar(255) NOT NULL,
+  `academic_degree` varchar(255) NOT NULL,
+  `position` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `scope_professional_competence` text NOT NULL,
+  `publications` text NOT NULL,
+  `implemented_projects` text NOT NULL,
+  `role_in_implemented_projects` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `expert_info`
@@ -2004,53 +2811,63 @@ INSERT INTO `expert_info` (`id`, `user_id`, `education`, `academic_degree`, `pos
 --
 
 CREATE TABLE `gcps` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `basic_confirm_id` int(11) UNSIGNED NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `segment_id` int(11) NOT NULL,
-  `problem_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `basic_confirm_id` int UNSIGNED NOT NULL,
+  `project_id` int NOT NULL,
+  `segment_id` int NOT NULL,
+  `problem_id` int NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `time_confirm` int(11) DEFAULT NULL,
-  `exist_confirm` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
+  `time_confirm` int DEFAULT NULL,
+  `exist_confirm` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `gcps`
 --
 
-INSERT INTO `gcps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `problem_id`, `title`, `description`, `time_confirm`, `exist_confirm`, `created_at`, `updated_at`, `enable_expertise`, `enable_expertise_at`, `deleted_at`) VALUES
-(1, 1, 1, 16, 1, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2. Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1620598011, 1, 1620597126, 1636999467, '1', 1636999467, 1691244711),
-(2, 4, 1, 26, 5, 'ГЦП 1', 'Наш продукт проблема 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от проблема 2.', 1620661464, 1, 1620656987, 1620661464, '0', NULL, 1691244711),
-(8, 4, 1, 26, 5, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', NULL, NULL, 1621705573, 1621705573, '0', NULL, 1691244711),
-(9, 13, 1, 32, 15, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 2, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1623359145, 0, 1623353835, 1623359145, '0', NULL, 1691244711),
-(11, 13, 1, 32, 15, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 2, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 4.', 1623359179, 1, 1623354865, 1623359179, '0', NULL, 1691244711),
-(12, 15, 1, 32, 17, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', 1624563764, 1, 1624476738, 1666553450, '0', NULL, 1691244711),
-(14, 15, 1, 32, 17, 'ГЦП 2', 'Наш продукт продукт 6 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 7.', NULL, NULL, 1624477982, 1624477982, '0', NULL, 1691244711),
-(15, 15, 1, 32, 17, 'ГЦП 3', 'Наш продукт продукт 5 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1624647562, 1624647562, '0', NULL, 1691244711),
-(16, 1, 1, 16, 1, 'ГЦП 2', 'Наш продукт продукт 10 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', 1640722345, 0, 1633513785, 1640722345, '1', 1640722345, 1691244711),
-(17, 1, 1, 16, 1, 'ГЦП 3', 'Наш продукт продукт помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', 1640722496, 1, 1640198067, 1640722496, '1', 1640722496, 1691244711),
-(18, 1, 1, 16, 1, 'ГЦП 4', 'Наш продукт товар помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт.', 1679734431, 1, 1640198477, 1679734432, '1', 1679734432, 1691244711),
-(19, 4, 1, 26, 5, 'ГЦП 3', 'Наш продукт продукт помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', NULL, NULL, 1640800783, 1640801557, '1', 1640801557, 1691244711),
-(20, 4, 1, 26, 5, 'ГЦП 4', 'Наш продукт продукт помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', NULL, NULL, 1640800810, 1640800810, '0', NULL, 1691244711),
-(21, 20, 6, 37, 32, 'ГЦП 1', 'Наш продукт продукт помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', 1650458415, 1, 1650458370, 1650458415, '1', 1650458415, 1691239716),
-(22, 21, 5, 38, 33, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1652968885, 1, 1652968484, 1652968885, '1', 1652968885, NULL),
-(23, 21, 5, 38, 33, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 4.', NULL, NULL, 1652968524, 1660478606, '1', 1660478606, NULL),
-(24, 1, 1, 16, 1, 'ГЦП 5', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1665919650, 1665919653, '1', 1665919653, 1691244711),
-(25, 26, 10, 54, 39, 'ГЦП 1', 'Наш продукт продукт 6 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 8.', 1666596444, 1, 1666596402, 1666596444, '1', 1666596444, NULL),
-(26, 27, 1, 41, 41, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 9, который хочет удовлетворить проблему отсутствие необходимой информации по патентованию продукта, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 3.', 1670153591, 1, 1670070639, 1670153591, '1', 1670153591, 1691244711),
-(30, 27, 1, 41, 41, 'ГЦП 2', 'Наш продукт продукт 5 помогает сегмент 9, который хочет удовлетворить проблему отсутствие необходимой информации по патентованию продукта, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 8.', NULL, NULL, 1670073403, 1670136435, '1', 1670136435, 1691244711),
-(31, 29, 17, 62, 48, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 111, который хочет удовлетворить проблему описание гипотезы проблемы сегмента 123, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1681053577, 1, 1681053492, 1681053579, '1', 1681053498, NULL),
-(32, 26, 10, 54, 39, 'ГЦП 2', 'Наш продукт продукт 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1682771823, 1, 1682771628, 1682771823, '1', 1682771631, NULL),
-(33, 28, 1, 16, 31, 'ГЦП 1', 'Наш продукт продукт 11 помогает сегмент 1 (длинное название сегмента, максимально длинное назван), который хочет удовлетворить проблему описание гипотезы проблемы сегмента 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 22.', NULL, NULL, 1684066155, 1684066155, '0', NULL, 1691244711),
-(34, 1, 1, 16, 1, 'ГЦП 6', 'Наш продукт продукт 1 помогает сегмент 1 (длинное название сегмента, максимально длинное назван), который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1689500249, 1689500264, '1', 1689500264, 1691244711),
-(35, 32, 7, 66, 55, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1699196093, 1, 1699195701, 1699196095, '1', 1699196019, NULL),
-(36, 33, 7, 67, 56, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 2, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1699262404, 1, 1699262334, 1699262407, '1', 1699262343, NULL);
+INSERT INTO `gcps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `problem_id`, `title`, `description`, `time_confirm`, `exist_confirm`, `created_at`, `updated_at`, `enable_expertise`, `enable_expertise_at`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 1, 16, 1, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2. Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1620598011, 1, 1620597126, 1636999467, '1', 1636999467, 1691244711, NULL, NULL),
+(2, 4, 1, 26, 5, 'ГЦП 1', 'Наш продукт проблема 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от проблема 2.', 1620661464, 1, 1620656987, 1620661464, '0', NULL, 1691244711, NULL, NULL),
+(8, 4, 1, 26, 5, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', NULL, NULL, 1621705573, 1621705573, '0', NULL, 1691244711, NULL, NULL),
+(9, 13, 1, 32, 15, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 2, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1623359145, 0, 1623353835, 1623359145, '0', NULL, 1691244711, NULL, NULL),
+(11, 13, 1, 32, 15, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 2, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 4.', 1623359179, 1, 1623354865, 1623359179, '0', NULL, 1691244711, NULL, NULL),
+(12, 15, 1, 32, 17, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', 1624563764, 1, 1624476738, 1666553450, '0', NULL, 1691244711, NULL, NULL),
+(14, 15, 1, 32, 17, 'ГЦП 2', 'Наш продукт продукт 6 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 7.', NULL, NULL, 1624477982, 1624477982, '0', NULL, 1691244711, NULL, NULL),
+(15, 15, 1, 32, 17, 'ГЦП 3', 'Наш продукт продукт 5 помогает сегмент 4, который хочет удовлетворить проблему описание гипотезы проблемы 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1624647562, 1624647562, '0', NULL, 1691244711, NULL, NULL),
+(16, 1, 1, 16, 1, 'ГЦП 2', 'Наш продукт продукт 10 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 5.', 1640722345, 0, 1633513785, 1640722345, '1', 1640722345, 1691244711, NULL, NULL),
+(17, 1, 1, 16, 1, 'ГЦП 3', 'Наш продукт продукт помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', 1640722496, 1, 1640198067, 1640722496, '1', 1640722496, 1691244711, NULL, NULL),
+(18, 1, 1, 16, 1, 'ГЦП 4', 'Наш продукт товар помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт.', 1679734431, 1, 1640198477, 1679734432, '1', 1679734432, 1691244711, NULL, NULL),
+(19, 4, 1, 26, 5, 'ГЦП 3', 'Наш продукт продукт помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', NULL, NULL, 1640800783, 1640801557, '1', 1640801557, 1691244711, NULL, NULL),
+(20, 4, 1, 26, 5, 'ГЦП 4', 'Наш продукт продукт помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', NULL, NULL, 1640800810, 1640800810, '0', NULL, 1691244711, NULL, NULL),
+(21, 20, 6, 37, 32, 'ГЦП 1', 'Наш продукт продукт помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы сегмента, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от товар.', 1650458415, 1, 1650458370, 1650458415, '1', 1650458415, 1691239716, NULL, NULL),
+(22, 21, 5, 38, 33, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1652968885, 1, 1652968484, 1652968885, '1', 1652968885, NULL, NULL, NULL),
+(23, 21, 5, 38, 33, 'ГЦП 2', 'Наш продукт продукт 3 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 4.', NULL, NULL, 1652968524, 1660478606, '1', 1660478606, NULL, NULL, NULL),
+(24, 1, 1, 16, 1, 'ГЦП 5', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1665919650, 1665919653, '1', 1665919653, 1691244711, NULL, NULL),
+(25, 26, 10, 54, 39, 'ГЦП 1', 'Наш продукт продукт 6 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 8.', 1666596444, 1, 1666596402, 1666596444, '1', 1666596444, NULL, NULL, NULL),
+(26, 27, 1, 41, 41, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 9, который хочет удовлетворить проблему отсутствие необходимой информации по патентованию продукта, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 3.', 1670153591, 1, 1670070639, 1670153591, '1', 1670153591, 1691244711, NULL, NULL),
+(30, 27, 1, 41, 41, 'ГЦП 2', 'Наш продукт продукт 5 помогает сегмент 9, который хочет удовлетворить проблему отсутствие необходимой информации по патентованию продукта, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 8.', NULL, NULL, 1670073403, 1670136435, '1', 1670136435, 1691244711, NULL, NULL),
+(31, 29, 17, 62, 48, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 111, который хочет удовлетворить проблему описание гипотезы проблемы сегмента 123, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1681053577, 1, 1681053492, 1681053579, '1', 1681053498, NULL, NULL, NULL),
+(32, 26, 10, 54, 39, 'ГЦП 2', 'Наш продукт продукт 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1682771823, 1, 1682771628, 1682771823, '1', 1682771631, NULL, NULL, NULL),
+(33, 28, 1, 16, 31, 'ГЦП 1', 'Наш продукт продукт 11 помогает сегмент 1 (длинное название сегмента, максимально длинное назван), который хочет удовлетворить проблему описание гипотезы проблемы сегмента 3, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 22.', NULL, NULL, 1684066155, 1684066155, '0', NULL, 1691244711, NULL, NULL),
+(34, 1, 1, 16, 1, 'ГЦП 6', 'Наш продукт продукт 1 помогает сегмент 1 (длинное название сегмента, максимально длинное назван), который хочет удовлетворить проблему инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера инициативная группа нижегородцев на щелоковском хуторе записала видеообращение к президенту россии владимиру путину с просьбой отменить qr-коды. опубликовано в instagram-аккаунте блогера, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1689500249, 1689500264, '1', 1689500264, 1691244711, NULL, NULL),
+(35, 32, 7, 66, 55, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1699196093, 1, 1699195701, 1699196095, '1', 1699196019, NULL, NULL, NULL),
+(36, 33, 7, 67, 56, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 2, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1699262404, 1, 1699262334, 1699262407, '1', 1699262343, NULL, NULL, NULL),
+(37, 32, 7, 66, 55, 'ГЦП 2', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1700753121, 1700753131, '1', 1700753131, NULL, NULL, NULL),
+(38, 32, 7, 66, 55, 'ГЦП 3', 'Наш продукт продукт 1 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1704554618, 1704626494, '0', NULL, NULL, 58, 30),
+(39, 32, 7, 66, 55, 'ГЦП 4', 'Наш продукт продукт 2 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 3.', NULL, NULL, 1704632810, 1704632810, '0', NULL, NULL, 58, 30),
+(40, 32, 7, 66, 55, 'ГЦП 5', 'Наш продукт продукт 3 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 4.', NULL, NULL, 1704632832, 1704632832, '0', NULL, NULL, 58, 30),
+(41, 32, 7, 66, 55, 'ГЦП 6', 'Наш продукт продукт 5 помогает сегмент 1, который хочет удовлетворить проблему описание гипотезы проблемы 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 6.', NULL, NULL, 1704632868, 1704632868, '0', NULL, NULL, 58, 30),
+(42, 34, 7, 68, 60, 'ГЦП 1', 'Наш продукт продукт 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы сегмента 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', 1706724399, 1, 1706635769, 1706724404, '1', 1706635778, NULL, NULL, NULL),
+(43, 34, 7, 68, 60, 'ГЦП 2', 'Наш продукт продукт 1 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы сегмента 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 2.', NULL, NULL, 1707415446, 1707417432, '1', 1707417431, NULL, 58, 59),
+(44, 34, 7, 68, 60, 'ГЦП 3', 'Наш продукт продукт 2 помогает сегмент 3, который хочет удовлетворить проблему описание гипотезы проблемы сегмента 1, избавиться от проблемы(или снизить её) и позволяет получить выгоду в виде, выгода, в отличии от продукт 3.', NULL, NULL, 1707415471, 1707415471, '0', NULL, NULL, 58, 59);
 
 -- --------------------------------------------------------
 
@@ -2059,14 +2876,14 @@ INSERT INTO `gcps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `probl
 --
 
 CREATE TABLE `interview_confirm_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `respond_id` int NOT NULL,
   `interview_file` varchar(255) DEFAULT NULL,
   `server_file` varchar(255) DEFAULT NULL,
   `status` enum('0','1') NOT NULL DEFAULT '0',
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2104,7 +2921,14 @@ INSERT INTO `interview_confirm_gcp` (`id`, `respond_id`, `interview_file`, `serv
 (29, 57, NULL, NULL, '1', 1682771808, 1682771808, NULL),
 (30, 58, NULL, NULL, '1', 1682771819, 1682771819, NULL),
 (31, 60, NULL, NULL, '1', 1699196086, 1699196086, NULL),
-(32, 61, NULL, NULL, '1', 1699262400, 1699262400, NULL);
+(32, 61, NULL, NULL, '1', 1699262400, 1699262400, NULL),
+(33, 66, 'Листинг для Spaccel.doc', 'lfuUkY0x8_Hi5lH.doc', '1', 1706723431, 1706723432, NULL),
+(34, 67, NULL, NULL, '1', 1706723505, 1706723505, NULL),
+(35, 64, NULL, NULL, '1', 1706723641, 1706723641, NULL),
+(36, 63, NULL, NULL, '1', 1706724150, 1706724150, NULL),
+(37, 65, NULL, NULL, '0', 1706724189, 1706724189, NULL),
+(38, 68, NULL, NULL, '0', 1706724220, 1706724220, NULL),
+(39, 71, NULL, NULL, '1', 1707417679, 1707417679, NULL);
 
 -- --------------------------------------------------------
 
@@ -2113,14 +2937,14 @@ INSERT INTO `interview_confirm_gcp` (`id`, `respond_id`, `interview_file`, `serv
 --
 
 CREATE TABLE `interview_confirm_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `respond_id` int NOT NULL,
   `interview_file` varchar(255) DEFAULT NULL,
   `server_file` varchar(255) DEFAULT NULL,
   `status` enum('0','1') NOT NULL DEFAULT '0',
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2159,7 +2983,14 @@ INSERT INTO `interview_confirm_mvp` (`id`, `respond_id`, `interview_file`, `serv
 (31, 52, '010323Методичка_Проектант для вставки в платформу.docx', 'UD_RjpZR94b0h8Z.docx', '1', 1682953456, 1682953458, 1691244710),
 (32, 53, NULL, NULL, '1', 1682953476, 1682953476, 1691244710),
 (33, 57, NULL, NULL, '1', 1699196776, 1699196776, NULL),
-(34, 58, NULL, NULL, '1', 1699262492, 1699262492, NULL);
+(34, 58, NULL, NULL, '1', 1699262492, 1699262492, NULL),
+(35, 59, NULL, NULL, '1', 1706961785, 1706961785, NULL),
+(36, 62, NULL, NULL, '1', 1706962023, 1706962023, NULL),
+(37, 63, NULL, NULL, '1', 1706962040, 1706962040, NULL),
+(38, 64, NULL, NULL, '0', 1706962055, 1706962055, NULL),
+(39, 65, NULL, NULL, '1', 1707051775, 1707051775, NULL),
+(40, 67, NULL, NULL, '0', 1707051916, 1707051916, NULL),
+(41, 74, NULL, NULL, '1', 1707556348, 1707556348, NULL);
 
 -- --------------------------------------------------------
 
@@ -2168,14 +2999,14 @@ INSERT INTO `interview_confirm_mvp` (`id`, `respond_id`, `interview_file`, `serv
 --
 
 CREATE TABLE `interview_confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `respond_id` int NOT NULL,
   `interview_file` varchar(255) DEFAULT NULL,
   `server_file` varchar(255) DEFAULT NULL,
   `status` enum('0','1') NOT NULL DEFAULT '0',
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2212,7 +3043,12 @@ INSERT INTO `interview_confirm_problem` (`id`, `respond_id`, `interview_file`, `
 (27, 84, NULL, NULL, '1', 1681053443, 1681053443, NULL),
 (28, 88, NULL, NULL, '1', 1699195311, 1699195311, NULL),
 (29, 89, NULL, NULL, '0', 1699195318, 1699195318, NULL),
-(30, 90, NULL, NULL, '1', 1699262297, 1699262297, NULL);
+(30, 90, NULL, NULL, '1', 1699262297, 1699262297, NULL),
+(31, 134, 'Листинг для Spaccel(1).doc', '5HCdMV0XQ2JtqRR.doc', '1', 1706553799, 1706553855, NULL),
+(32, 135, NULL, NULL, '1', 1706553816, 1706553816, NULL),
+(33, 136, NULL, NULL, '0', 1706553821, 1706635533, NULL),
+(34, 91, NULL, NULL, '1', 1706635685, 1706635685, NULL),
+(35, 137, NULL, NULL, '1', 1707415151, 1707415151, NULL);
 
 -- --------------------------------------------------------
 
@@ -2221,15 +3057,15 @@ INSERT INTO `interview_confirm_problem` (`id`, `respond_id`, `interview_file`, `
 --
 
 CREATE TABLE `interview_confirm_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `respond_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `respond_id` int NOT NULL,
   `interview_file` varchar(255) DEFAULT NULL,
   `server_file` varchar(255) DEFAULT NULL,
   `result` text NOT NULL,
   `status` enum('0','1') NOT NULL DEFAULT '0',
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2269,7 +3105,16 @@ INSERT INTO `interview_confirm_segment` (`id`, `respond_id`, `interview_file`, `
 (35, 92, NULL, NULL, 'Варианты проблем', '1', 1681048243, 1681048243, NULL),
 (36, 93, NULL, NULL, 'dfgbdf', '1', 1699193087, 1699193087, NULL),
 (37, 94, NULL, NULL, 'dfgbdf', '1', 1699193096, 1699193096, NULL),
-(38, 95, NULL, NULL, 'авпиыа', '1', 1699262156, 1699262156, NULL);
+(38, 95, NULL, NULL, 'авпиыа', '1', 1699262156, 1699262156, NULL),
+(42, 98, NULL, NULL, 'арпапрвапрвапр', '1', 1706110791, 1706110791, NULL),
+(43, 101, NULL, NULL, 'Варианты есть', '1', 1706364616, 1706364616, NULL),
+(44, 102, NULL, NULL, 'Нет вариантов', '0', 1706364647, 1706364647, NULL),
+(45, 103, NULL, NULL, 'Варианты', '1', 1707332404, 1707332404, NULL),
+(46, 105, NULL, NULL, 'Варианты есть', '1', 1707563510, 1707563510, NULL),
+(47, 106, '010323Методичка_Проектант для вставки в платформу.docx', '7_E-menYrF5izlm.docx', 'Варианты проблем', '1', 1707563563, 1707563565, NULL),
+(48, 108, NULL, NULL, 'какие-то варианты', '1', 1707563984, 1707563984, NULL),
+(49, 109, NULL, NULL, 'Варианты проблем\r\nОписание', '1', 1708262435, 1708262435, NULL),
+(50, 104, NULL, NULL, 'Варианты проблем', '1', 1709060005, 1709060005, NULL);
 
 -- --------------------------------------------------------
 
@@ -2278,10 +3123,10 @@ INSERT INTO `interview_confirm_segment` (`id`, `respond_id`, `interview_file`, `
 --
 
 CREATE TABLE `keywords_expert` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `expert_id` int(11) NOT NULL,
-  `description` text CHARACTER SET utf8
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `expert_id` int NOT NULL,
+  `description` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `keywords_expert`
@@ -2300,7 +3145,7 @@ INSERT INTO `keywords_expert` (`id`, `expert_id`, `description`) VALUES
 --
 
 CREATE TABLE `location_wish_list` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2331,14 +3176,14 @@ INSERT INTO `location_wish_list` (`id`, `name`) VALUES
 --
 
 CREATE TABLE `message_admin` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `conversation_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
   `description` text,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2641,14 +3486,14 @@ INSERT INTO `message_admin` (`id`, `conversation_id`, `sender_id`, `adressee_id`
 --
 
 CREATE TABLE `message_development` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `conversation_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
   `description` text,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2854,15 +3699,15 @@ INSERT INTO `message_development` (`id`, `conversation_id`, `sender_id`, `adress
 --
 
 CREATE TABLE `message_expert` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
-  `description` text CHARACTER SET utf8,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `conversation_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
+  `description` text,
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `message_expert`
@@ -2987,9 +3832,9 @@ INSERT INTO `message_expert` (`id`, `conversation_id`, `sender_id`, `adressee_id
 --
 
 CREATE TABLE `message_files` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `message_id` int(11) NOT NULL,
-  `category` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `message_id` int NOT NULL,
+  `category` int NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `server_file` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3078,14 +3923,14 @@ INSERT INTO `message_files` (`id`, `message_id`, `category`, `file_name`, `serve
 --
 
 CREATE TABLE `message_main_admin` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `conversation_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
   `description` text,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3155,14 +4000,14 @@ INSERT INTO `message_main_admin` (`id`, `conversation_id`, `sender_id`, `adresse
 --
 
 CREATE TABLE `message_manager` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `conversation_id` int NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
   `description` text,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3235,141 +4080,162 @@ INSERT INTO `message_manager` (`id`, `conversation_id`, `sender_id`, `adressee_i
 --
 
 CREATE TABLE `migration` (
-  `version` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apply_time` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `version` varchar(180) NOT NULL,
+  `apply_time` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Дамп данных таблицы `migration`
 --
 
 INSERT INTO `migration` (`version`, `apply_time`) VALUES
-('m000000_000000_base', 1671964295),
-('m221225_103838_create_table_all_questions_confirm_gcp', 1671970242),
-('m221225_121421_create_table_all_questions_confirm_mvp', 1671970537),
-('m221225_122343_create_table_all_questions_confirm_problem', 1671971119),
-('m221225_122612_create_table_all_questions_confirm_segment', 1671971326),
-('m221225_124232_create_table_answers_questions_confirm_gcp', 1671972537),
-('m221225_130017_create_table_answers_questions_confirm_mvp', 1671973299),
-('m221225_130335_create_table_answers_questions_confirm_problem', 1671973508),
-('m221225_130358_create_table_answers_questions_confirm_segment', 1671973508),
-('m221225_133459_create_table_authors', 1671975475),
-('m221225_134022_create_table_business_model', 1671976761),
-('m221225_141436_create_table_checking_online_user', 1671977776),
-('m221225_141754_create_table_client', 1671978060),
-('m221225_142235_create_table_client_activation', 1671978272),
-('m221225_142617_create_table_client_rates_plan', 1671978524),
-('m221225_143020_create_table_client_settings', 1671978814),
-('m221225_143550_create_table_client_user', 1671979040),
-('m221225_143823_create_table_communication_patterns', 1671979755),
-('m221225_145025_create_table_communication_response', 1671979978),
-('m221225_145501_create_table_confirm_gcp', 1671980239),
-('m221225_145820_create_table_confirm_mvp', 1671980602),
-('m221225_145838_create_table_confirm_problem', 1671980603),
-('m221225_145853_create_table_confirm_segment', 1671980603),
-('m221225_150723_create_table_conversation_admin', 1671981296),
-('m221225_150746_create_table_conversation_development', 1671981297),
-('m221225_150806_create_table_conversation_expert', 1671981298),
-('m221225_150825_create_table_conversation_main_admin', 1671981298),
-('m221225_150859_create_table_conversation_manager', 1671981299),
-('m221225_151830_create_table_customer_expert', 1671981689),
-('m221225_152244_create_table_customer_manager', 1671981978),
-('m221225_152305_create_table_customer_tracker', 1671981979),
-('m221225_152819_create_table_duplicate_communications', 1671982369),
-('m221225_152846_create_table_expected_results_interview_confirm_problem', 1671982370),
-('m230104_081625_create_table_expert_info', 1672820973),
-('m230104_083358_create_table_expertise', 1672821566),
-('m230104_084527_create_table_gcps', 1672822809),
-('m230104_091124_create_table_interview_confirm_gcp', 1672824683),
-('m230104_093411_create_table_interview_confirm_mvp', 1672824903),
-('m230104_093626_create_table_interview_confirm_problem', 1672825102),
-('m230104_094543_create_table_interview_confirm_segment', 1672825663),
-('m230104_095257_create_table_keywords_expert', 1672826731),
-('m230104_100751_create_table_message_admin', 1672827927),
-('m230104_102739_create_table_message_development', 1672828143),
-('m230104_103218_create_table_message_expert', 1672828402),
-('m230104_103600_create_table_message_files', 1672828702),
-('m230104_104027_create_table_message_main_admin', 1672828880),
-('m230104_104322_create_table_message_manager', 1672829100),
-('m230104_104711_create_table_mvps', 1672830328),
-('m230104_110906_create_table_pre_files', 1672830675),
-('m230104_111337_create_table_problems', 1672831076),
-('m230104_112114_create_table_project_communications', 1672831480),
-('m230104_115038_create_table_projects', 1672833590),
-('m230104_120250_create_table_questions_confirm_gcp', 1672833971),
-('m230104_120737_create_table_questions_confirm_mvp', 1672834231),
-('m230104_120800_create_table_questions_confirm_problem', 1672834231),
-('m230104_120825_create_table_questions_confirm_segment', 1672834232),
-('m230104_121328_create_table_rates_plan', 1672834611),
-('m230104_121937_create_table_responds_gcp', 1672835176),
-('m230104_122031_create_table_responds_mvp', 1672835178),
-('m230104_122053_create_table_responds_problem', 1672835178),
-('m230104_122115_create_table_responds_segment', 1672835179),
-('m230104_122937_create_table_segments', 1672835780),
-('m230104_123826_create_table_types_access_to_expertise', 1672836048),
-('m230104_125755_create_table_user', 1672838565),
-('m230104_132432_create_table_user_access_to_projects', 1672838831),
-('m230105_103954_create_table_wish_list', 1675517861),
-('m230105_105630_create_table_requirement_wish_list', 1675517862),
-('m230105_105806_create_table_reason_requirement_wish_list', 1675517862),
-('m230121_112328_create_table_customer_wish_list', 1675517863),
-('m230121_134223_create_table_location_wish_list', 1675517864),
-('m230211_060220_add_column_use_wish_list_for_table_segments', 1676096049),
-('m230211_121110_create_table_segment_requirement', 1676117811),
-('m230319_161705_add_column_hypothesis_id_for_table_project_communications', 1679242869),
-('m230326_134201_add_column_enable_expertise_at_for_table_projects', 1679838357),
-('m230326_135133_add_column_enable_expertise_at_for_table_segments', 1679838755),
-('m230326_135555_add_column_enable_expertise_at_for_table_confirm_segment', 1679839009),
-('m230326_140356_add_column_enable_expertise_at_for_table_problems', 1679839480),
-('m230326_140600_add_column_enable_expertise_at_for_table_confirm_problem', 1679839633),
-('m230326_141502_add_column_enable_expertise_at_for_table_gcps', 1679840154),
-('m230326_141700_add_column_enable_expertise_at_for_table_confirm_gcp', 1679840344),
-('m230326_142020_add_column_enable_expertise_at_for_table_mvps', 1679840463),
-('m230326_142206_add_column_enable_expertise_at_for_table_confirm_mvp', 1679840575),
-('m230326_142419_add_column_enable_expertise_at_for_table_business_model', 1679840718),
-('m230423_133124_add_column_deleted_at_for_table_projects', 1682258056),
-('m230423_133200_add_column_deleted_at_for_table_segments', 1682258058),
-('m230423_133234_add_column_deleted_at_for_table_confirm_segment', 1682258059),
-('m230423_133353_add_column_deleted_at_for_table_problems', 1682258060),
-('m230423_133411_add_column_deleted_at_for_table_confirm_problem', 1682258061),
-('m230423_133440_add_column_deleted_at_for_table_gcps', 1682258062),
-('m230423_133450_add_column_deleted_at_for_table_confirm_gcp', 1682258063),
-('m230423_133515_add_column_deleted_at_for_table_mvps', 1682258064),
-('m230423_133528_add_column_deleted_at_for_table_confirm_mvp', 1682258065),
-('m230423_133620_add_column_deleted_at_for_table_business_model', 1682258067),
-('m230423_133751_add_column_deleted_at_for_table_interview_confirm_segment', 1682258068),
-('m230423_133817_add_column_deleted_at_for_table_interview_confirm_problem', 1682258069),
-('m230423_133827_add_column_deleted_at_for_table_interview_confirm_gcp', 1682258070),
-('m230423_133836_add_column_deleted_at_for_table_interview_confirm_mvp', 1682258071),
-('m230423_133957_add_column_deleted_at_for_table_answers_questions_confirm_segment', 1682258072),
-('m230423_134008_add_column_deleted_at_for_table_answers_questions_confirm_problem', 1682258073),
-('m230423_134024_add_column_deleted_at_for_table_answers_questions_confirm_gcp', 1682258074),
-('m230423_134037_add_column_deleted_at_for_table_answers_questions_confirm_mvp', 1682258075),
-('m230423_134137_add_column_deleted_at_for_table_questions_confirm_segment', 1682258076),
-('m230423_134148_add_column_deleted_at_for_table_questions_confirm_problem', 1682258077),
-('m230423_134159_add_column_deleted_at_for_table_questions_confirm_gcp', 1682258078),
-('m230423_134209_add_column_deleted_at_for_table_questions_confirm_mvp', 1682258079),
-('m230423_134326_add_column_deleted_at_for_table_responds_segment', 1682258080),
-('m230423_134338_add_column_deleted_at_for_table_responds_problem', 1682258082),
-('m230423_134347_add_column_deleted_at_for_table_responds_gcp', 1682258083),
-('m230423_134359_add_column_deleted_at_for_table_responds_mvp', 1682258084),
-('m230430_084812_add_column_deleted_at_for_table_authors', 1682844636),
-('m230430_084852_add_column_deleted_at_for_table_pre_files', 1682844637),
-('m230430_092727_add_column_deleted_at_for_table_segment_requirement', 1682846893),
-('m230430_094555_add_column_deleted_at_for_table_expected_results_interview_confirm_problem', 1682848001),
-('m230812_081230_create_table_client_codes', 1691828832),
-('m230820_074145_create_table_contractor_project', 1694968931),
-('m230820_074317_create_table_contractor_activities', 1694968932),
-('m230820_074402_create_table_contractor_info', 1694968933),
-('m230820_074425_create_table_contractor_tasks', 1694968934),
-('m230820_082619_insert_into_contractor_activities', 1694968934),
-('m230916_084700_create_table_contractor_educations', 1694968935),
-('m230916_094501_create_table_contractor_users', 1694968937),
-('m231007_085754_create_table_contractor_communications', 1696761670),
-('m231007_091042_create_table_contractor_communication_response', 1696761671),
-('m231007_092728_create_table_contractor_project_access', 1696768138),
-('m231029_170913_add_primary_key_for_table_contractor_project', 1698599593),
-('m231104_142551_add_column_activity_id_for_table_contractor_task', 1699108080);
+('m000000_000000_base', 1707068863),
+('m221225_103838_create_table_all_questions_confirm_gcp', 1707068880),
+('m221225_121421_create_table_all_questions_confirm_mvp', 1707068881),
+('m221225_122343_create_table_all_questions_confirm_problem', 1707068882),
+('m221225_122612_create_table_all_questions_confirm_segment', 1707068883),
+('m221225_124232_create_table_answers_questions_confirm_gcp', 1707068884),
+('m221225_130017_create_table_answers_questions_confirm_mvp', 1707068884),
+('m221225_130335_create_table_answers_questions_confirm_problem', 1707068885),
+('m221225_130358_create_table_answers_questions_confirm_segment', 1707068886),
+('m221225_133459_create_table_authors', 1707068887),
+('m221225_134022_create_table_business_model', 1707068888),
+('m221225_141436_create_table_checking_online_user', 1707068889),
+('m221225_141754_create_table_client', 1707068890),
+('m221225_142235_create_table_client_activation', 1707068891),
+('m221225_142617_create_table_client_rates_plan', 1707068892),
+('m221225_143020_create_table_client_settings', 1707068893),
+('m221225_143550_create_table_client_user', 1707068895),
+('m221225_143823_create_table_communication_patterns', 1707068898),
+('m221225_145025_create_table_communication_response', 1707068901),
+('m221225_145501_create_table_confirm_gcp', 1707068903),
+('m221225_145820_create_table_confirm_mvp', 1707068905),
+('m221225_145838_create_table_confirm_problem', 1707068908),
+('m221225_145853_create_table_confirm_segment', 1707068910),
+('m221225_150723_create_table_conversation_admin', 1707068911),
+('m221225_150746_create_table_conversation_development', 1707068912),
+('m221225_150806_create_table_conversation_expert', 1707068913),
+('m221225_150825_create_table_conversation_main_admin', 1707068915),
+('m221225_150859_create_table_conversation_manager', 1707068915),
+('m221225_151830_create_table_customer_expert', 1707068917),
+('m221225_152244_create_table_customer_manager', 1707068919),
+('m221225_152305_create_table_customer_tracker', 1707068921),
+('m221225_152819_create_table_duplicate_communications', 1707068922),
+('m221225_152846_create_table_expected_results_interview_confirm_problem', 1707068923),
+('m230104_081625_create_table_expert_info', 1707068924),
+('m230104_083358_create_table_expertise', 1707068925),
+('m230104_084527_create_table_gcps', 1707068926),
+('m230104_091124_create_table_interview_confirm_gcp', 1707068927),
+('m230104_093411_create_table_interview_confirm_mvp', 1707068928),
+('m230104_093626_create_table_interview_confirm_problem', 1707068929),
+('m230104_094543_create_table_interview_confirm_segment', 1707068930),
+('m230104_095257_create_table_keywords_expert', 1707068931),
+('m230104_100751_create_table_message_admin', 1707068932),
+('m230104_102739_create_table_message_development', 1707068934),
+('m230104_103218_create_table_message_expert', 1707068935),
+('m230104_103600_create_table_message_files', 1707068936),
+('m230104_104027_create_table_message_main_admin', 1707068937),
+('m230104_104322_create_table_message_manager', 1707068938),
+('m230104_104711_create_table_mvps', 1707068939),
+('m230104_110906_create_table_pre_files', 1707068940),
+('m230104_111337_create_table_problems', 1707068941),
+('m230104_112114_create_table_project_communications', 1707068942),
+('m230104_115038_create_table_projects', 1707068944),
+('m230104_120250_create_table_questions_confirm_gcp', 1707068946),
+('m230104_120737_create_table_questions_confirm_mvp', 1707068948),
+('m230104_120800_create_table_questions_confirm_problem', 1707068949),
+('m230104_120825_create_table_questions_confirm_segment', 1707068951),
+('m230104_121328_create_table_rates_plan', 1707068952),
+('m230104_121937_create_table_responds_gcp', 1707068955),
+('m230104_122031_create_table_responds_mvp', 1707068958),
+('m230104_122053_create_table_responds_problem', 1707068960),
+('m230104_122115_create_table_responds_segment', 1707068963),
+('m230104_122937_create_table_segments', 1707068966),
+('m230104_123826_create_table_types_access_to_expertise', 1707068967),
+('m230104_125755_create_table_user', 1707068969),
+('m230104_132432_create_table_user_access_to_projects', 1707068970),
+('m230105_103954_create_table_wish_list', 1707068972),
+('m230105_105630_create_table_requirement_wish_list', 1707068975),
+('m230105_105806_create_table_reason_requirement_wish_list', 1707068977),
+('m230121_112328_create_table_customer_wish_list', 1707068978),
+('m230121_134223_create_table_location_wish_list', 1707068980),
+('m230211_060220_add_column_use_wish_list_for_table_segments', 1707068981),
+('m230211_121110_create_table_segment_requirement', 1707068982),
+('m230319_161705_add_column_hypothesis_id_for_table_project_communications', 1707068982),
+('m230326_134201_add_column_enable_expertise_at_for_table_projects', 1707068984),
+('m230326_135133_add_column_enable_expertise_at_for_table_segments', 1707068986),
+('m230326_135555_add_column_enable_expertise_at_for_table_confirm_segment', 1707068987),
+('m230326_140356_add_column_enable_expertise_at_for_table_problems', 1707068988),
+('m230326_140600_add_column_enable_expertise_at_for_table_confirm_problem', 1707068990),
+('m230326_141502_add_column_enable_expertise_at_for_table_gcps', 1707068992),
+('m230326_141700_add_column_enable_expertise_at_for_table_confirm_gcp', 1707068994),
+('m230326_142020_add_column_enable_expertise_at_for_table_mvps', 1707068996),
+('m230326_142206_add_column_enable_expertise_at_for_table_confirm_mvp', 1707068998),
+('m230326_142419_add_column_enable_expertise_at_for_table_business_model', 1707068999),
+('m230423_133124_add_column_deleted_at_for_table_projects', 1707069001),
+('m230423_133200_add_column_deleted_at_for_table_segments', 1707069004),
+('m230423_133234_add_column_deleted_at_for_table_confirm_segment', 1707069006),
+('m230423_133353_add_column_deleted_at_for_table_problems', 1707069007),
+('m230423_133411_add_column_deleted_at_for_table_confirm_problem', 1707069008),
+('m230423_133440_add_column_deleted_at_for_table_gcps', 1707069009),
+('m230423_133450_add_column_deleted_at_for_table_confirm_gcp', 1707069010),
+('m230423_133515_add_column_deleted_at_for_table_mvps', 1707069011),
+('m230423_133528_add_column_deleted_at_for_table_confirm_mvp', 1707069012),
+('m230423_133620_add_column_deleted_at_for_table_business_model', 1707069013),
+('m230423_133751_add_column_deleted_at_for_table_interview_confirm_segment', 1707069014),
+('m230423_133817_add_column_deleted_at_for_table_interview_confirm_problem', 1707069015),
+('m230423_133827_add_column_deleted_at_for_table_interview_confirm_gcp', 1707069016),
+('m230423_133836_add_column_deleted_at_for_table_interview_confirm_mvp', 1707069017),
+('m230423_133957_add_column_deleted_at_for_table_answers_questions_confirm_segment', 1707069017),
+('m230423_134008_add_column_deleted_at_for_table_answers_questions_confirm_problem', 1707069018),
+('m230423_134024_add_column_deleted_at_for_table_answers_questions_confirm_gcp', 1707069019),
+('m230423_134037_add_column_deleted_at_for_table_answers_questions_confirm_mvp', 1707069020),
+('m230423_134137_add_column_deleted_at_for_table_questions_confirm_segment', 1707069021),
+('m230423_134148_add_column_deleted_at_for_table_questions_confirm_problem', 1707069021),
+('m230423_134159_add_column_deleted_at_for_table_questions_confirm_gcp', 1707069022),
+('m230423_134209_add_column_deleted_at_for_table_questions_confirm_mvp', 1707069024),
+('m230423_134326_add_column_deleted_at_for_table_responds_segment', 1707069025),
+('m230423_134338_add_column_deleted_at_for_table_responds_problem', 1707069026),
+('m230423_134347_add_column_deleted_at_for_table_responds_gcp', 1707069027),
+('m230423_134359_add_column_deleted_at_for_table_responds_mvp', 1707069029),
+('m230430_084812_add_column_deleted_at_for_table_authors', 1707069030),
+('m230430_084852_add_column_deleted_at_for_table_pre_files', 1707069031),
+('m230430_092727_add_column_deleted_at_for_table_segment_requirement', 1707069032),
+('m230430_094555_add_column_deleted_at_for_table_expected_results_interview_confirm_problem', 1707069034),
+('m230812_081230_create_table_client_codes', 1707069035),
+('m230820_074145_create_table_contractor_project', 1707069037),
+('m230820_074317_create_table_contractor_activities', 1707069039),
+('m230820_074402_create_table_contractor_info', 1707069041),
+('m230820_074425_create_table_contractor_tasks', 1707069043),
+('m230820_082619_insert_into_contractor_activities', 1707069043),
+('m230916_084700_create_table_contractor_educations', 1707069044),
+('m230916_094501_create_table_contractor_users', 1707069052),
+('m231007_085754_create_table_contractor_communications', 1707069053),
+('m231007_091042_create_table_contractor_communication_response', 1707069055),
+('m231007_092728_create_table_contractor_project_access', 1707069057),
+('m231029_170913_add_primary_key_for_table_contractor_project', 1707069060),
+('m231104_142551_add_column_activity_id_for_table_contractor_task', 1707069061),
+('m231122_151825_add_column_contractor_id_for_table_segments', 1707069062),
+('m231122_151851_add_column_contractor_id_for_table_problems', 1707069063),
+('m231122_151909_add_column_contractor_id_for_table_gcps', 1707069064),
+('m231122_151928_add_column_contractor_id_for_table_mvps', 1707069065),
+('m231122_151957_add_column_contractor_id_for_table_responds_segment', 1707069066),
+('m231122_152009_add_column_contractor_id_for_table_responds_problem', 1707069067),
+('m231122_152024_add_column_contractor_id_for_table_responds_gcp', 1707069067),
+('m231122_152033_add_column_contractor_id_for_table_responds_mvp', 1707069068),
+('m231125_124151_add_column_task_id_for_table_segments', 1707069069),
+('m231125_124222_add_column_task_id_for_table_problems', 1707069070),
+('m231125_124233_add_column_task_id_for_table_gcps', 1707069072),
+('m231125_124256_add_column_task_id_for_table_mvps', 1707069073),
+('m231125_124324_add_column_task_id_for_table_responds_segment', 1707069074),
+('m231125_124334_add_column_task_id_for_table_responds_problem', 1707069075),
+('m231125_124346_add_column_task_id_for_table_responds_gcp', 1707069077),
+('m231125_124357_add_column_task_id_for_table_responds_mvp', 1707069078),
+('m231203_095849_create_table_contractor_task_histories', 1707069080),
+('m240211_095427_create_table_contractor_task_products', 1707646178),
+('m240223_111717_create_table_contractor_task_similar_products', 1708687765),
+('m240223_111806_create_table_contractor_task_similar_product_params', 1708691072),
+('m240226_170807_create_table_contractor_task_files', 1708967382);
 
 -- --------------------------------------------------------
 
@@ -3378,58 +4244,71 @@ INSERT INTO `migration` (`version`, `apply_time`) VALUES
 --
 
 CREATE TABLE `mvps` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `basic_confirm_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `segment_id` int(11) NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  `gcp_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `basic_confirm_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `segment_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `gcp_id` int NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `time_confirm` int(11) DEFAULT NULL,
-  `exist_confirm` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
+  `time_confirm` int DEFAULT NULL,
+  `exist_confirm` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `mvps`
 --
 
-INSERT INTO `mvps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `problem_id`, `gcp_id`, `title`, `description`, `time_confirm`, `exist_confirm`, `created_at`, `updated_at`, `enable_expertise`, `enable_expertise_at`, `deleted_at`) VALUES
-(1, 1, 1, 16, 1, 1, 'MVP 1', 'Кроме того, в видеоролике говорится о том, что не подобает ограничивать свободу и навязывать чуждого россиянам мирового порядка. Также его авторы обращают внимание, что принимаемые региональными властями законы провоцируют бизнес «своими же руками создавать условия для разделения общества». Кроме того, в видеоролике говорится о том, что не подобает ограничивать свободу и навязывать чуждого россиянам мирового порядка. Также его авторы обращают внимание, что принимаемые региональными властями законы провоцируют бизнес «своими же руками создавать условия для разделения общества».', 1620598592, 1, 1620598446, 1636999676, '1', 1636999676, 1691244710),
-(2, 2, 1, 26, 5, 2, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1620661557, 1, 1620661479, 1620661557, '0', NULL, 1691244711),
-(8, 2, 1, 26, 5, 2, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1621705795, 1621705795, '0', NULL, 1691244711),
-(9, 10, 1, 32, 15, 11, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1623787609, 1, 1623591795, 1623787609, '0', NULL, 1691244711),
-(11, 10, 1, 32, 15, 11, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1623786080, 1623786080, '0', NULL, 1691244711),
-(12, 11, 1, 32, 17, 12, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1624746150, 1, 1624567071, 1624746150, '0', NULL, 1691244711),
-(13, 11, 1, 32, 17, 12, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1624647234, 1624647234, '0', NULL, 1691244711),
-(14, 1, 1, 16, 1, 1, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1679735558, 1, 1633031528, 1679735558, '1', 1679735558, 1691244710),
-(16, 1, 1, 16, 1, 1, 'MVP 3', 'Описание минимально жизнеспособного продукта 3', NULL, NULL, 1640199377, 1640802149, '1', 1640802149, 1691244710),
-(17, 14, 1, 16, 1, 17, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1640724151, 1, 1640722747, 1640724151, '1', 1640724151, 1691244711),
-(18, 16, 6, 37, 32, 21, 'MVP 1', 'Описание минимально жизнеспособного продукта', 1650458530, 1, 1650458478, 1650458530, '1', 1650458530, 1691239716),
-(19, 17, 5, 38, 33, 22, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1652969157, 1, 1652968902, 1652969157, '1', 1652969157, NULL),
-(20, 17, 5, 38, 33, 22, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1652968908, 1660479736, '1', 1660479736, NULL),
-(21, 14, 1, 16, 1, 17, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1656149853, 1656149856, '1', 1656149856, 1691244711),
-(22, 1, 1, 16, 1, 1, 'MVP 4', 'Описание минимально жизнеспособного продукта 4', 1666291583, 0, 1666291537, 1666291583, '1', 1666291583, 1691244710),
-(23, 19, 10, 54, 39, 25, 'MVP 1', 'Описание минимально жизнеспособного продукта', 1666596491, 1, 1666596452, 1666596491, '1', 1666596491, NULL),
-(24, 20, 1, 41, 41, 26, 'MVP 1', 'Описание продукта 11', 1670167489, 1, 1670155652, 1670167489, '1', 1670167489, 1691244711),
-(27, 20, 1, 41, 41, 26, 'MVP 2', 'продукт 22', NULL, NULL, 1670157526, 1670157526, '0', NULL, 1691244711),
-(28, 18, 1, 16, 1, 18, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', NULL, NULL, 1679734863, 1679734866, '1', 1679734866, 1691244711),
-(29, 21, 17, 62, 48, 31, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1681053675, 1, 1681053607, 1681053677, '1', 1681053613, NULL),
-(30, 19, 10, 54, 39, 25, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1682765016, 1, 1682763939, 1682765016, '1', 1682763941, NULL),
-(31, 22, 10, 54, 39, 32, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1682771927, 1, 1682771839, 1682771927, '1', 1682771854, NULL),
-(32, 22, 10, 54, 39, 32, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1682772012, 1, 1682771851, 1682772012, '1', 1682771855, NULL),
-(34, 1, 1, 16, 1, 1, 'MVP 5', 'Описание минимально жизнеспособного продукта 5', NULL, NULL, 1682859984, 1690121257, '1', 1690121257, 1691244710),
-(35, 1, 1, 16, 1, 1, 'MVP 6', 'Описание минимально жизнеспособного продукта 5', 1682953482, 1, 1682953310, 1682953485, '1', 1682953321, 1691244710),
-(36, 1, 1, 16, 1, 1, 'MVP 7', 'Описание минимально жизнеспособного продукта 7', NULL, NULL, 1683967084, 1690114630, '1', 1690114630, 1691244710),
-(37, 1, 1, 16, 1, 1, 'MVP 8', 'Описание минимально жизнеспособного продукта 8', NULL, NULL, 1689503220, 1689503239, '1', 1689503239, 1691244711),
-(38, 1, 1, 16, 1, 1, 'MVP 9', 'Описание минимально жизнеспособного продукта 9', NULL, NULL, 1690712088, 1690712256, '0', NULL, 1691244711),
-(39, 24, 7, 66, 55, 35, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1699196780, 1, 1699196369, 1699196782, '1', 1699196701, NULL),
-(40, 25, 7, 67, 56, 36, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1699262496, 1, 1699262429, 1699262498, '1', 1699262437, NULL);
+INSERT INTO `mvps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `problem_id`, `gcp_id`, `title`, `description`, `time_confirm`, `exist_confirm`, `created_at`, `updated_at`, `enable_expertise`, `enable_expertise_at`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 1, 16, 1, 1, 'MVP 1', 'Кроме того, в видеоролике говорится о том, что не подобает ограничивать свободу и навязывать чуждого россиянам мирового порядка. Также его авторы обращают внимание, что принимаемые региональными властями законы провоцируют бизнес «своими же руками создавать условия для разделения общества». Кроме того, в видеоролике говорится о том, что не подобает ограничивать свободу и навязывать чуждого россиянам мирового порядка. Также его авторы обращают внимание, что принимаемые региональными властями законы провоцируют бизнес «своими же руками создавать условия для разделения общества».', 1620598592, 1, 1620598446, 1636999676, '1', 1636999676, 1691244710, NULL, NULL),
+(2, 2, 1, 26, 5, 2, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1620661557, 1, 1620661479, 1620661557, '0', NULL, 1691244711, NULL, NULL),
+(8, 2, 1, 26, 5, 2, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1621705795, 1621705795, '0', NULL, 1691244711, NULL, NULL),
+(9, 10, 1, 32, 15, 11, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1623787609, 1, 1623591795, 1623787609, '0', NULL, 1691244711, NULL, NULL),
+(11, 10, 1, 32, 15, 11, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1623786080, 1623786080, '0', NULL, 1691244711, NULL, NULL),
+(12, 11, 1, 32, 17, 12, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1624746150, 1, 1624567071, 1624746150, '0', NULL, 1691244711, NULL, NULL),
+(13, 11, 1, 32, 17, 12, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1624647234, 1624647234, '0', NULL, 1691244711, NULL, NULL),
+(14, 1, 1, 16, 1, 1, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1679735558, 1, 1633031528, 1679735558, '1', 1679735558, 1691244710, NULL, NULL),
+(16, 1, 1, 16, 1, 1, 'MVP 3', 'Описание минимально жизнеспособного продукта 3', NULL, NULL, 1640199377, 1640802149, '1', 1640802149, 1691244710, NULL, NULL),
+(17, 14, 1, 16, 1, 17, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1640724151, 1, 1640722747, 1640724151, '1', 1640724151, 1691244711, NULL, NULL),
+(18, 16, 6, 37, 32, 21, 'MVP 1', 'Описание минимально жизнеспособного продукта', 1650458530, 1, 1650458478, 1650458530, '1', 1650458530, 1691239716, NULL, NULL),
+(19, 17, 5, 38, 33, 22, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1652969157, 1, 1652968902, 1652969157, '1', 1652969157, NULL, NULL, NULL),
+(20, 17, 5, 38, 33, 22, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1652968908, 1660479736, '1', 1660479736, NULL, NULL, NULL),
+(21, 14, 1, 16, 1, 17, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1656149853, 1656149856, '1', 1656149856, 1691244711, NULL, NULL),
+(22, 1, 1, 16, 1, 1, 'MVP 4', 'Описание минимально жизнеспособного продукта 4', 1666291583, 0, 1666291537, 1666291583, '1', 1666291583, 1691244710, NULL, NULL),
+(23, 19, 10, 54, 39, 25, 'MVP 1', 'Описание минимально жизнеспособного продукта', 1666596491, 1, 1666596452, 1666596491, '1', 1666596491, NULL, NULL, NULL),
+(24, 20, 1, 41, 41, 26, 'MVP 1', 'Описание продукта 11', 1670167489, 1, 1670155652, 1670167489, '1', 1670167489, 1691244711, NULL, NULL),
+(27, 20, 1, 41, 41, 26, 'MVP 2', 'продукт 22', NULL, NULL, 1670157526, 1670157526, '0', NULL, 1691244711, NULL, NULL),
+(28, 18, 1, 16, 1, 18, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', NULL, NULL, 1679734863, 1679734866, '1', 1679734866, 1691244711, NULL, NULL),
+(29, 21, 17, 62, 48, 31, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1681053675, 1, 1681053607, 1681053677, '1', 1681053613, NULL, NULL, NULL),
+(30, 19, 10, 54, 39, 25, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1682765016, 1, 1682763939, 1682765016, '1', 1682763941, NULL, NULL, NULL),
+(31, 22, 10, 54, 39, 32, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1682771927, 1, 1682771839, 1682771927, '1', 1682771854, NULL, NULL, NULL),
+(32, 22, 10, 54, 39, 32, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', 1682772012, 1, 1682771851, 1682772012, '1', 1682771855, NULL, NULL, NULL),
+(34, 1, 1, 16, 1, 1, 'MVP 5', 'Описание минимально жизнеспособного продукта 5', NULL, NULL, 1682859984, 1690121257, '1', 1690121257, 1691244710, NULL, NULL),
+(35, 1, 1, 16, 1, 1, 'MVP 6', 'Описание минимально жизнеспособного продукта 5', 1682953482, 1, 1682953310, 1682953485, '1', 1682953321, 1691244710, NULL, NULL),
+(36, 1, 1, 16, 1, 1, 'MVP 7', 'Описание минимально жизнеспособного продукта 7', NULL, NULL, 1683967084, 1690114630, '1', 1690114630, 1691244710, NULL, NULL),
+(37, 1, 1, 16, 1, 1, 'MVP 8', 'Описание минимально жизнеспособного продукта 8', NULL, NULL, 1689503220, 1689503239, '1', 1689503239, 1691244711, NULL, NULL),
+(38, 1, 1, 16, 1, 1, 'MVP 9', 'Описание минимально жизнеспособного продукта 9', NULL, NULL, 1690712088, 1690712256, '0', NULL, 1691244711, NULL, NULL),
+(39, 24, 7, 66, 55, 35, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1699196780, 1, 1699196369, 1699196782, '1', 1699196701, NULL, NULL, NULL),
+(40, 25, 7, 67, 56, 36, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1699262496, 1, 1699262429, 1699262498, '1', 1699262437, NULL, NULL, NULL),
+(46, 24, 7, 66, 55, 35, 'MVP 2', 'Описание минимально жизнеспособного продукта 11', NULL, NULL, 1704723266, 1704723703, '1', 1704723703, NULL, 58, 31),
+(47, 24, 7, 66, 55, 35, 'MVP 3', 'Описание минимально жизнеспособного продукта 22', NULL, NULL, 1704723322, 1704723322, '0', NULL, NULL, 58, 31),
+(48, 24, 7, 66, 55, 35, 'MVP 4', 'Описание минимально жизнеспособного продукта 33', NULL, NULL, 1704723329, 1704723329, '0', NULL, NULL, 58, 31),
+(49, 24, 7, 66, 55, 35, 'MVP 5', 'Описание минимально жизнеспособного продукта 44', NULL, NULL, 1704723344, 1704723344, '0', NULL, NULL, 58, 31),
+(50, 24, 7, 66, 55, 35, 'MVP 6', 'Описание минимально жизнеспособного продукта 55', NULL, NULL, 1704723359, 1704723359, '0', NULL, NULL, 58, 31),
+(51, 24, 7, 66, 55, 35, 'MVP 7', 'Описание минимально жизнеспособного продукта 10', NULL, NULL, 1704723759, 1704723759, '0', NULL, NULL, NULL, NULL),
+(52, 27, 7, 68, 60, 42, 'MVP 1', 'Описание минимально жизнеспособного продукта 1', 1706963082, 1, 1706806210, 1706963084, '1', 1706806262, NULL, NULL, NULL),
+(53, 27, 7, 68, 60, 42, 'MVP 2', 'Описание минимально жизнеспособного продукта 2', NULL, NULL, 1706806227, 1706806227, '0', NULL, NULL, NULL, NULL),
+(54, 27, 7, 68, 60, 42, 'MVP 3', 'Описание минимально жизнеспособного продукта 3', NULL, NULL, 1706963382, 1706963531, '1', 1706963531, NULL, NULL, NULL),
+(55, 27, 7, 68, 60, 42, 'MVP 4', 'Описание минимально жизнеспособного продукта 111', NULL, NULL, 1707554876, 1707555626, '1', 1707555626, NULL, 58, 57),
+(56, 27, 7, 68, 60, 42, 'MVP 5', 'Описание минимально жизнеспособного продукта 222', NULL, NULL, 1707554900, 1707554900, '0', NULL, NULL, 58, 57);
 
 -- --------------------------------------------------------
 
@@ -3438,11 +4317,11 @@ INSERT INTO `mvps` (`id`, `basic_confirm_id`, `project_id`, `segment_id`, `probl
 --
 
 CREATE TABLE `pre_files` (
-  `id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `project_id` int NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `server_file` varchar(255) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3461,64 +4340,74 @@ INSERT INTO `pre_files` (`id`, `project_id`, `file_name`, `server_file`, `delete
 --
 
 CREATE TABLE `problems` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `basic_confirm_id` int(11) NOT NULL,
-  `segment_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `basic_confirm_id` int NOT NULL,
+  `segment_id` int NOT NULL,
+  `project_id` int NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `indicator_positive_passage` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `time_confirm` int(11) DEFAULT NULL,
-  `exist_confirm` int(11) DEFAULT NULL,
+  `indicator_positive_passage` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `time_confirm` int DEFAULT NULL,
+  `exist_confirm` int DEFAULT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `problems`
 --
 
-INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `title`, `description`, `indicator_positive_passage`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`, `enable_expertise`, `enable_expertise_at`, `deleted_at`) VALUES
-(1, 1, 16, 1, 'ГПС 1', 'Инициативная группа нижегородцев на Щелоковском хуторе записала видеообращение к президенту России Владимиру Путину с просьбой отменить QR-коды. опубликовано в Instagram-аккаунте блогера Инициативная группа нижегородцев на Щелоковском хуторе записала видеообращение к президенту России Владимиру Путину с просьбой отменить QR-коды. опубликовано в Instagram-аккаунте блогера', 100, 1620592901, 1636995771, 1620596943, 1, '1', 1636995771, 1691244711),
-(2, 1, 16, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 5, 1620652673, 1640799342, NULL, NULL, '1', 1640799342, 1691244711),
-(3, 2, 17, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620655158, 1689449501, NULL, NULL, '1', 1689449501, 1691244711),
-(4, 2, 17, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1620656140, 1689446104, NULL, NULL, '1', 1689446104, 1691244711),
-(5, 11, 26, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620656570, 1640716600, 1620656964, 1, '1', 1640716600, 1691244711),
-(12, 11, 26, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1621705166, 1640716604, NULL, NULL, '1', 1640716604, 1691244711),
-(13, 17, 32, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1623268991, 1623274609, 1623274609, 0, '0', NULL, 1691244711),
-(15, 17, 32, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1623274632, 1623274676, 1623274676, 1, '0', NULL, 1691244711),
-(17, 17, 32, 1, 'ГПС 3', 'проблемы 3', 5, 1624388310, 1666549976, 1624473511, 1, '0', NULL, 1691244711),
-(18, 17, 32, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 0, 1624647703, 1624647703, NULL, NULL, '0', NULL, 1691244711),
-(25, 17, 32, 1, 'ГПС 5', 'Описание гипотезы проблемы 5', 10, 1625430570, 1625430570, NULL, NULL, '0', NULL, 1691244711),
-(26, 17, 32, 1, 'ГПС 6', 'Описание гипотезы проблемы 6', 25, 1625431156, 1625431368, NULL, NULL, '0', NULL, 1691244711),
-(28, 18, 33, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 70, 1625516729, 1640800732, NULL, NULL, '1', 1640800732, 1691244711),
-(29, 18, 33, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 25, 1625520335, 1640800736, NULL, NULL, '1', 1640800736, 1691244711),
-(30, 11, 26, 1, 'ГПС 3', 'Описание гипотезы проблемы сегмента', 15, 1640716656, 1640721059, 1640721059, 1, '1', 1640721059, 1691244711),
-(31, 1, 16, 1, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 10, 1640799155, 1679731106, 1679731105, 1, '1', 1679731106, 1691244711),
-(32, 21, 37, 6, 'ГПС 1', 'Описание гипотезы проблемы сегмента', 5, 1650458231, 1650458338, 1650458338, 1, '1', 1650458338, 1691239716),
-(33, 22, 38, 5, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1652966620, 1652968466, 1652968466, 1, '1', 1652968466, NULL),
-(34, 22, 38, 5, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1652966776, 1653410835, NULL, NULL, '1', 1653410835, NULL),
-(35, 22, 38, 5, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 20, 1657447091, 1657447095, NULL, NULL, '1', 1657447095, NULL),
-(36, 22, 38, 5, 'ГПС 4', 'Описание гипотезы проблемы сегмента 4', 5, 1657447281, 1657447284, NULL, NULL, '1', 1657447284, NULL),
-(37, 22, 38, 5, 'ГПС 5', 'Описание гипотезы проблемы сегмента 5', 5, 1657447386, 1657447390, NULL, NULL, '1', 1657447390, NULL),
-(38, 22, 38, 5, 'ГПС 6', 'Описание гипотезы проблемы сегмента', 5, 1660478062, 1660478067, NULL, NULL, '1', 1660478067, NULL),
-(39, 28, 54, 10, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1666595881, 1666596381, 1666596381, 1, '1', 1666596381, NULL),
-(40, 1, 16, 1, 'ГПС 4', 'Описание гипотезы проблемы сегмента 4', 20, 1669537807, 1679730211, NULL, NULL, '1', 1679730211, 1691244711),
-(41, 25, 41, 1, 'ГПС 1', 'Отсутствие необходимой информации по патентованию продукта', 20, 1669965534, 1670067023, 1670067023, 1, '1', 1670067023, 1691244711),
-(46, 25, 41, 1, 'ГПС 3', 'см ич', 5, 1669975164, 1669975164, NULL, NULL, '0', NULL, 1691244711),
-(47, 25, 41, 1, 'ГПС 4', 'аптап', 5, 1669975509, 1669975509, NULL, NULL, '0', NULL, 1691244711),
-(48, 33, 62, 17, 'ГПС 1', 'Описание гипотезы проблемы сегмента 123', 50, 1681048817, 1681053450, 1681053447, 1, '1', 1681048825, NULL),
-(49, 33, 62, 17, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1681053321, 1681053327, NULL, NULL, '1', 1681053327, NULL),
-(50, 2, 17, 1, 'ГПС 3', 'Описание гипотезы проблемы 3', 15, 1689446069, 1689446088, NULL, NULL, '1', 1689446088, 1691244711),
-(51, 2, 17, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 20, 1689447046, 1689447046, NULL, NULL, '0', NULL, 1691244711),
-(52, 2, 17, 1, 'ГПС 5', 'Описание гипотезы проблемы 5', 55, 1689447397, 1689447404, NULL, NULL, '1', 1689447404, 1691244711),
-(53, 31, 58, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 15, 1689495395, 1689495409, NULL, NULL, '1', 1689495409, 1691244711),
-(54, 31, 58, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1689495444, 1689495449, NULL, NULL, '1', 1689495449, 1691244711),
-(55, 34, 66, 7, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1699194235, 1699195325, 1699195323, 1, '1', 1699195054, NULL),
-(56, 35, 67, 7, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1699262223, 1699262303, 1699262300, 1, '1', 1699262250, NULL);
+INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `title`, `description`, `indicator_positive_passage`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`, `enable_expertise`, `enable_expertise_at`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 16, 1, 'ГПС 1', 'Инициативная группа нижегородцев на Щелоковском хуторе записала видеообращение к президенту России Владимиру Путину с просьбой отменить QR-коды. опубликовано в Instagram-аккаунте блогера Инициативная группа нижегородцев на Щелоковском хуторе записала видеообращение к президенту России Владимиру Путину с просьбой отменить QR-коды. опубликовано в Instagram-аккаунте блогера', 100, 1620592901, 1636995771, 1620596943, 1, '1', 1636995771, 1691244711, NULL, NULL),
+(2, 1, 16, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 5, 1620652673, 1640799342, NULL, NULL, '1', 1640799342, 1691244711, NULL, NULL),
+(3, 2, 17, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620655158, 1689449501, NULL, NULL, '1', 1689449501, 1691244711, NULL, NULL),
+(4, 2, 17, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1620656140, 1689446104, NULL, NULL, '1', 1689446104, 1691244711, NULL, NULL),
+(5, 11, 26, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1620656570, 1640716600, 1620656964, 1, '1', 1640716600, 1691244711, NULL, NULL),
+(12, 11, 26, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1621705166, 1640716604, NULL, NULL, '1', 1640716604, 1691244711, NULL, NULL),
+(13, 17, 32, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 0, 1623268991, 1623274609, 1623274609, 0, '0', NULL, 1691244711, NULL, NULL),
+(15, 17, 32, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 0, 1623274632, 1623274676, 1623274676, 1, '0', NULL, 1691244711, NULL, NULL),
+(17, 17, 32, 1, 'ГПС 3', 'проблемы 3', 5, 1624388310, 1666549976, 1624473511, 1, '0', NULL, 1691244711, NULL, NULL),
+(18, 17, 32, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 0, 1624647703, 1624647703, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(25, 17, 32, 1, 'ГПС 5', 'Описание гипотезы проблемы 5', 10, 1625430570, 1625430570, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(26, 17, 32, 1, 'ГПС 6', 'Описание гипотезы проблемы 6', 25, 1625431156, 1625431368, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(28, 18, 33, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 70, 1625516729, 1640800732, NULL, NULL, '1', 1640800732, 1691244711, NULL, NULL),
+(29, 18, 33, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 25, 1625520335, 1640800736, NULL, NULL, '1', 1640800736, 1691244711, NULL, NULL),
+(30, 11, 26, 1, 'ГПС 3', 'Описание гипотезы проблемы сегмента', 15, 1640716656, 1640721059, 1640721059, 1, '1', 1640721059, 1691244711, NULL, NULL),
+(31, 1, 16, 1, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 10, 1640799155, 1679731106, 1679731105, 1, '1', 1679731106, 1691244711, NULL, NULL),
+(32, 21, 37, 6, 'ГПС 1', 'Описание гипотезы проблемы сегмента', 5, 1650458231, 1650458338, 1650458338, 1, '1', 1650458338, 1691239716, NULL, NULL),
+(33, 22, 38, 5, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1652966620, 1652968466, 1652968466, 1, '1', 1652968466, NULL, NULL, NULL),
+(34, 22, 38, 5, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1652966776, 1653410835, NULL, NULL, '1', 1653410835, NULL, NULL, NULL),
+(35, 22, 38, 5, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 20, 1657447091, 1657447095, NULL, NULL, '1', 1657447095, NULL, NULL, NULL),
+(36, 22, 38, 5, 'ГПС 4', 'Описание гипотезы проблемы сегмента 4', 5, 1657447281, 1657447284, NULL, NULL, '1', 1657447284, NULL, NULL, NULL),
+(37, 22, 38, 5, 'ГПС 5', 'Описание гипотезы проблемы сегмента 5', 5, 1657447386, 1657447390, NULL, NULL, '1', 1657447390, NULL, NULL, NULL),
+(38, 22, 38, 5, 'ГПС 6', 'Описание гипотезы проблемы сегмента', 5, 1660478062, 1660478067, NULL, NULL, '1', 1660478067, NULL, NULL, NULL),
+(39, 28, 54, 10, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1666595881, 1666596381, 1666596381, 1, '1', 1666596381, NULL, NULL, NULL),
+(40, 1, 16, 1, 'ГПС 4', 'Описание гипотезы проблемы сегмента 4', 20, 1669537807, 1679730211, NULL, NULL, '1', 1679730211, 1691244711, NULL, NULL),
+(41, 25, 41, 1, 'ГПС 1', 'Отсутствие необходимой информации по патентованию продукта', 20, 1669965534, 1670067023, 1670067023, 1, '1', 1670067023, 1691244711, NULL, NULL),
+(46, 25, 41, 1, 'ГПС 3', 'см ич', 5, 1669975164, 1669975164, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(47, 25, 41, 1, 'ГПС 4', 'аптап', 5, 1669975509, 1669975509, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(48, 33, 62, 17, 'ГПС 1', 'Описание гипотезы проблемы сегмента 123', 50, 1681048817, 1681053450, 1681053447, 1, '1', 1681048825, NULL, NULL, NULL),
+(49, 33, 62, 17, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1681053321, 1681053327, NULL, NULL, '1', 1681053327, NULL, NULL, NULL),
+(50, 2, 17, 1, 'ГПС 3', 'Описание гипотезы проблемы 3', 15, 1689446069, 1689446088, NULL, NULL, '1', 1689446088, 1691244711, NULL, NULL),
+(51, 2, 17, 1, 'ГПС 4', 'Описание гипотезы проблемы 4', 20, 1689447046, 1689447046, NULL, NULL, '0', NULL, 1691244711, NULL, NULL),
+(52, 2, 17, 1, 'ГПС 5', 'Описание гипотезы проблемы 5', 55, 1689447397, 1689447404, NULL, NULL, '1', 1689447404, 1691244711, NULL, NULL),
+(53, 31, 58, 1, 'ГПС 1', 'Описание гипотезы проблемы 1', 15, 1689495395, 1689495409, NULL, NULL, '1', 1689495409, 1691244711, NULL, NULL),
+(54, 31, 58, 1, 'ГПС 2', 'Описание гипотезы проблемы 2', 20, 1689495444, 1689495449, NULL, NULL, '1', 1689495449, 1691244711, NULL, NULL),
+(55, 34, 66, 7, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1699194235, 1699195325, 1699195323, 1, '1', 1699195054, NULL, NULL, NULL),
+(56, 35, 67, 7, 'ГПС 1', 'Описание гипотезы проблемы 1', 5, 1699262223, 1699262303, 1699262300, 1, '1', 1699262250, NULL, NULL, NULL),
+(57, 34, 66, 7, 'ГПС 2', 'Описание гипотезы проблемы 1', 15, 1703423885, 1703423885, NULL, NULL, '0', NULL, NULL, NULL, NULL),
+(58, 34, 66, 7, 'ГПС 3', 'Описание гипотезы проблемы 33 Описание гипотезы проблемы 33 Описание гипотезы проблемы 33\nОписание гипотезы проблемы 33', 45, 1703424174, 1704460326, NULL, NULL, '0', NULL, NULL, 58, 29),
+(59, 34, 66, 7, 'ГПС 4', 'Описание гипотезы проблемы сегмента 4', 10, 1704460503, 1704460503, NULL, NULL, '0', NULL, NULL, 58, 29),
+(60, 36, 68, 7, 'ГПС 1', 'Описание гипотезы проблемы сегмента 1', 5, 1706378738, 1706635735, 1706635731, 1, '1', 1706378745, NULL, NULL, NULL),
+(61, 36, 68, 7, 'ГПС 2', 'Описание гипотезы проблемы сегмента 2', 5, 1706433040, 1706433047, NULL, NULL, '1', 1706433047, NULL, NULL, NULL),
+(62, 36, 68, 7, 'ГПС 3', 'Описание гипотезы проблемы сегмента 3', 5, 1706547745, 1706547753, NULL, NULL, '1', 1706547753, NULL, NULL, NULL),
+(63, 36, 68, 7, 'ГПС 4', 'Описание гипотезы проблемы сегмента 1', 5, 1707409927, 1707409927, NULL, NULL, '0', NULL, NULL, 58, 60),
+(64, 36, 68, 7, 'ГПС 5', 'Описание гипотезы проблемы сегмента 2', 15, 1707409962, 1707409962, NULL, NULL, '0', NULL, NULL, 58, 60);
 
 -- --------------------------------------------------------
 
@@ -3527,32 +4416,32 @@ INSERT INTO `problems` (`id`, `basic_confirm_id`, `segment_id`, `project_id`, `t
 --
 
 CREATE TABLE `projects` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   `project_fullname` varchar(255) NOT NULL,
   `project_name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `purpose_project` text NOT NULL,
   `rid` varchar(255) DEFAULT NULL,
   `patent_number` varchar(255) DEFAULT NULL,
-  `patent_date` int(11) DEFAULT NULL,
+  `patent_date` int DEFAULT NULL,
   `patent_name` varchar(255) DEFAULT NULL,
   `core_rid` text,
   `technology` varchar(255) DEFAULT NULL,
   `layout_technology` text,
   `register_name` varchar(255) DEFAULT NULL,
-  `register_date` int(11) DEFAULT NULL,
+  `register_date` int DEFAULT NULL,
   `site` varchar(255) DEFAULT NULL,
   `invest_name` varchar(255) DEFAULT NULL,
-  `invest_date` int(11) DEFAULT NULL,
-  `invest_amount` int(11) DEFAULT NULL,
-  `date_of_announcement` int(11) DEFAULT NULL,
+  `invest_date` int DEFAULT NULL,
+  `invest_amount` int DEFAULT NULL,
+  `date_of_announcement` int DEFAULT NULL,
   `announcement_event` varchar(255) DEFAULT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3566,7 +4455,7 @@ INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fu
 (4, 16, 1629311842, 1629311842, 'Сокращение расходов населения', 'Сокращение расходов населения', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629925200, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1629311842, NULL),
 (5, 1, 1629312867, 1699192972, 'Перспективы города, замерзающий во льдах', 'Перспективы города', 'Описание проекта', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1629234000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1661085971, NULL),
 (6, 47, 1649013301, 1650458572, 'Новый проект 1', 'Новый проект 1', 'Новый проект 1', 'Создать проект', 'Результат интеллектуальной деятельности', 'Номер патента', 1650574800, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', 'Зарегистрированное юр. лицо', 1651093200, 'Адрес сайта', 'Инвестор', 1650488400, 50000, 1651006800, 'Мероприятие, на котором проект анонсирован впервые', '1', 1650458572, 1691239716),
-(7, 1, 1653311886, 1699262498, 'Проект 3', 'Проект 3', 'Проект 3', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1653426000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1661023805, NULL),
+(7, 1, 1653311886, 1709060005, 'Проект 3', 'Проект 3', 'Проект 3\r\nОписание', 'Цель проекта', 'Результат интеллектуальной деятельности', 'Номер патента', 1653426000, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1661023805, NULL),
 (8, 1, 1661086033, 1693744127, 'Проект 4', 'Проект 4 (длинное наз вание про)', 'Проект 4', 'Цель проекта', 'Результат интеллектуальной деятельности', '', NULL, '', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', 'Макет базовой технологии', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1679243811, NULL),
 (9, 1, 1665311627, 1665318015, 'Проект 5', 'Проект 5', 'Описание проекта Проект 5', 'Цель проекта Проект 5', 'Результат интеллектуальной деятельности', 'Номер патента!', 1666731600, 'Наименование патента', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', '', '', NULL, '', '', NULL, NULL, NULL, '', '0', NULL, NULL),
 (10, 1, 1666590441, 1682772038, 'Проект 6', 'Проект 6', 'Проект 6', 'Цель проекта', 'Результат интеллектуальной деятельности', '', NULL, '', 'Суть результата интеллектуальной деятельности', 'На какой технологии основан проект', '', '', NULL, '', '', NULL, NULL, NULL, '', '1', 1666596519, NULL),
@@ -3584,19 +4473,19 @@ INSERT INTO `projects` (`id`, `user_id`, `created_at`, `updated_at`, `project_fu
 --
 
 CREATE TABLE `project_communications` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `adressee_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `pattern_id` int(11) DEFAULT NULL,
-  `triggered_communication_id` int(11) DEFAULT NULL,
-  `cancel` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `hypothesis_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `sender_id` int NOT NULL,
+  `adressee_id` int NOT NULL,
+  `type` int NOT NULL,
+  `project_id` int NOT NULL,
+  `status` int NOT NULL,
+  `pattern_id` int DEFAULT NULL,
+  `triggered_communication_id` int DEFAULT NULL,
+  `cancel` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `hypothesis_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `project_communications`
@@ -3760,7 +4649,43 @@ INSERT INTO `project_communications` (`id`, `sender_id`, `adressee_id`, `type`, 
 (215, 1, 31, 1005, 7, 500, NULL, NULL, 2222, 1699262341, 1699262341, 36),
 (216, 1, 31, 1006, 7, 500, NULL, NULL, 2222, 1699262405, 1699262405, 25),
 (217, 1, 31, 1007, 7, 500, NULL, NULL, 2222, 1699262435, 1699262435, 40),
-(218, 1, 31, 1008, 7, 500, NULL, NULL, 2222, 1699262496, 1699262496, 28);
+(218, 1, 31, 1008, 7, 500, NULL, NULL, 2222, 1699262496, 1699262496, 28),
+(219, 1, 31, 1005, 7, 500, NULL, NULL, 2222, 1700753126, 1700753126, 37),
+(220, 1, 31, 2003, 7, 500, NULL, NULL, 2222, 1704636431, 1704636431, 55),
+(221, 1, 31, 2000, 7, 500, NULL, NULL, 2222, 1704637061, 1704637061, 7),
+(222, 1, 31, 1007, 7, 500, NULL, NULL, 2222, 1704723699, 1704723699, 46),
+(223, 1, 31, 1001, 7, 500, NULL, NULL, 2222, 1705134920, 1705134920, 68),
+(224, 1, 31, 2001, 7, 500, NULL, NULL, 2222, 1705150389, 1705150389, 66),
+(225, 1, 31, 1002, 7, 500, NULL, NULL, 2222, 1706378695, 1706378695, 36),
+(226, 1, 31, 1003, 7, 500, NULL, NULL, 2222, 1706378744, 1706378744, 60),
+(227, 1, 31, 1003, 7, 500, NULL, NULL, 2222, 1706433043, 1706433043, 61),
+(228, 1, 31, 1003, 7, 500, NULL, NULL, 2222, 1706547748, 1706547748, 62),
+(229, 1, 31, 1004, 7, 500, NULL, NULL, 2222, 1706635731, 1706635731, 34),
+(230, 1, 31, 1005, 7, 500, NULL, NULL, 2222, 1706635775, 1706635775, 42),
+(231, 1, 31, 1001, 7, 500, NULL, NULL, 2222, 1706635823, 1706635823, 73),
+(232, 1, 31, 1006, 7, 500, NULL, NULL, 2222, 1706724399, 1706724399, 27),
+(233, 1, 31, 1007, 7, 500, NULL, NULL, 2222, 1706806259, 1706806259, 52),
+(236, 1, 31, 1008, 7, 500, NULL, NULL, 2222, 1706963082, 1706963082, 29),
+(237, 1, 31, 1007, 7, 500, NULL, NULL, 2222, 1706963529, 1706963529, 54),
+(238, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1706963800, 1706963800, 54),
+(239, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1707049952, 1707049952, 54),
+(240, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1707050745, 1707050745, 54),
+(241, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1707051158, 1707051158, 54),
+(242, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1707051215, 1707051215, 54),
+(243, 1, 31, 2007, 7, 500, NULL, NULL, 2222, 1707051964, 1707051964, 54),
+(245, 1, 31, 2005, 7, 500, NULL, NULL, 2222, 1707054760, 1707054760, 42),
+(246, 1, 31, 2003, 7, 500, NULL, NULL, 2222, 1707055603, 1707055603, 60),
+(247, 1, 31, 2003, 7, 500, NULL, NULL, 2222, 1707055721, 1707055721, 60),
+(248, 1, 31, 2001, 7, 500, NULL, NULL, 2222, 1707055839, 1707055839, 68),
+(249, 1, 31, 2000, 7, 500, NULL, NULL, 2222, 1707055989, 1707055989, 7),
+(250, 1, 31, 2005, 7, 500, NULL, NULL, 2222, 1707056151, 1707056151, 42),
+(251, 1, 31, 2003, 7, 500, NULL, NULL, 2222, 1707059601, 1707059601, 60),
+(252, 1, 31, 2000, 7, 500, NULL, NULL, 2222, 1707059860, 1707059860, 7),
+(255, 1, 31, 1005, 7, 500, NULL, NULL, 2222, 1707417431, 1707417431, 43),
+(256, 1, 31, 1007, 7, 500, NULL, NULL, 2222, 1707555619, 1707555619, 55),
+(257, 1, 31, 1001, 7, 500, NULL, NULL, 2222, 1707558409, 1707558409, 74),
+(258, 1, 31, 2001, 7, 500, NULL, NULL, 2222, 1708261514, 1708261514, 74),
+(259, 1, 31, 2003, 7, 500, NULL, NULL, 2222, 1708269188, 1708269188, 61);
 
 -- --------------------------------------------------------
 
@@ -3769,13 +4694,13 @@ INSERT INTO `project_communications` (`id`, `sender_id`, `adressee_id`, `type`, 
 --
 
 CREATE TABLE `questions_confirm_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3807,7 +4732,12 @@ INSERT INTO `questions_confirm_gcp` (`id`, `confirm_id`, `title`, `status`, `cre
 (29, 23, 'Что понравилось в решении и что нет?', 1, 1689500287, 1689500289, 1691244711),
 (30, 23, 'Вписывается ли предложение в формат вашей деятельности?', 0, 1689500292, 1689500292, 1691244711),
 (31, 24, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1699196040, 1699196040, NULL),
-(32, 25, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1699262359, 1699262359, NULL);
+(32, 25, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1699262359, 1699262359, NULL),
+(33, 26, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 0, 1700753154, 1700753154, NULL),
+(34, 27, 'Что понравилось в решении и что нет?', 1, 1706637466, 1706637474, NULL),
+(35, 27, 'Какая цена решения должна быть по вашему мнению?', 0, 1706637472, 1706637472, NULL),
+(36, 28, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 1, 1707417533, 1707417539, NULL),
+(37, 28, 'Какая цена решения должна быть по вашему мнению?', 0, 1707417544, 1707417544, NULL);
 
 -- --------------------------------------------------------
 
@@ -3816,13 +4746,13 @@ INSERT INTO `questions_confirm_gcp` (`id`, `confirm_id`, `title`, `status`, `cre
 --
 
 CREATE TABLE `questions_confirm_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3858,7 +4788,15 @@ INSERT INTO `questions_confirm_mvp` (`id`, `confirm_id`, `title`, `status`, `cre
 (32, 25, 'Вписывается ли предложение в формат вашей деятельности?', 0, 1689503266, 1689503266, 1691244711),
 (33, 26, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1699192972, 1699192972, NULL),
 (34, 27, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 0, 1699196716, 1699196716, NULL),
-(35, 28, 'Вписывается ли предложение в формат вашей деятельности?', 0, 1699262452, 1699262452, NULL);
+(35, 28, 'Вписывается ли предложение в формат вашей деятельности?', 0, 1699262452, 1699262452, NULL),
+(36, 29, 'Чем вы занимаетесь в настоящее время?', 0, 1706807115, 1706807115, NULL),
+(38, 29, 'Сколько сейчас платят?', 0, 1706807276, 1706807276, NULL),
+(39, 30, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1706963562, 1706963562, NULL),
+(40, 30, 'Какая цена решения должна быть по мнению респондентов?', 1, 1706963565, 1706963568, NULL),
+(41, 31, 'Что неудобно по сравнению с продуктами, которыми пользуются сейчас?', 1, 1707155659, 1707155662, NULL),
+(42, 31, 'Какая цена решения должна быть по мнению респондентов?', 0, 1707155665, 1707155665, NULL),
+(43, 32, 'Что понравилось в решении и что нет?', 1, 1707555674, 1707555687, NULL),
+(44, 32, 'Какие важные аспекты в продукте не затронуты, которые следовало бы продумать?', 0, 1707555683, 1707555683, NULL);
 
 -- --------------------------------------------------------
 
@@ -3867,13 +4805,13 @@ INSERT INTO `questions_confirm_mvp` (`id`, `confirm_id`, `title`, `status`, `cre
 --
 
 CREATE TABLE `questions_confirm_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3907,7 +4845,10 @@ INSERT INTO `questions_confirm_problem` (`id`, `confirm_id`, `title`, `status`, 
 (52, 30, 'Чем вы занимаетесь в настоящее время?', 0, 1689446159, 1689446159, 1691244711),
 (53, 30, 'Случалось ли вам столкнуться с …?', 0, 1689446163, 1689446163, 1691244711),
 (54, 32, 'Попадали ли вы в ситуацию ..?', 0, 1699195074, 1699195074, NULL),
-(55, 33, 'Попадали ли вы в ситуацию ..?', 0, 1699262268, 1699262268, NULL);
+(55, 33, 'Попадали ли вы в ситуацию ..?', 0, 1699262268, 1699262268, NULL),
+(56, 34, 'Случалось ли вам столкнуться с …?', 0, 1706432855, 1706432855, NULL),
+(57, 34, 'Как часто с вами происходит ..?', 0, 1706432863, 1706432863, NULL),
+(58, 35, 'Попадали ли вы в ситуацию ..?', 0, 1706433120, 1706433120, NULL);
 
 -- --------------------------------------------------------
 
@@ -3916,13 +4857,13 @@ INSERT INTO `questions_confirm_problem` (`id`, `confirm_id`, `title`, `status`, 
 --
 
 CREATE TABLE `questions_confirm_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `status` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `status` int NOT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3959,7 +4900,14 @@ INSERT INTO `questions_confirm_segment` (`id`, `confirm_id`, `title`, `status`, 
 (79, 33, 'Как вы определяете цели, задачи и последовательность действий?', 1, 1681048155, 1681048157, NULL),
 (80, 33, 'Что пытались сделать, чтобы определить верные последовательные действия?', 0, 1681048165, 1681048165, NULL),
 (81, 34, 'Что получается и что не получается в вашем проекте? Приведите примеры.', 1, 1699190163, 1699190166, NULL),
-(82, 35, 'Что получается и что не получается в вашем проекте? Приведите примеры.', 0, 1699262130, 1699262130, NULL);
+(82, 35, 'Что получается и что не получается в вашем проекте? Приведите примеры.', 0, 1699262130, 1699262130, NULL),
+(83, 36, 'Чем вы занимаетесь в настоящее время?', 1, 1705134982, 1705135011, NULL),
+(84, 36, 'Как вы добиваетесь достижения поставленной цели?', 0, 1705134995, 1705134995, NULL),
+(86, 36, 'Как вы решали проблему в последний раз, какие шаги предпринимали?', 0, 1705150579, 1705150579, NULL),
+(87, 37, 'Как вы определяете цели, задачи и последовательность действий?', 1, 1707244118, 1707244122, NULL),
+(88, 37, 'Как вы добиваетесь достижения поставленной цели?', 0, 1707244126, 1707244126, NULL),
+(89, 38, 'Как вы определяете цели, задачи и последовательность действий?', 1, 1707558449, 1707558459, NULL),
+(90, 38, 'Как вы добиваетесь достижения поставленной цели?', 0, 1707558457, 1707558457, NULL);
 
 -- --------------------------------------------------------
 
@@ -3968,13 +4916,13 @@ INSERT INTO `questions_confirm_segment` (`id`, `confirm_id`, `title`, `status`, 
 --
 
 CREATE TABLE `rates_plan` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
-  `description` text CHARACTER SET utf8 NOT NULL,
-  `max_count_project_user` int(11) NOT NULL,
-  `max_count_tracker` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `max_count_project_user` int NOT NULL,
+  `max_count_tracker` int NOT NULL,
+  `created_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `rates_plan`
@@ -3997,8 +4945,8 @@ INSERT INTO `rates_plan` (`id`, `name`, `description`, `max_count_project_user`,
 --
 
 CREATE TABLE `reason_requirement_wish_list` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `requirement_wish_list_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `requirement_wish_list_id` int NOT NULL,
   `reason` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -4027,9 +4975,9 @@ INSERT INTO `reason_requirement_wish_list` (`id`, `requirement_wish_list_id`, `r
 --
 
 CREATE TABLE `requirement_wish_list` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `wish_list_id` int(11) NOT NULL,
-  `is_actual` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `wish_list_id` int NOT NULL,
+  `is_actual` int NOT NULL,
   `requirement` text NOT NULL,
   `expected_result` text NOT NULL,
   `add_info` text
@@ -4054,57 +5002,71 @@ INSERT INTO `requirement_wish_list` (`id`, `wish_list_id`, `is_actual`, `require
 --
 
 CREATE TABLE `responds_gcp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `info_respond` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `date_plan` int(11) DEFAULT NULL,
+  `date_plan` int DEFAULT NULL,
   `place_interview` varchar(255) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `responds_gcp`
 --
 
-INSERT INTO `responds_gcp` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`) VALUES
-(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(2, 2, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(3, 2, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(4, 2, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(26, 8, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(27, 8, 'Петров Петр Петрович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(28, 8, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(29, 9, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711),
-(33, 9, 'Петров Петр Петрович', 'Данные респондента', '', 1623272400, 'Место проведения интервью', 1691244711),
-(34, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623358800, 'Место проведения интервью', 1691244711),
-(35, 10, 'Респондент 2', 'Данные респондента!', '', 1623358800, 'Место проведения интервью', 1691244711),
-(36, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624482000, 'Место проведения интервью', 1691244711),
-(37, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1624482000, 'Место проведения интервью', 1691244711),
-(38, 12, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711),
-(39, 12, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711),
-(40, 13, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(41, 14, 'Респондент 1', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(42, 14, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(43, 15, 'Иванов Иван Иванович', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(44, 15, 'Петров Петр Петрович', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(45, 15, 'Сидоров Николай Николаевич', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(46, 16, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716),
-(47, 17, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(48, 17, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(49, 18, 'Респондент 2', 'Данные респондента', '', 1654376400, 'Место проведения интервью', 1691244711),
-(50, 19, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(51, 20, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670101200, 'На улице', 1691244711),
-(52, 20, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670101200, 'Дома', 1691244711),
-(53, 20, 'Директор ООО \"БАЗАР\"', 'руководит компанией', '', 1670101200, 'на улице', 1691244711),
-(54, 21, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(55, 21, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(57, 22, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(58, 22, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(59, 23, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(60, 24, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(61, 25, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL);
+INSERT INTO `responds_gcp` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(2, 2, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(3, 2, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(4, 2, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(26, 8, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(27, 8, 'Петров Петр Петрович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(28, 8, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(29, 9, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(33, 9, 'Петров Петр Петрович', 'Данные респондента', '', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(34, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623358800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(35, 10, 'Респондент 2', 'Данные респондента!', '', 1623358800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(36, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624482000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(37, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1624482000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(38, 12, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(39, 12, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(40, 13, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(41, 14, 'Респондент 1', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(42, 14, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(43, 15, 'Иванов Иван Иванович', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(44, 15, 'Петров Петр Петрович', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(45, 15, 'Сидоров Николай Николаевич', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(46, 16, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716, NULL, NULL),
+(47, 17, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(48, 17, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(49, 18, 'Респондент 2', 'Данные респондента', '', 1654376400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(50, 19, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(51, 20, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670101200, 'На улице', 1691244711, NULL, NULL),
+(52, 20, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670101200, 'Дома', 1691244711, NULL, NULL),
+(53, 20, 'Директор ООО \"БАЗАР\"', 'руководит компанией', '', 1670101200, 'на улице', 1691244711, NULL, NULL),
+(54, 21, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(55, 21, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(57, 22, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(58, 22, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(59, 23, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(60, 24, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(61, 25, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL, NULL, NULL),
+(62, 26, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(63, 27, 'Петров Яков Васильевич', 'Данные респондента', '', 1706648400, 'Место у кафе', NULL, NULL, NULL),
+(64, 27, 'Бобровский Василий Петрович', 'Данные респондента', 'bober@mail.com', 1706734800, 'Место проведения интервью', NULL, 58, 54),
+(65, 27, 'Респондент 3', 'Данные респондента', '', 1706648400, 'Место проведения интервью', NULL, NULL, NULL),
+(66, 27, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1706648400, 'Уличное кафе', NULL, 58, 54),
+(67, 27, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1706648400, 'Невский проспект', NULL, 58, 54),
+(68, 27, 'Респондент 4', 'Данные респондента', '', 1706648400, 'Место проведения интервью', NULL, NULL, NULL),
+(69, 28, 'Петров Яков Васильевич', 'Данные респондента', '', NULL, 'Место у кафе', NULL, NULL, NULL),
+(70, 28, 'Респондент 2', '', '', NULL, '', NULL, NULL, NULL),
+(71, 28, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1707339600, 'Уличное кафе', NULL, 58, 64),
+(72, 28, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1707339600, 'Невский проспект', NULL, 58, 64),
+(73, 28, 'Бобровский Василий Петрович', 'Данные респондента', '', NULL, 'Место проведения интервью!', NULL, 58, 64);
 
 -- --------------------------------------------------------
 
@@ -4113,60 +5075,78 @@ INSERT INTO `responds_gcp` (`id`, `confirm_id`, `name`, `info_respond`, `email`,
 --
 
 CREATE TABLE `responds_mvp` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `info_respond` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `date_plan` int(11) DEFAULT NULL,
+  `date_plan` int DEFAULT NULL,
   `place_interview` varchar(255) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `responds_mvp`
 --
 
-INSERT INTO `responds_mvp` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`) VALUES
-(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244710),
-(2, 2, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(3, 2, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(4, 2, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(24, 8, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(25, 8, 'Петров Петр Петрович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(26, 8, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(27, 9, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623704400, 'Место проведения интервью', 1691244711),
-(28, 9, 'Петров Петр Петрович', 'Данные респондента!', '', 1623704400, 'Место проведения интервью', 1691244711),
-(29, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624741200, 'Место проведения интервью', 1691244711),
-(30, 10, 'Петров Петр Петрович', 'Данные респондента!', '', 1624741200, 'Место проведения интервью', 1691244711),
-(31, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711),
-(32, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711),
-(33, 12, 'Респондент 1', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(34, 12, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(35, 13, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716),
-(36, 14, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(37, 14, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(38, 15, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(39, 15, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(40, 16, 'Респондент 2', 'Данные респондента', '', 1666213200, 'Место проведения интервью', 1691244710),
-(41, 17, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(42, 18, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670101200, 'На улице', 1691244711),
-(43, 18, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670101200, 'Дома', 1691244711),
-(44, 18, 'Директор ООО \"БАЗАР\"', 'руководит компанией', '', 1670101200, 'на улице', 1691244711),
-(45, 19, 'Респондент 2', 'Данные респондента', '', 1674853200, 'Место проведения интервью', 1691244710),
-(46, 20, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(47, 21, 'Респондент 1', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(48, 22, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(49, 22, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(50, 23, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(51, 23, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL),
-(52, 24, 'Респондент 1', 'Данные респондента', '', 1682888400, 'Место проведения интервью', 1691244710),
-(53, 24, 'Респондент 2', 'Данные респондента', '', 1682888400, 'Место проведения интервью', 1691244710),
-(54, 25, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(55, 26, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(56, 26, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(57, 27, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(58, 28, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL);
+INSERT INTO `responds_mvp` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244710, NULL, NULL),
+(2, 2, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(3, 2, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(4, 2, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(24, 8, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(25, 8, 'Петров Петр Петрович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(26, 8, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(27, 9, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623704400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(28, 9, 'Петров Петр Петрович', 'Данные респондента!', '', 1623704400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(29, 10, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624741200, 'Место проведения интервью', 1691244711, NULL, NULL),
+(30, 10, 'Петров Петр Петрович', 'Данные респондента!', '', 1624741200, 'Место проведения интервью', 1691244711, NULL, NULL),
+(31, 11, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(32, 11, 'Петров Петр Петрович', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(33, 12, 'Респондент 1', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(34, 12, 'Респондент 2', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(35, 13, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716, NULL, NULL),
+(36, 14, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(37, 14, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(38, 15, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(39, 15, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(40, 16, 'Респондент 2', 'Данные респондента', '', 1666213200, 'Место проведения интервью', 1691244710, NULL, NULL),
+(41, 17, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(42, 18, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670101200, 'На улице', 1691244711, NULL, NULL),
+(43, 18, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670101200, 'Дома', 1691244711, NULL, NULL),
+(44, 18, 'Директор ООО \"БАЗАР\"', 'руководит компанией', '', 1670101200, 'на улице', 1691244711, NULL, NULL),
+(45, 19, 'Респондент 2', 'Данные респондента', '', 1674853200, 'Место проведения интервью', 1691244710, NULL, NULL),
+(46, 20, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(47, 21, 'Респондент 1', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(48, 22, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(49, 22, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(50, 23, 'Иванченко Иван Петрович', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(51, 23, 'Петров Иван Васильевич', 'Данные респондента', '', 1682715600, 'Место проведения интервью', NULL, NULL, NULL),
+(52, 24, 'Респондент 1', 'Данные респондента', '', 1682888400, 'Место проведения интервью', 1691244710, NULL, NULL),
+(53, 24, 'Респондент 2', 'Данные респондента', '', 1682888400, 'Место проведения интервью', 1691244710, NULL, NULL),
+(54, 25, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(55, 26, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(56, 26, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(57, 27, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(58, 28, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL, NULL, NULL),
+(59, 29, 'Петров Яков Васильевич', 'Данные респондента', '', 1706734800, 'Место у кафе', NULL, NULL, NULL),
+(62, 29, 'Бобровский Василий Петрович', 'Данные респондента', 'bober@mail.com', 1706907600, 'Место проведения интервью', NULL, 58, 55),
+(63, 29, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1706907600, 'Уличное кафе', NULL, 58, 55),
+(64, 29, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1706907600, 'Невский проспект', NULL, 58, 55),
+(65, 30, 'Петров Яков Васильевич', 'Данные респондента', '', 1706994000, 'Место у кафе', NULL, NULL, NULL),
+(66, 30, 'Респондент 2', '', '', NULL, '', NULL, NULL, NULL),
+(67, 30, 'Бобровский Василий Петрович', 'Данные респондента', 'bober@mail.com', 1706907600, 'Место проведения интервью', NULL, 58, 56),
+(68, 30, 'Никифоров Иван Федорович', 'Студент в Москве', '', NULL, 'Уличное кафе', NULL, 58, 56),
+(69, 30, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', NULL, 'Невский проспект', NULL, 58, 56),
+(70, 31, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(71, 31, 'Респондент 2', '', '', NULL, '', NULL, NULL, NULL),
+(72, 32, 'Петров Яков Васильевич', 'Данные респондента', '', NULL, 'Место у кафе', NULL, NULL, NULL),
+(73, 32, 'Респондент 2', '', '', NULL, '', NULL, NULL, NULL),
+(74, 32, 'Бобровский Василий Петрович', 'Данные респондента', 'bober@mail.com', 1707512400, 'Место проведения интервью', NULL, 58, 65),
+(75, 32, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1707512400, 'Уличное кафе', NULL, 58, 65),
+(76, 32, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', NULL, 'Невский проспект', NULL, 58, 65);
 
 -- --------------------------------------------------------
 
@@ -4175,75 +5155,85 @@ INSERT INTO `responds_mvp` (`id`, `confirm_id`, `name`, `info_respond`, `email`,
 --
 
 CREATE TABLE `responds_problem` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `info_respond` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `date_plan` int(11) DEFAULT NULL,
+  `date_plan` int DEFAULT NULL,
   `place_interview` varchar(255) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `responds_problem`
 --
 
-INSERT INTO `responds_problem` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`) VALUES
-(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(6, 4, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(7, 4, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(8, 4, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(9, 2, 'Михайлов Федор Сергеевич', 'Данные респондента', '', 1621112400, 'Место проведения интервью', 1691244711),
-(11, 2, 'Иванов Иван Иванович', '', '', NULL, '', 1691244711),
-(32, 11, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711),
-(33, 11, 'Петров Петр Петрович', 'Данные респондента', '', 1621976400, 'Место проведения интервью', 1691244711),
-(34, 11, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1621976400, 'Место проведения интервью', 1691244711),
-(35, 12, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711),
-(42, 12, 'Петров Петр Петрович', 'Данные респондента', '', 1623272400, 'Место проведения интервью', 1691244711),
-(43, 13, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711),
-(44, 13, 'Респондент 2', 'Данные респондента!', '', 1623272400, 'Место проведения интервью', 1691244711),
-(48, 15, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624309200, 'Место проведения интервью', 1691244711),
-(49, 15, 'Петров Петр Петрович', 'Данные респондента!', '', 1624309200, 'Место проведения интервью', 1691244711),
-(50, 16, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711),
-(51, 16, 'Респондент 2', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711),
-(52, 17, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(53, 17, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(54, 17, 'Респондент 3', '', '', NULL, '', 1691244711),
-(55, 17, 'Респондент 4', '', '', NULL, '', 1691244711),
-(56, 18, 'Иванов Иван Иванович', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(57, 18, 'Петров Петр Петрович', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(58, 18, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711),
-(59, 19, 'Респондент 1', 'Данные респондента', '', 1655586000, 'Место проведения интервью', 1691244711),
-(60, 20, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716),
-(61, 21, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(62, 21, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(63, 19, 'Респондент 2', '', '', NULL, '', 1691244711),
-(64, 19, 'Респондент 3', '', '', NULL, '', 1691244711),
-(65, 22, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(66, 22, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(67, 23, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(68, 23, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(69, 24, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(70, 24, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(73, 25, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(74, 25, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL),
-(75, 25, 'Респондент 3', '', '', NULL, '', NULL),
-(76, 25, 'Респондент 4', '', '', NULL, '', NULL),
-(77, 26, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(78, 27, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670014800, 'На улице', 1691244711),
-(79, 27, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670014800, 'Дома', 1691244711),
-(80, 27, 'Борисов Никита Львович', 'владеет частным бизнесом', '', 1670014800, 'конференция по бизнесу', 1691244711),
-(81, 28, 'Респондент 2', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711),
-(82, 28, 'Респондент 3', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711),
-(83, 29, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(84, 29, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(85, 30, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(86, 30, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(87, 31, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711),
-(88, 32, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(89, 32, 'Респондент 2', 'Данные респондента', 'dfghsf@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(90, 33, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL);
+INSERT INTO `responds_problem` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(6, 4, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(7, 4, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(8, 4, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(9, 2, 'Михайлов Федор Сергеевич', 'Данные респондента', '', 1621112400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(11, 2, 'Иванов Иван Иванович', '', '', NULL, '', 1691244711, NULL, NULL),
+(32, 11, 'Иванов Иван Иванович', 'Данные респондента', '', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(33, 11, 'Петров Петр Петрович', 'Данные респондента', '', 1621976400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(34, 11, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1621976400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(35, 12, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(42, 12, 'Петров Петр Петрович', 'Данные респондента', '', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(43, 13, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(44, 13, 'Респондент 2', 'Данные респондента!', '', 1623272400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(48, 15, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1624309200, 'Место проведения интервью', 1691244711, NULL, NULL),
+(49, 15, 'Петров Петр Петрович', 'Данные респондента!', '', 1624309200, 'Место проведения интервью', 1691244711, NULL, NULL),
+(50, 16, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(51, 16, 'Респондент 2', 'Данные респондента!', '', 1625000400, 'Место проведения интервью', 1691244711, NULL, NULL),
+(52, 17, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(53, 17, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(54, 17, 'Респондент 3', '', '', NULL, '', 1691244711, NULL, NULL),
+(55, 17, 'Респондент 4', '', '', NULL, '', 1691244711, NULL, NULL),
+(56, 18, 'Иванов Иван Иванович', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(57, 18, 'Петров Петр Петрович', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(58, 18, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1640638800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(59, 19, 'Респондент 1', 'Данные респондента', '', 1655586000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(60, 20, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716, NULL, NULL),
+(61, 21, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(62, 21, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(63, 19, 'Респондент 2', '', '', NULL, '', 1691244711, NULL, NULL),
+(64, 19, 'Респондент 3', '', '', NULL, '', 1691244711, NULL, NULL),
+(65, 22, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(66, 22, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(67, 23, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(68, 23, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(69, 24, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(70, 24, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(73, 25, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(74, 25, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', NULL, NULL, NULL),
+(75, 25, 'Респондент 3', '', '', NULL, '', NULL, NULL, NULL),
+(76, 25, 'Респондент 4', '', '', NULL, '', NULL, NULL, NULL),
+(77, 26, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(78, 27, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1670014800, 'На улице', 1691244711, NULL, NULL),
+(79, 27, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1670014800, 'Дома', 1691244711, NULL, NULL),
+(80, 27, 'Борисов Никита Львович', 'владеет частным бизнесом', '', 1670014800, 'конференция по бизнесу', 1691244711, NULL, NULL),
+(81, 28, 'Респондент 2', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(82, 28, 'Респондент 3', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(83, 29, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(84, 29, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(85, 30, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(86, 30, 'Респондент 2', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(87, 31, 'Респондент 1', 'Данные респондента', '', NULL, 'Место проведения интервью', 1691244711, NULL, NULL),
+(88, 32, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(89, 32, 'Респондент 2', 'Данные респондента', 'dfghsf@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(90, 33, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL, NULL, NULL),
+(91, 34, 'Петров Яков Васильевич', 'Данные респондента', '', 1706475600, 'Место у кафе', NULL, NULL, NULL),
+(96, 35, 'Респондент 1', '', '', NULL, '', NULL, NULL, NULL),
+(134, 34, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1706475600, 'Уличное кафе', NULL, 58, 53),
+(135, 34, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1706475600, 'Невский проспект', NULL, 58, 53),
+(136, 34, 'Бобровский Василий Петрович', 'Данные респондента', '', 1706475600, 'Место проведения интервью!', NULL, 58, 53),
+(137, 35, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1707339600, 'Уличное кафе', NULL, 58, 63),
+(138, 35, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1707339600, 'Невский проспект', NULL, 58, 63),
+(139, 35, 'Бобровский Василий Петрович', 'Данные респондента', '', NULL, 'Место проведения интервью!', NULL, 58, 63);
 
 -- --------------------------------------------------------
 
@@ -4252,60 +5242,72 @@ INSERT INTO `responds_problem` (`id`, `confirm_id`, `name`, `info_respond`, `ema
 --
 
 CREATE TABLE `responds_segment` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `confirm_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `confirm_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `info_respond` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `date_plan` int(11) DEFAULT NULL,
+  `date_plan` int DEFAULT NULL,
   `place_interview` varchar(255) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `responds_segment`
 --
 
-INSERT INTO `responds_segment` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`) VALUES
-(1, 1, 'Респондент 1', 'Данные респондента', '', 1620507600, 'Место проведения интервью', 1691244711),
-(2, 1, 'Респондент 2', 'Данные респондента', '', 1620507600, 'Место проведения интервью', 1691244711),
-(3, 2, 'Респондент 1', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(4, 2, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(18, 11, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(19, 11, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(20, 11, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711),
-(60, 17, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1622062800, 'Место проведения интервью', 1691244711),
-(61, 17, 'Респондент 2', 'Данные респондента!', '', 1621890000, 'Место проведения интервью', 1691244711),
-(62, 18, 'Респондент 1', 'Данные респондента', '', 1624395600, 'Место проведения интервью', 1691244711),
-(63, 18, 'Респондент 2', 'Данные респондента', '', 1624395600, 'Место проведения интервью', 1691244711),
-(64, 19, 'Респондент 1', 'Данные респондента', '', 1640293200, 'Место проведения интервью', 1691244711),
-(65, 19, 'Респондент 2', 'Данные респондента', '', 1640466000, 'Место проведения интервью', 1691244711),
-(66, 20, 'Респондент 1', 'Данные респондента', '', 1655326800, 'Место проведения интервью', 1691244711),
-(69, 21, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716),
-(70, 22, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(71, 22, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL),
-(72, 23, 'Респондент 1', 'Данные респондента', '', 1655845200, 'Место проведения интервью', NULL),
-(73, 23, 'Респондент 2', 'Данные респондента', '', 1655845200, 'Место проведения интервью', NULL),
-(74, 24, 'Респондент 1', '', '', NULL, '', 1691244711),
-(75, 24, 'Респондент 2', '', '', NULL, '', 1691244711),
-(76, 25, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1669755600, 'На улице', 1691244711),
-(77, 25, 'Петров Петр Петрович', 'Работает на заводе', 'petrov@mail.ru', 1669755600, 'По телефону', 1691244711),
-(78, 26, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(79, 27, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(80, 28, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL),
-(81, 29, 'Респондент 1', 'апр', '', 1669842000, 'пртп', 1691244711),
-(82, 29, 'Респондент 2', 'прт', '', 1669842000, 'прпр', 1691244711),
-(85, 25, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1669755600, 'Дома', 1691244711),
-(86, 30, 'Респондент 1', '', '', NULL, '', 1691244711),
-(87, 30, 'Респондент 2', '', '', NULL, '', 1691244711),
-(88, 31, 'Респондент 1', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711),
-(89, 31, 'Респондент 2', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711),
-(90, 32, 'Респондент 1', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711),
-(91, 33, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(92, 33, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL),
-(93, 34, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(94, 34, 'Респондент 2', 'Данные респондента', 'dfghsf@mail.com', 1699131600, 'Место проведения интервью', NULL),
-(95, 35, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL);
+INSERT INTO `responds_segment` (`id`, `confirm_id`, `name`, `info_respond`, `email`, `date_plan`, `place_interview`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(1, 1, 'Респондент 1', 'Данные респондента', '', 1620507600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(2, 1, 'Респондент 2', 'Данные респондента', '', 1620507600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(3, 2, 'Респондент 1', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(4, 2, 'Респондент 2', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(18, 11, 'Иванов Иван Иванович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(19, 11, 'Петров Петр Петрович', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(20, 11, 'Сидоров Николай Николаевич', 'Данные респондента', '', 1620594000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(60, 17, 'Иванов Иван Иванович', 'Данные респондента', 'ivanov@mail.com', 1622062800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(61, 17, 'Респондент 2', 'Данные респондента!', '', 1621890000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(62, 18, 'Респондент 1', 'Данные респондента', '', 1624395600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(63, 18, 'Респондент 2', 'Данные респондента', '', 1624395600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(64, 19, 'Респондент 1', 'Данные респондента', '', 1640293200, 'Место проведения интервью', 1691244711, NULL, NULL),
+(65, 19, 'Респондент 2', 'Данные респондента', '', 1640466000, 'Место проведения интервью', 1691244711, NULL, NULL),
+(66, 20, 'Респондент 1', 'Данные респондента', '', 1655326800, 'Место проведения интервью', 1691244711, NULL, NULL),
+(69, 21, 'Респондент 1', 'Данные респондента', '', 1650402000, 'Место проведения интервью', 1691239716, NULL, NULL),
+(70, 22, 'Респондент 1', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(71, 22, 'Респондент 2', 'Данные респондента', '', 1652907600, 'Место проведения интервью', NULL, NULL, NULL),
+(72, 23, 'Респондент 1', 'Данные респондента', '', 1655845200, 'Место проведения интервью', NULL, NULL, NULL),
+(73, 23, 'Респондент 2', 'Данные респондента', '', 1655845200, 'Место проведения интервью', NULL, NULL, NULL),
+(74, 24, 'Респондент 1', '', '', NULL, '', 1691244711, NULL, NULL),
+(75, 24, 'Респондент 2', '', '', NULL, '', 1691244711, NULL, NULL),
+(76, 25, 'Иванов Иван Иванович', 'Учится в университете', 'ivanov@mail.com', 1669755600, 'На улице', 1691244711, NULL, NULL),
+(77, 25, 'Петров Петр Петрович', 'Работает на заводе', 'petrov@mail.ru', 1669755600, 'По телефону', 1691244711, NULL, NULL),
+(78, 26, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(79, 27, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(80, 28, 'Респондент 1', 'Данные респондента', '', 1666558800, 'Место проведения интервью', NULL, NULL, NULL),
+(81, 29, 'Респондент 1', 'апр', '', 1669842000, 'пртп', 1691244711, NULL, NULL),
+(82, 29, 'Респондент 2', 'прт', '', 1669842000, 'прпр', 1691244711, NULL, NULL),
+(85, 25, 'Николаев Андрей Евгеньевич', 'Пенсионер', 'nikola@gmail.com', 1669755600, 'Дома', 1691244711, NULL, NULL),
+(86, 30, 'Респондент 1', '', '', NULL, '', 1691244711, NULL, NULL),
+(87, 30, 'Респондент 2', '', '', NULL, '', 1691244711, NULL, NULL),
+(88, 31, 'Респондент 1', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(89, 31, 'Респондент 2', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(90, 32, 'Респондент 1', 'Данные респондента', '', 1679691600, 'Место проведения интервью', 1691244711, NULL, NULL),
+(91, 33, 'Респондент 1', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(92, 33, 'Респондент 2', 'Данные респондента', '', 1680987600, 'Место проведения интервью', NULL, NULL, NULL),
+(93, 34, 'Респондент 1', 'Данные респондента', 'fgbsd@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(94, 34, 'Респондент 2', 'Данные респондента', 'dfghsf@mail.com', 1699131600, 'Место проведения интервью', NULL, NULL, NULL),
+(95, 35, 'Респондент 1', 'Данные респондента', '', 1699218000, 'Место проведения интервью', NULL, NULL, NULL),
+(98, 36, 'Никифоров Иван Федорович', 'Студент в Москве', '', 1705957200, 'Уличное кафе', NULL, 58, 33),
+(101, 36, 'Питерский Николай Николаевич', 'Уличный артист', 'piterskiy@mail.com', 1706043600, 'Невский проспект', NULL, 58, 33),
+(102, 36, 'Бобровский Василий Петрович', 'Данные респондента', '', 1706043600, 'Место проведения интервью!', NULL, 58, 33),
+(103, 37, 'Петров Петр Иванович', 'Данные респондента', '', 1707166800, 'Место проведения интервью', NULL, 58, 62),
+(104, 37, 'Сидоров Иван Петрович', 'Данные респондента', '', 1708981200, 'Место проведения интервью', NULL, 58, 71),
+(105, 38, 'Респондент 1', 'Данные респондента', 'jvihbh@mail.com', 1707512400, 'Место проведения интервью', NULL, NULL, NULL),
+(106, 38, 'Респондент 2', 'Данные респондента', '', 1707512400, 'Место проведения интервью', NULL, NULL, NULL),
+(107, 38, 'Респондент 3', 'Данные респондента', '', 1707512400, 'Место проведения интервью', NULL, NULL, NULL),
+(108, 38, 'Никитин Иван Петрович', 'Данные респондента', 'gfhdfg@mail.com', 1707512400, 'Место проведения интервью', NULL, 58, 67),
+(109, 38, 'Петров Василий Петрович', 'Данные респондента', 'gndf@mail.com', 1707512400, 'Место проведения интервью', NULL, 58, 67);
 
 -- --------------------------------------------------------
 
@@ -4314,68 +5316,82 @@ INSERT INTO `responds_segment` (`id`, `confirm_id`, `name`, `info_respond`, `ema
 --
 
 CREATE TABLE `segments` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `project_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `project_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `type_of_interaction_between_subjects` int(11) DEFAULT NULL,
+  `type_of_interaction_between_subjects` int DEFAULT NULL,
   `field_of_activity` varchar(255) DEFAULT NULL,
   `sort_of_activity` varchar(255) DEFAULT NULL,
-  `age_from` int(11) DEFAULT NULL,
-  `age_to` int(11) DEFAULT NULL,
-  `gender_consumer` int(11) DEFAULT NULL,
-  `education_of_consumer` int(11) DEFAULT NULL,
-  `income_from` int(11) DEFAULT NULL,
-  `income_to` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `market_volume` int(11) DEFAULT NULL,
+  `age_from` int DEFAULT NULL,
+  `age_to` int DEFAULT NULL,
+  `gender_consumer` int DEFAULT NULL,
+  `education_of_consumer` int DEFAULT NULL,
+  `income_from` int DEFAULT NULL,
+  `income_to` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `market_volume` int DEFAULT NULL,
   `company_products` text,
   `company_partner` text,
   `add_info` text,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL,
-  `time_confirm` int(11) DEFAULT NULL,
-  `exist_confirm` int(11) DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
+  `time_confirm` int DEFAULT NULL,
+  `exist_confirm` int DEFAULT NULL,
   `enable_expertise` enum('0','1') NOT NULL DEFAULT '0',
   `use_wish_list` enum('0','1') NOT NULL DEFAULT '0',
-  `enable_expertise_at` int(11) DEFAULT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `enable_expertise_at` int DEFAULT NULL,
+  `deleted_at` int DEFAULT NULL,
+  `contractor_id` int DEFAULT NULL,
+  `task_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `segments`
 --
 
-INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_interaction_between_subjects`, `field_of_activity`, `sort_of_activity`, `age_from`, `age_to`, `gender_consumer`, `education_of_consumer`, `income_from`, `income_to`, `quantity`, `market_volume`, `company_products`, `company_partner`, `add_info`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`, `enable_expertise`, `use_wish_list`, `enable_expertise_at`, `deleted_at`) VALUES
-(16, 1, 'Сегмент 1 (длинное название сегмента, максимально длинное назван)', 'Краткое описание сегмента', 100, 'На экраны кинолента выйдет 30 декабря 2021 года. Об этом сообщается на странице киностудии «Bazelevs» в Facebook.   В Нижнем Новгороде состоялись съемки очередного фильма кинофраншизы \"Елки\".   Режиссером новой ленты стал Антон Богданов, известный по раб', 'На экраны кинолента выйдет 30 декабря 2021 года. Об этом сообщается на странице киностудии «Bazelevs» в Facebook.   В Нижнем Новгороде состоялись съемки очередного фильма кинофраншизы \"Елки\".   Режиссером новой ленты стал Антон Богданов, известный по раб', 4, 5, 70, 50, 20000, 50000, 10000, 4200, NULL, NULL, '', 1620512807, 1667731072, 1620592870, 1, '1', '0', 1667731072, 1691244711),
-(17, 1, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Предпринимательство', 'Поликлинические услуги', NULL, NULL, NULL, NULL, 8, 100, 10, 540, 'Краткое описание сегмента', 'Краткое описание сегмента', 'доп инфа', 1620512969, 1667745366, 1620655139, 1, '1', '0', 1667745366, 1691244711),
-(26, 1, 'Сегмент 3', 'Краткое описание сегмента', 100, 'Образование', 'Репетиторство', 3, 4, 60, 50, 5000, 5000, 6, 7, NULL, NULL, '', 1620656418, 1640114892, 1620656543, 1, '1', '0', 1640114892, 1691244711),
-(32, 1, 'Сегмент 4', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя Вид / специализация деятельности потребителя', 4, 5, 70, 50, 5000, 5000, 9, 5, NULL, NULL, '', 1621703242, 1665328815, 1623267598, 1, '1', '0', 1665328815, 1691244711),
-(33, 1, 'Сегмент 5', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 6, 7, 5, 8, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1624393383, 1679842889, 1625001207, 1, '1', '0', 1679842889, 1691244711),
-(34, 1, 'Сегмент 6', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 77, 88, 66, 1000000, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1633512488, 1640715427, 1640682103, 1, '1', '0', 1640715427, 1691244711),
-(35, 1, 'Сегмент 7', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 7, 8, 70, 50, 5000, 5000, 9, 4, NULL, NULL, 'Дополнительная информация', 1640798226, 1666284470, 1666284470, 0, '1', '0', 1666284470, 1691244711),
-(36, 1, 'Сегмент 8', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 8, 9, 7, 4, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1640798526, 1653128715, NULL, NULL, '1', '0', 1653128715, 1691244711),
-(37, 6, 'Сегмент 1', 'Сегмент 1', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 22, 55, 70, 300, 5000, 50000, 200, 400, NULL, NULL, '', 1650457898, 1650458213, 1650458213, 1, '1', '0', 1650458213, 1691239716),
-(38, 5, 'Сегмент 1', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 4, 56, 70, 50, 40000, 80000, 100, 15, NULL, NULL, '', 1652965736, 1652966588, 1652966588, 1, '1', '0', 1652966588, NULL),
-(39, 5, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 10, 50, 20000, 999, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1652965800, 1655910375, 1655910375, 0, '1', '0', 1655910375, NULL),
-(40, 5, 'Сегмент 3', 'Сегмент 3', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 40, 80, 70, 300, 60000, 90000, 20, 15, NULL, NULL, 'Дополнительная информация', 1653388328, 1655914599, NULL, NULL, '1', '0', 1655914599, NULL),
-(41, 1, 'Сегмент 9', 'Сегмент 9', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 7, 99, 77, 496, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1655229264, 1669899789, 1669899789, 1, '1', '0', 1669899789, 1691244711),
-(42, 1, 'Сегмент 15 (Наименование сегмента)', 'Сегмент 15', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 1, 2, 2, 1, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1665329293, 1666537054, NULL, NULL, '1', '0', 1666537054, 1691244711),
-(52, 10, 'Наименование сегмента', 'Наименование сегмента', 100, 'Наименование сегмента', 'Наименование сегмента', 5, 6, 70, 50, 5000, 5000, 8, 8, NULL, NULL, '', 1666591705, 1666594063, 1666594063, 0, '1', '0', 1666594063, NULL),
-(53, 10, 'Сегмент 2', 'Сегмент 2', 100, 'Сегмент 2', 'Сегмент 2', 78, 78, 50, 50, 5000, 5000, 9, 9, NULL, NULL, '', 1666594112, 1666594689, 1666594689, 1, '1', '0', 1666594689, NULL),
-(54, 10, 'Сегмент 3', 'Сегмент 3', 100, 'Сегмент 3', 'Сегмент 3', 4, 5, 70, 50, 5000, 5000, 9, 9, NULL, NULL, '', 1666594825, 1666594884, 1666594884, 1, '1', '0', 1666594884, NULL),
-(55, 1, 'сегмент 16', 'сегмент 16', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 56, 78, 70, 50, 65, 667, 4500, 19, NULL, NULL, '', 1669534774, 1679734255, 1679734255, 1, '1', '0', 1679734255, 1691244711),
-(56, 1, 'Сегмент 20', 'Сегмент 20', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 10, 50, 50, 1500, 'Праздничные игрушки', 'Партнеры предприятия!', 'Дополнительная информация!', 1676791528, 1677082656, NULL, NULL, '1', '1', 1677082656, 1691244711),
-(58, 1, 'Сегмент 22', 'Сегмент 22', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 9, 22, 15, 232, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1676791775, 1679728908, 1679728908, 1, '1', '0', 1679728908, 1691244711),
-(59, 1, 'Сегмент 25', 'Краткое описание сегмента', 200, 'Фармацевтика', 'Продажа медицинских препаратов', NULL, NULL, NULL, NULL, 22, 35, 62, 1767, 'Медицинские препараты и натуральная косметика', 'Партнеры предприятия', 'Дополнительная информация', 1676800822, 1676801060, NULL, NULL, '0', '1', NULL, 1691244711),
-(60, 16, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 100, 10000, 700, 3535000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1679821122, 1679821159, NULL, NULL, '1', '1', 1679821159, NULL),
-(61, 18, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 777, 8888, 500, 2416250, 'Праздничные игрушки', 'Партнеры предприятия', '', 1680543450, 1680543457, NULL, NULL, '1', '1', 1680543457, NULL),
-(62, 17, 'Сегмент 111', 'Сегмент 111', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 100, 10000, 1000, 5050000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1681039882, 1681048252, 1681048249, 1, '1', '1', 1681039899, NULL),
-(63, 17, 'Сегмент 222', 'Сегмент 222', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 3456, 7435, 654, 3561357, 'Праздничные игрушки', 'Партнеры предприятия', '', 1681040719, 1681040724, NULL, NULL, '1', '1', 1681040724, NULL),
-(64, 17, 'Сегмент 333', 'Сегмент 333', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 33, 44, 70, 300, 6700, 670000, 31, 125, NULL, NULL, '', 1681041671, 1681041677, NULL, NULL, '1', '0', 1681041677, NULL),
-(65, 1, 'Сегмент 26', 'Сегмент 26', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 50, 100, 60, 4500, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1682236366, 1682236446, NULL, NULL, '0', '0', NULL, 1691244711),
-(66, 7, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 10, 50, 100, 3000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1699175921, 1699193107, 1699193102, 1, '1', '1', 1699189668, NULL),
-(67, 7, 'Сегмент 2', 'Сегмент 2', 200, 'Продовольственное питание', 'Продажа продуктов питания', NULL, NULL, NULL, NULL, 12, 56, 100, 3400, 'Продукты ежедневного потребления', 'Партнеры предприятия', 'Дополнительная информация', 1699262043, 1699262183, 1699262181, 1, '1', '1', 1699262052, NULL);
+INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_interaction_between_subjects`, `field_of_activity`, `sort_of_activity`, `age_from`, `age_to`, `gender_consumer`, `education_of_consumer`, `income_from`, `income_to`, `quantity`, `market_volume`, `company_products`, `company_partner`, `add_info`, `created_at`, `updated_at`, `time_confirm`, `exist_confirm`, `enable_expertise`, `use_wish_list`, `enable_expertise_at`, `deleted_at`, `contractor_id`, `task_id`) VALUES
+(16, 1, 'Сегмент 1 (длинное название сегмента, максимально длинное назван)', 'Краткое описание сегмента', 100, 'На экраны кинолента выйдет 30 декабря 2021 года. Об этом сообщается на странице киностудии «Bazelevs» в Facebook.   В Нижнем Новгороде состоялись съемки очередного фильма кинофраншизы \"Елки\".   Режиссером новой ленты стал Антон Богданов, известный по раб', 'На экраны кинолента выйдет 30 декабря 2021 года. Об этом сообщается на странице киностудии «Bazelevs» в Facebook.   В Нижнем Новгороде состоялись съемки очередного фильма кинофраншизы \"Елки\".   Режиссером новой ленты стал Антон Богданов, известный по раб', 4, 5, 70, 50, 20000, 50000, 10000, 4200, NULL, NULL, '', 1620512807, 1667731072, 1620592870, 1, '1', '0', 1667731072, 1691244711, NULL, NULL),
+(17, 1, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Предпринимательство', 'Поликлинические услуги', NULL, NULL, NULL, NULL, 8, 100, 10, 540, 'Краткое описание сегмента', 'Краткое описание сегмента', 'доп инфа', 1620512969, 1667745366, 1620655139, 1, '1', '0', 1667745366, 1691244711, NULL, NULL),
+(26, 1, 'Сегмент 3', 'Краткое описание сегмента', 100, 'Образование', 'Репетиторство', 3, 4, 60, 50, 5000, 5000, 6, 7, NULL, NULL, '', 1620656418, 1640114892, 1620656543, 1, '1', '0', 1640114892, 1691244711, NULL, NULL),
+(32, 1, 'Сегмент 4', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя Вид / специализация деятельности потребителя', 4, 5, 70, 50, 5000, 5000, 9, 5, NULL, NULL, '', 1621703242, 1665328815, 1623267598, 1, '1', '0', 1665328815, 1691244711, NULL, NULL),
+(33, 1, 'Сегмент 5', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 6, 7, 5, 8, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1624393383, 1679842889, 1625001207, 1, '1', '0', 1679842889, 1691244711, NULL, NULL),
+(34, 1, 'Сегмент 6', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 77, 88, 66, 1000000, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1633512488, 1640715427, 1640682103, 1, '1', '0', 1640715427, 1691244711, NULL, NULL),
+(35, 1, 'Сегмент 7', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 7, 8, 70, 50, 5000, 5000, 9, 4, NULL, NULL, 'Дополнительная информация', 1640798226, 1666284470, 1666284470, 0, '1', '0', 1666284470, 1691244711, NULL, NULL),
+(36, 1, 'Сегмент 8', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 8, 9, 7, 4, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1640798526, 1653128715, NULL, NULL, '1', '0', 1653128715, 1691244711, NULL, NULL),
+(37, 6, 'Сегмент 1', 'Сегмент 1', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 22, 55, 70, 300, 5000, 50000, 200, 400, NULL, NULL, '', 1650457898, 1650458213, 1650458213, 1, '1', '0', 1650458213, 1691239716, NULL, NULL),
+(38, 5, 'Сегмент 1', 'Краткое описание сегмента', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 4, 56, 70, 50, 40000, 80000, 100, 15, NULL, NULL, '', 1652965736, 1652966588, 1652966588, 1, '1', '0', 1652966588, NULL, NULL, NULL),
+(39, 5, 'Сегмент 2', 'Краткое описание сегмента', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 10, 50, 20000, 999, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1652965800, 1655910375, 1655910375, 0, '1', '0', 1655910375, NULL, NULL, NULL),
+(40, 5, 'Сегмент 3', 'Сегмент 3', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 40, 80, 70, 300, 60000, 90000, 20, 15, NULL, NULL, 'Дополнительная информация', 1653388328, 1655914599, NULL, NULL, '1', '0', 1655914599, NULL, NULL, NULL),
+(41, 1, 'Сегмент 9', 'Сегмент 9', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 7, 99, 77, 496, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1655229264, 1669899789, 1669899789, 1, '1', '0', 1669899789, 1691244711, NULL, NULL),
+(42, 1, 'Сегмент 15 (Наименование сегмента)', 'Сегмент 15', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 1, 2, 2, 1, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1665329293, 1666537054, NULL, NULL, '1', '0', 1666537054, 1691244711, NULL, NULL),
+(52, 10, 'Наименование сегмента', 'Наименование сегмента', 100, 'Наименование сегмента', 'Наименование сегмента', 5, 6, 70, 50, 5000, 5000, 8, 8, NULL, NULL, '', 1666591705, 1666594063, 1666594063, 0, '1', '0', 1666594063, NULL, NULL, NULL),
+(53, 10, 'Сегмент 2', 'Сегмент 2', 100, 'Сегмент 2', 'Сегмент 2', 78, 78, 50, 50, 5000, 5000, 9, 9, NULL, NULL, '', 1666594112, 1666594689, 1666594689, 1, '1', '0', 1666594689, NULL, NULL, NULL),
+(54, 10, 'Сегмент 3', 'Сегмент 3', 100, 'Сегмент 3', 'Сегмент 3', 4, 5, 70, 50, 5000, 5000, 9, 9, NULL, NULL, '', 1666594825, 1666594884, 1666594884, 1, '1', '0', 1666594884, NULL, NULL, NULL),
+(55, 1, 'сегмент 16', 'сегмент 16', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 56, 78, 70, 50, 65, 667, 4500, 19, NULL, NULL, '', 1669534774, 1679734255, 1679734255, 1, '1', '0', 1679734255, 1691244711, NULL, NULL),
+(56, 1, 'Сегмент 20', 'Сегмент 20', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 10, 50, 50, 1500, 'Праздничные игрушки', 'Партнеры предприятия!', 'Дополнительная информация!', 1676791528, 1677082656, NULL, NULL, '1', '1', 1677082656, 1691244711, NULL, NULL),
+(58, 1, 'Сегмент 22', 'Сегмент 22', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 9, 22, 15, 232, 'Продукция / услуги предприятия', 'Партнеры предприятия', '', 1676791775, 1679728908, 1679728908, 1, '1', '0', 1679728908, 1691244711, NULL, NULL),
+(59, 1, 'Сегмент 25', 'Краткое описание сегмента', 200, 'Фармацевтика', 'Продажа медицинских препаратов', NULL, NULL, NULL, NULL, 22, 35, 62, 1767, 'Медицинские препараты и натуральная косметика', 'Партнеры предприятия', 'Дополнительная информация', 1676800822, 1676801060, NULL, NULL, '0', '1', NULL, 1691244711, NULL, NULL),
+(60, 16, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 100, 10000, 700, 3535000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1679821122, 1679821159, NULL, NULL, '1', '1', 1679821159, NULL, NULL, NULL),
+(61, 18, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 777, 8888, 500, 2416250, 'Праздничные игрушки', 'Партнеры предприятия', '', 1680543450, 1680543457, NULL, NULL, '1', '1', 1680543457, NULL, NULL, NULL),
+(62, 17, 'Сегмент 111', 'Сегмент 111', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 100, 10000, 1000, 5050000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1681039882, 1681048252, 1681048249, 1, '1', '1', 1681039899, NULL, NULL, NULL),
+(63, 17, 'Сегмент 222', 'Сегмент 222', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 3456, 7435, 654, 3561357, 'Праздничные игрушки', 'Партнеры предприятия', '', 1681040719, 1681040724, NULL, NULL, '1', '1', 1681040724, NULL, NULL, NULL),
+(64, 17, 'Сегмент 333', 'Сегмент 333', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 33, 44, 70, 300, 6700, 670000, 31, 125, NULL, NULL, '', 1681041671, 1681041677, NULL, NULL, '1', '0', 1681041677, NULL, NULL, NULL),
+(65, 1, 'Сегмент 26', 'Сегмент 26', 200, 'Сфера деятельности предприятия', 'Вид / специализация деятельности предприятия', NULL, NULL, NULL, NULL, 50, 100, 60, 4500, 'Продукция / услуги предприятия', 'Партнеры предприятия', 'Дополнительная информация', 1682236366, 1682236446, NULL, NULL, '0', '0', NULL, 1691244711, NULL, NULL),
+(66, 7, 'Сегмент 1', 'Сегмент 1', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 10, 50, 100, 3000, 'Праздничные игрушки', 'Партнеры предприятия', 'Дополнительная информация', 1699175921, 1699193107, 1699193102, 1, '1', '1', 1699189668, NULL, NULL, NULL),
+(67, 7, 'Сегмент 2', 'Сегмент 2', 200, 'Продовольственное питание', 'Продажа продуктов питания', NULL, NULL, NULL, NULL, 12, 56, 100, 3400, 'Продукты ежедневного потребления', 'Партнеры предприятия', 'Дополнительная информация', 1699262043, 1699262183, 1699262181, 1, '1', '1', 1699262052, NULL, NULL, NULL),
+(68, 7, 'Сегмент 3', 'Сегмент 3', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 56, 67, 70, 300, 4567, 34353, 345, 80, NULL, NULL, '', 1700998570, 1706378701, 1706378694, 1, '1', '0', 1705134924, NULL, NULL, NULL),
+(73, 7, 'Сегмент 4', 'Сегмент 4', 100, 'Сфера деятельности потребителя!!!', 'Вид / специализация деятельности потребителя', 45, 70, 70, 50, 345345, 1000000, 435634, 3516468, NULL, NULL, 'Дополнительная информация', 1701003500, 1706635824, NULL, NULL, '1', '0', 1706635824, NULL, NULL, NULL),
+(74, 7, 'Сегмент 5', 'Сегмент 5', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 500, 800, 700, 455000, 'Праздничные игрушки', 'Партнеры предприятия', '', 1701004413, 1707558412, NULL, NULL, '1', '1', 1707558412, NULL, NULL, NULL),
+(76, 7, 'Сегмент 6', 'Сегмент 6', 200, 'Продовольственное питание', 'Продажа продуктов питания', NULL, NULL, NULL, NULL, 567, 681, 678, 423072, 'Продукты ежедневного потребления', 'Партнеры предприятия', '', 1701006646, 1702132383, NULL, NULL, '0', '1', NULL, NULL, NULL, NULL),
+(77, 7, 'Сегмент 7', 'Сегмент 7', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 456, 4566, 56, 140616, 'Праздничные игрушки', 'Партнеры предприятия', '', 1701017665, 1701017665, NULL, NULL, '0', '1', NULL, NULL, NULL, NULL),
+(78, 7, 'Сегмент 9', 'Сегмент 9', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 2, 3, 1, 2, 'Праздничные игрушки', 'Партнеры предприятия', '', 1702135422, 1702135422, NULL, NULL, '0', '1', NULL, NULL, NULL, NULL),
+(79, 7, 'Сегмент 10', 'Сегмент 10', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 3, 4, 2, 7, 'Праздничные игрушки', 'Партнеры предприятия', '', 1703331423, 1703331423, NULL, NULL, '0', '1', NULL, NULL, NULL, NULL),
+(80, 7, 'Сегмент 11', 'Сегмент 11', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 5, 50, 70, 50, 10000, 12000, 300000, 39600, NULL, NULL, '', 1703333639, 1703333639, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL),
+(81, 7, 'Сегмент 12', 'Сегмент 12', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 44, 55, 33, 1633, 'Праздничные игрушки', 'Партнеры предприятия', '', 1703333791, 1703333791, NULL, NULL, '0', '1', NULL, NULL, NULL, NULL),
+(82, 7, 'Сегмент 13', 'Сегмент 13', 100, 'Сфера деятельности потребителя', 'Вид / специализация деятельности потребителя', 44, 55, 70, 50, 4400, 440000, 550, 1466, NULL, NULL, '', 1703333912, 1703333912, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL),
+(83, 7, 'Сегмент 14', 'Сегмент 14', 200, 'Продовольственное питание', 'Продажа продуктов питания', NULL, NULL, NULL, NULL, 500, 10000, 40, 210000, 'Продукты ежедневного потребления', 'Партнеры предприятия', '', 1703334115, 1703334115, NULL, NULL, '0', '1', NULL, NULL, 58, 28),
+(84, 7, 'Сегмент 15', 'Сегмент 15', 200, 'Праздничные товары', 'Производство различного вида новогодних и праздничных атрибутов', NULL, NULL, NULL, NULL, 11, 11, 111, 1221, 'Праздничные игрушки', 'Партнеры предприятия', '', 1705143660, 1705143660, NULL, NULL, '0', '1', NULL, NULL, 58, 28);
 
 -- --------------------------------------------------------
 
@@ -4384,9 +5400,9 @@ INSERT INTO `segments` (`id`, `project_id`, `name`, `description`, `type_of_inte
 --
 
 CREATE TABLE `segment_requirement` (
-  `segment_id` int(11) NOT NULL,
-  `requirement_id` int(11) NOT NULL,
-  `deleted_at` int(11) DEFAULT NULL
+  `segment_id` int NOT NULL,
+  `requirement_id` int NOT NULL,
+  `deleted_at` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -4401,7 +5417,15 @@ INSERT INTO `segment_requirement` (`segment_id`, `requirement_id`, `deleted_at`)
 (62, 2, NULL),
 (63, 1, NULL),
 (66, 1, NULL),
-(67, 3, NULL);
+(67, 3, NULL),
+(74, 1, NULL),
+(76, 3, NULL),
+(77, 1, NULL),
+(78, 1, NULL),
+(79, 1, NULL),
+(81, 1, NULL),
+(83, 3, NULL),
+(84, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -4410,12 +5434,12 @@ INSERT INTO `segment_requirement` (`segment_id`, `requirement_id`, `deleted_at`)
 --
 
 CREATE TABLE `types_access_to_expertise` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `types` varchar(255) CHARACTER SET utf8 NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `communication_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `types` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `types_access_to_expertise`
@@ -4441,7 +5465,7 @@ INSERT INTO `types_access_to_expertise` (`id`, `communication_id`, `project_id`,
 --
 
 CREATE TABLE `user` (
-  `id` int(11) UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL,
   `email` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
@@ -4449,12 +5473,12 @@ CREATE TABLE `user` (
   `avatar_image` varchar(255) DEFAULT NULL,
   `auth_key` varchar(255) DEFAULT NULL,
   `secret_key` varchar(255) DEFAULT NULL,
-  `role` int(11) NOT NULL,
-  `status` smallint(6) NOT NULL,
-  `confirm` int(11) NOT NULL,
-  `id_admin` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `role` int NOT NULL,
+  `status` smallint NOT NULL,
+  `confirm` int NOT NULL,
+  `id_admin` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -4462,7 +5486,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `email`, `username`, `password_hash`, `avatar_max_image`, `avatar_image`, `auth_key`, `secret_key`, `role`, `status`, `confirm`, `id_admin`, `created_at`, `updated_at`) VALUES
-(1, 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_xzGGOPyw_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 46, 1582408272, 1699262498),
+(1, 'ivanov@mail.com', 'IvanoV', '$2y$13$GHlJeyDLCETcXCeFH5URZu/MCljd/xdr9DUQsAE.KBnAI.BC0tdva', 'tBH4LLXzmH4.jpg', 'avatar_xzGGOPyw_min.png', '32hRL8j7MkkANX9mIy7vYPhsxBuO5JD8', NULL, 10, 10, 20, 46, 1582408272, 1709060006),
 (9, 'karpov@mail.com', 'karpov', '$2y$13$aDvsycNgzvtoTq7.fLGI7ekA.HLbR93pCudDUsidh.qEl.fwf7xBG', '', '', '8ttyGMNTTQgVTM-5vPftdvK1Y7LVLkM1', NULL, 10, 10, 20, 21, 1583859778, 1629311661),
 (16, 'viktor@mail.ru', 'Viktor', '$2y$13$EU.K51p/fg4CbVtmMG/zHeimVSxiY5VE7YTrToUKCzuBBymYoBtk2', '', '', '9iGl39KVGbXS2DNazKaS4cgjbDwrBybF', NULL, 10, 10, 20, 21, 1585414934, 1629311842),
 (21, 'dibrov@mail.ru', 'Dibrov', '$2y$13$8qmD5Jj5YMbUl4HlyU9OqODvek.tgm1GU/zhmk6iM8lBeJh1hWhjK', '7AzQAtxQm1c.jpg', 'avatar_9Vc9GrGT_min.png', 'wd9PcB_fY8b_L_W9Rjdp3hxteBd0OQyy', NULL, 20, 10, 20, NULL, 1586614816, 1627203712),
@@ -4490,7 +5514,7 @@ INSERT INTO `user` (`id`, `email`, `username`, `password_hash`, `avatar_max_imag
 (56, 'tracker.test.company@yandex.ru', 'alexPetrov', '$2y$13$.qZ5yonmTPts.jRK0GVoKu1HzQXB/ygF0LNzoIAt7hlByRNrCy4TK', '', '', 'DdxAY6Bf3HJwg4Pt8UdMxrwBTToP6xjs', NULL, 20, 10, 20, NULL, 1677232161, 1677332005),
 (57, 'test.contractor@mail.ru', 'test.contractor@mail.ru', '$2y$13$eLESZIlX8NlvwvMK7mK/4.nHRDigIOUIvMHlAqTFYtVDRLODitj62', '', '', 'vCjpQBfZBptAzs3Lt494qfI7vi-D2xVt', NULL, 15, 10, 20, NULL, 1695469394, 1699173707),
 (58, 'test.contractor@yandex.ru', 'test.contractor.yandex.ru', '$2y$13$E8I5MWa3lHBvZQuFs2yHNefA4n1Om8QfDu4puP9xplU5DxVQ/68C6', '', '', '4nTKJNTAXGaBk1RMgE16mw_4kWU1Z0HI', NULL, 15, 10, 20, NULL, 1695469696, 1699173692),
-(59, 'test.contractor@gmail.com', 'test.contractor@gmail.com', '$2y$13$3X8rpFCddkHPUacp1K89fugPAA16LgpEph9l1FxzEZm7.8SvTueCm', '', '', 'MTU5ockKfx07uHSBZrwersdrcvl7Ay5c', NULL, 15, 10, 20, NULL, 1695469807, 1695469807);
+(59, 'test.contractor@gmail.com', 'test.contractor@gmail.com', '$2y$13$3X8rpFCddkHPUacp1K89fugPAA16LgpEph9l1FxzEZm7.8SvTueCm', '', '', 'MTU5ockKfx07uHSBZrwersdrcvl7Ay5c', NULL, 15, 10, 20, NULL, 1695469807, 1700729850);
 
 -- --------------------------------------------------------
 
@@ -4499,16 +5523,16 @@ INSERT INTO `user` (`id`, `email`, `username`, `password_hash`, `avatar_max_imag
 --
 
 CREATE TABLE `user_access_to_projects` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `communication_id` int(11) NOT NULL,
-  `communication_type` int(11) NOT NULL,
-  `cancel` int(11) NOT NULL,
-  `date_stop` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `communication_id` int NOT NULL,
+  `communication_type` int NOT NULL,
+  `cancel` int NOT NULL,
+  `date_stop` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `user_access_to_projects`
@@ -4569,20 +5593,20 @@ INSERT INTO `user_access_to_projects` (`id`, `user_id`, `project_id`, `communica
 --
 
 CREATE TABLE `wish_list` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `client_id` int(11) NOT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `client_id` int NOT NULL,
   `company_name` varchar(255) NOT NULL,
   `company_field_of_activity` varchar(255) NOT NULL,
   `company_sort_of_activity` varchar(255) NOT NULL,
   `company_products` text NOT NULL,
-  `size` int(11) NOT NULL,
-  `location_id` int(11) NOT NULL,
-  `type_company` int(11) NOT NULL,
-  `type_production` int(11) NOT NULL,
+  `size` int NOT NULL,
+  `location_id` int NOT NULL,
+  `type_company` int NOT NULL,
+  `type_production` int NOT NULL,
   `add_info` text,
-  `completed_at` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` int(11) NOT NULL
+  `completed_at` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -4651,8 +5675,7 @@ ALTER TABLE `answers_questions_confirm_segment`
 -- Индексы таблицы `authors`
 --
 ALTER TABLE `authors`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `project_id` (`project_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Индексы таблицы `business_model`
@@ -4784,6 +5807,36 @@ ALTER TABLE `contractor_project_access`
 -- Индексы таблицы `contractor_tasks`
 --
 ALTER TABLE `contractor_tasks`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `contractor_task_files`
+--
+ALTER TABLE `contractor_task_files`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `contractor_task_histories`
+--
+ALTER TABLE `contractor_task_histories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `contractor_task_products`
+--
+ALTER TABLE `contractor_task_products`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `contractor_task_similar_products`
+--
+ALTER TABLE `contractor_task_similar_products`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `contractor_task_similar_product_params`
+--
+ALTER TABLE `contractor_task_similar_product_params`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -5091,463 +6144,493 @@ ALTER TABLE `wish_list`
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_gcp`
 --
 ALTER TABLE `all_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_mvp`
 --
 ALTER TABLE `all_questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_problem`
 --
 ALTER TABLE `all_questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `all_questions_confirm_segment`
 --
 ALTER TABLE `all_questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_gcp`
 --
 ALTER TABLE `answers_questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_mvp`
 --
 ALTER TABLE `answers_questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_problem`
 --
 ALTER TABLE `answers_questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=201;
 
 --
 -- AUTO_INCREMENT для таблицы `answers_questions_confirm_segment`
 --
 ALTER TABLE `answers_questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=299;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=362;
 
 --
 -- AUTO_INCREMENT для таблицы `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT для таблицы `business_model`
 --
 ALTER TABLE `business_model`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT для таблицы `checking_online_user`
 --
 ALTER TABLE `checking_online_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT для таблицы `client`
 --
 ALTER TABLE `client`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `client_activation`
 --
 ALTER TABLE `client_activation`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT для таблицы `client_codes`
 --
 ALTER TABLE `client_codes`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `client_rates_plan`
 --
 ALTER TABLE `client_rates_plan`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT для таблицы `client_settings`
 --
 ALTER TABLE `client_settings`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `client_user`
 --
 ALTER TABLE `client_user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT для таблицы `communication_patterns`
 --
 ALTER TABLE `communication_patterns`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT для таблицы `communication_response`
 --
 ALTER TABLE `communication_response`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_gcp`
 --
 ALTER TABLE `confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_mvp`
 --
 ALTER TABLE `confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_problem`
 --
 ALTER TABLE `confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT для таблицы `confirm_segment`
 --
 ALTER TABLE `confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_activities`
 --
 ALTER TABLE `contractor_activities`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_communications`
 --
 ALTER TABLE `contractor_communications`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=389;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_communication_response`
 --
 ALTER TABLE `contractor_communication_response`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_educations`
 --
 ALTER TABLE `contractor_educations`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_info`
 --
 ALTER TABLE `contractor_info`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_project_access`
 --
 ALTER TABLE `contractor_project_access`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT для таблицы `contractor_tasks`
 --
 ALTER TABLE `contractor_tasks`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+
+--
+-- AUTO_INCREMENT для таблицы `contractor_task_files`
+--
+ALTER TABLE `contractor_task_files`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT для таблицы `contractor_task_histories`
+--
+ALTER TABLE `contractor_task_histories`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=251;
+
+--
+-- AUTO_INCREMENT для таблицы `contractor_task_products`
+--
+ALTER TABLE `contractor_task_products`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT для таблицы `contractor_task_similar_products`
+--
+ALTER TABLE `contractor_task_similar_products`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT для таблицы `contractor_task_similar_product_params`
+--
+ALTER TABLE `contractor_task_similar_product_params`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_admin`
 --
 ALTER TABLE `conversation_admin`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_development`
 --
 ALTER TABLE `conversation_development`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_expert`
 --
 ALTER TABLE `conversation_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_main_admin`
 --
 ALTER TABLE `conversation_main_admin`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `conversation_manager`
 --
 ALTER TABLE `conversation_manager`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `customer_expert`
 --
 ALTER TABLE `customer_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `customer_manager`
 --
 ALTER TABLE `customer_manager`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT для таблицы `customer_tracker`
 --
 ALTER TABLE `customer_tracker`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `customer_wish_list`
 --
 ALTER TABLE `customer_wish_list`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `duplicate_communications`
 --
 ALTER TABLE `duplicate_communications`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=263;
 
 --
 -- AUTO_INCREMENT для таблицы `expected_results_interview_confirm_problem`
 --
 ALTER TABLE `expected_results_interview_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT для таблицы `expertise`
 --
 ALTER TABLE `expertise`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT для таблицы `expert_info`
 --
 ALTER TABLE `expert_info`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `gcps`
 --
 ALTER TABLE `gcps`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_gcp`
 --
 ALTER TABLE `interview_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_mvp`
 --
 ALTER TABLE `interview_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_problem`
 --
 ALTER TABLE `interview_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT для таблицы `interview_confirm_segment`
 --
 ALTER TABLE `interview_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT для таблицы `keywords_expert`
 --
 ALTER TABLE `keywords_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `location_wish_list`
 --
 ALTER TABLE `location_wish_list`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT для таблицы `message_admin`
 --
 ALTER TABLE `message_admin`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=406;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=406;
 
 --
 -- AUTO_INCREMENT для таблицы `message_development`
 --
 ALTER TABLE `message_development`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
 
 --
 -- AUTO_INCREMENT для таблицы `message_expert`
 --
 ALTER TABLE `message_expert`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT для таблицы `message_files`
 --
 ALTER TABLE `message_files`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT для таблицы `message_main_admin`
 --
 ALTER TABLE `message_main_admin`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT для таблицы `message_manager`
 --
 ALTER TABLE `message_manager`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT для таблицы `mvps`
 --
 ALTER TABLE `mvps`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT для таблицы `pre_files`
 --
 ALTER TABLE `pre_files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `problems`
 --
 ALTER TABLE `problems`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT для таблицы `project_communications`
 --
 ALTER TABLE `project_communications`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=260;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_gcp`
 --
 ALTER TABLE `questions_confirm_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_mvp`
 --
 ALTER TABLE `questions_confirm_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_problem`
 --
 ALTER TABLE `questions_confirm_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT для таблицы `questions_confirm_segment`
 --
 ALTER TABLE `questions_confirm_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT для таблицы `rates_plan`
 --
 ALTER TABLE `rates_plan`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `reason_requirement_wish_list`
 --
 ALTER TABLE `reason_requirement_wish_list`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT для таблицы `requirement_wish_list`
 --
 ALTER TABLE `requirement_wish_list`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_gcp`
 --
 ALTER TABLE `responds_gcp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_mvp`
 --
 ALTER TABLE `responds_mvp`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_problem`
 --
 ALTER TABLE `responds_problem`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
 
 --
 -- AUTO_INCREMENT для таблицы `responds_segment`
 --
 ALTER TABLE `responds_segment`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT для таблицы `segments`
 --
 ALTER TABLE `segments`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT для таблицы `types_access_to_expertise`
 --
 ALTER TABLE `types_access_to_expertise`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT для таблицы `user_access_to_projects`
 --
 ALTER TABLE `user_access_to_projects`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT для таблицы `wish_list`
 --
 ALTER TABLE `wish_list`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

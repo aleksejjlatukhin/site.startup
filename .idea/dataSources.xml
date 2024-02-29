@@ -10,5 +10,15 @@
         <property name="autoReconnect" value="true" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="MySQL@spaxel" uuid="5bb12513-e4ad-44e4-b96b-e802f056fcc9">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306/u0975832_test_spaxel</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <driver-properties>
+        <property name="allowPublicKeyRetrieval" value="TRUE" />
+      </driver-properties>
+    </data-source>
   </component>
 </project>

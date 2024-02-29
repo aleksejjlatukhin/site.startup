@@ -1,7 +1,6 @@
 <?php
 
 use app\models\ConfirmSegment;
-use app\models\EnableExpertise;
 use app\models\forms\FormCreateQuestion;
 use app\models\forms\SearchForm;
 use app\models\Problems;
@@ -25,6 +24,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -157,6 +157,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
         <?= $this->render('ajax_data_confirm_trash', [
             'model' => $model,
             'project' => $project,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -434,6 +435,7 @@ $this->registerCssFile('@web/css/interview-view-style.css');
             <?= $this->render('ajax_data_confirm_trash', [
                 'model' => $model,
                 'project' => $project,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

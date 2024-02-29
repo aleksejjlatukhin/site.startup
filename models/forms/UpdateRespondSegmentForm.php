@@ -3,7 +3,7 @@
 
 namespace app\models\forms;
 
-use app\models\interfaces\ConfirmationInterface;
+use app\models\ContractorTasks;
 use app\models\ConfirmSegment;
 use app\models\RespondsSegment;
 use yii\web\NotFoundHttpException;
@@ -68,13 +68,18 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
 
 
     /**
+     * @param ContractorTasks|null $task
      * @return RespondsSegment|null
      * @throws NotFoundHttpException
      */
-    public function update(): ?RespondsSegment
+    public function update(ContractorTasks $task = null): ?RespondsSegment
     {
         $respond = RespondsSegment::findOne($this->getId());
         $respond->setName($this->getName());
+        if ($task) {
+            $respond->setTaskId($task->getId());
+            $respond->setContractorId($task->getContractorId());
+        }
         $respond->setParams([
             'info_respond' => $this->getInfoRespond(),
             'place_interview' => $this->getPlaceInterview(),
@@ -94,7 +99,11 @@ class UpdateRespondSegmentForm extends UpdateFormRespond
      */
     public function uniqueName($attr)
     {
-        $models = RespondsSegment::findAll(['confirm_id' => $this->getConfirmId()]);
+        $models = RespondsSegment::findAll([
+            'confirm_id' => $this->getConfirmId(),
+            'task_id' => $this->getTaskId(),
+            'contractor_id' => $this->getContractorId()
+        ]);
 
         foreach ($models as $item){
 

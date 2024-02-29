@@ -7,6 +7,7 @@ use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\ContractorTasks;
 use app\models\EnableExpertise;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateConfirmGcp;
@@ -22,6 +23,7 @@ use app\models\QuestionsConfirmGcp;
 use app\models\RespondsProblem;
 use app\models\RespondsGcp;
 use app\models\Segments;
+use app\models\StageExpertise;
 use app\models\StatusConfirmHypothesis;
 use app\models\User;
 use app\models\UserAccessToProjects;
@@ -288,7 +290,9 @@ class ConfirmGcpController extends AppUserPartController
         //кол-во респондентов, подтвердивших текущую проблему
         $count_represent_problem = RespondsProblem::find()->with('interview')
             ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-            ->andWhere(['confirm_id' => $confirmProblem->getId(), 'interview_confirm_problem.status' => '1'])->count();
+            ->andWhere(['confirm_id' => $confirmProblem->getId(), 'interview_confirm_problem.status' => '1'])
+            ->andWhere(['contractor_id' => null])
+            ->count();
 
         $model->setCountRespond($count_represent_problem);
 
@@ -359,6 +363,10 @@ class ConfirmGcpController extends AppUserPartController
         $project = Projects::findOne($problem->getProjectId());
         $questions = QuestionsConfirmGcp::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
+        $countContractorResponds = (int)RespondsGcp::find()
+            ->andWhere(['not', ['contractor_id' => null]])
+            ->andWhere(['confirm_id' => $id])
+            ->count();
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -376,6 +384,7 @@ class ConfirmGcpController extends AppUserPartController
             'confirmSegment' => $confirmSegment,
             'segment' => $segment,
             'project' => $project,
+            'countContractorResponds' => $countContractorResponds
         ]);
     }
 
@@ -393,6 +402,10 @@ class ConfirmGcpController extends AppUserPartController
             $model = new FormUpdateConfirmGcp($id);
             $confirm = ConfirmGcp::findOne($id);
             $gcp = Gcps::findOne($confirm->getGcpId());
+            $countContractorResponds = (int)RespondsGcp::find()
+                ->andWhere(['not', ['contractor_id' => null]])
+                ->andWhere(['confirm_id' => $id])
+                ->count();
 
             if ($model->load(Yii::$app->request->post())) {
                 if ($model = $model->update()){
@@ -401,7 +414,7 @@ class ConfirmGcpController extends AppUserPartController
                         'success' => true,
                         'ajax_data_confirm' => $this->renderAjax('ajax_data_confirm', [
                             'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($id),
-                            'model' => $model,  'gcp' => $gcp
+                            'model' => $model,  'gcp' => $gcp, 'countContractorResponds' => $countContractorResponds
                         ]),
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
@@ -434,6 +447,10 @@ class ConfirmGcpController extends AppUserPartController
         $project = Projects::findOne($segment->getProjectId());
         $questions = QuestionsConfirmGcp::findAll(['confirm_id' => $id]);
         $newQuestion = new FormCreateQuestion();
+        $countContractorResponds = (int)RespondsGcp::find()
+            ->andWhere(['not', ['contractor_id' => null]])
+            ->andWhere(['confirm_id' => $id])
+            ->count();
 
         //Список вопросов для добавления к списку программы
         $queryQuestions = $model->queryQuestionsGeneralList();
@@ -451,7 +468,8 @@ class ConfirmGcpController extends AppUserPartController
             'questions' => $questions,
             'newQuestion' => $newQuestion,
             'queryQuestions' => $queryQuestions,
-            'searchForm' => new SearchForm()
+            'searchForm' => new SearchForm(),
+            'countContractorResponds' => $countContractorResponds
         ]);
     }
 
@@ -503,6 +521,11 @@ class ConfirmGcpController extends AppUserPartController
             ->andWhere(['confirm_id' => $id])
             ->all();
 
+        $countContractorResponds = (int)RespondsGcp::find(false)
+            ->andWhere(['not', ['contractor_id' => null]])
+            ->andWhere(['confirm_id' => $id])
+            ->count();
+
         return $this->render('view_trash', [
             'model' => $model,
             'gcp' => $gcp,
@@ -512,7 +535,8 @@ class ConfirmGcpController extends AppUserPartController
             'segment' => $segment,
             'project' => $project,
             'questions' => $questions,
-            'searchForm' => new SearchForm()
+            'searchForm' => new SearchForm(),
+            'countContractorResponds' => $countContractorResponds
         ]);
     }
 
@@ -625,8 +649,27 @@ class ConfirmGcpController extends AppUserPartController
             ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
             ->andWhere(['confirm_id' => $id, 'interview_confirm_gcp.status' => '1'])->count();
 
+        $existTasksNotCompleted = ContractorTasks::find()
+            ->andWhere(['type' => StageExpertise::CONFIRM_GCP])
+            ->andWhere(['hypothesis_id' => $model->getId()])
+            ->andWhere(['in', 'status', [
+                ContractorTasks::TASK_STATUS_NEW,
+                ContractorTasks::TASK_STATUS_PROCESS,
+                ContractorTasks::TASK_STATUS_COMPLETED,
+                ContractorTasks::TASK_STATUS_RETURNED
+            ]])
+            ->exists();
+
         if(Yii::$app->request->isAjax) {
 
+            if (!$model->mvps && $existTasksNotCompleted) {
+
+                $response = ['not_completed_descInterviews' => true];
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
+
+            }
             if (!$model->mvps && (count($model->responds) > $count_descInterview)) {
 
                 $response = ['not_completed_descInterviews' => true];

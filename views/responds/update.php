@@ -17,7 +17,9 @@ use yii\helpers\Html;
 ?>
 
 
-<?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) && $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE) :?>
+<?php if ($isOnlyNotDelete && User::isUserSimple(Yii::$app->user->identity['username']) &&
+    $confirm->hypothesis->getExistConfirm() === StatusConfirmHypothesis::MISSING_OR_INCOMPLETE
+    && !$model->getContractorId()) :?>
 
 
     <?php $form = ActiveForm::begin([

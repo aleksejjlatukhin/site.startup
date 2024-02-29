@@ -59,7 +59,7 @@ $(document).ready(function() {
     //$('.catalog').dcAccordion({speed:300});
 
     /*
-    Открываем при загругрузке страницы событием click дефолтные вкладки на страницах подтверждений
+    Открываем при загрузке страницы событием click дефолтные вкладки на страницах подтверждений
     */
     var url_pathname = location.pathname;
     var array_search_results = [
@@ -144,6 +144,31 @@ $(document).on('click', 'body .openAllInformationSegment', function(e) {
 
     var url = $(this).attr('href');
     var modal = $('#data_segment_modal');
+    var container = $(modal).find('.modal-body');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            $(modal).modal('show');
+            $(container).html(response.renderAjax);
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+/*
+Добавляем контент в окно просмотра данных подтверждения гипотезы
+ */
+$(document).on('click', 'body .openDataConfirmHypothesis', function(e) {
+
+    var url = $(this).attr('href');
+    var modal = $('#data_confirm_hypothesis_modal');
     var container = $(modal).find('.modal-body');
 
     $.ajax({
@@ -462,6 +487,9 @@ $(document).on('beforeSubmit', '#taskCreateForm', function(e){
         success: function(response){
 
             $(task_create_modal).find('.modal-body').html(response.renderAjax);
+            if (response.reloadPage == true) {
+                window.location.reload();
+            }
         }
     });
 

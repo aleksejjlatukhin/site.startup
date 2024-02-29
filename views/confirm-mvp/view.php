@@ -40,6 +40,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -215,7 +216,8 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
         <?= $this->render('ajax_data_confirm', [
             'model' => $model,
             'mvp' => $mvp,
-            'formUpdateConfirmMvp' => $formUpdateConfirmMvp
+            'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -638,6 +640,7 @@ $this->registerCssFile('@web/css/confirm-mvp-view-style.css');
                 'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
                 'model' => $model,
                 'mvp' => $mvp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

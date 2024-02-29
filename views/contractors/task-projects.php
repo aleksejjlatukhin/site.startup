@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use app\models\User;
 
 $this->title = 'Задания по проектам';
-$this->registerCssFile('@web/css/profile-data-style.css');
+$this->registerCssFile('@web/css/notifications-style.css');
 
 /**
  * @var User $contractor
@@ -49,11 +49,7 @@ $this->registerCssFile('@web/css/profile-data-style.css');
 
                     </div>
 
-                    <div class="row container-fluid">
-                        <div class="col-md-12">
-                            <div class="hereAddProjectTasks"></div>
-                        </div>
-                    </div>
+                    <div class="hereAddProjectTasks"></div>
 
                 </div>
 

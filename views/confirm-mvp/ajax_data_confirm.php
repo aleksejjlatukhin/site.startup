@@ -13,6 +13,7 @@ use app\models\User;
  * @var ConfirmMvp $model
  * @var Mvps $mvp
  * @var FormUpdateConfirmMvp $formUpdateConfirmMvp
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -79,6 +80,14 @@ use app\models\User;
                 <div class="col-md-12">Формулировка минимально жизнеспособного продукта, который проверяем</div>
                 <div class="col-md-12"><?= $mvp->getDescription() ?></div>
             </div>
+
+            <?php if (User::isUserSimple(Yii::$app->user->identity['username'])): ?>
+                <div class="row">
+                    <div class="col-md-12">Количество респондентов, занятых исполнителями:
+                        <span><?= $countContractorResponds ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="row">
                 <div class="col-md-12">Количество респондентов, подтвердивших ценностное предложение:
@@ -151,6 +160,17 @@ use app\models\User;
 
             </div>
 
+            <div class="row pt-10">
+                <div class="col-xs-12 pl-20">
+                    <span class="bolder">
+                        Количество респондентов, занятых исполнителями:
+                    </span>
+                    <span>
+                        <?= $countContractorResponds ?>
+                    </span>
+                </div>
+            </div>
+
             <div class="row desktop-pt-5 desktop-pb-5 mt-15">
 
                 <?= $form->field($formUpdateConfirmMvp, 'count_respond', [
@@ -161,7 +181,8 @@ use app\models\User;
                         'required' => true,
                         'class' => 'style_form_field_respond form-control',
                         'id' => 'confirm_count_respond',
-                        'autocomplete' => 'off'
+                        'autocomplete' => 'off',
+                        'min' => $countContractorResponds
                     ])
                 ?>
 

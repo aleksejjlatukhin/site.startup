@@ -6,6 +6,7 @@ namespace app\models\forms;
 use app\models\Projects;
 use app\models\SegmentRequirement;
 use app\models\Segments;
+use Yii;
 use yii\base\ErrorException;
 use yii\web\NotFoundHttpException;
 
@@ -33,7 +34,7 @@ class FormCreateSegment extends FormSegment
     {
         $this->setProjectId($project->getId());
         $this->_cacheManager = new CacheForm();
-        $this->cachePath = self::getCachePath($project);
+        $this->cachePath = self::getCachePath($project->getId());
         $cacheName = 'formCreateHypothesisCache';
         if ($cache = $this->_cacheManager->getCache($this->cachePath, $cacheName)) {
             $className = explode('\\', self::class)[3];
@@ -59,13 +60,12 @@ class FormCreateSegment extends FormSegment
 
 
     /**
-     * @param Projects $project
+     * @param int $projectId
      * @return string
      */
-    public static function getCachePath(Projects $project): string
+    public static function getCachePath(int $projectId): string
     {
-        $user = $project->user;
-        return '../runtime/cache/forms/user-'.$user->getId(). '/projects/project-'.$project->getId().'/segments/formCreate/';
+        return '../runtime/cache/forms/user-'.Yii::$app->user->getId(). '/projects/project-'.$projectId.'/segments/formCreate/';
     }
 
 
@@ -132,6 +132,12 @@ class FormCreateSegment extends FormSegment
                 $segment->setQuantity($this->getQuantity());
                 $segment->setMarketVolume(((($this->getIncomeFrom() + $this->getIncomeTo()) * 6) * $this->getQuantity()) / 1000000);
                 $segment->setAddInfo($this->getAddInfoB2c());
+                if ($this->getContractorId()) {
+                    $segment->setContractorId($this->getContractorId());
+                }
+                if ($this->getTaskId()) {
+                    $segment->setTaskId($this->getTaskId());
+                }
 
                 if ($segment->save()) {
                     $this->_cacheManager->deleteCache($this->cachePath); // Удаление кэша формы создания
@@ -151,6 +157,12 @@ class FormCreateSegment extends FormSegment
                 $segment->setIncomeTo($this->getIncomeCompanyTo());
                 $segment->setMarketVolume((($this->getIncomeCompanyFrom() + $this->getIncomeCompanyTo()) / 2) * $this->getQuantityB2b());
                 $segment->setAddInfo($this->getAddInfoB2b());
+                if ($this->getContractorId()) {
+                    $segment->setContractorId($this->getContractorId());
+                }
+                if ($this->getTaskId()) {
+                    $segment->setTaskId($this->getTaskId());
+                }
 
                 if ($segment->save()) {
                     if ($this->getRequirementId()) {

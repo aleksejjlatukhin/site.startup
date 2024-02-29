@@ -97,7 +97,11 @@ class CreateRespondMvpForm extends FormCreateRespondent
      */
     public function uniqueName($attr)
     {
-        $models = RespondsMvp::findAll(['confirm_id' => $this->getConfirmId()]);
+        $models = RespondsMvp::findAll([
+            'confirm_id' => $this->getConfirmId(),
+            'task_id' => null,
+            'contractor_id' => null
+        ]);
 
         foreach ($models as $item){
 

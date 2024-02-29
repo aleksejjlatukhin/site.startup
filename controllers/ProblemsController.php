@@ -6,6 +6,7 @@ use app\models\ClientSettings;
 use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmSegment;
+use app\models\ContractorTasks;
 use app\models\ExpectedResultsInterviewConfirmProblem;
 use app\models\forms\CacheForm;
 use app\models\forms\FormUpdateProblem;
@@ -307,18 +308,37 @@ class ProblemsController extends AppUserPartController
 
     /**
      * @param int $id
+     * @param int|null $taskId
+     * @return bool
+     * @throws Throwable
      */
-    public function actionSaveCacheCreationForm(int $id): void
+    public function actionSaveCacheCreationForm(int $id, int $taskId = null): bool
     {
-        $confirmSegment = ConfirmSegment::findOne($id);
-        $cachePath = FormCreateProblem::getCachePath($confirmSegment->hypothesis);
-        $cacheName = 'formCreateHypothesisCache';
-
         if(Yii::$app->request->isAjax) {
+
+            try {
+                if (!$taskId) {
+                    $confirmSegment = ConfirmSegment::findOne($id);
+                } else {
+                    $task = ContractorTasks::findOne($taskId);
+                    $confirmSegment = ConfirmSegment::findOne($task->getHypothesisId());
+                    if ($task->getStatus() === ContractorTasks::TASK_STATUS_NEW) {
+                        $task->changeStatus(ContractorTasks::TASK_STATUS_PROCESS);
+                    }
+                }
+
+            } catch (\Exception $exception) {
+                return false;
+            }
+
+            $segment = $confirmSegment->hypothesis;
+            $cachePath = FormCreateProblem::getCachePath($segment);
+            $cacheName = 'formCreateHypothesisCache';
 
             $cache = new CacheForm();
             $cache->setCache($cachePath, $cacheName);
         }
+        return false;
     }
 
 
@@ -562,6 +582,7 @@ class ProblemsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
@@ -579,6 +600,7 @@ class ProblemsController extends AppUserPartController
      * @return void|Response
      * @throws HttpException
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionRecovery(int $id)
     {

@@ -2,11 +2,13 @@
 
 use app\models\ConfirmSegment;
 use app\models\Projects;
+use app\models\User;
 use yii\helpers\Html;
 
 /**
  * @var ConfirmSegment $model
  * @var Projects $project
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -45,6 +47,14 @@ use yii\helpers\Html;
             <div class="col-md-12">Причина и тема (что побудило) для проведения исследования</div>
             <div class="col-md-12"><?= $model->getReasonInterview() ?></div>
         </div>
+
+        <?php if (User::isUserSimple(Yii::$app->user->identity['username'])): ?>
+            <div class="row">
+                <div class="col-md-12">Количество респондентов, занятых исполнителями:
+                    <span><?= $countContractorResponds ?></span>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <div class="row">
             <div class="col-md-12">Планируемое количество респондентов:

@@ -1,5 +1,6 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
+var module = (window.location.pathname).split('/')[1];
 
 $(document).ready(function() {
 
@@ -62,8 +63,13 @@ $(body).on('click', '.open_modal_instruction_page', function (e) {
 //Отслеживаем изменения в форме создания проблемы и записываем их в кэш
 $(body).on('change', 'form#hypothesisCreateForm', function(){
 
-    var url = '/problems/save-cache-creation-form?id=' + id_page;
-    var data = $(this).serialize();
+    var url, data
+    if (module === 'contractor') {
+        url = '/problems/save-cache-creation-form?id=0&taskId=' + id_page;
+    } else {
+        url = '/problems/save-cache-creation-form?id=' + id_page;
+    }
+    data = $(this).serialize();
     $.ajax({url: url, data: data, method: 'POST', cache: false});
 });
 
@@ -185,7 +191,11 @@ $(body).on('beforeSubmit', '#hypothesisCreateForm', function(e){
 
             if (response.count === '1') {
                 $('.hypothesis_create_modal').modal('hide');
-                location.href = '/problems/index?id=' + id;
+                if (module === 'contractor') {
+                    location.href = '/contractor/problems/task?id=' + id;
+                } else {
+                    location.href = '/problems/index?id=' + id;
+                }
             } else {
                 $('.hypothesis_create_modal').modal('hide');
                 $('.block_all_hypothesis').html(response.renderAjax);
@@ -462,4 +472,136 @@ $(body).on('click', '.remove-expectedResults', function(){
 
     var hypothesis_update_modal = $('.hypothesis_update_modal');
     $(hypothesis_update_modal).find('.row-expectedResults-' + numberId).remove();
+});
+
+
+
+// Показать форму завершения задания
+$(body).on('click', '.showTaskFormComplete', function (e) {
+
+    $('.blockTaskCompleteForm').toggle('display');
+    $(this).toggle('display');
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Скрыть форму завершения задания
+$(body).on('click', '.hiddenTaskFormComplete', function (e) {
+
+    $('.blockTaskCompleteForm').toggle('display');
+    $('.showTaskFormComplete').toggle('display');
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Сохранение формы завершения задания исполнителем
+$(body).on('beforeSubmit', 'form#completeTaskForm', function (e) {
+
+    var form = $(this);
+    var url = $(this).attr('action');
+    var formData = new FormData(form[0]);
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        processData: false,
+        contentType: false,
+        data:  formData,
+        cache: false,
+        success: function(response){
+            if (response.success) {
+                location.reload();
+            }
+        }
+    });
+
+    e.preventDefault();
+    return false;
+});
+
+
+//Добавление файлов при завершении задания
+$(body).on('change', 'input[type=file]',function(){
+
+    for (var i = 0; i < this.files.length; i++) {
+        console.log(this.files[i].name);
+    }
+
+    //Количество добавленных файлов
+    var add_count = this.files.length;
+
+    if(add_count > 5) {
+        //Сделать кнопку отправки формы не активной
+        $(body).find('#submitTaskComplete').attr('disabled', true);
+        $(body).find('.error_files_count').show();
+    }else {
+        //Сделать кнопку отправки формы активной
+        $(body).find('#submitTaskComplete').attr('disabled', false);
+        $(body).find('.error_files_count').hide();
+    }
+
+});
+
+
+//Добавление файлов при повторном завершении задания
+$(body).on('change', 'input[type=file]',function(){
+
+    for (var i = 0; i < this.files.length; i++) {
+        console.log(this.files[i].name);
+    }
+
+    //Количество файлов уже загруженных
+    var count_exist_files = $(body).find('.block_all_files').children('div').length;
+    //Общее количество файлов
+    var countAllFiles = this.files.length + count_exist_files;
+
+    if(countAllFiles > 5) {
+        //Сделать кнопку отправки формы не активной
+        $(body).find('#submitTaskComplete').attr('disabled', true);
+        $(body).find('.error_files_count').show();
+    }else {
+        //Сделать кнопку отправки формы активной
+        $(body).find('#submitTaskComplete').attr('disabled', false);
+        $(hypothesis_update_modal).find('.error_files_count').hide();
+    }
+
+});
+
+
+//Удаление файла при повторном завершении задания
+$(body).on('click', '.delete_file', function(e){
+
+    var deleteFileId = $(this).attr('id');
+    deleteFileId = deleteFileId.split('-');
+    deleteFileId = deleteFileId[1];
+    var url = $(this).attr('href');
+
+    $.ajax({
+
+        url: url,
+        method: 'POST',
+        cache: false,
+        success: function(response){
+
+            if (response.success) {
+
+                //Удаляем блок с файлом
+                $(body).find('.one_block_file-' + deleteFileId).remove();
+
+                if (response.count_files === 4){
+                    $(body).find('.add_files').show();
+                    $(body).find('.add_max_files_text').hide();
+                }
+            }
+        }, error: function(){
+            alert('Ошибка');
+        }
+    });
+
+    e.preventDefault();
+    return false;
 });

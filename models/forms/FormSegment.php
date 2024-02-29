@@ -39,6 +39,8 @@ use yii\base\Model;
  * @property string $add_info_b2b                                   Дополнительная информация b2b
  * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
  * @property int|null $requirement_id                               Идентификатор запроса из виш-листа
+ * @property int|null $contractor_id                                Идентификатор исполнителя, создавшего сегмент (если null - сегмент создан проектантом)
+ * @property int|null $task_id                                      Идентификатор задания исполнителя, по которому создан сегмент (если null - сегмент создан проектантом)
  */
 abstract class FormSegment extends Model
 {
@@ -69,6 +71,8 @@ abstract class FormSegment extends Model
     public $add_info_b2b;
     public $use_wish_list;
     public $requirement_id;
+    public $contractor_id;
+    public $task_id;
 
 
     /**
@@ -111,6 +115,7 @@ abstract class FormSegment extends Model
                 Segments::USE_WISH_LIST,
                 Segments::NOT_USE_WISH_LIST,
             ]],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -570,6 +575,38 @@ abstract class FormSegment extends Model
     public function setAddInfoB2b(string $add_info_b2b): void
     {
         $this->add_info_b2b = $add_info_b2b;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 
 }

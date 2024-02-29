@@ -1,7 +1,8 @@
 //Установка Simple ScrollBar
 const simpleBar = new SimpleBar(document.getElementById('simplebar-shared-container'));
 const confirmId = (window.location.search).split('?id=')[1];
-const action = window.location.pathname.split('/')[2];
+const isContractorModule = (window.location.pathname).split('/')[1] === 'contractor';
+const action = !isContractorModule ? window.location.pathname.split('/')[2] : window.location.pathname.split('/')[3];
 var body = $('body');
 
 //Выполнить при загрузке страницы
@@ -31,15 +32,15 @@ function getQueryResponds() {
     var url
     if ($(window).width() <= '480') {
         if (action === 'view-trash') {
-            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true&isOnlyNotDelete=false';
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true&isOnlyNotDelete=false&isModuleContractor=' + isContractorModule;
         } else {
-            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true';
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isMobile=true&isModuleContractor=' + isContractorModule;
         }
     } else {
         if (action === 'view-trash') {
-            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isOnlyNotDelete=false';
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isOnlyNotDelete=false&isModuleContractor=' + isContractorModule;
         } else {
-            url = '/responds/get-query-responds?stage=2&id=' + confirmId;
+            url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&isModuleContractor=' + isContractorModule;
         }
     }
     $.ajax({
@@ -373,7 +374,7 @@ $(window).on('scroll', function() {
 // Отслеживаем клик вне поля Select
 $(document).mouseup(function (e){ // событие клика по веб-документу
 
-    if (action !== 'view-trash') {
+    if (!isContractorModule && action !== 'view-trash') {
         var search = $('.select2-container--krajee .select2-search--dropdown .select2-search__field'); // поле поиска в select
         var button = $('#button_add_text_question_confirm'); // кнопка открытия и закрытия списка select
 
@@ -456,9 +457,9 @@ $(body).on('change', 'form#new_respond_form', function(){
 
 
 //Поиск респондентов в мобильной версии
-$(body).on('change', 'input#search_input_responds_mobile', function () {
+$(body).on('input', 'input#search_input_responds_mobile', function () {
     var search = $('input#search_input_responds_mobile').val();
-    var url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&search=' + search + '&isMobile=true';
+    var url = '/responds/get-query-responds?stage=2&id=' + confirmId + '&search=' + search + '&isMobile=true&isModuleContractor=' + isContractorModule;
 
     $.ajax({
         url: url,
@@ -474,6 +475,9 @@ $(body).on('change', 'input#search_input_responds_mobile', function () {
 //При нажатии на кнопку Добавить респондента
 $(body).on('click', '#showRespondCreateForm', function(e){
 
+    if (isContractorModule) {
+        $('#formUpdateRespond').remove();
+    }
     var url = $(this).attr('href');
     var respondCreate_modal = $('#respondCreate_modal');
     $(body).append($(respondCreate_modal).first());
@@ -496,6 +500,9 @@ $(body).on('click', '#showRespondCreateForm', function(e){
 //В мобильной версии
 $(body).on('click', '.show_add_respond', function(e){
 
+    if (isContractorModule) {
+        $('#formUpdateRespond').remove();
+    }
     $('.add_respond_block_mobile').toggle('display');
     $('.row_header_data_generation_mobile').toggle('display');
     if ($(this).hasClass('link_add_respond_text')) {
@@ -582,11 +589,21 @@ $(body).on('beforeSubmit', '#new_respond_form', function(e){
 $(body).on('click', '.showRespondUpdateForm', function(e){
 
     var id = $(this).attr('id').split('-')[1];
-    if (action !== 'view-trash') {
-        var url = '/responds/get-data-update-form?stage=2&id=' + id;
+    if (!isContractorModule) {
+        if (action !== 'view-trash') {
+            var url = '/responds/get-data-update-form?stage=2&id=' + id;
+        } else {
+            var url = '/responds/get-data-update-form?stage=2&id=' + id + '&isOnlyNotDelete=false';
+        }
     } else {
-        var url = '/responds/get-data-update-form?stage=2&id=' + id + '&isOnlyNotDelete=false';
+        $('#formUpdateRespond').remove();
+        if (action !== 'view-trash') {
+            var url = '/contractor/responds/get-data-update-form?stage=2&id=' + id;
+        } else {
+            var url = '/contractor/responds/get-data-update-form?stage=2&id=' + id + '&isOnlyNotDelete=false';
+        }
     }
+
     var respond_update_modal = $('#respond_update_modal');
     $(body).append($(respond_update_modal).first());
 
@@ -657,6 +674,14 @@ $(body).on('beforeSubmit', '#formUpdateRespond', function(e){
                 //Закрываем окно редактирования
                 if (catchChange === true) catchChange = false;
                 $('#respond_update_modal').modal('hide');
+
+                if (isContractorModule) {
+                    $('#respondCreate_modal').modal('hide');
+                    if ($('.add_respond_block_mobile').is(":visible")) {
+                        $('.add_respond_block_mobile').toggle('display');
+                        $('.row_header_data_generation_mobile').toggle('display');
+                    }
+                }
 
             } else {
 
@@ -1017,7 +1042,7 @@ $(body).on('click', '#button_MovingNextStage', function(e){
 
                     //Показываем окно с информацией
                     $(error_respond_modal).find('.modal-header h3').html('Информация');
-                    $(error_respond_modal).find('.modal-body h4').html('Для продолжения Вам необходимо провести интервью со всеми заданными респондентами.');
+                    $(error_respond_modal).find('.modal-body h4').html('Для продолжения Вам необходимо опросить всех заданных респондентов. Если были созданы задания для исполнителей, то они должны быть готовы или отозваны.');
                     $(error_respond_modal).modal('show');
                 }
 
@@ -1085,6 +1110,40 @@ $(body).on('click', '.show_search_responds', function (e) {
 
     $('.search_block_mobile').toggle('display');
     $('.row_header_data_generation_mobile').toggle('display');
+    e.preventDefault();
+    return false;
+});
+
+
+// Показать форму завершения задания
+$(body).on('click', '.buttonShowTaskCompleteForm', function (e) {
+
+    $('.blockTaskCompleteForm').toggle('display');
+    $(this).toggle('display');
+
+    e.preventDefault();
+    return false;
+});
+
+
+// Сохранение формы завершения задания исполнителем
+$(body).on('beforeSubmit', 'form#completeTaskForm', function (e) {
+
+    var data = $(this).serialize();
+    var url = $(this).attr('action');
+
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function(response){
+            if (response.success) {
+                location.reload();
+            }
+        }
+    });
+
     e.preventDefault();
     return false;
 });

@@ -44,6 +44,8 @@ use yii\helpers\FileHelper;
  * @property int|null $enable_expertise_at                          Дата разрешения на экспертизу по даному этапу
  * @property int|null $deleted_at                                   Дата удаления
  * @property int $use_wish_list                                     Параметр использования запроса из виш-листа при формирования сегмента
+ * @property int|null $contractor_id                                Идентификатор исполнителя, создавшего сегмент (если null - сегмент создан проектантом)
+ * @property int|null $task_id                                      Идентификатор задания исполнителя, по которому создан сегмент (если null - сегмент создан проектантом)
  * @property PropertyContainer $propertyContainer                   Свойство для реализации шаблона 'контейнер свойств'
  *
  * @property Projects $project                                      Проект, к которому принадлежит сегмент
@@ -53,6 +55,7 @@ use yii\helpers\FileHelper;
  * @property Mvps[] $mvps                                           Mvp-продукты
  * @property BusinessModel[] $businessModels                        Бизнес-модели
  * @property SegmentRequirement $segmentRequirement                 Связь с запросом B2B компаний
+ * @property User|null $contractor                                  Исполнитель создавший сегмент
  */
 class Segments extends ActiveRecord
 {
@@ -173,6 +176,15 @@ class Segments extends ActiveRecord
     {
         return $this->hasOne(SegmentRequirement::class, ['segment_id' => 'id']);
     }
+
+    /**
+     * Исполнитель создавший сегмент
+     * @return User|null
+     */
+    public function getContractor(): ?User
+    {
+        return $this->getContractorId() ? User::findOne($this->getContractorId()) : null;
+    }
     
 
     /**
@@ -202,6 +214,7 @@ class Segments extends ActiveRecord
                 self::USE_WISH_LIST,
                 self::NOT_USE_WISH_LIST,
             ]],
+            [['contractor_id', 'task_id'], 'safe'],
         ];
     }
 
@@ -342,6 +355,7 @@ class Segments extends ActiveRecord
     /**
      * @param bool $sendCommunications
      * @return false|int
+     * @throws Throwable
      */
     public function softDeleteStage(bool $sendCommunications = true)
     {
@@ -380,6 +394,16 @@ class Segments extends ActiveRecord
 
                 QuestionsConfirmSegment::softDeleteAll(['confirm_id' => $confirm->getId()]);
                 RespondsSegment::softDeleteAll(['confirm_id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Изменение статусов заданий исполнителей на "Удалено"
+                    if (!ContractorTasks::deleteByParams(StageExpertise::CONFIRM_SEGMENT, $confirm->getId()) ||
+                        !ContractorTasks::deleteByParams(StageExpertise::PROBLEM, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
+
                 $confirm->softDelete(['id' => $confirm->getId()]);
             }
 
@@ -406,6 +430,7 @@ class Segments extends ActiveRecord
 
     /**
      * @return false|int
+     * @throws Throwable
      */
     public function recoveryStage()
     {
@@ -442,6 +467,15 @@ class Segments extends ActiveRecord
                 QuestionsConfirmSegment::recoveryAll(['confirm_id' => $confirm->getId()]);
                 RespondsSegment::recoveryAll(['confirm_id' => $confirm->getId()]);
                 $confirm->recovery(['id' => $confirm->getId()]);
+
+                if (User::isUserSimple(Yii::$app->user->identity['username'])) {
+                    // Воостановление статусов заданий исполнителей
+                    if (!ContractorTasks::recoveryByParams(StageExpertise::CONFIRM_SEGMENT, $confirm->getId()) ||
+                        !ContractorTasks::recoveryByParams(StageExpertise::PROBLEM, $confirm->getId())) {
+                        $transaction->rollBack();
+                        return false;
+                    }
+                }
             }
 
             $segmentRequirementExist = SegmentRequirement::find(false)
@@ -934,5 +968,37 @@ class Segments extends ActiveRecord
     public function setDeletedAt(int $deleted_at): void
     {
         $this->deleted_at = $deleted_at;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getContractorId(): ?int
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * @param int $contractor_id
+     */
+    public function setContractorId(int $contractor_id): void
+    {
+        $this->contractor_id = $contractor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTaskId(): ?int
+    {
+        return $this->task_id;
+    }
+
+    /**
+     * @param int $task_id
+     */
+    public function setTaskId(int $task_id): void
+    {
+        $this->task_id = $task_id;
     }
 }

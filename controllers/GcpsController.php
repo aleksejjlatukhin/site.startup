@@ -7,6 +7,7 @@ use app\models\CommunicationResponse;
 use app\models\CommunicationTypes;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\ContractorTasks;
 use app\models\forms\CacheForm;
 use app\models\forms\FormCreateGcp;
 use app\models\Gcps;
@@ -313,19 +314,35 @@ class GcpsController extends AppUserPartController
 
     /**
      * @param int $id
-     * @return void
+     * @param int|null $taskId
+     * @return bool
+     * @throws Throwable
      */
-    public function actionSaveCacheCreationForm(int $id): void
+    public function actionSaveCacheCreationForm(int $id, int $taskId = null): bool
     {
-        $confirmProblem = ConfirmProblem::findOne($id);
-        $cachePath = FormCreateGcp::getCachePath($confirmProblem->hypothesis);
-        $cacheName = 'formCreateHypothesisCache';
-
         if(Yii::$app->request->isAjax) {
+            try {
+                if (!$taskId) {
+                    $confirmProblem = ConfirmProblem::findOne($id);
+                } else {
+                    $task = ContractorTasks::findOne($taskId);
+                    $confirmProblem = ConfirmProblem::findOne($task->getHypothesisId());
+                    if ($task->getStatus() === ContractorTasks::TASK_STATUS_NEW) {
+                        $task->changeStatus(ContractorTasks::TASK_STATUS_PROCESS);
+                    }
+                }
+
+            } catch (\Exception $exception) {
+                return false;
+            }
+
+            $cachePath = FormCreateGcp::getCachePath($confirmProblem->hypothesis);
+            $cacheName = 'formCreateHypothesisCache';
 
             $cache = new CacheForm();
             $cache->setCache($cachePath, $cacheName);
         }
+        return false;
     }
 
 
@@ -521,6 +538,7 @@ class GcpsController extends AppUserPartController
      * @param int $id
      * @return bool
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionDelete(int $id): bool
     {
@@ -538,6 +556,7 @@ class GcpsController extends AppUserPartController
      * @return void|Response
      * @throws HttpException
      * @throws NotFoundHttpException
+     * @throws Throwable
      */
     public function actionRecovery(int $id)
     {

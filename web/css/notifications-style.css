@@ -1,4 +1,5 @@
-.page-notifications {
+.page-notifications,
+.page-contractor-notifications {
     margin-top: 20px;
     margin-bottom: 20px;
 }
@@ -43,7 +44,8 @@
 
 @media screen and (max-width: 480px) {
 
-    .page-notifications {
+    .page-notifications,
+    .page-contractor-notifications {
         background: #F2F2F2;
         margin: 0 0 -20px 0;
         padding: 0;
@@ -101,6 +103,17 @@
         padding-left: 10px;
         padding-right: 10px;
     }
+
+    .page-contractor-notifications .container-one_hypothesis,
+    .communication-projects .container-one_hypothesis,
+    .task-projects .container-one_hypothesis {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        min-height: 100px;
+    }
 }
 
 @media screen and (min-width: 481px) {
@@ -133,6 +146,11 @@
     min-height: 60px;
     background: #E0E0E0;
     font-weight: 700;
+}
+
+.task-projects .row.headers_data_notifications > div,
+.communication-projects .row.headers_data_notifications > div {
+    text-align: left;
 }
 .row.headers_data_notifications > div {
     text-align: center;

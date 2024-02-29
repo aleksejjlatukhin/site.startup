@@ -7,6 +7,7 @@ use app\models\ConfirmGcp;
 use app\models\ConfirmMvp;
 use app\models\ConfirmProblem;
 use app\models\ConfirmSegment;
+use app\models\ContractorTasks;
 use app\models\forms\CacheForm;
 use app\models\forms\CreateRespondGcpForm;
 use app\models\forms\CreateRespondMvpForm;
@@ -27,9 +28,9 @@ use app\models\RespondsMvp;
 use app\models\RespondsProblem;
 use app\models\RespondsSegment;
 use app\models\StageConfirm;
+use app\models\User;
 use Throwable;
 use yii\base\ErrorException;
-use yii\data\Pagination;
 use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
@@ -70,6 +71,12 @@ class RespondsController extends AppUserPartController
                 return parent::beforeAction($action);
             }
 
+            if ($model->getContractorId() === Yii::$app->user->getId()) {
+                // ОТКЛЮЧАЕМ CSRF
+                $this->enableCsrfValidation = false;
+                return parent::beforeAction($action);
+            }
+
             PatternHttpException::noAccess();
 
         }elseif ($action->id === 'create'){
@@ -103,66 +110,73 @@ class RespondsController extends AppUserPartController
      */
     public function actionDataAvailability(int $stage, int $id)
     {
-        $count_models = 0; // Кол-во респондентов подтверждения
-        $count_exist_data_respond = 0; // Кол-во респондентов, у кот-х заполнены данные
-        $count_exist_data_descInterview = 0; // Кол-во респондентов, у кот-х существует интервью
-
-        if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-
-            $count_models = RespondsSegment::find()->andWhere(['confirm_id' => $id])->count();
-
-            $count_exist_data_respond = RespondsSegment::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
-                ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
-
-            $count_exist_data_descInterview = RespondsSegment::find()->with('interview')
-                ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
-                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
-
-        } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-
-            $count_models = RespondsProblem::find()->andWhere(['confirm_id' => $id])->count();
-
-            $count_exist_data_respond = RespondsProblem::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
-                ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
-
-            $count_exist_data_descInterview = RespondsProblem::find()->with('interview')
-                ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
-                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
-
-        } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-
-            $count_models = RespondsGcp::find()->andWhere(['confirm_id' => $id])->count();
-
-            $count_exist_data_respond = RespondsGcp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
-                ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
-
-            $count_exist_data_descInterview = RespondsGcp::find()->with('interview')
-                ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
-                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
-
-        } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-
-            $count_models = RespondsMvp::find()->andWhere(['confirm_id' => $id])->count();
-
-            $count_exist_data_respond = RespondsMvp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
-                ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
-
-            $count_exist_data_descInterview = RespondsMvp::find()->with('interview')
-                ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
-                ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
-        }
-
-
         if(Yii::$app->request->isAjax) {
 
-            if (($count_exist_data_respond === $count_models) || ($count_exist_data_descInterview > 0)) {
-
+            if (User::isUserSimple(Yii::$app->user->identity['username']) || User::isUserContractor(Yii::$app->user->identity['username'])) {
                 $response =  ['success' => true];
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 Yii::$app->response->data = $response;
                 return $response;
-
             }
+
+//            TODO: Скорее всего эти ограничения более не акутуальны
+//            $count_models = 0; // Кол-во респондентов подтверждения
+//            $count_exist_data_respond = 0; // Кол-во респондентов, у кот-х заполнены данные
+//            $count_exist_data_descInterview = 0; // Кол-во респондентов, у кот-х существует интервью
+//
+//            if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
+//
+//                $count_models = RespondsSegment::find()->andWhere(['confirm_id' => $id])->count();
+//
+//                $count_exist_data_respond = RespondsSegment::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+//                    ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
+//
+//                $count_exist_data_descInterview = RespondsSegment::find()->with('interview')
+//                    ->leftJoin('interview_confirm_segment', '`interview_confirm_segment`.`respond_id` = `responds_segment`.`id`')
+//                    ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_segment.id' => null]])->count();
+//
+//            } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
+//
+//                $count_models = RespondsProblem::find()->andWhere(['confirm_id' => $id])->count();
+//
+//                $count_exist_data_respond = RespondsProblem::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+//                    ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
+//
+//                $count_exist_data_descInterview = RespondsProblem::find()->with('interview')
+//                    ->leftJoin('interview_confirm_problem', '`interview_confirm_problem`.`respond_id` = `responds_problem`.`id`')
+//                    ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_problem.id' => null]])->count();
+//
+//            } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
+//
+//                $count_models = RespondsGcp::find()->andWhere(['confirm_id' => $id])->count();
+//
+//                $count_exist_data_respond = RespondsGcp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+//                    ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
+//
+//                $count_exist_data_descInterview = RespondsGcp::find()->with('interview')
+//                    ->leftJoin('interview_confirm_gcp', '`interview_confirm_gcp`.`respond_id` = `responds_gcp`.`id`')
+//                    ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_gcp.id' => null]])->count();
+//
+//            } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
+//
+//                $count_models = RespondsMvp::find()->andWhere(['confirm_id' => $id])->count();
+//
+//                $count_exist_data_respond = RespondsMvp::find()->andWhere(['confirm_id' => $id])->andWhere(['not', ['info_respond' => '']])
+//                    ->andWhere(['not', ['date_plan' => null]])->andWhere(['not', ['place_interview' => '']])->count();
+//
+//                $count_exist_data_descInterview = RespondsMvp::find()->with('interview')
+//                    ->leftJoin('interview_confirm_mvp', '`interview_confirm_mvp`.`respond_id` = `responds_mvp`.`id`')
+//                    ->andWhere(['confirm_id' => $id])->andWhere(['not', ['interview_confirm_mvp.id' => null]])->count();
+//            }
+//
+//            if (($count_exist_data_respond === $count_models) || ($count_exist_data_descInterview > 0)) {
+//
+//                $response =  ['success' => true];
+//                Yii::$app->response->format = Response::FORMAT_JSON;
+//                Yii::$app->response->data = $response;
+//                return $response;
+//
+//            }
 
             $response = ['error' => true];
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -233,8 +247,8 @@ class RespondsController extends AppUserPartController
         $newRespond = $this::getCreateModel($stage, $confirm);
         $newRespond->setConfirmId($id);
 
-        if ($newRespond->load(Yii::$app->request->post()))
-        {
+        if ($newRespond->load(Yii::$app->request->post())) {
+
             if(Yii::$app->request->isAjax) {
 
                 if ($confirm->checkingLimitCountRespond()) {
@@ -398,12 +412,24 @@ class RespondsController extends AppUserPartController
      * @param string $search
      * @param bool $isMobile
      * @param bool $isOnlyNotDelete
+     * @param bool $isModuleContractor
      * @return array|bool
      */
-    public function actionGetQueryResponds(int $stage, int $id, string $search = '', bool $isMobile = false, bool $isOnlyNotDelete = true)
+    public function actionGetQueryResponds(int $stage, int $id, string $search = '', bool $isMobile = false, bool $isOnlyNotDelete = true, bool $isModuleContractor = false)
     {
+        $task = null;
+        if ($isModuleContractor) {
+            $task = ContractorTasks::findOne($id);
+            $id = $task->getHypothesisId();
+        }
+
         $confirm = self::getConfirm($stage, $id, $isOnlyNotDelete);
         $queryResponds = self::getQueryModels($stage, $id, $search, $isOnlyNotDelete);
+        if ($task && $task->activity->getTitle() === 'Полевая работа') {
+            $queryResponds->andWhere(['task_id' => $task->getId()]);
+        }
+
+        $currentTaskId = $task ? $task->getId() : null;
         $responds = $queryResponds->all();
 
         if(Yii::$app->request->isAjax) {
@@ -412,19 +438,19 @@ class RespondsController extends AppUserPartController
 
             if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmSegment', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete, 'isModuleContractor' => $isModuleContractor, 'currentTaskId' => $currentTaskId])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmProblem', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete, 'isModuleContractor' => $isModuleContractor, 'currentTaskId' => $currentTaskId])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmGcp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete, 'isModuleContractor' => $isModuleContractor, 'currentTaskId' => $currentTaskId])];
 
             } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
                 $response = ['ajax_data_responds' => $this->renderAjax('respondsForConfirmMvp', [
-                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete])];
+                    'confirm' => $confirm, 'responds' => $responds, 'isMobile' => $isMobile, 'isOnlyNotDelete' => $isOnlyNotDelete, 'isModuleContractor' => $isModuleContractor, 'currentTaskId' => $currentTaskId])];
             }
 
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -452,68 +478,112 @@ class RespondsController extends AppUserPartController
 
         if (Yii::$app->request->isAjax){
 
-            if ($confirm->getCountRespond() === 1){
+            if (User::isUserSimple(Yii::$app->user->identity['username'])) {
 
-                $response = ['zero_value_responds' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
-            elseif ($confirm->getCountRespond() === $confirm->getCountPositive()){
+                if ($confirm->getCountRespond() === 1){
 
-                $response = ['number_less_than_allowed' => true];
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                Yii::$app->response->data = $response;
-                return $response;
-            }
-            else {
-
-                if ($model->delete()) {
-
-                    //Обновление данных подтверждения
-                    $confirm->setCountRespond(--$confirm->count_respond);
-                    $confirm->save();
-
-                    $response = array();
-
-                    if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
-                        $response = [
-                            'success' => true, 'confirm_id' => $model->getConfirmId(),
-                            'ajax_data_confirm' => $this->renderAjax('/confirm-segment/ajax_data_confirm', [
-                                'model' => ConfirmSegment::findOne($model->getConfirmId()), 'project' => $project,
-                                'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->getConfirmId())]),
-                        ];
-
-                    } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
-                        $response = [
-                            'success' => true, 'confirm_id' => $model->getConfirmId(),
-                            'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', [
-                                'model' => ConfirmProblem::findOne($model->getConfirmId()), 'problem' => $hypothesis,
-                                'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->getConfirmId())]),
-                        ];
-
-                    } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
-                        $response = [
-                            'success' => true, 'confirm_id' => $model->getConfirmId(),
-                            'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', [
-                                'model' => ConfirmGcp::findOne($model->getConfirmId()), 'gcp' => $hypothesis,
-                                'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->getConfirmId())]),
-                        ];
-
-                    } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
-                        $response = [
-                            'success' => true, 'confirm_id' => $model->getConfirmId(),
-                            'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', [
-                                'model' => ConfirmMvp::findOne($model->getConfirmId()), 'mvp' => $hypothesis,
-                                'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->getConfirmId())]),
-                        ];
-                    }
-
+                    $response = ['zero_value_responds' => true];
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     Yii::$app->response->data = $response;
                     return $response;
                 }
-                return false;
+                elseif ($confirm->getCountRespond() === $confirm->getCountPositive()){
+
+                    $response = ['number_less_than_allowed' => true];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    Yii::$app->response->data = $response;
+                    return $response;
+                }
+                else {
+
+                    if ($model->delete()) {
+
+                        //Обновление данных подтверждения
+                        $confirm->setCountRespond(--$confirm->count_respond);
+                        $confirm->save();
+
+                        $response = array();
+
+                        if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
+                            $response = [
+                                'success' => true, 'confirm_id' => $model->getConfirmId(),
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-segment/ajax_data_confirm', [
+                                    'model' => ConfirmSegment::findOne($model->getConfirmId()), 'project' => $project,
+                                    'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->getConfirmId())]),
+                            ];
+
+                        } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
+                            $response = [
+                                'success' => true, 'confirm_id' => $model->getConfirmId(),
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', [
+                                    'model' => ConfirmProblem::findOne($model->getConfirmId()), 'problem' => $hypothesis,
+                                    'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->getConfirmId())]),
+                            ];
+
+                        } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
+                            $response = [
+                                'success' => true, 'confirm_id' => $model->getConfirmId(),
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', [
+                                    'model' => ConfirmGcp::findOne($model->getConfirmId()), 'gcp' => $hypothesis,
+                                    'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->getConfirmId())]),
+                            ];
+
+                        } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
+                            $response = [
+                                'success' => true, 'confirm_id' => $model->getConfirmId(),
+                                'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', [
+                                    'model' => ConfirmMvp::findOne($model->getConfirmId()), 'mvp' => $hypothesis,
+                                    'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->getConfirmId())]),
+                            ];
+                        }
+
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        Yii::$app->response->data = $response;
+                        return $response;
+                    }
+                    return false;
+                }
+            }
+
+            if (User::isUserContractor(Yii::$app->user->identity['username']) && $model->clearData()) {
+                $response = array();
+
+                if ($stage === StageConfirm::STAGE_CONFIRM_SEGMENT) {
+                    $response = [
+                        'success' => true, 'confirm_id' => $model->getConfirmId(),
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-segment/ajax_data_confirm', [
+                            'model' => ConfirmSegment::findOne($model->getConfirmId()), 'project' => $project,
+                            'formUpdateConfirmSegment' => new FormUpdateConfirmSegment($model->getConfirmId())]),
+                    ];
+
+                } elseif ($stage === StageConfirm::STAGE_CONFIRM_PROBLEM) {
+                    $response = [
+                        'success' => true, 'confirm_id' => $model->getConfirmId(),
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-problem/ajax_data_confirm', [
+                            'model' => ConfirmProblem::findOne($model->getConfirmId()), 'problem' => $hypothesis,
+                            'formUpdateConfirmProblem' => new FormUpdateConfirmProblem($model->getConfirmId())]),
+                    ];
+
+                } elseif ($stage === StageConfirm::STAGE_CONFIRM_GCP) {
+                    $response = [
+                        'success' => true, 'confirm_id' => $model->getConfirmId(),
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-gcp/ajax_data_confirm', [
+                            'model' => ConfirmGcp::findOne($model->getConfirmId()), 'gcp' => $hypothesis,
+                            'formUpdateConfirmGcp' => new FormUpdateConfirmGcp($model->getConfirmId())]),
+                    ];
+
+                } elseif ($stage === StageConfirm::STAGE_CONFIRM_MVP) {
+                    $response = [
+                        'success' => true, 'confirm_id' => $model->getConfirmId(),
+                        'ajax_data_confirm' => $this->renderAjax('/confirm-mvp/ajax_data_confirm', [
+                            'model' => ConfirmMvp::findOne($model->getConfirmId()), 'mvp' => $hypothesis,
+                            'formUpdateConfirmMvp' => new FormUpdateConfirmMvp($model->getConfirmId())]),
+                    ];
+                }
+
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->data = $response;
+                return $response;
             }
         }
         return false;

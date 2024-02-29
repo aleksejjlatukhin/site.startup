@@ -2,6 +2,20 @@
 
 }
 
+.task-block {
+    padding: 0 2% 10px 2%;
+}
+.task-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: #4F4F4F;
+}
+.task-description {
+    font-size: 16px;
+    font-weight: 400;
+    color: #4F4F4F;
+}
+
 .project_info_data {
     background: #707F99;
 }
@@ -306,6 +320,12 @@
     .container-data,
     .container-data_for_user {
         background-color: #F2F2F2;
+    }
+    .task-header {
+        color: #FFFFFF;
+    }
+    .task-description {
+        color: #FFFFFF;
     }
 }
 

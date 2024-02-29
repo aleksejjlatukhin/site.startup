@@ -14,11 +14,8 @@ use app\models\Segments;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
-use kartik\select2\Select2;
 use app\models\User;
-use app\models\QuestionStatus;
 
 $this->title = 'Подтверждение гипотез ценностных предложений';
 $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
@@ -35,6 +32,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
  * @var ConfirmSegment $confirmSegment
  * @var Segments $segment
  * @var Projects $project
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -197,9 +195,10 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
     <!--ПРОГРАММА ПОДТВЕРЖДЕНИЯ ГПС (ШАГ 1)-->
     <div id="step_one" class="tabcontent row">
         <?= $this->render('ajax_data_confirm', [
-                'model' => $model,
-                'gcp' => $gcp,
-                'formUpdateConfirmGcp' => $formUpdateConfirmGcp
+            'model' => $model,
+            'gcp' => $gcp,
+            'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -409,6 +408,7 @@ $this->registerCssFile('@web/css/confirm-gcp-add_questions-style.css');
                 'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
                 'model' => $model,
                 'gcp' => $gcp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

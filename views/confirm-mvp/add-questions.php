@@ -16,11 +16,8 @@ use app\models\Segments;
 use app\models\StatusConfirmHypothesis;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use app\models\User;
-use kartik\select2\Select2;
-use app\models\QuestionStatus;
 
 $this->title = 'Подтверждение MVP';
 $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
@@ -39,6 +36,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
  * @var QuestionsConfirmMvp[] $questions
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -210,7 +208,8 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
         <?= $this->render('ajax_data_confirm', [
             'model' => $model,
             'mvp' => $mvp,
-            'formUpdateConfirmMvp' => $formUpdateConfirmMvp
+            'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -425,6 +424,7 @@ $this->registerCssFile('@web/css/confirm-mvp-add_questions-style.css');
                 'formUpdateConfirmMvp' => $formUpdateConfirmMvp,
                 'model' => $model,
                 'mvp' => $mvp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 

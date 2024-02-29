@@ -36,6 +36,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
  * @var FormCreateQuestion $newQuestion
  * @var array $queryQuestions
  * @var SearchForm $searchForm
+ * @var int $countContractorResponds
  */
 
 ?>
@@ -206,7 +207,8 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
         <?= $this->render('ajax_data_confirm', [
             'model' => $model,
             'gcp' => $gcp,
-            'formUpdateConfirmGcp' => $formUpdateConfirmGcp
+            'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
+            'countContractorResponds' => $countContractorResponds
         ]) ?>
     </div>
 
@@ -495,6 +497,7 @@ $this->registerCssFile('@web/css/confirm-gcp-view-style.css');
                 'formUpdateConfirmGcp' => $formUpdateConfirmGcp,
                 'model' => $model,
                 'gcp' => $gcp,
+                'countContractorResponds' => $countContractorResponds
             ]) ?>
         </div>
 
